@@ -1,0 +1,2 @@
+// React Query hooks barrel file
+// Each domain will have its own file here: useHabits.ts, useTransactions.ts, etc.
