@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { UserPlus, Mail, Eye, EyeOff, User, Sparkles, Flame, Award, ArrowRight } from "lucide-react";
 import { useAuth } from "@/components/shared/AuthProvider";
+import { InvictusLogo } from "@/components/shared/InvictusLogo";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -66,21 +67,11 @@ export default function SignupPage() {
     <div className="w-full max-w-md mx-auto py-4">
       <div className="bg-white/95 backdrop-blur-md border-3 border-amber-300/80 rounded-[32px] p-6 sm:p-8 shadow-[0_16px_40px_rgba(245,185,66,0.18)] space-y-5 relative overflow-hidden">
         
-        {/* Header Badge */}
-        <div className="text-center space-y-1.5">
-          <div className="inline-flex h-14 w-14 rounded-3xl bg-amber-400 border-2 border-amber-500 shadow-md items-center justify-center text-navy-900 text-3xl font-black transform hover:rotate-6 transition-transform cursor-pointer">
-            ✨
-          </div>
-          <div>
-            <h2
-              className="text-2xl font-black text-navy-900 tracking-tight"
-              style={{ fontFamily: "var(--font-heading)" }}
-            >
-              Join Invictus
-            </h2>
-            <p className="text-navy-600 text-xs font-bold mt-0.5">
-              Start tracking goals, study & money in one playful dashboard! 🌟
-            </p>
+        {/* Header Mascot Badge */}
+        <div className="flex items-center justify-between border-b-2 border-navy-950/10 pb-3 mb-2">
+          <InvictusLogo size="md" variant="full" href="/signup" />
+          <div className="bg-emerald-300 text-navy-950 text-[10px] font-black px-2.5 py-1 rounded-xl border border-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)] uppercase">
+            Create Account
           </div>
         </div>
 

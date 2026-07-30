@@ -12,11 +12,15 @@ import {
   Settings,
   User,
   PieChart,
+  CheckSquare,
+  Trophy,
+  TrendingUp,
+  ShieldCheck,
 } from "lucide-react";
 
 import { useUIStore } from "@/store/ui-store";
-import { CheckSquare, Trophy, TrendingUp, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { InvictusLogo } from "@/components/shared/InvictusLogo";
 
 function SidebarContent() {
   const pathname = usePathname();
@@ -79,13 +83,8 @@ function SidebarContent() {
     <aside className="hidden lg:flex flex-col w-64 bg-white border-r border-border/70 h-screen sticky top-0 p-6 justify-between select-none shadow-xs">
       <div className="space-y-8">
         {/* Logo */}
-        <div className="flex items-center gap-2 px-2">
-          <span
-            className="text-2xl font-black tracking-tight text-navy-900"
-            style={{ fontFamily: "var(--font-heading)" }}
-          >
-            Invictus
-          </span>
+        <div className="px-1">
+          <InvictusLogo size="md" variant="full" href="/today" />
         </div>
 
         {/* Links */}

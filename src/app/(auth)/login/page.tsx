@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { LogIn, Mail, Eye, EyeOff, Sparkles, Target, BookOpen, Wallet, Flame, Smile, CheckCircle2, Heart, Award, ArrowRight } from "lucide-react";
 import { useAuth } from "@/components/shared/AuthProvider";
+import { InvictusLogo } from "@/components/shared/InvictusLogo";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -191,21 +192,10 @@ export default function LoginPage() {
       <div className="w-full col-span-1 lg:col-span-6 max-w-md mx-auto">
         <div className="bg-white/95 backdrop-blur-md border-3 border-amber-300/80 rounded-[28px] md:rounded-[32px] p-6 sm:p-7 md:p-8 shadow-[0_16px_40px_rgba(245,185,66,0.18)] space-y-4 md:space-y-5 relative overflow-hidden">
           
-          {/* Header Mascot Badge */}
-          <div className="text-center space-y-1.5">
-            <div className="inline-flex h-12 w-12 sm:h-14 sm:w-14 rounded-2xl sm:rounded-3xl bg-amber-400 border-2 border-amber-500 shadow-md items-center justify-center text-navy-900 text-2xl sm:text-3xl font-black transform hover:rotate-6 transition-transform cursor-pointer">
-              ⚡
-            </div>
-            <div>
-              <h2
-                className="text-xl sm:text-2xl font-black text-navy-900 tracking-tight"
-                style={{ fontFamily: "var(--font-heading)" }}
-              >
-                Sign In to Invictus
-              </h2>
-              <p className="text-navy-600 text-[11px] sm:text-xs font-bold mt-0.5">
-                Ready to level up your day? Let&apos;s go! 🚀
-              </p>
+          <div className="flex items-center justify-between border-b-2 border-navy-950/10 pb-3 mb-2">
+            <InvictusLogo size="md" variant="full" href="/login" />
+            <div className="bg-amber-300 text-navy-950 text-[10px] font-black px-2.5 py-1 rounded-xl border border-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)] uppercase">
+              Sign In
             </div>
           </div>
 

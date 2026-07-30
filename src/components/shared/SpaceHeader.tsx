@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { ChevronDown, Sparkles, ArrowRight, Megaphone, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/shared/AuthProvider";
+import { InvictusLogo } from "@/components/shared/InvictusLogo";
 import { getGlobalAnnouncement, type GlobalAnnouncement } from "@/lib/custom-auth";
 
 export function SpaceHeader() {
@@ -80,11 +81,12 @@ export function SpaceHeader() {
       )}
       <header className="sticky top-0 z-40 w-full bg-white/90 backdrop-blur-md border-b-2 border-navy-950 transition-colors duration-300">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
-        {/* Left side: Space Badge indicator & Live Sync Badge */}
-        <div className="flex items-center gap-2.5">
+        {/* Left side: Invictus Brand Logo & Space Badge */}
+        <div className="flex items-center gap-3">
+          <InvictusLogo size="sm" variant="horizontal" href="/today" />
           <div
             className={cn(
-              "px-3.5 py-1.5 rounded-xl text-xs font-black border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] flex items-center gap-2 transition-all duration-300",
+              "hidden sm:flex px-3 py-1 rounded-xl text-xs font-black border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] items-center gap-1.5 transition-all duration-300",
               currentSpace.accentBg
             )}
           >
@@ -93,11 +95,6 @@ export function SpaceHeader() {
               <span className="relative inline-flex rounded-full h-2 w-2 bg-current" />
             </span>
             <span>{currentSpace.shortLabel}</span>
-          </div>
-
-          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-200 border-2 border-navy-950 text-[10px] font-black text-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)]">
-            <span className="h-2 w-2 rounded-full bg-emerald-500 border border-black animate-pulse" />
-            <span>Live Sync</span>
           </div>
         </div>
 
