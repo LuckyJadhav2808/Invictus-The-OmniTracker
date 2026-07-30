@@ -8,7 +8,8 @@ import { FAB } from "@/components/shared/FAB";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
-import { format, startOfWeek, addDays, isSameDay } from "date-fns";
+import { toast } from "sonner";
+import { format, startOfWeek, addDays, isSameDay, subMonths, startOfMonth, endOfMonth } from "date-fns";
 import { BookOpen, Wallet, CheckSquare, Sparkles, Clock, LogOut, ArrowRight, Play, Square, Award } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useHabits, useHabitLogs, useStreaks } from "@/lib/queries/goals";
@@ -23,8 +24,9 @@ import { cn } from "@/lib/utils";
 export default function TodayPage() {
   const { user } = useAuth();
   const router = useRouter();
-  const { selectedDate } = useUIStore();
+  const { selectedDate, setSelectedDate } = useUIStore();
   const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
+  const [chartViewMode, setChartViewMode] = useState<"week" | "month">("week");
 
   // Profile preferences
   const [currency, setCurrency] = useState("INR");
@@ -183,16 +185,56 @@ export default function TodayPage() {
         {/* Weekly Calendar Strip */}
         <CalendarStrip activityDays={{}} />
 
-        {/* Liquid Pill Bar Chart - Real Dynamic Weekly Performance Flow */}
+        {/* Liquid Pill Bar Chart - Dynamic Weekly / Monthly Analytics Flow */}
         {(() => {
           const todayDate = new Date();
+
+          if (chartViewMode === "month") {
+            // Calculate past 6 months dynamically from actual logs
+            const monthlyBars = Array.from({ length: 6 }, (_, i) => {
+              const monthDate = subMonths(todayDate, 5 - i);
+              const mStart = format(startOfMonth(monthDate), "yyyy-MM-dd");
+              const mEnd = format(endOfMonth(monthDate), "yyyy-MM-dd");
+              const isCurrentMonth = i === 5;
+
+              const habitsInMonth = logs.filter((l) => l.date >= mStart && l.date <= mEnd && l.completed).length;
+              const studySecsInMonth = studySessions
+                .filter((s) => s.date >= mStart && s.date <= mEnd)
+                .reduce((acc, curr) => acc + ((curr.durationMinutes || 0) * 60), 0);
+
+              const scorePct = Math.min(100, Math.round((habitsInMonth * 10) + ((studySecsInMonth / 3600) * 15)));
+
+              return {
+                label: format(monthDate, "MMM"),
+                percentage: Math.max(10, scorePct),
+                value: scorePct > 0 ? `${scorePct}%` : "0%",
+                highlighted: isCurrentMonth,
+                color: isCurrentMonth ? "#FB7185" : "#38BDF8",
+              };
+            });
+
+            return (
+              <LiquidPillBarChart
+                title="Monthly Performance & Tracker Flow"
+                totalValue={`${logs.filter((l) => l.completed).length} Total Habits | ${(studySessions.reduce((a, c) => a + (c.durationMinutes || 0), 0) / 60).toFixed(1)}h Total Study`}
+                data={monthlyBars}
+                onCalendarClick={() => {
+                  setSelectedDate(format(todayDate, "yyyy-MM-dd"));
+                  toast.success("Jumped to Today 📅");
+                }}
+                onViewModeToggle={(nextMode) => setChartViewMode(nextMode)}
+                className="my-6"
+              />
+            );
+          }
+
+          // Default Weekly Mode
           const mondayDate = startOfWeek(todayDate, { weekStartsOn: 1 });
           const weeklyBars = Array.from({ length: 7 }, (_, i) => {
             const day = addDays(mondayDate, i);
             const dayStr = format(day, "yyyy-MM-dd");
             const isToday = isSameDay(day, todayDate);
             
-            // Real logs calculation
             const habitsDoneOnDay = logs.filter((l) => l.date === dayStr && l.completed).length;
             const studySecsOnDay = studySessions
               .filter((s) => s.date === dayStr)
@@ -216,6 +258,11 @@ export default function TodayPage() {
               title="Weekly Consistency & Tracker Flow"
               totalValue={`${completedHabitsCount} Habits | ${studyHoursToday}h Study`}
               data={weeklyBars}
+              onCalendarClick={() => {
+                setSelectedDate(format(todayDate, "yyyy-MM-dd"));
+                toast.success("Jumped to Today 📅");
+              }}
+              onViewModeToggle={(nextMode) => setChartViewMode(nextMode)}
               className="my-6"
             />
           );
