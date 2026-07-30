@@ -19,31 +19,34 @@
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
   
-  /* Crisp Premium Palette */
-  --color-[#FAF9F6]: #FAF9F6;
-  --color-[#1E232A]: #1E232A;
+  /* 5-Color Master Palette Spectrum */
+  --color-malachite: #03D26F;
+  --color-cyprus: #014651;
+  --color-aqua-haze: #EAF4F4;
+  --color-starship: #CEF431;
+  --color-cod-gray: #161514;
 
-  /* Legacy Utility Color Mappings */
-  --color-cream-bg: var(--cream-bg);
-  --color-amber-400: #FBBF24;
-  --color-amber-500: #F59E0B;
-  --color-amber-600: #D97706;
-  --color-orange-500: #F97316;
-  --color-mint-400: #A7F3D0;
-  --color-mint-600: #059669;
-  --color-emerald-500: #10B981;
-  --color-emerald-600: #059669;
-  --color-emerald-700: #047857;
-  --color-lavender-400: #C084FC;
-  --color-coral-400: #FB7185;
-  --color-navy-900: #1E232A;
-  --color-navy-950: #14171F;
-  --color-navy-600: #475569;
-  --color-navy-700: #334155;
-  --color-navy-800: #1E293B;
+  /* Utility Mappings */
+  --color-cream-bg: #EAF4F4;
+  --color-amber-400: #CEF431;
+  --color-amber-500: #CEF431;
+  --color-amber-600: #03D26F;
+  --color-orange-500: #03D26F;
+  --color-mint-400: #03D26F;
+  --color-mint-600: #014651;
+  --color-emerald-500: #03D26F;
+  --color-emerald-600: #014651;
+  --color-emerald-700: #014651;
+  --color-lavender-400: #014651;
+  --color-coral-400: #CEF431;
+  --color-navy-900: #161514;
+  --color-navy-950: #161514;
+  --color-navy-600: #014651;
+  --color-navy-700: #014651;
+  --color-navy-800: #161514;
   --color-white: #FFFFFF;
-  --color-success: #10B981;
-  --color-warning: #F59E0B;
+  --color-success: #03D26F;
+  --color-warning: #CEF431;
   --color-danger: #EF4444;
 
   --color-ring: var(--ring);
@@ -70,49 +73,49 @@
 }
 
 :root {
-  /* Ultra-Clean Modern Neobrutal Theme Variables */
-  --background: #FAF9F6;
-  --foreground: #1E232A;
+  /* 5-Color Master Neobrutalist Theme Variables */
+  --background: #EAF4F4;
+  --foreground: #161514;
   --card: #FFFFFF;
-  --card-foreground: #1E232A;
+  --card-foreground: #161514;
   --popover: #FFFFFF;
-  --popover-foreground: #1E232A;
-  --primary: #F59E0B;
-  --primary-foreground: #1E232A;
-  --secondary: #10B981;
-  --secondary-foreground: #FFFFFF;
-  --muted: #6366F1;
+  --popover-foreground: #161514;
+  --primary: #CEF431;
+  --primary-foreground: #161514;
+  --secondary: #03D26F;
+  --secondary-foreground: #161514;
+  --muted: #014651;
   --muted-foreground: #FFFFFF;
-  --accent: #10B981;
-  --accent-foreground: #FFFFFF;
+  --accent: #03D26F;
+  --accent-foreground: #161514;
   --destructive: #EF4444;
   --destructive-foreground: #FFFFFF;
-  --border: #1E232A;
-  --input: #1E232A;
-  --ring: #F59E0B;
+  --border: #161514;
+  --input: #161514;
+  --ring: #CEF431;
   --radius: 24px;
 
-  /* Standardized Token Aliases */
-  --cream-bg: #FAF9F6;
-  --amber-400: #FBBF24;
-  --amber-500: #F59E0B;
-  --amber-600: #D97706;
-  --orange-500: #F97316;
-  --mint-400: #A7F3D0;
-  --mint-600: #059669;
-  --emerald-500: #10B981;
-  --emerald-600: #059669;
-  --emerald-700: #047857;
-  --lavender-400: #C084FC;
-  --coral-400: #FB7185;
-  --navy-900: #1E232A;
-  --navy-950: #14171F;
-  --navy-600: #475569;
-  --navy-700: #334155;
-  --navy-800: #1E293B;
+  /* Master Token Aliases */
+  --cream-bg: #EAF4F4;
+  --amber-400: #CEF431;
+  --amber-500: #CEF431;
+  --amber-600: #03D26F;
+  --orange-500: #03D26F;
+  --mint-400: #03D26F;
+  --mint-600: #014651;
+  --emerald-500: #03D26F;
+  --emerald-600: #014651;
+  --emerald-700: #014651;
+  --lavender-400: #014651;
+  --coral-400: #CEF431;
+  --navy-900: #161514;
+  --navy-950: #161514;
+  --navy-600: #014651;
+  --navy-700: #014651;
+  --navy-800: #161514;
   --white: #FFFFFF;
-  --success: #10B981;
-  --warning: #F59E0B;
+  --success: #03D26F;
+  --warning: #CEF431;
   --danger: #EF4444;
 
   /* Border radius scale */
@@ -123,56 +126,56 @@
 }
 
 .dark {
-  --background: #14171F;
-  --foreground: #FAF9F6;
-  --card: #1E232A;
-  --card-foreground: #FAF9F6;
-  --popover: #1E232A;
-  --popover-foreground: #FAF9F6;
-  --primary: #F59E0B;
-  --primary-foreground: #1E232A;
-  --secondary: #10B981;
-  --secondary-foreground: #FFFFFF;
-  --muted: #6366F1;
-  --muted-foreground: #10B981;
-  --accent: #10B981;
-  --accent-foreground: #FAF9F6;
+  --background: #161514;
+  --foreground: #EAF4F4;
+  --card: #014651;
+  --card-foreground: #EAF4F4;
+  --popover: #014651;
+  --popover-foreground: #EAF4F4;
+  --primary: #CEF431;
+  --primary-foreground: #161514;
+  --secondary: #03D26F;
+  --secondary-foreground: #161514;
+  --muted: #014651;
+  --muted-foreground: #03D26F;
+  --accent: #03D26F;
+  --accent-foreground: #EAF4F4;
   --destructive: #EF4444;
   --destructive-foreground: #FFFFFF;
-  --border: #334155;
-  --input: #334155;
-  --ring: #F59E0B;
+  --border: #03D26F;
+  --input: #03D26F;
+  --ring: #CEF431;
 }
 
-/* Space Specific Dynamic Background Accents */
+/* Space Themes mapped to Master 5-Color Spectrum */
 .theme-life {
-  --cream-bg: #FAF9F6;
-  --background: #FAF9F6;
-  --primary: #10B981;
-  --ring: #10B981;
+  --cream-bg: #EAF4F4;
+  --background: #EAF4F4;
+  --primary: #03D26F;
+  --ring: #03D26F;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .theme-study {
-  --cream-bg: #FAF9F6;
-  --background: #FAF9F6;
-  --primary: #6366F1;
-  --ring: #6366F1;
+  --cream-bg: #EAF4F4;
+  --background: #EAF4F4;
+  --primary: #014651;
+  --ring: #014651;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .theme-money {
-  --cream-bg: #FAF9F6;
-  --background: #FAF9F6;
-  --primary: #F59E0B;
-  --ring: #F59E0B;
+  --cream-bg: #EAF4F4;
+  --background: #EAF4F4;
+  --primary: #CEF431;
+  --ring: #CEF431;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes playfulAssemble {
   0% {
     opacity: 0;
-    transform: translateY(20px) scale(0.98);
+    transform: translateY(18px) scale(0.98);
   }
   100% {
     opacity: 1;
@@ -181,7 +184,7 @@
 }
 
 .animate-playful-assemble {
-  animation: playfulAssemble 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: playfulAssemble 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @layer base {
@@ -192,41 +195,41 @@
     @apply bg-background text-foreground transition-colors duration-400;
   }
   body.theme-life {
-    background-image: radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.08) 0px, transparent 60%),
-                      radial-gradient(at 100% 100%, rgba(5, 150, 105, 0.06) 0px, transparent 60%);
+    background-image: radial-gradient(at 0% 0%, rgba(3, 210, 111, 0.08) 0px, transparent 60%),
+                      radial-gradient(at 100% 100%, rgba(206, 244, 49, 0.06) 0px, transparent 60%);
   }
   body.theme-study {
-    background-image: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 60%),
-                      radial-gradient(at 100% 100%, rgba(56, 189, 248, 0.06) 0px, transparent 60%);
+    background-image: radial-gradient(at 0% 0%, rgba(1, 70, 81, 0.08) 0px, transparent 60%),
+                      radial-gradient(at 100% 100%, rgba(3, 210, 111, 0.06) 0px, transparent 60%);
   }
   body.theme-money {
-    background-image: radial-gradient(at 0% 0%, rgba(245, 158, 11, 0.08) 0px, transparent 60%),
-                      radial-gradient(at 100% 100%, rgba(217, 119, 6, 0.06) 0px, transparent 60%);
+    background-image: radial-gradient(at 0% 0%, rgba(206, 244, 49, 0.08) 0px, transparent 60%),
+                      radial-gradient(at 100% 100%, rgba(1, 70, 81, 0.06) 0px, transparent 60%);
   }
   html {
     @apply font-sans;
   }
 }
 
-/* Premium Neobrutalism Design System Utility Classes */
+/* Master Neobrutalism System Utility Classes with Cod Gray (#161514) Ink Borders & Hard Shadows */
 .neo-card {
   background-color: #ffffff;
   border-radius: 1.5rem;
   border-width: 2px;
-  border-color: #1E232A;
-  box-shadow: 4px 4px 0px 0px rgba(30, 35, 42, 1);
+  border-color: #161514;
+  box-shadow: 4px 4px 0px 0px rgba(22, 21, 20, 1);
   transition: all 0.15s ease;
 }
 
 .neo-card:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0px 0px rgba(30, 35, 42, 1);
+  box-shadow: 6px 6px 0px 0px rgba(22, 21, 20, 1);
 }
 
 .neo-button {
   border-width: 2px;
-  border-color: #1E232A;
-  box-shadow: 3px 3px 0px 0px rgba(30, 35, 42, 1);
+  border-color: #161514;
+  box-shadow: 3px 3px 0px 0px rgba(22, 21, 20, 1);
   transition: all 0.15s ease;
   font-weight: 900;
   border-radius: 1rem;
@@ -235,18 +238,18 @@
 
 .neo-button:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 5px 5px 0px 0px rgba(30, 35, 42, 1);
+  box-shadow: 5px 5px 0px 0px rgba(22, 21, 20, 1);
 }
 
 .neo-button:active {
   transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0px 0px rgba(30, 35, 42, 1);
+  box-shadow: 1px 1px 0px 0px rgba(22, 21, 20, 1);
 }
 
 .neo-badge {
   border-width: 2px;
-  border-color: #1E232A;
-  box-shadow: 2px 2px 0px 0px rgba(30, 35, 42, 1);
+  border-color: #161514;
+  box-shadow: 2px 2px 0px 0px rgba(22, 21, 20, 1);
   font-weight: 900;
   text-transform: uppercase;
   font-size: 10px;
@@ -256,12 +259,12 @@
 
 .neo-input {
   border-width: 2px;
-  border-color: #1E232A;
+  border-color: #161514;
   border-radius: 1rem;
   background-color: #ffffff;
   padding: 0.625rem 1rem;
-  box-shadow: 2px 2px 0px 0px rgba(30, 35, 42, 1);
+  box-shadow: 2px 2px 0px 0px rgba(22, 21, 20, 1);
   font-weight: 700;
-  color: #1E232A;
+  color: #161514;
   outline: none;
 }
