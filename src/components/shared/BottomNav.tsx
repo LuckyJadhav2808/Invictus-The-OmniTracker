@@ -63,7 +63,7 @@ function BottomNavContent() {
   };
 
   return (
-    <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-[380px] h-16 bg-amber-400 border-2 border-navy-950 rounded-2xl px-3 flex items-center justify-around shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] z-40 lg:hidden transition-colors duration-500">
+    <nav className="fixed bottom-2 sm:bottom-3 left-1/2 -translate-x-1/2 w-[92%] max-w-[380px] h-14 sm:h-15 bg-[#CEF431] border-2 border-[#161514] rounded-full px-3 flex items-center justify-around shadow-[3.5px_3.5px_0px_0px_rgba(22,21,20,1)] z-50 lg:hidden transition-all duration-300">
       {navItems.map((item) => {
         const isActive = isLinkActive(item.href);
         const Icon = item.icon;
@@ -73,10 +73,10 @@ function BottomNavContent() {
             key={item.href}
             href={item.href}
             className={cn(
-              "flex items-center justify-center transition-all duration-200 h-11 w-11 rounded-xl border-2 border-transparent",
+              "flex items-center justify-center transition-all duration-200 h-10 w-10 sm:h-11 sm:w-11 rounded-full border-2 border-transparent",
               isActive
-                ? "bg-navy-950 text-white border-navy-950 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] scale-105"
-                : "text-navy-950 hover:bg-white/50 hover:border-navy-950"
+                ? "bg-[#161514] text-white border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] scale-105"
+                : "text-[#161514] hover:bg-white/60 hover:border-[#161514]"
             )}
           >
             <Icon className="h-5 w-5 stroke-[2.5]" />

@@ -161,7 +161,7 @@ export default function TodayPage() {
   const hasAnyLogs = habitsDone.length > 0 || studyToday.length > 0 || txsToday.length > 0;
 
   return (
-    <div className="min-h-screen bg-cream-bg p-4 md:p-8 space-y-6">
+    <div className="min-h-screen bg-cream-bg p-4 md:p-8 pb-28 lg:pb-12 space-y-6">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Space Hero Banner */}
         <SpaceHeroBanner
