@@ -29,37 +29,37 @@ export function SpaceHeroBanner({
   actionButton,
   children,
 }: SpaceHeroBannerProps) {
-  // Master 5-Color Palette Spectrum Styles
+  // Master Palette + Retro Space Tints Matching Reference Design
   const themeStyles = {
     today: {
-      cardBg: "bg-gradient-to-br from-[#CEF431] via-[#03D26F] to-[#014651] text-[#161514] border-[#161514]",
+      cardBg: "bg-gradient-to-br from-[#CEF431] via-[#03D26F] to-[#EAF4F4] text-[#161514] border-[#161514]",
       badgeBg: "bg-white text-[#161514] border-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)]",
       statBg: "bg-white text-[#161514] border-[#161514] font-black shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)]",
       btnBg: "bg-[#161514] text-[#CEF431] hover:bg-[#014651] border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)]",
     },
     life: {
-      cardBg: "bg-gradient-to-br from-[#03D26F] via-[#CEF431] to-[#014651] text-[#161514] border-[#161514]",
+      cardBg: "bg-gradient-to-br from-[#FDE68A] via-[#FEF08A] to-[#03D26F] text-[#161514] border-[#161514]",
       badgeBg: "bg-white text-[#161514] border-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)]",
       statBg: "bg-white text-[#161514] border-[#161514] font-black shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)]",
       btnBg: "bg-[#161514] text-[#CEF431] hover:bg-[#014651] border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)]",
     },
     study: {
-      cardBg: "bg-gradient-to-br from-[#014651] via-[#161514] to-[#014651] text-white border-[#161514]",
+      cardBg: "bg-gradient-to-br from-[#C084FC] via-[#DDD6FE] to-[#014651] text-[#161514] border-[#161514]",
       badgeBg: "bg-[#CEF431] text-[#161514] border-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)]",
-      statBg: "bg-[#014651] text-white border-[#161514] font-black shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)]",
-      btnBg: "bg-[#CEF431] text-[#161514] hover:bg-[#03D26F] border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)]",
+      statBg: "bg-white text-[#161514] border-[#161514] font-black shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)]",
+      btnBg: "bg-[#161514] text-[#CEF431] hover:bg-[#014651] border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)]",
     },
     money: {
-      cardBg: "bg-gradient-to-br from-[#CEF431] via-[#03D26F] to-[#014651] text-[#161514] border-[#161514]",
+      cardBg: "bg-gradient-to-br from-[#FBCFE8] via-[#F472B6] to-[#CEF431] text-[#161514] border-[#161514]",
       badgeBg: "bg-white text-[#161514] border-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)]",
       statBg: "bg-white text-[#161514] border-[#161514] font-black shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)]",
       btnBg: "bg-[#161514] text-[#CEF431] hover:bg-[#014651] border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)]",
     },
     analytics: {
-      cardBg: "bg-gradient-to-br from-[#03D26F] via-[#014651] to-[#161514] text-white border-[#161514]",
+      cardBg: "bg-gradient-to-br from-[#FDE68A] via-[#03D26F] to-[#014651] text-[#161514] border-[#161514]",
       badgeBg: "bg-[#CEF431] text-[#161514] border-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)]",
-      statBg: "bg-[#014651] text-white border-[#161514] font-black shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)]",
-      btnBg: "bg-[#CEF431] text-[#161514] hover:bg-[#03D26F] border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)]",
+      statBg: "bg-white text-[#161514] border-[#161514] font-black shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)]",
+      btnBg: "bg-[#161514] text-[#CEF431] hover:bg-[#014651] border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)]",
     },
   }[space];
 
@@ -85,7 +85,7 @@ export function SpaceHeroBanner({
         
         {/* Left Main Content with Playful Mascot Avatar */}
         <div className="flex items-start gap-4 sm:gap-6 max-w-xl">
-          <PlayfulMascot type={mascotMap[space] || "star-avatar"} size="lg" className="hidden sm:block" />
+          <PlayfulMascot type={mascotMap[space] || "star-avatar"} size="lg" className="hidden sm:block shrink-0" />
 
           <div className="space-y-3">
             <div
@@ -98,35 +98,35 @@ export function SpaceHeroBanner({
               <span>{badgeText}</span>
             </div>
 
-          <h1
-            className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight leading-tight"
-            style={{ fontFamily: "var(--font-heading)" }}
-          >
-            {title}
-          </h1>
+            <h1
+              className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight leading-tight text-[#161514]"
+              style={{ fontFamily: "var(--font-heading)" }}
+            >
+              {title}
+            </h1>
 
-          <p className="text-xs sm:text-sm font-bold opacity-90 leading-relaxed max-w-lg">
-            {subtitle}
-          </p>
+            <p className="text-xs sm:text-sm font-bold text-[#161514]/80 leading-relaxed max-w-lg">
+              {subtitle}
+            </p>
 
-          {/* Action Button */}
-          {actionButton && (
-            <div className="pt-1.5">
-              <button
-                type="button"
-                onClick={actionButton.onClick}
-                className={cn(
-                  "text-xs font-black px-5 py-2.5 rounded-2xl border-2 transition-all flex items-center gap-2 cursor-pointer uppercase tracking-wider hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_rgba(22,21,20,1)]",
-                  themeStyles.btnBg
-                )}
-              >
-                <span>{actionButton.label}</span>
-                {actionButton.icon || <ArrowUpRight className="h-4 w-4 stroke-[3]" />}
-              </button>
-            </div>
-          )}
+            {/* Action Button */}
+            {actionButton && (
+              <div className="pt-1.5">
+                <button
+                  type="button"
+                  onClick={actionButton.onClick}
+                  className={cn(
+                    "text-xs font-black px-5 py-2.5 rounded-2xl border-2 transition-all flex items-center gap-2 cursor-pointer uppercase tracking-wider hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_rgba(22,21,20,1)]",
+                    themeStyles.btnBg
+                  )}
+                >
+                  <span>{actionButton.label}</span>
+                  {actionButton.icon || <ArrowUpRight className="h-4 w-4 stroke-[3]" />}
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
 
         {/* Right Production Stat Cards */}
         <div className="flex flex-col gap-2.5 min-w-[220px] shrink-0">

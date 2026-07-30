@@ -19,12 +19,16 @@
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
   
-  /* 5-Color Master Palette Spectrum */
+  /* Master Palette Spectrum + 3 Retro Space Tints */
   --color-malachite: #03D26F;
   --color-cyprus: #014651;
   --color-aqua-haze: #EAF4F4;
   --color-starship: #CEF431;
   --color-cod-gray: #161514;
+  
+  --color-warm-peach: #FDE68A;
+  --color-retro-pink: #FBCFE8;
+  --color-electric-lavender: #C084FC;
 
   /* Utility Mappings */
   --color-cream-bg: #EAF4F4;
@@ -37,7 +41,7 @@
   --color-emerald-500: #03D26F;
   --color-emerald-600: #014651;
   --color-emerald-700: #014651;
-  --color-lavender-400: #014651;
+  --color-lavender-400: #C084FC;
   --color-coral-400: #CEF431;
   --color-navy-900: #161514;
   --color-navy-950: #161514;
@@ -73,7 +77,7 @@
 }
 
 :root {
-  /* 5-Color Master Neobrutalist Theme Variables */
+  /* Master Neobrutalist Theme Variables */
   --background: #EAF4F4;
   --foreground: #161514;
   --card: #FFFFFF;
@@ -106,7 +110,7 @@
   --emerald-500: #03D26F;
   --emerald-600: #014651;
   --emerald-700: #014651;
-  --lavender-400: #014651;
+  --lavender-400: #C084FC;
   --coral-400: #CEF431;
   --navy-900: #161514;
   --navy-950: #161514;
@@ -147,26 +151,26 @@
   --ring: #CEF431;
 }
 
-/* Space Themes mapped to Master 5-Color Spectrum */
+/* Space Themes with Retro Pastel Canvases */
 .theme-life {
-  --cream-bg: #EAF4F4;
-  --background: #EAF4F4;
+  --cream-bg: #FEF08A;
+  --background: #FEF08A;
   --primary: #03D26F;
   --ring: #03D26F;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .theme-study {
-  --cream-bg: #EAF4F4;
-  --background: #EAF4F4;
-  --primary: #014651;
-  --ring: #014651;
+  --cream-bg: #DDD6FE;
+  --background: #DDD6FE;
+  --primary: #C084FC;
+  --ring: #C084FC;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .theme-money {
-  --cream-bg: #EAF4F4;
-  --background: #EAF4F4;
+  --cream-bg: #FBCFE8;
+  --background: #FBCFE8;
   --primary: #CEF431;
   --ring: #CEF431;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -195,16 +199,16 @@
     @apply bg-background text-foreground transition-colors duration-400;
   }
   body.theme-life {
-    background-image: radial-gradient(at 0% 0%, rgba(3, 210, 111, 0.08) 0px, transparent 60%),
-                      radial-gradient(at 100% 100%, rgba(206, 244, 49, 0.06) 0px, transparent 60%);
+    background-image: radial-gradient(at 0% 0%, rgba(253, 230, 138, 0.3) 0px, transparent 60%),
+                      radial-gradient(at 100% 100%, rgba(3, 210, 111, 0.15) 0px, transparent 60%);
   }
   body.theme-study {
-    background-image: radial-gradient(at 0% 0%, rgba(1, 70, 81, 0.08) 0px, transparent 60%),
-                      radial-gradient(at 100% 100%, rgba(3, 210, 111, 0.06) 0px, transparent 60%);
+    background-image: radial-gradient(at 0% 0%, rgba(192, 132, 252, 0.3) 0px, transparent 60%),
+                      radial-gradient(at 100% 100%, rgba(1, 70, 81, 0.15) 0px, transparent 60%);
   }
   body.theme-money {
-    background-image: radial-gradient(at 0% 0%, rgba(206, 244, 49, 0.08) 0px, transparent 60%),
-                      radial-gradient(at 100% 100%, rgba(1, 70, 81, 0.06) 0px, transparent 60%);
+    background-image: radial-gradient(at 0% 0%, rgba(251, 207, 232, 0.3) 0px, transparent 60%),
+                      radial-gradient(at 100% 100%, rgba(206, 244, 49, 0.15) 0px, transparent 60%);
   }
   html {
     @apply font-sans;
