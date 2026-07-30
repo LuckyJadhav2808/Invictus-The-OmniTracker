@@ -56,14 +56,14 @@ export function ExamSyllabusTracker({
   return (
     <div className="bg-white rounded-3xl p-5 md:p-6 border-2 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] space-y-5 my-4">
       {/* Header & 1-Click Exam Syllabus Generator */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b-2 border-navy-950/10">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 pb-3 border-b-2 border-navy-950/10">
         <div className="flex items-center gap-3">
           <div className="h-12 w-12 rounded-2xl bg-lavender-400 border-2 border-navy-950 flex items-center justify-center text-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] shrink-0">
             <BookOpen className="h-6 w-6 stroke-[2.5]" />
           </div>
           <div>
             <h3
-              className="text-lg font-black text-navy-950 tracking-wider uppercase flex items-center gap-2"
+              className="text-base sm:text-lg font-black text-navy-950 tracking-wider uppercase flex items-center gap-2"
               style={{ fontFamily: "var(--font-heading)" }}
             >
               EXAM SYLLABUS & REVISION TRACKER
@@ -75,11 +75,11 @@ export function ExamSyllabusTracker({
         </div>
 
         {/* Exam Preset Selector Dropdown & Generator */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 max-w-full">
           <select
             value={selectedExamId}
             onChange={(e) => setSelectedExamId(e.target.value)}
-            className="bg-cream-bg rounded-xl border-2 border-navy-950 px-3 py-1.5 text-xs font-black text-navy-950 outline-none shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)]"
+            className="bg-cream-bg rounded-xl border-2 border-navy-950 px-3 py-1.5 text-xs font-black text-navy-950 outline-none shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] flex-1 sm:flex-none max-w-full"
           >
             {presets.map((p) => (
               <option key={p.id} value={p.id}>
