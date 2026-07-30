@@ -19,34 +19,32 @@
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
   
-  /* MP076 Master Color Palette */
-  --color-praxeti-white: #F6F7ED;
-  --color-spring-lime: #DBE64C;
-  --color-midnight-mirage: #001F3F;
-  --color-mantis-green: #74C365;
-  --color-picture-book-green: #00804C;
-  --color-nuit-blanche: #1E488F;
+  /* Crisp Premium Palette */
+  --color-[#FAF9F6]: #FAF9F6;
+  --color-[#1E232A]: #1E232A;
 
   /* Legacy Utility Color Mappings */
   --color-cream-bg: var(--cream-bg);
-  --color-amber-400: var(--amber-400);
-  --color-amber-500: var(--amber-500);
-  --color-amber-600: var(--amber-600);
-  --color-orange-500: var(--orange-500);
-  --color-mint-400: var(--mint-400);
-  --color-mint-600: var(--mint-600);
-  --color-emerald-500: var(--emerald-500);
-  --color-emerald-600: var(--emerald-600);
-  --color-emerald-700: var(--emerald-700);
-  --color-lavender-400: var(--lavender-400);
-  --color-coral-400: var(--coral-400);
-  --color-navy-900: var(--navy-900);
-  --color-navy-950: var(--navy-950);
-  --color-navy-600: var(--navy-600);
-  --color-white: var(--white);
-  --color-success: var(--success);
-  --color-warning: var(--warning);
-  --color-danger: var(--danger);
+  --color-amber-400: #FBBF24;
+  --color-amber-500: #F59E0B;
+  --color-amber-600: #D97706;
+  --color-orange-500: #F97316;
+  --color-mint-400: #A7F3D0;
+  --color-mint-600: #059669;
+  --color-emerald-500: #10B981;
+  --color-emerald-600: #059669;
+  --color-emerald-700: #047857;
+  --color-lavender-400: #C084FC;
+  --color-coral-400: #FB7185;
+  --color-navy-900: #1E232A;
+  --color-navy-950: #14171F;
+  --color-navy-600: #475569;
+  --color-navy-700: #334155;
+  --color-navy-800: #1E293B;
+  --color-white: #FFFFFF;
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
 
   --color-ring: var(--ring);
   --color-input: var(--input);
@@ -72,126 +70,109 @@
 }
 
 :root {
-  /* MP076 Production Theme Variables */
-  --background: #F6F7ED;
-  --foreground: #001F3F;
+  /* Ultra-Clean Modern Neobrutal Theme Variables */
+  --background: #FAF9F6;
+  --foreground: #1E232A;
   --card: #FFFFFF;
-  --card-foreground: #001F3F;
+  --card-foreground: #1E232A;
   --popover: #FFFFFF;
-  --popover-foreground: #001F3F;
-  --primary: #DBE64C;
-  --primary-foreground: #001F3F;
-  --secondary: #74C365;
-  --secondary-foreground: #001F3F;
-  --muted: #1E488F;
-  --muted-foreground: #1E488F;
-  --accent: #00804C;
+  --popover-foreground: #1E232A;
+  --primary: #F59E0B;
+  --primary-foreground: #1E232A;
+  --secondary: #10B981;
+  --secondary-foreground: #FFFFFF;
+  --muted: #6366F1;
+  --muted-foreground: #FFFFFF;
+  --accent: #10B981;
   --accent-foreground: #FFFFFF;
-  --destructive: #B91F3F;
+  --destructive: #EF4444;
   --destructive-foreground: #FFFFFF;
-  --border: #001F3F;
-  --input: #001F3F;
-  --ring: #DBE64C;
-  --radius: 28px;
+  --border: #1E232A;
+  --input: #1E232A;
+  --ring: #F59E0B;
+  --radius: 24px;
 
-  /* MP076 Standardized Token Aliases */
-  --praxeti-white: #F6F7ED;
-  --spring-lime: #DBE64C;
-  --midnight-mirage: #001F3F;
-  --mantis-green: #74C365;
-  --picture-book-green: #00804C;
-  --nuit-blanche: #1E488F;
-
-  /* Legacy Bindings mapped strictly to MP076 */
-  --cream-bg: #F6F7ED;
-  --amber-400: #DBE64C;
-  --amber-500: #DBE64C;
-  --amber-600: #74C365;
-  --orange-500: #74C365;
-  --mint-400: #74C365;
-  --mint-600: #00804C;
-  --emerald-500: #00804C;
-  --emerald-600: #00804C;
-  --emerald-700: #00804C;
-  --lavender-400: #1E488F;
-  --coral-400: #DBE64C;
-  --navy-900: #001F3F;
-  --navy-950: #001F3F;
-  --navy-600: #1E488F;
-  --navy-700: #1E488F;
-  --navy-800: #001F3F;
+  /* Standardized Token Aliases */
+  --cream-bg: #FAF9F6;
+  --amber-400: #FBBF24;
+  --amber-500: #F59E0B;
+  --amber-600: #D97706;
+  --orange-500: #F97316;
+  --mint-400: #A7F3D0;
+  --mint-600: #059669;
+  --emerald-500: #10B981;
+  --emerald-600: #059669;
+  --emerald-700: #047857;
+  --lavender-400: #C084FC;
+  --coral-400: #FB7185;
+  --navy-900: #1E232A;
+  --navy-950: #14171F;
+  --navy-600: #475569;
+  --navy-700: #334155;
+  --navy-800: #1E293B;
   --white: #FFFFFF;
-  --success: #74C365;
-  --warning: #DBE64C;
-  --danger: #B91F3F;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --danger: #EF4444;
 
   /* Border radius scale */
   --radius-sm: 12px;
-  --radius-md: 20px;
-  --radius-lg: 28px;
-  --radius-xl: 36px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
 }
 
 .dark {
-  --background: #001F3F;
-  --foreground: #F6F7ED;
-  --card: #0A294A;
-  --card-foreground: #F6F7ED;
-  --popover: #0A294A;
-  --popover-foreground: #F6F7ED;
-  --primary: #DBE64C;
-  --primary-foreground: #001F3F;
-  --secondary: #74C365;
-  --secondary-foreground: #001F3F;
-  --muted: #1E488F;
-  --muted-foreground: #74C365;
-  --accent: #00804C;
-  --accent-foreground: #F6F7ED;
-  --destructive: #B91F3F;
+  --background: #14171F;
+  --foreground: #FAF9F6;
+  --card: #1E232A;
+  --card-foreground: #FAF9F6;
+  --popover: #1E232A;
+  --popover-foreground: #FAF9F6;
+  --primary: #F59E0B;
+  --primary-foreground: #1E232A;
+  --secondary: #10B981;
+  --secondary-foreground: #FFFFFF;
+  --muted: #6366F1;
+  --muted-foreground: #10B981;
+  --accent: #10B981;
+  --accent-foreground: #FAF9F6;
+  --destructive: #EF4444;
   --destructive-foreground: #FFFFFF;
-  --border: #1E488F;
-  --input: #1E488F;
-  --ring: #DBE64C;
+  --border: #334155;
+  --input: #334155;
+  --ring: #F59E0B;
 }
 
-/* MP076 Space Specific Themes */
+/* Space Specific Dynamic Background Accents */
 .theme-life {
-  --cream-bg: #F6F7ED;
-  --background: #F6F7ED;
-  --amber-500: #DBE64C;
-  --orange-500: #74C365;
-  --primary: #DBE64C;
-  --ring: #DBE64C;
-  transition: all 0.5s ease;
+  --cream-bg: #FAF9F6;
+  --background: #FAF9F6;
+  --primary: #10B981;
+  --ring: #10B981;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .theme-study {
-  --cream-bg: #F6F7ED;
-  --background: #F6F7ED;
-  --amber-500: #1E488F;
-  --orange-500: #001F3F;
-  --primary: #1E488F;
-  --ring: #1E488F;
-  transition: all 0.5s ease;
+  --cream-bg: #FAF9F6;
+  --background: #FAF9F6;
+  --primary: #6366F1;
+  --ring: #6366F1;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .theme-money {
-  --cream-bg: #F6F7ED;
-  --background: #F6F7ED;
-  --amber-500: #00804C;
-  --orange-500: #74C365;
-  --primary: #00804C;
-  --ring: #00804C;
-  transition: all 0.5s ease;
+  --cream-bg: #FAF9F6;
+  --background: #FAF9F6;
+  --primary: #F59E0B;
+  --ring: #F59E0B;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes playfulAssemble {
   0% {
     opacity: 0;
-    transform: translateY(30px) scale(0.97);
-  }
-  60% {
-    transform: translateY(-3px) scale(1.005);
+    transform: translateY(20px) scale(0.98);
   }
   100% {
     opacity: 1;
@@ -200,7 +181,7 @@
 }
 
 .animate-playful-assemble {
-  animation: playfulAssemble 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation: playfulAssemble 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @layer base {
@@ -208,44 +189,44 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground transition-colors duration-500;
+    @apply bg-background text-foreground transition-colors duration-400;
   }
   body.theme-life {
-    background-image: radial-gradient(at 0% 0%, rgba(219, 230, 76, 0.15) 0px, transparent 50%),
-                      radial-gradient(at 100% 100%, rgba(116, 195, 101, 0.12) 0px, transparent 50%);
+    background-image: radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.08) 0px, transparent 60%),
+                      radial-gradient(at 100% 100%, rgba(5, 150, 105, 0.06) 0px, transparent 60%);
   }
   body.theme-study {
-    background-image: radial-gradient(at 0% 0%, rgba(30, 72, 143, 0.12) 0px, transparent 50%),
-                      radial-gradient(at 100% 100%, rgba(0, 31, 63, 0.10) 0px, transparent 50%);
+    background-image: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 60%),
+                      radial-gradient(at 100% 100%, rgba(56, 189, 248, 0.06) 0px, transparent 60%);
   }
   body.theme-money {
-    background-image: radial-gradient(at 0% 0%, rgba(0, 128, 76, 0.12) 0px, transparent 50%),
-                      radial-gradient(at 100% 100%, rgba(116, 195, 101, 0.12) 0px, transparent 50%);
+    background-image: radial-gradient(at 0% 0%, rgba(245, 158, 11, 0.08) 0px, transparent 60%),
+                      radial-gradient(at 100% 100%, rgba(217, 119, 6, 0.06) 0px, transparent 60%);
   }
   html {
     @apply font-sans;
   }
 }
 
-/* Neubrutalism Design System Utility Classes with MP076 Midnight Mirage (#001F3F) Borders & Shadows */
+/* Premium Neobrutalism Design System Utility Classes */
 .neo-card {
   background-color: #ffffff;
   border-radius: 1.5rem;
   border-width: 2px;
-  border-color: #001F3F;
-  box-shadow: 4px 4px 0px 0px rgba(0, 31, 63, 1);
-  transition: all 0.2s ease;
+  border-color: #1E232A;
+  box-shadow: 4px 4px 0px 0px rgba(30, 35, 42, 1);
+  transition: all 0.15s ease;
 }
 
 .neo-card:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0px 0px rgba(0, 31, 63, 1);
+  box-shadow: 6px 6px 0px 0px rgba(30, 35, 42, 1);
 }
 
 .neo-button {
   border-width: 2px;
-  border-color: #001F3F;
-  box-shadow: 3px 3px 0px 0px rgba(0, 31, 63, 1);
+  border-color: #1E232A;
+  box-shadow: 3px 3px 0px 0px rgba(30, 35, 42, 1);
   transition: all 0.15s ease;
   font-weight: 900;
   border-radius: 1rem;
@@ -254,18 +235,18 @@
 
 .neo-button:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 5px 5px 0px 0px rgba(0, 31, 63, 1);
+  box-shadow: 5px 5px 0px 0px rgba(30, 35, 42, 1);
 }
 
 .neo-button:active {
   transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0px 0px rgba(0, 31, 63, 1);
+  box-shadow: 1px 1px 0px 0px rgba(30, 35, 42, 1);
 }
 
 .neo-badge {
   border-width: 2px;
-  border-color: #001F3F;
-  box-shadow: 2px 2px 0px 0px rgba(0, 31, 63, 1);
+  border-color: #1E232A;
+  box-shadow: 2px 2px 0px 0px rgba(30, 35, 42, 1);
   font-weight: 900;
   text-transform: uppercase;
   font-size: 10px;
@@ -275,12 +256,12 @@
 
 .neo-input {
   border-width: 2px;
-  border-color: #001F3F;
+  border-color: #1E232A;
   border-radius: 1rem;
   background-color: #ffffff;
   padding: 0.625rem 1rem;
-  box-shadow: 2px 2px 0px 0px rgba(0, 31, 63, 1);
+  box-shadow: 2px 2px 0px 0px rgba(30, 35, 42, 1);
   font-weight: 700;
-  color: #001F3F;
+  color: #1E232A;
   outline: none;
 }
