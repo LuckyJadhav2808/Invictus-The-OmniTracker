@@ -3,6 +3,7 @@
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { Sparkles, ArrowUpRight } from "lucide-react";
+import { PlayfulMascot, type MascotType } from "@/components/shared/PlayfulMascot";
 
 interface SpaceHeroBannerProps {
   space: "today" | "life" | "study" | "money" | "analytics";
@@ -62,6 +63,14 @@ export function SpaceHeroBanner({
     },
   }[space];
 
+  const mascotMap: Record<string, MascotType> = {
+    today: "star-avatar",
+    life: "sushi-stack",
+    study: "book-wizard",
+    money: "burger-boss",
+    analytics: "cake-skates",
+  };
+
   return (
     <div
       className={cn(
@@ -74,17 +83,20 @@ export function SpaceHeroBanner({
 
       <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
         
-        {/* Left Main Content */}
-        <div className="space-y-3.5 max-w-xl">
-          <div
-            className={cn(
-              "inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black border-2 w-fit uppercase tracking-wider",
-              themeStyles.badgeBg
-            )}
-          >
-            <Sparkles className="h-3.5 w-3.5 stroke-[2.5]" />
-            <span>{badgeText}</span>
-          </div>
+        {/* Left Main Content with Playful Mascot Avatar */}
+        <div className="flex items-start gap-4 sm:gap-6 max-w-xl">
+          <PlayfulMascot type={mascotMap[space] || "star-avatar"} size="lg" className="hidden sm:block" />
+
+          <div className="space-y-3">
+            <div
+              className={cn(
+                "inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black border-2 w-fit uppercase tracking-wider",
+                themeStyles.badgeBg
+              )}
+            >
+              <Sparkles className="h-3.5 w-3.5 stroke-[2.5]" />
+              <span>{badgeText}</span>
+            </div>
 
           <h1
             className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight leading-tight"
@@ -114,6 +126,7 @@ export function SpaceHeroBanner({
             </div>
           )}
         </div>
+      </div>
 
         {/* Right Production Stat Cards */}
         <div className="flex flex-col gap-2.5 min-w-[220px] shrink-0">
