@@ -22,7 +22,7 @@ export function CalendarStrip({
   const days = Array.from({ length: 7 }, (_, i) => addDays(monday, i));
 
   return (
-    <div className="bg-white rounded-[var(--radius-lg)] p-4 shadow-[0_8px_24px_rgba(31,36,48,0.08)] flex justify-between items-center w-full">
+    <div className="bg-white rounded-3xl p-3 sm:p-4 border-2 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] flex justify-between items-center w-full my-4">
       {days.map((day) => {
         const dayStr = format(day, "yyyy-MM-dd");
         const isToday = isSameDay(day, today);
@@ -34,19 +34,19 @@ export function CalendarStrip({
             key={dayStr}
             type="button"
             onClick={() => setSelectedDate(dayStr)}
-            className={`flex flex-col items-center p-2 rounded-full min-w-[40px] transition-all relative ${
+            className={`flex flex-col items-center p-2 rounded-2xl min-w-[42px] transition-all relative cursor-pointer border-2 ${
               isSelected
-                ? "bg-navy-900 text-white"
-                : "hover:bg-cream-bg/50 text-navy-900"
+                ? "bg-amber-300 border-navy-950 text-navy-950 font-black shadow-[2px_2px_0px_0px_rgba(31,36,48,1)]"
+                : "border-transparent text-navy-950 hover:bg-cream-bg/80 font-bold"
             }`}
           >
-            <span className="text-[10px] font-bold uppercase opacity-60">
+            <span className="text-[10px] font-black uppercase tracking-wider opacity-70">
               {format(day, "eee").charAt(0)}
             </span>
             <span
-              className={`text-sm font-bold mt-1 h-7 w-7 flex items-center justify-center rounded-full ${
+              className={`text-sm font-black mt-1 h-7 w-7 flex items-center justify-center rounded-xl ${
                 isToday && !isSelected
-                  ? "border-2 border-navy-900"
+                  ? "border-2 border-navy-950 bg-emerald-200"
                   : ""
               }`}
             >
@@ -55,7 +55,7 @@ export function CalendarStrip({
             {hasActivity && (
               <span
                 className={`absolute bottom-1 h-1.5 w-1.5 rounded-full ${
-                  isSelected ? "bg-white" : dotColorClass
+                  isSelected ? "bg-navy-950" : dotColorClass
                 }`}
               />
             )}
