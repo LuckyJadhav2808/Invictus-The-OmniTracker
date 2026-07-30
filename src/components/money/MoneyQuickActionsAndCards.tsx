@@ -63,11 +63,11 @@ export function MoneyQuickActionsAndCards({
 
   const getCategoryBgColor = (idx: number) => {
     const colors = [
-      "bg-amber-500 border-amber-600 text-navy-950",
-      "bg-yellow-500 border-yellow-600 text-navy-950",
-      "bg-amber-600 border-amber-700 text-white",
-      "bg-orange-500 border-orange-600 text-white",
-      "bg-emerald-600 border-emerald-700 text-white",
+      "bg-[#CEF431] text-[#161514]",
+      "bg-[#F59E0B] text-[#161514]",
+      "bg-[#03D26F] text-[#161514]",
+      "bg-[#03D26F] text-[#161514]",
+      "bg-[#014651] text-white",
     ];
     return colors[idx % colors.length];
   };
@@ -231,7 +231,7 @@ export function MoneyQuickActionsAndCards({
                 {/* Folder Top Tab */}
                 <div
                   className={cn(
-                    "w-28 h-5 rounded-t-xl ml-4 text-[9px] font-black uppercase px-2 flex items-center justify-between border-2 border-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]",
+                    "w-28 h-5 rounded-t-xl ml-4 text-[9px] font-black uppercase px-2 flex items-center justify-between border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)]",
                     getCategoryBgColor(idx)
                   )}
                 >
@@ -240,7 +240,7 @@ export function MoneyQuickActionsAndCards({
                     {onEditCategory && (
                       <button
                         onClick={() => onEditCategory(cat)}
-                        className="text-navy-950 hover:scale-110 p-0.5 cursor-pointer border-none bg-transparent"
+                        className="text-current hover:scale-110 p-0.5 cursor-pointer border-none bg-transparent"
                         title="Edit category"
                       >
                         <Edit3 className="h-2.5 w-2.5" />
@@ -249,7 +249,7 @@ export function MoneyQuickActionsAndCards({
                     {onDeleteCategory && (
                       <button
                         onClick={() => onDeleteCategory(cat.id)}
-                        className="text-navy-950 hover:scale-110 p-0.5 cursor-pointer border-none bg-transparent"
+                        className="text-current hover:scale-110 p-0.5 cursor-pointer border-none bg-transparent"
                         title="Delete category"
                       >
                         <Trash2 className="h-2.5 w-2.5" />
@@ -261,7 +261,7 @@ export function MoneyQuickActionsAndCards({
                 {/* Main Card Body */}
                 <div
                   className={cn(
-                    "rounded-2xl rounded-tl-none p-4 border-2 border-navy-950 space-y-3 transition-all duration-200 shadow-[3px_3px_0px_0px_rgba(31,36,48,1)] group-hover:-translate-x-0.5 group-hover:-translate-y-0.5 group-hover:shadow-[5px_5px_0px_0px_rgba(31,36,48,1)]",
+                    "rounded-2xl rounded-tl-none p-4 border-2 border-[#161514] space-y-3 transition-all duration-200 shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] group-hover:-translate-x-0.5 group-hover:-translate-y-0.5 group-hover:shadow-[5px_5px_0px_0px_rgba(22,21,20,1)]",
                     getCategoryBgColor(idx)
                   )}
                 >
