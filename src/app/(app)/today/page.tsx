@@ -15,6 +15,7 @@ import { useStudySessions } from "@/lib/queries/study";
 import { useTransactions, useCategories } from "@/lib/queries/money";
 import { useUIStore } from "@/store/ui-store";
 import { SpaceHeroBanner } from "@/components/shared/SpaceHeroBanner";
+import { LiquidPillBarChart } from "@/components/shared/LiquidPillBarChart";
 import { generateInsights, type Insight } from "@/lib/utils/insights";
 import { cn } from "@/lib/utils";
 
@@ -180,6 +181,20 @@ export default function TodayPage() {
 
         {/* Weekly Calendar Strip */}
         <CalendarStrip activityDays={{}} />
+
+        {/* Liquid Pill Bar Chart - Playful Neobrutal Analytics */}
+        <LiquidPillBarChart
+          title="Monthly Consistency & Savings Flow"
+          totalValue={`${completedHabitsCount} Habits | ${studyHoursToday}h Study`}
+          data={[
+            { label: "Jan", percentage: 45, value: "45%" },
+            { label: "Feb", percentage: 85, value: "85%", highlighted: true, color: "#FB7185" },
+            { label: "Mar", percentage: 60, value: "60%" },
+            { label: "Apr", percentage: 40, value: "40%" },
+            { label: "May", percentage: 75, value: "75%", color: "#38BDF8" },
+          ]}
+          className="my-6"
+        />
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

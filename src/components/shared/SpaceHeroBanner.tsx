@@ -17,6 +17,8 @@ interface SpaceHeroBannerProps {
     onClick: () => void;
     icon?: ReactNode;
   };
+  activeFilter?: string;
+  onFilterChange?: (filter: string) => void;
   children?: ReactNode;
 }
 
@@ -27,6 +29,8 @@ export function SpaceHeroBanner({
   subtitle,
   stats,
   actionButton,
+  activeFilter,
+  onFilterChange,
   children,
 }: SpaceHeroBannerProps) {
   // Master Palette + Retro Space Tints Matching Reference Design
@@ -88,14 +92,38 @@ export function SpaceHeroBanner({
           <PlayfulMascot type={mascotMap[space] || "star-avatar"} size="lg" className="hidden sm:block shrink-0" />
 
           <div className="space-y-3">
-            <div
-              className={cn(
-                "inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black border-2 w-fit uppercase tracking-wider",
-                themeStyles.badgeBg
-              )}
-            >
-              <Sparkles className="h-3.5 w-3.5 stroke-[2.5]" />
-              <span>{badgeText}</span>
+            <div className="flex flex-wrap items-center gap-2">
+              <div
+                className={cn(
+                  "inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black border-2 w-fit uppercase tracking-wider",
+                  themeStyles.badgeBg
+                )}
+              >
+                <Sparkles className="h-3.5 w-3.5 stroke-[2.5]" />
+                <span>{badgeText}</span>
+              </div>
+
+              {/* Capsule Pill Filters: All, Year, Month, Week */}
+              <div className="flex items-center gap-1.5 bg-white/80 p-1 rounded-full border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)]">
+                {["All", "Year", "Month", "Week"].map((flt) => {
+                  const isAct = (activeFilter || "All").toLowerCase() === flt.toLowerCase();
+                  return (
+                    <button
+                      key={flt}
+                      type="button"
+                      onClick={() => onFilterChange?.(flt)}
+                      className={cn(
+                        "px-3 py-0.5 text-[10px] font-black rounded-full transition-all border-1.5 cursor-pointer uppercase tracking-wider",
+                        isAct
+                          ? "bg-[#CEF431] text-[#161514] border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] scale-105"
+                          : "bg-transparent text-[#161514]/70 border-transparent hover:bg-[#EAF4F4]"
+                      )}
+                    >
+                      {flt}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             <h1
