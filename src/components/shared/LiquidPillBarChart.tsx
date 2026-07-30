@@ -2,8 +2,8 @@
 
 import { cn } from "@/lib/utils";
 
-interface BarData {
-  label: string; // e.g. "Jan", "Feb", "Mar"
+export interface BarData {
+  label?: string; // e.g. "M", "T", "W", "T", "F", "S", "S" or undefined
   percentage: number; // 0 to 100
   value?: string | number;
   highlighted?: boolean;
@@ -18,8 +18,8 @@ interface LiquidPillBarChartProps {
 }
 
 export function LiquidPillBarChart({
-  title = "Total Savings",
-  totalValue = "$90,744",
+  title = "Weekly Consistency & Tracker Flow",
+  totalValue = "0 Habits | 0.0h Study",
   data,
   className,
 }: LiquidPillBarChartProps) {
@@ -37,7 +37,7 @@ export function LiquidPillBarChart({
             {title}
           </span>
           <h2
-            className="text-3xl font-black tracking-tight text-[#161514] mt-0.5"
+            className="text-2xl sm:text-3xl font-black tracking-tight text-[#161514] mt-0.5"
             style={{ fontFamily: "var(--font-heading)" }}
           >
             {totalValue}
@@ -54,7 +54,7 @@ export function LiquidPillBarChart({
       </div>
 
       {/* Liquid Pill Columns Row */}
-      <div className="bg-white rounded-3xl p-5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] flex justify-between items-end gap-3 sm:gap-4">
+      <div className="bg-white rounded-3xl p-5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] flex justify-between items-end gap-2 sm:gap-4">
         {data.map((bar, idx) => {
           const isHighlight = bar.highlighted;
           const fillColor = bar.color || (isHighlight ? "#FB7185" : "#38BDF8");
@@ -62,31 +62,37 @@ export function LiquidPillBarChart({
           return (
             <div key={idx} className="flex flex-col items-center flex-1">
               {/* Value Pill Tooltip for Highlighted Column */}
-              {isHighlight && (
+              {isHighlight ? (
                 <div className="mb-2 bg-[#161514] text-white text-[10px] font-black px-2 py-0.5 rounded-full border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] animate-bounce">
-                  {bar.value || `${bar.percentage}%`}
+                  {bar.value || `${Math.round(bar.percentage)}%`}
                 </div>
+              ) : (
+                <div className="h-5 mb-2" />
               )}
 
               {/* Capsule Shell Bar Column */}
-              <div className="relative w-full max-w-[44px] h-44 rounded-[40px] bg-[#EAF4F4] border-2 border-[#161514] overflow-hidden flex flex-col justify-end p-1 shadow-[inset_0_2px_4px_rgba(0,0,0,0.06)]">
+              <div className="relative w-full max-w-[44px] h-40 sm:h-44 rounded-[40px] bg-[#EAF4F4] border-2 border-[#161514] overflow-hidden flex flex-col justify-end p-1 shadow-[inset_0_2px_4px_rgba(0,0,0,0.06)]">
                 {/* Liquid Level Fill */}
                 <div
                   className="w-full rounded-[32px] transition-all duration-700 ease-out relative"
                   style={{
-                    height: `${Math.min(100, Math.max(10, bar.percentage))}%`,
+                    height: `${Math.min(100, Math.max(5, bar.percentage))}%`,
                     backgroundColor: fillColor,
                   }}
                 >
                   {/* Dotted Liquid Surface Line */}
-                  <div className="absolute top-0 left-0 right-0 border-t-2 border-dashed border-[#161514]/40" />
+                  {bar.percentage > 5 && (
+                    <div className="absolute top-0 left-0 right-0 border-t-2 border-dashed border-[#161514]/40" />
+                  )}
                 </div>
               </div>
 
-              {/* Month Label */}
-              <span className="text-[11px] font-black uppercase tracking-wider text-[#161514] mt-2.5">
-                {bar.label}
-              </span>
+              {/* Day Label if provided */}
+              {bar.label && (
+                <span className="text-[11px] font-black uppercase tracking-wider text-[#161514] mt-2.5">
+                  {bar.label}
+                </span>
+              )}
             </div>
           );
         })}

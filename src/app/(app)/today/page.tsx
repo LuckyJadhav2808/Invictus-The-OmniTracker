@@ -8,6 +8,7 @@ import { FAB } from "@/components/shared/FAB";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
+import { format, startOfWeek, addDays, isSameDay } from "date-fns";
 import { BookOpen, Wallet, CheckSquare, Sparkles, Clock, LogOut, ArrowRight, Play, Square, Award } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useHabits, useHabitLogs, useStreaks } from "@/lib/queries/goals";
@@ -182,19 +183,43 @@ export default function TodayPage() {
         {/* Weekly Calendar Strip */}
         <CalendarStrip activityDays={{}} />
 
-        {/* Liquid Pill Bar Chart - Playful Neobrutal Analytics */}
-        <LiquidPillBarChart
-          title="Monthly Consistency & Savings Flow"
-          totalValue={`${completedHabitsCount} Habits | ${studyHoursToday}h Study`}
-          data={[
-            { label: "Jan", percentage: 45, value: "45%" },
-            { label: "Feb", percentage: 85, value: "85%", highlighted: true, color: "#FB7185" },
-            { label: "Mar", percentage: 60, value: "60%" },
-            { label: "Apr", percentage: 40, value: "40%" },
-            { label: "May", percentage: 75, value: "75%", color: "#38BDF8" },
-          ]}
-          className="my-6"
-        />
+        {/* Liquid Pill Bar Chart - Real Dynamic Weekly Performance Flow */}
+        {(() => {
+          const todayDate = new Date();
+          const mondayDate = startOfWeek(todayDate, { weekStartsOn: 1 });
+          const weeklyBars = Array.from({ length: 7 }, (_, i) => {
+            const day = addDays(mondayDate, i);
+            const dayStr = format(day, "yyyy-MM-dd");
+            const isToday = isSameDay(day, todayDate);
+            
+            // Real logs calculation
+            const habitsDoneOnDay = logs.filter((l) => l.date === dayStr && l.completed).length;
+            const studySecsOnDay = studySessions
+              .filter((s) => s.date === dayStr)
+              .reduce((acc, curr) => acc + ((curr.durationMinutes || 0) * 60), 0);
+            
+            const habitPct = totalHabitsCount > 0 ? (habitsDoneOnDay / totalHabitsCount) * 50 : 0;
+            const studyPct = Math.min(50, (studySecsOnDay / 3600) * 25);
+            const scorePct = Math.min(100, Math.round(habitPct + studyPct));
+
+            return {
+              label: format(day, "eee"),
+              percentage: Math.max(8, scorePct),
+              value: scorePct > 0 ? `${scorePct}%` : "0%",
+              highlighted: isToday,
+              color: isToday ? "#FB7185" : "#38BDF8",
+            };
+          });
+
+          return (
+            <LiquidPillBarChart
+              title="Weekly Consistency & Tracker Flow"
+              totalValue={`${completedHabitsCount} Habits | ${studyHoursToday}h Study`}
+              data={weeklyBars}
+              className="my-6"
+            />
+          );
+        })()}
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
