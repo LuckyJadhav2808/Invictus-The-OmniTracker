@@ -1,6 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
   <defs>
-    <!-- Master Brand Gradients -->
     <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#1F2430" />
       <stop offset="50%" stop-color="#141824" />
@@ -29,7 +28,6 @@
       <stop offset="100%" stop-color="#D97706" />
     </linearGradient>
 
-    <!-- Soft Drop Shadow Filter -->
     <filter id="soft-shadow" x="-20%" y="-20%" width="140%" height="140%">
       <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.5" />
     </filter>
@@ -40,53 +38,38 @@
     </filter>
   </defs>
 
-  <!-- Base Squircle Container -->
   <rect width="512" height="512" rx="124" fill="url(#bg-grad)" />
-  
-  <!-- Sleek Neon Border Ring -->
   <rect x="18" y="18" width="476" height="476" rx="106" fill="none" stroke="url(#border-grad)" stroke-width="8" opacity="0.85" />
-
-  <!-- Inner Soft Backdrop Shield -->
   <rect x="40" y="40" width="432" height="432" rx="84" fill="#242B3B" opacity="0.4" />
 
-  <!-- 1. DUMBBELL SYMBOL (Health & Goals Space - Left Upper) -->
+  <!-- DUMBBELL (Health & Goals Space) -->
   <g filter="url(#soft-shadow)" transform="translate(112, 130)">
-    <!-- Dumbbell Bar -->
     <rect x="10" y="42" width="80" height="12" rx="6" fill="#FFFFFF" opacity="0.9" />
-    <!-- Left Weight Plates -->
     <rect x="22" y="22" width="14" height="52" rx="5" fill="url(#gym-grad)" />
     <rect x="10" y="28" width="10" height="40" rx="4" fill="url(#gym-grad)" />
-    <!-- Right Weight Plates -->
     <rect x="64" y="22" width="14" height="52" rx="5" fill="url(#gym-grad)" />
     <rect x="80" y="28" width="10" height="40" rx="4" fill="url(#gym-grad)" />
   </g>
 
-  <!-- 2. OPEN BOOK SYMBOL (Study Space - Right Upper) -->
+  <!-- OPEN BOOK (Study Space) -->
   <g filter="url(#soft-shadow)" transform="translate(300, 130)">
-    <!-- Book Spine & Pages -->
     <path d="M50 75 C32 60 14 62 4 68 V 22 C14 16 32 14 50 28 C68 14 86 16 96 22 V 68 C86 62 68 60 50 75 Z" fill="url(#study-grad)" />
-    <!-- Center Spine Line -->
     <line x1="50" y1="28" x2="50" y2="75" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" opacity="0.9" />
-    <!-- Left Page Lines -->
     <path d="M16 34 C26 31 38 31 44 36" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity="0.6" />
     <path d="M16 46 C26 43 38 43 44 48" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity="0.6" />
-    <!-- Right Page Lines -->
     <path d="M84 34 C74 31 62 31 56 36" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity="0.6" />
     <path d="M84 46 C74 43 62 43 56 48" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity="0.6" />
   </g>
 
-  <!-- 3. MONEY COIN & GROWTH SYMBOL (Money Space - Bottom Center) -->
+  <!-- MONEY COIN (Money Space) -->
   <g filter="url(#soft-shadow)" transform="translate(206, 290)">
-    <!-- Outer Coin -->
     <circle cx="50" cy="50" r="42" fill="url(#money-grad)" />
     <circle cx="50" cy="50" r="34" fill="none" stroke="#FFFFFF" stroke-width="3" opacity="0.5" />
-    <!-- Rupee / Dollar Currency Sign -->
     <path d="M38 34 H62 M38 44 H58 M38 34 V52 C46 52 56 52 56 60 C56 66 46 66 38 66 H62" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
   </g>
 
-  <!-- CENTRAL OMNI SPARKLE (The Unifying Trinity Star) -->
+  <!-- CENTRAL OMNI SPARKLE STAR -->
   <g filter="url(#glow-light)" transform="translate(256, 230)">
-    <!-- 4-Point Diamond Sparkle -->
     <path d="M0 -36 Q0 0 36 0 Q0 0 0 36 Q0 0 -36 0 Q0 0 0 -36 Z" fill="#FFFFFF" />
     <circle cx="0" cy="0" r="6" fill="#FBBF24" />
   </g>
