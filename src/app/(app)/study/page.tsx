@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useSubjects, useAddSubject, useUpdateSubject, useDeleteSubject, useTests, useAddTest, useUpdateTest, useDeleteTest, useStudySessions, useAllTopics, useAddTopic, useUpdateTopic, useDeleteTopic, useAddStudySession } from "@/lib/queries/study";
 import { ExamSyllabusTracker } from "@/components/study/ExamSyllabusTracker";
 import { StudySessionLogger } from "@/components/study/StudySessionLogger";
+import { DraggableDashboardGrid } from "@/components/shared/DraggableDashboardGrid";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
 import { TemplateSelectionModal, TemplatePack } from "@/components/shared/TemplateSelectionModal";
@@ -300,50 +301,65 @@ function StudyPageContent() {
           </div>
         )}
 
-        {/* EXAM SYLLABUS DATASET TRACKER */}
-        <ExamSyllabusTracker
-          subjects={subjects}
-          allTopics={allTopics}
-          onAddTopic={(subjectId, title) => {
-            addTopicMutation.mutate({
-              subjectId,
-              title,
-              status: "notStarted",
-              confidence: 1,
-              estimatedHours: 2,
-            } as any);
-            toast.success("Topic added to syllabus! 📚");
-          }}
-          onUpdateTopicStatus={(topicId, status, revisionsCount) => {
-            updateTopicMutation.mutate({
-              id: topicId,
-              status: status as any,
-              revisionsCount,
-            } as any);
-          }}
-          onEditTopic={(topicId, title) => {
-            updateTopicMutation.mutate({
-              id: topicId,
-              title,
-            } as any);
-            toast.success("Topic title updated! 📝");
-          }}
-          onDeleteTopic={(topicId) => {
-            deleteTopicMutation.mutate(topicId);
-            toast.success("Topic removed 🗑️");
-          }}
-        />
-
-        {/* STUDY SESSION LOGGER & SATISFACTION METER */}
-        <StudySessionLogger
-          topics={allTopics}
-          onLogSession={(data) => {
-            logSessionMutation.mutate({
-              durationMinutes: data.durationMinutes,
-              topicId: data.topicId || "",
-              notes: data.notes,
-            } as any);
-          }}
+        {/* Draggable Study Widgets Grid */}
+        <DraggableDashboardGrid
+          storageKey="study"
+          widgets={[
+            {
+              id: "syllabus-tracker",
+              title: "📚 Exam Syllabus & Revision Tracker",
+              component: (
+                <ExamSyllabusTracker
+                  subjects={subjects}
+                  allTopics={allTopics}
+                  onAddTopic={(subjectId, title) => {
+                    addTopicMutation.mutate({
+                      subjectId,
+                      title,
+                      status: "notStarted",
+                      confidence: 1,
+                      estimatedHours: 2,
+                    } as any);
+                    toast.success("Topic added to syllabus! 📚");
+                  }}
+                  onUpdateTopicStatus={(topicId, status, revisionsCount) => {
+                    updateTopicMutation.mutate({
+                      id: topicId,
+                      status: status as any,
+                      revisionsCount,
+                    } as any);
+                  }}
+                  onEditTopic={(topicId, title) => {
+                    updateTopicMutation.mutate({
+                      id: topicId,
+                      title,
+                    } as any);
+                    toast.success("Topic title updated! 📝");
+                  }}
+                  onDeleteTopic={(topicId) => {
+                    deleteTopicMutation.mutate(topicId);
+                    toast.success("Topic removed 🗑️");
+                  }}
+                />
+              ),
+            },
+            {
+              id: "session-logger",
+              title: "✍️ Study Session Logger & Focus Meter",
+              component: (
+                <StudySessionLogger
+                  topics={allTopics}
+                  onLogSession={(data) => {
+                    logSessionMutation.mutate({
+                      durationMinutes: data.durationMinutes,
+                      topicId: data.topicId || "",
+                      notes: data.notes,
+                    } as any);
+                  }}
+                />
+              ),
+            },
+          ]}
         />
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="bg-white rounded-full p-1 border border-border shadow-sm flex w-full max-w-[400px] mb-6">

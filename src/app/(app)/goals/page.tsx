@@ -37,6 +37,7 @@ import { SleepAndActiveWidgets } from "@/components/goals/SleepAndActiveWidgets"
 import { GymRoutineTracker } from "@/components/goals/GymRoutineTracker";
 import { MealTracker } from "@/components/goals/MealTracker";
 import { WeeklyOverviewWidget } from "@/components/goals/WeeklyOverviewWidget";
+import { DraggableDashboardGrid } from "@/components/shared/DraggableDashboardGrid";
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
 import { Edit3 } from "lucide-react";
 import { EmptyState } from "@/components/shared/EmptyState";
@@ -485,7 +486,7 @@ function GoalsPageContent() {
             {/* Dashboard Grid (Habits Checklist, Water Intake, Macros, Training & Diet) - FRONT & CENTER AT TOP */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 my-4">
               {/* Column 1: Habits Checklist */}
-              <div className="space-y-4">
+              <div id="habits-section" className="space-y-4">
                 <h3 className="text-xs font-black uppercase tracking-wider text-navy-950">
                   🌱 Habits & Routines
                 </h3>
@@ -894,17 +895,32 @@ function GoalsPageContent() {
               </div>
             </div>
 
-            {/* Sleep & Active Time Widgets */}
-            <SleepAndActiveWidgets />
-
-            {/* Gym Routine & Machines Tracker (Full CRUD) */}
-            <GymRoutineTracker />
-
-            {/* Daily Meal Routine & Nutrition Tracker (Full CRUD) */}
-            <MealTracker />
-
-            {/* Daily Mood & Energy Journaling Widget */}
-            <MoodJournalWidget dateStr={selectedDate} />
+            {/* Draggable Goals & Life Widgets Grid */}
+            <DraggableDashboardGrid
+              storageKey="goals"
+              widgets={[
+                {
+                  id: "gym-section",
+                  title: "🏋️ Gym Splits & Workout Routines",
+                  component: <GymRoutineTracker />,
+                },
+                {
+                  id: "nutrition-section",
+                  title: "🥗 Nutrition & Meal Tracker",
+                  component: <MealTracker />,
+                },
+                {
+                  id: "mood-section",
+                  title: "😴 Sleep, Energy & Mood Journal",
+                  component: (
+                    <div className="space-y-4">
+                      <SleepAndActiveWidgets />
+                      <MoodJournalWidget dateStr={selectedDate} />
+                    </div>
+                  ),
+                },
+              ]}
+            />
           </TabsContent>
 
           {/* Calendar Tab */}

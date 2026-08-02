@@ -13,11 +13,21 @@ import { format, startOfWeek, addDays, isSameDay, subMonths, startOfMonth, endOf
 import { BookOpen, Wallet, CheckSquare, Sparkles, Clock, LogOut, ArrowRight, Play, Square, Award } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useHabits, useHabitLogs, useStreaks } from "@/lib/queries/goals";
-import { useStudySessions } from "@/lib/queries/study";
+import { useStudySessions, useSubjects, useAllTopics } from "@/lib/queries/study";
 import { useTransactions, useCategories } from "@/lib/queries/money";
 import { useUIStore } from "@/store/ui-store";
 import { SpaceHeroBanner } from "@/components/shared/SpaceHeroBanner";
 import { LiquidPillBarChart } from "@/components/shared/LiquidPillBarChart";
+import { DraggableDashboardGrid } from "@/components/shared/DraggableDashboardGrid";
+import { GymRoutineTracker } from "@/components/goals/GymRoutineTracker";
+import { MealTracker } from "@/components/goals/MealTracker";
+import { MoodJournalWidget } from "@/components/goals/MoodJournalWidget";
+import { SleepAndActiveWidgets } from "@/components/goals/SleepAndActiveWidgets";
+import { ExamSyllabusTracker } from "@/components/study/ExamSyllabusTracker";
+import { StudySessionLogger } from "@/components/study/StudySessionLogger";
+import { MoneyQuickActionsAndCards } from "@/components/money/MoneyQuickActionsAndCards";
+import { SubscriptionsTracker } from "@/components/money/SubscriptionsTracker";
+import { SavingsGoals } from "@/components/money/SavingsGoals";
 import { generateInsights, type Insight } from "@/lib/utils/insights";
 import { cn } from "@/lib/utils";
 
@@ -46,6 +56,8 @@ export default function TodayPage() {
   const { data: logs = [] } = useHabitLogs(selectedDate);
   const { data: streaks = {} } = useStreaks();
   const { data: studySessions = [] } = useStudySessions();
+  const { data: subjects = [] } = useSubjects();
+  const { data: allTopics = [] } = useAllTopics();
   const { data: transactions = [] } = useTransactions();
   const { data: categories = [] } = useCategories();
 
@@ -182,91 +194,179 @@ export default function TodayPage() {
           }}
         />
 
-        {/* Weekly Calendar Strip */}
-        <CalendarStrip activityDays={{}} />
+        {/* Draggable Today Dashboard Grid with Pinning Support from Goals, Study & Money Spaces */}
+        <DraggableDashboardGrid
+          storageKey="today"
+          widgets={[
+            {
+              id: "pillbar-chart",
+              title: "📊 Liquid Pill Bar Chart & Calendar Strip",
+              category: "today",
+              component: (
+                <div className="space-y-4">
+                  <CalendarStrip activityDays={{}} />
+                  {(() => {
+                    const todayDate = new Date();
+                    if (chartViewMode === "month") {
+                      const monthlyBars = Array.from({ length: 6 }, (_, i) => {
+                        const monthDate = subMonths(todayDate, 5 - i);
+                        const mStart = format(startOfMonth(monthDate), "yyyy-MM-dd");
+                        const mEnd = format(endOfMonth(monthDate), "yyyy-MM-dd");
+                        const isCurrentMonth = i === 5;
+                        const habitsInMonth = logs.filter((l) => l.date >= mStart && l.date <= mEnd && l.completed).length;
+                        const studySecsInMonth = studySessions
+                          .filter((s) => s.date >= mStart && s.date <= mEnd)
+                          .reduce((acc, curr) => acc + ((curr.durationMinutes || 0) * 60), 0);
+                        const scorePct = Math.min(100, Math.round((habitsInMonth * 10) + ((studySecsInMonth / 3600) * 15)));
+                        return {
+                          label: format(monthDate, "MMM"),
+                          percentage: Math.max(10, scorePct),
+                          value: scorePct > 0 ? `${scorePct}%` : "0%",
+                          highlighted: isCurrentMonth,
+                          color: isCurrentMonth ? "#FB7185" : "#38BDF8",
+                        };
+                      });
 
-        {/* Liquid Pill Bar Chart - Dynamic Weekly / Monthly Analytics Flow */}
-        {(() => {
-          const todayDate = new Date();
+                      return (
+                        <LiquidPillBarChart
+                          title="Monthly Performance & Tracker Flow"
+                          totalValue={`${logs.filter((l) => l.completed).length} Total Habits | ${(studySessions.reduce((a, c) => a + (c.durationMinutes || 0), 0) / 60).toFixed(1)}h Total Study`}
+                          data={monthlyBars}
+                          onCalendarClick={() => {
+                            setSelectedDate(format(todayDate, "yyyy-MM-dd"));
+                            toast.success("Jumped to Today 📅");
+                          }}
+                          onViewModeToggle={(nextMode) => setChartViewMode(nextMode)}
+                          className="my-4"
+                        />
+                      );
+                    }
 
-          if (chartViewMode === "month") {
-            // Calculate past 6 months dynamically from actual logs
-            const monthlyBars = Array.from({ length: 6 }, (_, i) => {
-              const monthDate = subMonths(todayDate, 5 - i);
-              const mStart = format(startOfMonth(monthDate), "yyyy-MM-dd");
-              const mEnd = format(endOfMonth(monthDate), "yyyy-MM-dd");
-              const isCurrentMonth = i === 5;
+                    const mondayDate = startOfWeek(todayDate, { weekStartsOn: 1 });
+                    const weeklyBars = Array.from({ length: 7 }, (_, i) => {
+                      const day = addDays(mondayDate, i);
+                      const dayStr = format(day, "yyyy-MM-dd");
+                      const isToday = isSameDay(day, todayDate);
+                      const habitsDoneOnDay = logs.filter((l) => l.date === dayStr && l.completed).length;
+                      const studySecsOnDay = studySessions
+                        .filter((s) => s.date === dayStr)
+                        .reduce((acc, curr) => acc + ((curr.durationMinutes || 0) * 60), 0);
+                      const habitPct = totalHabitsCount > 0 ? (habitsDoneOnDay / totalHabitsCount) * 50 : 0;
+                      const studyPct = Math.min(50, (studySecsOnDay / 3600) * 25);
+                      const scorePct = Math.min(100, Math.round(habitPct + studyPct));
 
-              const habitsInMonth = logs.filter((l) => l.date >= mStart && l.date <= mEnd && l.completed).length;
-              const studySecsInMonth = studySessions
-                .filter((s) => s.date >= mStart && s.date <= mEnd)
-                .reduce((acc, curr) => acc + ((curr.durationMinutes || 0) * 60), 0);
+                      return {
+                        label: format(day, "eee"),
+                        percentage: Math.max(8, scorePct),
+                        value: scorePct > 0 ? `${scorePct}%` : "0%",
+                        highlighted: isToday,
+                        color: isToday ? "#FB7185" : "#38BDF8",
+                      };
+                    });
 
-              const scorePct = Math.min(100, Math.round((habitsInMonth * 10) + ((studySecsInMonth / 3600) * 15)));
-
-              return {
-                label: format(monthDate, "MMM"),
-                percentage: Math.max(10, scorePct),
-                value: scorePct > 0 ? `${scorePct}%` : "0%",
-                highlighted: isCurrentMonth,
-                color: isCurrentMonth ? "#FB7185" : "#38BDF8",
-              };
-            });
-
-            return (
-              <LiquidPillBarChart
-                title="Monthly Performance & Tracker Flow"
-                totalValue={`${logs.filter((l) => l.completed).length} Total Habits | ${(studySessions.reduce((a, c) => a + (c.durationMinutes || 0), 0) / 60).toFixed(1)}h Total Study`}
-                data={monthlyBars}
-                onCalendarClick={() => {
-                  setSelectedDate(format(todayDate, "yyyy-MM-dd"));
-                  toast.success("Jumped to Today 📅");
-                }}
-                onViewModeToggle={(nextMode) => setChartViewMode(nextMode)}
-                className="my-6"
-              />
-            );
-          }
-
-          // Default Weekly Mode
-          const mondayDate = startOfWeek(todayDate, { weekStartsOn: 1 });
-          const weeklyBars = Array.from({ length: 7 }, (_, i) => {
-            const day = addDays(mondayDate, i);
-            const dayStr = format(day, "yyyy-MM-dd");
-            const isToday = isSameDay(day, todayDate);
-            
-            const habitsDoneOnDay = logs.filter((l) => l.date === dayStr && l.completed).length;
-            const studySecsOnDay = studySessions
-              .filter((s) => s.date === dayStr)
-              .reduce((acc, curr) => acc + ((curr.durationMinutes || 0) * 60), 0);
-            
-            const habitPct = totalHabitsCount > 0 ? (habitsDoneOnDay / totalHabitsCount) * 50 : 0;
-            const studyPct = Math.min(50, (studySecsOnDay / 3600) * 25);
-            const scorePct = Math.min(100, Math.round(habitPct + studyPct));
-
-            return {
-              label: format(day, "eee"),
-              percentage: Math.max(8, scorePct),
-              value: scorePct > 0 ? `${scorePct}%` : "0%",
-              highlighted: isToday,
-              color: isToday ? "#FB7185" : "#38BDF8",
-            };
-          });
-
-          return (
-            <LiquidPillBarChart
-              title="Weekly Consistency & Tracker Flow"
-              totalValue={`${completedHabitsCount} Habits | ${studyHoursToday}h Study`}
-              data={weeklyBars}
-              onCalendarClick={() => {
-                setSelectedDate(format(todayDate, "yyyy-MM-dd"));
-                toast.success("Jumped to Today 📅");
-              }}
-              onViewModeToggle={(nextMode) => setChartViewMode(nextMode)}
-              className="my-6"
-            />
-          );
-        })()}
+                    return (
+                      <LiquidPillBarChart
+                        title="Weekly Consistency & Tracker Flow"
+                        totalValue={`${completedHabitsCount} Habits | ${studyHoursToday}h Study`}
+                        data={weeklyBars}
+                        onCalendarClick={() => {
+                          setSelectedDate(format(todayDate, "yyyy-MM-dd"));
+                          toast.success("Jumped to Today 📅");
+                        }}
+                        onViewModeToggle={(nextMode) => setChartViewMode(nextMode)}
+                        className="my-4"
+                      />
+                    );
+                  })()}
+                </div>
+              ),
+            },
+          ]}
+          availableWidgets={[
+            {
+              id: "gym-section",
+              title: "🏋️ Gym Splits & Workout Routines",
+              category: "goals",
+              component: <GymRoutineTracker />,
+            },
+            {
+              id: "nutrition-section",
+              title: "🥗 Nutrition & Meal Tracker",
+              category: "goals",
+              component: <MealTracker />,
+            },
+            {
+              id: "mood-section",
+              title: "😴 Sleep, Energy & Mood Journal",
+              category: "goals",
+              component: (
+                <div className="space-y-4">
+                  <SleepAndActiveWidgets />
+                  <MoodJournalWidget dateStr={selectedDate} />
+                </div>
+              ),
+            },
+            {
+              id: "syllabus-tracker",
+              title: "📚 Exam Syllabus & Revision Tracker",
+              category: "study",
+              component: (
+                <ExamSyllabusTracker
+                  subjects={subjects}
+                  allTopics={allTopics}
+                />
+              ),
+            },
+            {
+              id: "session-logger",
+              title: "✍️ Study Session Logger & Focus Meter",
+              category: "study",
+              component: (
+                <StudySessionLogger
+                  topics={allTopics}
+                  onLogSession={(data) => {
+                    toast.success(`Logged ${data.durationMinutes} min study session! 📚`);
+                  }}
+                />
+              ),
+            },
+            {
+              id: "category-wallets",
+              title: "💳 Category Wallets & Accounts",
+              category: "money",
+              component: (
+                <MoneyQuickActionsAndCards
+                  mainBalance={0}
+                  currencySymbol={currencySymbol}
+                  categories={categories.map((c) => ({
+                    id: c.id,
+                    name: c.name,
+                    amount: transactions
+                      .filter((t) => t.categoryId === c.id && t.type === "expense")
+                      .reduce((sum, t) => sum + t.amount, 0),
+                    color: c.color,
+                    icon: c.icon || "💳",
+                    type: c.type,
+                    monthlyBudget: c.monthlyBudget,
+                  }))}
+                  onAddTransaction={() => router.push("/money")}
+                />
+              ),
+            },
+            {
+              id: "subscriptions",
+              title: "🔁 Active Subscriptions",
+              category: "money",
+              component: <SubscriptionsTracker />,
+            },
+            {
+              id: "savings-goals",
+              title: "🐷 Savings Goals & Piggy Bank",
+              category: "money",
+              component: <SavingsGoals />,
+            },
+          ]}
+        />
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

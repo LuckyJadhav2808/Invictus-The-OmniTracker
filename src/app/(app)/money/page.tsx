@@ -19,6 +19,7 @@ import { SpaceHeroBanner } from "@/components/shared/SpaceHeroBanner";
 import { MoneyQuickActionsAndCards } from "@/components/money/MoneyQuickActionsAndCards";
 import { SubscriptionsTracker } from "@/components/money/SubscriptionsTracker";
 import { SavingsGoals } from "@/components/money/SavingsGoals";
+import { DraggableDashboardGrid } from "@/components/shared/DraggableDashboardGrid";
 import { useCostOfLivingIndex } from "@/lib/queries/cost-of-living";
 import { useApplyMonthlyBudgetTemplate } from "@/lib/queries/spending";
 import { detectCategoryFromNote } from "@/lib/utils/merchant-categorizer";
@@ -320,46 +321,63 @@ function MoneyPageContent() {
           }}
         />
 
-        {/* Money Quick Action Pills, Balance Privacy Eye Toggle, Proportion Bar & Folder Category Cards */}
-        <MoneyQuickActionsAndCards
-          mainBalance={totalBalance}
-          currencySymbol={currencySymbol}
-          categories={categories.map((c) => ({
-            id: c.id,
-            name: c.name,
-            amount: transactions
-              .filter((t) => t.categoryId === c.id && t.type === "expense")
-              .reduce((sum, t) => sum + t.amount, 0),
-            color: c.color,
-            icon: c.icon || "💳",
-            type: c.type,
-            monthlyBudget: c.monthlyBudget,
-          }))}
-          onAddTransaction={() => {
-            if (categories.length === 0) {
-              toast.error("Loading categories...");
-              return;
-            }
-            setTxCategoryId(categories.filter((c) => c.type === txType)[0]?.id || "");
-            setIsAddTxOpen(true);
-          }}
-          onViewDetails={() => setActiveTab("analytics")}
-          onAddCategory={() => setIsChoiceOpen(true)}
-          onEditCategory={(cat) => {
-            const full = categories.find((c) => c.id === cat.id);
-            setEditingCat(full || cat);
-            setEditCatName(full?.name || cat.name);
-            setEditCatType(full?.type || "expense");
-            setEditCatColor(full?.color || "orange");
-            setEditCatIcon(full?.icon || "💳");
-            setEditCatMonthlyBudget(String(full?.monthlyBudget || 0));
-          }}
-          onDeleteCategory={(catId) => setDeleteCatId(catId)}
+        {/* Draggable Money Widgets Grid */}
+        <DraggableDashboardGrid
+          storageKey="money"
+          widgets={[
+            {
+              id: "category-wallets",
+              title: "💳 Category Wallets & Accounts",
+              component: (
+                <MoneyQuickActionsAndCards
+                  mainBalance={totalBalance}
+                  currencySymbol={currencySymbol}
+                  categories={categories.map((c) => ({
+                    id: c.id,
+                    name: c.name,
+                    amount: transactions
+                      .filter((t) => t.categoryId === c.id && t.type === "expense")
+                      .reduce((sum, t) => sum + t.amount, 0),
+                    color: c.color,
+                    icon: c.icon || "💳",
+                    type: c.type,
+                    monthlyBudget: c.monthlyBudget,
+                  }))}
+                  onAddTransaction={() => {
+                    if (categories.length === 0) {
+                      toast.error("Loading categories...");
+                      return;
+                    }
+                    setTxCategoryId(categories.filter((c) => c.type === txType)[0]?.id || "");
+                    setIsAddTxOpen(true);
+                  }}
+                  onViewDetails={() => setActiveTab("analytics")}
+                  onAddCategory={() => setIsChoiceOpen(true)}
+                  onEditCategory={(cat) => {
+                    const full = categories.find((c) => c.id === cat.id);
+                    setEditingCat(full || cat);
+                    setEditCatName(full?.name || cat.name);
+                    setEditCatType(full?.type || "expense");
+                    setEditCatColor(full?.color || "orange");
+                    setEditCatIcon(full?.icon || "💳");
+                    setEditCatMonthlyBudget(String(full?.monthlyBudget || 0));
+                  }}
+                  onDeleteCategory={(catId) => setDeleteCatId(catId)}
+                />
+              ),
+            },
+            {
+              id: "subscriptions",
+              title: "🔁 Active Subscriptions",
+              component: <SubscriptionsTracker />,
+            },
+            {
+              id: "savings-goals",
+              title: "🐷 Savings Goals & Piggy Bank",
+              component: <SavingsGoals />,
+            },
+          ]}
         />
-
-        {/* Subscriptions & Savings Goals Widgets */}
-        <SubscriptionsTracker />
-        <SavingsGoals />
 
         {/* Ledger Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
