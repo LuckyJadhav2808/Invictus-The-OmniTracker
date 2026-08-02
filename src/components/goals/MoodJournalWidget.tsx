@@ -43,20 +43,23 @@ export function MoodJournalWidget({ dateStr }: MoodJournalWidgetProps) {
     }
   }, [moodData]);
 
-  const handleSave = async (overrideMood?: string) => {
-    const moodToSave = overrideMood || selectedMood || "okay";
+  const handleSave = async (overrideMood?: string | null, overrideEnergy?: number, overrideNote?: string) => {
+    const moodToSave = overrideMood !== undefined ? (overrideMood || "okay") : (selectedMood || "okay");
+    const energyToSave = overrideEnergy !== undefined ? overrideEnergy : energyLevel;
+    const noteToSave = overrideNote !== undefined ? overrideNote : journalNote;
+
     try {
       await saveMoodMutation.mutateAsync({
         date: targetDate,
         mood: moodToSave,
-        energy: energyLevel,
-        note: journalNote,
+        energy: energyToSave,
+        note: noteToSave,
       });
       setSavedSuccess(true);
-      toast.success("Mood & journal saved! 🌟");
-      setTimeout(() => setSavedSuccess(false), 2000);
+      toast.success("Mood & energy saved! 🌟");
+      setTimeout(() => setSavedSuccess(false), 2500);
     } catch {
-      toast.error("Failed to save mood log");
+      toast.error("Failed to save mood & energy log");
     }
   };
 
@@ -99,7 +102,7 @@ export function MoodJournalWidget({ dateStr }: MoodJournalWidgetProps) {
                 type="button"
                 onClick={() => {
                   setSelectedMood(m.id);
-                  handleSave(m.id);
+                  handleSave(m.id, energyLevel, journalNote);
                 }}
                 className={cn(
                   "flex flex-col items-center justify-center p-2 rounded-2xl border-2 border-navy-950 transition-all cursor-pointer select-none shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5",
@@ -131,11 +134,11 @@ export function MoodJournalWidget({ dateStr }: MoodJournalWidgetProps) {
               type="button"
               onClick={() => {
                 setEnergyLevel(level);
-                handleSave();
+                handleSave(selectedMood, level, journalNote);
               }}
               className={cn(
-                "h-2.5 flex-1 rounded-full transition-all cursor-pointer",
-                level <= energyLevel ? "bg-amber-500 shadow-2xs" : "bg-gray-100"
+                "h-2.5 flex-1 rounded-full transition-all cursor-pointer border border-navy-950/20",
+                level <= energyLevel ? "bg-amber-400 shadow-2xs" : "bg-gray-100"
               )}
             />
           ))}
@@ -151,7 +154,7 @@ export function MoodJournalWidget({ dateStr }: MoodJournalWidgetProps) {
           type="text"
           value={journalNote}
           onChange={(e) => setJournalNote(e.target.value)}
-          onBlur={() => handleSave()}
+          onBlur={(e) => handleSave(selectedMood, energyLevel, e.target.value)}
           placeholder="What went well today? Any thoughts..."
           className="w-full bg-cream-bg/50 rounded-xl px-3 py-2 text-xs text-navy-900 font-medium border border-border/60 focus:outline-none focus:border-amber-500"
         />
