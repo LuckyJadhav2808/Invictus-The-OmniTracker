@@ -9,6 +9,7 @@ import {
   customLogout,
   setCustomSession,
 } from "@/lib/custom-auth";
+import { registerServiceWorker } from "@/lib/utils/notifications";
 
 interface AuthContextType {
   user: User | null;
@@ -46,6 +47,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     refreshUser();
+    registerServiceWorker();
   }, []);
 
   const isGuest = user?.uid === "guest-user";

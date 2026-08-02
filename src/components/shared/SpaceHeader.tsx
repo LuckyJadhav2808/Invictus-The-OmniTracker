@@ -4,9 +4,11 @@ import { useState, useEffect } from "react";
 import { useUIStore } from "@/store/ui-store";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Sparkles, ArrowRight, Megaphone, X, Home, BookOpen, Wallet, CheckSquare, Dumbbell, Utensils, Moon, Trophy, ChevronDown } from "lucide-react";
+import { Sparkles, ArrowRight, Megaphone, X, Home, BookOpen, Wallet, CheckSquare, Dumbbell, Utensils, Moon, Trophy, ChevronDown, Bell } from "lucide-react";
 import { InvictusLogo } from "@/components/shared/InvictusLogo";
 import { getGlobalAnnouncement, type GlobalAnnouncement } from "@/lib/custom-auth";
+import { requestNotificationPermission, sendNativeNotification } from "@/lib/utils/notifications";
+import { toast } from "sonner";
 
 export function SpaceHeader() {
   const pathname = usePathname();
@@ -75,6 +77,16 @@ export function SpaceHeader() {
     }
     setIsOpen(false);
     router.push(href);
+  };
+
+  const enableOSNotifications = async () => {
+    const granted = await requestNotificationPermission();
+    if (granted) {
+      sendNativeNotification("Invictus Status Bar Notifications Active 🚀", "You will receive background alerts on your laptop and mobile status bar!");
+      toast.success("Laptop & Mobile Status Bar Notifications Active! 🔔");
+    } else {
+      toast.error("Notification permission denied in browser settings.");
+    }
   };
 
   const getSubFeatures = () => {
@@ -192,7 +204,16 @@ export function SpaceHeader() {
           </div>
 
           {/* Right side: Switch Space Dropdown Popover Button */}
-          <div className="relative">
+          <div className="relative flex items-center gap-2">
+            <button
+              type="button"
+              onClick={enableOSNotifications}
+              className="p-2 bg-amber-100 hover:bg-amber-200 text-[#161514] rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] transition-all cursor-pointer"
+              title="Enable Laptop & Mobile Status Bar Notifications"
+            >
+              <Bell className="h-4 w-4 stroke-[2.5]" />
+            </button>
+
             <button
               type="button"
               onClick={() => setIsOpen(!isOpen)}
@@ -266,6 +287,20 @@ export function SpaceHeader() {
                       </button>
                     );
                   })}
+                </div>
+
+                <div className="pt-2 border-t border-[#161514]/15">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsOpen(false);
+                      enableOSNotifications();
+                    }}
+                    className="w-full p-2 rounded-xl bg-amber-100 hover:bg-amber-200 text-[#161514] text-xs font-black border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] transition-all cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <Bell className="h-3.5 w-3.5" />
+                    <span>Enable Status Bar OS Alerts 🔔</span>
+                  </button>
                 </div>
               </div>
             )}
