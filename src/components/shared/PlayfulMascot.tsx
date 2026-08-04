@@ -7,7 +7,8 @@ export type MascotType =
   | "cake-skates"
   | "sushi-stack"
   | "book-wizard"
-  | "star-avatar";
+  | "star-avatar"
+  | "robot-taskmaster";
 
 interface PlayfulMascotProps {
   type: MascotType;
@@ -217,6 +218,53 @@ export function PlayfulMascot({ type, className, size = "md" }: PlayfulMascotPro
       );
 
     case "star-avatar":
+    case "robot-taskmaster":
+      return (
+        <div className={cn("relative shrink-0 select-none", currentSize, className)}>
+          {/* 🤖 ROBOT TASKMASTER: High-Energy Task Robot with Clipboard & Glowing Visor */}
+          <svg viewBox="0 0 200 200" className="w-full h-full drop-shadow-[3px_3px_0px_rgba(22,21,20,1)]" fill="none" xmlns="http://www.w3.org/2000/svg">
+            {/* Robot Antenna with Glowing Tip */}
+            <line x1="100" y1="35" x2="100" y2="15" stroke="#161514" strokeWidth="6" strokeLinecap="round" />
+            <circle cx="100" cy="12" r="8" fill="#F59E0B" stroke="#161514" strokeWidth="3" />
+
+            {/* Robot Head Box */}
+            <rect x="50" y="35" width="100" height="65" rx="14" fill="#FFFBEB" stroke="#161514" strokeWidth="6" />
+            
+            {/* Cyber Visor Eyes */}
+            <rect x="62" y="52" width="76" height="24" rx="8" fill="#161514" />
+            <circle cx="78" cy="64" r="6" fill="#CEF431" />
+            <circle cx="122" cy="64" r="6" fill="#CEF431" />
+
+            {/* Happy Robot Mouth Grid */}
+            <path d="M 80 84 Q 100 96 120 84" stroke="#161514" strokeWidth="4" strokeLinecap="round" />
+
+            {/* Robot Body */}
+            <rect x="58" y="106" width="84" height="60" rx="12" fill="#F59E0B" stroke="#161514" strokeWidth="6" />
+            <circle cx="80" cy="136" r="8" fill="#161514" />
+            <circle cx="100" cy="136" r="8" fill="#CEF431" stroke="#161514" strokeWidth="2" />
+            <circle cx="120" cy="136" r="8" fill="#03D26F" stroke="#161514" strokeWidth="2" />
+
+            {/* Left Arm holding Clipboard */}
+            <path d="M 58 120 Q 30 130 25 150" stroke="#161514" strokeWidth="7" strokeLinecap="round" />
+            {/* Neobrutalist Task Clipboard */}
+            <rect x="5" y="130" width="34" height="44" rx="5" fill="#FFFFFF" stroke="#161514" strokeWidth="4" />
+            <rect x="14" y="125" width="16" height="8" rx="2" fill="#161514" />
+            <line x1="12" y1="144" x2="30" y2="144" stroke="#03D26F" strokeWidth="3" strokeLinecap="round" />
+            <line x1="12" y1="154" x2="28" y2="154" stroke="#161514" strokeWidth="3" strokeLinecap="round" />
+            <line x1="12" y1="164" x2="24" y2="164" stroke="#F59E0B" strokeWidth="3" strokeLinecap="round" />
+
+            {/* Right Arm Waving Checkmark Pen */}
+            <path d="M 142 120 Q 170 110 178 95" stroke="#161514" strokeWidth="7" strokeLinecap="round" />
+            <circle cx="178" cy="95" r="10" fill="#CEF431" stroke="#161514" strokeWidth="3" />
+            <path d="M 173 95 L 177 99 L 184 91" stroke="#161514" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+
+            {/* Robot Feet */}
+            <rect x="68" y="166" width="22" height="18" rx="5" fill="#161514" />
+            <rect x="110" y="166" width="22" height="18" rx="5" fill="#161514" />
+          </svg>
+        </div>
+      );
+
     default:
       return (
         <div className={cn("relative shrink-0 select-none", currentSize, className)}>

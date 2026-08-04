@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-type ActiveTab = "today" | "goals" | "study" | "money" | "profile";
-type ActiveTracker = "life" | "study" | "money";
+type ActiveTab = "today" | "goals" | "study" | "money" | "tasks" | "profile";
+type ActiveTracker = "life" | "study" | "money" | "tasks";
 type HabitLayoutStyle = "cards" | "compact";
 type WidgetVariantStyle = "classic" | "expanded" | "dark";
 

@@ -91,7 +91,7 @@ export function InvictusLogo({
         </div>
         <span
           className={cn(
-            "font-black tracking-[0.2em] uppercase rounded-lg mt-1 w-fit border-1.5 border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)]",
+            "font-black tracking-[0.2em] uppercase rounded-lg mt-1 w-fit border-1.5 border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] hidden xs:inline-block",
             currentSize.badge,
             "bg-[#CEF431] text-[#161514]"
           )}

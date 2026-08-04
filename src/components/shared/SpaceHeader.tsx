@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useUIStore } from "@/store/ui-store";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Sparkles, ArrowRight, Megaphone, X, Home, BookOpen, Wallet, CheckSquare, Dumbbell, Utensils, Moon, Trophy, ChevronDown, Bell, Eye, EyeOff, Layers } from "lucide-react";
+import { Sparkles, ArrowRight, Megaphone, X, Home, BookOpen, Wallet, CheckSquare, Dumbbell, Utensils, Moon, Trophy, ChevronDown, Bell, Eye, EyeOff } from "lucide-react";
 import { InvictusLogo } from "@/components/shared/InvictusLogo";
 import { getGlobalAnnouncement, type GlobalAnnouncement } from "@/lib/custom-auth";
 import { requestNotificationPermission, sendNativeNotification } from "@/lib/utils/notifications";
@@ -75,6 +75,16 @@ export function SpaceHeader() {
       href: "/study",
     },
     {
+      value: "tasks" as const,
+      label: "📋 Tasks & Projects",
+      shortLabel: "📋 Tasks Space",
+      mobileLabel: "📋 Tasks",
+      desc: "Kanban board, P1-P4 matrix & subtasks",
+      activeBg: "bg-[#F59E0B] text-white",
+      accentBg: "bg-[#F59E0B]/30 text-[#161514]",
+      href: "/tasks",
+    },
+    {
       value: "money" as const,
       label: "💰 Money & Ledger",
       shortLabel: "💰 Money Space",
@@ -113,6 +123,13 @@ export function SpaceHeader() {
   };
 
   const getSubFeatures = () => {
+    if (pathname.startsWith("/tasks")) {
+      return [
+        { label: "Kanban Board", icon: CheckSquare, targetId: "kanban-board", spaceHref: "/tasks", tab: "kanban" },
+        { label: "Task List", icon: Sparkles, targetId: "task-list", spaceHref: "/tasks", tab: "list" },
+        { label: "Eisenhower Matrix", icon: Trophy, targetId: "matrix-view", spaceHref: "/tasks", tab: "matrix" },
+      ];
+    }
     if (pathname.startsWith("/study")) {
       return [
         { label: "Syllabus Tracker", icon: BookOpen, targetId: "syllabus-tracker", spaceHref: "/study", tab: "subjects" },
@@ -155,7 +172,6 @@ export function SpaceHeader() {
         behavior: "smooth",
       });
 
-      // Highlight target section box visually
       el.classList.add("ring-4", "ring-[#CEF431]", "scale-[1.01]", "transition-all", "duration-300");
       setTimeout(() => {
         el.classList.remove("ring-4", "ring-[#CEF431]", "scale-[1.01]");
@@ -165,7 +181,6 @@ export function SpaceHeader() {
     }
   };
 
-  // Automatically catch jump query parameter or hash on route load
   useEffect(() => {
     const jumpId = searchParams.get("jump") || (typeof window !== "undefined" ? window.location.hash.replace("#", "") : "");
     if (jumpId) {
@@ -206,17 +221,17 @@ export function SpaceHeader() {
       )}
 
       {/* Main Sticky Header */}
-      <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b-2 border-[#161514] transition-all">
-        <div className="max-w-6xl mx-auto px-2.5 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-1.5 sm:gap-3">
+      <header className="sticky top-0 z-[100] w-full bg-white/95 backdrop-blur-md border-b-2 border-[#161514] transition-all">
+        <div className="max-w-6xl mx-auto px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-2">
           
-          {/* Left side: Brand Logo & Current Space Active Badge */}
-          <div className="flex items-center gap-1.5 sm:gap-3 min-w-0 shrink">
+          {/* Left side: Brand Logo & Desktop Active Space Badge */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <InvictusLogo size="sm" variant="horizontal" href="/today" />
             
-            {/* Responsive Active Space Badge */}
+            {/* Desktop Only Active Space Badge */}
             <div
               className={cn(
-                "px-2 sm:px-3 py-0.5 sm:py-1 rounded-xl text-[10px] sm:text-xs font-black border-1.5 sm:border-2 border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] flex items-center gap-1 sm:gap-1.5 shrink whitespace-nowrap",
+                "hidden sm:flex px-3 py-1 rounded-xl text-xs font-black border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] items-center gap-1.5 shrink-0 whitespace-nowrap",
                 currentSpace.accentBg
               )}
             >
@@ -224,8 +239,7 @@ export function SpaceHeader() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#161514] opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-[#161514]" />
               </span>
-              <span className="hidden sm:inline font-black">{currentSpace.shortLabel}</span>
-              <span className="sm:hidden font-black">{currentSpace.mobileLabel}</span>
+              <span className="font-black">{currentSpace.shortLabel}</span>
             </div>
           </div>
 
@@ -237,7 +251,7 @@ export function SpaceHeader() {
                 type="button"
                 onClick={toggleSubNav}
                 className={cn(
-                  "p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl border-1.5 sm:border-2 border-[#161514] text-xs font-black shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] transition-all cursor-pointer flex items-center gap-1",
+                  "p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl border-1.5 sm:border-2 border-[#161514] text-xs font-black shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] transition-all cursor-pointer flex items-center gap-1 shrink-0",
                   isSubNavVisible
                     ? "bg-[#CEF431] text-[#161514]"
                     : "bg-white text-[#161514]/70 hover:text-[#161514]"
@@ -245,7 +259,7 @@ export function SpaceHeader() {
                 title={isSubNavVisible ? "Hide sub-navigation bar" : "Show sub-navigation bar"}
               >
                 {isSubNavVisible ? <Eye className="h-4 w-4 stroke-[2.5]" /> : <EyeOff className="h-4 w-4 stroke-[2.5]" />}
-                <span className="hidden md:inline">{isSubNavVisible ? "Sub-Nav" : "Sub-Nav"}</span>
+                <span className="hidden md:inline">Sub-Nav</span>
               </button>
             )}
 
@@ -253,40 +267,40 @@ export function SpaceHeader() {
             <button
               type="button"
               onClick={enableOSNotifications}
-              className="p-1.5 sm:p-2 bg-amber-100 hover:bg-amber-200 text-[#161514] rounded-xl sm:rounded-2xl border-1.5 sm:border-2 border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] sm:shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] transition-all cursor-pointer"
+              className="p-1.5 sm:p-2 bg-amber-100 hover:bg-amber-200 text-[#161514] rounded-xl sm:rounded-2xl border-1.5 sm:border-2 border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] sm:shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] transition-all cursor-pointer shrink-0"
               title="Enable Laptop & Mobile Status Bar Notifications"
             >
               <Bell className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2.5]" />
             </button>
 
-            {/* Switch Space Popover Button */}
+            {/* Switch Space Popover Button (Displays Active Space Indicator on Mobile) */}
             <button
               type="button"
               onClick={() => setIsOpen(!isOpen)}
               className={cn(
-                "flex items-center gap-1 sm:gap-2 rounded-xl sm:rounded-2xl px-2.5 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-black shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] sm:shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] border-1.5 sm:border-2 border-[#161514] transition-all duration-200 cursor-pointer uppercase tracking-wider select-none hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 whitespace-nowrap",
+                "flex items-center gap-1 sm:gap-2 rounded-xl sm:rounded-2xl px-2.5 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-black shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] sm:shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] border-1.5 sm:border-2 border-[#161514] transition-all duration-200 cursor-pointer uppercase tracking-wider select-none hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 whitespace-nowrap shrink-0",
                 currentSpace.activeBg
               )}
             >
-              <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2.5]" />
-              <span className="hidden xs:inline">Switch Space</span>
-              <span className="xs:hidden">Switch</span>
+              <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2.5] shrink-0" />
+              <span className="hidden sm:inline">Switch Space</span>
+              <span className="sm:hidden font-black">{currentSpace.mobileLabel}</span>
               <ChevronDown
-                className={cn("h-3.5 w-3.5 sm:h-4 sm:w-4 transition-transform duration-200 stroke-[2.5]", isOpen && "rotate-180")}
+                className={cn("h-3.5 w-3.5 sm:h-4 sm:w-4 transition-transform duration-200 stroke-[2.5] shrink-0", isOpen && "rotate-180")}
               />
             </button>
 
             {/* Backdrop for click outside */}
             {isOpen && (
               <div
-                className="fixed inset-0 z-40 bg-[#161514]/15 backdrop-blur-2xs"
+                className="fixed inset-0 z-[110] bg-[#161514]/25 backdrop-blur-2xs"
                 onClick={() => setIsOpen(false)}
               />
             )}
 
             {/* Space Switcher Popover Menu */}
             {isOpen && (
-              <div className="absolute right-0 top-full mt-2.5 w-72 sm:w-80 bg-white border-2.5 border-[#161514] rounded-3xl shadow-[6px_6px_0px_0px_rgba(22,21,20,1)] p-3 z-50 animate-in fade-in slide-in-from-top-3 duration-200 origin-top-right space-y-2">
+              <div className="absolute right-0 top-full mt-2.5 w-72 sm:w-80 bg-white border-2.5 border-[#161514] rounded-3xl shadow-[6px_6px_0px_0px_rgba(22,21,20,1)] p-3 z-[120] animate-in fade-in slide-in-from-top-3 duration-200 origin-top-right space-y-2">
                 
                 {/* Popover Header with Explicit Close X Button */}
                 <div className="px-3 py-1.5 flex items-center justify-between border-b-2 border-[#161514]/15">

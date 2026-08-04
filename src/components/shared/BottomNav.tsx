@@ -18,6 +18,14 @@ function BottomNavContent() {
   const getNavItems = () => {
     let items = [];
     switch (activeTracker) {
+      case "tasks":
+        items = [
+          { href: "/today", icon: Home, label: "Today" },
+          { href: "/tasks", icon: CheckSquare, label: "Tasks" },
+          { href: "/tasks?tab=kanban", icon: TrendingUp, label: "Kanban" },
+          { href: "/profile", icon: User, label: "Profile" },
+        ];
+        break;
       case "study":
         items = [
           { href: "/today", icon: Home, label: "Today" },

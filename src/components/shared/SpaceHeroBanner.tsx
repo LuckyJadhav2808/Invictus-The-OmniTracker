@@ -6,7 +6,7 @@ import { Sparkles, ArrowUpRight } from "lucide-react";
 import { PlayfulMascot, type MascotType } from "@/components/shared/PlayfulMascot";
 
 interface SpaceHeroBannerProps {
-  space: "today" | "life" | "study" | "money" | "analytics";
+  space: "today" | "life" | "study" | "money" | "tasks" | "analytics";
   badgeText: string;
   title: string;
   subtitle: string;
@@ -53,6 +53,12 @@ export function SpaceHeroBanner({
       statBg: "bg-white text-[#161514] border-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] sm:shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)]",
       btnBg: "bg-[#161514] text-[#C084FC] hover:bg-[#252321] border-[#161514] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)]",
     },
+    tasks: {
+      cardBg: "bg-[#FFFBEB] text-[#161514] border-[#161514]",
+      badgeBg: "bg-[#F59E0B] text-white border-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)]",
+      statBg: "bg-white text-[#161514] border-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] sm:shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)]",
+      btnBg: "bg-[#161514] text-[#F59E0B] hover:bg-[#252321] border-[#161514] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)]",
+    },
     money: {
       cardBg: "bg-[#FFF1F2] text-[#161514] border-[#161514]",
       badgeBg: "bg-[#FBCFE8] text-[#161514] border-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)]",
@@ -71,6 +77,7 @@ export function SpaceHeroBanner({
     today: "star-avatar",
     life: "sushi-stack",
     study: "book-wizard",
+    tasks: "robot-taskmaster",
     money: "burger-boss",
     analytics: "cake-skates",
   };
