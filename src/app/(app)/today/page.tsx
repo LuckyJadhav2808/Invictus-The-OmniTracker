@@ -19,6 +19,7 @@ import { useUIStore } from "@/store/ui-store";
 import { SpaceHeroBanner } from "@/components/shared/SpaceHeroBanner";
 import { LiquidPillBarChart } from "@/components/shared/LiquidPillBarChart";
 import { DraggableDashboardGrid } from "@/components/shared/DraggableDashboardGrid";
+import { QuickThoughtsWidget } from "@/components/shared/QuickThoughtsWidget";
 import { GymRoutineTracker } from "@/components/goals/GymRoutineTracker";
 import { MealTracker } from "@/components/goals/MealTracker";
 import { MoodJournalWidget } from "@/components/goals/MoodJournalWidget";
@@ -428,6 +429,9 @@ export default function TodayPage() {
             </Button>
           </div>
         )}
+
+        {/* Quick Thoughts & Scratchpad Widget */}
+        <QuickThoughtsWidget />
 
         {/* Daily Log summaries */}
         <div className="bg-white rounded-[var(--radius-lg)] p-6 shadow-[0_8px_24px_rgba(31,36,48,0.06)] space-y-4 border">

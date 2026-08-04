@@ -48,6 +48,7 @@ export function SpaceHeader() {
       value: "today" as const,
       label: "🔥 Today Overview",
       shortLabel: "🔥 Today Space",
+      mobileLabel: "🔥 Today",
       desc: "Daily flow, habits summary & liquid chart",
       activeBg: "bg-[#CEF431] text-[#161514]",
       accentBg: "bg-[#CEF431]/30 text-[#161514]",
@@ -57,6 +58,7 @@ export function SpaceHeader() {
       value: "life" as const,
       label: "🌱 Goals & Life",
       shortLabel: "🌱 Goals Space",
+      mobileLabel: "🌱 Goals",
       desc: "Habits, gym splits, nutrition & sleep",
       activeBg: "bg-[#03D26F] text-[#161514]",
       accentBg: "bg-[#03D26F]/30 text-[#161514]",
@@ -66,6 +68,7 @@ export function SpaceHeader() {
       value: "study" as const,
       label: "📚 Study & Exams",
       shortLabel: "📚 Study Space",
+      mobileLabel: "📚 Study",
       desc: "GATE syllabus, revision & mock tests",
       activeBg: "bg-[#C084FC] text-[#161514]",
       accentBg: "bg-[#C084FC]/30 text-[#161514]",
@@ -75,6 +78,7 @@ export function SpaceHeader() {
       value: "money" as const,
       label: "💰 Money & Ledger",
       shortLabel: "💰 Money Space",
+      mobileLabel: "💰 Money",
       desc: "Category wallets, budgets & savings",
       activeBg: "bg-[#FBCFE8] text-[#161514]",
       accentBg: "bg-[#FBCFE8]/30 text-[#161514]",
@@ -212,7 +216,7 @@ export function SpaceHeader() {
             {/* Responsive Active Space Badge */}
             <div
               className={cn(
-                "px-2 sm:px-3 py-0.5 sm:py-1 rounded-xl text-[10px] sm:text-xs font-black border-1.5 sm:border-2 border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] sm:shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] flex items-center gap-1 sm:gap-1.5 shrink truncate max-w-[110px] sm:max-w-none",
+                "px-2 sm:px-3 py-0.5 sm:py-1 rounded-xl text-[10px] sm:text-xs font-black border-1.5 sm:border-2 border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] flex items-center gap-1 sm:gap-1.5 shrink whitespace-nowrap",
                 currentSpace.accentBg
               )}
             >
@@ -220,7 +224,8 @@ export function SpaceHeader() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#161514] opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-[#161514]" />
               </span>
-              <span className="truncate">{currentSpace.shortLabel}</span>
+              <span className="hidden sm:inline font-black">{currentSpace.shortLabel}</span>
+              <span className="sm:hidden font-black">{currentSpace.mobileLabel}</span>
             </div>
           </div>
 
