@@ -171,22 +171,31 @@ export function setCustomSession(user: User) {
   localStorage.removeItem("invictus_guest_name");
 }
 
-// Get active session
+// Get active session with guaranteed profile persistence
 export function getCustomSession(): User | null {
   if (typeof window === "undefined") return null;
   const isGuestMode = localStorage.getItem("invictus_guest_mode") === "true";
   if (isGuestMode) {
     const guestName = localStorage.getItem("invictus_guest_name") || "Guest Explorer";
+    const profileStr = localStorage.getItem("invictus_user_profile");
+    let guestProfile: Partial<User> = {};
+    if (profileStr) {
+      try {
+        guestProfile = JSON.parse(profileStr);
+      } catch {}
+    }
+
     return {
       uid: "guest-user",
       email: "guest@invictus.local",
-      displayName: guestName,
+      displayName: guestProfile.displayName || guestName,
       role: "user",
       timezone: "Asia/Kolkata",
       weekStartsOn: 1,
       currency: "INR",
       onboarded: true,
       modulesEnabled: { goals: true, study: true, money: true },
+      ...guestProfile,
     };
   }
 
@@ -196,10 +205,16 @@ export function getCustomSession(): User | null {
 
   try {
     const user: User = JSON.parse(userJson);
-    if (user.email.toLowerCase().includes("luckymanojjadhav") || user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
-      user.role = "admin";
+    const users = getRegisteredUsers();
+    const dbUser = users.find((u) => u.uid === user.uid || u.email.toLowerCase() === user.email.toLowerCase());
+    
+    // Merge dbUser updates into active user session so user updates are never lost!
+    const finalUser: User = dbUser ? { ...user, ...dbUser } : user;
+
+    if (finalUser.email.toLowerCase().includes("luckymanojjadhav") || finalUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+      finalUser.role = "admin";
     }
-    return user;
+    return finalUser;
   } catch {
     return null;
   }
@@ -212,29 +227,68 @@ export function customLogout() {
   localStorage.removeItem(ACTIVE_USER_KEY);
   localStorage.removeItem("invictus_guest_mode");
   localStorage.removeItem("invictus_guest_name");
+  localStorage.removeItem("invictus_user_profile");
 }
 
-// Update user details in DB & active session
+// Update user details in DB & active session atomically
 export function customUpdateUser(uid: string, updates: Partial<User>): User | null {
-  const users = getRegisteredUsers();
-  const idx = users.findIndex((u) => u.uid === uid);
-  if (idx === -1) return null;
+  if (typeof window === "undefined") return null;
 
-  const updatedUser: User = {
-    ...users[idx],
-    ...updates,
-    updatedAt: new Date().toISOString(),
-  };
-
-  users[idx] = updatedUser;
-  saveRegisteredUsers(users);
-
-  const currentUser = getCustomSession();
-  if (currentUser && currentUser.uid === uid) {
-    localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(updatedUser));
+  const isGuestMode = localStorage.getItem("invictus_guest_mode") === "true";
+  if (isGuestMode || uid === "guest-user") {
+    const profileStr = localStorage.getItem("invictus_user_profile");
+    const existing = profileStr ? JSON.parse(profileStr) : {};
+    const updated = { ...existing, ...updates };
+    if (updates.displayName) {
+      localStorage.setItem("invictus_guest_name", updates.displayName);
+    }
+    localStorage.setItem("invictus_user_profile", JSON.stringify(updated));
+    return getCustomSession();
   }
 
+  const users = getRegisteredUsers();
+  const idx = users.findIndex((u) => u.uid === uid);
+  
+  let updatedUser: User;
+  if (idx !== -1) {
+    updatedUser = {
+      ...users[idx],
+      ...updates,
+      updatedAt: new Date().toISOString(),
+    };
+    users[idx] = updatedUser;
+    saveRegisteredUsers(users);
+  } else {
+    const currentSession = getCustomSession();
+    updatedUser = {
+      ...(currentSession || ({} as User)),
+      uid,
+      ...updates,
+      updatedAt: new Date().toISOString(),
+    };
+  }
+
+  // Atomically update active session in localStorage
+  localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(updatedUser));
   return updatedUser;
+}
+
+// Update user password
+export async function customUpdatePassword(uid: string, newPassword: string): Promise<boolean> {
+  const users = getRegisteredUsers();
+  const idx = users.findIndex((u) => u.uid === uid);
+  if (idx === -1) return false;
+
+  const passwordHash = await hashPassword(newPassword);
+  users[idx].passwordHash = passwordHash;
+  saveRegisteredUsers(users);
+
+  const session = getCustomSession();
+  if (session && session.uid === uid) {
+    session.passwordHash = passwordHash;
+    localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(session));
+  }
+  return true;
 }
 
 // Delete user by UID or Email permanently
@@ -245,7 +299,6 @@ export function customDeleteUser(uidOrEmail: string): boolean {
   const target = uidOrEmail.trim().toLowerCase();
   users = users.filter((u) => u.uid !== uidOrEmail && u.email.toLowerCase() !== target);
   
-  // Persist updated list (even if empty array []) so seedAdmin is NOT re-seeded!
   saveRegisteredUsers(users);
   return users.length !== initialCount;
 }
@@ -300,64 +353,81 @@ export function getReportedIssues(): IssueReport[] {
   }
 }
 
-export function createReportedIssue(issue: Omit<IssueReport, "id" | "reportedAt">): IssueReport {
+export function saveReportedIssue(issue: Omit<IssueReport, "id" | "reportedAt">): IssueReport {
   const issues = getReportedIssues();
   const newIssue: IssueReport = {
     ...issue,
-    id: `issue_${Math.random().toString(36).substring(2, 9)}_${Date.now()}`,
+    id: `issue_${Date.now()}`,
     reportedAt: new Date().toISOString(),
   };
   issues.unshift(newIssue);
-  if (typeof window !== "undefined") {
-    localStorage.setItem(ISSUES_DB_KEY, JSON.stringify(issues));
-  }
+  localStorage.setItem(ISSUES_DB_KEY, JSON.stringify(issues));
   return newIssue;
 }
 
-export function updateIssueStatus(id: string, status: "open" | "in_progress" | "resolved"): boolean {
+export const createReportedIssue = saveReportedIssue;
+
+export function updateReportedIssueStatus(id: string, status: "open" | "in_progress" | "resolved"): boolean {
   const issues = getReportedIssues();
   const idx = issues.findIndex((i) => i.id === id);
-  if (idx !== -1) {
-    issues[idx].status = status;
-    if (typeof window !== "undefined") {
-      localStorage.setItem(ISSUES_DB_KEY, JSON.stringify(issues));
-    }
-    return true;
-  }
-  return false;
+  if (idx === -1) return false;
+  issues[idx].status = status;
+  localStorage.setItem(ISSUES_DB_KEY, JSON.stringify(issues));
+  return true;
 }
+
+export const updateIssueStatus = updateReportedIssueStatus;
 
 export function deleteReportedIssue(id: string): boolean {
   let issues = getReportedIssues();
   const initial = issues.length;
   issues = issues.filter((i) => i.id !== id);
-  if (issues.length !== initial) {
-    if (typeof window !== "undefined") {
-      localStorage.setItem(ISSUES_DB_KEY, JSON.stringify(issues));
-    }
-    return true;
-  }
-  return false;
+  localStorage.setItem(ISSUES_DB_KEY, JSON.stringify(issues));
+  return issues.length !== initial;
 }
 
-// Password update helper for custom auth
-export async function customUpdatePassword(uid: string, newPassword: string): Promise<boolean> {
-  if (!newPassword || newPassword.length < 4) {
-    throw new Error("Password must be at least 4 characters.");
-  }
-  const passwordHash = await hashPassword(newPassword);
-  const updated = customUpdateUser(uid, { passwordHash });
-  return updated !== null;
+// Audit Logs for Admin Panel
+export interface AuditLogItem {
+  id: string;
+  action: string;
+  userEmail: string;
+  performedBy?: string;
+  timestamp: string;
+  details?: string;
 }
 
-// Global Announcement Banner System
+const AUDIT_LOGS_KEY = "invictus_audit_logs_db";
+
+export function getAuditLogs(): AuditLogItem[] {
+  if (typeof window === "undefined") return [];
+  const data = localStorage.getItem(AUDIT_LOGS_KEY);
+  if (!data) return [];
+  try { return JSON.parse(data); } catch { return []; }
+}
+
+export function addAuditLog(action: string, userEmail: string, details?: string, performedBy?: string) {
+  if (typeof window === "undefined") return;
+  const logs = getAuditLogs();
+  const newLog: AuditLogItem = {
+    id: `log_${Date.now()}`,
+    action,
+    userEmail,
+    performedBy: performedBy || userEmail,
+    timestamp: new Date().toISOString(),
+    details,
+  };
+  logs.unshift(newLog);
+  localStorage.setItem(AUDIT_LOGS_KEY, JSON.stringify(logs.slice(0, 100)));
+}
+
+// Global Announcement Banner Persistence
 export interface GlobalAnnouncement {
   id: string;
   message: string;
-  type: "info" | "warning" | "success" | "alert";
   active: boolean;
+  type?: "info" | "warning" | "success" | "alert";
+  createdBy?: string;
   createdAt: string;
-  createdBy: string;
 }
 
 const ANNOUNCEMENT_KEY = "invictus_global_announcement";
@@ -367,68 +437,32 @@ export function getGlobalAnnouncement(): GlobalAnnouncement | null {
   const data = localStorage.getItem(ANNOUNCEMENT_KEY);
   if (!data) return null;
   try {
-    const parsed = JSON.parse(data);
-    return parsed.active ? parsed : null;
+    const ann: GlobalAnnouncement = JSON.parse(data);
+    return ann.active ? ann : null;
   } catch {
     return null;
   }
 }
 
-export function setGlobalAnnouncement(announcement: GlobalAnnouncement | null) {
+export function setGlobalAnnouncement(
+  message: string,
+  active: boolean = true,
+  type: "info" | "warning" | "success" | "alert" = "info",
+  createdBy?: string
+) {
   if (typeof window === "undefined") return;
-  if (!announcement) {
-    localStorage.removeItem(ANNOUNCEMENT_KEY);
-  } else {
-    localStorage.setItem(ANNOUNCEMENT_KEY, JSON.stringify(announcement));
-  }
-}
-
-// Audit Trail Logging System
-export interface AuditLogItem {
-  id: string;
-  action: string;
-  performedBy: string;
-  timestamp: string;
-  details: string;
-}
-
-const AUDIT_LOGS_KEY = "invictus_system_audit_logs";
-
-export function getAuditLogs(): AuditLogItem[] {
-  if (typeof window === "undefined") return [];
-  const data = localStorage.getItem(AUDIT_LOGS_KEY);
-  if (!data) {
-    const defaultLogs: AuditLogItem[] = [
-      {
-        id: "audit_1",
-        action: "SYSTEM_INITIALIZATION",
-        performedBy: ADMIN_EMAIL,
-        timestamp: new Date().toISOString(),
-        details: "Invictus Governance Engine & Custom Auth SHA-256 System Initialized.",
-      },
-    ];
-    localStorage.setItem(AUDIT_LOGS_KEY, JSON.stringify(defaultLogs));
-    return defaultLogs;
-  }
-  try {
-    return JSON.parse(data);
-  } catch {
-    return [];
-  }
-}
-
-export function addAuditLog(action: string, performedBy: string, details: string) {
-  const logs = getAuditLogs();
-  const newLog: AuditLogItem = {
-    id: `audit_${Date.now()}`,
-    action,
-    performedBy,
-    timestamp: new Date().toISOString(),
-    details,
+  const ann: GlobalAnnouncement = {
+    id: `ann_${Date.now()}`,
+    message,
+    active,
+    type,
+    createdBy,
+    createdAt: new Date().toISOString(),
   };
-  logs.unshift(newLog);
-  if (typeof window !== "undefined") {
-    localStorage.setItem(AUDIT_LOGS_KEY, JSON.stringify(logs.slice(0, 50))); // Keep last 50
-  }
+  localStorage.setItem(ANNOUNCEMENT_KEY, JSON.stringify(ann));
 }
 
+export function clearGlobalAnnouncement() {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(ANNOUNCEMENT_KEY);
+}

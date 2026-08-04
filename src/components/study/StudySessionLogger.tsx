@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Clock, Star, Plus, CheckCircle, Sparkles, Smile, Frown, Meh } from "lucide-react";
+import { Clock, Star, Plus, CheckCircle, Sparkles, Smile, Frown, Meh, X } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -72,9 +72,10 @@ export function StudySessionLogger({ topics = [], onLogSession }: StudySessionLo
             <button
               type="button"
               onClick={() => setIsOpen(false)}
-              className="text-xs font-black text-navy-600 hover:text-navy-950 cursor-pointer"
+              className="bg-rose-100 hover:bg-rose-300 text-[#161514] p-1 rounded-xl border-2 border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
+              title="Close form"
             >
-              Cancel
+              <X className="h-4 w-4 stroke-[3]" />
             </button>
           </div>
 

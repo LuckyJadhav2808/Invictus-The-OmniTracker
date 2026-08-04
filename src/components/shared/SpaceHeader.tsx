@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useUIStore } from "@/store/ui-store";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Sparkles, ArrowRight, Megaphone, X, Home, BookOpen, Wallet, CheckSquare, Dumbbell, Utensils, Moon, Trophy, ChevronDown, Bell } from "lucide-react";
+import { Sparkles, ArrowRight, Megaphone, X, Home, BookOpen, Wallet, CheckSquare, Dumbbell, Utensils, Moon, Trophy, ChevronDown, Bell, Eye, EyeOff, Layers } from "lucide-react";
 import { InvictusLogo } from "@/components/shared/InvictusLogo";
 import { getGlobalAnnouncement, type GlobalAnnouncement } from "@/lib/custom-auth";
 import { requestNotificationPermission, sendNativeNotification } from "@/lib/utils/notifications";
@@ -18,11 +18,30 @@ export function SpaceHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const [announcement, setAnnouncement] = useState<GlobalAnnouncement | null>(null);
   const [dismissedAnn, setDismissedAnn] = useState(false);
+  
+  // Toggle sub-nav visibility state with localStorage persistence
+  const [isSubNavVisible, setIsSubNavVisible] = useState<boolean>(true);
 
   useEffect(() => {
     const ann = getGlobalAnnouncement();
     setAnnouncement(ann);
+
+    try {
+      const savedSubNav = localStorage.getItem("invictus_show_subnav");
+      if (savedSubNav !== null) {
+        setIsSubNavVisible(savedSubNav === "true");
+      }
+    } catch {}
   }, []);
+
+  const toggleSubNav = () => {
+    const next = !isSubNavVisible;
+    setIsSubNavVisible(next);
+    try {
+      localStorage.setItem("invictus_show_subnav", String(next));
+    } catch {}
+    toast.info(next ? "Sub-navigation bar visible 📍" : "Sub-navigation bar hidden 🙈");
+  };
 
   const spaces = [
     {
@@ -184,48 +203,71 @@ export function SpaceHeader() {
 
       {/* Main Sticky Header */}
       <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b-2 border-[#161514] transition-all">
-        <div className="max-w-6xl mx-auto px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-3">
+        <div className="max-w-6xl mx-auto px-2.5 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-1.5 sm:gap-3">
           
           {/* Left side: Brand Logo & Current Space Active Badge */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 min-w-0 shrink">
             <InvictusLogo size="sm" variant="horizontal" href="/today" />
+            
+            {/* Responsive Active Space Badge */}
             <div
               className={cn(
-                "hidden sm:flex px-3 py-1 rounded-xl text-xs font-black border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] items-center gap-1.5 transition-all",
+                "px-2 sm:px-3 py-0.5 sm:py-1 rounded-xl text-[10px] sm:text-xs font-black border-1.5 sm:border-2 border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] sm:shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] flex items-center gap-1 sm:gap-1.5 shrink truncate max-w-[110px] sm:max-w-none",
                 currentSpace.accentBg
               )}
             >
-              <span className="relative flex h-2 w-2">
+              <span className="relative flex h-2 w-2 shrink-0">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#161514] opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-[#161514]" />
               </span>
-              <span>{currentSpace.shortLabel}</span>
+              <span className="truncate">{currentSpace.shortLabel}</span>
             </div>
           </div>
 
-          {/* Right side: Switch Space Dropdown Popover Button */}
-          <div className="relative flex items-center gap-2">
+          {/* Right side: Actions & Switch Space Dropdown Popover Button */}
+          <div className="relative flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* Sub-Nav Show / Hide Toggle Button */}
+            {subFeatures.length > 0 && (
+              <button
+                type="button"
+                onClick={toggleSubNav}
+                className={cn(
+                  "p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl border-1.5 sm:border-2 border-[#161514] text-xs font-black shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] transition-all cursor-pointer flex items-center gap-1",
+                  isSubNavVisible
+                    ? "bg-[#CEF431] text-[#161514]"
+                    : "bg-white text-[#161514]/70 hover:text-[#161514]"
+                )}
+                title={isSubNavVisible ? "Hide sub-navigation bar" : "Show sub-navigation bar"}
+              >
+                {isSubNavVisible ? <Eye className="h-4 w-4 stroke-[2.5]" /> : <EyeOff className="h-4 w-4 stroke-[2.5]" />}
+                <span className="hidden md:inline">{isSubNavVisible ? "Sub-Nav" : "Sub-Nav"}</span>
+              </button>
+            )}
+
+            {/* Notification Bell */}
             <button
               type="button"
               onClick={enableOSNotifications}
-              className="p-2 bg-amber-100 hover:bg-amber-200 text-[#161514] rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] transition-all cursor-pointer"
+              className="p-1.5 sm:p-2 bg-amber-100 hover:bg-amber-200 text-[#161514] rounded-xl sm:rounded-2xl border-1.5 sm:border-2 border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] sm:shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] transition-all cursor-pointer"
               title="Enable Laptop & Mobile Status Bar Notifications"
             >
-              <Bell className="h-4 w-4 stroke-[2.5]" />
+              <Bell className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2.5]" />
             </button>
 
+            {/* Switch Space Popover Button */}
             <button
               type="button"
               onClick={() => setIsOpen(!isOpen)}
               className={cn(
-                "flex items-center gap-2 rounded-2xl px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs font-black shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] border-2 border-[#161514] transition-all duration-200 cursor-pointer uppercase tracking-wider select-none hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5",
+                "flex items-center gap-1 sm:gap-2 rounded-xl sm:rounded-2xl px-2.5 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-black shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] sm:shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] border-1.5 sm:border-2 border-[#161514] transition-all duration-200 cursor-pointer uppercase tracking-wider select-none hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 whitespace-nowrap",
                 currentSpace.activeBg
               )}
             >
-              <Sparkles className="h-4 w-4 stroke-[2.5]" />
-              <span>Switch Space</span>
+              <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2.5]" />
+              <span className="hidden xs:inline">Switch Space</span>
+              <span className="xs:hidden">Switch</span>
               <ChevronDown
-                className={cn("h-4 w-4 transition-transform duration-200 stroke-[2.5]", isOpen && "rotate-180")}
+                className={cn("h-3.5 w-3.5 sm:h-4 sm:w-4 transition-transform duration-200 stroke-[2.5]", isOpen && "rotate-180")}
               />
             </button>
 
@@ -239,14 +281,26 @@ export function SpaceHeader() {
 
             {/* Space Switcher Popover Menu */}
             {isOpen && (
-              <div className="absolute right-0 mt-2.5 w-72 sm:w-80 bg-white border-2.5 border-[#161514] rounded-3xl shadow-[6px_6px_0px_0px_rgba(22,21,20,1)] p-3 z-50 animate-in fade-in slide-in-from-top-3 duration-200 origin-top-right space-y-2">
+              <div className="absolute right-0 top-full mt-2.5 w-72 sm:w-80 bg-white border-2.5 border-[#161514] rounded-3xl shadow-[6px_6px_0px_0px_rgba(22,21,20,1)] p-3 z-50 animate-in fade-in slide-in-from-top-3 duration-200 origin-top-right space-y-2">
+                
+                {/* Popover Header with Explicit Close X Button */}
                 <div className="px-3 py-1.5 flex items-center justify-between border-b-2 border-[#161514]/15">
                   <span className="text-[10px] font-black uppercase tracking-wider text-[#161514]">
                     Select Workspace
                   </span>
-                  <span className="text-[10px] font-black bg-[#CEF431] text-[#161514] px-2.5 py-0.5 rounded-xl border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)]">
-                    4 Spaces Active
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[9px] font-black bg-[#CEF431] text-[#161514] px-2 py-0.5 rounded-lg border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)]">
+                      4 Active
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setIsOpen(false)}
+                      className="p-1 rounded-xl bg-rose-100 hover:bg-rose-300 text-[#161514] border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
+                      title="Close workspace switcher"
+                    >
+                      <X className="h-3.5 w-3.5 stroke-[3]" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="space-y-1.5 pt-1">
@@ -308,9 +362,9 @@ export function SpaceHeader() {
 
         </div>
 
-        {/* Sub-Feature Navigation Quick-Jump Pill Bar */}
-        {subFeatures.length > 0 && (
-          <div className="bg-[#EAF4F4]/70 border-t border-[#161514]/15 px-3 sm:px-6 py-1.5 overflow-x-auto no-scrollbar">
+        {/* Sub-Feature Navigation Quick-Jump Pill Bar (Toggleable via isSubNavVisible) */}
+        {subFeatures.length > 0 && isSubNavVisible && (
+          <div className="bg-[#EAF4F4]/70 border-t border-[#161514]/15 px-3 sm:px-6 py-1.5 overflow-x-auto no-scrollbar animate-in fade-in slide-in-from-top-1 duration-200">
             <div className="max-w-6xl mx-auto flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-[#161514]/80">
               <span className="shrink-0 text-[9px] bg-white px-2 py-0.5 rounded-md border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] font-black">
                 📍 SECTIONS

@@ -70,7 +70,7 @@ const TIMEZONES = [
 const CURRENCIES = ["INR", "USD", "EUR", "GBP", "JPY", "AUD", "CAD"];
 
 export default function SettingsPage() {
-  const { user, signOut } = useAuth();
+  const { user, signOut, refreshUser } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -255,8 +255,8 @@ export default function SettingsPage() {
     if (!user) return;
     setSaving(true);
     try {
-      const isGuestMode = localStorage.getItem("invictus_guest_mode") === "true";
       const settingsData = {
+        displayName: displayName.trim(),
         timezone,
         weekStartsOn,
         currency,
@@ -269,20 +269,14 @@ export default function SettingsPage() {
           : undefined,
       };
 
-      if (isGuestMode) {
-        const profileStr = localStorage.getItem("invictus_user_profile");
-        const profile = profileStr ? JSON.parse(profileStr) : {};
-        localStorage.setItem("invictus_guest_name", displayName);
-        localStorage.setItem(
-          "invictus_user_profile",
-          JSON.stringify({ ...profile, ...settingsData, displayName })
-        );
-      } else {
-        customUpdateUser(user.uid, { ...settingsData, displayName });
-      }
+      customUpdateUser(user.uid, settingsData);
+      refreshUser();
       showToast.success("Settings saved! ✨", "Settings locked in! System configuration complete! ⚙️🔒");
-      window.location.reload();
-    } catch {
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    } catch (err) {
+      console.error("Save settings error:", err);
       showToast.error("Failed to save settings", "Ah! We failed to lock in your changes! ❌🔒");
     } finally {
       setSaving(false);

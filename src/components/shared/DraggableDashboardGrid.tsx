@@ -281,13 +281,13 @@ export function DraggableDashboardGrid({
           >
             {/* Edit Mode Controls (Only visible when isEditMode is TRUE) */}
             {isEditMode && (
-              <div className="flex flex-wrap items-center justify-between bg-[#CEF431] px-4 py-2 rounded-t-2xl border-2 border-b-0 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] select-none gap-2 animate-in fade-in duration-200">
+              <div className="flex flex-wrap items-center justify-between bg-[#161514] text-white px-4 py-2.5 rounded-t-3xl border-2 border-b-0 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] select-none gap-2 animate-in fade-in duration-200">
                 <div className="flex items-center gap-2.5">
-                  <div className="flex items-center gap-1 bg-[#161514] text-white px-2 py-0.5 rounded-lg cursor-grab active:cursor-grabbing font-black text-[10px] border border-[#161514]">
-                    <GripVertical className="h-3.5 w-3.5 text-[#CEF431] stroke-[3]" />
+                  <div className="flex items-center gap-1 bg-[#CEF431] text-[#161514] px-2 py-0.5 rounded-lg cursor-grab active:cursor-grabbing font-black text-[10px] border border-[#161514] shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]">
+                    <GripVertical className="h-3.5 w-3.5 text-[#161514] stroke-[3]" />
                     <span>DRAG</span>
                   </div>
-                  <span className="text-xs font-black uppercase tracking-wider text-[#161514]">
+                  <span className="text-xs font-black uppercase tracking-wider text-white">
                     {item.title}
                   </span>
                 </div>

@@ -14,6 +14,7 @@ import {
   deleteReportedIssue,
   getGlobalAnnouncement,
   setGlobalAnnouncement,
+  clearGlobalAnnouncement,
   getAuditLogs,
   addAuditLog,
   type IssueReport,
@@ -224,19 +225,11 @@ export default function AdminDashboardPage() {
   const handleSaveAnnouncement = (e: React.FormEvent) => {
     e.preventDefault();
     if (!announcementMsg.trim()) {
-      setGlobalAnnouncement(null);
+      clearGlobalAnnouncement();
       addAuditLog("CLEAR_ANNOUNCEMENT", user?.email || ADMIN_EMAIL, "Cleared global announcement banner.");
       toast.success("Announcement banner cleared!");
     } else {
-      const newAnn: GlobalAnnouncement = {
-        id: `ann_${Date.now()}`,
-        message: announcementMsg.trim(),
-        type: announcementType,
-        active: true,
-        createdAt: new Date().toISOString(),
-        createdBy: user?.email || ADMIN_EMAIL,
-      };
-      setGlobalAnnouncement(newAnn);
+      setGlobalAnnouncement(announcementMsg.trim(), true, announcementType, user?.email || ADMIN_EMAIL);
       addAuditLog("BROADCAST_ANNOUNCEMENT", user?.email || ADMIN_EMAIL, `Broadcasted banner: "${announcementMsg.trim()}"`);
       toast.success("Global announcement published! 📢");
     }
@@ -604,7 +597,7 @@ export default function AdminDashboardPage() {
                       <Button
                         type="button"
                         onClick={() => {
-                          setGlobalAnnouncement(null);
+                          clearGlobalAnnouncement();
                           setAnnouncementMsg("");
                           toast.success("Banner cleared");
                           refreshData();
