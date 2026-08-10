@@ -8,6 +8,8 @@ export const CategorySchema = z.object({
   color: z.string().default("mint"),
   monthlyBudget: z.number().min(0).optional(),
   archived: z.boolean().default(false),
+  isTemplate: z.boolean().optional(),
+  templatePackId: z.string().optional(),
   createdAt: z.any().optional(),
 });
 

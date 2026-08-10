@@ -39,7 +39,7 @@ export function ResponsiveFormContainer({
   if (isDesktop) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[520px] max-h-[90vh] flex flex-col bg-white rounded-3xl p-0 border-2 sm:border-[2.5px] border-navy-950 shadow-[6px_6px_0px_0px_rgba(31,36,48,1)] overflow-hidden">
+        <DialogContent showCloseButton={false} className="sm:max-w-[520px] max-h-[90vh] flex flex-col bg-white rounded-3xl p-0 border-2 sm:border-[2.5px] border-navy-950 shadow-[6px_6px_0px_0px_rgba(31,36,48,1)] overflow-hidden">
           <DialogHeader className="shrink-0 px-6 pt-6 pb-3 border-b-2 border-navy-950/20 bg-cream-bg/40 relative">
             <div className="pr-8">
               <DialogTitle className="text-xl font-black text-navy-950 tracking-tight" style={{ fontFamily: "var(--font-heading)" }}>

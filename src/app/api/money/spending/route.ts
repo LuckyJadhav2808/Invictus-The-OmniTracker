@@ -151,8 +151,8 @@ export async function POST(req: NextRequest) {
       for (const item of typicalTemplate) {
         await Category.findOneAndUpdate(
           { userId, name: item.name },
-          { ...item, userId },
-          { upsert: true, new: true }
+          { ...item, userId, isTemplate: true, templatePackId: "monthly-spending-template" },
+          { upsert: true, returnDocument: "after" }
         );
       }
     }
@@ -165,5 +165,29 @@ export async function POST(req: NextRequest) {
   } catch (err: any) {
     console.error("Apply template API error:", err);
     return NextResponse.json({ error: err?.message || "Failed to apply budget template" }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const userId = searchParams.get("userId") || "user-admin-default";
+
+    if (userId !== "guest") {
+      await connectToDatabase();
+      // Safely remove only categories created by the 1-click monthly spending template
+      await Category.deleteMany({
+        userId,
+        templatePackId: "monthly-spending-template",
+      });
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: "Unapplied 1-Click Monthly Budget Template successfully!",
+    });
+  } catch (err: any) {
+    console.error("Unapply template API error:", err);
+    return NextResponse.json({ error: err?.message || "Failed to unapply budget template" }, { status: 500 });
   }
 }

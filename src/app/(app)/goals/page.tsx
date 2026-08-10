@@ -37,6 +37,7 @@ import { SleepAndActiveWidgets } from "@/components/goals/SleepAndActiveWidgets"
 import { GymRoutineTracker } from "@/components/goals/GymRoutineTracker";
 import { MealTracker } from "@/components/goals/MealTracker";
 import { WeeklyOverviewWidget } from "@/components/goals/WeeklyOverviewWidget";
+import { WeeklyVelocityAndHabitMatrix } from "@/components/goals/WeeklyVelocityAndHabitMatrix";
 import { DraggableDashboardGrid } from "@/components/shared/DraggableDashboardGrid";
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
 import { Edit3 } from "lucide-react";
@@ -482,6 +483,9 @@ function GoalsPageContent() {
           <TabsContent value="list" className="space-y-6 outline-none">
             {/* Neubrutalism Weekly Overview Widget (Top) */}
             <WeeklyOverviewWidget />
+
+            {/* Weekly Velocity & 4-Week Activity Heatmap Matrix */}
+            <WeeklyVelocityAndHabitMatrix />
 
             {/* Dashboard Grid (Habits Checklist, Water Intake, Macros, Training & Diet) - FRONT & CENTER AT TOP */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 my-4">

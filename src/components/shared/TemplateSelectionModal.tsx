@@ -37,8 +37,10 @@ interface TemplateSelectionModalProps {
   templatesLabel: string;
   templatesDesc: string;
   templatePacks: TemplatePack[];
+  appliedPackIds?: string[];
   onSelectBlank: () => void;
   onApplyTemplatePack: (pack: TemplatePack) => void;
+  onUnapplyTemplatePack?: (pack: TemplatePack) => void;
 }
 
 export function TemplateSelectionModal({
@@ -51,8 +53,10 @@ export function TemplateSelectionModal({
   templatesLabel,
   templatesDesc,
   templatePacks,
+  appliedPackIds = [],
   onSelectBlank,
   onApplyTemplatePack,
+  onUnapplyTemplatePack,
 }: TemplateSelectionModalProps) {
   const [view, setView] = useState<"choice" | "browse">("choice");
 
@@ -68,6 +72,13 @@ export function TemplateSelectionModal({
   const handleApply = (pack: TemplatePack) => {
     onApplyTemplatePack(pack);
     handleClose(false);
+  };
+
+  const handleUnapply = (pack: TemplatePack) => {
+    if (onUnapplyTemplatePack) {
+      onUnapplyTemplatePack(pack);
+      handleClose(false);
+    }
   };
 
   return (
@@ -111,8 +122,8 @@ export function TemplateSelectionModal({
             className="w-full bg-white rounded-2xl p-4 border-2 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] flex items-center justify-between gap-4 text-left hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-amber-50/60 active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_rgba(31,36,48,1)] transition-all cursor-pointer group"
           >
             <div className="flex items-center gap-3.5">
-              <div className="h-11 w-11 rounded-xl bg-amber-400 border-2 border-navy-950 flex items-center justify-center shrink-0 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] group-hover:scale-105 transition-transform">
-                <BookOpen className="h-5 w-5 stroke-[2.5] text-navy-950" />
+              <div className="h-11 w-11 rounded-xl bg-amber-300 border-2 border-navy-950 flex items-center justify-center shrink-0 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] group-hover:scale-105 transition-transform">
+                <BookOpen className="h-6 w-6 stroke-[2.5] text-navy-950" />
               </div>
               <div>
                 <span className="text-sm font-black uppercase tracking-wider text-navy-950 block">
@@ -139,51 +150,65 @@ export function TemplateSelectionModal({
           </button>
 
           <div className="space-y-3 max-h-[55vh] overflow-y-auto pr-1">
-            {templatePacks.map((pack) => (
-              <div
-                key={pack.id}
-                className="bg-white rounded-2xl p-4 border-2 border-navy-950 shadow-[3px_3px_0px_0px_rgba(31,36,48,1)] space-y-3"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-2.5">
-                    <span className="text-2xl">{pack.icon}</span>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h4 className="text-sm font-black text-navy-950 tracking-tight">{pack.name}</h4>
-                        {pack.badge && (
-                          <span className="bg-amber-300 text-navy-950 text-[9px] font-black uppercase px-2 py-0.5 rounded-lg border border-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
-                            {pack.badge}
-                          </span>
-                        )}
+            {templatePacks.map((pack) => {
+              const isApplied = appliedPackIds.includes(pack.id);
+              return (
+                <div
+                  key={pack.id}
+                  className="bg-white rounded-2xl p-4 border-2 border-navy-950 shadow-[3px_3px_0px_0px_rgba(31,36,48,1)] space-y-3"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-2xl">{pack.icon}</span>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-sm font-black text-navy-950 tracking-tight">{pack.name}</h4>
+                          {pack.badge && (
+                            <span className="bg-amber-300 text-navy-950 text-[9px] font-black uppercase px-2 py-0.5 rounded-lg border border-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
+                              {pack.badge}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[10px] font-bold text-navy-700">{pack.tagline}</p>
                       </div>
-                      <p className="text-[10px] font-bold text-navy-700">{pack.tagline}</p>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {isApplied && onUnapplyTemplatePack && (
+                        <button
+                          type="button"
+                          onClick={() => handleUnapply(pack)}
+                          className="bg-rose-400 hover:bg-rose-500 text-navy-950 border-2 border-navy-950 px-2.5 py-1.5 rounded-xl text-xs font-black shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center gap-1"
+                        >
+                          <span>Unapply</span>
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => handleApply(pack)}
+                        className="bg-amber-400 hover:bg-amber-500 text-navy-950 border-2 border-navy-950 px-3 py-1.5 rounded-xl text-xs font-black shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center gap-1"
+                      >
+                        <Sparkles className="h-3.5 w-3.5 stroke-[2.5]" />
+                        <span>{isApplied ? "Re-Apply" : "Apply Pack"}</span>
+                      </button>
                     </div>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => handleApply(pack)}
-                    className="bg-amber-400 hover:bg-amber-500 text-navy-950 border-2 border-navy-950 px-3 py-1.5 rounded-xl text-xs font-black shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer shrink-0 transition-all flex items-center gap-1"
-                  >
-                    <Sparkles className="h-3.5 w-3.5 stroke-[2.5]" />
-                    <span>Apply Pack</span>
-                  </button>
+                  {/* Items included pill list */}
+                  <div className="pt-2 border-t border-navy-950/10 flex flex-wrap gap-1.5">
+                    {pack.items.map((item, idx) => (
+                      <span
+                        key={idx}
+                        className="bg-cream-bg text-navy-950 border border-navy-950 px-2 py-0.5 rounded-lg text-[9px] font-black flex items-center gap-1 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]"
+                      >
+                        <Check className="h-2.5 w-2.5 text-emerald-600 stroke-[3]" />
+                        <span>{item.title}</span>
+                      </span>
+                    ))}
+                  </div>
                 </div>
-
-                {/* Items included pill list */}
-                <div className="pt-2 border-t border-navy-950/10 flex flex-wrap gap-1.5">
-                  {pack.items.map((item, idx) => (
-                    <span
-                      key={idx}
-                      className="bg-cream-bg text-navy-950 border border-navy-950 px-2 py-0.5 rounded-lg text-[9px] font-black flex items-center gap-1 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]"
-                    >
-                      <Check className="h-2.5 w-2.5 text-emerald-600 stroke-[3]" />
-                      <span>{item.title}</span>
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

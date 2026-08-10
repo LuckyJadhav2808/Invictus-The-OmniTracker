@@ -11,7 +11,7 @@ import { InvictusLogo } from "@/components/shared/InvictusLogo";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { enterGuestMode, login } = useAuth();
+  const { enterGuestMode, login, signup } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -22,7 +22,9 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const loggedUser = await login(email, password);
-      toast.success("Welcome back champion! 🥳");
+      toast.success(`Account Found! Welcome back, ${loggedUser.displayName || "Champion"}! 🥳✨`, {
+        description: `Logged in as ${loggedUser.email}`,
+      });
       if (!loggedUser.onboarded) {
         router.push("/onboarding");
       } else {
@@ -30,8 +32,10 @@ export default function LoginPage() {
       }
     } catch (error: unknown) {
       const message =
-        error instanceof Error ? error.message : "Login failed. Please check your credentials.";
-      toast.error(message);
+        error instanceof Error ? error.message : `No account found with ${email || "this email"}. Please check or Sign Up below! 📝❌`;
+      toast.error(message, {
+        description: "Double check your credentials or click 'Create a free account' below.",
+      });
     } finally {
       setLoading(false);
     }
@@ -40,19 +44,42 @@ export default function LoginPage() {
   const handleGoogleLogin = async () => {
     setLoading(true);
     try {
-      // Custom Google auth demo login
-      const loggedUser = await login("google.user@invictus.app", "google_demo_pass").catch(() => 
-        useAuth().signup("google.user@invictus.app", "google_demo_pass", "Google User")
-      );
-      toast.success("Yay! Welcome back! 🎉");
-      if (!loggedUser.onboarded) {
-        router.push("/onboarding");
-      } else {
-        router.push("/today");
+      let targetEmail = email.trim();
+      if (!targetEmail) {
+        const input = window.prompt("Enter your Google Account email address:", "you@gmail.com");
+        if (!input) {
+          setLoading(false);
+          return;
+        }
+        targetEmail = input.trim();
+        setEmail(targetEmail);
       }
-    } catch {
-      toast.success("Signed in with Google mode! 🎉");
-      enterGuestMode("Google User");
+
+      const displayName = targetEmail.includes("@") ? targetEmail.split("@")[0] : "Google User";
+      
+      let loggedUser: any;
+      let isNewAccount = false;
+      try {
+        loggedUser = await login(targetEmail, "hash_default");
+      } catch {
+        loggedUser = await signup(targetEmail, "hash_default", displayName);
+        isNewAccount = true;
+      }
+
+      if (isNewAccount) {
+        toast.success(`New Google Account Created! Welcome to Invictus 🎉✨`, {
+          description: `Signed in as ${targetEmail}`,
+        });
+      } else {
+        toast.success(`Google Account Found! Welcome back, ${loggedUser?.displayName || "Champion"}! 🚀✨`, {
+          description: `Logged in as ${targetEmail}`,
+        });
+      }
+      router.push("/today");
+    } catch (err: any) {
+      console.warn("Google Sign-In error:", err);
+      toast.info(`Signed in as Google Guest (${email || "Google User"})! 🎈`);
+      enterGuestMode(email ? email.split("@")[0] : "Google User");
       router.push("/today");
     } finally {
       setLoading(false);

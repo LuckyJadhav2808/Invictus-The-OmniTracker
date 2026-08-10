@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Clock, Star, Plus, CheckCircle, Sparkles, Smile, Frown, Meh, X } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
 
 interface StudySessionLoggerProps {
   topics: any[];
@@ -104,19 +105,21 @@ export function StudySessionLogger({ topics = [], onLogSession }: StudySessionLo
               </div>
 
               <div>
-                <label className="text-[9px] font-black uppercase text-navy-700 block">Topic / Chapter Studied</label>
-                <select
+                <label className="text-[9px] font-black uppercase text-navy-700 block mb-1">Topic / Chapter Studied</label>
+                <NeobrutalistSelect
                   value={selectedTopicId}
-                  onChange={(e) => setSelectedTopicId(e.target.value)}
-                  className="w-full bg-cream-bg rounded-xl border-2 border-navy-950 px-3 py-1.5 text-xs font-black text-navy-950 outline-none mt-1"
-                >
-                  {topics.map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.title}
-                    </option>
-                  ))}
-                  {topics.length === 0 && <option value="">General Study</option>}
-                </select>
+                  onChange={setSelectedTopicId}
+                  options={
+                    topics.length > 0
+                      ? topics.map((t) => ({
+                          value: t.id,
+                          label: t.title,
+                          icon: "📚",
+                        }))
+                      : [{ value: "", label: "General Study", icon: "📖" }]
+                  }
+                  placeholder="Select Topic"
+                />
               </div>
 
               <div>

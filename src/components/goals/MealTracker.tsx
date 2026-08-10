@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { Utensils, Plus, Trash2, Edit3, CheckCircle2, Circle, Flame, Sparkles } from "lucide-react";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
+import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
 import { TemplateSelectionModal, TemplatePack } from "@/components/shared/TemplateSelectionModal";
 import { MEAL_TEMPLATE_PACKS } from "@/lib/templates-data";
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
@@ -365,20 +366,16 @@ export function MealTracker() {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Meal Type</label>
-                <select
-                  value={mealType}
-                  onChange={(e) => setMealType(e.target.value as any)}
-                  className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium"
-                >
-                  {MEAL_TYPES.map((t) => (
-                    <option key={t} value={t}>
-                      {t}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Meal Type</label>
+              <NeobrutalistSelect
+                value={mealType}
+                onChange={(val) => setMealType(val as any)}
+                options={MEAL_TYPES.map((t) => ({
+                  value: t,
+                  label: t,
+                  icon: t === "Breakfast" ? "🍳" : t === "Lunch" ? "🍱" : t === "Dinner" ? "🍲" : t === "Snack" ? "🥪" : "⚡",
+                }))}
+              />
               <div className="space-y-1.5">
                 <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Time (Optional)</label>
                 <input
@@ -451,12 +448,12 @@ export function MealTracker() {
         onOpenChange={(open) => {
           if (!open) setEditingMeal(null);
         }}
-        title="Edit Meal Details"
-        description="Update meal title, time, or macro values"
+        title="Edit Meal & Macros"
+        description="Update your logged food item"
       >
         <form onSubmit={handleUpdateMealSubmit} className="space-y-4 pt-2">
           <div className="space-y-1.5">
-            <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Meal Name</label>
+            <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Meal / Dish Name *</label>
             <input
               type="text"
               value={editMealName}
@@ -469,17 +466,15 @@ export function MealTracker() {
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Meal Type</label>
-              <select
+              <NeobrutalistSelect
                 value={editMealType}
-                onChange={(e) => setEditMealType(e.target.value as any)}
-                className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium"
-              >
-                {MEAL_TYPES.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
-                  </option>
-                ))}
-              </select>
+                onChange={(val) => setEditMealType(val as any)}
+                options={MEAL_TYPES.map((t) => ({
+                  value: t,
+                  label: t,
+                  icon: t === "Breakfast" ? "🍳" : t === "Lunch" ? "🍱" : t === "Dinner" ? "🍲" : t === "Snack" ? "🥪" : "⚡",
+                }))}
+              />
             </div>
             <div className="space-y-1.5">
               <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Time</label>

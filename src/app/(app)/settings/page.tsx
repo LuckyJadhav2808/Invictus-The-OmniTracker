@@ -11,6 +11,7 @@ import { useUIStore } from "@/store/ui-store";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUserAchievements } from "@/lib/queries/achievements";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
+import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
 import { playCompletionSound, type SoundEffectType } from "@/lib/utils/completion-sound";
 import { enableWebPushNotifications, triggerTestPushNotification } from "@/lib/utils/push-client";
 import {
@@ -1234,36 +1235,32 @@ export default function SettingsPage() {
                   <label htmlFor="timezone" className="text-xs font-extrabold text-navy-600 flex items-center gap-1">
                     <Globe className="h-3 w-3" /> Timezone
                   </label>
-                  <select
-                    id="timezone"
+                  <NeobrutalistSelect
                     value={timezone}
-                    onChange={(e) => setTimezone(e.target.value)}
-                    className="w-full rounded-xl border border-input bg-cream-bg/50 py-2.5 px-3 text-xs font-medium"
-                  >
-                    {TIMEZONES.map((tz) => (
-                      <option key={tz} value={tz}>
-                        {tz}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={setTimezone}
+                    options={TIMEZONES.map((tz) => ({
+                      value: tz,
+                      label: tz,
+                      icon: "🌐",
+                    }))}
+                    placeholder="Select Timezone"
+                  />
                 </div>
 
                 <div className="space-y-1.5">
                   <label htmlFor="currency" className="text-xs font-extrabold text-navy-600">
                     Currency Symbol
                   </label>
-                  <select
-                    id="currency"
+                  <NeobrutalistSelect
                     value={currency}
-                    onChange={(e) => setCurrency(e.target.value)}
-                    className="w-full rounded-xl border border-input bg-cream-bg/50 py-2.5 px-3 text-xs font-medium"
-                  >
-                    {CURRENCIES.map((c) => (
-                      <option key={c} value={c}>
-                        {c}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={setCurrency}
+                    options={CURRENCIES.map((c) => ({
+                      value: c,
+                      label: c,
+                      icon: "💰",
+                    }))}
+                    placeholder="Select Currency"
+                  />
                 </div>
               </div>
 

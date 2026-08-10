@@ -7,7 +7,7 @@ export async function POST(req: Request) {
     await connectToDatabase();
     const body = await req.json();
 
-    const { email, displayName, passwordHash, uid } = body;
+    const { email, passwordHash, displayName } = body;
     if (!email) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
     }
@@ -16,22 +16,24 @@ export async function POST(req: Request) {
     let existingUser = await User.findOne({ email: normalizedEmail });
 
     if (existingUser) {
-      // Upsert existing user details
+      // Update last login
       existingUser.lastLogin = new Date();
-      if (displayName && existingUser.displayName !== displayName) {
-        existingUser.displayName = displayName;
-      }
-      if (passwordHash && passwordHash !== "hash_default" && existingUser.passwordHash === "hash_default") {
+      if (passwordHash && existingUser.passwordHash === "hash_default") {
         existingUser.passwordHash = passwordHash;
       }
+      if (displayName && (!existingUser.displayName || existingUser.displayName.includes("User"))) {
+        existingUser.displayName = displayName;
+      }
       await existingUser.save();
-      return NextResponse.json({ success: true, user: existingUser, updated: true }, { status: 200 });
+
+      return NextResponse.json({ success: true, user: existingUser }, { status: 200 });
     }
 
+    // If user does not exist in MongoDB Atlas yet, create cloud user
     const newUser = await User.create({
-      uid: uid || `user_${Math.random().toString(36).substring(2, 11)}_${Date.now()}`,
+      uid: `user_${Math.random().toString(36).substring(2, 11)}_${Date.now()}`,
       email: normalizedEmail,
-      displayName: displayName || (normalizedEmail.includes("@") ? normalizedEmail.split("@")[0] : "Invictus Explorer"),
+      displayName: displayName || (normalizedEmail.includes("@") ? normalizedEmail.split("@")[0] : "Invictus User"),
       passwordHash: passwordHash || "hash_default",
       role: normalizedEmail === "luckymanojjadhav@gmail.com" ? "admin" : "user",
       timezone: "Asia/Kolkata",
@@ -45,7 +47,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true, user: newUser }, { status: 201 });
   } catch (error: any) {
-    console.error("Auth register API error:", error);
+    console.error("Auth login API error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

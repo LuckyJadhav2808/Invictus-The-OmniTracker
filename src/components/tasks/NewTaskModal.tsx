@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
+import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
 import { TaskItem, Subtask } from "@/types";
 import { Plus, Trash2, CheckCircle2, Clock, Tag, AlertCircle, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -158,17 +159,17 @@ export function NewTaskModal({ open, onOpenChange, taskToEdit, onSubmit }: NewTa
             <label className="text-xs font-black uppercase tracking-wider text-[#161514]">
               Kanban Status
             </label>
-            <select
+            <NeobrutalistSelect
               value={status}
-              onChange={(e) => setStatus(e.target.value as TaskItem["status"])}
-              className="w-full bg-white rounded-2xl p-2.5 border-2 border-[#161514] text-xs font-black text-[#161514] outline-none"
-            >
-              <option value="backlog">📥 Backlog</option>
-              <option value="todo">⏳ To Do</option>
-              <option value="in_progress">⚡ In Progress</option>
-              <option value="review">👀 Under Review</option>
-              <option value="completed">✅ Completed</option>
-            </select>
+              onChange={(val) => setStatus(val as TaskItem["status"])}
+              options={[
+                { value: "backlog", label: "Backlog", icon: "📥" },
+                { value: "todo", label: "To Do", icon: "⏳" },
+                { value: "in_progress", label: "In Progress", icon: "⚡" },
+                { value: "review", label: "Under Review", icon: "👀" },
+                { value: "completed", label: "Completed", icon: "✅" },
+              ]}
+            />
           </div>
 
           <div className="space-y-1">

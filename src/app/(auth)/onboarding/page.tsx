@@ -6,6 +6,7 @@ import { useAuth } from "@/components/shared/AuthProvider";
 import { customUpdateUser } from "@/lib/custom-auth";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
 import {
   Target,
   BookOpen,
@@ -188,18 +189,16 @@ export default function OnboardingPage() {
               >
                 <Globe className="h-3 w-3" /> Timezone
               </label>
-              <select
-                id="timezone"
+              <NeobrutalistSelect
                 value={timezone}
-                onChange={(e) => setTimezone(e.target.value)}
-                className="w-full rounded-[var(--radius-sm)] border border-input bg-cream-bg/50 py-2.5 px-3 text-sm outline-none focus:ring-2 focus:ring-amber-500"
-              >
-                {TIMEZONES.map((tz) => (
-                  <option key={tz} value={tz}>
-                    {tz}
-                  </option>
-                ))}
-              </select>
+                onChange={setTimezone}
+                options={TIMEZONES.map((tz) => ({
+                  value: tz,
+                  label: tz,
+                  icon: "🌐",
+                }))}
+                placeholder="Select Timezone"
+              />
             </div>
 
             <div className="space-y-1.5">
@@ -234,18 +233,16 @@ export default function OnboardingPage() {
               >
                 Currency
               </label>
-              <select
-                id="currency"
+              <NeobrutalistSelect
                 value={currency}
-                onChange={(e) => setCurrency(e.target.value)}
-                className="w-full rounded-[var(--radius-sm)] border border-input bg-cream-bg/50 py-2.5 px-3 text-sm outline-none focus:ring-2 focus:ring-amber-500"
-              >
-                {CURRENCIES.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
+                onChange={setCurrency}
+                options={CURRENCIES.map((c) => ({
+                  value: c,
+                  label: c,
+                  icon: "💰",
+                }))}
+                placeholder="Select Currency"
+              />
             </div>
           </div>
         )}

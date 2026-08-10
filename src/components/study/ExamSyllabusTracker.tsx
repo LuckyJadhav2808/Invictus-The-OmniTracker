@@ -6,6 +6,7 @@ import { useExamSyllabusPresets, useGenerateExamSyllabus } from "@/lib/queries/s
 import { useAuth } from "@/components/shared/AuthProvider";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
 
 interface ExamSyllabusTrackerProps {
   subjects: any[];
@@ -76,17 +77,18 @@ export function ExamSyllabusTracker({
 
         {/* Exam Preset Selector Dropdown & Generator */}
         <div className="flex flex-wrap items-center gap-2 max-w-full">
-          <select
-            value={selectedExamId}
-            onChange={(e) => setSelectedExamId(e.target.value)}
-            className="bg-cream-bg rounded-xl border-2 border-navy-950 px-3 py-1.5 text-xs font-black text-navy-950 outline-none shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] flex-1 sm:flex-none max-w-full"
-          >
-            {presets.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name}
-              </option>
-            ))}
-          </select>
+          <div className="min-w-[200px] flex-1 sm:flex-none">
+            <NeobrutalistSelect
+              value={selectedExamId}
+              onChange={setSelectedExamId}
+              options={presets.map((p) => ({
+                value: p.id,
+                label: p.name,
+                icon: "🎓",
+              }))}
+              placeholder="Select Exam Preset"
+            />
+          </div>
 
           <button
             type="button"

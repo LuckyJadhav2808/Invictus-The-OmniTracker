@@ -42,3 +42,22 @@ export function useApplyMonthlyBudgetTemplate() {
     },
   });
 }
+
+export function useUnapplyMonthlyBudgetTemplate() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (userId: string = "user-admin-default") => {
+      const res = await fetch(`/api/money/spending?userId=${userId}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        throw new Error("Failed to unapply monthly budget template");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+    },
+  });
+}

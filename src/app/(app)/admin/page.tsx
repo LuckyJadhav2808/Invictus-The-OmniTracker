@@ -45,6 +45,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
+import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
 import { format } from "date-fns";
 
@@ -736,28 +737,28 @@ export default function AdminDashboardPage() {
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Category</label>
-              <select
+              <NeobrutalistSelect
                 value={issueCategory}
-                onChange={(e) => setIssueCategory(e.target.value as any)}
-                className="w-full bg-cream-bg rounded-xl border border-border/85 px-3 py-2.5 text-xs text-navy-900 font-medium"
-              >
-                <option value="bug">Bug</option>
-                <option value="feature">Feature Request</option>
-                <option value="ui">UI / Aesthetics</option>
-                <option value="other">Other</option>
-              </select>
+                onChange={(val) => setIssueCategory(val as any)}
+                options={[
+                  { value: "bug", label: "Bug", icon: "🐛" },
+                  { value: "feature", label: "Feature Request", icon: "🚀" },
+                  { value: "ui", label: "UI / Aesthetics", icon: "🎨" },
+                  { value: "other", label: "Other", icon: "📌" },
+                ]}
+              />
             </div>
             <div className="space-y-1.5">
               <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Severity</label>
-              <select
+              <NeobrutalistSelect
                 value={issueSeverity}
-                onChange={(e) => setIssueSeverity(e.target.value as any)}
-                className="w-full bg-cream-bg rounded-xl border border-border/85 px-3 py-2.5 text-xs text-navy-900 font-medium"
-              >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-              </select>
+                onChange={(val) => setIssueSeverity(val as any)}
+                options={[
+                  { value: "low", label: "Low", icon: "🟢" },
+                  { value: "medium", label: "Medium", icon: "🟡" },
+                  { value: "high", label: "High", icon: "🔴" },
+                ]}
+              />
             </div>
           </div>
           <Button

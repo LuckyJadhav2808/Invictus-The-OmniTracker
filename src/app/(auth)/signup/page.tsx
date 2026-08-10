@@ -26,12 +26,19 @@ export default function SignupPage() {
     }
     setLoading(true);
     try {
-      await signup(email, password, name);
-      toast.success("Account created! Let's set things up 🚀");
+      const newUser = await signup(email, password, name);
+      toast.success(`Account Created Successfully! Welcome aboard, ${name || "Champion"}! 🎉✨`, {
+        description: `Account created for ${email}`,
+      });
       router.push("/onboarding");
     } catch (error: unknown) {
       const message =
         error instanceof Error ? error.message : "Signup failed. Please try again.";
+      if (message.toLowerCase().includes("already exists") || message.toLowerCase().includes("please sign in")) {
+        toast.info(`Account already exists for ${email}! Logging you in... 🔑✨`);
+        router.push("/login");
+        return;
+      }
       toast.error(message);
     } finally {
       setLoading(false);
@@ -41,17 +48,36 @@ export default function SignupPage() {
   const handleGoogleSignup = async () => {
     setLoading(true);
     try {
-      await signup(
-        `user_${Date.now()}@google.com`,
-        "google_pass_default",
-        name || "Google Pioneer"
-      );
-      toast.success("Account created! Let's set things up 🚀");
-      router.push("/onboarding");
+      let targetEmail = email.trim();
+      if (!targetEmail) {
+        const input = window.prompt("Enter your Google Account email address:", "you@gmail.com");
+        if (!input) {
+          setLoading(false);
+          return;
+        }
+        targetEmail = input.trim();
+        setEmail(targetEmail);
+      }
+
+      const displayName = name.trim() || (targetEmail.includes("@") ? targetEmail.split("@")[0] : "Google User");
+
+      let loggedUser: any;
+      try {
+        loggedUser = await signup(targetEmail, "hash_default", displayName);
+        toast.success(`Google Account Created! Welcome to Invictus 🎉✨`, {
+          description: `Registered as ${targetEmail}`,
+        });
+      } catch {
+        loggedUser = await signup(targetEmail, "hash_default", displayName).catch(() => null);
+        toast.success(`Welcome back, ${displayName}! 🚀✨`, {
+          description: `Logged in as ${targetEmail}`,
+        });
+      }
+      router.push("/today");
     } catch {
       enterGuestMode(name || "Guest Explorer");
-      toast.success("Welcome to Offline Guest Mode! 🎈");
-      router.push("/onboarding");
+      toast.success("Welcome to Guest Mode! 🎈");
+      router.push("/today");
     } finally {
       setLoading(false);
     }

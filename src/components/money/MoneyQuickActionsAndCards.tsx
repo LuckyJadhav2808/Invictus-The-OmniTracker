@@ -5,6 +5,29 @@ import { Eye, EyeOff, Plus, ArrowRightLeft, Send, MoreHorizontal, Wallet, Edit3,
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
+export const renderCategoryEmoji = (icon: string | undefined): string => {
+  if (!icon) return "💳";
+  const map: Record<string, string> = {
+    Briefcase: "💼",
+    Coffee: "☕",
+    Home: "🏠",
+    Compass: "🧭",
+    DollarSign: "💲",
+    Smile: "😊",
+    Wallet: "💳",
+    ShoppingBag: "🛍️",
+    Utensils: "🍽️",
+    Car: "🚗",
+    Zap: "⚡",
+    Droplet: "💧",
+    Gift: "🎁",
+    Film: "🎬",
+    Book: "📚",
+    Heart: "❤️",
+  };
+  return map[icon] || icon;
+};
+
 interface CategoryCardItem {
   id: string;
   name: string;
@@ -61,15 +84,41 @@ export function MoneyQuickActionsAndCards({
   const displayCategories = categories;
   const totalSpending = displayCategories.reduce((sum, c) => sum + c.amount, 0);
 
-  const getCategoryBgColor = (idx: number) => {
-    const colors = [
-      "bg-[#CEF431] text-[#161514]",
-      "bg-[#F59E0B] text-[#161514]",
-      "bg-[#03D26F] text-[#161514]",
-      "bg-[#03D26F] text-[#161514]",
-      "bg-[#014651] text-white",
+  const getCategoryColors = (cat: CategoryCardItem, idx: number) => {
+    const colorMap: Record<string, { bg: string; text: string }> = {
+      orange: { bg: "#FF6B00", text: "#FFFFFF" },
+      amber: { bg: "#F59E0B", text: "#161514" },
+      mint: { bg: "#03D26F", text: "#161514" },
+      green: { bg: "#03D26F", text: "#161514" },
+      emerald: { bg: "#03D26F", text: "#161514" },
+      lavender: { bg: "#A78BFA", text: "#161514" },
+      purple: { bg: "#A78BFA", text: "#161514" },
+      coral: { bg: "#FF5A5F", text: "#FFFFFF" },
+      indigo: { bg: "#6366F1", text: "#FFFFFF" },
+      blue: { bg: "#6366F1", text: "#FFFFFF" },
+      rose: { bg: "#EC4899", text: "#FFFFFF" },
+      pink: { bg: "#EC4899", text: "#FFFFFF" },
+      cyan: { bg: "#06B6D4", text: "#FFFFFF" },
+      sky: { bg: "#06B6D4", text: "#FFFFFF" },
+      lime: { bg: "#CEF431", text: "#161514" },
+      yellow: { bg: "#F59E0B", text: "#161514" },
+    };
+
+    if (cat.color && colorMap[cat.color.toLowerCase()]) {
+      return colorMap[cat.color.toLowerCase()];
+    }
+
+    const fallbacks = [
+      { bg: "#FF6B00", text: "#FFFFFF" },
+      { bg: "#F59E0B", text: "#161514" },
+      { bg: "#03D26F", text: "#161514" },
+      { bg: "#A78BFA", text: "#161514" },
+      { bg: "#FF5A5F", text: "#FFFFFF" },
+      { bg: "#6366F1", text: "#FFFFFF" },
+      { bg: "#EC4899", text: "#FFFFFF" },
+      { bg: "#06B6D4", text: "#FFFFFF" },
     ];
-    return colors[idx % colors.length];
+    return fallbacks[idx % fallbacks.length];
   };
 
   const getSegmentColor = (idx: number) => {
@@ -226,47 +275,45 @@ export function MoneyQuickActionsAndCards({
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5">
-            {displayCategories.map((cat, idx) => (
-              <div key={cat.id || idx} className="relative group cursor-pointer">
-                {/* Folder Top Tab */}
-                <div
-                  className={cn(
-                    "w-28 h-5 rounded-t-xl ml-4 text-[9px] font-black uppercase px-2 flex items-center justify-between border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)]",
-                    getCategoryBgColor(idx)
-                  )}
-                >
-                  <span className="truncate">{cat.name.slice(0, 8)}</span>
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
-                    {onEditCategory && (
-                      <button
-                        onClick={() => onEditCategory(cat)}
-                        className="text-current hover:scale-110 p-0.5 cursor-pointer border-none bg-transparent"
-                        title="Edit category"
-                      >
-                        <Edit3 className="h-2.5 w-2.5" />
-                      </button>
-                    )}
-                    {onDeleteCategory && (
-                      <button
-                        onClick={() => onDeleteCategory(cat.id)}
-                        className="text-current hover:scale-110 p-0.5 cursor-pointer border-none bg-transparent"
-                        title="Delete category"
-                      >
-                        <Trash2 className="h-2.5 w-2.5" />
-                      </button>
-                    )}
+            {displayCategories.map((cat, idx) => {
+              const theme = getCategoryColors(cat, idx);
+              return (
+                <div key={cat.id || idx} className="relative group cursor-pointer">
+                  {/* Folder Top Tab */}
+                  <div
+                    style={{ backgroundColor: theme.bg, color: theme.text }}
+                    className="w-28 h-5 rounded-t-xl ml-4 text-[9px] font-black uppercase px-2 flex items-center justify-between border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)]"
+                  >
+                    <span className="truncate">{cat.name.slice(0, 8)}</span>
+                    <div className="flex items-center gap-1.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+                      {onEditCategory && (
+                        <button
+                          onClick={() => onEditCategory(cat)}
+                          className="text-current hover:scale-110 p-0.5 cursor-pointer border-none bg-transparent"
+                          title="Edit category"
+                        >
+                          <Edit3 className="h-2.5 w-2.5" />
+                        </button>
+                      )}
+                      {onDeleteCategory && (
+                        <button
+                          onClick={() => onDeleteCategory(cat.id)}
+                          className="text-current hover:scale-110 p-0.5 cursor-pointer border-none bg-transparent"
+                          title="Delete category"
+                        >
+                          <Trash2 className="h-2.5 w-2.5" />
+                        </button>
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                {/* Main Card Body */}
-                <div
-                  className={cn(
-                    "rounded-2xl rounded-tl-none p-4 border-2 border-[#161514] space-y-3 transition-all duration-200 shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] group-hover:-translate-x-0.5 group-hover:-translate-y-0.5 group-hover:shadow-[5px_5px_0px_0px_rgba(22,21,20,1)]",
-                    getCategoryBgColor(idx)
-                  )}
-                >
+                  {/* Main Card Body */}
+                  <div
+                    style={{ backgroundColor: theme.bg, color: theme.text }}
+                    className="rounded-2xl rounded-tl-none p-4 border-2 border-[#161514] space-y-3 transition-all duration-200 shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] group-hover:-translate-x-0.5 group-hover:-translate-y-0.5 group-hover:shadow-[5px_5px_0px_0px_rgba(22,21,20,1)]"
+                  >
                   <div className="flex items-center justify-between">
-                    <span className="text-xl">{cat.icon || "💳"}</span>
+                    <span className="text-xl">{renderCategoryEmoji(cat.icon)}</span>
                     <span className="text-[10px] font-black uppercase bg-black/15 px-2 py-0.5 rounded-xl border border-navy-950 backdrop-blur-xs">
                       {cat.type || "Expense"}
                     </span>
@@ -282,7 +329,8 @@ export function MoneyQuickActionsAndCards({
                   </div>
                 </div>
               </div>
-            ))}
+            );
+          })}
           </div>
         )}
       </div>

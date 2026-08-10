@@ -198,46 +198,46 @@ export function SavingsGoals() {
       >
         <form onSubmit={handleAddGoal} className="space-y-4 pt-2">
           <div className="space-y-1.5">
-            <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Target Title</label>
+            <label className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514]">Target Title *</label>
             <input
               type="text"
               placeholder="e.g. Emergency Fund, New Laptop"
               value={goalTitle}
               onChange={(e) => setGoalTitle(e.target.value)}
-              className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:ring-2 focus:ring-amber-500 font-medium transition-all"
+              className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
               required
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Target Amount (₹)</label>
+              <label className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514]">Target Amount (₹) *</label>
               <input
                 type="number"
                 placeholder="e.g. 50000"
                 value={goalTarget}
                 onChange={(e) => setGoalTarget(e.target.value)}
-                className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:ring-2 focus:ring-amber-500 font-medium transition-all"
+                className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
                 required
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Initial Saved (₹)</label>
+              <label className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514]">Initial Saved (₹)</label>
               <input
                 type="number"
                 placeholder="e.g. 10000"
                 value={goalCurrent}
                 onChange={(e) => setGoalCurrent(e.target.value)}
-                className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:ring-2 focus:ring-amber-500 font-medium transition-all"
+                className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
               />
             </div>
           </div>
-          <Button
+          <button
             type="submit"
             disabled={addGoalMutation.isPending}
-            className="w-full bg-amber-500 hover:bg-amber-600 text-navy-900 font-bold rounded-full py-2.5 mt-2 border-none cursor-pointer"
+            className="w-full bg-[#F59E0B] hover:bg-[#d98206] text-white font-black text-xs uppercase tracking-wider rounded-2xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all"
           >
             {addGoalMutation.isPending ? "Creating…" : "Create Savings Target"}
-          </Button>
+          </button>
         </form>
       </ResponsiveFormContainer>
 
@@ -252,23 +252,23 @@ export function SavingsGoals() {
       >
         <form onSubmit={handleAddDeposit} className="space-y-4 pt-2">
           <div className="space-y-1.5">
-            <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Deposit Amount (₹)</label>
+            <label className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514]">Deposit Amount (₹) *</label>
             <input
               type="number"
               placeholder="e.g. 5000"
               value={depositAmount}
               onChange={(e) => setDepositAmount(e.target.value)}
-              className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:ring-2 focus:ring-amber-500 font-medium transition-all"
+              className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
               required
             />
           </div>
-          <Button
+          <button
             type="submit"
             disabled={updateGoalMutation.isPending}
-            className="w-full bg-amber-500 hover:bg-amber-600 text-navy-900 font-bold rounded-full py-2.5 mt-2 border-none cursor-pointer"
+            className="w-full bg-[#03D26F] hover:bg-[#02b35d] text-[#161514] font-black text-xs uppercase tracking-wider rounded-2xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all"
           >
             {updateGoalMutation.isPending ? "Depositing…" : "Add Deposit"}
-          </Button>
+          </button>
         </form>
       </ResponsiveFormContainer>
 

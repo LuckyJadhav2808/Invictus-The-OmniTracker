@@ -2,9 +2,20 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { type Category, type Transaction } from "@/types";
 
+import { getCustomSession } from "@/lib/custom-auth";
+
 const isGuestMode = () => {
   if (typeof window === "undefined") return false;
   return localStorage.getItem("invictus_guest_mode") === "true";
+};
+
+const getActiveUserId = (user: any) => {
+  if (user?.uid) return user.uid;
+  if (typeof window !== "undefined") {
+    const session = getCustomSession();
+    if (session?.uid) return session.uid;
+  }
+  return "user-admin-default";
 };
 
 const DEFAULT_CATEGORIES: Category[] = [
@@ -20,9 +31,10 @@ const DEFAULT_CATEGORIES: Category[] = [
 
 export function useCategories() {
   const { user } = useAuth();
+  const userId = getActiveUserId(user);
 
   return useQuery<Category[]>({
-    queryKey: ["categories", user?.uid],
+    queryKey: ["categories", userId],
     queryFn: async () => {
       if (isGuestMode()) {
         const local = localStorage.getItem("invictus_categories");
@@ -30,11 +42,14 @@ export function useCategories() {
           localStorage.setItem("invictus_categories", JSON.stringify(DEFAULT_CATEGORIES));
           return DEFAULT_CATEGORIES;
         }
-        return JSON.parse(local).filter((c: any) => !c.archived);
+        const parsed = JSON.parse(local).filter((c: any) => !c.archived);
+        return parsed.map((c: any, idx: number) => ({
+          ...c,
+          color: c.color || ["orange", "amber", "mint", "lavender", "coral", "indigo"][idx % 6],
+        }));
       }
-      if (!user) return [];
 
-      const res = await fetch(`/api/money/categories?userId=${user.uid}`);
+      const res = await fetch(`/api/money/categories?userId=${userId}`);
       if (!res.ok) return [];
       const list = await res.json();
       if (list.length === 0) {
@@ -43,14 +58,18 @@ export function useCategories() {
           await fetch("/api/money/categories", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId: user.uid, ...cat }),
+            body: JSON.stringify({ userId, ...cat }),
           });
         }
         return DEFAULT_CATEGORIES;
       }
-      return list.map((c: any) => ({ ...c, id: c.id || c._id }));
+      return list.map((c: any, idx: number) => ({
+        ...c,
+        id: c.id || c._id,
+        color: c.color || ["orange", "amber", "mint", "lavender", "coral", "indigo"][idx % 6],
+      }));
     },
-    enabled: !!user || isGuestMode(),
+    enabled: true,
   });
 }
 
@@ -60,6 +79,7 @@ export function useAddCategory() {
 
   return useMutation({
     mutationFn: async (category: Omit<Category, "id" | "archived" | "createdAt">) => {
+      const userId = getActiveUserId(user);
       if (isGuestMode()) {
         const local = localStorage.getItem("invictus_categories");
         const list = local ? JSON.parse(local) : [...DEFAULT_CATEGORIES];
@@ -74,19 +94,26 @@ export function useAddCategory() {
         return newCategory;
       }
 
-      if (!user) throw new Error("Unauthenticated");
       const catId = `cat_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
       const res = await fetch("/api/money/categories", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: catId, userId: user.uid, ...category }),
+        body: JSON.stringify({ id: catId, userId, ...category }),
       });
 
-      if (!res.ok) throw new Error("Failed to add category to MongoDB");
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "Failed to add category to MongoDB");
+      }
       return res.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["categories", user?.uid] });
+    onSuccess: (newCat) => {
+      const userId = getActiveUserId(user);
+      queryClient.setQueryData<Category[]>(["categories", userId], (old) => {
+        if (!old) return [newCat];
+        return [...old, newCat];
+      });
+      queryClient.invalidateQueries({ queryKey: ["categories", userId] });
     },
   });
 }
@@ -97,6 +124,7 @@ export function useUpdateCategory() {
 
   return useMutation({
     mutationFn: async (category: Partial<Category> & { id: string }) => {
+      const userId = getActiveUserId(user);
       if (isGuestMode()) {
         const local = localStorage.getItem("invictus_categories");
         const list = local ? JSON.parse(local) : [...DEFAULT_CATEGORIES];
@@ -108,18 +136,25 @@ export function useUpdateCategory() {
         return category;
       }
 
-      if (!user) throw new Error("Unauthenticated");
       const res = await fetch("/api/money/categories", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user.uid, ...category }),
+        body: JSON.stringify({ userId, ...category }),
       });
 
-      if (!res.ok) throw new Error("Failed to update category in MongoDB");
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "Failed to update category in MongoDB");
+      }
       return res.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["categories", user?.uid] });
+    onSuccess: (updatedCat) => {
+      const userId = getActiveUserId(user);
+      queryClient.setQueryData<Category[]>(["categories", userId], (old) => {
+        if (!old) return [updatedCat as Category];
+        return old.map((c) => (c.id === updatedCat.id ? { ...c, ...updatedCat } : c));
+      });
+      queryClient.invalidateQueries({ queryKey: ["categories", userId] });
     },
   });
 }
@@ -464,6 +499,33 @@ export function useDeleteSubscription() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["subscriptions", user?.uid] });
+    },
+  });
+}
+
+export function useUnapplySpendingTemplate() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      const userId = getActiveUserId(user);
+      if (isGuestMode()) {
+        const local = localStorage.getItem("invictus_categories");
+        const list = local ? JSON.parse(local) : [];
+        const filtered = list.filter((c: any) => c.templatePackId !== "monthly-spending-template");
+        localStorage.setItem("invictus_categories", JSON.stringify(filtered));
+        return;
+      }
+
+      const res = await fetch(`/api/money/spending?userId=${userId}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Failed to unapply monthly budget template");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
     },
   });
 }

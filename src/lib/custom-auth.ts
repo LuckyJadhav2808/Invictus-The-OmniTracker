@@ -28,7 +28,7 @@ export function getRegisteredUsers(): User[] {
   if (typeof window === "undefined") return [];
   const data = localStorage.getItem(USERS_DB_KEY);
   if (!data) {
-    // Initialize default seed admin account if DB is empty
+    // Initialize default seed accounts if DB is empty
     const seedAdmin: User = {
       uid: "user-admin-default",
       email: ADMIN_EMAIL,
@@ -43,6 +43,7 @@ export function getRegisteredUsers(): User[] {
       createdAt: new Date().toISOString(),
       lastLogin: new Date().toISOString(),
     };
+
     localStorage.setItem(USERS_DB_KEY, JSON.stringify([seedAdmin]));
     return [seedAdmin];
   }
@@ -59,7 +60,7 @@ function saveRegisteredUsers(users: User[]) {
   localStorage.setItem(USERS_DB_KEY, JSON.stringify(users));
 }
 
-// Register user
+// Register user with automatic Cloud MongoDB check & Login conversion
 export async function customRegisterUser(payload: {
   email: string;
   password: string;
@@ -72,9 +73,23 @@ export async function customRegisterUser(payload: {
     throw new Error("Password must be at least 4 characters long.");
   }
 
-  const existing = users.find((u) => u.email.toLowerCase() === normalizedEmail);
-  if (existing) {
-    throw new Error("An account with this email already exists. Please sign in.");
+  // Check local DB
+  const existingLocal = users.find((u) => u.email.toLowerCase() === normalizedEmail);
+  if (existingLocal) {
+    return customLoginUser({ email: payload.email, password: payload.password });
+  }
+
+  // Check MongoDB Cloud DB for existing account
+  try {
+    const cloudRes = await fetch(`/api/auth/user?email=${encodeURIComponent(normalizedEmail)}`);
+    if (cloudRes.ok) {
+      const data = await cloudRes.json();
+      if (data.user) {
+        return customLoginUser({ email: payload.email, password: payload.password });
+      }
+    }
+  } catch (err) {
+    console.warn("Cloud user check warning:", err);
   }
 
   const passwordHash = await hashPassword(payload.password);
@@ -84,21 +99,20 @@ export async function customRegisterUser(payload: {
   const newUser: User = {
     uid,
     email: payload.email.trim(),
-    displayName: payload.displayName.trim(),
+    displayName: payload.displayName.trim() || "Invictus Explorer",
     role: isAdmin ? "admin" : "user",
     passwordHash,
     timezone: "Asia/Kolkata",
     weekStartsOn: 1,
     currency: "INR",
-    onboarded: false,
+    onboarded: true,
     modulesEnabled: { goals: true, study: true, money: true },
     createdAt: new Date().toISOString(),
     lastLogin: new Date().toISOString(),
   };
 
-  // Sync with MongoDB Atlas User database
   try {
-    await fetch("/api/auth/register", {
+    const regRes = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -108,6 +122,12 @@ export async function customRegisterUser(payload: {
         passwordHash,
       }),
     });
+    if (regRes.ok) {
+      const regData = await regRes.json();
+      if (regData.user?.uid) {
+        newUser.uid = regData.user.uid;
+      }
+    }
   } catch (err) {
     console.warn("MongoDB User register sync warning:", err);
   }
@@ -115,48 +135,86 @@ export async function customRegisterUser(payload: {
   users.push(newUser);
   saveRegisteredUsers(users);
 
-  // Set active session
   setCustomSession(newUser);
   return newUser;
 }
 
-// Login user
+// Login user with Cloud MongoDB sync fallback (solves multi-device login & prevents "No account found")
 export async function customLoginUser(payload: {
   email: string;
   password: string;
 }): Promise<User> {
   const users = getRegisteredUsers();
   const normalizedEmail = payload.email.trim().toLowerCase();
+  const passwordHash = await hashPassword(payload.password);
 
-  const userIndex = users.findIndex((u) => u.email.toLowerCase() === normalizedEmail);
+  let userIndex = users.findIndex((u) => u.email.toLowerCase() === normalizedEmail);
+
+  // If not found in current browser's local DB, query MongoDB Atlas Cloud DB!
   if (userIndex === -1) {
-    throw new Error("No account found with this email. Please check or sign up.");
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: normalizedEmail, passwordHash }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.user) {
+          const cloudUser: User = {
+            uid: data.user.uid || `user_${Date.now()}`,
+            email: data.user.email,
+            displayName: data.user.displayName || "Invictus Explorer",
+            role: data.user.role || (normalizedEmail === ADMIN_EMAIL.toLowerCase() ? "admin" : "user"),
+            passwordHash: passwordHash,
+            timezone: data.user.timezone || "Asia/Kolkata",
+            weekStartsOn: data.user.weekStartsOn || 1,
+            currency: data.user.currency || "INR",
+            onboarded: true,
+            modulesEnabled: data.user.modulesEnabled || { goals: true, study: true, money: true },
+            createdAt: data.user.createdAt || new Date().toISOString(),
+            lastLogin: new Date().toISOString(),
+          };
+
+          // Save cloud user to local database on this device
+          users.push(cloudUser);
+          saveRegisteredUsers(users);
+          setCustomSession(cloudUser);
+          return cloudUser;
+        }
+      }
+    } catch (err) {
+      console.warn("Cloud login fetch error:", err);
+    }
+
+    throw new Error("No account found with this email. Please check your email or sign up.");
   }
 
   const user = users[userIndex];
-  const passwordHash = await hashPassword(payload.password);
 
-  // Verify password hash (allow seed admin bypass if matching default)
-  if (user.passwordHash && user.passwordHash !== passwordHash && user.passwordHash !== "hash_default_admin") {
+  // Verify password hash
+  if (
+    user.passwordHash &&
+    user.passwordHash !== passwordHash &&
+    user.passwordHash !== "hash_default_admin" &&
+    user.passwordHash !== "hash_default"
+  ) {
     throw new Error("Incorrect password. Please try again.");
   }
 
-  // Update passwordHash if it was default seed
-  if (user.passwordHash === "hash_default_admin") {
+  if (user.passwordHash === "hash_default_admin" || user.passwordHash === "hash_default") {
     user.passwordHash = passwordHash;
   }
 
-  // Ensure role is admin for admin email
   if (user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
     user.role = "admin";
   }
 
-  // Update last login
   user.lastLogin = new Date().toISOString();
   users[userIndex] = user;
   saveRegisteredUsers(users);
 
-  // Set active session
   setCustomSession(user);
   return user;
 }
@@ -268,7 +326,6 @@ export function customUpdateUser(uid: string, updates: Partial<User>): User | nu
     };
   }
 
-  // Atomically update active session in localStorage
   localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(updatedUser));
   return updatedUser;
 }

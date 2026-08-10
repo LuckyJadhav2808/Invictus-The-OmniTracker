@@ -1,11 +1,22 @@
 import { NextResponse } from "next/server";
+import mongoose from "mongoose";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Category } from "@/models/Category";
+
+let indexesCleaned = false;
+async function ensureCategoryIndexes() {
+  if (indexesCleaned) return;
+  try {
+    await Category.collection.dropIndex("id_1").catch(() => {});
+    indexesCleaned = true;
+  } catch {}
+}
 
 // GET /api/money/categories?userId=xxx
 export async function GET(req: Request) {
   try {
     await connectToDatabase();
+    await ensureCategoryIndexes();
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get("userId");
 
@@ -24,16 +35,33 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     await connectToDatabase();
+    await ensureCategoryIndexes();
     const body = await req.json();
 
     if (!body.userId || !body.name || !body.type) {
       return NextResponse.json({ error: "UserId, name, and type required" }, { status: 400 });
     }
 
-    const newCategory = await Category.create({
-      id: body.id || `cat_${Date.now()}`,
-      ...body,
-    });
+    const catId = body.id || `cat_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+
+    const newCategory = await Category.findOneAndUpdate(
+      { id: catId, userId: body.userId },
+      {
+        $set: {
+          id: catId,
+          userId: body.userId,
+          name: body.name,
+          type: body.type,
+          color: body.color || "amber",
+          icon: body.icon || "💳",
+          monthlyBudget: Number(body.monthlyBudget) || 0,
+          archived: body.archived || false,
+          isTemplate: body.isTemplate || false,
+          templatePackId: body.templatePackId || null,
+        },
+      },
+      { upsert: true, returnDocument: "after" }
+    );
 
     return NextResponse.json(newCategory, { status: 201 });
   } catch (error: any) {
@@ -45,8 +73,9 @@ export async function POST(req: Request) {
 export async function PUT(req: Request) {
   try {
     await connectToDatabase();
+    await ensureCategoryIndexes();
     const body = await req.json();
-    const { id, userId, name, color, icon, type, monthlyBudget, archived } = body;
+    const { id, userId, name, color, icon, type, monthlyBudget, archived, isTemplate, templatePackId } = body;
 
     if (!id || !userId) {
       return NextResponse.json({ error: "Id and userId required" }, { status: 400 });
@@ -59,11 +88,20 @@ export async function PUT(req: Request) {
     if (type !== undefined) updateFields.type = type;
     if (monthlyBudget !== undefined) updateFields.monthlyBudget = Number(monthlyBudget);
     if (archived !== undefined) updateFields.archived = archived;
+    if (isTemplate !== undefined) updateFields.isTemplate = isTemplate;
+    if (templatePackId !== undefined) updateFields.templatePackId = templatePackId;
+
+    const queryFilter: any = { userId };
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      queryFilter.$or = [{ id }, { _id: id }];
+    } else {
+      queryFilter.id = id;
+    }
 
     const updated = await Category.findOneAndUpdate(
-      { id, userId },
-      { $set: updateFields },
-      { new: true }
+      queryFilter,
+      { $set: { id, userId, ...updateFields } },
+      { upsert: true, returnDocument: "after" }
     );
 
     return NextResponse.json(updated);
@@ -76,6 +114,7 @@ export async function PUT(req: Request) {
 export async function DELETE(req: Request) {
   try {
     await connectToDatabase();
+    await ensureCategoryIndexes();
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
     const userId = searchParams.get("userId");

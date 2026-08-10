@@ -24,10 +24,15 @@ export function Providers({ children }: { children: React.ReactNode }) {
         {children}
         <Toaster
           position="top-center"
+          expand
+          richColors
+          closeButton
           toastOptions={{
             style: {
-              borderRadius: "var(--radius-md)",
+              borderRadius: "1.25rem",
               fontFamily: "var(--font-sans)",
+              border: "2.5px solid #161514",
+              boxShadow: "4px 4px 0px 0px rgba(22,21,20,1)",
             },
           }}
         />

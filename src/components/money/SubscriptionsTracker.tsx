@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { CreditCard, Plus, Trash2, Clock } from "lucide-react";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
+import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
 import { TemplateSelectionModal, TemplatePack } from "@/components/shared/TemplateSelectionModal";
 import { SUBSCRIPTION_TEMPLATE_PACKS } from "@/lib/templates-data";
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
@@ -149,6 +150,21 @@ export function SubscriptionsTracker() {
         </div>
       )}
 
+      {/* Choice Modal: Blank or Template Packs */}
+      <TemplateSelectionModal
+        open={isChoiceOpen}
+        onOpenChange={setIsChoiceOpen}
+        title="ADD RECURRING SUBSCRIPTION"
+        subtitle="LOG A CUSTOM SUBSCRIPTION OR APPLY A READY-MADE PACK."
+        blankLabel="CUSTOM SUBSCRIPTION"
+        blankDesc="ENTER SERVICE NAME, COST & RENEWAL DATE"
+        templatesLabel="SUBSCRIPTION PACKS"
+        templatesDesc="STREAMING MEDIA, DEVELOPER SUITE, GYM..."
+        templatePacks={SUBSCRIPTION_TEMPLATE_PACKS}
+        onSelectBlank={() => setIsAddOpen(true)}
+        onApplyTemplatePack={handleApplySubPack}
+      />
+
       {/* Add Subscription Modal */}
       <ResponsiveFormContainer
         open={isAddOpen}
@@ -158,57 +174,57 @@ export function SubscriptionsTracker() {
       >
         <form onSubmit={handleAddSub} className="space-y-4 pt-2">
           <div className="space-y-1.5">
-            <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Service Name</label>
+            <label className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514]">Service Name *</label>
             <input
               type="text"
               placeholder="e.g. Netflix, Gym, Notion"
               value={subName}
               onChange={(e) => setSubName(e.target.value)}
-              className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium transition-all"
+              className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
               required
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Amount (₹)</label>
+              <label className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514]">Amount (₹) *</label>
               <input
                 type="number"
                 placeholder="e.g. 499"
                 value={subAmount}
                 onChange={(e) => setSubAmount(e.target.value)}
-                className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium transition-all"
+                className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
                 required
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Billing Cycle</label>
-              <select
+              <label className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514]">Billing Cycle</label>
+              <NeobrutalistSelect
                 value={subCycle}
-                onChange={(e) => setSubCycle(e.target.value as any)}
-                className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium transition-all"
-              >
-                <option value="monthly">Monthly</option>
-                <option value="yearly">Yearly</option>
-              </select>
+                onChange={(val) => setSubCycle(val as any)}
+                options={[
+                  { value: "monthly", label: "Monthly", icon: "📅" },
+                  { value: "yearly", label: "Yearly", icon: "🎆" },
+                ]}
+              />
             </div>
           </div>
           <div className="space-y-1.5">
-            <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Next Renewal Date</label>
+            <label className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514]">Next Renewal Date *</label>
             <input
               type="date"
               value={subDate}
               onChange={(e) => setSubDate(e.target.value)}
-              className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium transition-all"
+              className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
               required
             />
           </div>
-          <Button
+          <button
             type="submit"
             disabled={addSubMutation.isPending}
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-full py-2.5 mt-2 border-none cursor-pointer"
+            className="w-full bg-[#03D26F] hover:bg-[#02b35d] text-[#161514] font-black text-xs uppercase tracking-wider rounded-2xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all"
           >
             {addSubMutation.isPending ? "Saving…" : "Save Subscription"}
-          </Button>
+          </button>
         </form>
       </ResponsiveFormContainer>
 

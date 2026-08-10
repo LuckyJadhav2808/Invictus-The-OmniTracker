@@ -120,6 +120,25 @@ export const BUDGET_CATEGORY_TEMPLATE_PACKS: TemplatePack[] = [
       { id: "sb3", title: "Metro & Transport Pass", amount: 80, type: "Expense" },
     ],
   },
+  {
+    id: "monthly-spending-template",
+    name: "1-Click Monthly Indian Expense Suite",
+    tagline: "10 essential categories based on typical Indian household expenditure data",
+    badge: "🔥 Full Suite",
+    icon: "🇮🇳",
+    items: [
+      { id: "mst1", title: "Rent & Housing", amount: 10000, type: "Expense" },
+      { id: "mst2", title: "Groceries & Provisions", amount: 5500, type: "Expense" },
+      { id: "mst3", title: "Transportation & Fuel", amount: 2500, type: "Expense" },
+      { id: "mst4", title: "Utilities & Wifi", amount: 1800, type: "Expense" },
+      { id: "mst5", title: "Gym & Health", amount: 900, type: "Expense" },
+      { id: "mst6", title: "Dining & Outings", amount: 2800, type: "Expense" },
+      { id: "mst7", title: "Shopping & Wants", amount: 1800, type: "Expense" },
+      { id: "mst8", title: "Healthcare & Meds", amount: 1500, type: "Expense" },
+      { id: "mst9", title: "SIP Investments", amount: 4800, type: "Expense" },
+      { id: "mst10", title: "Emergency Savings", amount: 5000, type: "Expense" },
+    ],
+  },
 ];
 
 export const SAVINGS_GOAL_TEMPLATE_PACKS: TemplatePack[] = [
