@@ -54,6 +54,7 @@ import { useUIStore } from "@/store/ui-store";
 import { cn } from "@/lib/utils";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from "recharts";
 import { SpaceHeroBanner } from "@/components/shared/SpaceHeroBanner";
+import { ProactiveReminderBanner } from "@/components/shared/ProactiveReminderBanner";
 import { useSearchParams, useRouter } from "next/navigation";
 
 function GoalsPageContent() {
@@ -455,6 +456,9 @@ function GoalsPageContent() {
             onClick: () => setIsChoiceOpen(true),
           }}
         />
+
+        {/* Proactive Reminder Banner */}
+        <ProactiveReminderBanner space="goals" />
 
         {/* Tab Controls */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

@@ -21,6 +21,7 @@ import { useAuth } from "@/components/shared/AuthProvider";
 import { cn } from "@/lib/utils";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell, LineChart, Line, Legend } from "recharts";
 import { SpaceHeroBanner } from "@/components/shared/SpaceHeroBanner";
+import { ProactiveReminderBanner } from "@/components/shared/ProactiveReminderBanner";
 
 function StudyPageContent() {
   const router = useRouter();
@@ -281,6 +282,9 @@ function StudyPageContent() {
             onClick: () => setIsSubjectChoiceOpen(true),
           }}
         />
+
+        {/* Proactive Reminder Banner */}
+        <ProactiveReminderBanner space="study" />
 
         {/* Countdown Banner */}
         {studyTarget && daysLeft !== null && (

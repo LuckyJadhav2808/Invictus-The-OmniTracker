@@ -17,6 +17,7 @@ import { useAuth } from "@/components/shared/AuthProvider";
 import { cn } from "@/lib/utils";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Legend, PieChart, Pie, Cell } from "recharts";
 import { SpaceHeroBanner } from "@/components/shared/SpaceHeroBanner";
+import { ProactiveReminderBanner } from "@/components/shared/ProactiveReminderBanner";
 import { MoneyQuickActionsAndCards, renderCategoryEmoji } from "@/components/money/MoneyQuickActionsAndCards";
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
 import { SubscriptionsTracker } from "@/components/money/SubscriptionsTracker";
@@ -630,6 +631,9 @@ function MoneyPageContent() {
             },
           }}
         />
+
+        {/* Proactive Reminder Banner */}
+        <ProactiveReminderBanner space="money" />
 
         {/* Draggable Money Widgets Grid */}
         <DraggableDashboardGrid

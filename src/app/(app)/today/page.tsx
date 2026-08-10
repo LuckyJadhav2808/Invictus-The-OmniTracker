@@ -17,6 +17,7 @@ import { useStudySessions, useSubjects, useAllTopics } from "@/lib/queries/study
 import { useTransactions, useCategories } from "@/lib/queries/money";
 import { useUIStore } from "@/store/ui-store";
 import { SpaceHeroBanner } from "@/components/shared/SpaceHeroBanner";
+import { ProactiveReminderBanner } from "@/components/shared/ProactiveReminderBanner";
 import { LiquidPillBarChart } from "@/components/shared/LiquidPillBarChart";
 import { DraggableDashboardGrid } from "@/components/shared/DraggableDashboardGrid";
 import { QuickThoughtsWidget } from "@/components/shared/QuickThoughtsWidget";
@@ -194,6 +195,9 @@ export default function TodayPage() {
             onClick: () => router.push("/goals"),
           }}
         />
+
+        {/* Proactive Reminder Banner */}
+        <ProactiveReminderBanner space="today" />
 
         {/* Draggable Today Dashboard Grid with Pinning Support from Goals, Study & Money Spaces */}
         <DraggableDashboardGrid

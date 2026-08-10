@@ -1,9 +1,10 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Toaster } from "sonner";
 import { AuthProvider } from "@/components/shared/AuthProvider";
+import { initReminderScheduler } from "@/lib/utils/reminder-scheduler";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -17,6 +18,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
         },
       })
   );
+
+  useEffect(() => {
+    initReminderScheduler();
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
