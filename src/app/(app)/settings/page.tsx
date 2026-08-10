@@ -54,6 +54,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
+import { ReminderManagerModal } from "@/components/shared/ReminderManagerModal";
 
 const TIMEZONES = [
   "Asia/Kolkata",
@@ -88,6 +89,7 @@ export default function SettingsPage() {
 
   // Active Tab State
   const [activeTab, setActiveTab] = useState<"preferences" | "modules" | "security" | "datavault">("preferences");
+  const [isRemindersOpen, setIsRemindersOpen] = useState(false);
 
   // Global Announcement Banner state
   const [activeAnnouncement, setActiveAnnouncement] = useState<GlobalAnnouncement | null>(null);
@@ -535,6 +537,34 @@ export default function SettingsPage() {
             className="w-full bg-navy-950 hover:bg-navy-900 text-white font-black text-xs uppercase tracking-widest py-3.5 px-4 rounded-2xl border-2 border-navy-950 shadow-[3px_3px_0px_0px_rgba(31,36,48,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all"
           >
             UPDATE SCHEDULE
+          </button>
+        </div>
+
+        {/* DAILY LOG REMINDERS CARD */}
+        <div className="space-y-2 pt-2">
+          <span className="text-[10px] font-black text-navy-700 uppercase tracking-widest px-1">
+            NOTIFICATIONS & ALERTS
+          </span>
+
+          <button
+            type="button"
+            onClick={() => setIsRemindersOpen(true)}
+            className="w-full bg-[#CEF431] hover:bg-[#bce028] text-[#161514] rounded-2xl p-4 border-2 border-[#161514] shadow-[4px_4px_0px_0px_rgba(22,21,20,1)] flex items-center justify-between transition-all cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5"
+          >
+            <div className="flex items-center gap-3.5">
+              <div className="h-11 w-11 rounded-xl bg-white border-2 border-[#161514] flex items-center justify-center text-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] shrink-0">
+                <Bell className="h-5 w-5 stroke-[2.5]" />
+              </div>
+              <div className="text-left">
+                <h4 className="font-black text-sm text-[#161514] tracking-tight uppercase" style={{ fontFamily: "var(--font-heading)" }}>
+                  DAILY LOG REMINDERS & NOTIFICATIONS 🔔
+                </h4>
+                <p className="text-[10px] text-[#161514]/80 font-extrabold uppercase tracking-wide">
+                  EXPENSES, HABITS & EXAM STUDY TIMES
+                </p>
+              </div>
+            </div>
+            <ChevronRight className="h-5 w-5 text-[#161514] stroke-[3]" />
           </button>
         </div>
 
@@ -1766,6 +1796,11 @@ export default function SettingsPage() {
             </div>
           </div>
         )}
+        {/* Daily Log Reminders Manager Modal */}
+        <ReminderManagerModal
+          open={isRemindersOpen}
+          onOpenChange={setIsRemindersOpen}
+        />
       </div>
     </div>
   );

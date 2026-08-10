@@ -40,32 +40,39 @@ export async function sendNativeNotification(title: string, body: string, url: s
   }
 
   if (Notification.permission !== "granted") {
-    const granted = await requestNotificationPermission();
-    if (!granted) return;
+    const permission = await Notification.requestPermission();
+    if (permission !== "granted") return;
   }
 
   try {
-    if ("serviceWorker" in navigator) {
-      const reg = await navigator.serviceWorker.ready;
-      if (reg && reg.showNotification) {
-        reg.showNotification(title, {
-          body,
-          icon: "/icons/icon-192.png",
-          badge: "/icons/icon-192.png",
-          vibrate: [200, 100, 200],
-          data: { url },
-        } as any);
-        return;
-      }
-    }
-
-    // Fallback to standard Notification API
-    new Notification(title, {
+    // 1. Try standard browser Notification constructor first for instant desktop popup
+    const n = new Notification(title, {
       body,
       icon: "/icons/icon-192.png",
+      data: { url },
     });
-  } catch (err) {
-    console.error("Error triggering native notification:", err);
+    n.onclick = () => {
+      window.focus();
+      window.location.href = url;
+    };
+  } catch {
+    // 2. Fallback to Service Worker notification if constructor fails (e.g. Android Chrome)
+    try {
+      if ("serviceWorker" in navigator) {
+        const reg = await navigator.serviceWorker.getRegistration();
+        if (reg && reg.showNotification) {
+          await reg.showNotification(title, {
+            body,
+            icon: "/icons/icon-192.png",
+            badge: "/icons/icon-192.png",
+            vibrate: [200, 100, 200],
+            data: { url },
+          } as any);
+        }
+      }
+    } catch (err) {
+      console.error("Error triggering native notification:", err);
+    }
   }
 }
 

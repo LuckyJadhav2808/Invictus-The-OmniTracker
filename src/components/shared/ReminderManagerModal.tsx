@@ -12,6 +12,7 @@ import { requestNotificationPermission, sendNativeNotification } from "@/lib/uti
 import { Bell, Clock, DollarSign, Target, BookOpen, Volume2, VolumeX, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { NeobrutalistTimeInput } from "@/components/shared/NeobrutalistTimeInput";
 
 interface ReminderManagerModalProps {
   open: boolean;
@@ -109,13 +110,10 @@ export function ReminderManagerModal({
           </div>
 
           {config.moneyEnabled && (
-            <div className="flex items-center justify-between gap-2 pt-1 border-t border-[#161514]/10">
-              <span className="text-[10px] font-extrabold text-[#161514]/70">Daily Alert Time:</span>
-              <input
-                type="time"
+            <div className="pt-1 border-t border-[#161514]/10">
+              <NeobrutalistTimeInput
                 value={config.moneyTime}
-                onChange={(e) => setConfig({ ...config, moneyTime: e.target.value })}
-                className="bg-white px-3 py-1 rounded-xl border-2 border-[#161514] text-xs font-black text-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)]"
+                onChange={(val) => setConfig({ ...config, moneyTime: val })}
               />
             </div>
           )}
@@ -141,13 +139,10 @@ export function ReminderManagerModal({
           </div>
 
           {config.habitsEnabled && (
-            <div className="flex items-center justify-between gap-2 pt-1 border-t border-[#161514]/10">
-              <span className="text-[10px] font-extrabold text-[#161514]/70">Daily Alert Time:</span>
-              <input
-                type="time"
+            <div className="pt-1 border-t border-[#161514]/10">
+              <NeobrutalistTimeInput
                 value={config.habitsTime}
-                onChange={(e) => setConfig({ ...config, habitsTime: e.target.value })}
-                className="bg-white px-3 py-1 rounded-xl border-2 border-[#161514] text-xs font-black text-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)]"
+                onChange={(val) => setConfig({ ...config, habitsTime: val })}
               />
             </div>
           )}
@@ -173,13 +168,10 @@ export function ReminderManagerModal({
           </div>
 
           {config.studyEnabled && (
-            <div className="flex items-center justify-between gap-2 pt-1 border-t border-[#161514]/10">
-              <span className="text-[10px] font-extrabold text-[#161514]/70">Daily Alert Time:</span>
-              <input
-                type="time"
+            <div className="pt-1 border-t border-[#161514]/10">
+              <NeobrutalistTimeInput
                 value={config.studyTime}
-                onChange={(e) => setConfig({ ...config, studyTime: e.target.value })}
-                className="bg-white px-3 py-1 rounded-xl border-2 border-[#161514] text-xs font-black text-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)]"
+                onChange={(val) => setConfig({ ...config, studyTime: val })}
               />
             </div>
           )}
@@ -205,13 +197,10 @@ export function ReminderManagerModal({
           </div>
 
           {config.examEnabled && (
-            <div className="flex items-center justify-between gap-2 pt-1 border-t border-[#161514]/10">
-              <span className="text-[10px] font-extrabold text-[#161514]/70">Daily Alert Time:</span>
-              <input
-                type="time"
+            <div className="pt-1 border-t border-[#161514]/10">
+              <NeobrutalistTimeInput
                 value={config.examTime}
-                onChange={(e) => setConfig({ ...config, examTime: e.target.value })}
-                className="bg-white px-3 py-1 rounded-xl border-2 border-[#161514] text-xs font-black text-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)]"
+                onChange={(val) => setConfig({ ...config, examTime: val })}
               />
             </div>
           )}
