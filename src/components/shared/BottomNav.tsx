@@ -71,7 +71,7 @@ function BottomNavContent() {
   };
 
   return (
-    <nav className="fixed bottom-2 sm:bottom-3 left-1/2 -translate-x-1/2 w-[92%] max-w-[380px] h-14 sm:h-15 bg-[#CEF431] border-2 border-[#161514] rounded-full px-3 flex items-center justify-around shadow-[3.5px_3.5px_0px_0px_rgba(22,21,20,1)] z-50 lg:hidden transition-all duration-300">
+    <nav className="fixed bottom-2 sm:bottom-3 left-1/2 -translate-x-1/2 w-[92%] max-w-[380px] h-14 sm:h-15 bg-[#CEF431] border-2 border-[#161514] rounded-full px-3 flex items-center justify-around shadow-[3.5px_3.5px_0px_0px_rgba(22,21,20,1)] z-[60] lg:hidden transition-all duration-300">
       {navItems.map((item) => {
         const isActive = isLinkActive(item.href);
         const Icon = item.icon;

@@ -23,8 +23,22 @@ export function SpaceHeader() {
   const [isSubNavVisible, setIsSubNavVisible] = useState<boolean>(true);
 
   useEffect(() => {
-    const ann = getGlobalAnnouncement();
-    setAnnouncement(ann);
+    const fetchAnnouncement = async () => {
+      try {
+        const res = await fetch("/api/admin/announcement");
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.message) {
+            setAnnouncement(data);
+            return;
+          }
+        }
+        setAnnouncement(getGlobalAnnouncement());
+      } catch {
+        setAnnouncement(getGlobalAnnouncement());
+      }
+    };
+    fetchAnnouncement();
 
     try {
       const savedSubNav = localStorage.getItem("invictus_show_subnav");
@@ -206,16 +220,19 @@ export function SpaceHeader() {
   return (
     <>
       {announcement && !dismissedAnn && (
-        <div className="bg-[#CEF431] text-[#161514] px-4 py-1.5 text-xs font-black flex items-center justify-between border-b-2 border-[#161514]">
-          <div className="flex items-center gap-2 max-w-6xl mx-auto flex-1">
-            <Megaphone className="h-4 w-4 shrink-0 animate-bounce" />
-            <span className="truncate">{announcement.message}</span>
+        <div className="bg-[#CEF431] text-[#161514] px-3 sm:px-4 py-2 text-xs font-black flex items-center justify-between border-b-2 border-[#161514] relative z-[110]">
+          <div className="flex items-center gap-2 max-w-6xl mx-auto flex-1 min-w-0 pr-2">
+            <Megaphone className="h-4 w-4 shrink-0 animate-bounce text-[#161514]" />
+            <span className="text-[11px] sm:text-xs font-bold leading-tight break-words line-clamp-2 sm:line-clamp-none">
+              {announcement.message}
+            </span>
           </div>
           <button
             onClick={() => setDismissedAnn(true)}
-            className="text-[#161514]/80 hover:text-[#161514] p-0.5 cursor-pointer ml-2"
+            className="text-[#161514] hover:bg-[#161514]/10 p-1 rounded-lg cursor-pointer shrink-0 transition-colors"
+            title="Dismiss Announcement"
           >
-            <X className="h-4 w-4 stroke-[2.5]" />
+            <X className="h-4 w-4 stroke-[3]" />
           </button>
         </div>
       )}

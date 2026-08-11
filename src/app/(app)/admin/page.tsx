@@ -42,6 +42,7 @@ import {
   HardDrive,
   UserPlus,
   Shield,
+  Edit3,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
@@ -80,22 +81,67 @@ export default function AdminDashboardPage() {
   const [issueCategory, setIssueCategory] = useState<IssueReport["category"]>("bug");
   const [issueSeverity, setIssueSeverity] = useState<IssueReport["severity"]>("medium");
 
-  // Delete User Modal
-  const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
+  // Edit User Modal State
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editEmail, setEditEmail] = useState("");
+  const [editPassword, setEditPassword] = useState("");
 
-  // Storage usage metric
+  // Delete User Modal & Storage States
+  const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
   const [storageKB, setStorageKB] = useState(0);
 
-  // Load Data
-  const refreshData = () => {
-    setUsersList(getRegisteredUsers());
-    setIssuesList(getReportedIssues());
+  // Load Data from MongoDB & Local Stores
+  const refreshData = async () => {
+    try {
+      const res = await fetch("/api/admin/users");
+      if (res.ok) {
+        const mongoUsers = await res.json();
+        setUsersList(mongoUsers);
+      } else {
+        setUsersList(getRegisteredUsers());
+      }
+    } catch {
+      setUsersList(getRegisteredUsers());
+    }
+
+    try {
+      const res = await fetch("/api/admin/issues");
+      if (res.ok) {
+        const mongoIssues = await res.json();
+        setIssuesList(mongoIssues);
+      } else {
+        setIssuesList(getReportedIssues());
+      }
+    } catch {
+      setIssuesList(getReportedIssues());
+    }
+
     setAuditLogs(getAuditLogs());
-    const activeAnn = getGlobalAnnouncement();
-    setAnnouncement(activeAnn);
-    if (activeAnn) {
-      setAnnouncementMsg(activeAnn.message);
-      setAnnouncementType(activeAnn.type);
+    try {
+      const res = await fetch("/api/admin/announcement");
+      if (res.ok) {
+        const mongoAnn = await res.json();
+        setAnnouncement(mongoAnn);
+        if (mongoAnn && mongoAnn.message) {
+          setAnnouncementMsg(mongoAnn.message);
+          setAnnouncementType(mongoAnn.type || "info");
+        }
+      } else {
+        const activeAnn = getGlobalAnnouncement();
+        setAnnouncement(activeAnn);
+        if (activeAnn) {
+          setAnnouncementMsg(activeAnn.message);
+          setAnnouncementType(activeAnn.type);
+        }
+      }
+    } catch {
+      const activeAnn = getGlobalAnnouncement();
+      setAnnouncement(activeAnn);
+      if (activeAnn) {
+        setAnnouncementMsg(activeAnn.message);
+        setAnnouncementType(activeAnn.type);
+      }
     }
 
     // Calculate localStorage KB
@@ -153,18 +199,24 @@ export default function AdminDashboardPage() {
     );
   }
 
-  // Handle Add User
+  // Handle Add User in MongoDB
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newEmail || !newName || !newPassword) return;
     try {
-      await customRegisterUser({
-        email: newEmail,
-        displayName: newName,
-        password: newPassword,
+      const res = await fetch("/api/admin/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: newEmail, displayName: newName, password: newPassword }),
       });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to create user");
+
+      // Also sync to legacy local auth for fallback
+      await customRegisterUser({ email: newEmail, displayName: newName, password: newPassword }).catch(() => {});
+
       addAuditLog("CREATE_USER", user?.email || ADMIN_EMAIL, `Created new account for ${newName} (${newEmail}).`);
-      toast.success(`User ${newName} created successfully! 🎉`);
+      toast.success(`User ${newName} created successfully in MongoDB! 🎉`);
       setNewEmail("");
       setNewName("");
       setNewPassword("");
@@ -175,66 +227,172 @@ export default function AdminDashboardPage() {
     }
   };
 
-  // Toggle User Role (Admin <-> User)
-  const handleToggleUserRole = (u: User) => {
+  // Toggle User Role in MongoDB
+  const handleToggleUserRole = async (u: User) => {
     if (u.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
       toast.error("Primary SuperAdmin role cannot be changed.");
       return;
     }
     const newRole = u.role === "admin" ? "user" : "admin";
-    customUpdateUser(u.uid, { role: newRole });
-    addAuditLog("UPDATE_ROLE", user?.email || ADMIN_EMAIL, `Updated role for ${u.displayName} to ${newRole}.`);
-    toast.success(`Role for ${u.displayName} changed to ${newRole.toUpperCase()}`);
-    refreshData();
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid: u.uid, role: newRole }),
+      });
+      if (!res.ok) throw new Error("Failed to update role in MongoDB");
+
+      customUpdateUser(u.uid, { role: newRole });
+      addAuditLog("UPDATE_ROLE", user?.email || ADMIN_EMAIL, `Updated role for ${u.displayName} to ${newRole}.`);
+      toast.success(`Role for ${u.displayName} changed to ${newRole.toUpperCase()}`);
+      refreshData();
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to update role");
+    }
   };
 
-  // Handle Add Issue
-  const handleCreateIssue = (e: React.FormEvent) => {
+  // Toggle User Status (Active <-> Suspended) in MongoDB
+  const handleToggleUserStatus = async (u: User) => {
+    if (u.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+      toast.error("Primary SuperAdmin account cannot be suspended.");
+      return;
+    }
+    const newStatus = (u as any).status === "suspended" ? "active" : "suspended";
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid: u.uid, status: newStatus }),
+      });
+      if (!res.ok) throw new Error("Failed to update status in MongoDB");
+
+      addAuditLog("UPDATE_STATUS", user?.email || ADMIN_EMAIL, `Updated account status for ${u.displayName} to ${newStatus}.`);
+      toast.success(`Account status for ${u.displayName} set to ${newStatus.toUpperCase()}`);
+      refreshData();
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to update status");
+    }
+  };
+
+  // Save User Edits (Name, Email, New Password) in MongoDB
+  const handleSaveUserEdits = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingUser) return;
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          uid: editingUser.uid,
+          displayName: editName,
+          email: editEmail,
+          newPassword: editPassword || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to update user");
+
+      addAuditLog("EDIT_USER", user?.email || ADMIN_EMAIL, `Updated user details for ${editName} (${editEmail}).`);
+      toast.success(`User details for ${editName} updated! ✨`);
+      setEditingUser(null);
+      setEditName("");
+      setEditEmail("");
+      setEditPassword("");
+      refreshData();
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to update user");
+    }
+  };
+
+  // Handle Add Issue in MongoDB
+  const handleCreateIssue = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!issueTitle) return;
-    createReportedIssue({
-      title: issueTitle,
-      description: issueDesc,
-      category: issueCategory,
-      severity: issueSeverity,
-      status: "open",
-      reportedBy: user?.email || ADMIN_EMAIL,
-    });
-    addAuditLog("REPORT_ISSUE", user?.email || ADMIN_EMAIL, `Logged issue: ${issueTitle}`);
-    toast.success("Issue reported to tracking board! 🛠️");
-    setIssueTitle("");
-    setIssueDesc("");
-    setIsAddIssueOpen(false);
-    refreshData();
-  };
+    try {
+      const res = await fetch("/api/admin/issues", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: issueTitle,
+          description: issueDesc,
+          category: issueCategory,
+          severity: issueSeverity,
+          reportedBy: user?.email || ADMIN_EMAIL,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to create issue");
 
-  // Handle Delete User
-  const confirmDeleteUser = () => {
-    if (!deletingUserId) return;
-    const deleted = customDeleteUser(deletingUserId);
-    if (deleted) {
-      addAuditLog("DELETE_USER", user?.email || ADMIN_EMAIL, `Deleted user account ID ${deletingUserId}.`);
-      toast.success("User account deleted");
+      createReportedIssue({
+        title: issueTitle,
+        description: issueDesc,
+        category: issueCategory,
+        severity: issueSeverity,
+        status: "open",
+        reportedBy: user?.email || ADMIN_EMAIL,
+      });
+
+      addAuditLog("REPORT_ISSUE", user?.email || ADMIN_EMAIL, `Logged issue: ${issueTitle}`);
+      toast.success("Issue reported to tracking board! 🛠️");
+      setIssueTitle("");
+      setIssueDesc("");
+      setIsAddIssueOpen(false);
       refreshData();
-    } else {
-      toast.error("Could not delete user");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to create issue");
     }
-    setDeletingUserId(null);
   };
 
-  // Handle Broadcast Announcement
-  const handleSaveAnnouncement = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!announcementMsg.trim()) {
-      clearGlobalAnnouncement();
-      addAuditLog("CLEAR_ANNOUNCEMENT", user?.email || ADMIN_EMAIL, "Cleared global announcement banner.");
-      toast.success("Announcement banner cleared!");
-    } else {
-      setGlobalAnnouncement(announcementMsg.trim(), true, announcementType, user?.email || ADMIN_EMAIL);
-      addAuditLog("BROADCAST_ANNOUNCEMENT", user?.email || ADMIN_EMAIL, `Broadcasted banner: "${announcementMsg.trim()}"`);
-      toast.success("Global announcement published! 📢");
+  // Handle Delete User in MongoDB
+  const confirmDeleteUser = async () => {
+    if (!deletingUserId) return;
+    try {
+      const res = await fetch(`/api/admin/users?uid=${deletingUserId}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Failed to delete user from MongoDB");
+
+      customDeleteUser(deletingUserId);
+      addAuditLog("DELETE_USER", user?.email || ADMIN_EMAIL, `Deleted user account ID ${deletingUserId}.`);
+      toast.success("User account deleted from MongoDB");
+      refreshData();
+    } catch (err: any) {
+      toast.error(err?.message || "Could not delete user");
+    } finally {
+      setDeletingUserId(null);
     }
-    refreshData();
+  };
+
+  // Handle Broadcast Announcement in MongoDB
+  const handleSaveAnnouncement = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      if (!announcementMsg.trim()) {
+        await fetch("/api/admin/announcement", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ clear: true }),
+        });
+        clearGlobalAnnouncement();
+        addAuditLog("CLEAR_ANNOUNCEMENT", user?.email || ADMIN_EMAIL, "Cleared global announcement banner.");
+        toast.success("Announcement banner cleared in MongoDB!");
+      } else {
+        await fetch("/api/admin/announcement", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: announcementMsg.trim(),
+            type: announcementType,
+            createdBy: user?.email || ADMIN_EMAIL,
+          }),
+        });
+        setGlobalAnnouncement(announcementMsg.trim(), true, announcementType, user?.email || ADMIN_EMAIL);
+        addAuditLog("BROADCAST_ANNOUNCEMENT", user?.email || ADMIN_EMAIL, `Broadcasted banner: "${announcementMsg.trim()}"`);
+        toast.success("Global announcement published to MongoDB! 📢");
+      }
+      refreshData();
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to broadcast announcement");
+    }
   };
 
   // Filtered Users
@@ -247,7 +405,7 @@ export default function AdminDashboardPage() {
   const openIssuesCount = issuesList.filter((i) => i.status === "open").length;
 
   return (
-    <div className="min-h-screen bg-cream-bg p-4 md:p-8 space-y-6">
+    <div className="min-h-screen bg-cream-bg p-3 sm:p-8 space-y-4 sm:space-y-6 w-full max-w-full overflow-x-hidden">
       <div className="max-w-5xl mx-auto space-y-6">
         
         {/* Admin Header Banner */}
@@ -391,8 +549,8 @@ export default function AdminDashboardPage() {
                   <tr className="border-b border-border/60 text-[10px] font-black text-navy-600 uppercase tracking-widest bg-cream-bg/40">
                     <th className="p-3 rounded-l-xl">User Profile</th>
                     <th className="p-3">Role Governance</th>
+                    <th className="p-3">Account Status</th>
                     <th className="p-3">Joined Date</th>
-                    <th className="p-3">Last Active</th>
                     <th className="p-3 text-right rounded-r-xl">Actions</th>
                   </tr>
                 </thead>
@@ -406,12 +564,13 @@ export default function AdminDashboardPage() {
                   ) : (
                     filteredUsers.map((u) => {
                       const isSeedAdmin = u.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+                      const statusVal = (u as any).status || "active";
                       return (
                         <tr key={u.uid} className="hover:bg-cream-bg/30 transition-colors">
                           <td className="p-3">
                             <div className="flex items-center gap-3">
                               <div className="h-9 w-9 rounded-full bg-amber-400/20 text-amber-900 font-extrabold flex items-center justify-center text-xs">
-                                {u.displayName.charAt(0).toUpperCase()}
+                                {u.displayName ? u.displayName.charAt(0).toUpperCase() : "U"}
                               </div>
                               <div>
                                 <p className="font-bold text-navy-900 leading-tight">{u.displayName}</p>
@@ -434,20 +593,44 @@ export default function AdminDashboardPage() {
                               {u.role || "user"}
                             </button>
                           </td>
+                          <td className="p-3">
+                            <button
+                              onClick={() => handleToggleUserStatus(u)}
+                              disabled={isSeedAdmin}
+                              title={isSeedAdmin ? "Primary SuperAdmin" : "Click to toggle active/suspended status"}
+                              className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase flex items-center gap-1 cursor-pointer transition-all ${
+                                statusVal === "suspended"
+                                  ? "bg-red-100 text-red-800 border border-red-300 hover:bg-red-200"
+                                  : "bg-emerald-100 text-emerald-800 border border-emerald-300 hover:bg-emerald-200"
+                              } ${isSeedAdmin ? "cursor-not-allowed opacity-90" : ""}`}
+                            >
+                              <span>{statusVal === "suspended" ? "🔴 Suspended" : "🟢 Active"}</span>
+                            </button>
+                          </td>
                           <td className="p-3 text-navy-600 text-[11px]">
                             {u.createdAt ? format(new Date(u.createdAt), "MMM d, yyyy") : "Initial Seed"}
                           </td>
-                          <td className="p-3 text-navy-600 text-[11px]">
-                            {u.lastLogin ? format(new Date(u.lastLogin), "MMM d, h:mm a") : "Recent"}
-                          </td>
-                          <td className="p-3 text-right space-x-2">
+                          <td className="p-3 text-right space-x-1.5 whitespace-nowrap">
+                            <button
+                              onClick={() => {
+                                setEditingUser(u);
+                                setEditName(u.displayName);
+                                setEditEmail(u.email);
+                                setEditPassword("");
+                              }}
+                              className="text-navy-700 hover:text-navy-900 bg-cream-bg hover:bg-amber-100 p-1.5 rounded-lg border border-border/60 transition-colors cursor-pointer"
+                              title="Edit user & password reset"
+                            >
+                              <Edit3 className="h-3.5 w-3.5" />
+                            </button>
+
                             {!isSeedAdmin && (
                               <button
                                 onClick={() => setDeletingUserId(u.uid)}
-                                className="text-red-500 hover:text-red-700 p-1.5 rounded-lg hover:bg-red-50 transition-colors outline-none cursor-pointer border-none"
+                                className="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-1.5 rounded-lg border border-red-200 transition-colors cursor-pointer"
                                 title="Delete user"
                               >
-                                <Trash2 className="h-4 w-4" />
+                                <Trash2 className="h-3.5 w-3.5" />
                               </button>
                             )}
                           </td>
@@ -492,11 +675,16 @@ export default function AdminDashboardPage() {
                     </div>
 
                     <button
-                      onClick={() => {
-                        deleteReportedIssue(issue.id);
-                        addAuditLog("DELETE_ISSUE", user?.email || ADMIN_EMAIL, `Deleted issue ID ${issue.id}`);
-                        toast.success("Issue removed");
-                        refreshData();
+                      onClick={async () => {
+                        try {
+                          await fetch(`/api/admin/issues?id=${issue.id}`, { method: "DELETE" });
+                          deleteReportedIssue(issue.id);
+                          addAuditLog("DELETE_ISSUE", user?.email || ADMIN_EMAIL, `Deleted issue ID ${issue.id}`);
+                          toast.success("Issue removed from MongoDB");
+                          refreshData();
+                        } catch {
+                          toast.error("Failed to delete issue");
+                        }
                       }}
                       className="text-navy-600 hover:text-red-500 p-1 cursor-pointer outline-none border-none bg-transparent"
                     >
@@ -517,11 +705,21 @@ export default function AdminDashboardPage() {
                     
                     <select
                       value={issue.status}
-                      onChange={(e) => {
-                        updateIssueStatus(issue.id, e.target.value as any);
-                        addAuditLog("UPDATE_ISSUE_STATUS", user?.email || ADMIN_EMAIL, `Changed status of issue ${issue.id} to ${e.target.value}`);
-                        toast.success("Status updated");
-                        refreshData();
+                      onChange={async (e) => {
+                        const newSt = e.target.value;
+                        try {
+                          await fetch("/api/admin/issues", {
+                            method: "PATCH",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ id: issue.id, status: newSt }),
+                          });
+                          updateIssueStatus(issue.id, newSt as any);
+                          addAuditLog("UPDATE_ISSUE_STATUS", user?.email || ADMIN_EMAIL, `Changed status of issue ${issue.id} to ${newSt}`);
+                          toast.success("Issue status updated in MongoDB");
+                          refreshData();
+                        } catch {
+                          toast.error("Failed to update status");
+                        }
                       }}
                       className={`font-black uppercase px-2.5 py-1 rounded-full border cursor-pointer outline-none ${
                         issue.status === "resolved"
@@ -574,9 +772,9 @@ export default function AdminDashboardPage() {
                   />
                 </div>
 
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Banner Style:</span>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600 w-full sm:w-auto">Banner Style:</span>
                     {(["info", "warning", "success", "alert"] as const).map((st) => (
                       <button
                         type="button"
@@ -593,25 +791,30 @@ export default function AdminDashboardPage() {
                     ))}
                   </div>
 
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                     {announcement && (
                       <Button
                         type="button"
-                        onClick={() => {
+                        onClick={async () => {
+                          await fetch("/api/admin/announcement", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ clear: true }),
+                          });
                           clearGlobalAnnouncement();
                           setAnnouncementMsg("");
                           toast.success("Banner cleared");
                           refreshData();
                         }}
                         variant="outline"
-                        className="rounded-full text-xs font-bold py-2 border-red-200 text-red-600 hover:bg-red-50 cursor-pointer"
+                        className="rounded-full text-xs font-bold py-2 border-red-200 text-red-600 hover:bg-red-50 cursor-pointer w-full sm:w-auto"
                       >
                         Clear Banner
                       </Button>
                     )}
                     <Button
                       type="submit"
-                      className="bg-amber-500 hover:bg-amber-600 text-navy-900 font-bold rounded-full text-xs py-2 px-5 cursor-pointer border-none"
+                      className="bg-amber-500 hover:bg-amber-600 text-navy-900 font-bold rounded-full text-xs py-2.5 px-5 cursor-pointer border-none w-full sm:w-auto"
                     >
                       Publish Announcement
                     </Button>
@@ -701,6 +904,55 @@ export default function AdminDashboardPage() {
             className="w-full bg-amber-500 hover:bg-amber-600 text-navy-900 font-bold rounded-full py-2.5 mt-2 border-none cursor-pointer"
           >
             Create User Account
+          </Button>
+        </form>
+      </ResponsiveFormContainer>
+
+      {/* Edit User & Reset Password Modal */}
+      <ResponsiveFormContainer
+        open={!!editingUser}
+        onOpenChange={(open) => !open && setEditingUser(null)}
+        title="Edit User Profile & Reset Password"
+        description="Update display name, email, or reset user password directly in MongoDB"
+      >
+        <form onSubmit={handleSaveUserEdits} className="space-y-4 pt-2">
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Full Display Name</label>
+            <input
+              type="text"
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+              className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:border-amber-500 font-medium"
+              required
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Email Address</label>
+            <input
+              type="email"
+              value={editEmail}
+              onChange={(e) => setEditEmail(e.target.value)}
+              className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:border-amber-500 font-medium"
+              required
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">
+              Reset Password (leave blank to keep unchanged)
+            </label>
+            <input
+              type="password"
+              value={editPassword}
+              onChange={(e) => setEditPassword(e.target.value)}
+              className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:border-amber-500 font-medium"
+              placeholder="Enter new password"
+            />
+          </div>
+          <Button
+            type="submit"
+            className="w-full bg-amber-500 hover:bg-amber-600 text-navy-900 font-bold rounded-full py-2.5 mt-2 border-none cursor-pointer"
+          >
+            Save User Changes
           </Button>
         </form>
       </ResponsiveFormContainer>

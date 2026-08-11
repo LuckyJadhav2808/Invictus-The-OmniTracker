@@ -10,7 +10,7 @@ import { BUDGET_CATEGORY_TEMPLATE_PACKS } from "@/lib/templates-data";
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Wallet, Plus, Calendar as CalendarIcon, ArrowUpRight, ArrowDownRight, Trash2, Edit3, PieChart as PieIcon, TrendingUp, ShieldAlert, Tag, Search, X, Filter, ChevronLeft, ChevronRight, Copy, Eye, Receipt } from "lucide-react";
+import { Wallet, Plus, Calendar as CalendarIcon, ArrowUpRight, ArrowDownRight, Trash2, Edit3, PieChart as PieIcon, TrendingUp, ShieldAlert, Tag, Search, X, Filter, ChevronLeft, ChevronRight, Copy, Eye, Receipt, FileText } from "lucide-react";
 import { format, parseISO, isToday, isYesterday, subMonths, addMonths } from "date-fns";
 import { toast } from "sonner";
 import { useAuth } from "@/components/shared/AuthProvider";
@@ -22,6 +22,7 @@ import { MoneyQuickActionsAndCards, renderCategoryEmoji } from "@/components/mon
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
 import { SubscriptionsTracker } from "@/components/money/SubscriptionsTracker";
 import { SavingsGoals } from "@/components/money/SavingsGoals";
+import { PDFExportModal } from "@/components/money/PDFExportModal";
 import { DraggableDashboardGrid } from "@/components/shared/DraggableDashboardGrid";
 import { useCostOfLivingIndex } from "@/lib/queries/cost-of-living";
 import { detectCategoryFromNote } from "@/lib/utils/merchant-categorizer";
@@ -121,6 +122,29 @@ function MoneyPageContent() {
   const updateCatMutation = useUpdateCategory();
   const deleteCatMutation = useDeleteCategory();
   const unapplyMonthlyTemplateMutation = useUnapplyMonthlyBudgetTemplate();
+
+  const [isCreatingAutoCat, setIsCreatingAutoCat] = useState(false);
+
+  const handleQuickCreateCategory = async (detected: { categoryName?: string; icon?: string }) => {
+    if (!detected.categoryName) return;
+    setIsCreatingAutoCat(true);
+    try {
+      const res = await addCatMutation.mutateAsync({
+        name: detected.categoryName,
+        type: txType,
+        icon: detected.icon || "💳",
+        color: "orange",
+        monthlyBudget: 0,
+      });
+      const newId = (res as any)?.id || (res as any)?._id;
+      if (newId) setTxCategoryId(newId);
+      toast.success(`Created & selected category: ${detected.categoryName} ${detected.icon || ""}`);
+    } catch (err: any) {
+      toast.error(err.message || "Failed to auto-create category.");
+    } finally {
+      setIsCreatingAutoCat(false);
+    }
+  };
 
   // Move Money Modal states
   const [isMoveMoneyOpen, setIsMoveMoneyOpen] = useState(false);
@@ -295,6 +319,7 @@ function MoneyPageContent() {
 
   // Transaction Inspector state (Feature 3)
   const [inspectingTx, setInspectingTx] = useState<any | null>(null);
+  const [isPDFExportOpen, setIsPDFExportOpen] = useState(false);
 
   const handleDuplicateTx = (tx: any) => {
     setTxAmount(String(tx.amount));
@@ -880,6 +905,15 @@ function MoneyPageContent() {
                       Net: {monthlyStats.net >= 0 ? "+" : ""}{currencySymbol}{monthlyStats.net.toLocaleString()}
                     </span>
 
+                    <button
+                      type="button"
+                      onClick={() => setIsPDFExportOpen(true)}
+                      className="px-3 py-1 rounded-xl bg-white hover:bg-[#CEF431] text-[#161514] text-[10px] font-black border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer flex items-center gap-1 shrink-0 ml-1"
+                    >
+                      <FileText className="h-3 w-3 stroke-[2.5]" />
+                      <span>Export PDF 📄</span>
+                    </button>
+
                     {(ledgerSearchQuery || ledgerCategoryFilter !== "all" || ledgerTypeFilter !== "all" || ledgerMonthFilter !== currentMonthKey) && (
                       <button
                         type="button"
@@ -1454,12 +1488,34 @@ function MoneyPageContent() {
               <label htmlFor="tx-notes" className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514]">
                 Notes (optional)
               </label>
-              {detectCategoryFromNote(txNote, categories) && (
-                <span className="text-[10px] font-black text-[#161514] bg-[#CEF431] px-2 py-0.5 rounded-lg flex items-center gap-1 border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)]">
-                  <span>{detectCategoryFromNote(txNote, categories)?.icon}</span>
-                  Auto-Matched: {detectCategoryFromNote(txNote, categories)?.categoryName}
-                </span>
-              )}
+              {(() => {
+                const detected = detectCategoryFromNote(txNote, categories);
+                if (!detected) return null;
+
+                if (detected.categoryId) {
+                  return (
+                    <span className="text-[10px] font-black text-[#161514] bg-[#CEF431] px-2 py-0.5 rounded-lg flex items-center gap-1 border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)]">
+                      <span>{detected.icon}</span>
+                      Auto-Matched: {detected.categoryName}
+                    </span>
+                  );
+                }
+
+                return (
+                  <button
+                    type="button"
+                    disabled={isCreatingAutoCat}
+                    onClick={() => handleQuickCreateCategory(detected)}
+                    className="text-[10px] font-black text-[#161514] bg-[#CEF431] hover:bg-[#bce028] px-2 py-0.5 rounded-lg flex items-center gap-1 border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    <span>{detected.icon}</span>
+                    <span>Auto-Match: {detected.categoryName}</span>
+                    <span className="bg-[#161514] text-[#CEF431] px-1 py-0.2 rounded text-[9px] font-black ml-0.5">
+                      {isCreatingAutoCat ? "..." : "+ Create"}
+                    </span>
+                  </button>
+                );
+              })()}
             </div>
             <input
               id="tx-notes"
@@ -2232,6 +2288,16 @@ function MoneyPageContent() {
         }}
         title="Delete Category"
         description="Are you sure you want to delete this money category? Existing transaction logs in this category will remain, but will show as uncategorized."
+      />
+      {/* PDF Export Modal */}
+      <PDFExportModal
+        open={isPDFExportOpen}
+        onOpenChange={setIsPDFExportOpen}
+        transactions={transactions}
+        categories={categories}
+        currentMonthKey={ledgerMonthFilter}
+        currencySymbol={currencySymbol}
+        userName={user?.displayName || "Invictus Explorer"}
       />
     </div>
   );

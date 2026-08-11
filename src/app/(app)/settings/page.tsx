@@ -54,7 +54,9 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
+import { SubscriptionsTracker } from "@/components/money/SubscriptionsTracker";
 import { ReminderManagerModal } from "@/components/shared/ReminderManagerModal";
+import { ReportIssueModal } from "@/components/shared/ReportIssueModal";
 
 const TIMEZONES = [
   "Asia/Kolkata",
@@ -133,6 +135,7 @@ export default function SettingsPage() {
   const [isHabitGroupsOpen, setIsHabitGroupsOpen] = useState(false);
   const [isCSVModalOpen, setIsCSVModalOpen] = useState(false);
   const [isWidgetVariantsOpen, setIsWidgetVariantsOpen] = useState(false);
+  const [isReportIssueOpen, setIsReportIssueOpen] = useState(false);
 
   // Reminders & Audio feedback states
   const [smartReminders, setSmartReminders] = useState(true);
@@ -786,6 +789,28 @@ export default function SettingsPage() {
                 </h4>
                 <p className="text-[10px] text-navy-700 font-bold uppercase tracking-wide">
                   COMPACT, EXPANDED & DARK MODE
+                </p>
+              </div>
+            </div>
+            <ChevronRight className="h-5 w-5 text-navy-950 stroke-[3]" />
+          </button>
+
+          {/* FEATURE 5C: 🛠️ REPORT AN ISSUE / FEEDBACK CARD */}
+          <button
+            type="button"
+            onClick={() => setIsReportIssueOpen(true)}
+            className="w-full bg-[#CEF431] hover:bg-[#bce028] rounded-2xl p-4 border-2 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] flex items-center justify-between transition-all cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5"
+          >
+            <div className="flex items-center gap-3.5">
+              <div className="h-11 w-11 rounded-xl bg-white border-2 border-navy-950 flex items-center justify-center text-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] shrink-0 font-black text-lg">
+                🛠️
+              </div>
+              <div className="text-left">
+                <h4 className="font-black text-sm text-navy-950 tracking-tight uppercase" style={{ fontFamily: "var(--font-heading)" }}>
+                  REPORT ISSUE OR FEEDBACK
+                </h4>
+                <p className="text-[10px] text-navy-950 font-bold uppercase tracking-wide opacity-80">
+                  SUBMIT BUGS & REQUESTS TO ADMIN BOARD
                 </p>
               </div>
             </div>
@@ -1800,6 +1825,12 @@ export default function SettingsPage() {
         <ReminderManagerModal
           open={isRemindersOpen}
           onOpenChange={setIsRemindersOpen}
+        />
+
+        {/* User Issue & Feedback Reporting Modal */}
+        <ReportIssueModal
+          open={isReportIssueOpen}
+          onOpenChange={setIsReportIssueOpen}
         />
       </div>
     </div>
