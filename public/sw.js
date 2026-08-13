@@ -24,7 +24,9 @@ self.addEventListener("push", (event) => {
     body: data.body,
     icon: "/icons/icon-192.png",
     badge: "/icons/icon-192.png",
-    vibrate: [100, 50, 100],
+    vibrate: [200, 100, 200],
+    tag: "invictus-notification-" + Date.now(),
+    renotify: true,
     data: {
       url: data.url || "/today",
     },

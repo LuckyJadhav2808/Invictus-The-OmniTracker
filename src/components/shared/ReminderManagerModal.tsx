@@ -14,6 +14,8 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { NeobrutalistTimeInput } from "@/components/shared/NeobrutalistTimeInput";
 
+import { enableWebPushNotifications, triggerTestPushNotification } from "@/lib/utils/push-client";
+
 interface ReminderManagerModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -46,6 +48,9 @@ export function ReminderManagerModal({
       setPermissionState(granted ? "granted" : "denied");
     }
 
+    // Enable Background Web Push token registration
+    await enableWebPushNotifications().catch(() => {});
+
     saveReminderConfig(config);
     toast.success("Daily Reminders Saved & Active! 🔔");
     onOpenChange(false);
@@ -59,7 +64,8 @@ export function ReminderManagerModal({
         "Your daily reminders are working perfectly! You'll be notified at your chosen times.",
         "/today"
       );
-      toast.success("Test notification fired! Check your screen/device notifications 🔔");
+      await triggerTestPushNotification().catch(() => {});
+      toast.success("Test notification fired! Check your status bar / device notifications 📲");
     } else {
       toast.error("Notification permission denied by browser settings.");
     }
@@ -74,7 +80,31 @@ export function ReminderManagerModal({
     >
       <form onSubmit={handleSave} className="space-y-4 pt-1">
         {/* Permission Banner */}
-        {permissionState !== "granted" && (
+        {permissionState === "granted" ? (
+          <div className="bg-emerald-100 p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] text-xs font-bold text-emerald-950 flex items-center justify-between gap-2">
+            <span className="flex items-center gap-1.5 font-black">
+              <CheckCircle2 className="h-4 w-4 text-emerald-700 stroke-[2.5]" />
+              🟢 Browser Notifications Granted & Active
+            </span>
+            <button
+              type="button"
+              onClick={handleTestNotification}
+              className="px-3 py-1 rounded-xl bg-white hover:bg-emerald-200 text-[#161514] font-black text-[10px] uppercase border border-[#161514] cursor-pointer shrink-0"
+            >
+              Test Notification
+            </button>
+          </div>
+        ) : permissionState === "denied" ? (
+          <div className="bg-rose-100 p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] text-xs font-bold text-rose-950 space-y-1">
+            <div className="flex items-center gap-1.5 font-black">
+              <Bell className="h-4 w-4 text-rose-700 stroke-[2.5]" />
+              ⚠️ Notifications Blocked in Browser Settings
+            </div>
+            <p className="text-[11px] font-medium text-rose-900 leading-tight">
+              To enable: Click the 🔒 lock icon on your browser address bar next to <code className="bg-white/80 px-1 py-0.5 rounded text-[10px]">localhost:3000</code> → Switch <strong>Notifications</strong> to <strong>Allow</strong>.
+            </p>
+          </div>
+        ) : (
           <div className="bg-amber-100 p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] text-xs font-bold text-[#161514] flex items-center justify-between gap-2">
             <span className="flex items-center gap-1.5">
               <Bell className="h-4 w-4 text-amber-700 stroke-[2.5]" />
@@ -82,7 +112,16 @@ export function ReminderManagerModal({
             </span>
             <button
               type="button"
-              onClick={handleTestNotification}
+              onClick={async () => {
+                const granted = await requestNotificationPermission();
+                setPermissionState(granted ? "granted" : "denied");
+                if (granted) {
+                  await enableWebPushNotifications().catch(() => {});
+                  toast.success("Notifications Enabled! 🎉");
+                } else {
+                  toast.error("Permission denied in browser.");
+                }
+              }}
               className="px-2.5 py-1 rounded-xl bg-[#CEF431] text-[#161514] font-black text-[10px] uppercase border border-[#161514] cursor-pointer shrink-0"
             >
               Enable Now

@@ -1,6 +1,8 @@
 import { toast } from "sonner";
 
-const PUBLIC_VAPID_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || "";
+const PUBLIC_VAPID_KEY =
+  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ||
+  "BPiAPqUaPwQEX8zTKH08KceB_zOT4aKAI5c-fj0DDpBkN88iXLgqUjn6n5lXlIpx8JGU31jzKTN1btUXTrpK45E";
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -31,11 +33,16 @@ export async function enableWebPushNotifications(userId: string = "guest") {
     const registration = await navigator.serviceWorker.register("/sw.js");
     await navigator.serviceWorker.ready;
 
-    // 3. Subscribe using VAPID Key
-    const subscription = await registration.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY),
-    });
+    // 3. Check for existing subscription or create new one using VAPID Key
+    let subscription = await registration.pushManager.getSubscription();
+
+    if (!subscription) {
+      const convertedKey = urlBase64ToUint8Array(PUBLIC_VAPID_KEY);
+      subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: convertedKey,
+      });
+    }
 
     // 4. Send PushSubscription token to MongoDB backend automatically
     const res = await fetch("/api/push/subscribe", {

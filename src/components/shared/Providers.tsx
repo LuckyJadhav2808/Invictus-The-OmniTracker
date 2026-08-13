@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { Toaster } from "sonner";
 import { AuthProvider } from "@/components/shared/AuthProvider";
 import { initReminderScheduler } from "@/lib/utils/reminder-scheduler";
+import { registerServiceWorker } from "@/lib/utils/notifications";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -21,6 +22,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     initReminderScheduler();
+    registerServiceWorker().catch(() => {});
   }, []);
 
   return (

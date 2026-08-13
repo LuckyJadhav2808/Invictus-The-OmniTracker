@@ -44,35 +44,40 @@ export async function sendNativeNotification(title: string, body: string, url: s
     if (permission !== "granted") return;
   }
 
+  // 1. Fire Direct Browser Notification Constructor IMMEDIATELY (Non-blocking, instant OS status bar toast)
   try {
-    // 1. Try standard browser Notification constructor first for instant desktop popup
     const n = new Notification(title, {
       body,
       icon: "/icons/icon-192.png",
+      badge: "/icons/icon-192.png",
       data: { url },
     });
     n.onclick = () => {
       window.focus();
       window.location.href = url;
     };
-  } catch {
-    // 2. Fallback to Service Worker notification if constructor fails (e.g. Android Chrome)
-    try {
-      if ("serviceWorker" in navigator) {
-        const reg = await navigator.serviceWorker.getRegistration();
-        if (reg && reg.showNotification) {
-          await reg.showNotification(title, {
-            body,
-            icon: "/icons/icon-192.png",
-            badge: "/icons/icon-192.png",
-            vibrate: [200, 100, 200],
-            data: { url },
-          } as any);
-        }
+  } catch (err) {
+    console.warn("Direct Notification constructor failed:", err);
+  }
+
+  // 2. Also trigger via Service Worker if registered (for mobile background lockscreen support)
+  try {
+    if ("serviceWorker" in navigator) {
+      const reg = await navigator.serviceWorker.getRegistration();
+      if (reg && reg.showNotification) {
+        await reg.showNotification(title, {
+          body,
+          icon: "/icons/icon-192.png",
+          badge: "/icons/icon-192.png",
+          vibrate: [200, 100, 200],
+          tag: "invictus-alert-" + Date.now(),
+          renotify: true,
+          data: { url },
+        } as any);
       }
-    } catch (err) {
-      console.error("Error triggering native notification:", err);
     }
+  } catch (err) {
+    console.warn("SW showNotification error:", err);
   }
 }
 
