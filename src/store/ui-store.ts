@@ -43,6 +43,11 @@ export const useUIStore = create<UIState>()(
     }),
     {
       name: "invictus-ui-store",
+      partialize: (state) => {
+        // Exclude selectedDate from localStorage so app always defaults to fresh TODAY on load
+        const { selectedDate, ...rest } = state;
+        return rest;
+      },
     }
   )
 );

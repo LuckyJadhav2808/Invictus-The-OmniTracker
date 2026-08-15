@@ -10,6 +10,7 @@ import { format, subDays, parseISO } from "date-fns";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { exportElementToPDF } from "@/lib/utils/pdf-exporter";
+import { generateEnterpriseVectorPDF } from "@/lib/utils/vector-pdf-engine";
 
 interface PDFExportModalProps {
   open: boolean;
@@ -64,15 +65,22 @@ export function PDFExportModal({
     e.preventDefault();
     e.stopPropagation();
     setIsGenerating(true);
-    toast.info("Generating Studio PDF download... 📄");
+    toast.info("Generating Enterprise Vector PDF statement... 📄");
     try {
       const safeLabel = periodLabel.replace(/[^a-zA-Z0-9_-]/g, "_");
-      await exportElementToPDF("invictus-pdf-statement", `Invictus_Ledger_${safeLabel}.pdf`);
-      toast.success("Studio PDF Statement downloaded! 📄✨");
+      generateEnterpriseVectorPDF({
+        transactions: filteredTxs,
+        categories,
+        periodLabel,
+        currencySymbol,
+        userName,
+        filename: `Invictus_Ledger_${safeLabel}.pdf`,
+      });
+      toast.success("Enterprise Vector PDF Statement downloaded! ⚡📄");
       onOpenChange(false);
     } catch (err) {
       console.error("PDF generation error:", err);
-      toast.error("Direct PDF export encountered an error. Use 'Print Direct' -> 'Save as PDF'.");
+      toast.error("PDF export encountered an error.");
     } finally {
       setIsGenerating(false);
     }

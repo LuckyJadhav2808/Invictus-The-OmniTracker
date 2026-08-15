@@ -859,10 +859,10 @@ function MoneyPageContent() {
                 </div>
 
                 {/* Bottom Row: Monthly Summary Stats & Type Filter Pills */}
-                <div className="flex items-center justify-between flex-wrap gap-2 pt-2 border-t border-navy-950/10">
+                <div className="flex items-center justify-between flex-wrap gap-2 pt-2 border-t border-navy-950/10 overflow-x-auto no-scrollbar py-0.5">
                   {/* Type Filter Pills */}
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] font-black uppercase text-navy-700 mr-1 flex items-center gap-1">
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <span className="text-[10px] font-black uppercase text-navy-700 mr-1 flex items-center gap-1 whitespace-nowrap shrink-0">
                       <Filter className="h-3 w-3 stroke-[2.5]" /> Type:
                     </span>
                     {(["all", "income", "expense"] as const).map((t) => {
@@ -874,7 +874,7 @@ function MoneyPageContent() {
                           type="button"
                           onClick={() => setLedgerTypeFilter(t)}
                           className={cn(
-                            "px-3 py-1 rounded-xl text-[10px] font-black transition-all border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] cursor-pointer",
+                            "px-3 py-1 rounded-xl text-[10px] font-black transition-all border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] cursor-pointer whitespace-nowrap shrink-0",
                             isActive
                               ? t === "income"
                                 ? "bg-[#03D26F] text-[#161514] scale-105"
@@ -891,15 +891,15 @@ function MoneyPageContent() {
                   </div>
 
                   {/* Monthly Summary Badges */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded-xl bg-[#03D26F]/20 text-emerald-950 border border-[#161514]">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded-xl bg-[#03D26F]/20 text-emerald-950 border border-[#161514] whitespace-nowrap shrink-0">
                       In: +{currencySymbol}{monthlyStats.income.toLocaleString()}
                     </span>
-                    <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded-xl bg-rose-100 text-rose-950 border border-[#161514]">
+                    <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded-xl bg-rose-100 text-rose-950 border border-[#161514] whitespace-nowrap shrink-0">
                       Out: -{currencySymbol}{monthlyStats.expense.toLocaleString()}
                     </span>
                     <span className={cn(
-                      "text-[10px] font-black uppercase px-2.5 py-1 rounded-xl border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)]",
+                      "text-[10px] font-black uppercase px-2.5 py-1 rounded-xl border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] whitespace-nowrap shrink-0",
                       monthlyStats.net >= 0 ? "bg-[#CEF431] text-[#161514]" : "bg-amber-300 text-[#161514]"
                     )}>
                       Net: {monthlyStats.net >= 0 ? "+" : ""}{currencySymbol}{monthlyStats.net.toLocaleString()}
@@ -908,7 +908,7 @@ function MoneyPageContent() {
                     <button
                       type="button"
                       onClick={() => setIsPDFExportOpen(true)}
-                      className="px-3 py-1 rounded-xl bg-white hover:bg-[#CEF431] text-[#161514] text-[10px] font-black border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer flex items-center gap-1 shrink-0 ml-1"
+                      className="px-3 py-1 rounded-xl bg-white hover:bg-[#CEF431] text-[#161514] text-[10px] font-black border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer flex items-center gap-1 shrink-0 whitespace-nowrap ml-1"
                     >
                       <FileText className="h-3 w-3 stroke-[2.5]" />
                       <span>Export PDF 📄</span>
@@ -1015,11 +1015,11 @@ function MoneyPageContent() {
                               </div>
                             </div>
 
-                            <div className="flex items-center gap-2 shrink-0">
-                              <span className={cn("font-black text-xs sm:text-sm tracking-tight px-2 py-1 rounded-xl border border-[#161514]", tx.type === "income" ? "bg-[#03D26F]/20 text-emerald-950" : "bg-rose-100 text-rose-950")}>
+                            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                              <span className={cn("font-black text-xs sm:text-sm tracking-tight px-2 py-1 rounded-xl border border-[#161514] whitespace-nowrap", tx.type === "income" ? "bg-[#03D26F]/20 text-emerald-950" : "bg-rose-100 text-rose-950")}>
                                 {tx.type === "income" ? "+" : "-"}{currencySymbol}{tx.amount.toLocaleString()}
                               </span>
-                              <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                              <div className="hidden sm:flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                                 <button
                                   type="button"
                                   onClick={() => handleDuplicateTx(tx)}

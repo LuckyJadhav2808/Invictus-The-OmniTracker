@@ -594,7 +594,7 @@ function GoalsPageContent() {
                         setCustomWaterAmount(String(waterLogged));
                         setIsWaterEditOpen(true);
                       }}
-                      className="relative w-16 h-36 border-2 border-navy-950 rounded-2xl overflow-hidden flex items-end bg-sky-50 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] cursor-pointer hover:border-sky-600 transition-colors"
+                      className="relative w-16 h-36 border-2 border-navy-950 rounded-2xl overflow-hidden flex items-end bg-sky-50 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] cursor-pointer hover:border-sky-600 transition-colors shrink-0"
                     >
                       <div className="absolute inset-x-0 bottom-[25%] border-b border-dashed border-navy-950/20" />
                       <div className="absolute inset-x-0 bottom-[50%] border-b border-dashed border-navy-950/25" />
@@ -603,15 +603,24 @@ function GoalsPageContent() {
                         className="w-full bg-sky-400 transition-all duration-500 ease-out"
                         style={{ height: `${Math.min(100, (waterLogged / 1000) * 100)}%` }}
                       />
-                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <span className="text-[10px] font-black text-navy-950 bg-white/90 px-1.5 py-0.5 rounded-xl border border-navy-950">
-                          {waterLogged} ml ({ (waterLogged / 1000).toFixed(1) } L)
-                        </span>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none">
+                        <div className="bg-white/95 backdrop-blur-sm px-2 py-1 rounded-xl border border-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)] text-center">
+                          <span className="text-sm sm:text-base font-black text-navy-950 block leading-none">{waterLogged}</span>
+                          <span className="text-[8px] font-black uppercase text-sky-700 tracking-wider block mt-0.5">ml</span>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="flex-1 space-y-2">
-                      <span className="text-[9px] font-black text-navy-700 block">Daily Target: 1000 ml (1 Ltr)</span>
+                    <div className="flex-1 space-y-2.5">
+                      <div>
+                        <div className="text-xs font-black text-navy-950 uppercase flex items-center justify-between">
+                          <span>{waterLogged} ml Logged</span>
+                          <span className="text-[10px] text-sky-700 font-black">({(waterLogged / 1000).toFixed(1)} L)</span>
+                        </div>
+                        <span className="text-[9px] font-bold text-navy-600 block mt-0.5">
+                          Target: 1000 ml (1.0 L) • {Math.min(100, Math.round((waterLogged / 1000) * 100))}%
+                        </span>
+                      </div>
                       <div className="grid grid-cols-2 gap-1.5">
                         <button
                           onClick={() => logWater(250)}
@@ -631,14 +640,28 @@ function GoalsPageContent() {
                           onClick={() => logWater(-250)}
                           className="flex-1 bg-amber-100 hover:bg-amber-200 text-navy-950 text-[9px] font-black py-1 rounded-xl cursor-pointer border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] transition-all"
                         >
-                          Remove 250ml
+                          -250ml
+                        </button>
+                        <button
+                          onClick={async () => {
+                            try {
+                              await setWaterMutation.mutateAsync({ date: selectedDate, amount: 0 });
+                              toast.success("Water reset to 0ml for today 💧");
+                            } catch {
+                              toast.error("Failed to reset water intake");
+                            }
+                          }}
+                          className="bg-rose-100 hover:bg-rose-200 text-rose-950 text-[9px] font-black px-2 py-1 rounded-xl cursor-pointer border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] transition-all"
+                          title="Reset water intake to 0ml for selected date"
+                        >
+                          Reset
                         </button>
                         <button
                           onClick={() => {
                             setCustomWaterAmount(String(waterLogged));
                             setIsWaterEditOpen(true);
                           }}
-                          className="bg-sky-200 hover:bg-sky-300 text-navy-950 text-[9px] font-black px-3 py-1 rounded-xl cursor-pointer border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] transition-all"
+                          className="bg-sky-200 hover:bg-sky-300 text-navy-950 text-[9px] font-black px-2.5 py-1 rounded-xl cursor-pointer border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] transition-all"
                         >
                           Edit
                         </button>

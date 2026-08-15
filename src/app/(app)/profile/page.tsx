@@ -45,11 +45,11 @@ export default function ProfilePage() {
 
         {/* Issue 3 Fix: Prominent Settings Discovery Hero Card */}
         <div className="bg-gradient-to-br from-[#CEF431] via-[#03D26F] to-[#EAF4F4] rounded-3xl p-6 border-2.5 border-navy-950 shadow-[6px_6px_0px_0px_rgba(31,36,48,1)] space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="bg-white text-navy-950 px-3 py-1 rounded-xl text-xs font-black border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] uppercase tracking-wider flex items-center gap-1.5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <span className="bg-white text-navy-950 px-3 py-1 rounded-xl text-xs font-black border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] uppercase tracking-wider flex items-center gap-1.5 whitespace-nowrap shrink-0 self-start sm:self-auto">
               <Sparkles className="h-4 w-4" /> 11 Settings Categories Available
             </span>
-            <span className="text-xs font-black text-navy-950 bg-white/80 px-2.5 py-1 rounded-lg border border-navy-950">
+            <span className="text-xs font-black text-navy-950 bg-white/80 px-2.5 py-1 rounded-lg border border-navy-950 whitespace-nowrap shrink-0 self-start sm:self-auto">
               FULL CONTROL
             </span>
           </div>

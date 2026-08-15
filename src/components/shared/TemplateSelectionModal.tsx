@@ -157,14 +157,14 @@ export function TemplateSelectionModal({
                   key={pack.id}
                   className="bg-white rounded-2xl p-4 border-2 border-navy-950 shadow-[3px_3px_0px_0px_rgba(31,36,48,1)] space-y-3"
                 >
-                  <div className="flex items-start justify-between gap-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-center gap-2.5">
-                      <span className="text-2xl">{pack.icon}</span>
+                      <span className="text-2xl shrink-0">{pack.icon}</span>
                       <div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <h4 className="text-sm font-black text-navy-950 tracking-tight">{pack.name}</h4>
                           {pack.badge && (
-                            <span className="bg-amber-300 text-navy-950 text-[9px] font-black uppercase px-2 py-0.5 rounded-lg border border-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
+                            <span className="bg-amber-300 text-navy-950 text-[9px] font-black uppercase px-2 py-0.5 rounded-lg border border-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] whitespace-nowrap shrink-0">
                               {pack.badge}
                             </span>
                           )}
@@ -173,12 +173,12 @@ export function TemplateSelectionModal({
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1.5 shrink-0">
+                    <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-auto">
                       {isApplied && onUnapplyTemplatePack && (
                         <button
                           type="button"
                           onClick={() => handleUnapply(pack)}
-                          className="bg-rose-400 hover:bg-rose-500 text-navy-950 border-2 border-navy-950 px-2.5 py-1.5 rounded-xl text-xs font-black shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center gap-1"
+                          className="bg-rose-400 hover:bg-rose-500 text-navy-950 border-2 border-navy-950 px-2.5 py-1.5 rounded-xl text-xs font-black shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center gap-1 whitespace-nowrap shrink-0"
                         >
                           <span>Unapply</span>
                         </button>
@@ -186,7 +186,7 @@ export function TemplateSelectionModal({
                       <button
                         type="button"
                         onClick={() => handleApply(pack)}
-                        className="bg-amber-400 hover:bg-amber-500 text-navy-950 border-2 border-navy-950 px-3 py-1.5 rounded-xl text-xs font-black shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center gap-1"
+                        className="bg-amber-400 hover:bg-amber-500 text-navy-950 border-2 border-navy-950 px-3 py-1.5 rounded-xl text-xs font-black shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center gap-1 whitespace-nowrap shrink-0"
                       >
                         <Sparkles className="h-3.5 w-3.5 stroke-[2.5]" />
                         <span>{isApplied ? "Re-Apply" : "Apply Pack"}</span>

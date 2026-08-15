@@ -22,7 +22,7 @@ export function CalendarStrip({
   const days = Array.from({ length: 7 }, (_, i) => addDays(monday, i));
 
   return (
-    <div className="bg-white rounded-full p-3 sm:p-4 border-2 border-[#161514] shadow-[4px_4px_0px_0px_rgba(22,21,20,1)] flex justify-between items-center w-full my-4">
+    <div className="bg-white rounded-3xl p-2.5 sm:p-4 border-2 border-[#161514] shadow-[4px_4px_0px_0px_rgba(22,21,20,1)] flex justify-between items-center w-full my-4 overflow-x-auto no-scrollbar gap-1">
       {days.map((day) => {
         const dayStr = format(day, "yyyy-MM-dd");
         const isToday = isSameDay(day, today);
@@ -34,7 +34,7 @@ export function CalendarStrip({
             key={dayStr}
             type="button"
             onClick={() => setSelectedDate(dayStr)}
-            className={`flex flex-col items-center py-2 px-3 rounded-full min-w-[44px] transition-all relative cursor-pointer border-2 ${
+            className={`flex flex-col items-center py-2 px-3 rounded-full min-w-[44px] shrink-0 transition-all relative cursor-pointer border-2 ${
               isSelected
                 ? "bg-[#CEF431] border-[#161514] text-[#161514] font-black shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] -translate-y-0.5"
                 : "border-transparent text-[#161514] hover:bg-[#EAF4F4] font-bold"

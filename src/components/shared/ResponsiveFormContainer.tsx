@@ -73,7 +73,7 @@ export function ResponsiveFormContainer({
       <SheetContent
         side="bottom"
         showCloseButton={false}
-        className="bg-white rounded-t-3xl px-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-4 border-t-2 border-x-2 border-navy-950 shadow-[0px_-6px_0px_0px_rgba(31,36,48,1)] outline-none max-h-[88vh] overflow-y-auto"
+        className="bg-white rounded-t-3xl px-6 pb-[calc(3rem+env(safe-area-inset-bottom))] pt-4 border-t-2 border-x-2 border-navy-950 shadow-[0px_-6px_0px_0px_rgba(31,36,48,1)] outline-none max-h-[92vh] overflow-y-auto z-50"
       >
         <div className="mx-auto w-12 h-2 rounded-full bg-navy-950 mb-3 border border-black" />
         <SheetHeader className="text-left p-0 mb-2 border-b-2 border-navy-950/20 pb-3 relative">

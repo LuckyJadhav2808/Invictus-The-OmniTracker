@@ -80,6 +80,9 @@ export function MoneyQuickActionsAndCards({
     } catch {}
   };
 
+  const [walletViewMode, setWalletViewMode] = useState<"stacked" | "carousel">("stacked");
+  const [activeCardId, setActiveCardId] = useState<string | null>(null);
+
   // Use user's real category items
   const displayCategories = categories;
   const totalSpending = displayCategories.reduce((sum, c) => sum + c.amount, 0);
@@ -233,22 +236,49 @@ export function MoneyQuickActionsAndCards({
 
       {/* Folder-Tab Category Wallet Cards */}
       <div className="space-y-3">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <h4 className="text-xs font-black uppercase tracking-wider text-navy-600">
             Category Wallets & Accounts
           </h4>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* View Mode Toggle Button */}
+            <div className="flex items-center bg-white rounded-xl border-2 border-navy-950 p-0.5 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] shrink-0">
+              <button
+                type="button"
+                onClick={() => setWalletViewMode("stacked")}
+                className={cn(
+                  "text-[10px] font-black px-2.5 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1",
+                  walletViewMode === "stacked"
+                    ? "bg-[#CEF431] text-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]"
+                    : "text-navy-700 hover:bg-slate-100"
+                )}
+                title="Apple Wallet Overlapping Stack"
+              >
+                <span>🎴 Stack Deck</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setWalletViewMode("carousel")}
+                className={cn(
+                  "text-[10px] font-black px-2.5 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1",
+                  walletViewMode === "carousel"
+                    ? "bg-[#CEF431] text-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]"
+                    : "text-navy-700 hover:bg-slate-100"
+                )}
+                title="Horizontal Swipe Carousel"
+              >
+                <span>📱 Carousel</span>
+              </button>
+            </div>
+
             {onAddCategory && (
               <button
                 onClick={onAddCategory}
-                className="text-[10px] font-black text-navy-950 bg-amber-400 hover:bg-amber-500 px-3 py-1 rounded-xl cursor-pointer transition-colors flex items-center gap-1 border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)]"
+                className="text-[10px] font-black text-navy-950 bg-amber-400 hover:bg-amber-500 px-3 py-1.5 rounded-xl cursor-pointer transition-colors flex items-center gap-1 border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] whitespace-nowrap shrink-0"
               >
                 <Plus className="h-3 w-3 stroke-[3]" /> New Category
               </button>
             )}
-            <span className="text-[10px] font-black text-navy-950 bg-amber-200 border-2 border-navy-950 px-2.5 py-0.5 rounded-xl shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)]">
-              {displayCategories.length} Categories Active
-            </span>
           </div>
         </div>
 
@@ -274,17 +304,36 @@ export function MoneyQuickActionsAndCards({
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5">
+          <div
+            className={cn(
+              walletViewMode === "carousel"
+                ? "flex gap-3.5 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-3 pt-1"
+                : "relative pt-2 pb-6 flex flex-col -space-y-12 sm:-space-y-14 max-w-2xl mx-auto w-full"
+            )}
+          >
             {displayCategories.map((cat, idx) => {
               const theme = getCategoryColors(cat, idx);
+              const isSelected = activeCardId === cat.id;
               return (
-                <div key={cat.id || idx} className="relative group cursor-pointer">
+                <div
+                  key={cat.id || idx}
+                  onClick={() => setActiveCardId(isSelected ? null : cat.id)}
+                  style={{ zIndex: isSelected ? 40 : idx + 1 }}
+                  className={cn(
+                    "relative group cursor-pointer transition-all duration-300 ease-out",
+                    walletViewMode === "carousel" ? "w-[240px] sm:w-[280px] shrink-0 snap-start" : "w-full hover:-translate-y-4 hover:z-50",
+                    walletViewMode === "stacked" && isSelected && "-translate-y-6 shadow-2xl scale-[1.01]"
+                  )}
+                >
                   {/* Folder Top Tab */}
                   <div
                     style={{ backgroundColor: theme.bg, color: theme.text }}
-                    className="w-28 h-5 rounded-t-xl ml-4 text-[9px] font-black uppercase px-2 flex items-center justify-between border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)]"
+                    className="w-32 h-6 rounded-t-xl ml-4 text-[9px] font-black uppercase px-2.5 flex items-center justify-between border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)]"
                   >
-                    <span className="truncate">{cat.name.slice(0, 8)}</span>
+                    <span className="truncate flex items-center gap-1">
+                      <span>{renderCategoryEmoji(cat.icon)}</span>
+                      <span className="truncate">{cat.name.slice(0, 10)}</span>
+                    </span>
                     <div className="flex items-center gap-1.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
                       {onEditCategory && (
                         <button
@@ -310,22 +359,35 @@ export function MoneyQuickActionsAndCards({
                   {/* Main Card Body */}
                   <div
                     style={{ backgroundColor: theme.bg, color: theme.text }}
-                    className="rounded-2xl rounded-tl-none p-4 border-2 border-[#161514] space-y-3 transition-all duration-200 shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] group-hover:-translate-x-0.5 group-hover:-translate-y-0.5 group-hover:shadow-[5px_5px_0px_0px_rgba(22,21,20,1)]"
+                    className="rounded-2xl rounded-tl-none p-4 sm:p-5 border-2 border-[#161514] space-y-3 transition-all duration-200 shadow-[4px_4px_0px_0px_rgba(22,21,20,1)] group-hover:shadow-[6px_6px_0px_0px_rgba(22,21,20,1)]"
                   >
                   <div className="flex items-center justify-between">
-                    <span className="text-xl">{renderCategoryEmoji(cat.icon)}</span>
-                    <span className="text-[10px] font-black uppercase bg-black/15 px-2 py-0.5 rounded-xl border border-navy-950 backdrop-blur-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">{renderCategoryEmoji(cat.icon)}</span>
+                      <span className="text-xs font-black tracking-wide block truncate opacity-90">
+                        {cat.name}
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-black uppercase bg-black/15 px-2.5 py-0.5 rounded-xl border border-navy-950 backdrop-blur-xs">
                       {cat.type || "Expense"}
                     </span>
                   </div>
 
-                  <div>
-                    <span className="text-xs font-black tracking-wide block truncate opacity-90">
-                      {cat.name}
-                    </span>
-                    <span className="text-lg font-black block tracking-tight">
-                      {isHideBalance ? "••••••" : `${currencySymbol}${cat.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
-                    </span>
+                  <div className="flex items-end justify-between pt-1">
+                    <div>
+                      <span className="text-[9px] font-black uppercase opacity-75 block">Spent Balance</span>
+                      <span className="text-xl sm:text-2xl font-black block tracking-tight">
+                        {isHideBalance ? "••••••" : `${currencySymbol}${cat.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
+                      </span>
+                    </div>
+                    {cat.monthlyBudget && cat.monthlyBudget > 0 && (
+                      <div className="text-right">
+                        <span className="text-[9px] font-black uppercase opacity-75 block">Budget Cap</span>
+                        <span className="text-xs font-black opacity-90">
+                          {currencySymbol}{cat.monthlyBudget.toLocaleString()}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

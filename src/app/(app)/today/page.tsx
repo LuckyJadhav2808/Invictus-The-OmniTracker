@@ -204,8 +204,8 @@ export default function TodayPage() {
           storageKey="today"
           widgets={[
             {
-              id: "pillbar-chart",
-              title: "📊 Liquid Pill Bar Chart & Calendar Strip",
+              id: "analytics-chart",
+              title: "📊 Performance Analytics & Calendar Strip",
               category: "today",
               component: (
                 <div className="space-y-4">
@@ -225,7 +225,7 @@ export default function TodayPage() {
                         const scorePct = Math.min(100, Math.round((habitsInMonth * 10) + ((studySecsInMonth / 3600) * 15)));
                         return {
                           label: format(monthDate, "MMM"),
-                          percentage: Math.max(10, scorePct),
+                          percentage: scorePct,
                           value: scorePct > 0 ? `${scorePct}%` : "0%",
                           highlighted: isCurrentMonth,
                           color: isCurrentMonth ? "#FB7185" : "#38BDF8",
@@ -262,7 +262,7 @@ export default function TodayPage() {
 
                       return {
                         label: format(day, "eee"),
-                        percentage: Math.max(8, scorePct),
+                        percentage: scorePct,
                         value: scorePct > 0 ? `${scorePct}%` : "0%",
                         highlighted: isToday,
                         color: isToday ? "#FB7185" : "#38BDF8",

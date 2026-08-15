@@ -55,6 +55,8 @@ export function WeeklyVelocityAndHabitMatrix() {
         date: day,
         dateStr,
         dayName: format(day, "EEEE"),
+        monthName: format(day, "MMM"),
+        dayNum: format(day, "d"),
         shortDate: format(day, "MMM d"),
         count,
         totalHabits: totalActiveHabits,
@@ -190,7 +192,7 @@ export function WeeklyVelocityAndHabitMatrix() {
                   onMouseEnter={() => setHoveredDay(d)}
                   onMouseLeave={() => setHoveredDay(null)}
                   className={cn(
-                    "relative h-10 sm:h-12 rounded-xl border-2 border-navy-950 p-1 flex flex-col justify-between transition-all cursor-pointer select-none",
+                    "relative aspect-square sm:aspect-auto sm:h-12 rounded-xl border-2 border-navy-950 p-1 flex flex-col items-center justify-center text-center transition-all cursor-pointer select-none overflow-hidden",
                     d.intensity === 0 && "bg-[#FAF8F5]",
                     d.intensity === 1 && "bg-[#CEF431]/30",
                     d.intensity === 2 && "bg-[#CEF431]/60 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]",
@@ -199,8 +201,12 @@ export function WeeklyVelocityAndHabitMatrix() {
                     d.isToday && "ring-2 ring-amber-400 ring-offset-1"
                   )}
                 >
-                  <span className="text-[9px] font-black uppercase opacity-80 leading-none">{d.shortDate}</span>
-                  <span className="text-xs font-black text-right leading-none">{d.count > 0 ? d.count : "•"}</span>
+                  <span className="text-[8px] font-black uppercase opacity-70 leading-none">{d.monthName}</span>
+                  <span className="text-xs font-black leading-none mt-0.5">{d.dayNum}</span>
+
+                  {d.count > 0 && (
+                    <span className="absolute bottom-1 right-1 h-1.5 w-1.5 rounded-full bg-current opacity-90" />
+                  )}
 
                   {/* Tooltip on Hover */}
                   {isHovered && (
@@ -225,46 +231,6 @@ export function WeeklyVelocityAndHabitMatrix() {
                       )}
                     </div>
                   )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Weekday Distribution Bar Grid (Mon - Sun) */}
-        <div className="space-y-2 pt-3 border-t-2 border-navy-950/10">
-          <span className="text-xs font-black uppercase tracking-wider text-navy-950 flex items-center gap-1.5">
-            <TrendingUp className="h-4 w-4 stroke-[2.5]" /> Weekday Productivity Distribution
-          </span>
-
-          <div className="grid grid-cols-7 gap-2 pt-1">
-            {weekdayStats.list.map((item) => {
-              const isPeak = item.dayNum === weekdayStats.peakDay.dayNum;
-              const maxAvgVal = weekdayStats.maxAvg || 1;
-              const barHeightPct = Math.max(15, Math.round((item.avg / maxAvgVal) * 100));
-
-              return (
-                <div key={item.dayNum} className="space-y-1.5 text-center">
-                  <div className="h-24 bg-[#FAF8F5] rounded-xl border-2 border-navy-950 p-1 flex flex-col justify-end relative shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)]">
-                    {isPeak && (
-                      <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-xs">👑</span>
-                    )}
-                    <div
-                      style={{ height: `${barHeightPct}%` }}
-                      className={cn(
-                        "w-full rounded-lg border border-navy-950 transition-all flex items-center justify-center text-[10px] font-black",
-                        isPeak ? "bg-[#CEF431] text-[#161514]" : "bg-[#03D26F]/40 text-navy-950"
-                      )}
-                    >
-                      {item.avg > 0 ? item.avg : ""}
-                    </div>
-                  </div>
-                  <span className={cn(
-                    "text-[10px] font-black block uppercase",
-                    isPeak ? "text-emerald-700 underline" : "text-navy-900"
-                  )}>
-                    {item.shortName}
-                  </span>
                 </div>
               );
             })}
