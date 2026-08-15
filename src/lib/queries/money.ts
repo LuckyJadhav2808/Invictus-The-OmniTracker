@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/components/shared/AuthProvider";
-import { type Category, type Transaction } from "@/types";
+import { type Category, type Transaction, type Debt } from "@/types";
 
 import { getCustomSession } from "@/lib/custom-auth";
 
@@ -526,6 +526,172 @@ export function useUnapplySpendingTemplate() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
+    },
+  });
+}
+
+// --- LENT & BORROWED DEBT LEDGER ---
+
+export function useDebts() {
+  const { user } = useAuth();
+  const userId = getActiveUserId(user);
+
+  return useQuery<Debt[]>({
+    queryKey: ["debts", userId],
+    queryFn: async () => {
+      if (isGuestMode()) {
+        const local = localStorage.getItem("invictus_debts");
+        return local ? JSON.parse(local) : [];
+      }
+      const res = await fetch(`/api/money/debts?userId=${userId}`);
+      if (!res.ok) return [];
+      const data = await res.json();
+      const debtsList = data.debts || [];
+      if (typeof window !== "undefined") {
+        localStorage.setItem("invictus_debts", JSON.stringify(debtsList));
+      }
+      return debtsList;
+    },
+    enabled: true,
+  });
+}
+
+export function useAddDebt() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (newDebt: Omit<Debt, "id" | "userId" | "status" | "createdAt" | "updatedAt">) => {
+      const userId = getActiveUserId(user);
+      if (isGuestMode()) {
+        const local = localStorage.getItem("invictus_debts");
+        const list = local ? JSON.parse(local) : [];
+        const item: Debt = {
+          id: `debt-${Date.now()}`,
+          userId,
+          ...newDebt,
+          status: "pending",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        list.unshift(item);
+        localStorage.setItem("invictus_debts", JSON.stringify(list));
+        return item;
+      }
+
+      const res = await fetch("/api/money/debts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, ...newDebt }),
+      });
+
+      if (!res.ok) throw new Error("Failed to create debt record");
+      const data = await res.json();
+      return data.debt;
+    },
+    onSuccess: () => {
+      const userId = getActiveUserId(user);
+      queryClient.invalidateQueries({ queryKey: ["debts", userId] });
+    },
+  });
+}
+
+export function useUpdateDebt() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (updatedDebt: Partial<Debt> & { id: string }) => {
+      const userId = getActiveUserId(user);
+      if (isGuestMode()) {
+        const local = localStorage.getItem("invictus_debts");
+        const list = local ? JSON.parse(local) : [];
+        const idx = list.findIndex((d: any) => d.id === updatedDebt.id);
+        if (idx > -1) {
+          list[idx] = { ...list[idx], ...updatedDebt, updatedAt: new Date().toISOString() };
+          localStorage.setItem("invictus_debts", JSON.stringify(list));
+        }
+        return updatedDebt;
+      }
+
+      const res = await fetch("/api/money/debts", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedDebt),
+      });
+
+      if (!res.ok) throw new Error("Failed to update debt record");
+      const data = await res.json();
+      return data.debt;
+    },
+    onSuccess: () => {
+      const userId = getActiveUserId(user);
+      queryClient.invalidateQueries({ queryKey: ["debts", userId] });
+    },
+  });
+}
+
+export function useSettleDebt() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id }: { id: string }) => {
+      const userId = getActiveUserId(user);
+      if (isGuestMode()) {
+        const local = localStorage.getItem("invictus_debts");
+        const list = local ? JSON.parse(local) : [];
+        const idx = list.findIndex((d: any) => d.id === id);
+        if (idx > -1) {
+          list[idx].status = "settled";
+          list[idx].settledAt = new Date().toISOString();
+          localStorage.setItem("invictus_debts", JSON.stringify(list));
+        }
+        return list[idx];
+      }
+
+      const res = await fetch("/api/money/debts", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status: "settled" }),
+      });
+
+      if (!res.ok) throw new Error("Failed to settle debt record");
+      const data = await res.json();
+      return data.debt;
+    },
+    onSuccess: () => {
+      const userId = getActiveUserId(user);
+      queryClient.invalidateQueries({ queryKey: ["debts", userId] });
+      queryClient.invalidateQueries({ queryKey: ["transactions", userId] });
+    },
+  });
+}
+
+export function useDeleteDebt() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      if (isGuestMode()) {
+        const local = localStorage.getItem("invictus_debts");
+        const list = local ? JSON.parse(local) : [];
+        const filtered = list.filter((d: any) => d.id !== id);
+        localStorage.setItem("invictus_debts", JSON.stringify(filtered));
+        return;
+      }
+
+      const res = await fetch(`/api/money/debts?id=${id}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) throw new Error("Failed to delete debt record");
+      return res.json();
+    },
+    onSuccess: () => {
+      const userId = getActiveUserId(user);
+      queryClient.invalidateQueries({ queryKey: ["debts", userId] });
     },
   });
 }

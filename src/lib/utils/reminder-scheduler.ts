@@ -138,14 +138,51 @@ export function initReminderScheduler() {
     if (config.examEnabled && config.examTime === currentTimeStr) {
       await triggerReminder(
         "exam",
-        "🎯 Exam Target & Countdown Review!",
-        "Review your exam syllabus target and high-weightage topics today.",
+        "⚡ Review Today's Exam Syllabus Targets!",
+        "Stay ahead of your target date. Review study topics in Study Space.",
         "/study"
       );
     }
+
+    // 5. Debt Due Date Reminders (Lent & Borrowed Due Today - Triggers STRICTLY ONCE PER DAY per debt)
+    try {
+      const localDebtsStr = localStorage.getItem("invictus_debts");
+      if (localDebtsStr) {
+        const localDebts = JSON.parse(localDebtsStr);
+        for (const debt of localDebts) {
+          if (debt.status === "pending" && debt.dueDate === todayDateStr) {
+            const title = debt.type === "lent"
+              ? `💰 Collect ₹${debt.amount} from ${debt.personName}`
+              : `🚨 Pay ₹${debt.amount} to ${debt.personName}`;
+            const body = debt.type === "lent"
+              ? `${debt.personName} owes you ₹${debt.amount} due today. Tap to settle up!`
+              : `You owe ${debt.personName} ₹${debt.amount} due today. Tap to settle up!`;
+
+            // Use once-per-day key format: debt_id_2026-08-15
+            const dailyDebtKey = `debt_${debt.id}_${todayDateStr}`;
+            if (!lastTriggered[dailyDebtKey]) {
+              lastTriggered[dailyDebtKey] = new Date().toISOString();
+              localStorage.setItem(LAST_TRIGGERED_KEY, JSON.stringify(lastTriggered));
+
+              if (config.soundEnabled) playNotificationChime();
+
+              toast.info(title, {
+                description: body,
+                action: {
+                  label: "Open Money",
+                  onClick: () => { window.location.href = "/money"; },
+                },
+              });
+
+              await sendNativeNotification(title, body, "/money");
+            }
+          }
+        }
+      }
+    } catch {}
   };
 
-  // Run check immediately and then every 30 seconds
+  // Run initial check and set up interval
   checkAndTrigger();
-  schedulerInterval = setInterval(checkAndTrigger, 30000);
+  schedulerInterval = setInterval(checkAndTrigger, 30000); // check every 30s
 }

@@ -14,7 +14,7 @@ export interface ISubscription extends Document {
 
 const SubscriptionSchema = new Schema<ISubscription>(
   {
-    id: { type: String, required: true, unique: true, index: true },
+    id: { type: String, required: true, unique: true },
     userId: { type: String, required: true, index: true },
     name: { type: String, required: true },
     cost: { type: Number, required: true },
@@ -26,7 +26,5 @@ const SubscriptionSchema = new Schema<ISubscription>(
   },
   { timestamps: true }
 );
-
-SubscriptionSchema.index({ userId: 1 });
 
 export const Subscription = models.Subscription || model<ISubscription>("Subscription", SubscriptionSchema);

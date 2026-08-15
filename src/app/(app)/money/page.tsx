@@ -22,6 +22,7 @@ import { MoneyQuickActionsAndCards, renderCategoryEmoji } from "@/components/mon
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
 import { SubscriptionsTracker } from "@/components/money/SubscriptionsTracker";
 import { SavingsGoals } from "@/components/money/SavingsGoals";
+import { DebtTracker } from "@/components/money/DebtTracker";
 import { PDFExportModal } from "@/components/money/PDFExportModal";
 import { DraggableDashboardGrid } from "@/components/shared/DraggableDashboardGrid";
 import { useCostOfLivingIndex } from "@/lib/queries/cost-of-living";
@@ -731,6 +732,11 @@ function MoneyPageContent() {
               id: "savings-goals",
               title: "🐷 Savings Goals & Piggy Bank",
               component: <SavingsGoals />,
+            },
+            {
+              id: "debt-tracker",
+              title: "💸 Lent & Borrowed Money Ledger",
+              component: <DebtTracker currencySymbol={currencySymbol} />,
             },
           ]}
         />

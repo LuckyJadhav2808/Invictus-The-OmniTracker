@@ -13,7 +13,7 @@ export interface ISavingsGoal extends Document {
 
 const SavingsGoalSchema = new Schema<ISavingsGoal>(
   {
-    id: { type: String, required: true, unique: true, index: true },
+    id: { type: String, required: true, unique: true },
     userId: { type: String, required: true, index: true },
     title: { type: String, required: true },
     targetAmount: { type: Number, required: true },
@@ -24,7 +24,5 @@ const SavingsGoalSchema = new Schema<ISavingsGoal>(
   },
   { timestamps: true }
 );
-
-SavingsGoalSchema.index({ userId: 1 });
 
 export const SavingsGoal = models.SavingsGoal || model<ISavingsGoal>("SavingsGoal", SavingsGoalSchema);

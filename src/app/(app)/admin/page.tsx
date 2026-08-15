@@ -422,6 +422,16 @@ export default function AdminDashboardPage() {
             <p className="text-xs sm:text-sm font-semibold opacity-90">
               Authorized session: <strong className="text-amber-300">{user?.email}</strong>. Manage account roles, global announcements, system audit trails, and issue reports.
             </p>
+            <div className="pt-1">
+              <button
+                type="button"
+                onClick={() => router.push("/profile")}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-amber-400 text-[#161514] hover:bg-amber-300 font-black text-xs border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
+              >
+                <UserCheck className="h-4 w-4 stroke-[2.5]" />
+                <span>My Profile 👤</span>
+              </button>
+            </div>
           </div>
         </div>
 

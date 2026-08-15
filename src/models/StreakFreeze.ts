@@ -11,7 +11,7 @@ export interface IStreakFreeze extends Document {
 
 const StreakFreezeSchema = new Schema<IStreakFreeze>(
   {
-    userId: { type: String, required: true, unique: true, index: true },
+    userId: { type: String, required: true, unique: true },
     tokensAvailable: { type: Number, default: 1, min: 0, max: 2 },
     lastMonthlyCredit: { type: String, default: "" },
     frozenDates: { type: [String], default: [] },

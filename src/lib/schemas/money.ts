@@ -39,6 +39,21 @@ export const RecurringRuleSchema = z.object({
   createdAt: z.any().optional(),
 });
 
+export const DebtSchema = z.object({
+  id: z.string(),
+  userId: z.string(),
+  personName: z.string().min(1, "Please enter a person name"),
+  type: z.enum(["lent", "borrowed"]),
+  amount: z.number().min(0.01, "Amount must be greater than zero"),
+  dueDate: z.string().optional(),
+  note: z.string().optional(),
+  status: z.enum(["pending", "settled"]).default("pending"),
+  settledAt: z.string().optional(),
+  createdAt: z.any().optional(),
+  updatedAt: z.any().optional(),
+});
+
 export type Category = z.infer<typeof CategorySchema>;
 export type Transaction = z.infer<typeof TransactionSchema>;
 export type RecurringRule = z.infer<typeof RecurringRuleSchema>;
+export type Debt = z.infer<typeof DebtSchema>;
