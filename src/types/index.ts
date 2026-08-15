@@ -26,3 +26,10 @@ export interface TaskItem {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface StreakFreezeData {
+  userId: string;
+  tokensAvailable: number;
+  lastMonthlyCredit: string;
+  frozenDates: string[];
+}

@@ -201,6 +201,15 @@ export function useStreaks() {
       if (!res.ok) return {};
       const logs: HabitLog[] = await res.json();
       
+      let frozenDates: string[] = [];
+      try {
+        const freezeRes = await fetch(`/api/goals/streak-freeze?userId=${user.uid}`);
+        if (freezeRes.ok) {
+          const freezeData = await freezeRes.json();
+          frozenDates = freezeData.streakFreeze?.frozenDates || [];
+        }
+      } catch {}
+
       const streaks: Record<string, Streak> = {};
       const habitGroup: Record<string, string[]> = {};
       
@@ -211,7 +220,7 @@ export function useStreaks() {
 
       const todayStr = format(new Date(), "yyyy-MM-dd");
       Object.entries(habitGroup).forEach(([habitId, completedDates]) => {
-        const { currentStreak, longestStreak } = calculateStreak(completedDates, todayStr);
+        const { currentStreak, longestStreak } = calculateStreak(completedDates, todayStr, frozenDates);
         streaks[habitId] = {
           habitId,
           currentStreak,
@@ -896,6 +905,74 @@ export function useSaveMoodLog() {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["moodLog", user?.uid, variables.date] });
+    },
+  });
+}
+
+// 18. Fetch Streak Freeze Tokens & Status
+export function useStreakFreeze() {
+  const { user } = useAuth();
+  return useQuery<{
+    userId: string;
+    tokensAvailable: number;
+    lastMonthlyCredit: string;
+    frozenDates: string[];
+  }>({
+    queryKey: ["streakFreeze", user?.uid],
+    queryFn: async () => {
+      if (isGuestMode()) {
+        const local = localStorage.getItem("invictus_streak_freeze");
+        return local
+          ? JSON.parse(local)
+          : { userId: "guest", tokensAvailable: 1, lastMonthlyCredit: format(new Date(), "yyyy-MM"), frozenDates: [] };
+      }
+      if (!user) return { userId: "guest", tokensAvailable: 1, lastMonthlyCredit: format(new Date(), "yyyy-MM"), frozenDates: [] };
+      const res = await fetch(`/api/goals/streak-freeze?userId=${user.uid}`);
+      if (!res.ok) return { userId: user.uid, tokensAvailable: 1, lastMonthlyCredit: format(new Date(), "yyyy-MM"), frozenDates: [] };
+      const data = await res.json();
+      return data.streakFreeze;
+    },
+    enabled: !!user || isGuestMode(),
+  });
+}
+
+// 19. Consume Streak Freeze Token
+export function useConsumeStreakFreeze() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  return useMutation({
+    mutationFn: async ({ frozenDate }: { frozenDate: string }) => {
+      if (isGuestMode()) {
+        const localStr = localStorage.getItem("invictus_streak_freeze");
+        const sf = localStr
+          ? JSON.parse(localStr)
+          : { userId: "guest", tokensAvailable: 1, lastMonthlyCredit: format(new Date(), "yyyy-MM"), frozenDates: [] };
+        if (sf.tokensAvailable <= 0) throw new Error("No Streak Freeze tokens available!");
+        if (!sf.frozenDates.includes(frozenDate)) {
+          sf.frozenDates.push(frozenDate);
+          sf.tokensAvailable = Math.max(0, sf.tokensAvailable - 1);
+        }
+        localStorage.setItem("invictus_streak_freeze", JSON.stringify(sf));
+        return sf;
+      }
+      if (!user) throw new Error("Unauthenticated");
+
+      const res = await fetch("/api/goals/streak-freeze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user.uid, action: "freeze_date", frozenDate }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Failed to consume streak freeze token");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["streakFreeze", user?.uid] });
+      queryClient.invalidateQueries({ queryKey: ["streaks", user?.uid] });
     },
   });
 }

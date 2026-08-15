@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import { format, startOfWeek, addDays, isSameDay, subMonths, startOfMonth, endOfMonth } from "date-fns";
 import { BookOpen, Wallet, CheckSquare, Sparkles, Clock, LogOut, ArrowRight, Play, Square, Award } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useHabits, useHabitLogs, useStreaks } from "@/lib/queries/goals";
+import { useHabits, useHabitLogs, useStreaks, useStreakFreeze } from "@/lib/queries/goals";
 import { useStudySessions, useSubjects, useAllTopics } from "@/lib/queries/study";
 import { useTransactions, useCategories } from "@/lib/queries/money";
 import { useUIStore } from "@/store/ui-store";
@@ -57,6 +57,7 @@ export default function TodayPage() {
   const { data: habits = [] } = useHabits();
   const { data: logs = [] } = useHabitLogs(selectedDate);
   const { data: streaks = {} } = useStreaks();
+  const { data: streakFreeze = { tokensAvailable: 1, frozenDates: [] as string[] } } = useStreakFreeze();
   const { data: studySessions = [] } = useStudySessions();
   const { data: subjects = [] } = useSubjects();
   const { data: allTopics = [] } = useAllTopics();
@@ -237,6 +238,8 @@ export default function TodayPage() {
                           title="Monthly Performance & Tracker Flow"
                           totalValue={`${logs.filter((l) => l.completed).length} Total Habits | ${(studySessions.reduce((a, c) => a + (c.durationMinutes || 0), 0) / 60).toFixed(1)}h Total Study`}
                           data={monthlyBars}
+                          streakFreezeTokens={streakFreeze.tokensAvailable}
+                          frozenDates={streakFreeze.frozenDates}
                           onCalendarClick={() => {
                             setSelectedDate(format(todayDate, "yyyy-MM-dd"));
                             toast.success("Jumped to Today 📅");
@@ -259,6 +262,7 @@ export default function TodayPage() {
                       const habitPct = totalHabitsCount > 0 ? (habitsDoneOnDay / totalHabitsCount) * 50 : 0;
                       const studyPct = Math.min(50, (studySecsOnDay / 3600) * 25);
                       const scorePct = Math.min(100, Math.round(habitPct + studyPct));
+                      const isFrozen = streakFreeze.frozenDates?.includes(dayStr);
 
                       return {
                         label: format(day, "eee"),
@@ -266,6 +270,8 @@ export default function TodayPage() {
                         value: scorePct > 0 ? `${scorePct}%` : "0%",
                         highlighted: isToday,
                         color: isToday ? "#FB7185" : "#38BDF8",
+                        dateKey: dayStr,
+                        isFrozen,
                       };
                     });
 
@@ -274,6 +280,8 @@ export default function TodayPage() {
                         title="Weekly Consistency & Tracker Flow"
                         totalValue={`${completedHabitsCount} Habits | ${studyHoursToday}h Study`}
                         data={weeklyBars}
+                        streakFreezeTokens={streakFreeze.tokensAvailable}
+                        frozenDates={streakFreeze.frozenDates}
                         onCalendarClick={() => {
                           setSelectedDate(format(todayDate, "yyyy-MM-dd"));
                           toast.success("Jumped to Today 📅");

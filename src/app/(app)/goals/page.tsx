@@ -10,6 +10,7 @@ import {
   useHabitLogs,
   useMonthHabitLogs,
   useStreaks,
+  useStreakFreeze,
   useHealthProfile,
   useUpdateHealthProfile,
   useWaterLog,
@@ -139,6 +140,7 @@ function GoalsPageContent() {
 
   const { data: habits = [], isLoading: habitsLoading } = useHabits();
   const { data: streaks = {} } = useStreaks();
+  const { data: streakFreeze = { tokensAvailable: 1, frozenDates: [] } } = useStreakFreeze();
   const { data: logs = [] } = useHabitLogs(selectedDate);
   const achievements = useUserAchievements();
   const { habitLayoutStyle } = useUIStore();
@@ -459,6 +461,37 @@ function GoalsPageContent() {
 
         {/* Proactive Reminder Banner */}
         <ProactiveReminderBanner space="goals" />
+
+        {/* Sleek Ultra-Compact Streak Freeze Pill Banner */}
+        <div className="bg-[#FAF8F5] rounded-xl p-3 border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="h-8 w-8 shrink-0 rounded-lg bg-sky-200 border-2 border-[#161514] flex items-center justify-center text-base shadow-[1px_1px_0px_0px_rgba(22,21,20,1)]">
+              🛡️
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <h4 className="font-black text-xs text-[#161514] uppercase tracking-tight truncate">
+                  Streak Protection
+                </h4>
+                <span className="bg-sky-400 text-navy-950 font-black text-[9px] px-1.5 py-0.5 rounded-md border border-[#161514] shrink-0">
+                  {streakFreeze.tokensAvailable}/2 Active
+                </span>
+              </div>
+              <p className="text-[10px] text-[#161514]/70 font-medium truncate pt-0.5">
+                {streakFreeze.tokensAvailable > 0
+                  ? "1-day missed log bridge active (travel & sickness protection)"
+                  : "0 Tokens available. Refills 1st of month"}
+              </p>
+            </div>
+          </div>
+
+          <div className="shrink-0">
+            <span className="text-[10px] font-black text-sky-950 bg-sky-200 px-2 py-1 rounded-lg border border-[#161514] flex items-center gap-1 shadow-[1px_1px_0px_0px_rgba(22,21,20,1)]">
+              <span>🧊</span>
+              <span className="hidden xs:inline">Armed</span>
+            </span>
+          </div>
+        </div>
 
         {/* Tab Controls */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

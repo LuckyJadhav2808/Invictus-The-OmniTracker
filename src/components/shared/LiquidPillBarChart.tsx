@@ -11,6 +11,8 @@ export interface BarData {
   value?: string | number;
   highlighted?: boolean;
   color?: string;
+  dateKey?: string;
+  isFrozen?: boolean;
 }
 
 interface LiquidPillBarChartProps {
@@ -18,6 +20,8 @@ interface LiquidPillBarChartProps {
   totalValue?: string | number;
   data: BarData[];
   streakDays?: number;
+  streakFreezeTokens?: number;
+  frozenDates?: string[];
   className?: string;
   onCalendarClick?: () => void;
   onViewModeToggle?: (mode: "week" | "month") => void;
@@ -28,6 +32,8 @@ export function LiquidPillBarChart({
   totalValue = "0 Habits | 0.0h Study Logged",
   data = [],
   streakDays = 7,
+  streakFreezeTokens = 1,
+  frozenDates = [],
   className,
   onCalendarClick,
 }: LiquidPillBarChartProps) {
@@ -78,6 +84,15 @@ export function LiquidPillBarChart({
             <span className="bg-amber-300 text-[#161514] text-[10px] font-black px-2.5 py-1 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] uppercase flex items-center gap-1">
               <Flame className="h-3.5 w-3.5 text-rose-600 fill-rose-600" />
               {streakDays}-Day Active Streak
+            </span>
+
+            {/* Streak Freeze Token Badge */}
+            <span
+              className="bg-sky-200 text-sky-950 text-[10px] font-black px-2.5 py-1 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] uppercase flex items-center gap-1"
+              title="Duolingo-Style Streak Freeze Protection Tokens Available"
+            >
+              <span>🛡️</span>
+              <span>{streakFreezeTokens} Freeze Token{streakFreezeTokens !== 1 ? "s" : ""}</span>
             </span>
 
             {/* Verified Tracking Badge */}
@@ -186,6 +201,7 @@ export function LiquidPillBarChart({
           {data.map((day, idx) => {
             const isToday = day.highlighted;
             const isCompleted = day.percentage > 0 && day.value !== "0%";
+            const isFrozen = day.isFrozen || (day.dateKey && frozenDates.includes(day.dateKey));
 
             return (
               <div key={idx} className="flex flex-col items-center space-y-1.5">
@@ -197,12 +213,16 @@ export function LiquidPillBarChart({
                       ? "bg-[#CEF431] text-[#161514] ring-2 ring-amber-400 shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] scale-105"
                       : isCompleted
                       ? "bg-[#03D26F] text-white shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)]"
+                      : isFrozen
+                      ? "bg-sky-400 text-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] ring-2 ring-sky-300"
                       : "bg-white text-[#161514]/40"
                   )}
-                  title={`${day.label}: ${day.value || `${Math.round(day.percentage)}%`}`}
+                  title={isFrozen ? `Protected by Streak Freeze 🧊` : `${day.label}: ${day.value || `${Math.round(day.percentage)}%`}`}
                 >
                   {isCompleted ? (
                     <Check className="h-4 w-4 sm:h-5 sm:w-5 stroke-[3]" />
+                  ) : isFrozen ? (
+                    <span className="text-xs sm:text-sm">🧊</span>
                   ) : isToday ? (
                     <span className="text-xs sm:text-sm">👑</span>
                   ) : (

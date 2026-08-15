@@ -6,14 +6,16 @@ import { differenceInDays, parseISO, format, subDays } from "date-fns";
  */
 export function calculateStreak(
   completedDates: string[], // e.g. ["2026-07-19", "2026-07-18", "2026-07-16"]
-  referenceDateStr?: string // default is today's date "yyyy-MM-dd"
+  referenceDateStr?: string, // default is today's date "yyyy-MM-dd"
+  frozenDates: string[] = [] // e.g. ["2026-08-14"] (Streak Freeze protected dates)
 ): { currentStreak: number; longestStreak: number } {
-  if (completedDates.length === 0) {
+  const allValidDates = [...completedDates, ...frozenDates];
+  if (allValidDates.length === 0) {
     return { currentStreak: 0, longestStreak: 0 };
   }
 
   // Deduplicate and sort dates descending (newest first)
-  const uniqueDates = Array.from(new Set(completedDates)).sort(
+  const uniqueDates = Array.from(new Set(allValidDates)).sort(
     (a, b) => b.localeCompare(a)
   );
 
