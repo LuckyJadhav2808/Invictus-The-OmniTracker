@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { NeobrutalistTimeInput } from "@/components/shared/NeobrutalistTimeInput";
 
 import { enableWebPushNotifications, triggerTestPushNotification } from "@/lib/utils/push-client";
+import { useAuth } from "@/components/shared/AuthProvider";
 
 interface ReminderManagerModalProps {
   open: boolean;
@@ -27,6 +28,7 @@ export function ReminderManagerModal({
   onOpenChange,
   defaultSpace = "all",
 }: ReminderManagerModalProps) {
+  const { user } = useAuth();
   const [config, setConfig] = useState<ReminderConfig>(DEFAULT_REMINDER_CONFIG);
   const [permissionState, setPermissionState] = useState<string>("default");
 
@@ -48,11 +50,11 @@ export function ReminderManagerModal({
       setPermissionState(granted ? "granted" : "denied");
     }
 
-    // Enable Background Web Push token registration
-    await enableWebPushNotifications().catch(() => {});
+    // Enable Background Web Push token registration & sync schedule to MongoDB
+    await enableWebPushNotifications(user?.uid || "guest", config).catch(() => {});
 
     saveReminderConfig(config);
-    toast.success("Daily Reminders Saved & Active! 🔔");
+    toast.success("Daily Reminders Saved & Active! 🔔 (Background Sync Ready)");
     onOpenChange(false);
   };
 

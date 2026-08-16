@@ -15,7 +15,10 @@ function urlBase64ToUint8Array(base64String: string) {
   return outputArray;
 }
 
-export async function enableWebPushNotifications(userId: string = "guest") {
+export async function enableWebPushNotifications(
+  userId: string = "guest",
+  config?: any
+) {
   if (typeof window === "undefined" || !("serviceWorker" in navigator) || !("PushManager" in window)) {
     toast.error("Push Notifications are not supported on this browser.");
     return false;
@@ -44,19 +47,24 @@ export async function enableWebPushNotifications(userId: string = "guest") {
       });
     }
 
-    // 4. Send PushSubscription token to MongoDB backend automatically
+    // Determine user's local timezone (e.g. "Asia/Kolkata", "America/New_York")
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Kolkata";
+
+    // 4. Send PushSubscription token & reminder config to MongoDB backend automatically
     const res = await fetch("/api/push/subscribe", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         userId,
         subscription,
+        timezone,
+        config,
       }),
     });
 
     if (!res.ok) throw new Error("Failed to store push token");
 
-    toast.success("Background Push Notifications Active! 🔔");
+    toast.success("Background Push Notifications Active! 🔔 (Fires even when app is closed)");
     return true;
   } catch (err: any) {
     console.error("Enable web push error:", err);

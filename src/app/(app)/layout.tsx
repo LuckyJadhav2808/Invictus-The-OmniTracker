@@ -6,6 +6,7 @@ import { useAuth } from "@/components/shared/AuthProvider";
 import { Sidebar } from "@/components/shared/Sidebar";
 import { BottomNav } from "@/components/shared/BottomNav";
 import { SpaceHeader } from "@/components/shared/SpaceHeader";
+import { NeobrutalistCalculator } from "@/components/shared/NeobrutalistCalculator";
 import { useUIStore } from "@/store/ui-store";
 import { cn } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
@@ -104,6 +105,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
         </footer>
       </main>
+      <NeobrutalistCalculator />
       <BottomNav />
     </div>
   );
