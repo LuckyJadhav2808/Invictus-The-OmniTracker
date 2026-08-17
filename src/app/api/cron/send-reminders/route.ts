@@ -54,56 +54,57 @@ async function handleCronReminders(req: NextRequest) {
         const lastSent = sub.lastSentKeys || {};
         const notificationsToSend: Array<{ key: string; title: string; body: string; url: string }> = [];
 
+        // Helper to check if a reminder is due today and not yet sent
+        const isReminderDue = (targetTimeStr?: string, keyPrefix?: string) => {
+          if (!targetTimeStr || !keyPrefix) return false;
+          const key = `${keyPrefix}_${todayDateStr}`;
+          if (lastSent[key]) return false; // Already sent today
+          // Match if current time is at or past the target time (windowed catch-up)
+          return currentTimeStr >= targetTimeStr;
+        };
+
         // 1. Money / Expense Log Reminder
-        if (sub.moneyEnabled && sub.moneyTime === currentTimeStr) {
+        if (sub.moneyEnabled && isReminderDue(sub.moneyTime, "money")) {
           const key = `money_${todayDateStr}`;
-          if (!lastSent[key]) {
-            notificationsToSend.push({
-              key,
-              title: "💰 Time to Log Today's Expenses!",
-              body: "Keep your budget on track. Log your spending & income in Money Space.",
-              url: "/money",
-            });
-          }
+          notificationsToSend.push({
+            key,
+            title: "💰 Time to Log Today's Expenses!",
+            body: "Keep your budget on track. Log your spending & income in Money Space.",
+            url: "/money",
+          });
         }
 
         // 2. Habits & Streaks Reminder
-        if (sub.habitsEnabled && sub.habitsTime === currentTimeStr) {
+        if (sub.habitsEnabled && isReminderDue(sub.habitsTime, "habits")) {
           const key = `habits_${todayDateStr}`;
-          if (!lastSent[key]) {
-            notificationsToSend.push({
-              key,
-              title: "🔥 Keep Your Habit Streaks Glowing!",
-              body: "Don't lose your streak! Check off today's habits in Life Space.",
-              url: "/goals",
-            });
-          }
+          notificationsToSend.push({
+            key,
+            title: "🔥 Keep Your Habit Streaks Glowing!",
+            body: "Don't lose your streak! Check off today's habits in Life Space.",
+            url: "/goals",
+          });
         }
 
         // 3. Study Session & PYQ Check-in
-        if (sub.studyEnabled && sub.studyTime === currentTimeStr) {
+        if (sub.studyEnabled && isReminderDue(sub.studyTime, "study")) {
           const key = `study_${todayDateStr}`;
-          if (!lastSent[key]) {
-            notificationsToSend.push({
-              key,
-              title: "📚 Study Session & PYQ Check-in!",
-              body: "Log your study hours and PYQs solved today in Study Space.",
-              url: "/study",
-            });
-          }
+          notificationsToSend.push({
+            key,
+            title: "📚 Study Session & PYQ Check-in!",
+            body: "Log your study hours and PYQs solved today in Study Space.",
+            url: "/study",
+          });
         }
 
         // 4. Morning Exam Prep & Syllabus Review
-        if (sub.examEnabled && sub.examTime === currentTimeStr) {
+        if (sub.examEnabled && isReminderDue(sub.examTime, "exam")) {
           const key = `exam_${todayDateStr}`;
-          if (!lastSent[key]) {
-            notificationsToSend.push({
-              key,
-              title: "⚡ Review Today's Exam Syllabus Targets!",
-              body: "Stay ahead of your target date. Review study topics in Study Space.",
-              url: "/study",
-            });
-          }
+          notificationsToSend.push({
+            key,
+            title: "⚡ Review Today's Exam Syllabus Targets!",
+            body: "Stay ahead of your target date. Review study topics in Study Space.",
+            url: "/study",
+          });
         }
 
         // 5. Debt Due Date Reminders (Checked in morning slot around 09:00 - 10:00 or current slot)

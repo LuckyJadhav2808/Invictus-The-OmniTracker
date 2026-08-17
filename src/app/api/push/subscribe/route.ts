@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { PushSubscriptionModel } from "@/lib/models/push-subscription";
+import { scheduleAllUserReminders } from "@/lib/services/qstash-service";
 
 export async function POST(req: NextRequest) {
   try {
@@ -37,9 +38,20 @@ export async function POST(req: NextRequest) {
       { upsert: true, new: true }
     );
 
-    return NextResponse.json({ success: true, message: "Push subscription and reminder schedule saved to MongoDB" });
+    // Schedule precision delayed jobs in QStash
+    if (config) {
+      scheduleAllUserReminders(userId || "guest", timezone || "Asia/Kolkata", config).catch((e) =>
+        console.error("[PushSubscribe] Failed to schedule QStash jobs:", e)
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: "Push subscription and reminder schedule saved & queued with precision QStash timers",
+    });
   } catch (err: any) {
     console.error("Push subscription error:", err);
     return NextResponse.json({ error: err?.message || "Failed to subscribe" }, { status: 500 });
   }
 }
+
