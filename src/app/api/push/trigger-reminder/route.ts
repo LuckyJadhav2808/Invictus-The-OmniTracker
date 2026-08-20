@@ -92,13 +92,14 @@ export async function POST(req: NextRequest) {
       })
     );
 
-    // 4. Auto-Reschedule NEXT day's recurring reminder in QStash (Self-Perpetuating Loop)
+    // 4. Auto-Reschedule NEXT day's recurring reminder in QStash (Self-Perpetuating 24h Loop)
     if (timeStr) {
       await scheduleReminderJob({
         userId,
         type,
         timeStr,
         timezone: timezone || "Asia/Kolkata",
+        customDelaySeconds: 24 * 3600,
       }).catch((e) => console.error("[TriggerReminder] Failed to schedule next day recurring job:", e));
     }
 

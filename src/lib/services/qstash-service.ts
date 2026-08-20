@@ -13,16 +13,18 @@ export const qstashClient = qstashToken
 export type ReminderType = "money" | "habits" | "study" | "exam";
 
 /**
- * Calculates the exact next target timestamp in seconds (epoch) for a given "HH:MM" in a specific timezone.
+ * Calculates the exact delay in seconds from right now until the target "HH:MM" in the specified timezone.
+ * Bulletproof and immune to any server clock drift.
  */
-export function calculateNextOccurrenceEpoch(timeStr: string, timezone: string = "Asia/Kolkata"): { epochSeconds: number; targetDateStr: string } {
+export function calculateDelaySeconds(
+  timeStr: string,
+  timezone: string = "Asia/Kolkata"
+): { diffSeconds: number; targetDateStr: string } {
   const [targetHourStr, targetMinStr] = timeStr.split(":");
   const targetHour = parseInt(targetHourStr, 10) || 0;
   const targetMin = parseInt(targetMinStr, 10) || 0;
 
   const now = new Date();
-
-  // Get current local date parts in user's timezone
   const formatter = new Intl.DateTimeFormat("en-CA", {
     timeZone: timezone,
     year: "numeric",
@@ -38,42 +40,30 @@ export function calculateNextOccurrenceEpoch(timeStr: string, timezone: string =
   const getPart = (type: string) => parseInt(parts.find((p) => p.type === type)?.value || "0", 10);
 
   const year = getPart("year");
-  const month = getPart("month") - 1; // 0-indexed
+  const month = getPart("month");
   const day = getPart("day");
   const curHour = getPart("hour");
   const curMin = getPart("minute");
+  const curSec = getPart("second");
 
-  // Approximate offset difference in ms
-  const localTargetDate = new Date(Date.UTC(year, month, day, targetHour, targetMin, 0));
-  
-  // Calculate if target time today has already passed in user's timezone
-  const isPastToday = curHour > targetHour || (curHour === targetHour && curMin >= targetMin);
+  const curTotalSec = curHour * 3600 + curMin * 60 + curSec;
+  const targetTotalSec = targetHour * 3600 + targetMin * 60;
 
-  // If passed today, schedule for tomorrow
-  let targetDay = day;
-  let targetMonth = month;
-  let targetYear = year;
+  let diffSeconds = targetTotalSec - curTotalSec;
+  let targetDateStr = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 
-  if (isPastToday) {
-    const nextDay = new Date(Date.UTC(year, month, day + 1));
-    targetYear = nextDay.getUTCFullYear();
-    targetMonth = nextDay.getUTCMonth();
-    targetDay = nextDay.getUTCDate();
+  if (diffSeconds <= 0) {
+    // Already passed today in user's timezone -> Schedule for tomorrow
+    diffSeconds += 24 * 3600;
+    const tomorrow = new Date(now.getTime() + 24 * 3600 * 1000);
+    const tmrParts = formatter.formatToParts(tomorrow);
+    const tmrYear = tmrParts.find((p) => p.type === "year")?.value || year;
+    const tmrMonth = tmrParts.find((p) => p.type === "month")?.value || month;
+    const tmrDay = tmrParts.find((p) => p.type === "day")?.value || day;
+    targetDateStr = `${tmrYear}-${String(tmrMonth).padStart(2, "0")}-${String(tmrDay).padStart(2, "0")}`;
   }
 
-  // Convert target local time to UTC epoch
-  // Using Intl format string representation to parse cleanly
-  const targetIsoString = `${targetYear}-${String(targetMonth + 1).padStart(2, "0")}-${String(targetDay).padStart(2, "0")}T${String(targetHour).padStart(2, "0")}:${String(targetMin).padStart(2, "0")}:00`;
-  
-  // Create Date with user timezone string
-  const targetWithTz = new Date(new Date(targetIsoString).toLocaleString("en-US", { timeZone: timezone }));
-  const diff = new Date().getTime() - new Date(new Date().toLocaleString("en-US", { timeZone: timezone })).getTime();
-  const exactTargetUtcMs = new Date(targetIsoString).getTime() + diff;
-
-  const epochSeconds = Math.floor(exactTargetUtcMs / 1000);
-  const targetDateStr = `${targetYear}-${String(targetMonth + 1).padStart(2, "0")}-${String(targetDay).padStart(2, "0")}`;
-
-  return { epochSeconds, targetDateStr };
+  return { diffSeconds, targetDateStr };
 }
 
 /**
@@ -84,6 +74,7 @@ export async function scheduleReminderJob(params: {
   type: ReminderType;
   timeStr: string;
   timezone: string;
+  customDelaySeconds?: number;
 }) {
   if (!qstashClient) {
     console.warn("[QStash] No QSTASH_TOKEN configured. Falling back to background cron.");
@@ -91,11 +82,12 @@ export async function scheduleReminderJob(params: {
   }
 
   try {
-    const { userId, type, timeStr, timezone } = params;
-    const { epochSeconds, targetDateStr } = calculateNextOccurrenceEpoch(timeStr, timezone);
+    const { userId, type, timeStr, timezone, customDelaySeconds } = params;
+    const { diffSeconds, targetDateStr } = calculateDelaySeconds(timeStr, timezone);
+    const finalDelay = customDelaySeconds !== undefined ? customDelaySeconds : diffSeconds;
 
     const destinationUrl = `${appUrl}/api/push/trigger-reminder`;
-    const deduplicationId = `invictus_${userId}_${type}_${targetDateStr}_${timeStr.replace(":", "")}`;
+    const deduplicationId = `invictus_${userId}_${type}_${Date.now()}`;
 
     const res = await qstashClient.publishJSON({
       url: destinationUrl,
@@ -106,12 +98,14 @@ export async function scheduleReminderJob(params: {
         timezone,
         scheduledForDate: targetDateStr,
       },
-      notBefore: epochSeconds,
+      delay: Math.max(1, Math.round(finalDelay)),
       deduplicationId,
       retries: 3,
     });
 
-    console.log(`[QStash] Successfully scheduled ${type} reminder for user ${userId} at ${targetDateStr} ${timeStr} (${timezone}). Message ID: ${res.messageId}`);
+    console.log(
+      `[QStash] Successfully queued ${type} reminder for user ${userId} in ${finalDelay}s (Target: ${timeStr} ${timezone}). Message ID: ${(res as any)?.messageId || "ok"}`
+    );
     return res;
   } catch (err) {
     console.error("[QStash] Error scheduling reminder job:", err);
