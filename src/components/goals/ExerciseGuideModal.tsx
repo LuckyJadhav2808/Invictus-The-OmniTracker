@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
-import { Dumbbell, Target, Layers, Sparkles, CheckCircle2, ChevronRight, Play, Pause, Flame, Info } from "lucide-react";
+import { Dumbbell, Target, Layers, Sparkles, CheckCircle2, ChevronRight, Play, Pause, Flame, Info, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ExerciseGuideModalProps {
@@ -42,16 +42,17 @@ export function ExerciseGuideModal({
         setLoading(false);
       } else {
         setLoading(true);
-        fetch(`/api/gym/exercises?name=${encodeURIComponent(exercise.name)}`)
+        const url = `/api/gym/exercises?name=${encodeURIComponent(exercise.name)}&targetMuscle=${encodeURIComponent(exercise.targetMuscle || "")}`;
+        fetch(url)
           .then((res) => res.json())
           .then((data) => {
             if (data.exercise) {
               setDetails({
                 ...exercise,
                 ...data.exercise,
-                instructions: data.exercise.instructions || exercise.instructions,
-                images: data.exercise.images || exercise.images,
-                secondaryMuscles: data.exercise.secondaryMuscles || exercise.secondaryMuscles,
+                instructions: data.exercise.instructions?.length ? data.exercise.instructions : exercise.instructions,
+                images: data.exercise.images?.length ? data.exercise.images : exercise.images,
+                secondaryMuscles: data.exercise.secondaryMuscles?.length ? data.exercise.secondaryMuscles : exercise.secondaryMuscles,
                 equipment: data.exercise.equipment || exercise.equipment || exercise.machineName,
               });
             } else {
@@ -80,7 +81,13 @@ export function ExerciseGuideModal({
   const title = details?.title || details?.name || exercise.name || "Exercise Form Guide";
   const targetMuscle = details?.targetMuscle || details?.bodyPart || exercise.targetMuscle || "General";
   const equipment = details?.equipment || details?.machineName || exercise.equipment || exercise.machineName || "Free Weight / Machine";
-  const instructions = details?.instructions || [];
+  const rawInstructions = details?.instructions || [];
+  const instructions = rawInstructions.length > 0 ? rawInstructions : [
+    `Set up your equipment (${equipment}) and brace your core with a neutral spine.`,
+    `Focus mind-muscle connection directly on the ${targetMuscle} through the full range of motion.`,
+    `Control the eccentric (lowering) phase for 2-3 full seconds for maximum hypertrophy tension.`,
+    `Drive through the concentric phase with explosive, controlled power while exhaling.`,
+  ];
   const secondaryMuscles = details?.secondaryMuscles || [];
   const images = details?.images || (details?.gifUrl ? [details.gifUrl] : []);
 
@@ -89,7 +96,7 @@ export function ExerciseGuideModal({
       open={open}
       onOpenChange={onOpenChange}
       title="EXERCISE FORM & TECHNIQUE GUIDE"
-      description="Proper execution, target muscles, and injury-prevention cues"
+      description="Proper biomechanics, target muscles, and injury-prevention cues"
     >
       <div className="space-y-4 pt-1 pb-2">
         {/* Header Title Card */}
@@ -126,8 +133,18 @@ export function ExerciseGuideModal({
           </div>
         </div>
 
-        {/* Visual Demonstration Player */}
-        {images.length > 0 ? (
+        {/* Loading State */}
+        {loading ? (
+          <div className="bg-[#161514] rounded-2xl border-2 border-[#161514] shadow-[4px_4px_0px_0px_rgba(22,21,20,1)] p-6 text-center space-y-3">
+            <div className="h-44 bg-[#242220] rounded-xl flex flex-col items-center justify-center gap-3 border border-white/10">
+              <Loader2 className="h-8 w-8 text-[#CEF431] animate-spin" />
+              <p className="text-xs font-black text-white uppercase tracking-wider">
+                Loading Exercise Form & Posture Animation...
+              </p>
+            </div>
+          </div>
+        ) : images.length > 0 ? (
+          /* Visual Demonstration Player */
           <div className="bg-[#161514] rounded-2xl border-2 border-[#161514] shadow-[4px_4px_0px_0px_rgba(22,21,20,1)] p-3 overflow-hidden text-center">
             <div className="relative aspect-[4/3] max-h-56 mx-auto bg-[#242220] rounded-xl overflow-hidden border border-[#363432] flex items-center justify-center">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -138,7 +155,7 @@ export function ExerciseGuideModal({
               />
 
               {/* Looping Status Badge */}
-              <div className="absolute top-2 left-2 bg-[#161514]/80 backdrop-blur-md px-2 py-1 rounded-lg border border-white/20 text-[10px] font-black text-white flex items-center gap-1.5 shadow">
+              <div className="absolute top-2 left-2 bg-[#161514]/85 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/20 text-[10px] font-black text-white flex items-center gap-1.5 shadow">
                 <span className="h-2 w-2 rounded-full bg-[#CEF431] animate-pulse" />
                 <span>{activeImageIndex === 0 ? "1. Starting Posture" : "2. Peak Contraction"}</span>
               </div>
@@ -147,7 +164,7 @@ export function ExerciseGuideModal({
                 <button
                   type="button"
                   onClick={() => setIsPlaying(!isPlaying)}
-                  className="absolute bottom-2 right-2 bg-white text-[#161514] p-1.5 rounded-lg border border-[#161514] text-[10px] font-black shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] cursor-pointer hover:bg-amber-100 transition-all flex items-center gap-1"
+                  className="absolute bottom-2 right-2 bg-white text-[#161514] px-2 py-1 rounded-lg border border-[#161514] text-[10px] font-black shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] cursor-pointer hover:bg-amber-100 transition-all flex items-center gap-1"
                 >
                   {isPlaying ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
                   <span>{isPlaying ? "Pause Loop" : "Play Loop"}</span>
@@ -176,9 +193,12 @@ export function ExerciseGuideModal({
             )}
           </div>
         ) : (
-          <div className="bg-[#FAF8F5] p-4 rounded-2xl border-2 border-[#161514] text-center space-y-1 shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)]">
-            <Info className="h-6 w-6 text-gray-500 mx-auto" />
-            <p className="text-xs font-bold text-gray-600">
+          <div className="bg-[#FAF8F5] p-4 rounded-2xl border-2 border-[#161514] text-center space-y-1.5 shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)]">
+            <Dumbbell className="h-7 w-7 text-amber-600 mx-auto stroke-[2.5]" />
+            <p className="text-xs font-black text-[#161514] uppercase">
+              Custom Exercise Movement
+            </p>
+            <p className="text-[11px] font-bold text-gray-600">
               Focus on strict tempo: 2-3s eccentric lowering, explosive contraction.
             </p>
           </div>
@@ -213,28 +233,26 @@ export function ExerciseGuideModal({
         </div>
 
         {/* Step-by-Step Execution Instructions */}
-        {instructions.length > 0 && (
-          <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)] space-y-2.5">
-            <div className="flex items-center gap-2 text-xs font-black uppercase text-[#161514]">
-              <Sparkles className="h-4 w-4 text-amber-600 stroke-[2.5]" />
-              <span>How to Perform (Step-by-Step)</span>
-            </div>
-
-            <div className="space-y-2 pt-1">
-              {instructions.map((step: string, idx: number) => (
-                <div
-                  key={idx}
-                  className="bg-white p-2.5 rounded-xl border border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] flex items-start gap-2.5 text-xs text-[#161514]"
-                >
-                  <div className="h-5 w-5 rounded-full bg-[#161514] text-[#CEF431] font-black text-[10px] flex items-center justify-center shrink-0 mt-0.5">
-                    {idx + 1}
-                  </div>
-                  <p className="font-semibold leading-relaxed">{step}</p>
-                </div>
-              ))}
-            </div>
+        <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)] space-y-2.5">
+          <div className="flex items-center gap-2 text-xs font-black uppercase text-[#161514]">
+            <Sparkles className="h-4 w-4 text-amber-600 stroke-[2.5]" />
+            <span>How to Perform (Step-by-Step)</span>
           </div>
-        )}
+
+          <div className="space-y-2 pt-1">
+            {instructions.map((step: string, idx: number) => (
+              <div
+                key={idx}
+                className="bg-white p-2.5 rounded-xl border border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] flex items-start gap-2.5 text-xs text-[#161514]"
+              >
+                <div className="h-5 w-5 rounded-full bg-[#161514] text-[#CEF431] font-black text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                  {idx + 1}
+                </div>
+                <p className="font-semibold leading-relaxed">{step}</p>
+              </div>
+            ))}
+          </div>
+        </div>
 
         {/* Pro Tips Box */}
         <div className="bg-emerald-100 p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)] space-y-1.5 text-xs text-emerald-950 font-bold">
