@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { Sparkles, ArrowRight, Megaphone, X, Home, BookOpen, Wallet, CheckSquare, Dumbbell, Utensils, Moon, Trophy, ChevronDown, Bell, Eye, EyeOff } from "lucide-react";
 import { InvictusLogo } from "@/components/shared/InvictusLogo";
 import { getGlobalAnnouncement, type GlobalAnnouncement } from "@/lib/custom-auth";
-import { requestNotificationPermission, sendNativeNotification } from "@/lib/utils/notifications";
+import { ReminderManagerModal } from "@/components/shared/ReminderManagerModal";
 import { toast } from "sonner";
 
 export function SpaceHeader() {
@@ -18,6 +18,7 @@ export function SpaceHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const [announcement, setAnnouncement] = useState<GlobalAnnouncement | null>(null);
   const [dismissedAnn, setDismissedAnn] = useState(false);
+  const [isReminderModalOpen, setIsReminderModalOpen] = useState(false);
   
   // Toggle sub-nav visibility state with localStorage persistence
   const [isSubNavVisible, setIsSubNavVisible] = useState<boolean>(true);
@@ -126,15 +127,6 @@ export function SpaceHeader() {
     router.push(href);
   };
 
-  const enableOSNotifications = async () => {
-    const granted = await requestNotificationPermission();
-    if (granted) {
-      sendNativeNotification("Invictus Status Bar Notifications Active 🚀", "You will receive background alerts on your laptop and mobile status bar!");
-      toast.success("Laptop & Mobile Status Bar Notifications Active! 🔔");
-    } else {
-      toast.error("Notification permission denied in browser settings.");
-    }
-  };
 
   const getSubFeatures = () => {
     if (pathname.startsWith("/tasks")) {
@@ -283,9 +275,9 @@ export function SpaceHeader() {
             {/* Notification Bell */}
             <button
               type="button"
-              onClick={enableOSNotifications}
+              onClick={() => setIsReminderModalOpen(true)}
               className="p-1.5 sm:p-2 bg-amber-100 hover:bg-amber-200 text-[#161514] rounded-xl sm:rounded-2xl border-1.5 sm:border-2 border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] sm:shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] transition-all cursor-pointer shrink-0"
-              title="Enable Laptop & Mobile Status Bar Notifications"
+              title="Manage Daily Reminders & Notification Alarms"
             >
               <Bell className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2.5]" />
             </button>
@@ -384,12 +376,12 @@ export function SpaceHeader() {
                     type="button"
                     onClick={() => {
                       setIsOpen(false);
-                      enableOSNotifications();
+                      setIsReminderModalOpen(true);
                     }}
                     className="w-full p-2 rounded-xl bg-amber-100 hover:bg-amber-200 text-[#161514] text-xs font-black border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] transition-all cursor-pointer flex items-center justify-center gap-2"
                   >
                     <Bell className="h-3.5 w-3.5" />
-                    <span>Enable Status Bar OS Alerts 🔔</span>
+                    <span>Daily Reminders & Alarms 🔔</span>
                   </button>
                 </div>
               </div>
@@ -424,6 +416,13 @@ export function SpaceHeader() {
           </div>
         )}
       </header>
+
+      {/* Daily Reminders & Alarm Manager Modal */}
+      <ReminderManagerModal
+        open={isReminderModalOpen}
+        onOpenChange={setIsReminderModalOpen}
+        defaultSpace="all"
+      />
     </>
   );
 }
