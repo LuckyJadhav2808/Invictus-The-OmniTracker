@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Invictus — The OmniTracker</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: #161514;
+      color: #FAF7F2;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+      text-align: center;
+    }
+    .card {
+      background: #242220;
+      border: 3px solid #FAF7F2;
+      border-radius: 24px;
+      padding: 32px 24px;
+      max-width: 360px;
+      width: 100%;
+      box-shadow: 6px 6px 0px #CEF431;
+    }
+    .logo {
+      font-size: 42px;
+      margin-bottom: 12px;
+    }
+    h1 {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+      color: #CEF431;
+      text-transform: uppercase;
+    }
+    p {
+      font-size: 13px;
+      color: #A8A29E;
+      line-height: 1.5;
+      margin-bottom: 24px;
+      font-weight: 600;
+    }
+    .btn {
+      display: block;
+      width: 100%;
+      background: #CEF431;
+      color: #161514;
+      font-weight: 900;
+      text-decoration: none;
+      padding: 14px;
+      border-radius: 16px;
+      border: 2px solid #161514;
+      font-size: 14px;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 3px 3px 0px #FAF7F2;
+    }
+    .spinner {
+      margin: 16px auto;
+      width: 36px;
+      height: 36px;
+      border: 4px solid #363432;
+      border-top-color: #CEF431;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">⚡</div>
+    <h1>INVICTUS</h1>
+    <p id="status-text">Connecting to OmniTracker live server...</p>
+    <div class="spinner" id="spinner"></div>
+    <button class="btn" onclick="retryConnection()">Open OmniTracker 🚀</button>
+  </div>
+
+  <script>
+    const LIVE_URL = "https://invictus-the-omni-tracker.vercel.app/today";
+    function retryConnection() {
+      window.location.href = LIVE_URL;
+    }
+    // Auto-redirect if online
+    if (navigator.onLine) {
+      setTimeout(() => {
+        window.location.replace(LIVE_URL);
+      }, 500);
+    } else {
+      document.getElementById('status-text').innerText = "Offline Mode active. Reconnecting when internet is available...";
+      window.addEventListener('online', () => {
+        window.location.replace(LIVE_URL);
+      });
+    }
+  </script>
+</body>
+</html>
