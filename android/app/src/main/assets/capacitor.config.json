@@ -1,0 +1,24 @@
+{
+	"appId": "com.invictus.omnitracker",
+	"appName": "Invictus",
+	"webDir": "public",
+	"server": {
+		"url": "https://invictus-the-omni-tracker.vercel.app",
+		"cleartext": true
+	},
+	"plugins": {
+		"LocalNotifications": {
+			"smallIcon": "ic_stat_icon",
+			"iconColor": "#CEF431"
+		},
+		"SplashScreen": {
+			"launchShowDuration": 2000,
+			"backgroundColor": "#161514",
+			"showSpinner": false
+		},
+		"StatusBar": {
+			"backgroundColor": "#161514",
+			"style": "DARK"
+		}
+	}
+}
