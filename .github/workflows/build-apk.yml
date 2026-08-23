@@ -12,7 +12,7 @@ on:
 
 jobs:
   build-android:
-    name: 🤖 Compile Android APK (Fast Build)
+    name: 🤖 Compile Android APK (Lightning Fast)
     runs-on: ubuntu-latest
 
     steps:
@@ -24,6 +24,14 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+
+      - name: 📦 Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: ⚡ Quick Install Capacitor Native Plugins
+        run: npm install @capacitor/core @capacitor/android @capacitor/local-notifications @capacitor/haptics @capacitor/splash-screen @capacitor/status-bar --no-audit --no-fund
 
       - name: 🔑 Grant Execute Permission for Gradlew
         run: chmod +x android/gradlew
