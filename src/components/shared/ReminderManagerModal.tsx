@@ -33,15 +33,22 @@ export function ReminderManagerModal({
   const { user } = useAuth();
   const [config, setConfig] = useState<ReminderConfig>(DEFAULT_REMINDER_CONFIG);
   const [permissionState, setPermissionState] = useState<string>("default");
+  const isNative = isNativeApp();
 
   useEffect(() => {
     if (open) {
       setConfig(getReminderConfig());
-      if (typeof window !== "undefined" && "Notification" in window) {
+      if (isNative) {
+        import("@/lib/native/native-notifications").then(({ checkNativeNotificationPermissions }) => {
+          checkNativeNotificationPermissions().then((granted) => {
+            setPermissionState(granted ? "granted" : "default");
+          });
+        });
+      } else if (typeof window !== "undefined" && "Notification" in window) {
         setPermissionState(Notification.permission);
       }
     }
-  }, [open]);
+  }, [open, isNative]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,25 +56,31 @@ export function ReminderManagerModal({
     triggerHaptic("success");
 
     // 1. If running as Native Android/iOS App, schedule hardware-level exact alarms
-    if (isNativeApp()) {
+    if (isNative) {
       await scheduleAllNativeAlarms(config);
-    }
-
-    // 2. Request browser notification permission if not yet granted
-    if (typeof window !== "undefined" && "Notification" in window && Notification.permission !== "granted") {
-      const granted = await requestNotificationPermission();
-      setPermissionState(granted ? "granted" : "denied");
+    } else {
+      // 2. Request browser notification permission if on web browser
+      if (typeof window !== "undefined" && "Notification" in window && Notification.permission !== "granted") {
+        const granted = await requestNotificationPermission();
+        setPermissionState(granted ? "granted" : "denied");
+      }
     }
 
     // Enable Background Web Push token registration & sync schedule to MongoDB
     await enableWebPushNotifications(user?.uid || "guest", config).catch(() => {});
 
     saveReminderConfig(config);
-    toast.success("Daily Reminders Saved & Active! 🔔 (Background Sync Ready)");
+    toast.success("Daily Reminders Saved & Active! 🔔 (Exact Hardware Alarms & Cloud Ready)");
     onOpenChange(false);
   };
 
   const handleTestNotification = async () => {
+    if (isNative) {
+      const { sendTestNativeAlarm } = await import("@/lib/native/native-notifications");
+      await sendTestNativeAlarm();
+      return;
+    }
+
     const granted = await requestNotificationPermission();
     if (granted) {
       sendNativeNotification(
@@ -95,17 +108,17 @@ export function ReminderManagerModal({
           <div className="bg-emerald-100 p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] text-xs font-bold text-emerald-950 flex items-center justify-between gap-2">
             <span className="flex items-center gap-1.5 font-black">
               <CheckCircle2 className="h-4 w-4 text-emerald-700 stroke-[2.5]" />
-              🟢 Browser Notifications Granted & Active
+              {isNative ? "🟢 Native Hardware Alarms Granted & Active" : "🟢 Browser Notifications Granted & Active"}
             </span>
             <button
               type="button"
               onClick={handleTestNotification}
               className="px-3 py-1 rounded-xl bg-white hover:bg-emerald-200 text-[#161514] font-black text-[10px] uppercase border border-[#161514] cursor-pointer shrink-0"
             >
-              Test Notification
+              Test Alarm 🔔
             </button>
           </div>
-        ) : permissionState === "denied" ? (
+        ) : permissionState === "denied" && !isNative ? (
           <div className="bg-rose-100 p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] text-xs font-bold text-rose-950 space-y-1">
             <div className="flex items-center gap-1.5 font-black">
               <Bell className="h-4 w-4 text-rose-700 stroke-[2.5]" />
@@ -119,18 +132,24 @@ export function ReminderManagerModal({
           <div className="bg-amber-100 p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] text-xs font-bold text-[#161514] flex items-center justify-between gap-2">
             <span className="flex items-center gap-1.5">
               <Bell className="h-4 w-4 text-amber-700 stroke-[2.5]" />
-              Allow browser notifications for background alerts
+              {isNative ? "Enable Native Hardware Alarms for lock screen alerts" : "Allow browser notifications for background alerts"}
             </span>
             <button
               type="button"
               onClick={async () => {
-                const granted = await requestNotificationPermission();
-                setPermissionState(granted ? "granted" : "denied");
-                if (granted) {
-                  await enableWebPushNotifications().catch(() => {});
-                  toast.success("Notifications Enabled! 🎉");
+                if (isNative) {
+                  const { requestNativeNotificationPermissions } = await import("@/lib/native/native-notifications");
+                  const granted = await requestNativeNotificationPermissions();
+                  setPermissionState(granted ? "granted" : "default");
                 } else {
-                  toast.error("Permission denied in browser.");
+                  const granted = await requestNotificationPermission();
+                  setPermissionState(granted ? "granted" : "denied");
+                  if (granted) {
+                    await enableWebPushNotifications().catch(() => {});
+                    toast.success("Notifications Enabled! 🎉");
+                  } else {
+                    toast.error("Permission denied in browser.");
+                  }
                 }
               }}
               className="px-2.5 py-1 rounded-xl bg-[#CEF431] text-[#161514] font-black text-[10px] uppercase border border-[#161514] cursor-pointer shrink-0"
