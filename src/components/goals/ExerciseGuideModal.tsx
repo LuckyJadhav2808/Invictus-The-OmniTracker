@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
-import { Dumbbell, Target, Layers, Sparkles, CheckCircle2, ChevronRight, Play, Pause, Flame, Info, Loader2 } from "lucide-react";
+import { Dumbbell, Target, Layers, Sparkles, CheckCircle2, Play, Pause, Info, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ExerciseGuideModalProps {
@@ -11,7 +11,9 @@ interface ExerciseGuideModalProps {
   exercise: {
     id?: string;
     name?: string;
+    title?: string;
     targetMuscle?: string;
+    bodyPart?: string;
     equipment?: string;
     machineName?: string;
     instructions?: string[];
@@ -21,6 +23,7 @@ interface ExerciseGuideModalProps {
     mechanic?: string;
     level?: string;
     notes?: string;
+    desc?: string;
   } | null;
 }
 
@@ -36,60 +39,97 @@ export function ExerciseGuideModal({
 
   // Auto-fetch full guide if instructions or images are missing
   useEffect(() => {
-    if (open && exercise?.name) {
-      if (exercise.instructions && exercise.instructions.length > 0 && exercise.images && exercise.images.length > 0) {
-        setDetails(exercise);
-        setLoading(false);
-      } else {
-        setLoading(true);
-        const url = `/api/gym/exercises?name=${encodeURIComponent(exercise.name)}&targetMuscle=${encodeURIComponent(exercise.targetMuscle || "")}`;
-        fetch(url)
-          .then((res) => res.json())
-          .then((data) => {
-            if (data.exercise) {
-              setDetails({
-                ...exercise,
-                ...data.exercise,
-                instructions: data.exercise.instructions?.length ? data.exercise.instructions : exercise.instructions,
-                images: data.exercise.images?.length ? data.exercise.images : exercise.images,
-                secondaryMuscles: data.exercise.secondaryMuscles?.length ? data.exercise.secondaryMuscles : exercise.secondaryMuscles,
-                equipment: data.exercise.equipment || exercise.equipment || exercise.machineName,
-              });
-            } else {
-              setDetails(exercise);
-            }
-          })
-          .catch(() => setDetails(exercise))
-          .finally(() => setLoading(false));
-      }
+    if (!open || !exercise) {
+      setDetails(null);
+      setLoading(false);
+      return;
+    }
+
+    const exName = exercise.title || exercise.name || "";
+    const exMuscle = exercise.targetMuscle || exercise.bodyPart || "";
+    const hasImages = (exercise.images && exercise.images.length > 0) || Boolean(exercise.gifUrl);
+    const hasInstructions = exercise.instructions && exercise.instructions.length > 0;
+
+    // Immediately set available props so modal is never blank
+    setDetails(exercise);
+
+    if (hasImages && hasInstructions) {
+      setLoading(false);
+      return;
+    }
+
+    if (exName) {
+      if (!hasImages) setLoading(true);
+
+      const url = `/api/gym/exercises?name=${encodeURIComponent(exName)}&targetMuscle=${encodeURIComponent(exMuscle)}`;
+      fetch(url)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data?.exercise) {
+            setDetails((prev: any) => ({
+              ...prev,
+              ...exercise,
+              ...data.exercise,
+              title: data.exercise.title || exName,
+              bodyPart: data.exercise.bodyPart || exMuscle,
+              targetMuscle: data.exercise.bodyPart || exMuscle,
+              instructions: data.exercise.instructions?.length
+                ? data.exercise.instructions
+                : exercise.instructions?.length
+                ? exercise.instructions
+                : [],
+              images: data.exercise.images?.length
+                ? data.exercise.images
+                : exercise.images?.length
+                ? exercise.images
+                : exercise.gifUrl
+                ? [exercise.gifUrl]
+                : [],
+              secondaryMuscles: data.exercise.secondaryMuscles?.length
+                ? data.exercise.secondaryMuscles
+                : exercise.secondaryMuscles?.length
+                ? exercise.secondaryMuscles
+                : [],
+              equipment: data.exercise.equipment || exercise.equipment || exercise.machineName,
+            }));
+          }
+        })
+        .catch((err) => console.error("Guide lookup error:", err))
+        .finally(() => setLoading(false));
     }
   }, [open, exercise]);
 
   // Looping animation toggle between image 0 (Start) and image 1 (Contracted)
+  const resolvedImages: string[] =
+    (details?.images && details.images.length > 0 ? details.images : null) ||
+    (exercise?.images && exercise.images.length > 0 ? exercise.images : null) ||
+    (details?.gifUrl ? [details.gifUrl] : null) ||
+    (exercise?.gifUrl ? [exercise.gifUrl] : null) ||
+    [];
+
   useEffect(() => {
-    if (!open || !isPlaying || !details?.images || details.images.length < 2) return;
+    if (!open || !isPlaying || resolvedImages.length < 2) return;
 
     const interval = setInterval(() => {
       setActiveImageIndex((prev) => (prev === 0 ? 1 : 0));
     }, 1200);
 
     return () => clearInterval(interval);
-  }, [open, isPlaying, details?.images]);
+  }, [open, isPlaying, resolvedImages.length]);
 
   if (!exercise) return null;
 
-  const title = details?.title || details?.name || exercise.name || "Exercise Form Guide";
-  const targetMuscle = details?.targetMuscle || details?.bodyPart || exercise.targetMuscle || "General";
+  const title = details?.title || details?.name || exercise.title || exercise.name || "Exercise Form Guide";
+  const targetMuscle = details?.targetMuscle || details?.bodyPart || exercise.targetMuscle || exercise.bodyPart || "General";
   const equipment = details?.equipment || details?.machineName || exercise.equipment || exercise.machineName || "Free Weight / Machine";
-  const rawInstructions = details?.instructions || [];
+  const rawInstructions = details?.instructions?.length ? details.instructions : exercise.instructions?.length ? exercise.instructions : [];
   const instructions = rawInstructions.length > 0 ? rawInstructions : [
     `Set up your equipment (${equipment}) and brace your core with a neutral spine.`,
     `Focus mind-muscle connection directly on the ${targetMuscle} through the full range of motion.`,
     `Control the eccentric (lowering) phase for 2-3 full seconds for maximum hypertrophy tension.`,
     `Drive through the concentric phase with explosive, controlled power while exhaling.`,
   ];
-  const secondaryMuscles = details?.secondaryMuscles || [];
-  const images = details?.images || (details?.gifUrl ? [details.gifUrl] : []);
+  const secondaryMuscles = details?.secondaryMuscles?.length ? details.secondaryMuscles : exercise.secondaryMuscles || [];
 
   return (
     <ResponsiveFormContainer
@@ -133,8 +173,8 @@ export function ExerciseGuideModal({
           </div>
         </div>
 
-        {/* Loading State */}
-        {loading ? (
+        {/* Visual Demonstration Player */}
+        {loading && resolvedImages.length === 0 ? (
           <div className="bg-[#161514] rounded-2xl border-2 border-[#161514] shadow-[4px_4px_0px_0px_rgba(22,21,20,1)] p-6 text-center space-y-3">
             <div className="h-44 bg-[#242220] rounded-xl flex flex-col items-center justify-center gap-3 border border-white/10">
               <Loader2 className="h-8 w-8 text-[#CEF431] animate-spin" />
@@ -143,13 +183,12 @@ export function ExerciseGuideModal({
               </p>
             </div>
           </div>
-        ) : images.length > 0 ? (
-          /* Visual Demonstration Player */
+        ) : resolvedImages.length > 0 ? (
           <div className="bg-[#161514] rounded-2xl border-2 border-[#161514] shadow-[4px_4px_0px_0px_rgba(22,21,20,1)] p-3 overflow-hidden text-center">
             <div className="relative aspect-[4/3] max-h-56 mx-auto bg-[#242220] rounded-xl overflow-hidden border border-[#363432] flex items-center justify-center">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={images[activeImageIndex] || images[0]}
+                src={resolvedImages[activeImageIndex] || resolvedImages[0]}
                 alt={title}
                 className="w-full h-full object-contain p-2 transition-all duration-300"
               />
@@ -157,10 +196,16 @@ export function ExerciseGuideModal({
               {/* Looping Status Badge */}
               <div className="absolute top-2 left-2 bg-[#161514]/85 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/20 text-[10px] font-black text-white flex items-center gap-1.5 shadow">
                 <span className="h-2 w-2 rounded-full bg-[#CEF431] animate-pulse" />
-                <span>{activeImageIndex === 0 ? "1. Starting Posture" : "2. Peak Contraction"}</span>
+                <span>
+                  {resolvedImages.length === 1
+                    ? "Posture Demonstration"
+                    : activeImageIndex === 0
+                    ? "1. Starting Posture"
+                    : "2. Peak Contraction"}
+                </span>
               </div>
 
-              {images.length > 1 && (
+              {resolvedImages.length > 1 && (
                 <button
                   type="button"
                   onClick={() => setIsPlaying(!isPlaying)}
@@ -173,9 +218,9 @@ export function ExerciseGuideModal({
             </div>
 
             {/* Frame Indicator Dots */}
-            {images.length > 1 && (
+            {resolvedImages.length > 1 && (
               <div className="flex items-center justify-center gap-1.5 mt-2">
-                {images.map((_: any, idx: number) => (
+                {resolvedImages.map((_: any, idx: number) => (
                   <button
                     key={idx}
                     type="button"
