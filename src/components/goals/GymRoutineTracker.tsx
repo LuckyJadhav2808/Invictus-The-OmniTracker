@@ -1,17 +1,17 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Dumbbell, Plus, Trash2, Edit3, CheckCircle2, Circle, Flame, Sparkles, Layers } from "lucide-react";
+import { Dumbbell, Plus, Trash2, Edit3, CheckCircle2, Circle, Flame, Sparkles, Layers, Search, Info, Eye } from "lucide-react";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
 import { TemplateSelectionModal, TemplatePack } from "@/components/shared/TemplateSelectionModal";
 import { GYM_TEMPLATE_PACKS } from "@/lib/templates-data";
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
+import { ExerciseGuideModal } from "@/components/goals/ExerciseGuideModal";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useGymRoutines, useAddGymRoutine, useUpdateGymRoutine, useDeleteGymRoutine } from "@/lib/queries/gym";
 import { useExerciseLibrary } from "@/lib/queries/exercises";
-import { Search } from "lucide-react";
 
 const DAYS_OF_WEEK = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] as const;
 
@@ -41,6 +41,7 @@ export function GymRoutineTracker() {
 
   const [isAddExerciseOpen, setIsAddExerciseOpen] = useState(false);
   const [isChoiceOpen, setIsChoiceOpen] = useState(false);
+  const [selectedGuideExercise, setSelectedGuideExercise] = useState<any | null>(null);
 
   const handleApplyGymPack = (pack: TemplatePack) => {
     const newExercises = pack.items.map((item, idx) => ({
@@ -74,8 +75,9 @@ export function GymRoutineTracker() {
   const [machineName, setMachineName] = useState("");
   const [targetMuscle, setTargetMuscle] = useState("Chest");
   const [exerciseNotes, setExerciseNotes] = useState("");
+  const [selectedLibItem, setSelectedLibItem] = useState<any | null>(null);
 
-  // 2,900+ Exercise Library Search State
+  // 800+ Exercise Library Search State
   const [libQuery, setLibQuery] = useState("");
   const [libBodyPart, setLibBodyPart] = useState("all");
   const [libEquipment, setLibEquipment] = useState("all");
@@ -83,7 +85,7 @@ export function GymRoutineTracker() {
     query: libQuery,
     bodyPart: libBodyPart,
     equipment: libEquipment,
-    limit: 20,
+    limit: 25,
   });
 
   const [editingExercise, setEditingExercise] = useState<any | null>(null);
@@ -138,8 +140,13 @@ export function GymRoutineTracker() {
     const newExercise = {
       id: `ex_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
       name: exerciseName.trim(),
-      machineName: machineName.trim() || "Free Weights",
-      targetMuscle: targetMuscle || "Chest",
+      machineName: machineName.trim() || selectedLibItem?.equipment || "Free Weights",
+      targetMuscle: targetMuscle || selectedLibItem?.bodyPart || "Chest",
+      equipment: selectedLibItem?.equipment || machineName.trim(),
+      instructions: selectedLibItem?.instructions || [],
+      images: selectedLibItem?.images || [],
+      gifUrl: selectedLibItem?.gifUrl || selectedLibItem?.images?.[0] || "",
+      secondaryMuscles: selectedLibItem?.secondaryMuscles || [],
       notes: exerciseNotes.trim(),
       sets: [
         { id: `set_1_${Date.now()}`, setNumber: 1, weight: 20, reps: 12, completed: false },
@@ -169,6 +176,7 @@ export function GymRoutineTracker() {
       setExerciseName("");
       setMachineName("");
       setExerciseNotes("");
+      setSelectedLibItem(null);
     } catch {
       toast.error("Failed to add exercise");
     }
@@ -432,9 +440,9 @@ export function GymRoutineTracker() {
           {currentExercises.map((ex: any) => (
             <div key={ex.id} className="bg-cream-bg/40 rounded-2xl p-4 border border-border/80 space-y-3">
               {/* Exercise Header */}
-              <div className="flex items-start justify-between">
+              <div className="flex items-start justify-between gap-2">
                 <div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <h5 className="font-extrabold text-sm text-navy-900">{ex.name}</h5>
                     <span className="text-[9px] font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded-full uppercase">
                       {ex.targetMuscle || "General"}
@@ -447,7 +455,17 @@ export function GymRoutineTracker() {
                   )}
                 </div>
 
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedGuideExercise(ex)}
+                    className="px-2 py-1 rounded-xl bg-amber-300 hover:bg-amber-400 text-navy-950 font-black text-[10px] uppercase border border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] flex items-center gap-1 cursor-pointer transition-all active:translate-x-0.5 active:translate-y-0.5"
+                    title="View execution form guide, muscle activation & posture"
+                  >
+                    <Eye className="h-3 w-3 stroke-[2.5]" />
+                    <span>Form Guide</span>
+                  </button>
+
                   <button
                     onClick={() => {
                       setEditingExercise(ex);
@@ -637,38 +655,61 @@ export function GymRoutineTracker() {
 
             {/* Live Search Results List */}
             {libData?.exercises && libData.exercises.length > 0 && (
-              <div className="max-h-48 overflow-y-auto space-y-1.5 pr-1 pt-1 divide-y divide-amber-200/60">
+              <div className="max-h-56 overflow-y-auto space-y-2 pr-1 pt-1 divide-y divide-amber-200/60">
                 {libData.exercises.map((item) => (
                   <div
                     key={item.id}
                     onClick={() => {
+                      setSelectedLibItem(item);
                       setExerciseName(item.title);
                       setMachineName(item.equipment || "Free Weights");
                       setTargetMuscle(item.bodyPart || "Chest");
                       setExerciseNotes(item.desc ? item.desc.slice(0, 120) + "..." : `${item.level} ${item.type}`);
-                      toast.success(`Selected '${item.title}' from library! 🎯`);
+                      toast.success(`Selected '${item.title}' with Form Guide! 🎯`);
                     }}
                     className="p-2 rounded-xl bg-white hover:bg-amber-100/80 border border-navy-950 cursor-pointer transition-all flex items-center justify-between gap-2 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]"
                   >
-                    <div>
-                      <h5 className="font-black text-xs text-navy-950">{item.title}</h5>
-                      <div className="flex items-center gap-1.5 mt-0.5">
-                        <span className="text-[8px] font-black uppercase px-1.5 py-0.2 rounded bg-amber-400 text-navy-950 border border-navy-950">
-                          {item.bodyPart}
-                        </span>
-                        <span className="text-[8px] font-black uppercase px-1.5 py-0.2 rounded bg-sky-200 text-navy-950 border border-navy-950">
-                          {item.equipment}
-                        </span>
-                        {item.level && (
-                          <span className="text-[8px] font-black uppercase text-navy-600">
-                            • {item.level}
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      {item.images && item.images[0] ? (
+                        <div className="h-10 w-10 rounded-lg bg-[#242220] border border-navy-950 overflow-hidden shrink-0 flex items-center justify-center">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={item.images[0]} alt={item.title} className="h-full w-full object-contain" />
+                        </div>
+                      ) : (
+                        <div className="h-10 w-10 rounded-lg bg-amber-200 border border-navy-950 flex items-center justify-center text-navy-950 font-black text-xs shrink-0">
+                          🏋️
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <h5 className="font-black text-xs text-navy-950 truncate">{item.title}</h5>
+                        <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                          <span className="text-[8px] font-black uppercase px-1.5 py-0.2 rounded bg-amber-400 text-navy-950 border border-navy-950">
+                            {item.bodyPart}
                           </span>
-                        )}
+                          <span className="text-[8px] font-black uppercase px-1.5 py-0.2 rounded bg-sky-200 text-navy-950 border border-navy-950">
+                            {item.equipment}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                    <span className="text-[10px] font-black bg-emerald-400 text-navy-950 px-2 py-0.5 rounded-lg border border-navy-950 shrink-0">
-                      USE ➔
-                    </span>
+
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedGuideExercise(item);
+                        }}
+                        className="px-2 py-1 rounded-lg bg-amber-300 hover:bg-amber-400 text-navy-950 text-[9px] font-black border border-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)] flex items-center gap-1 cursor-pointer transition-all"
+                        title="View Exercise Form Guide"
+                      >
+                        <Eye className="h-2.5 w-2.5 stroke-[2.5]" />
+                        <span>Guide</span>
+                      </button>
+                      <span className="text-[9px] font-black bg-emerald-400 text-navy-950 px-2 py-1 rounded-lg border border-navy-950">
+                        USE ➔
+                      </span>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -797,6 +838,15 @@ export function GymRoutineTracker() {
         }}
         title="Remove Exercise"
         description="Are you sure you want to remove this exercise from today's routine split?"
+      />
+
+      {/* Exercise Form & Technique Guide Modal */}
+      <ExerciseGuideModal
+        open={selectedGuideExercise !== null}
+        onOpenChange={(open) => {
+          if (!open) setSelectedGuideExercise(null);
+        }}
+        exercise={selectedGuideExercise}
       />
     </div>
   );
