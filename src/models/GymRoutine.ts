@@ -13,6 +13,10 @@ export interface IGymExercise {
   name: string;
   machineName?: string;
   targetMuscle: string;
+  equipment?: string;
+  gifUrl?: string;
+  instructions?: string[];
+  secondaryMuscles?: string[];
   notes?: string;
   sets: IExerciseSet[];
 }
@@ -40,6 +44,10 @@ const GymExerciseSchema = new Schema<IGymExercise>({
   name: { type: String, required: true },
   machineName: { type: String, default: "" },
   targetMuscle: { type: String, default: "General" },
+  equipment: { type: String, default: "" },
+  gifUrl: { type: String, default: "" },
+  instructions: { type: [String], default: [] },
+  secondaryMuscles: { type: [String], default: [] },
   notes: { type: String, default: "" },
   sets: [ExerciseSetSchema],
 });
