@@ -9,6 +9,19 @@ export function isNativeApp(): boolean {
 }
 
 /**
+ * Check if native notification permissions are granted
+ */
+export async function checkNativeNotificationPermissions(): Promise<boolean> {
+  if (!isNativeApp()) return false;
+  try {
+    const status = await LocalNotifications.checkPermissions();
+    return status.display === "granted";
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Request exact alarm & notification permissions on native Android/iOS
  */
 export async function requestNativeNotificationPermissions(): Promise<boolean> {
@@ -20,11 +33,40 @@ export async function requestNativeNotificationPermissions(): Promise<boolean> {
       toast.success("Native Alarm Permissions Granted! 🔔");
       return true;
     } else {
-      toast.error("Notification permissions not granted on device.");
+      toast.error("Notification permission denied on device.");
       return false;
     }
   } catch (err) {
     console.error("[NativeNotifications] Failed to request permissions:", err);
+    return false;
+  }
+}
+
+/**
+ * Sends an instant test native alarm
+ */
+export async function sendTestNativeAlarm(): Promise<boolean> {
+  if (!isNativeApp()) return false;
+  try {
+    await requestNativeNotificationPermissions();
+    await LocalNotifications.schedule({
+      notifications: [
+        {
+          id: 999,
+          title: "🔔 Test Native Hardware Alarm",
+          body: "Your native alarms are active and will wake your lock screen at your scheduled times!",
+          schedule: { at: new Date(Date.now() + 1000) },
+          smallIcon: "ic_stat_icon",
+          iconColor: "#CEF431",
+          extra: { url: "/today" },
+        },
+      ],
+    });
+    toast.success("Test alarm dispatched to status bar! 📲");
+    return true;
+  } catch (e: any) {
+    console.error("Test native alarm failed:", e);
+    toast.error("Failed to fire test alarm: " + e?.message);
     return false;
   }
 }
@@ -89,7 +131,6 @@ export async function scheduleAllNativeAlarms(config: NativeAlarmConfig): Promis
           repeats: true,
           every: "day",
         },
-        sound: "beep.wav",
         smallIcon: "ic_stat_icon",
         iconColor: "#CEF431",
         extra: { url: "/goals", type: "habits" },
@@ -108,7 +149,6 @@ export async function scheduleAllNativeAlarms(config: NativeAlarmConfig): Promis
           repeats: true,
           every: "day",
         },
-        sound: "beep.wav",
         smallIcon: "ic_stat_icon",
         iconColor: "#03D26F",
         extra: { url: "/money", type: "money" },
@@ -127,7 +167,6 @@ export async function scheduleAllNativeAlarms(config: NativeAlarmConfig): Promis
           repeats: true,
           every: "day",
         },
-        sound: "beep.wav",
         smallIcon: "ic_stat_icon",
         iconColor: "#FED7AA",
         extra: { url: "/study", type: "study" },
@@ -146,7 +185,6 @@ export async function scheduleAllNativeAlarms(config: NativeAlarmConfig): Promis
           repeats: true,
           every: "day",
         },
-        sound: "beep.wav",
         smallIcon: "ic_stat_icon",
         iconColor: "#FFE4E6",
         extra: { url: "/study", type: "exam" },
