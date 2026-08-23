@@ -5,7 +5,13 @@ import { LocalNotifications } from "@capacitor/local-notifications";
 import { toast } from "sonner";
 
 export function isNativeApp(): boolean {
-  return typeof window !== "undefined" && Capacitor.isNativePlatform();
+  if (typeof window === "undefined") return false;
+  const win = window as any;
+  if (win.Capacitor?.isNativePlatform && win.Capacitor.isNativePlatform()) return true;
+  if (win.Capacitor?.getPlatform && win.Capacitor.getPlatform() !== "web") return true;
+  if (Capacitor.isNativePlatform()) return true;
+  if (/capacitor/i.test(navigator.userAgent) || /android.*wv/i.test(navigator.userAgent)) return true;
+  return false;
 }
 
 /**
