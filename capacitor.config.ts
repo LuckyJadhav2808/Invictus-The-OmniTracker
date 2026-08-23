@@ -13,7 +13,6 @@ const config: CapacitorConfig = {
     LocalNotifications: {
       smallIcon: "ic_stat_icon",
       iconColor: "#CEF431",
-      sound: "beep.wav",
     },
     SplashScreen: {
       launchShowDuration: 2000,
