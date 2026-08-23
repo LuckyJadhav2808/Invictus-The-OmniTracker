@@ -12,7 +12,7 @@ on:
 
 jobs:
   build-android:
-    name: 🤖 Compile Android APK (Lightning Fast)
+    name: 🤖 Compile Android APK
     runs-on: ubuntu-latest
 
     steps:
@@ -24,14 +24,15 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+          cache: 'gradle'
 
       - name: 📦 Setup Node.js 22
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      - name: ⚡ Quick Install Capacitor Native Plugins
-        run: npm install @capacitor/core @capacitor/android @capacitor/local-notifications @capacitor/haptics @capacitor/splash-screen @capacitor/status-bar --no-audit --no-fund
+      - name: ⚡ Install Native Android Bridge Plugins
+        run: npm install @capacitor/core @capacitor/cli @capacitor/android @capacitor/local-notifications @capacitor/haptics @capacitor/splash-screen @capacitor/status-bar --no-audit --no-fund
 
       - name: 🔑 Grant Execute Permission for Gradlew
         run: chmod +x android/gradlew
@@ -39,7 +40,7 @@ jobs:
       - name: 🏗️ Build Debug APK with Gradle
         run: |
           cd android
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: 📤 Upload Installable APK Artifact
         uses: actions/upload-artifact@v4
