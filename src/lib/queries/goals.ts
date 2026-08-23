@@ -3,6 +3,7 @@ import { useAuth } from "@/components/shared/AuthProvider";
 import { type Habit, type HabitLog, type Streak, type HealthProfile, type WaterLog, type Workout, type Macros, type Diet } from "@/types";
 import { calculateStreak } from "@/lib/utils/streaks";
 import { format } from "date-fns";
+import { executeOfflineMutation } from "@/lib/offline/offline-mutation";
 
 const isGuestMode = () => {
   if (typeof window === "undefined") return false;
@@ -60,18 +61,15 @@ export function useAddHabit() {
       if (!user) throw new Error("Unauthenticated");
 
       const habitId = `h_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
-      const res = await fetch("/api/goals/habits", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: habitId,
-          userId: user.uid,
-          ...habit,
-        }),
-      });
+      const newHabitObj = { id: habitId, userId: user.uid, ...habit };
 
-      if (!res.ok) throw new Error("Failed to create habit in MongoDB");
-      return res.json();
+      return executeOfflineMutation(newHabitObj, {
+        endpoint: "/api/goals/habits",
+        method: "POST",
+        type: "goals",
+        label: `Create Habit: ${habit.title}`,
+        getOptimisticResult: () => newHabitObj,
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["habits", user?.uid] });
@@ -308,22 +306,23 @@ export function useToggleHabitLog() {
 
       if (!user) throw new Error("Unauthenticated");
 
-      const res = await fetch("/api/goals/logs", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: user.uid,
-          habitId,
-          date,
-          completed,
-          value: countLogged,
-          note,
-          quickTags,
-        }),
-      });
+      const logPayload = {
+        userId: user.uid,
+        habitId,
+        date,
+        completed,
+        value: countLogged,
+        note,
+        quickTags,
+      };
 
-      if (!res.ok) throw new Error("Failed to update habit log in MongoDB");
-      return res.json();
+      return executeOfflineMutation(logPayload, {
+        endpoint: "/api/goals/logs",
+        method: "POST",
+        type: "goals",
+        label: completed ? "Check off Habit" : "Uncheck Habit",
+        getOptimisticResult: () => ({ success: true, ...logPayload }),
+      });
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["habitLogs", user?.uid, variables.date] });
@@ -450,14 +449,16 @@ export function useLogWater() {
       }
       if (!user) throw new Error("Unauthenticated");
 
-      const res = await fetch("/api/goals/water", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user.uid, date, amount, mode: "add" }),
-      });
-      if (!res.ok) throw new Error("Failed to update water log in MongoDB");
-      const data = await res.json();
-      return { id: data._id || date, date: data.date || date, amount: data.amount };
+      return executeOfflineMutation(
+        { userId: user.uid, date, amount, mode: "add" },
+        {
+          endpoint: "/api/goals/water",
+          method: "POST",
+          type: "goals",
+          label: `Log Water (+${amount}ml)`,
+          getOptimisticResult: () => ({ id: date, date, amount }),
+        }
+      );
     },
     onSuccess: (_, variables) => {
       if (variables?.date) {
@@ -481,14 +482,16 @@ export function useSetWater() {
       }
       if (!user) throw new Error("Unauthenticated");
 
-      const res = await fetch("/api/goals/water", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user.uid, date, amount: next, mode: "set" }),
-      });
-      if (!res.ok) throw new Error("Failed to set water intake in MongoDB");
-      const data = await res.json();
-      return { id: data._id || date, date: data.date || date, amount: data.amount };
+      return executeOfflineMutation(
+        { userId: user.uid, date, amount: next, mode: "set" },
+        {
+          endpoint: "/api/goals/water",
+          method: "POST",
+          type: "goals",
+          label: `Set Water (${next}ml)`,
+          getOptimisticResult: () => ({ id: date, date, amount: next }),
+        }
+      );
     },
     onSuccess: (_, variables) => {
       if (variables?.date) {
@@ -537,13 +540,17 @@ export function useAddWorkout() {
       }
 
       if (!user) throw new Error("Unauthenticated");
-      const res = await fetch("/api/goals/workouts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user.uid, date, name, details }),
-      });
-      if (!res.ok) throw new Error("Failed to add workout to MongoDB");
-      return res.json();
+
+      return executeOfflineMutation(
+        { userId: user.uid, date, name, details },
+        {
+          endpoint: "/api/goals/workouts",
+          method: "POST",
+          type: "gym",
+          label: `Log Workout: ${name}`,
+          getOptimisticResult: () => ({ id: date, date, name, details, completed: false }),
+        }
+      );
     },
     onSuccess: (_, variables) => {
       if (variables?.date) {
@@ -894,14 +901,15 @@ export function useSaveMoodLog() {
       }
       if (!user) throw new Error("Unauthenticated");
 
-      const res = await fetch("/api/goals/mood", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user.uid, date, mood, energy, note }),
-      });
+      const moodPayload = { userId: user.uid, date, mood, energy, note };
 
-      if (!res.ok) throw new Error("Failed to save mood log to MongoDB");
-      return res.json();
+      return executeOfflineMutation(moodPayload, {
+        endpoint: "/api/goals/mood",
+        method: "POST",
+        type: "goals",
+        label: `Log Mood: ${mood}`,
+        getOptimisticResult: () => ({ success: true, ...moodPayload }),
+      });
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["moodLog", user?.uid, variables.date] });

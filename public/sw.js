@@ -22,11 +22,14 @@ self.addEventListener("push", (event) => {
 
   const options = {
     body: data.body,
-    icon: "/icons/icon-192.png",
-    badge: "/icons/icon-192.png",
-    vibrate: [200, 100, 200],
+    icon: "/icon.svg",
+    badge: "/icon.svg",
+    vibrate: [300, 100, 300, 100, 300],
     tag: "invictus-notification-" + Date.now(),
     renotify: true,
+    requireInteraction: true, // Force lockscreen persistence
+    silent: false,
+    timestamp: Date.now(),
     data: {
       url: data.url || "/today",
     },

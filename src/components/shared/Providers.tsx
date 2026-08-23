@@ -6,6 +6,8 @@ import { Toaster } from "sonner";
 import { AuthProvider } from "@/components/shared/AuthProvider";
 import { initReminderScheduler } from "@/lib/utils/reminder-scheduler";
 import { registerServiceWorker } from "@/lib/utils/notifications";
+import { syncEngine } from "@/lib/offline/sync-manager";
+import { OfflineStatusBanner } from "@/components/shared/OfflineStatusBanner";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -23,11 +25,15 @@ export function Providers({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     initReminderScheduler();
     registerServiceWorker().catch(() => {});
-  }, []);
+    syncEngine.registerQueryInvalidator(() => {
+      queryClient.invalidateQueries();
+    });
+  }, [queryClient]);
 
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <OfflineStatusBanner />
         {children}
         <Toaster
           position="top-center"

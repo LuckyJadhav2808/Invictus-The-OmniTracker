@@ -16,6 +16,8 @@ import { NeobrutalistTimeInput } from "@/components/shared/NeobrutalistTimeInput
 
 import { enableWebPushNotifications, triggerTestPushNotification } from "@/lib/utils/push-client";
 import { useAuth } from "@/components/shared/AuthProvider";
+import { isNativeApp, scheduleAllNativeAlarms } from "@/lib/native/native-notifications";
+import { triggerHaptic } from "@/lib/native/haptics";
 
 interface ReminderManagerModalProps {
   open: boolean;
@@ -44,7 +46,14 @@ export function ReminderManagerModal({
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Request browser notification permission if not yet granted
+    triggerHaptic("success");
+
+    // 1. If running as Native Android/iOS App, schedule hardware-level exact alarms
+    if (isNativeApp()) {
+      await scheduleAllNativeAlarms(config);
+    }
+
+    // 2. Request browser notification permission if not yet granted
     if (typeof window !== "undefined" && "Notification" in window && Notification.permission !== "granted") {
       const granted = await requestNotificationPermission();
       setPermissionState(granted ? "granted" : "denied");

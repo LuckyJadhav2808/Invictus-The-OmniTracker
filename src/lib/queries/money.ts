@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { type Category, type Transaction, type Debt } from "@/types";
-
 import { getCustomSession } from "@/lib/custom-auth";
+import { executeOfflineMutation } from "@/lib/offline/offline-mutation";
 
 const isGuestMode = () => {
   if (typeof window === "undefined") return false;
@@ -231,15 +231,17 @@ export function useAddTransaction() {
       }
 
       if (!user) throw new Error("Unauthenticated");
-      const txId = `tx_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
-      const res = await fetch("/api/money/transactions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: txId, userId: user.uid, ...transaction }),
-      });
 
-      if (!res.ok) throw new Error("Failed to save transaction to MongoDB");
-      return res.json();
+      const txId = `tx_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+      const txPayload = { id: txId, userId: user.uid, ...transaction };
+
+      return executeOfflineMutation(txPayload, {
+        endpoint: "/api/money/transactions",
+        method: "POST",
+        type: "money",
+        label: `Add ${transaction.type === "income" ? "Income" : "Expense"}: ₹${transaction.amount}`,
+        getOptimisticResult: () => txPayload,
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["transactions", user?.uid] });
@@ -579,15 +581,15 @@ export function useAddDebt() {
         return item;
       }
 
-      const res = await fetch("/api/money/debts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, ...newDebt }),
-      });
+      const debtPayload = { userId, ...newDebt };
 
-      if (!res.ok) throw new Error("Failed to create debt record");
-      const data = await res.json();
-      return data.debt;
+      return executeOfflineMutation(debtPayload, {
+        endpoint: "/api/money/debts",
+        method: "POST",
+        type: "money",
+        label: `Record ${newDebt.type === "lent" ? "Lent to" : "Borrowed from"} ${newDebt.personName}`,
+        getOptimisticResult: () => ({ id: `debt-${Date.now()}`, status: "pending", ...debtPayload }),
+      });
     },
     onSuccess: () => {
       const userId = getActiveUserId(user);

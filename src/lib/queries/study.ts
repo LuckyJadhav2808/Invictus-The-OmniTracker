@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { type Subject, type Topic, type StudySession, type Test } from "@/types";
+import { executeOfflineMutation } from "@/lib/offline/offline-mutation";
 
 const isGuestMode = () => {
   if (typeof window === "undefined") return false;
@@ -54,14 +55,16 @@ export function useAddSubject() {
       }
 
       if (!user) throw new Error("Unauthenticated");
-      const res = await fetch("/api/study/subjects", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, userId: user.uid, ...subject }),
-      });
 
-      if (!res.ok) throw new Error("Failed to add subject to MongoDB");
-      return res.json();
+      const subjectPayload = { id, userId: user.uid, ...subject };
+
+      return executeOfflineMutation(subjectPayload, {
+        endpoint: "/api/study/subjects",
+        method: "POST",
+        type: "study",
+        label: `Add Subject: ${subject.name}`,
+        getOptimisticResult: () => newSubject,
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["subjects", user?.uid] });
@@ -208,14 +211,16 @@ export function useAddTopic() {
       }
 
       if (!user) throw new Error("Unauthenticated");
-      const res = await fetch("/api/study/topics", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, userId: user.uid, ...topic }),
-      });
 
-      if (!res.ok) throw new Error("Failed to add topic to MongoDB");
-      return res.json();
+      const topicPayload = { id, userId: user.uid, ...topic };
+
+      return executeOfflineMutation(topicPayload, {
+        endpoint: "/api/study/topics",
+        method: "POST",
+        type: "study",
+        label: `Add Topic: ${topic.title}`,
+        getOptimisticResult: () => newTopic,
+      });
     },
     onSuccess: (_, variables: any) => {
       if (variables?.subjectId) {
@@ -349,14 +354,16 @@ export function useAddStudySession() {
       }
 
       if (!user) throw new Error("Unauthenticated");
-      const res = await fetch("/api/study/sessions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, userId: user.uid, ...session }),
-      });
 
-      if (!res.ok) throw new Error("Failed to add study session to MongoDB");
-      return res.json();
+      const sessionPayload = { id, userId: user.uid, ...session };
+
+      return executeOfflineMutation(sessionPayload, {
+        endpoint: "/api/study/sessions",
+        method: "POST",
+        type: "study",
+        label: `Log Study Session (${session.durationMinutes || 25}m)`,
+        getOptimisticResult: () => newSession,
+      });
     },
     onSuccess: (_, variables: any) => {
       if (variables?.subjectId) {
