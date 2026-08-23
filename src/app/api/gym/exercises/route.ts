@@ -362,43 +362,133 @@ function loadExercises(): GymExerciseItem[] {
 
 // Synonym/Alias Map for smart fuzzy searching
 const SEARCH_ALIASES: Record<string, string[]> = {
-  "pec": ["chest", "fly", "pec deck", "butterfly"],
-  "pec fly": ["pec deck", "fly", "chest fly", "cable fly", "machine fly"],
-  "chest fly": ["pec deck", "cable fly", "dumbbell fly", "pec fly"],
-  "preacher": ["ez-bar preacher", "preacher curl", "bicep curl", "arm curl"],
-  "preacher curl": ["ez-bar preacher", "bicep curl", "hammer curl"],
-  "lat": ["pulldown", "lat pulldown", "lats", "pullup", "row"],
-  "lat pulldown": ["pulldown", "lat", "cable down"],
-  "pulldown": ["lat pulldown", "lat", "cable down"],
-  "bench": ["bench press", "barbell bench", "chest press"],
-  "tricep": ["rope pushdown", "pushdown", "skullcrushers", "extension"],
-  "bicep": ["bicep curl", "hammer curl", "preacher curl"],
-  "lateral": ["lateral raise", "side delt", "shoulder raise"],
+  "pec": ["butterfly", "chest fly", "pec deck", "machine fly"],
+  "pec deck": ["butterfly", "chest fly", "pec deck", "machine fly"],
+  "pec fly": ["butterfly", "chest fly", "cable fly", "dumbbell fly"],
+  "chest fly": ["butterfly", "flat bench cable flyes", "dumbbell flyes", "pec deck"],
+  "bench press": ["barbell flat bench press", "barbell bench press", "chest press"],
+  "incline bench": ["incline dumbbell chest press", "incline barbell bench press", "incline bench"],
+  "incline dumbbell": ["incline dumbbell chest press", "incline dumbbell press"],
+  "preacher": ["ez-bar preacher curl", "cable preacher curl", "bicep curl"],
+  "preacher curl": ["ez-bar preacher curl", "cable preacher curl", "hammer curl"],
+  "lat": ["wide-grip lat pulldown", "close-grip front lat pulldown", "lat pulldown", "pullup", "row"],
+  "lat pulldown": ["wide-grip lat pulldown", "close-grip front lat pulldown", "lat pulldown"],
+  "pulldown": ["wide-grip lat pulldown", "close-grip front lat pulldown", "lat pulldown"],
+  "seated row": ["seated cable row", "seated cable rows", "cable row"],
+  "cable row": ["seated cable row", "seated cable rows", "low pulley row"],
+  "bench": ["barbell flat bench press", "barbell bench press", "dumbbell bench press"],
+  "tricep": ["triceps pushdown", "rope pushdown", "skullcrushers", "lying triceps extension"],
+  "tricep pushdown": ["triceps pushdown - rope attachment", "triceps pushdown", "rope pushdown"],
+  "triceps pushdown": ["triceps pushdown - rope attachment", "triceps pushdown"],
+  "tricep extension": ["cable lying triceps extension", "lying triceps extension", "triceps pushdown"],
+  "bicep": ["dumbbell alternate bicep curl", "bicep curl", "hammer curl", "ez-bar preacher curl"],
+  "bicep curl": ["dumbbell alternate bicep curl", "biceps curl", "barbell curl"],
+  "biceps curl": ["dumbbell alternate bicep curl", "biceps curl", "barbell curl"],
+  "hammer curl": ["hammer curls", "dumbbell hammer curl", "bicep curl"],
+  "lateral": ["dumbbell lateral raise", "side lateral raise", "shoulder raise"],
+  "lateral raise": ["dumbbell lateral raise", "side lateral raise"],
+  "side raise": ["dumbbell lateral raise", "side lateral raise"],
+  "shoulder press": ["standing military press", "overhead barbell press", "dumbbell shoulder press"],
+  "overhead press": ["standing military press", "overhead barbell press"],
+  "military press": ["standing military press", "overhead barbell press"],
   "rdl": ["romanian deadlift", "deadlift", "hamstring"],
-  "squat": ["barbell squat", "back squat", "leg press"],
+  "deadlift": ["axle deadlift", "barbell deadlift", "romanian deadlift"],
+  "squat": ["barbell back squat", "barbell full squat", "squat", "leg press"],
+  "leg press": ["incline leg press", "leg press"],
+  "leg extension": ["leg extensions", "leg extension"],
+  "leg curl": ["lying leg curls", "seated leg curl", "hamstring curl"],
+  "hamstring curl": ["lying leg curls", "seated leg curl"],
+  "calf raise": ["standing calf raises", "seated calf raise"],
+  "face pull": ["face pull", "cable rear delt"],
+  "skull crusher": ["cable lying triceps extension", "lying triceps extension"],
+  "skull crushers": ["cable lying triceps extension", "lying triceps extension"],
 };
+
+function normalizeText(s: string): string {
+  return (s || "").toLowerCase().replace(/[^a-z0-9]/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function findBestGuideExercise(
+  allExercises: GymExerciseItem[],
+  query: string,
+  targetMuscle?: string
+): GymExerciseItem | null {
+  if (!query) return null;
+  const qNorm = normalizeText(query);
+  const qWords = qNorm.split(" ").filter((w) => w.length > 2);
+
+  // 1. Direct match
+  const directMatch = allExercises.find(
+    (e) =>
+      normalizeText(e.title) === qNorm ||
+      normalizeText(e.id) === qNorm ||
+      normalizeText(e.title).includes(qNorm) ||
+      qNorm.includes(normalizeText(e.title))
+  );
+  if (directMatch) return directMatch;
+
+  // 2. Alias dictionary lookup
+  for (const [key, list] of Object.entries(SEARCH_ALIASES)) {
+    if (qNorm.includes(key) || key.includes(qNorm)) {
+      for (const alias of list) {
+        const found = allExercises.find((e) => normalizeText(e.title).includes(normalizeText(alias)));
+        if (found) return found;
+      }
+    }
+  }
+
+  // 3. Word token stem scoring
+  if (qWords.length > 0) {
+    const scored = allExercises
+      .map((e) => {
+        const eNorm = normalizeText(e.title);
+        let score = 0;
+        for (const w of qWords) {
+          const stem = w.replace(/s$/, "").replace(/ing$/, "").replace(/es$/, "");
+          if (eNorm.includes(stem)) score += 3;
+          if (normalizeText(e.bodyPart).includes(stem)) score += 2;
+          if (normalizeText(e.equipment).includes(stem)) score += 1;
+        }
+        return { e, score };
+      })
+      .filter((x) => x.score > 0)
+      .sort((a, b) => b.score - a.score);
+
+    if (scored.length > 0) return scored[0].e;
+  }
+
+  // 4. Target muscle fallback
+  if (targetMuscle) {
+    const mNorm = normalizeText(targetMuscle);
+    const muscleMatch = allExercises.find(
+      (e) =>
+        normalizeText(e.bodyPart).includes(mNorm) ||
+        mNorm.includes(normalizeText(e.bodyPart)) ||
+        (e.primaryMuscles || []).some(
+          (m) => normalizeText(m).includes(mNorm) || mNorm.includes(normalizeText(m))
+        )
+    );
+    if (muscleMatch) return muscleMatch;
+  }
+
+  return allExercises[0] || null;
+}
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const query = (searchParams.get("q") || "").toLowerCase().trim();
     const nameLookup = (searchParams.get("name") || "").toLowerCase().trim();
-    const bodyPart = (searchParams.get("bodyPart") || "").toLowerCase().trim();
+    const bodyPart = (searchParams.get("bodyPart") || searchParams.get("targetMuscle") || "").toLowerCase().trim();
     const equipment = (searchParams.get("equipment") || "").toLowerCase().trim();
     const level = (searchParams.get("level") || "").toLowerCase().trim();
     const limit = parseInt(searchParams.get("limit") || "40", 10);
 
     const allExercises = loadExercises();
 
-    // 1. Direct Name / Guide Lookup
+    // 1. Direct Name / Guide Lookup with Smart Fuzzy Matcher
     if (nameLookup) {
-      const match = allExercises.find(
-        (ex) =>
-          ex.title.toLowerCase() === nameLookup ||
-          ex.id.toLowerCase() === nameLookup ||
-          ex.title.toLowerCase().includes(nameLookup) ||
-          nameLookup.includes(ex.title.toLowerCase())
-      );
+      const match = findBestGuideExercise(allExercises, nameLookup, bodyPart);
       if (match) {
         return NextResponse.json({ success: true, exercise: match });
       }
