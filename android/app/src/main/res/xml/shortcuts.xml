@@ -4,7 +4,7 @@
     <shortcut
         android:shortcutId="quick_expense"
         android:enabled="true"
-        android:icon="@drawable/ic_stat_icon"
+        android:icon="@drawable/ic_shortcut_expense"
         android:shortcutShortLabel="@string/shortcut_quick_expense_short"
         android:shortcutLongLabel="@string/shortcut_quick_expense_long">
         <intent
@@ -19,7 +19,7 @@
     <shortcut
         android:shortcutId="quick_habit"
         android:enabled="true"
-        android:icon="@drawable/ic_stat_icon"
+        android:icon="@drawable/ic_shortcut_habits"
         android:shortcutShortLabel="@string/shortcut_check_habits_short"
         android:shortcutLongLabel="@string/shortcut_check_habits_long">
         <intent
@@ -27,13 +27,14 @@
             android:targetPackage="com.invictus.omnitracker"
             android:targetClass="com.invictus.omnitracker.MainActivity"
             android:data="https://invictus-the-omni-tracker.vercel.app/goals?action=quick-habit" />
+        <categories android:name="android.shortcut.conversation" />
     </shortcut>
 
     <!-- 3. Today's Gym Split Shortcut -->
     <shortcut
         android:shortcutId="gym_workout"
         android:enabled="true"
-        android:icon="@drawable/ic_stat_icon"
+        android:icon="@drawable/ic_shortcut_gym"
         android:shortcutShortLabel="@string/shortcut_gym_workout_short"
         android:shortcutLongLabel="@string/shortcut_gym_workout_long">
         <intent
@@ -41,19 +42,21 @@
             android:targetPackage="com.invictus.omnitracker"
             android:targetClass="com.invictus.omnitracker.MainActivity"
             android:data="https://invictus-the-omni-tracker.vercel.app/goals?tab=gym" />
+        <categories android:name="android.shortcut.conversation" />
     </shortcut>
 
     <!-- 4. Log Study Session Shortcut -->
     <shortcut
         android:shortcutId="log_study"
         android:enabled="true"
-        android:icon="@drawable/ic_stat_icon"
+        android:icon="@drawable/ic_shortcut_study"
         android:shortcutShortLabel="@string/shortcut_log_study_short"
         android:shortcutLongLabel="@string/shortcut_log_study_long">
         <intent
             android:action="android.intent.action.VIEW"
             android:targetPackage="com.invictus.omnitracker"
             android:targetClass="com.invictus.omnitracker.MainActivity"
-            android:data="https://invictus-the-omni-tracker.vercel.app/study?tab=subjects" />
+            android:data="https://invictus-the-omni-tracker.vercel.app/study" />
+        <categories android:name="android.shortcut.conversation" />
     </shortcut>
 </shortcuts>
