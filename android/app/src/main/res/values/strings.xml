@@ -4,4 +4,14 @@
     <string name="title_activity_main">Invictus</string>
     <string name="package_name">com.invictus.omnitracker</string>
     <string name="custom_url_scheme">com.invictus.omnitracker</string>
+
+    <!-- App Shortcuts Strings -->
+    <string name="shortcut_quick_expense_short">Quick Expense</string>
+    <string name="shortcut_quick_expense_long">Log Instant Expense</string>
+    <string name="shortcut_check_habits_short">Check Habits</string>
+    <string name="shortcut_check_habits_long">Check Today\'s Habits</string>
+    <string name="shortcut_gym_workout_short">Gym Workout</string>
+    <string name="shortcut_gym_workout_long">Today\'s Workout Split</string>
+    <string name="shortcut_log_study_short">Log Study</string>
+    <string name="shortcut_log_study_long">Log Study Session</string>
 </resources>
