@@ -190,8 +190,8 @@ export function NeobrutalistCalculator() {
 
   return (
     <>
-      {/* 1. Floating Neobrutalist Trigger Button (Placed safely above mobile bottom-nav) */}
-      <div className="fixed bottom-20 right-3.5 sm:bottom-6 sm:right-6 z-30 select-none">
+      {/* 1. Floating Neobrutalist Trigger Button (Placed safely on bottom-left, away from FAB on right) */}
+      <div className="fixed bottom-20 left-3.5 sm:bottom-6 sm:left-6 z-30 select-none">
         <button
           type="button"
           onClick={() => setIsOpen((prev) => !prev)}
@@ -220,7 +220,7 @@ export function NeobrutalistCalculator() {
 
           <div
             ref={containerRef}
-            className="fixed bottom-34 right-3.5 sm:bottom-22 sm:right-6 z-50 w-[310px] sm:w-[330px] rounded-3xl bg-[#FAF8F5] border-3 border-[#161514] shadow-[6px_6px_0px_0px_rgba(22,21,20,1)] p-4 space-y-3 animate-in fade-in zoom-in-95 duration-150 select-none"
+            className="fixed bottom-34 left-3.5 sm:bottom-22 sm:left-6 z-50 w-[310px] sm:w-[330px] rounded-3xl bg-[#FAF8F5] border-3 border-[#161514] shadow-[6px_6px_0px_0px_rgba(22,21,20,1)] p-4 space-y-3 animate-in fade-in zoom-in-95 duration-150 select-none"
           >
             {/* Header Strip */}
             <div className="flex items-center justify-between pb-1 border-b-2 border-[#161514]/15">
