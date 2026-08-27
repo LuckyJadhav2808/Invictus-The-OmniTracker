@@ -1,12 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { Button } from "@/components/ui/button";
-import { LogOut, Settings, User, Sparkles, ShieldCheck, Database, Bell, Sliders, ArrowRight, Trophy } from "lucide-react";
+import { LogOut, Settings, User, Sparkles, ShieldCheck, Database, Bell, Sliders, ArrowRight, Trophy, RefreshCw } from "lucide-react";
 import Link from "next/link";
+import { UpdateCheckModal } from "@/components/shared/UpdateCheckModal";
+import { APP_VERSION_CONFIG } from "@/config/version";
 
 export default function ProfilePage() {
   const { user, signOut } = useAuth();
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-cream-bg p-4 md:p-8 space-y-6">
@@ -20,30 +24,46 @@ export default function ProfilePage() {
           >
             USER PROFILE & ENGINE
           </h1>
-          <span className="bg-amber-400 text-navy-950 text-[10px] font-black uppercase px-3 py-1 rounded-xl border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)]">
-            INVICTUS PRO
-          </span>
+          <button
+            type="button"
+            onClick={() => setIsUpdateModalOpen(true)}
+            className="bg-[#CEF431] hover:bg-[#bce022] text-[#161514] text-[10px] font-black uppercase px-3 py-1 rounded-xl border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] flex items-center gap-1.5 cursor-pointer active:translate-x-0.5 active:translate-y-0.5 transition-all"
+          >
+            <span>⚡ v{APP_VERSION_CONFIG.version}</span>
+          </button>
         </div>
 
         {/* User Info Card */}
         <div className="bg-white rounded-3xl p-6 border-2.5 border-navy-950 shadow-[6px_6px_0px_0px_rgba(31,36,48,1)] space-y-5">
-          <div className="flex items-center gap-4">
-            <div className="h-16 w-16 rounded-2xl bg-amber-400 border-2 border-navy-950 flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] shrink-0">
-              <User className="h-8 w-8 text-navy-950 stroke-[2.5]" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="h-16 w-16 rounded-2xl bg-amber-400 border-2 border-navy-950 flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] shrink-0">
+                <User className="h-8 w-8 text-navy-950 stroke-[2.5]" />
+              </div>
+              <div>
+                <p className="font-black text-lg text-navy-950 tracking-tight" style={{ fontFamily: "var(--font-heading)" }}>
+                  {user?.displayName || "Invictus Explorer"}
+                </p>
+                <p className="text-navy-700 text-xs font-bold">{user?.email}</p>
+                <span className="inline-block mt-1 bg-emerald-100 text-emerald-900 border border-emerald-950 text-[9px] font-black px-2 py-0.5 rounded-md">
+                  Active Session
+                </span>
+              </div>
             </div>
-            <div>
-              <p className="font-black text-lg text-navy-950 tracking-tight" style={{ fontFamily: "var(--font-heading)" }}>
-                {user?.displayName || "Invictus Explorer"}
-              </p>
-              <p className="text-navy-700 text-xs font-bold">{user?.email}</p>
-              <span className="inline-block mt-1 bg-emerald-100 text-emerald-900 border border-emerald-950 text-[9px] font-black px-2 py-0.5 rounded-md">
-                Active Session
-              </span>
-            </div>
+
+            <button
+              type="button"
+              onClick={() => setIsUpdateModalOpen(true)}
+              className="p-2.5 rounded-2xl bg-[#FAF8F5] hover:bg-white border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] text-navy-950 text-xs font-black flex items-center gap-1.5 cursor-pointer active:translate-x-0.5 active:translate-y-0.5 transition-all shrink-0"
+              title="Check for updates"
+            >
+              <RefreshCw className="h-4 w-4" />
+              <span className="hidden sm:inline">Updates</span>
+            </button>
           </div>
         </div>
 
-        {/* Issue 3 Fix: Prominent Settings Discovery Hero Card */}
+        {/* Prominent Settings Discovery Hero Card */}
         <div className="bg-gradient-to-br from-[#CEF431] via-[#03D26F] to-[#EAF4F4] rounded-3xl p-6 border-2.5 border-navy-950 shadow-[6px_6px_0px_0px_rgba(31,36,48,1)] space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <span className="bg-white text-navy-950 px-3 py-1 rounded-xl text-xs font-black border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] uppercase tracking-wider flex items-center gap-1.5 whitespace-nowrap shrink-0 self-start sm:self-auto">
@@ -66,6 +86,7 @@ export default function ProfilePage() {
           {/* Quick Features Badges */}
           <div className="flex flex-wrap gap-1.5 pt-1">
             {[
+              { label: "⚡ v1.2.0 Updates", icon: "⚡" },
               { label: "⏰ Global Wake-Up", icon: "⏰" },
               { label: "🏆 Badges & XP", icon: "🏆" },
               { label: "📂 Habit Groups", icon: "📂" },
@@ -110,6 +131,12 @@ export default function ProfilePage() {
         </div>
 
       </div>
+
+      {/* In-App Update Modal */}
+      <UpdateCheckModal
+        open={isUpdateModalOpen}
+        onOpenChange={setIsUpdateModalOpen}
+      />
     </div>
   );
 }
