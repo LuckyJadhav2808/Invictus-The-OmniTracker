@@ -191,22 +191,23 @@ export function useDeleteCategory() {
 
 export function useTransactions() {
   const { user } = useAuth();
+  const userId = getActiveUserId(user);
 
   return useQuery<Transaction[]>({
-    queryKey: ["transactions", user?.uid],
+    queryKey: ["transactions", userId],
     queryFn: async () => {
       if (isGuestMode()) {
         const local = localStorage.getItem("invictus_transactions");
         return local ? JSON.parse(local) : [];
       }
-      if (!user) return [];
+      if (!userId) return [];
 
-      const res = await fetch(`/api/money/transactions?userId=${user.uid}`);
+      const res = await fetch(`/api/money/transactions?userId=${userId}`);
       if (!res.ok) return [];
       const list = await res.json();
       return list.map((t: any) => ({ ...t, id: t.id || t._id }));
     },
-    enabled: !!user || isGuestMode(),
+    enabled: !!userId || isGuestMode(),
   });
 }
 
@@ -216,6 +217,7 @@ export function useAddTransaction() {
 
   return useMutation({
     mutationFn: async (transaction: Omit<Transaction, "id" | "createdAt" | "updatedAt">) => {
+      const userId = getActiveUserId(user);
       if (isGuestMode()) {
         const local = localStorage.getItem("invictus_transactions");
         const list = local ? JSON.parse(local) : [];
@@ -230,10 +232,10 @@ export function useAddTransaction() {
         return newTransaction;
       }
 
-      if (!user) throw new Error("Unauthenticated");
+      if (!userId) throw new Error("Unauthenticated");
 
       const txId = `tx_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
-      const txPayload = { id: txId, userId: user.uid, ...transaction };
+      const txPayload = { id: txId, userId, ...transaction };
 
       return executeOfflineMutation(txPayload, {
         endpoint: "/api/money/transactions",
@@ -244,7 +246,10 @@ export function useAddTransaction() {
       });
     },
     onSuccess: () => {
+      const userId = getActiveUserId(user);
+      queryClient.invalidateQueries({ queryKey: ["transactions", userId] });
       queryClient.invalidateQueries({ queryKey: ["transactions", user?.uid] });
+      queryClient.invalidateQueries({ queryKey: ["categories", userId] });
     },
   });
 }
@@ -255,6 +260,7 @@ export function useDeleteTransaction() {
 
   return useMutation({
     mutationFn: async (transactionId: string) => {
+      const userId = getActiveUserId(user);
       if (isGuestMode()) {
         const local = localStorage.getItem("invictus_transactions");
         const list = local ? JSON.parse(local) : [];
@@ -263,8 +269,8 @@ export function useDeleteTransaction() {
         return transactionId;
       }
 
-      if (!user) throw new Error("Unauthenticated");
-      const res = await fetch(`/api/money/transactions?id=${transactionId}&userId=${user.uid}`, {
+      if (!userId) throw new Error("Unauthenticated");
+      const res = await fetch(`/api/money/transactions?id=${transactionId}&userId=${userId}`, {
         method: "DELETE",
       });
 
@@ -272,7 +278,10 @@ export function useDeleteTransaction() {
       return transactionId;
     },
     onSuccess: () => {
+      const userId = getActiveUserId(user);
+      queryClient.invalidateQueries({ queryKey: ["transactions", userId] });
       queryClient.invalidateQueries({ queryKey: ["transactions", user?.uid] });
+      queryClient.invalidateQueries({ queryKey: ["categories", userId] });
     },
   });
 }
@@ -283,6 +292,7 @@ export function useUpdateTransaction() {
 
   return useMutation({
     mutationFn: async (transaction: Partial<Transaction> & { id: string }) => {
+      const userId = getActiveUserId(user);
       if (isGuestMode()) {
         const local = localStorage.getItem("invictus_transactions");
         const list = local ? JSON.parse(local) : [];
@@ -294,18 +304,21 @@ export function useUpdateTransaction() {
         return transaction;
       }
 
-      if (!user) throw new Error("Unauthenticated");
+      if (!userId) throw new Error("Unauthenticated");
       const res = await fetch("/api/money/transactions", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user.uid, ...transaction }),
+        body: JSON.stringify({ userId, ...transaction }),
       });
 
       if (!res.ok) throw new Error("Failed to update transaction in MongoDB");
       return res.json();
     },
     onSuccess: () => {
+      const userId = getActiveUserId(user);
+      queryClient.invalidateQueries({ queryKey: ["transactions", userId] });
       queryClient.invalidateQueries({ queryKey: ["transactions", user?.uid] });
+      queryClient.invalidateQueries({ queryKey: ["categories", userId] });
     },
   });
 }
@@ -697,4 +710,3 @@ export function useDeleteDebt() {
     },
   });
 }
-
