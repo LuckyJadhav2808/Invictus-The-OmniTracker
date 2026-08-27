@@ -11,6 +11,9 @@ import { useUIStore } from "@/store/ui-store";
 import { cn } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
 
+import { Suspense } from "react";
+import { QuickActionModal } from "@/components/shared/QuickActionModal";
+
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -64,8 +67,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     );
   }
 
-
-
   return (
     <div
       className={cn(
@@ -106,6 +107,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </footer>
       </main>
       <NeobrutalistCalculator />
+      <Suspense fallback={null}>
+        <QuickActionModal />
+      </Suspense>
       <BottomNav />
     </div>
   );
