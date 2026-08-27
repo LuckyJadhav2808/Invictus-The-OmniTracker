@@ -11,7 +11,7 @@
             android:action="android.intent.action.VIEW"
             android:targetPackage="com.invictus.omnitracker"
             android:targetClass="com.invictus.omnitracker.MainActivity"
-            android:data="https://invictus-the-omnitracker.vercel.app/money?action=quick-expense" />
+            android:data="https://invictus-the-omni-tracker.vercel.app/money?action=quick-expense" />
         <categories android:name="android.shortcut.conversation" />
     </shortcut>
 
@@ -26,7 +26,7 @@
             android:action="android.intent.action.VIEW"
             android:targetPackage="com.invictus.omnitracker"
             android:targetClass="com.invictus.omnitracker.MainActivity"
-            android:data="https://invictus-the-omnitracker.vercel.app/goals?action=quick-habit" />
+            android:data="https://invictus-the-omni-tracker.vercel.app/goals?action=quick-habit" />
     </shortcut>
 
     <!-- 3. Today's Gym Split Shortcut -->
@@ -40,7 +40,7 @@
             android:action="android.intent.action.VIEW"
             android:targetPackage="com.invictus.omnitracker"
             android:targetClass="com.invictus.omnitracker.MainActivity"
-            android:data="https://invictus-the-omnitracker.vercel.app/goals?tab=gym" />
+            android:data="https://invictus-the-omni-tracker.vercel.app/goals?tab=gym" />
     </shortcut>
 
     <!-- 4. Log Study Session Shortcut -->
@@ -54,6 +54,6 @@
             android:action="android.intent.action.VIEW"
             android:targetPackage="com.invictus.omnitracker"
             android:targetClass="com.invictus.omnitracker.MainActivity"
-            android:data="https://invictus-the-omnitracker.vercel.app/study?tab=subjects" />
+            android:data="https://invictus-the-omni-tracker.vercel.app/study?tab=subjects" />
     </shortcut>
 </shortcuts>
