@@ -322,38 +322,40 @@ function GoalsPageContent() {
           </div>
         </div>
 
-        {/* Tab Controls */}
+        {/* Tab Controls (Horizontally scrollable on mobile, inline on desktop) */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="bg-[#FAF8F5] rounded-2xl p-1.5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] grid grid-cols-2 sm:grid-cols-4 gap-1.5 w-full max-w-[620px] mb-6 h-auto">
-            <TabsTrigger
-              value="list"
-              className="rounded-xl text-xs font-black py-2.5 px-2 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] text-[#161514]/70 hover:text-[#161514] transition-all cursor-pointer flex items-center justify-center gap-1.5"
-            >
-              <span>🌱</span>
-              <span className="truncate">Habits & Life</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="gym"
-              className="rounded-xl text-xs font-black py-2.5 px-2 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] text-[#161514]/70 hover:text-[#161514] transition-all cursor-pointer flex items-center justify-center gap-1.5"
-            >
-              <span>🏋️</span>
-              <span className="truncate">Gym & Meals</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="calendar"
-              className="rounded-xl text-xs font-black py-2.5 px-2 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] text-[#161514]/70 hover:text-[#161514] transition-all cursor-pointer flex items-center justify-center gap-1.5"
-            >
-              <span>📅</span>
-              <span className="truncate">Calendar</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="analytics"
-              className="rounded-xl text-xs font-black py-2.5 px-2 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] text-[#161514]/70 hover:text-[#161514] transition-all cursor-pointer flex items-center justify-center gap-1.5"
-            >
-              <span>📊</span>
-              <span className="truncate">Analytics</span>
-            </TabsTrigger>
-          </TabsList>
+          <div className="w-full overflow-x-auto no-scrollbar pb-1 mb-5">
+            <TabsList className="bg-[#FAF8F5] rounded-2xl p-1.5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] flex items-center gap-1.5 w-max min-w-full sm:min-w-0 sm:w-auto">
+              <TabsTrigger
+                value="list"
+                className="rounded-xl text-xs font-black py-2 px-3.5 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
+              >
+                <span>🌱</span>
+                <span>Habits & Life</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="gym"
+                className="rounded-xl text-xs font-black py-2 px-3.5 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
+              >
+                <span>🏋️</span>
+                <span>Gym & Meals</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="calendar"
+                className="rounded-xl text-xs font-black py-2 px-3.5 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
+              >
+                <span>📅</span>
+                <span>Calendar</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="analytics"
+                className="rounded-xl text-xs font-black py-2 px-3.5 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
+              >
+                <span>📊</span>
+                <span>Analytics</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* Tab 2: Gym & Meals Workspace (Dedicated full-width view) */}
           <TabsContent value="gym" className="space-y-6 outline-none">
@@ -427,8 +429,8 @@ function GoalsPageContent() {
                               <button
                                 type="button"
                                 onClick={(e) => {
-                                   e.stopPropagation();
-                                   handleToggleLog(habit.id, !isDone);
+                                  e.stopPropagation();
+                                  handleToggleLog(habit.id, !isDone);
                                 }}
                                 className={cn(
                                   "h-8 w-8 rounded-xl border-2 border-navy-950 flex items-center justify-center font-black text-sm transition-all cursor-pointer shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)]",
