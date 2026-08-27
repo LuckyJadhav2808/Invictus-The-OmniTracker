@@ -57,6 +57,8 @@ import { toast } from "sonner";
 import { SubscriptionsTracker } from "@/components/money/SubscriptionsTracker";
 import { ReminderManagerModal } from "@/components/shared/ReminderManagerModal";
 import { ReportIssueModal } from "@/components/shared/ReportIssueModal";
+import { UpdateCheckModal } from "@/components/shared/UpdateCheckModal";
+import { APP_VERSION_CONFIG } from "@/config/version";
 
 const TIMEZONES = [
   "Asia/Kolkata",
@@ -136,6 +138,7 @@ export default function SettingsPage() {
   const [isCSVModalOpen, setIsCSVModalOpen] = useState(false);
   const [isWidgetVariantsOpen, setIsWidgetVariantsOpen] = useState(false);
   const [isReportIssueOpen, setIsReportIssueOpen] = useState(false);
+  const [isUpdateCheckOpen, setIsUpdateCheckOpen] = useState(false);
 
   // Reminders & Audio feedback states
   const [smartReminders, setSmartReminders] = useState(true);
@@ -1094,6 +1097,45 @@ export default function SettingsPage() {
             </div>
           </div>
         </ResponsiveFormContainer>
+
+        {/* SYSTEM & APP UPDATES SECTION */}
+        <div className="space-y-3 pt-2">
+          <span className="text-[10px] font-black text-navy-700 uppercase tracking-widest px-1">
+            SYSTEM & APP UPDATES
+          </span>
+
+          <button
+            type="button"
+            onClick={() => setIsUpdateCheckOpen(true)}
+            className="w-full bg-white hover:bg-cream-bg/50 rounded-2xl p-4 border-2 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] flex items-center justify-between transition-all cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5"
+          >
+            <div className="flex items-center gap-3.5">
+              <div className="h-11 w-11 rounded-xl bg-[#CEF431] border-2 border-navy-950 flex items-center justify-center text-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] shrink-0 font-black text-lg">
+                ⚡
+              </div>
+              <div className="text-left">
+                <div className="flex items-center gap-2">
+                  <h4 className="font-black text-sm text-navy-950 tracking-tight uppercase" style={{ fontFamily: "var(--font-heading)" }}>
+                    APP VERSION & UPDATES
+                  </h4>
+                  <span className="bg-[#CEF431] text-[#161514] font-black text-[9px] px-2 py-0.5 rounded-full border border-navy-950">
+                    v{APP_VERSION_CONFIG.version}
+                  </span>
+                </div>
+                <p className="text-[10px] text-navy-700 font-bold uppercase tracking-wide">
+                  CHECK FOR UPDATES • RELEASE NOTES • APK DOWNLOAD
+                </p>
+              </div>
+            </div>
+            <ChevronRight className="h-5 w-5 text-navy-950 stroke-[3]" />
+          </button>
+        </div>
+
+        {/* Update Checker Modal */}
+        <UpdateCheckModal
+          open={isUpdateCheckOpen}
+          onOpenChange={setIsUpdateCheckOpen}
+        />
 
         {/* ACCOUNT SECTION */}
         <div className="space-y-3 pt-2">
