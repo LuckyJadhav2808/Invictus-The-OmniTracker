@@ -7,16 +7,22 @@ export const HabitFrequencySchema = z.object({
 });
 
 export const HabitSchema = z.object({
-  id: z.string(),
+  id: z.string().optional(),
   title: z.string().min(1, "Please enter a habit title"),
   icon: z.string().default("Target"),
   color: z.string().default("amber"),
-  frequency: HabitFrequencySchema,
-  reminderTime: z.string().optional(),
+  frequency: HabitFrequencySchema.default({ type: "daily", targetPerDay: 1 }),
+  reminderTime: z.string().optional().nullable(),
   allowGraceSkip: z.boolean().default(false),
   isGoalStyle: z.boolean().default(false),
-  goalTarget: z.number().optional(),
-  goalUnit: z.string().optional(),
+  goalTarget: z
+    .preprocess((val) => {
+      if (val === "" || val === null || val === undefined || Number.isNaN(val)) return undefined;
+      const num = Number(val);
+      return Number.isNaN(num) ? undefined : num;
+    }, z.number().optional())
+    .optional(),
+  goalUnit: z.string().optional().nullable(),
   archived: z.boolean().default(false),
   createdAt: z.any().optional(),
   updatedAt: z.any().optional(),
