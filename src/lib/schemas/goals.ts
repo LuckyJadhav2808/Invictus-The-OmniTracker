@@ -7,7 +7,7 @@ export const HabitFrequencySchema = z.object({
 });
 
 export const HabitSchema = z.object({
-  id: z.string().optional(),
+  id: z.string(),
   title: z.string().min(1, "Please enter a habit title"),
   icon: z.string().default("Target"),
   color: z.string().default("amber"),
