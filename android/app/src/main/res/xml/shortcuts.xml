@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- 1. Quick Expense Shortcut (Triggerable via Home Screen Long Press, Pixel Back-Tap, or Samsung Side Key) -->
+    <!-- 1. Quick Expense Shortcut -->
     <shortcut
         android:shortcutId="quick_expense"
         android:enabled="true"
         android:icon="@drawable/ic_stat_icon"
-        android:shortcutShortLabel="Quick Expense"
-        android:shortcutLongLabel="Log Instant Expense (₹)">
+        android:shortcutShortLabel="@string/shortcut_quick_expense_short"
+        android:shortcutLongLabel="@string/shortcut_quick_expense_long">
         <intent
             android:action="android.intent.action.VIEW"
             android:targetPackage="com.invictus.omnitracker"
@@ -20,8 +20,8 @@
         android:shortcutId="quick_habit"
         android:enabled="true"
         android:icon="@drawable/ic_stat_icon"
-        android:shortcutShortLabel="Check Habits"
-        android:shortcutLongLabel="Check Today's Habits">
+        android:shortcutShortLabel="@string/shortcut_check_habits_short"
+        android:shortcutLongLabel="@string/shortcut_check_habits_long">
         <intent
             android:action="android.intent.action.VIEW"
             android:targetPackage="com.invictus.omnitracker"
@@ -34,8 +34,8 @@
         android:shortcutId="gym_workout"
         android:enabled="true"
         android:icon="@drawable/ic_stat_icon"
-        android:shortcutShortLabel="Gym Workout"
-        android:shortcutLongLabel="Today's Workout &amp; Form Guides">
+        android:shortcutShortLabel="@string/shortcut_gym_workout_short"
+        android:shortcutLongLabel="@string/shortcut_gym_workout_long">
         <intent
             android:action="android.intent.action.VIEW"
             android:targetPackage="com.invictus.omnitracker"
@@ -48,8 +48,8 @@
         android:shortcutId="log_study"
         android:enabled="true"
         android:icon="@drawable/ic_stat_icon"
-        android:shortcutShortLabel="Log Study"
-        android:shortcutLongLabel="Log Study &amp; GATE Tracker">
+        android:shortcutShortLabel="@string/shortcut_log_study_short"
+        android:shortcutLongLabel="@string/shortcut_log_study_long">
         <intent
             android:action="android.intent.action.VIEW"
             android:targetPackage="com.invictus.omnitracker"
