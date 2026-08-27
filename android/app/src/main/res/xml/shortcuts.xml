@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 1. Quick Expense Shortcut (Triggerable via Home Screen Long Press, Pixel Back-Tap, or Samsung Side Key) -->
+    <shortcut
+        android:shortcutId="quick_expense"
+        android:enabled="true"
+        android:icon="@drawable/ic_stat_icon"
+        android:shortcutShortLabel="Quick Expense"
+        android:shortcutLongLabel="Log Instant Expense (₹)">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.invictus.omnitracker"
+            android:targetClass="com.invictus.omnitracker.MainActivity"
+            android:data="https://invictus-the-omnitracker.vercel.app/money?action=quick-expense" />
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+
+    <!-- 2. Quick Habit Check Shortcut -->
+    <shortcut
+        android:shortcutId="quick_habit"
+        android:enabled="true"
+        android:icon="@drawable/ic_stat_icon"
+        android:shortcutShortLabel="Check Habits"
+        android:shortcutLongLabel="Check Today's Habits">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.invictus.omnitracker"
+            android:targetClass="com.invictus.omnitracker.MainActivity"
+            android:data="https://invictus-the-omnitracker.vercel.app/goals?action=quick-habit" />
+    </shortcut>
+
+    <!-- 3. Today's Gym Split Shortcut -->
+    <shortcut
+        android:shortcutId="gym_workout"
+        android:enabled="true"
+        android:icon="@drawable/ic_stat_icon"
+        android:shortcutShortLabel="Gym Workout"
+        android:shortcutLongLabel="Today's Workout &amp; Form Guides">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.invictus.omnitracker"
+            android:targetClass="com.invictus.omnitracker.MainActivity"
+            android:data="https://invictus-the-omnitracker.vercel.app/goals?tab=gym" />
+    </shortcut>
+
+    <!-- 4. Log Study Session Shortcut -->
+    <shortcut
+        android:shortcutId="log_study"
+        android:enabled="true"
+        android:icon="@drawable/ic_stat_icon"
+        android:shortcutShortLabel="Log Study"
+        android:shortcutLongLabel="Log Study &amp; GATE Tracker">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.invictus.omnitracker"
+            android:targetClass="com.invictus.omnitracker.MainActivity"
+            android:data="https://invictus-the-omnitracker.vercel.app/study?tab=subjects" />
+    </shortcut>
+</shortcuts>
