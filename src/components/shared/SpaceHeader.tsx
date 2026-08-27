@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useUIStore } from "@/store/ui-store";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Sparkles, ArrowRight, Megaphone, X, Home, BookOpen, Wallet, CheckSquare, Dumbbell, Utensils, Moon, Trophy, ChevronDown, Bell, Eye, EyeOff } from "lucide-react";
+import { Sparkles, ArrowRight, Megaphone, X, Home, BookOpen, Wallet, CheckSquare, Dumbbell, Utensils, Moon, Trophy, ChevronDown, Bell, Eye, EyeOff, Zap } from "lucide-react";
 import { InvictusLogo } from "@/components/shared/InvictusLogo";
 import { getGlobalAnnouncement, type GlobalAnnouncement } from "@/lib/custom-auth";
 import { ReminderManagerModal } from "@/components/shared/ReminderManagerModal";
@@ -126,7 +126,6 @@ export function SpaceHeader() {
     setIsOpen(false);
     router.push(href);
   };
-
 
   const getSubFeatures = () => {
     if (pathname.startsWith("/tasks")) {
@@ -271,6 +270,21 @@ export function SpaceHeader() {
                 <span className="hidden md:inline">Sub-Nav</span>
               </button>
             )}
+
+            {/* Instant Quick Action (Back Tap / Shortcut / Ctrl+E) */}
+            <button
+              type="button"
+              onClick={() => {
+                const params = new URLSearchParams(searchParams ? searchParams.toString() : "");
+                params.set("action", "quick-expense");
+                router.push(`${pathname}?${params.toString()}`);
+              }}
+              className="p-1.5 sm:px-2.5 sm:py-1.5 bg-[#CEF431] hover:bg-[#b8dd25] text-[#161514] rounded-xl sm:rounded-2xl border-1.5 sm:border-2 border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] sm:shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] transition-all cursor-pointer flex items-center gap-1 shrink-0 font-black text-xs"
+              title="Instant Quick Input (Ctrl+E / Back-Tap)"
+            >
+              <Zap className="h-3.5 w-3.5 sm:h-4 sm:w-4 fill-current stroke-[2.5]" />
+              <span className="hidden md:inline">Quick Log</span>
+            </button>
 
             {/* Notification Bell */}
             <button
