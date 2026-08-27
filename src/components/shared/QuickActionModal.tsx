@@ -58,35 +58,64 @@ export function QuickActionModal() {
   const { data: streaks = {} } = useStreaks();
   const toggleHabitMutation = useToggleHabitLog();
 
-  // Watch URL params & Capacitor deep links
+  // Watch URL params & direct URL on mount/navigation
   useEffect(() => {
-    const action = searchParams.get("action");
-    if (action === "quick-expense" || action === "add-expense") {
-      setActiveTab("expense");
-      setIsOpen(true);
-    } else if (action === "quick-habit" || action === "check-habits") {
-      setActiveTab("habits");
-      setIsOpen(true);
-    }
+    const checkAction = () => {
+      const action = searchParams.get("action");
+      if (action === "quick-expense" || action === "add-expense") {
+        setActiveTab("expense");
+        setIsOpen(true);
+        return;
+      } else if (action === "quick-habit" || action === "check-habits") {
+        setActiveTab("habits");
+        setIsOpen(true);
+        return;
+      }
+
+      if (typeof window !== "undefined") {
+        const href = window.location.href;
+        if (href.includes("action=quick-expense") || href.includes("quick-expense")) {
+          setActiveTab("expense");
+          setIsOpen(true);
+        } else if (href.includes("action=quick-habit") || href.includes("quick-habit")) {
+          setActiveTab("habits");
+          setIsOpen(true);
+        }
+      }
+    };
+
+    checkAction();
+    window.addEventListener("popstate", checkAction);
+    window.addEventListener("hashchange", checkAction);
+    return () => {
+      window.removeEventListener("popstate", checkAction);
+      window.removeEventListener("hashchange", checkAction);
+    };
   }, [searchParams]);
 
   // Capacitor native deep-link listener
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const capacitor = (window as any).Capacitor;
-    if (capacitor?.Plugins?.App) {
-      capacitor.Plugins.App.addListener("appUrlOpen", (data: any) => {
-        if (data?.url) {
-          if (data.url.includes("quick-expense") || data.url.includes("action=quick-expense")) {
-            setActiveTab("expense");
-            setIsOpen(true);
-          } else if (data.url.includes("quick-habit") || data.url.includes("action=quick-habit")) {
-            setActiveTab("habits");
-            setIsOpen(true);
+    let handle: any = null;
+    const setupCapacitor = async () => {
+      try {
+        const { App } = await import("@capacitor/app");
+        handle = await App.addListener("appUrlOpen", (data: any) => {
+          if (data?.url) {
+            if (data.url.includes("quick-expense") || data.url.includes("action=quick-expense")) {
+              setActiveTab("expense");
+              setIsOpen(true);
+            } else if (data.url.includes("quick-habit") || data.url.includes("action=quick-habit")) {
+              setActiveTab("habits");
+              setIsOpen(true);
+            }
           }
-        }
-      });
-    }
+        });
+      } catch {}
+    };
+    setupCapacitor();
+    return () => {
+      if (handle?.remove) handle.remove();
+    };
   }, []);
 
   // Keyboard shortcut listener (Ctrl+E or Cmd+E for instant expense modal)
