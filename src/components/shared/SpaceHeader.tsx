@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useUIStore } from "@/store/ui-store";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Sparkles, ArrowRight, Megaphone, X, Home, BookOpen, Wallet, CheckSquare, Dumbbell, Utensils, Moon, Trophy, ChevronDown, Bell, Eye, EyeOff, Zap } from "lucide-react";
+import { Sparkles, ArrowRight, Megaphone, X, Home, BookOpen, Wallet, CheckSquare, Dumbbell, Utensils, Moon, Trophy, ChevronDown, Bell, Eye, EyeOff, Zap, User, Flame, Settings, Target } from "lucide-react";
 import { InvictusLogo } from "@/components/shared/InvictusLogo";
 import { getGlobalAnnouncement, type GlobalAnnouncement } from "@/lib/custom-auth";
 import { ReminderManagerModal } from "@/components/shared/ReminderManagerModal";
@@ -127,7 +127,30 @@ export function SpaceHeader() {
     router.push(href);
   };
 
-  const getSubFeatures = () => {
+  interface SubFeatureItem {
+    label: string;
+    icon: any;
+    targetId: string;
+    spaceHref: string;
+    tab?: string;
+  }
+
+  const getSubFeatures = (): SubFeatureItem[] => {
+    if (pathname.startsWith("/profile")) {
+      return [
+        { label: "Profile Info", icon: User, targetId: "user-profile-card", spaceHref: "/profile" },
+        { label: "365d Matrix", icon: Flame, targetId: "activity-matrix-section", spaceHref: "/profile" },
+        { label: "Settings Center", icon: Settings, targetId: "settings-discovery-card", spaceHref: "/profile" },
+      ];
+    }
+    if (pathname.startsWith("/analytics")) {
+      return [
+        { label: "Goals Analytics", icon: Target, targetId: "goals-analytics", spaceHref: "/analytics", tab: "goals" },
+        { label: "Study Analytics", icon: BookOpen, targetId: "study-analytics", spaceHref: "/analytics", tab: "study" },
+        { label: "Money Analytics", icon: Wallet, targetId: "money-analytics", spaceHref: "/analytics", tab: "money" },
+        { label: "365d Matrix", icon: Sparkles, targetId: "matrix-analytics", spaceHref: "/analytics", tab: "matrix" },
+      ];
+    }
     if (pathname.startsWith("/tasks")) {
       return [
         { label: "Kanban Board", icon: CheckSquare, targetId: "kanban-board", spaceHref: "/tasks", tab: "kanban" },
@@ -137,16 +160,20 @@ export function SpaceHeader() {
     }
     if (pathname.startsWith("/study")) {
       return [
-        { label: "Syllabus Tracker", icon: BookOpen, targetId: "syllabus-tracker", spaceHref: "/study", tab: "subjects" },
-        { label: "Study Logger", icon: Sparkles, targetId: "session-logger", spaceHref: "/study", tab: "subjects" },
+        { label: "Syllabus Tracker", icon: BookOpen, targetId: "syllabus-tracker", spaceHref: "/study" },
+        { label: "Study Logger", icon: Sparkles, targetId: "session-logger", spaceHref: "/study" },
+        { label: "Subjects List", icon: CheckSquare, targetId: "subjects-list", spaceHref: "/study", tab: "subjects" },
         { label: "Mock Tests", icon: Trophy, targetId: "mock-tests", spaceHref: "/study", tab: "tests" },
       ];
     }
     if (pathname.startsWith("/money")) {
       return [
-        { label: "Category Wallets", icon: Wallet, targetId: "category-wallets", spaceHref: "/money", tab: "ledger" },
-        { label: "Savings Goals", icon: Sparkles, targetId: "savings-goals", spaceHref: "/money", tab: "ledger" },
-        { label: "Subscriptions", icon: Sparkles, targetId: "subscriptions", spaceHref: "/money", tab: "ledger" },
+        { label: "Wallets & Cards", icon: Wallet, targetId: "category-wallets", spaceHref: "/money" },
+        { label: "Subscriptions", icon: Sparkles, targetId: "subscriptions", spaceHref: "/money" },
+        { label: "Savings Goals", icon: Trophy, targetId: "savings-goals", spaceHref: "/money" },
+        { label: "Debt Ledger", icon: ArrowRight, targetId: "debt-tracker", spaceHref: "/money" },
+        { label: "Transaction Ledger", icon: CheckSquare, targetId: "money-ledger", spaceHref: "/money", tab: "ledger" },
+        { label: "Monthly Budgets", icon: Target, targetId: "money-budgets", spaceHref: "/money", tab: "budgets" },
       ];
     }
     if (pathname.startsWith("/goals")) {
@@ -158,8 +185,10 @@ export function SpaceHeader() {
       ];
     }
     return [
-      { label: "Daily Overview", icon: Home, targetId: "overview", spaceHref: "/today", tab: "overview" },
-      { label: "Liquid Bar Chart", icon: Sparkles, targetId: "pillbar-chart", spaceHref: "/today", tab: "overview" },
+      { label: "Flow Analytics", icon: Sparkles, targetId: "analytics-chart", spaceHref: "/today" },
+      { label: "Stats Scorecard", icon: Target, targetId: "today-stats-grid", spaceHref: "/today" },
+      { label: "Quick Thoughts", icon: Flame, targetId: "today-quick-thoughts", spaceHref: "/today" },
+      { label: "Daily Summary", icon: CheckSquare, targetId: "today-summary-logs", spaceHref: "/today" },
     ];
   };
 

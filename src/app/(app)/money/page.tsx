@@ -55,6 +55,13 @@ function MoneyPageContent() {
   const tabParam = searchParams.get("tab");
   const [activeTab, setActiveTab] = useState(tabParam || "ledger");
   const [isAddTxOpen, setIsAddTxOpen] = useState(false);
+
+  useEffect(() => {
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
+
   const [isEditBudgetOpen, setIsEditBudgetOpen] = useState(false);
   const [deleteTxId, setDeleteTxId] = useState<string | null>(null);
 
@@ -789,7 +796,7 @@ function MoneyPageContent() {
           </TabsList>
 
           {/* Ledger Tab */}
-          <TabsContent value="ledger" className="space-y-4">
+          <TabsContent id="money-ledger" value="ledger" className="space-y-4 scroll-mt-24">
             {/* Search, Month Selector & Multi-Filter Control Bar */}
             {transactions.length > 0 && (
               <div className="bg-white rounded-2xl p-4 border-2 border-navy-950 shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] space-y-3">
@@ -1063,7 +1070,7 @@ function MoneyPageContent() {
           </TabsContent>
 
           {/* Budgets Tab */}
-          <TabsContent value="budgets">
+          <TabsContent id="money-budgets" value="budgets" className="scroll-mt-24">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="font-bold text-xs uppercase tracking-wider text-navy-600" style={{ fontFamily: "var(--font-heading)" }}>
@@ -1324,7 +1331,7 @@ function MoneyPageContent() {
           </TabsContent>
 
           {/* Analytics Tab */}
-          <TabsContent value="analytics">
+          <TabsContent id="money-analytics" value="analytics" className="scroll-mt-24">
             <div className="space-y-6">
               {transactions.length === 0 ? (
                 <EmptyState

@@ -275,7 +275,7 @@ export function DraggableDashboardGrid({
             onDragOver={handleDragOver}
             onDrop={(e) => handleDrop(e, index)}
             className={cn(
-              "group relative transition-all duration-300",
+              "group relative transition-all duration-300 scroll-mt-28",
               draggedIndex === index && "opacity-40 scale-[0.98]"
             )}
           >

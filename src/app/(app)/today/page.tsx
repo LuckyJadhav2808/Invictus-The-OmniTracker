@@ -382,7 +382,7 @@ export default function TodayPage() {
         />
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div id="today-stats-grid" className="grid grid-cols-2 md:grid-cols-4 gap-4 scroll-mt-28">
           <StatTile
             label="Needs Satisfaction"
             value={`${needsSatisfaction}%`}
@@ -443,10 +443,12 @@ export default function TodayPage() {
         )}
 
         {/* Quick Thoughts & Scratchpad Widget */}
-        <QuickThoughtsWidget />
+        <div id="today-quick-thoughts" className="scroll-mt-28">
+          <QuickThoughtsWidget />
+        </div>
 
         {/* Daily Log summaries */}
-        <div className="bg-white rounded-[var(--radius-lg)] p-6 shadow-[0_8px_24px_rgba(31,36,48,0.06)] space-y-4 border">
+        <div id="today-summary-logs" className="bg-white rounded-[var(--radius-lg)] p-6 shadow-[0_8px_24px_rgba(31,36,48,0.06)] space-y-4 border scroll-mt-28">
           <h3 className="font-bold text-xs uppercase tracking-wider text-navy-600" style={{ fontFamily: "var(--font-heading)" }}>
             Tracking summary for {selectedDate}
           </h3>

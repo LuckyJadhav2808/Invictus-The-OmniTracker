@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Legend, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 import { SpaceHeroBanner } from "@/components/shared/SpaceHeroBanner";
 import { useUIStore } from "@/store/ui-store";
+import { YearlyActivityMatrix } from "@/components/profile/YearlyActivityMatrix";
 
 export default function AnalyticsHubPage() {
   const { activeTracker } = useUIStore();
@@ -115,7 +116,7 @@ export default function AnalyticsHubPage() {
 
         {/* Tab Controls */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="bg-white rounded-full p-1 border border-border shadow-sm flex w-full max-w-[400px] mb-6">
+          <TabsList className="bg-white rounded-full p-1 border border-border shadow-sm flex w-full max-w-[500px] mb-6">
             <TabsTrigger value="goals" className="flex-1 rounded-full text-xs font-bold py-2 data-state=active:bg-navy-900 data-state=active:text-white transition-all cursor-pointer">
               Goals
             </TabsTrigger>
@@ -125,10 +126,13 @@ export default function AnalyticsHubPage() {
             <TabsTrigger value="money" className="flex-1 rounded-full text-xs font-bold py-2 data-state=active:bg-navy-900 data-state=active:text-white transition-all cursor-pointer">
               Money
             </TabsTrigger>
+            <TabsTrigger value="matrix" className="flex-1 rounded-full text-xs font-bold py-2 data-state=active:bg-navy-900 data-state=active:text-white transition-all cursor-pointer">
+              ⚡ 365d Matrix
+            </TabsTrigger>
           </TabsList>
 
           {/* Goals Tab */}
-          <TabsContent value="goals" className="space-y-6">
+          <TabsContent id="goals-analytics" value="goals" className="space-y-6 scroll-mt-24">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="bg-white rounded-[var(--radius-lg)] p-5 shadow-sm border flex items-center gap-4">
                 <div className="h-10 w-10 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500">
@@ -183,7 +187,7 @@ export default function AnalyticsHubPage() {
           </TabsContent>
 
           {/* Study Tab */}
-          <TabsContent value="study" className="space-y-6">
+          <TabsContent id="study-analytics" value="study" className="space-y-6 scroll-mt-24">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="bg-white rounded-[var(--radius-lg)] p-5 shadow-sm border flex items-center gap-4">
                 <div className="h-10 w-10 rounded-full bg-orange-500/10 flex items-center justify-center text-orange-500">
@@ -242,7 +246,7 @@ export default function AnalyticsHubPage() {
           </TabsContent>
 
           {/* Money Tab */}
-          <TabsContent value="money" className="space-y-6">
+          <TabsContent id="money-analytics" value="money" className="space-y-6 scroll-mt-24">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="bg-white rounded-[var(--radius-lg)] p-5 shadow-sm border flex items-center gap-4">
                 <div className="h-10 w-10 rounded-full bg-mint-600/10 flex items-center justify-center text-mint-600">
@@ -311,6 +315,11 @@ export default function AnalyticsHubPage() {
                 </ResponsiveContainer>
               </div>
             </div>
+          </TabsContent>
+
+          {/* 365-Day Activity Matrix Tab */}
+          <TabsContent id="matrix-analytics" value="matrix" className="space-y-6 scroll-mt-24">
+            <YearlyActivityMatrix title="365-DAY LIFE MOMENTUM HEATMAP MATRIX" />
           </TabsContent>
         </Tabs>
       </div>

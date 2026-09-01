@@ -379,7 +379,7 @@ function StudyPageContent() {
           </TabsList>
 
           {/* Subjects List Tab */}
-          <TabsContent value="subjects">
+          <TabsContent id="subjects-list" value="subjects" className="scroll-mt-24">
             {subjectsLoading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {[1, 2].map((i) => (
@@ -531,7 +531,7 @@ function StudyPageContent() {
           </TabsContent>
 
           {/* Mock Tests Tab */}
-          <TabsContent value="tests">
+          <TabsContent id="mock-tests" value="tests" className="scroll-mt-24">
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h3 className="font-bold text-xs uppercase tracking-wider text-navy-600" style={{ fontFamily: "var(--font-heading)" }}>

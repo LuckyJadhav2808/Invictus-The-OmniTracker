@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { LogOut, Settings, User, Sparkles, ShieldCheck, Database, Bell, Sliders, ArrowRight, Trophy, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { UpdateCheckModal } from "@/components/shared/UpdateCheckModal";
+import { YearlyActivityMatrix } from "@/components/profile/YearlyActivityMatrix";
 import { APP_VERSION_CONFIG } from "@/config/version";
 
 export default function ProfilePage() {
@@ -14,7 +15,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-cream-bg p-4 md:p-8 space-y-6">
-      <div className="max-w-xl mx-auto space-y-6">
+      <div className="max-w-2xl mx-auto space-y-6">
         
         {/* Profile Header */}
         <div className="flex items-center justify-between">
@@ -34,7 +35,7 @@ export default function ProfilePage() {
         </div>
 
         {/* User Info Card */}
-        <div className="bg-white rounded-3xl p-6 border-2.5 border-navy-950 shadow-[6px_6px_0px_0px_rgba(31,36,48,1)] space-y-5">
+        <div id="user-profile-card" className="bg-white rounded-3xl p-6 border-2.5 border-navy-950 shadow-[6px_6px_0px_0px_rgba(31,36,48,1)] space-y-5 scroll-mt-24">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="h-16 w-16 rounded-2xl bg-amber-400 border-2 border-navy-950 flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] shrink-0">
@@ -63,8 +64,13 @@ export default function ProfilePage() {
           </div>
         </div>
 
+        {/* 🌟 365-DAY GITHUB-STYLE LIFE MOMENTUM MATRIX */}
+        <div id="activity-matrix-section" className="scroll-mt-24">
+          <YearlyActivityMatrix />
+        </div>
+
         {/* Prominent Settings Discovery Hero Card */}
-        <div className="bg-gradient-to-br from-[#CEF431] via-[#03D26F] to-[#EAF4F4] rounded-3xl p-6 border-2.5 border-navy-950 shadow-[6px_6px_0px_0px_rgba(31,36,48,1)] space-y-4">
+        <div id="settings-discovery-card" className="bg-gradient-to-br from-[#CEF431] via-[#03D26F] to-[#EAF4F4] rounded-3xl p-6 border-2.5 border-navy-950 shadow-[6px_6px_0px_0px_rgba(31,36,48,1)] space-y-4 scroll-mt-24">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <span className="bg-white text-navy-950 px-3 py-1 rounded-xl text-xs font-black border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] uppercase tracking-wider flex items-center gap-1.5 whitespace-nowrap shrink-0 self-start sm:self-auto">
               <Sparkles className="h-4 w-4" /> 11 Settings Categories Available
