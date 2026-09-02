@@ -9,7 +9,7 @@ export async function GET() {
     let releaseTitle = `Invictus v${APP_VERSION_CONFIG.version}`;
     let releaseNotes = APP_VERSION_CONFIG.changelog;
     let downloadUrl = `${APP_VERSION_CONFIG.githubRepoUrl}/releases/latest`;
-    let apkDownloadUrl = `${APP_VERSION_CONFIG.githubRepoUrl}/releases/download/v${APP_VERSION_CONFIG.version}/Invictus.apk`;
+    let apkDownloadUrl = "/api/download/android";
     let publishedAt = APP_VERSION_CONFIG.releaseDate;
 
     // Attempt to query GitHub Releases API

@@ -8,7 +8,11 @@ on:
       - 'android/**'
       - 'capacitor.config.ts'
       - '.github/workflows/build-apk.yml'
+      - 'src/config/version.ts'
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build-android:
@@ -19,7 +23,7 @@ jobs:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
 
-      - name: ☕ Setup Java JDK 17
+      - name: ☕ Setup Java JDK
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -48,3 +52,26 @@ jobs:
           name: Invictus-Android-App
           path: android/app/build/outputs/apk/debug/Invictus.apk
           retention-days: 30
+
+      - name: 🚀 Publish GitHub Release with APK
+        uses: softprops/action-gh-release@v2
+        if: github.ref == 'refs/heads/main'
+        with:
+          tag_name: v1.2.0
+          name: Invictus Android v1.2.0
+          files: android/app/build/outputs/apk/debug/Invictus.apk
+          draft: false
+          prerelease: false
+          body: |
+            ## 📱 Invictus for Android v1.2.0
+            Official standalone APK release for Android devices.
+
+            ### ✨ What's Included:
+            - ⚡ 1-Tap Native Android Shortcuts (Expenses, Habits, Gym, Study)
+            - 💳 High-Performance Money & Ledger Workspace
+            - 🎨 Single-Row Tab Rail with Horizontal Momentum Swipe
+            - 🧮 Neobrutalist Quick Calculator
+            - 🛡️ Streak Freeze & Missed Log Protection Tokens
+            - ✨ Native Haptic Feedback & Offline Cache Sync
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

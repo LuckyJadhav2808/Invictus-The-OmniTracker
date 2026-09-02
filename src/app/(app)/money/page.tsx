@@ -27,8 +27,9 @@ import { PDFExportModal } from "@/components/money/PDFExportModal";
 import { DraggableDashboardGrid } from "@/components/shared/DraggableDashboardGrid";
 import { useCostOfLivingIndex } from "@/lib/queries/cost-of-living";
 import { detectCategoryFromNote } from "@/lib/utils/merchant-categorizer";
-import { Globe, Sparkles, Layers } from "lucide-react";
+import { Globe, Sparkles, Layers, DollarSign, PiggyBank, Smartphone, Banknote, ShieldCheck } from "lucide-react";
 import { useSearchParams } from "next/navigation";
+import { computeMonthlyBudgetStats, isCashTransaction, isOnlineTransaction } from "@/lib/utils/budget-rollover";
 
 const PRESET_CATEGORY_EMOJIS = [
   "🛒", "🍕", "☕", "🍔", "🍣", "🧋", "🍿", "🍩",
@@ -169,7 +170,74 @@ function MoneyPageContent() {
   const [sendCatId, setSendCatId] = useState("");
   const [sendNote, setSendNote] = useState("");
 
+  // 1-Tap UPI vs Cash state
+  const [showMorePaymentMethods, setShowMorePaymentMethods] = useState(false);
 
+  // Top frequent merchants/notes from past user transactions + smart fallbacks
+  const frequentMerchantPills = useMemo(() => {
+    const counts: Record<string, number> = {};
+    transactions.forEach((t) => {
+      if (t.note && t.note.trim().length > 1) {
+        const clean = t.note.trim();
+        const primary = clean.split(/[ ,-]/)[0];
+        if (primary && primary.length > 2) {
+          const capitalized = primary.charAt(0).toUpperCase() + primary.slice(1).toLowerCase();
+          counts[capitalized] = (counts[capitalized] || 0) + 1;
+        }
+      }
+    });
+
+    const sorted = Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([name]) => name);
+
+    const defaults = ["Swiggy", "Blinkit", "Uber", "Chai", "Fuel", "Groceries"];
+    const combined = Array.from(new Set([...sorted, ...defaults])).slice(0, 6);
+
+    const emojiMap: Record<string, { emoji: string; mode: string }> = {
+      swiggy: { emoji: "🍔", mode: "upi" },
+      zomato: { emoji: "🍕", mode: "upi" },
+      blinkit: { emoji: "🛒", mode: "upi" },
+      zepto: { emoji: "🛍️", mode: "upi" },
+      instamart: { emoji: "🛒", mode: "upi" },
+      uber: { emoji: "🚕", mode: "upi" },
+      ola: { emoji: "🛵", mode: "upi" },
+      chai: { emoji: "☕", mode: "cash" },
+      coffee: { emoji: "☕", mode: "upi" },
+      fuel: { emoji: "⛽", mode: "upi" },
+      petrol: { emoji: "⛽", mode: "upi" },
+      groceries: { emoji: "🥦", mode: "upi" },
+      dmart: { emoji: "🛒", mode: "upi" },
+      recharge: { emoji: "📱", mode: "upi" },
+      rent: { emoji: "🏠", mode: "bank" },
+    };
+
+    return combined.map((m) => {
+      const lower = m.toLowerCase();
+      const meta = emojiMap[lower] || { emoji: "🏷️", mode: "upi" };
+      return {
+        label: m,
+        icon: meta.emoji,
+        defaultMode: meta.mode,
+      };
+    });
+  }, [transactions]);
+
+  // Granular Envelope Rollover Allocation Handler
+  const handleBoostCategoryEnvelope = async (item: { categoryId: string; categoryName: string; saved: number; budget: number }) => {
+    const currentCat = categories.find((c) => c.id === item.categoryId);
+    const currentBudget = currentCat?.monthlyBudget || item.budget || 0;
+    const newBudget = currentBudget + item.saved;
+    try {
+      await updateCatMutation.mutateAsync({
+        id: item.categoryId,
+        monthlyBudget: newBudget,
+      });
+      toast.success(`🎉 Boosted ${item.categoryName} envelope by +${currencySymbol}${item.saved.toLocaleString()}! New monthly budget: ${currencySymbol}${newBudget.toLocaleString()}`);
+    } catch {
+      toast.error("Failed to boost category envelope.");
+    }
+  };
 
   // Ledger Search & Filter states (Feature 1 & Feature 2)
   const currentMonthKey = useMemo(() => format(new Date(), "yyyy-MM"), []);
@@ -177,6 +245,35 @@ function MoneyPageContent() {
   const [ledgerSearchQuery, setLedgerSearchQuery] = useState("");
   const [ledgerCategoryFilter, setLedgerCategoryFilter] = useState("all");
   const [ledgerTypeFilter, setLedgerTypeFilter] = useState<"all" | "income" | "expense">("all");
+  const [paymentChannelFilter, setPaymentChannelFilter] = useState<"all" | "online" | "cash">("all");
+
+  // User Base Monthly Budget Target (Defaults to ₹9,000, persisted in localStorage & User Profile)
+  const [baseBudget, setBaseBudget] = useState<number>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("invictus_monthly_budget_target");
+      if (saved && !isNaN(Number(saved)) && Number(saved) > 0) {
+        return Number(saved);
+      }
+    }
+    return 9000;
+  });
+  const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
+  const [tempBudgetInput, setTempBudgetInput] = useState(String(baseBudget));
+
+  const handleSaveMonthlyBudget = (e: React.FormEvent) => {
+    e.preventDefault();
+    const val = Number(tempBudgetInput);
+    if (isNaN(val) || val <= 0) {
+      toast.error("Please enter a valid budget amount");
+      return;
+    }
+    setBaseBudget(val);
+    try {
+      localStorage.setItem("invictus_monthly_budget_target", String(val));
+    } catch {}
+    toast.success(`Monthly Budget Target set to ${currencySymbol}${val.toLocaleString()}! 🎯`);
+    setIsBudgetModalOpen(false);
+  };
 
   // Available Month options dynamically generated from transactions + current month
   const monthOptions = useMemo(() => {
@@ -204,6 +301,18 @@ function MoneyPageContent() {
     ];
   }, [transactions, currentMonthKey]);
 
+  // Compute Full Monthly Budget & Rollover Metrics
+  const activeMonthForStats = ledgerMonthFilter === "all" ? currentMonthKey : ledgerMonthFilter;
+  const budgetStats = useMemo(() => {
+    return computeMonthlyBudgetStats({
+      transactions,
+      categories,
+      targetMonthKey: activeMonthForStats,
+      baseBudget,
+      enableRollover: true,
+    });
+  }, [transactions, categories, activeMonthForStats, baseBudget]);
+
   const filteredLedgerTransactions = useMemo(() => {
     return transactions.filter((tx) => {
       const category = categories.find((c) => c.id === tx.categoryId);
@@ -226,9 +335,14 @@ function MoneyPageContent() {
       const matchesMonth =
         ledgerMonthFilter === "all" || (tx.date && tx.date.startsWith(ledgerMonthFilter));
 
-      return matchesSearch && matchesCategory && matchesType && matchesMonth;
+      const matchesChannel =
+        paymentChannelFilter === "all" ||
+        (paymentChannelFilter === "cash" && isCashTransaction(tx.paymentMethod)) ||
+        (paymentChannelFilter === "online" && isOnlineTransaction(tx.paymentMethod));
+
+      return matchesSearch && matchesCategory && matchesType && matchesMonth && matchesChannel;
     });
-  }, [transactions, categories, ledgerSearchQuery, ledgerCategoryFilter, ledgerTypeFilter, ledgerMonthFilter]);
+  }, [transactions, categories, ledgerSearchQuery, ledgerCategoryFilter, ledgerTypeFilter, ledgerMonthFilter, paymentChannelFilter]);
 
   const monthlyStats = useMemo(() => {
     const income = filteredLedgerTransactions
@@ -641,162 +755,362 @@ function MoneyPageContent() {
   return (
     <div className="min-h-screen bg-cream-bg p-4 md:p-8 space-y-6">
       <div className="max-w-4xl mx-auto space-y-6">
-        {/* Space Hero Banner */}
-        <SpaceHeroBanner
-          space="money"
-          badgeText="💰 Money & Ledger Space"
-          title="Track Finances. Build Wealth."
-          subtitle="Budgets, income, and expenses overview."
-          stats={[
-            { label: "Net Balance", value: `${currencySymbol}${netBalance}`, icon: "💵" },
-            { label: "Total Income", value: `${currencySymbol}${totalIncome}`, icon: "📈" },
-            { label: "Total Expense", value: `${currencySymbol}${totalExpense}`, icon: "📉" },
-          ]}
-          actionButton={{
-            label: "+ Add Transaction",
-            onClick: () => {
-              if (categories.length === 0) {
-                toast.error("Loading categories...");
-                return;
-              }
-              setTxCategoryId(categories.filter((c) => c.type === txType)[0]?.id || "");
-              setIsAddTxOpen(true);
-            },
-          }}
-        />
-
-        {/* Proactive Reminder Banner */}
-        <ProactiveReminderBanner space="money" />
-
-        {/* Draggable Money Widgets Grid */}
-        <DraggableDashboardGrid
-          storageKey="money"
-          widgets={[
-            {
-              id: "category-wallets",
-              title: "💳 Category Wallets & Accounts",
-              component: (
-                <MoneyQuickActionsAndCards
-                  mainBalance={totalBalance}
-                  currencySymbol={currencySymbol}
-                  categories={categories.map((c) => ({
-                    id: c.id,
-                    name: c.name,
-                    amount: transactions
-                      .filter((t) => t.categoryId === c.id && t.type === "expense")
-                      .reduce((sum, t) => sum + t.amount, 0),
-                    color: c.color,
-                    icon: c.icon || "💳",
-                    type: c.type,
-                    monthlyBudget: c.monthlyBudget,
-                  }))}
-                  onAddTransaction={() => {
-                    if (categories.length === 0) {
-                      toast.error("Loading categories...");
-                      return;
-                    }
-                    setTxCategoryId(categories.filter((c) => c.type === txType)[0]?.id || "");
-                    setIsAddTxOpen(true);
-                  }}
-                  onMoveMoney={() => {
-                    if (categories.length < 2) {
-                      toast.error("Please create at least 2 categories to move money between them!");
-                      return;
-                    }
-                    setMoveFromCatId(categories[0]?.id || "");
-                    setMoveToCatId(categories[1]?.id || "");
-                    setIsMoveMoneyOpen(true);
-                  }}
-                  onSendMoney={() => {
-                    if (categories.length === 0) {
-                      toast.error("Please create a category first!");
-                      return;
-                    }
-                    setSendCatId(categories[0]?.id || "");
-                    setIsSendMoneyOpen(true);
-                  }}
-                  onViewDetails={() => setActiveTab("analytics")}
-                  onAddCategory={() => setIsChoiceOpen(true)}
-                  onEditCategory={(cat) => {
-                    const full = categories.find((c) => c.id === cat.id);
-                    setEditingCat(full || cat);
-                    setEditCatName(full?.name || cat.name);
-                    setEditCatType(full?.type || "expense");
-                    setEditCatColor(full?.color || "orange");
-                    setEditCatIcon(full?.icon || "💳");
-                    setEditCatMonthlyBudget(String(full?.monthlyBudget || 0));
-                  }}
-                  onDeleteCategory={(catId) => setDeleteCatId(catId)}
-                />
-              ),
-            },
-            {
-              id: "subscriptions",
-              title: "🔁 Active Subscriptions",
-              component: <SubscriptionsTracker />,
-            },
-            {
-              id: "savings-goals",
-              title: "🐷 Savings Goals & Piggy Bank",
-              component: <SavingsGoals />,
-            },
-            {
-              id: "debt-tracker",
-              title: "💸 Lent & Borrowed Money Ledger",
-              component: <DebtTracker currencySymbol={currencySymbol} />,
-            },
-          ]}
-        />
-
-        {/* Ledger Summary Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-white rounded-[var(--radius-lg)] p-5 shadow-[0_8px_24px_rgba(31,36,48,0.04)] flex items-center gap-4">
-            <div className="h-10 w-10 rounded-full bg-mint-600/10 flex items-center justify-center text-mint-600">
-              <ArrowUpRight className="h-5 w-5" />
+        {/* 💰 EXECUTIVE FINANCIAL COMMAND HEADER */}
+        <div className="bg-[#FAF8F5] rounded-3xl p-5 md:p-6 border-2.5 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] space-y-4">
+          {/* Top Bar: Title, Month Stepper & Primary CTA */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b-2 border-navy-950/10 pb-3.5">
+            <div className="flex items-center gap-2.5">
+              <div className="h-10 w-10 rounded-2xl bg-[#CEF431] border-2 border-navy-950 flex items-center justify-center text-navy-950 font-black text-lg shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] shrink-0">
+                💰
+              </div>
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h2 className="font-black text-sm sm:text-base uppercase tracking-wider text-navy-950" style={{ fontFamily: "var(--font-heading)" }}>
+                    Money & Ledger Space
+                  </h2>
+                </div>
+                <p className="text-[10px] text-navy-700 font-bold mt-0.5">
+                  Track daily liquidity, stay within budget & build cumulative wealth
+                </p>
+              </div>
             </div>
-            <div>
-              <h5 className="text-[10px] font-bold text-navy-600 uppercase tracking-wider">Total Income</h5>
-              <p className="text-xl font-extrabold text-navy-900 mt-0.5">{currencySymbol}{totalIncome.toLocaleString()}</p>
+
+            {/* Stepper + Action CTA */}
+            <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap self-start md:self-auto">
+              {/* 📅 FEATURE 2: MONTH STEPPER IN EXECUTIVE HEADER */}
+              <div className="flex items-center gap-1 shrink-0">
+                <button
+                  type="button"
+                  onClick={handlePrevMonth}
+                  className="p-2 rounded-xl bg-white hover:bg-[#CEF431] text-[#161514] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all shrink-0"
+                  title="Previous Month"
+                >
+                  <ChevronLeft className="h-3.5 w-3.5 stroke-[3]" />
+                </button>
+
+                <div className="w-36 sm:w-44">
+                  <NeobrutalistSelect
+                    value={ledgerMonthFilter}
+                    onChange={setLedgerMonthFilter}
+                    options={monthOptions}
+                    placeholder="Select Month"
+                  />
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleNextMonth}
+                  className="p-2 rounded-xl bg-white hover:bg-[#CEF431] text-[#161514] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all shrink-0"
+                  title="Next Month"
+                >
+                  <ChevronRight className="h-3.5 w-3.5 stroke-[3]" />
+                </button>
+              </div>
+
+              {/* Primary Action Button */}
+              <button
+                onClick={() => {
+                  if (categories.length === 0) {
+                    toast.error("Loading categories...");
+                    return;
+                  }
+                  setTxCategoryId(categories.filter((c) => c.type === txType)[0]?.id || "");
+                  setIsAddTxOpen(true);
+                }}
+                className="px-3.5 py-2.5 rounded-2xl bg-amber-400 hover:bg-amber-500 text-navy-950 text-xs font-black uppercase tracking-wider border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center justify-center gap-1.5 shrink-0"
+              >
+                <Plus className="h-4 w-4 stroke-[3]" />
+                <span>Log Transaction</span>
+              </button>
             </div>
           </div>
 
-          <div className="bg-white rounded-[var(--radius-lg)] p-5 shadow-[0_8px_24px_rgba(31,36,48,0.04)] flex items-center gap-4">
-            <div className="h-10 w-10 rounded-full bg-coral-400/20 flex items-center justify-center text-coral-500">
-              <ArrowDownRight className="h-5 w-5" />
+          {/* Centerpiece: Safe To Spend Hero Gauge & Intelligent Burn Pace Indicator */}
+          <div className="bg-white rounded-2xl p-4 sm:p-5 border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[10px] font-black uppercase tracking-widest text-navy-600">
+                  Safe To Spend ({budgetStats.targetMonthLabel.split(" ")[0]})
+                </span>
+                {budgetStats.rolloverSurplus > 0 && (
+                  <span className="text-[9px] font-black bg-[#03D26F] text-[#161514] px-1.5 py-0.5 rounded-full border border-[#161514] shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]">
+                    +{currencySymbol}{budgetStats.rolloverSurplus.toLocaleString()} Rolled
+                  </span>
+                )}
+                {/* 🧭 FEATURE 3: INTELLIGENT BURN PACE BADGE */}
+                <span className={cn(
+                  "text-[9px] font-black uppercase px-2 py-0.5 rounded-full border shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] flex items-center gap-1",
+                  budgetStats.burnPaceStatus === "fast"
+                    ? "bg-rose-100 text-rose-950 border-[#161514]"
+                    : budgetStats.burnPaceStatus === "frugal"
+                    ? "bg-[#03D26F]/25 text-emerald-950 border-[#161514]"
+                    : "bg-[#CEF431] text-[#161514] border-[#161514]"
+                )}>
+                  {budgetStats.burnPaceStatus === "fast" ? "⚠️ Fast Burn" : budgetStats.burnPaceStatus === "frugal" ? "🟢 Frugal Pace" : "✨ On Track"}
+                </span>
+              </div>
+              <div className="text-3xl sm:text-4xl font-black text-navy-950 tracking-tight">
+                {currencySymbol}{budgetStats.remainingBudget.toLocaleString()}
+              </div>
+              <p className="text-xs text-navy-700 font-bold">
+                {budgetStats.burnPaceMessage}
+              </p>
             </div>
-            <div>
-              <h5 className="text-[10px] font-bold text-navy-600 uppercase tracking-wider">Total Expense</h5>
-              <p className="text-xl font-extrabold text-navy-900 mt-0.5">{currencySymbol}{totalExpense.toLocaleString()}</p>
+
+            {/* Quick Metrics Badge Group */}
+            <div className="flex flex-wrap sm:flex-nowrap gap-2 sm:self-center">
+              <div className="bg-[#FAF8F5] px-3 py-2 rounded-xl border border-navy-950 text-left shrink-0 min-w-[110px]">
+                <span className="text-[9px] font-black uppercase text-navy-600 block">Total Pool</span>
+                <span className="text-sm font-black text-navy-950 block">
+                  {currencySymbol}{budgetStats.totalAvailableBudget.toLocaleString()}
+                </span>
+              </div>
+              <div className="bg-[#FAF8F5] px-3 py-2 rounded-xl border border-navy-950 text-left shrink-0 min-w-[110px]">
+                <span className="text-[9px] font-black uppercase text-rose-600 block">Spent</span>
+                <span className="text-sm font-black text-rose-600 block">
+                  -{currencySymbol}{budgetStats.monthlyExpense.toLocaleString()}
+                </span>
+              </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-[var(--radius-lg)] p-5 shadow-[0_8px_24px_rgba(31,36,48,0.04)] flex items-center gap-4">
-            <div className={cn("h-10 w-10 rounded-full flex items-center justify-center", totalBalance >= 0 ? "bg-mint-600/10 text-mint-600" : "bg-coral-400/20 text-coral-500")}>
-              <Wallet className="h-5 w-5" />
+          {/* Bottom Status Rail: Budget Allowance, Mode Split & Lifetime Vault */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-[11px] font-bold text-navy-800">
+            {/* Allowance Pill with Edit Button */}
+            <div className="bg-white p-2.5 rounded-xl border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] flex items-center justify-between gap-2">
+              <span className="truncate">
+                🎯 <strong>{currencySymbol}{budgetStats.baseBudget.toLocaleString()}</strong> Base Budget
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setTempBudgetInput(String(baseBudget));
+                  setIsBudgetModalOpen(true);
+                }}
+                className="text-[9px] font-black uppercase px-2 py-0.5 rounded-lg bg-amber-400 hover:bg-amber-500 border border-navy-950 cursor-pointer shrink-0"
+              >
+                Edit
+              </button>
             </div>
-            <div>
-              <h5 className="text-[10px] font-bold text-navy-600 uppercase tracking-wider">Net Balance</h5>
-              <p className="text-xl font-extrabold text-navy-900 mt-0.5">{currencySymbol}{totalBalance.toLocaleString()}</p>
+
+            {/* Payment Mode Ratio Pill */}
+            <div className="bg-white p-2.5 rounded-xl border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] flex items-center justify-between gap-1 truncate">
+              <span>💳 Spends Split:</span>
+              <span className="font-black text-navy-950 text-[10px] shrink-0">
+                📱 {currencySymbol}{budgetStats.onlineExpense.toLocaleString()} ({budgetStats.onlinePercentage}%) • 💵 {currencySymbol}{budgetStats.cashExpense.toLocaleString()} ({budgetStats.cashPercentage}%)
+              </span>
+            </div>
+
+            {/* Lifetime Vault Pill */}
+            <div className="bg-white p-2.5 rounded-xl border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] flex items-center justify-between gap-1">
+              <span>🏦 Lifetime Vault:</span>
+              <span className={cn(
+                "text-[10px] font-black px-1.5 py-0.5 rounded-md border",
+                totalBalance >= 0 ? "bg-[#03D26F]/20 text-emerald-950 border-[#161514]" : "bg-rose-100 text-rose-950 border-[#161514]"
+              )}>
+                {totalBalance < 0 ? `-${currencySymbol}${Math.abs(totalBalance).toLocaleString()}` : `+${currencySymbol}${totalBalance.toLocaleString()}`}
+              </span>
             </div>
           </div>
         </div>
 
+        {/* Proactive Reminder Banner */}
+        <ProactiveReminderBanner space="money" />
+
         {/* Tab Controls */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="bg-white rounded-full p-1 border border-border shadow-sm flex w-full max-w-[400px] mb-6">
-            <TabsTrigger value="ledger" className="flex-1 rounded-full text-xs font-bold py-2 data-state=active:bg-navy-900 data-state=active:text-white transition-all cursor-pointer">
-              Ledger
-            </TabsTrigger>
-            <TabsTrigger value="budgets" className="flex-1 rounded-full text-xs font-bold py-2 data-state=active:bg-navy-900 data-state=active:text-white transition-all cursor-pointer">
-              Budgets
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex-1 rounded-full text-xs font-bold py-2 data-state=active:bg-navy-900 data-state=active:text-white transition-all cursor-pointer">
-              Analytics
-            </TabsTrigger>
-          </TabsList>
+          <div className="w-full overflow-x-auto no-scrollbar pb-1 mb-4">
+            <TabsList className="bg-[#FAF8F5] rounded-2xl p-1.5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] flex items-center gap-1.5 w-max min-w-full sm:min-w-0 sm:w-auto">
+              <TabsTrigger
+                value="ledger"
+                className="rounded-xl text-xs font-black py-2 px-3.5 sm:px-4 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
+              >
+                <span>📒</span>
+                <span>Daily Ledger</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="budgets"
+                className="rounded-xl text-xs font-black py-2 px-3.5 sm:px-4 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
+              >
+                <span>🎯</span>
+                <span>Budget & Rollover</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="vault"
+                className="rounded-xl text-xs font-black py-2 px-3.5 sm:px-4 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
+              >
+                <span>🐷</span>
+                <span>Goals & Debts</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="analytics"
+                className="rounded-xl text-xs font-black py-2 px-3.5 sm:px-4 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
+              >
+                <span>📊</span>
+                <span>Analytics</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
-          {/* Ledger Tab */}
+          {/* 📒 Tab 1: Daily Ledger */}
           <TabsContent id="money-ledger" value="ledger" className="space-y-4 scroll-mt-24">
+            {/* Category Wallets Carousel */}
+            <MoneyQuickActionsAndCards
+              mainBalance={budgetStats.remainingBudget}
+              currencySymbol={currencySymbol}
+              categories={categories.map((c) => ({
+                id: c.id,
+                name: c.name,
+                amount: transactions
+                  .filter((t) => t.categoryId === c.id && t.type === "expense" && (ledgerMonthFilter === "all" ? true : t.date?.startsWith(activeMonthForStats)))
+                  .reduce((sum, t) => sum + t.amount, 0),
+                color: c.color,
+                icon: c.icon || "💳",
+                type: c.type,
+                monthlyBudget: c.monthlyBudget,
+              }))}
+              onAddTransaction={() => {
+                if (categories.length === 0) {
+                  toast.error("Loading categories...");
+                  return;
+                }
+                setTxCategoryId(categories.filter((c) => c.type === txType)[0]?.id || "");
+                setIsAddTxOpen(true);
+              }}
+              onMoveMoney={() => {
+                if (categories.length < 2) {
+                  toast.error("Please create at least 2 categories to move money between them!");
+                  return;
+                }
+                setMoveFromCatId(categories[0]?.id || "");
+                setMoveToCatId(categories[1]?.id || "");
+                setIsMoveMoneyOpen(true);
+              }}
+              onSendMoney={() => {
+                if (categories.length === 0) {
+                  toast.error("Please create a category first!");
+                  return;
+                }
+                setSendCatId(categories[0]?.id || "");
+                setIsSendMoneyOpen(true);
+              }}
+              onViewDetails={() => setActiveTab("analytics")}
+              onAddCategory={() => setIsChoiceOpen(true)}
+              onEditCategory={(cat) => {
+                const full = categories.find((c) => c.id === cat.id);
+                setEditingCat(full || cat);
+                setEditCatName(full?.name || cat.name);
+                setEditCatType(full?.type || "expense");
+                setEditCatColor(full?.color || "orange");
+                setEditCatIcon(full?.icon || "💳");
+                setEditCatMonthlyBudget(String(full?.monthlyBudget || 0));
+              }}
+              onDeleteCategory={(catId) => setDeleteCatId(catId)}
+            />
+
+            {/* Online (UPI) vs Cash Liquidity Split Card */}
+            <div className="bg-white rounded-3xl p-5 border-2.5 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-navy-950/10 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="h-9 w-9 rounded-xl bg-[#03D26F] border-2 border-navy-950 flex items-center justify-center text-navy-950 font-black text-base shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] shrink-0">
+                    💳
+                  </div>
+                  <div>
+                    <h4 className="font-black text-sm uppercase tracking-wider text-[#161514]">
+                      Online (UPI) vs Cash Breakdown ({budgetStats.targetMonthLabel.split(" ")[0]})
+                    </h4>
+                    <p className="text-[10px] text-navy-700 font-bold mt-0.5">
+                      Segregation of Digital Wallet / UPI spends vs Physical Cash expenses
+                    </p>
+                  </div>
+                </div>
+
+                {/* Quick Channel Filter Toggles */}
+                <div className="flex items-center bg-[#FAF8F5] rounded-xl border-2 border-navy-950 p-0.5 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] self-start sm:self-auto">
+                  {(["all", "online", "cash"] as const).map((ch) => (
+                    <button
+                      key={ch}
+                      type="button"
+                      onClick={() => setPaymentChannelFilter(ch)}
+                      className={cn(
+                        "text-[10px] font-black px-2.5 py-1 rounded-lg transition-all cursor-pointer",
+                        paymentChannelFilter === ch
+                          ? "bg-[#CEF431] text-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]"
+                          : "text-navy-700 hover:bg-white"
+                      )}
+                    >
+                      {ch === "all" ? "All Modes" : ch === "online" ? "📱 UPI/Online" : "💵 Cash"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Online Spends */}
+                <div
+                  onClick={() => setPaymentChannelFilter("online")}
+                  className={cn(
+                    "p-4 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] cursor-pointer transition-all hover:-translate-y-0.5",
+                    paymentChannelFilter === "online" ? "bg-[#03D26F]/20 ring-2 ring-[#03D26F]" : "bg-[#FAF8F5]"
+                  )}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black uppercase text-[#161514] flex items-center gap-1.5">
+                      <Smartphone className="h-4 w-4 text-emerald-700 stroke-[2.5]" />
+                      <span>Online / UPI Spends</span>
+                    </span>
+                    <span className="text-xs font-black bg-[#03D26F] text-[#161514] px-2 py-0.5 rounded-full border border-[#161514]">
+                      {budgetStats.onlinePercentage}%
+                    </span>
+                  </div>
+                  <span className="text-2xl font-black text-[#161514] block mt-2">
+                    {currencySymbol}{budgetStats.onlineExpense.toLocaleString()}
+                  </span>
+                  <span className="text-[10px] font-bold text-navy-600 block mt-1">
+                    GPay, PhonePe, Cards & Bank Transfers
+                  </span>
+                </div>
+
+                {/* Cash Spends */}
+                <div
+                  onClick={() => setPaymentChannelFilter("cash")}
+                  className={cn(
+                    "p-4 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] cursor-pointer transition-all hover:-translate-y-0.5",
+                    paymentChannelFilter === "cash" ? "bg-amber-100 ring-2 ring-amber-500" : "bg-[#FAF8F5]"
+                  )}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black uppercase text-[#161514] flex items-center gap-1.5">
+                      <Banknote className="h-4 w-4 text-amber-700 stroke-[2.5]" />
+                      <span>Physical Cash Spends</span>
+                    </span>
+                    <span className="text-xs font-black bg-amber-400 text-[#161514] px-2 py-0.5 rounded-full border border-[#161514]">
+                      {budgetStats.cashPercentage}%
+                    </span>
+                  </div>
+                  <span className="text-2xl font-black text-[#161514] block mt-2">
+                    {currencySymbol}{budgetStats.cashExpense.toLocaleString()}
+                  </span>
+                  <span className="text-[10px] font-bold text-navy-600 block mt-1">
+                    Pocket money, street vendors & cash tips
+                  </span>
+                </div>
+              </div>
+
+              {/* Ratio bar */}
+              <div className="w-full bg-gray-100 h-3 rounded-full overflow-hidden border-2 border-navy-950 flex p-0.5 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]">
+                <div
+                  className="bg-[#03D26F] h-full rounded-l-full transition-all duration-500"
+                  style={{ width: `${budgetStats.onlinePercentage}%` }}
+                  title={`Online/UPI: ${budgetStats.onlinePercentage}%`}
+                />
+                <div
+                  className="bg-amber-400 h-full rounded-r-full transition-all duration-500"
+                  style={{ width: `${budgetStats.cashPercentage}%` }}
+                  title={`Cash: ${budgetStats.cashPercentage}%`}
+                />
+              </div>
+            </div>
             {/* Search, Month Selector & Multi-Filter Control Bar */}
             {transactions.length > 0 && (
               <div className="bg-white rounded-2xl p-4 border-2 border-navy-950 shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] space-y-3">
@@ -871,36 +1185,68 @@ function MoneyPageContent() {
                   </div>
                 </div>
 
-                {/* Bottom Row: Monthly Summary Stats & Type Filter Pills */}
+                {/* Bottom Row: Monthly Summary Stats & Type / Channel Filter Pills */}
                 <div className="flex items-center justify-between flex-wrap gap-2 pt-2 border-t border-navy-950/10 overflow-x-auto no-scrollbar py-0.5">
-                  {/* Type Filter Pills */}
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <span className="text-[10px] font-black uppercase text-navy-700 mr-1 flex items-center gap-1 whitespace-nowrap shrink-0">
-                      <Filter className="h-3 w-3 stroke-[2.5]" /> Type:
-                    </span>
-                    {(["all", "income", "expense"] as const).map((t) => {
-                      const isActive = ledgerTypeFilter === t;
-                      const label = t === "all" ? "All" : t === "income" ? "Income (+)" : "Expense (-)";
-                      return (
-                        <button
-                          key={t}
-                          type="button"
-                          onClick={() => setLedgerTypeFilter(t)}
-                          className={cn(
-                            "px-3 py-1 rounded-xl text-[10px] font-black transition-all border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] cursor-pointer whitespace-nowrap shrink-0",
-                            isActive
-                              ? t === "income"
-                                ? "bg-[#03D26F] text-[#161514] scale-105"
-                                : t === "expense"
-                                ? "bg-rose-400 text-[#161514] scale-105"
-                                : "bg-[#CEF431] text-[#161514] scale-105"
-                              : "bg-white text-navy-800 hover:bg-amber-100"
-                          )}
-                        >
-                          {label}
-                        </button>
-                      );
-                    })}
+                  <div className="flex items-center gap-3 flex-wrap shrink-0">
+                    {/* Type Filter Pills */}
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <span className="text-[10px] font-black uppercase text-navy-700 mr-1 flex items-center gap-1 whitespace-nowrap shrink-0">
+                        <Filter className="h-3 w-3 stroke-[2.5]" /> Type:
+                      </span>
+                      {(["all", "income", "expense"] as const).map((t) => {
+                        const isActive = ledgerTypeFilter === t;
+                        const label = t === "all" ? "All" : t === "income" ? "Income (+)" : "Expense (-)";
+                        return (
+                          <button
+                            key={t}
+                            type="button"
+                            onClick={() => setLedgerTypeFilter(t)}
+                            className={cn(
+                              "px-2.5 py-1 rounded-xl text-[10px] font-black transition-all border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] cursor-pointer whitespace-nowrap shrink-0",
+                              isActive
+                                ? t === "income"
+                                  ? "bg-[#03D26F] text-[#161514] scale-105"
+                                  : t === "expense"
+                                  ? "bg-rose-400 text-[#161514] scale-105"
+                                  : "bg-[#CEF431] text-[#161514] scale-105"
+                                : "bg-white text-navy-800 hover:bg-amber-100"
+                            )}
+                          >
+                            {label}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Payment Channel Filter Pills (UPI vs Cash) */}
+                    <div className="flex items-center gap-1.5 shrink-0 pl-1 border-l border-navy-950/20">
+                      <span className="text-[10px] font-black uppercase text-navy-700 mr-1 flex items-center gap-1 whitespace-nowrap shrink-0">
+                        💳 Mode:
+                      </span>
+                      {(["all", "online", "cash"] as const).map((ch) => {
+                        const isActive = paymentChannelFilter === ch;
+                        const label = ch === "all" ? "All Modes" : ch === "online" ? "📱 UPI/Online" : "💵 Cash";
+                        return (
+                          <button
+                            key={ch}
+                            type="button"
+                            onClick={() => setPaymentChannelFilter(ch)}
+                            className={cn(
+                              "px-2.5 py-1 rounded-xl text-[10px] font-black transition-all border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] cursor-pointer whitespace-nowrap shrink-0",
+                              isActive
+                                ? ch === "online"
+                                  ? "bg-[#03D26F] text-[#161514] scale-105"
+                                  : ch === "cash"
+                                  ? "bg-amber-400 text-[#161514] scale-105"
+                                  : "bg-[#CEF431] text-[#161514] scale-105"
+                                : "bg-white text-navy-800 hover:bg-amber-100"
+                            )}
+                          >
+                            {label}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
 
                   {/* Monthly Summary Badges */}
@@ -1069,12 +1415,216 @@ function MoneyPageContent() {
             )}
           </TabsContent>
 
-          {/* Budgets Tab */}
-          <TabsContent id="money-budgets" value="budgets" className="scroll-mt-24">
-            <div className="space-y-4">
+          {/* 🎯 Tab 2: Budgets & Rollover */}
+          <TabsContent id="money-budgets" value="budgets" className="space-y-4 scroll-mt-24">
+            {/* 🎯 FEATURE 4 & 5: MONTHLY BUDGET CEILING & ROLLOVER ALLOWANCE CARD */}
+            <div className="bg-white rounded-3xl p-5 border-2.5 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-navy-950/10 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="h-10 w-10 rounded-2xl bg-[#CEF431] border-2 border-navy-950 flex items-center justify-center text-[#161514] font-black text-lg shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] shrink-0">
+                    🎯
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h4 className="font-black text-sm uppercase tracking-wider text-[#161514]">
+                        {budgetStats.targetMonthLabel} Budget & Rollover
+                      </h4>
+                      {budgetStats.rolloverSurplus > 0 && (
+                        <span className="text-[10px] font-black bg-[#03D26F] text-[#161514] px-2 py-0.5 rounded-full border border-[#161514] shadow-[1px_1px_0px_0px_rgba(31,36,48,1)] flex items-center gap-1">
+                          <Sparkles className="h-3 w-3 stroke-[3]" /> +{currencySymbol}{budgetStats.rolloverSurplus.toLocaleString()} Rolled from {budgetStats.previousMonthLabel.split(" ")[0]}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[10px] text-navy-700 font-bold mt-0.5">
+                      Base Income Budget: {currencySymbol}{budgetStats.baseBudget.toLocaleString()} • Daily expenses deduct from this pool
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTempBudgetInput(String(baseBudget));
+                    setIsBudgetModalOpen(true);
+                  }}
+                  className="self-start sm:self-auto px-3 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-500 text-navy-950 text-xs font-black border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center gap-1.5 shrink-0"
+                >
+                  <Edit3 className="h-3.5 w-3.5 stroke-[2.5]" />
+                  <span>Edit Allowance</span>
+                </button>
+              </div>
+
+              {/* Budget Meter Metrics */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)]">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-navy-600 block">Total Available Pool</span>
+                  <span className="text-xl font-black text-[#161514] block mt-0.5">
+                    {currencySymbol}{budgetStats.totalAvailableBudget.toLocaleString()}
+                  </span>
+                  <span className="text-[9px] font-bold text-navy-600 block mt-0.5">
+                    {budgetStats.baseBudget.toLocaleString()} base {budgetStats.rolloverSurplus > 0 ? `+ ${budgetStats.rolloverSurplus.toLocaleString()} rollover` : ""}
+                  </span>
+                </div>
+
+                <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)]">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-rose-700 block">Spent This Month</span>
+                  <span className="text-xl font-black text-rose-600 block mt-0.5">
+                    -{currencySymbol}{budgetStats.monthlyExpense.toLocaleString()}
+                  </span>
+                  <span className="text-[9px] font-bold text-navy-600 block mt-0.5">
+                    {budgetStats.budgetUsedPercentage}% of monthly pool used
+                  </span>
+                </div>
+
+                <div className={cn(
+                  "p-3.5 rounded-2xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)]",
+                  budgetStats.remainingBudget >= 0 ? "bg-[#CEF431]/30" : "bg-rose-100"
+                )}>
+                  <span className="text-[10px] font-black uppercase tracking-wider text-navy-800 block">Remaining Safe-to-Spend</span>
+                  <span className={cn("text-xl font-black block mt-0.5", budgetStats.remainingBudget >= 0 ? "text-emerald-900" : "text-rose-700")}>
+                    {currencySymbol}{budgetStats.remainingBudget.toLocaleString()}
+                  </span>
+                  <span className="text-[9px] font-bold text-navy-800 block mt-0.5">
+                    {budgetStats.remainingBudget > 0
+                      ? `~${currencySymbol}${budgetStats.dailySafeToSpend}/day safe (${budgetStats.daysRemainingInMonth}d left)`
+                      : "Over-budget! Trim expenses"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="space-y-1.5 pt-1">
+                <div className="flex justify-between items-center text-[10px] font-black uppercase text-navy-800">
+                  <span>Budget Consumption Progress</span>
+                  <span>{budgetStats.budgetUsedPercentage}%</span>
+                </div>
+                <div className="w-full bg-gray-100 h-3 rounded-full overflow-hidden border-2 border-navy-950 p-0.5 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]">
+                  <div
+                    className={cn(
+                      "h-full rounded-full transition-all duration-500",
+                      budgetStats.budgetUsedPercentage > 90 ? "bg-rose-500" : budgetStats.budgetUsedPercentage > 75 ? "bg-amber-400" : "bg-[#03D26F]"
+                    )}
+                    style={{ width: `${Math.min(100, budgetStats.budgetUsedPercentage)}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* 🐷 FEATURE 5: WHERE DID YOU SAVE LAST MONTH? CARD */}
+            {(budgetStats.categorySavingsAudit.length > 0 || budgetStats.previousMonthSavings > 0) && (
+              <div className="bg-[#FAF8F5] rounded-3xl p-5 border-2.5 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] space-y-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="h-9 w-9 rounded-xl bg-amber-400 border-2 border-navy-950 flex items-center justify-center text-navy-950 font-black text-base shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] shrink-0">
+                    🐷
+                  </div>
+                  <div>
+                    <h4 className="font-black text-sm uppercase tracking-wider text-[#161514]">
+                      {budgetStats.previousMonthLabel} Savings Audit & Highlights
+                    </h4>
+                    <p className="text-[10px] text-navy-700 font-bold">
+                      You saved {currencySymbol}{budgetStats.previousMonthSavings.toLocaleString()} in {budgetStats.previousMonthLabel}! Here is where you stayed under budget:
+                    </p>
+                  </div>
+                </div>
+
+                {budgetStats.categorySavingsAudit.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 pt-1">
+                    {budgetStats.categorySavingsAudit.map((item) => (
+                      <div
+                        key={item.categoryId}
+                        className="bg-white p-3 rounded-2xl border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] flex flex-col justify-between gap-2"
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className="text-lg shrink-0">{renderCategoryEmoji(item.icon)}</span>
+                            <div className="min-w-0">
+                              <span className="text-xs font-black text-[#161514] block truncate">{item.categoryName}</span>
+                              <span className="text-[9px] font-bold text-navy-600 block">
+                                Spent: {currencySymbol}{item.spent} / {currencySymbol}{item.budget}
+                              </span>
+                            </div>
+                          </div>
+                          <span className="text-xs font-black text-emerald-800 bg-[#03D26F]/20 px-2 py-0.5 rounded-lg border border-emerald-800/30 shrink-0">
+                            +{currencySymbol}{item.saved}
+                          </span>
+                        </div>
+
+                        {/* 🔄 FEATURE 5: 1-CLICK GRANULAR ENVELOPE ROLLOVER BUTTON */}
+                        <button
+                          type="button"
+                          onClick={() => handleBoostCategoryEnvelope(item)}
+                          disabled={updateCatMutation.isPending}
+                          className="w-full py-1.5 px-2 rounded-xl bg-[#FAF8F5] hover:bg-[#CEF431] text-navy-950 text-[10px] font-black border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer flex items-center justify-center gap-1 disabled:opacity-50"
+                        >
+                          <Sparkles className="h-3 w-3 stroke-[3]" />
+                          <span>Boost {budgetStats.targetMonthLabel.split(" ")[0]} Envelope (+{currencySymbol}{item.saved})</span>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="bg-white p-4 rounded-2xl border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-navy-950/10 pb-2.5">
+                      <div>
+                        <span className="text-xs font-black text-[#161514] block">
+                          Total {budgetStats.previousMonthLabel.split(" ")[0]} Rollover Surplus: +{currencySymbol}{budgetStats.previousMonthSavings.toLocaleString()}
+                        </span>
+                        <span className="text-[10px] text-navy-700 font-bold mt-0.5 block">
+                          You spent {currencySymbol}{budgetStats.previousMonthExpense.toLocaleString()} of your {currencySymbol}{budgetStats.baseBudget.toLocaleString()} overall budget!
+                        </span>
+                      </div>
+                      <span className="text-xs font-black text-emerald-800 bg-[#03D26F]/25 px-2.5 py-1 rounded-xl border border-emerald-800/30 self-start sm:self-auto">
+                        +{currencySymbol}{budgetStats.previousMonthSavings.toLocaleString()} Available
+                      </span>
+                    </div>
+
+                    <div className="space-y-2">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-navy-900 flex items-center gap-1.5">
+                        <span>🎯</span>
+                        <span>1-Tap Allocate +{currencySymbol}{budgetStats.previousMonthSavings.toLocaleString()} to a {budgetStats.targetMonthLabel.split(" ")[0]} Category Envelope:</span>
+                      </span>
+
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                        {categories.filter((c) => c.type === "expense").slice(0, 6).map((cat) => (
+                          <button
+                            key={cat.id}
+                            type="button"
+                            onClick={() => handleBoostCategoryEnvelope({
+                              categoryId: cat.id,
+                              categoryName: cat.name,
+                              saved: budgetStats.previousMonthSavings,
+                              budget: cat.monthlyBudget || 0,
+                            })}
+                            disabled={updateCatMutation.isPending}
+                            className="p-3 rounded-2xl bg-[#FAF8F5] hover:bg-[#CEF431] text-navy-950 border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer flex flex-col justify-between gap-2.5 text-left disabled:opacity-50 group"
+                          >
+                            <div className="flex items-center justify-between w-full">
+                              <span className="text-xl leading-none">{renderCategoryEmoji(cat.icon)}</span>
+                              <span className="text-[10px] font-black text-emerald-950 bg-[#03D26F]/25 px-2 py-0.5 rounded-lg border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)]">
+                                +{currencySymbol}{budgetStats.previousMonthSavings}
+                              </span>
+                            </div>
+                            <div className="w-full">
+                              <span className="text-xs font-black text-[#161514] block leading-snug break-words">
+                                {cat.name}
+                              </span>
+                              <span className="text-[9px] font-bold text-navy-600 group-hover:text-navy-950 block mt-0.5">
+                                Tap to boost 🎯
+                              </span>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="space-y-4 pt-2">
               <div className="flex items-center justify-between">
                 <h3 className="font-bold text-xs uppercase tracking-wider text-navy-600" style={{ fontFamily: "var(--font-heading)" }}>
-                  Monthly Budget Status
+                  Category Budget Envelopes
                 </h3>
                 <div className="flex items-center gap-2">
                   <Button
@@ -1330,7 +1880,31 @@ function MoneyPageContent() {
             </div>
           </TabsContent>
 
-          {/* Analytics Tab */}
+          {/* 🐷 Tab 3: Goals, Subscriptions & Debts */}
+          <TabsContent id="money-vault" value="vault" className="space-y-6 scroll-mt-24">
+            <DraggableDashboardGrid
+              storageKey="money-vault"
+              widgets={[
+                {
+                  id: "subscriptions",
+                  title: "🔁 Active Subscriptions",
+                  component: <SubscriptionsTracker />,
+                },
+                {
+                  id: "savings-goals",
+                  title: "🐷 Savings Goals & Piggy Bank",
+                  component: <SavingsGoals />,
+                },
+                {
+                  id: "debt-tracker",
+                  title: "💸 Lent & Borrowed Money Ledger",
+                  component: <DebtTracker currencySymbol={currencySymbol} />,
+                },
+              ]}
+            />
+          </TabsContent>
+
+          {/* 📊 Tab 4: Analytics */}
           <TabsContent id="money-analytics" value="analytics" className="scroll-mt-24">
             <div className="space-y-6">
               {transactions.length === 0 ? (
@@ -1480,19 +2054,92 @@ function MoneyPageContent() {
               />
             </div>
             <div className="space-y-1">
-              <label htmlFor="tx-pm" className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514]">
-                Payment Method *
-              </label>
-              <NeobrutalistSelect
-                value={txPaymentMethod}
-                onChange={setTxPaymentMethod}
-                options={[
-                  { value: "upi", label: "UPI / GPay / PhonePe", icon: "📱" },
-                  { value: "cash", label: "Cash", icon: "💵" },
-                  { value: "card", label: "Debit/Credit Card", icon: "💳" },
-                  { value: "bank", label: "Bank Transfer", icon: "🏦" },
-                ]}
-              />
+              <div className="flex items-center justify-between">
+                <label className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514]">
+                  Payment Method *
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowMorePaymentMethods(!showMorePaymentMethods)}
+                  className="text-[9px] font-black uppercase text-navy-600 hover:text-navy-950 underline cursor-pointer border-none bg-transparent"
+                >
+                  {showMorePaymentMethods ? "Simple Mode" : "Card / Bank ▾"}
+                </button>
+              </div>
+
+              {!showMorePaymentMethods ? (
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setTxPaymentMethod("upi")}
+                    className={cn(
+                      "py-2.5 px-3 rounded-2xl border-2 border-[#161514] text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5",
+                      txPaymentMethod !== "cash"
+                        ? "bg-[#03D26F] text-[#161514]"
+                        : "bg-white text-[#161514]/70 hover:bg-[#FAF8F5]"
+                    )}
+                  >
+                    <span>📱</span>
+                    <span>UPI / Online</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setTxPaymentMethod("cash")}
+                    className={cn(
+                      "py-2.5 px-3 rounded-2xl border-2 border-[#161514] text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5",
+                      txPaymentMethod === "cash"
+                        ? "bg-amber-400 text-[#161514]"
+                        : "bg-white text-[#161514]/70 hover:bg-[#FAF8F5]"
+                    )}
+                  >
+                    <span>💵</span>
+                    <span>Cash</span>
+                  </button>
+                </div>
+              ) : (
+                <NeobrutalistSelect
+                  value={txPaymentMethod}
+                  onChange={setTxPaymentMethod}
+                  options={[
+                    { value: "upi", label: "UPI / GPay / PhonePe", icon: "📱" },
+                    { value: "cash", label: "Cash", icon: "💵" },
+                    { value: "card", label: "Debit/Credit Card", icon: "💳" },
+                    { value: "bank", label: "Bank Transfer", icon: "🏦" },
+                  ]}
+                />
+              )}
+            </div>
+          </div>
+
+          {/* 🏷️ FEATURE 4: FREQUENT MERCHANT TAP CHIPS */}
+          <div className="space-y-1.5 pt-1">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-black uppercase tracking-wider text-[#161514] flex items-center gap-1">
+                <span>⚡</span>
+                <span>Frequent Presets (1-Tap Fill)</span>
+              </span>
+              <span className="text-[9px] font-bold text-navy-600 lowercase">fills note, cat & mode</span>
+            </div>
+            <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-1">
+              {frequentMerchantPills.map((pill) => (
+                <button
+                  key={pill.label}
+                  type="button"
+                  onClick={() => {
+                    setTxNote(pill.label);
+                    setTxPaymentMethod(pill.defaultMode);
+                    const detected = detectCategoryFromNote(pill.label, categories);
+                    if (detected?.categoryId) {
+                      setTxCategoryId(detected.categoryId);
+                    }
+                  }}
+                  className="px-2.5 py-1 rounded-xl bg-white hover:bg-[#CEF431] text-[#161514] text-[10px] font-black border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center gap-1 shrink-0 cursor-pointer"
+                >
+                  <span>{pill.icon}</span>
+                  <span>{pill.label}</span>
+                </button>
+              ))}
             </div>
           </div>
 
@@ -2312,6 +2959,62 @@ function MoneyPageContent() {
         currencySymbol={currencySymbol}
         userName={user?.displayName || "Invictus Explorer"}
       />
+
+      {/* Monthly Budget Allowance Setup Modal */}
+      <ResponsiveFormContainer
+        open={isBudgetModalOpen}
+        onOpenChange={setIsBudgetModalOpen}
+        title="Set Monthly Budget Allowance"
+        description="Your base monthly income/budget from which daily expenses are deducted"
+      >
+        <form onSubmit={handleSaveMonthlyBudget} className="space-y-4 pt-1">
+          <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] space-y-1">
+            <span className="text-[10px] font-black uppercase tracking-wider text-navy-600 block">
+              How Monthly Budget Works
+            </span>
+            <p className="text-xs text-navy-800 font-medium leading-relaxed">
+              If you set your budget to <strong>{currencySymbol}9,000</strong>, all daily expenses will be deducted from it. If you spend <strong>{currencySymbol}8,000</strong>, the remaining <strong>{currencySymbol}1,000</strong> rolls over to give you <strong>{currencySymbol}10,000</strong> next month! 🚀
+            </p>
+          </div>
+
+          <div className="space-y-1.5">
+            <label htmlFor="budget-input" className="text-xs font-black uppercase tracking-wider text-[#161514] block">
+              Base Monthly Budget Amount ({currencySymbol}) *
+            </label>
+            <input
+              id="budget-input"
+              type="number"
+              min="100"
+              step="50"
+              value={tempBudgetInput}
+              onChange={(e) => setTempBudgetInput(e.target.value)}
+              placeholder="e.g. 9000, 15000, 50000"
+              required
+              className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-4 py-3 text-sm font-black text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
+            />
+          </div>
+
+          <div className="grid grid-cols-3 gap-2">
+            {[5000, 9000, 15000, 25000, 50000, 100000].map((preset) => (
+              <button
+                key={preset}
+                type="button"
+                onClick={() => setTempBudgetInput(String(preset))}
+                className="py-1.5 rounded-xl bg-white hover:bg-[#CEF431] text-[#161514] font-black text-xs border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] cursor-pointer transition-all active:translate-x-0.5 active:translate-y-0.5"
+              >
+                {currencySymbol}{preset.toLocaleString()}
+              </button>
+            ))}
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-[#CEF431] hover:bg-[#03D26F] text-[#161514] font-black text-xs uppercase tracking-wider py-3.5 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center justify-center gap-2 mt-2"
+          >
+            <span>Save Monthly Budget Target 🎯</span>
+          </button>
+        </form>
+      </ResponsiveFormContainer>
     </div>
   );
 }

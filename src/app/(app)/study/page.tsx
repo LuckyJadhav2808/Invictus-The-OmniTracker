@@ -366,17 +366,31 @@ function StudyPageContent() {
           ]}
         />
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="bg-white rounded-full p-1 border border-border shadow-sm flex w-full max-w-[400px] mb-6 overflow-x-auto no-scrollbar">
-            <TabsTrigger value="subjects" className="flex-1 rounded-full text-xs font-bold py-2 data-state=active:bg-navy-900 data-state=active:text-white transition-all cursor-pointer whitespace-nowrap shrink-0">
-              Subjects
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex-1 rounded-full text-xs font-bold py-2 data-state=active:bg-navy-900 data-state=active:text-white transition-all cursor-pointer whitespace-nowrap shrink-0">
-              Analytics
-            </TabsTrigger>
-            <TabsTrigger value="tests" className="flex-1 rounded-full text-xs font-bold py-2 data-state=active:bg-navy-900 data-state=active:text-white transition-all cursor-pointer whitespace-nowrap shrink-0">
-              Mock Tests
-            </TabsTrigger>
-          </TabsList>
+          <div className="w-full overflow-x-auto no-scrollbar pb-1 mb-5">
+            <TabsList className="bg-[#FAF8F5] rounded-2xl p-1.5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] flex items-center gap-1.5 w-max min-w-full sm:min-w-0 sm:w-auto">
+              <TabsTrigger
+                value="subjects"
+                className="rounded-xl text-xs font-black py-2 px-4 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
+              >
+                <span>📚</span>
+                <span>Subjects</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="analytics"
+                className="rounded-xl text-xs font-black py-2 px-4 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
+              >
+                <span>📊</span>
+                <span>Analytics</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="tests"
+                className="rounded-xl text-xs font-black py-2 px-4 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
+              >
+                <span>📝</span>
+                <span>Mock Tests</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* Subjects List Tab */}
           <TabsContent id="subjects-list" value="subjects" className="scroll-mt-24">

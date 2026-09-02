@@ -8,6 +8,7 @@ export interface ITransaction extends Document {
   type: "income" | "expense";
   date: string; // YYYY-MM-DD
   note?: string;
+  paymentMethod?: string; // "UPI" | "Cash" | "Card" | "Bank"
   createdAt: Date;
 }
 
@@ -20,6 +21,7 @@ const TransactionSchema = new Schema<ITransaction>(
     type: { type: String, enum: ["income", "expense"], required: true },
     date: { type: String, required: true, index: true },
     note: { type: String, default: "" },
+    paymentMethod: { type: String, default: "UPI" },
     createdAt: { type: Date, default: Date.now },
   },
   { timestamps: true }

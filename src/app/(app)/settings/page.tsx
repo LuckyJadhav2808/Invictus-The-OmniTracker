@@ -51,6 +51,10 @@ import {
   Volume2,
   AlarmClock,
   Cloud,
+  Smartphone,
+  ChevronDown,
+  ChevronUp,
+  ExternalLink,
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -139,6 +143,7 @@ export default function SettingsPage() {
   const [isWidgetVariantsOpen, setIsWidgetVariantsOpen] = useState(false);
   const [isReportIssueOpen, setIsReportIssueOpen] = useState(false);
   const [isUpdateCheckOpen, setIsUpdateCheckOpen] = useState(false);
+  const [isInstallGuideOpen, setIsInstallGuideOpen] = useState(false);
 
   // Reminders & Audio feedback states
   const [smartReminders, setSmartReminders] = useState(true);
@@ -148,6 +153,38 @@ export default function SettingsPage() {
   const [isCompletionSoundOpen, setIsCompletionSoundOpen] = useState(false);
   const [cloudSync, setCloudSync] = useState(true);
   const [isAIInsightsOpen, setIsAIInsightsOpen] = useState(false);
+
+  // 📲 Native 1-Tap PWA Installation Support
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [isInstallable, setIsInstallable] = useState(false);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setIsInstallable(true);
+    };
+
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    };
+  }, []);
+
+  const handleInstallPWA = async () => {
+    if (!deferredPrompt) {
+      toast.info("To install on your phone: Tap the browser menu (⋮) -> 'Add to Home screen' or 'Install App' 📲");
+      return;
+    }
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === "accepted") {
+      toast.success("Invictus installed to your Home Screen! 🎉");
+      setIsInstallable(false);
+    }
+    setDeferredPrompt(null);
+  };
 
   const downloadCSVReport = (reportType: "habits" | "finance" | "study" | "bundle") => {
     let csvContent = "";
@@ -478,6 +515,58 @@ export default function SettingsPage() {
           >
             <Sliders className="h-5 w-5 stroke-[2.5]" />
           </button>
+        </div>
+
+        {/* 📱 FEATURE 7: WEB-TO-APP DOWNLOAD DISCOVERY HINT CARD */}
+        <div className="bg-[#CEF431] rounded-3xl p-5 border-2.5 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="h-12 w-12 rounded-2xl bg-white border-2 border-navy-950 flex items-center justify-center text-2xl shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] shrink-0">
+              📱
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="font-black text-sm uppercase tracking-tight text-navy-950">
+                  Get Invictus for Android
+                </h3>
+                <span className="bg-[#161514] text-[#CEF431] text-[9px] font-black uppercase px-2 py-0.5 rounded-full">
+                  Official APK v{APP_VERSION_CONFIG.version}
+                </span>
+              </div>
+              <p className="text-xs text-navy-900 font-bold mt-0.5 leading-snug">
+                Browsing on the web? Install the official Android APK for native haptic feedback, offline cache, and instant home-screen app shortcuts!
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 self-stretch sm:self-auto shrink-0 flex-wrap sm:flex-nowrap">
+            <button
+              type="button"
+              onClick={handleInstallPWA}
+              className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-[#CEF431] hover:bg-[#bce028] text-[#161514] text-xs font-black uppercase tracking-wider border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center justify-center gap-1.5"
+              title="Install immediately to Home Screen without downloading APK"
+            >
+              <Smartphone className="h-4 w-4 stroke-[2.5]" />
+              <span>Install App</span>
+            </button>
+
+            <a
+              href="/api/download/android"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-[#161514] hover:bg-navy-900 text-white text-xs font-black uppercase tracking-wider border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center justify-center gap-1.5"
+            >
+              <Download className="h-4 w-4 stroke-[2.5]" />
+              <span>Download APK</span>
+            </a>
+
+            <button
+              type="button"
+              onClick={() => setIsUpdateCheckOpen(true)}
+              className="px-3 py-2.5 rounded-xl bg-white hover:bg-amber-100 text-navy-950 text-xs font-black border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all shrink-0"
+              title="View Release Notes & Check Updates"
+            >
+              <Sparkles className="h-4 w-4 text-navy-950 stroke-[2.5]" />
+            </button>
+          </div>
         </div>
 
         {/* FEATURE 1: ⏰ GLOBAL WAKE-UP HERO WIDGET */}
@@ -1098,37 +1187,107 @@ export default function SettingsPage() {
           </div>
         </ResponsiveFormContainer>
 
-        {/* SYSTEM & APP UPDATES SECTION */}
+        {/* 📱 FEATURE 7: INVICTUS FOR ANDROID (OFFICIAL APK & UPDATES) */}
         <div className="space-y-3 pt-2">
           <span className="text-[10px] font-black text-navy-700 uppercase tracking-widest px-1">
-            SYSTEM & APP UPDATES
+            ANDROID APP & SYSTEM UPDATES
           </span>
 
-          <button
-            type="button"
-            onClick={() => setIsUpdateCheckOpen(true)}
-            className="w-full bg-white hover:bg-cream-bg/50 rounded-2xl p-4 border-2 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] flex items-center justify-between transition-all cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5"
-          >
-            <div className="flex items-center gap-3.5">
-              <div className="h-11 w-11 rounded-xl bg-[#CEF431] border-2 border-navy-950 flex items-center justify-center text-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] shrink-0 font-black text-lg">
-                ⚡
-              </div>
-              <div className="text-left">
-                <div className="flex items-center gap-2">
-                  <h4 className="font-black text-sm text-navy-950 tracking-tight uppercase" style={{ fontFamily: "var(--font-heading)" }}>
-                    APP VERSION & UPDATES
-                  </h4>
-                  <span className="bg-[#CEF431] text-[#161514] font-black text-[9px] px-2 py-0.5 rounded-full border border-navy-950">
-                    v{APP_VERSION_CONFIG.version}
-                  </span>
+          <div className="w-full bg-white rounded-3xl p-5 border-2.5 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] space-y-4">
+            <div className="flex items-start sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3.5">
+                <div className="h-12 w-12 rounded-2xl bg-[#CEF431] border-2 border-navy-950 flex items-center justify-center text-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] shrink-0 font-black text-2xl">
+                  🤖
                 </div>
-                <p className="text-[10px] text-navy-700 font-bold uppercase tracking-wide">
-                  CHECK FOR UPDATES • RELEASE NOTES • APK DOWNLOAD
-                </p>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h4 className="font-black text-sm text-navy-950 tracking-tight uppercase" style={{ fontFamily: "var(--font-heading)" }}>
+                      Invictus for Android
+                    </h4>
+                    <span className="bg-[#CEF431] text-[#161514] font-black text-[9px] px-2 py-0.5 rounded-full border border-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]">
+                      v{APP_VERSION_CONFIG.version} (Build {APP_VERSION_CONFIG.buildNumber})
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-navy-700 font-bold uppercase tracking-wide mt-0.5">
+                    Official Android APK • Native Haptics • Instant Shortcuts • Zero Data Loss
+                  </p>
+                </div>
               </div>
             </div>
-            <ChevronRight className="h-5 w-5 text-navy-950 stroke-[3]" />
-          </button>
+
+            {/* Action Buttons */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+              <button
+                type="button"
+                onClick={handleInstallPWA}
+                className="w-full bg-[#CEF431] hover:bg-[#bce028] text-[#161514] font-black text-xs uppercase tracking-wider py-3.5 px-3 rounded-2xl border-2 border-navy-950 shadow-[3px_3px_0px_0px_rgba(31,36,48,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center justify-center gap-2 text-center"
+              >
+                <Smartphone className="h-4 w-4 stroke-[2.5]" />
+                <span>1-Tap Install (PWA)</span>
+              </button>
+
+              <a
+                href="/api/download/android"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full bg-[#161514] hover:bg-navy-900 text-white font-black text-xs uppercase tracking-wider py-3.5 px-3 rounded-2xl border-2 border-navy-950 shadow-[3px_3px_0px_0px_rgba(31,36,48,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center justify-center gap-2 text-center"
+              >
+                <Download className="h-4 w-4 stroke-[2.5]" />
+                <span>Download APK</span>
+              </a>
+
+              <button
+                type="button"
+                onClick={() => setIsUpdateCheckOpen(true)}
+                className="w-full bg-white hover:bg-amber-100 text-navy-950 font-black text-xs uppercase tracking-wider py-3.5 px-3 rounded-2xl border-2 border-navy-950 shadow-[3px_3px_0px_0px_rgba(31,36,48,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center justify-center gap-2"
+              >
+                <Sparkles className="h-4 w-4 stroke-[2.5]" />
+                <span>Check Updates</span>
+              </button>
+            </div>
+
+            {/* Expandable 3-Step Installation Guide */}
+            <div className="pt-2 border-t-2 border-navy-950/10">
+              <button
+                type="button"
+                onClick={() => setIsInstallGuideOpen(!isInstallGuideOpen)}
+                className="w-full flex items-center justify-between text-xs font-black uppercase text-navy-900 hover:text-navy-950 cursor-pointer"
+              >
+                <span className="flex items-center gap-1.5">
+                  <span>📖 How to Install & Update the Android App</span>
+                </span>
+                {isInstallGuideOpen ? <ChevronUp className="h-4 w-4 stroke-[2.5]" /> : <ChevronDown className="h-4 w-4 stroke-[2.5]" />}
+              </button>
+
+              {isInstallGuideOpen && (
+                <div className="mt-3 space-y-2.5 bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] text-xs font-bold text-navy-800">
+                  <div className="flex items-start gap-2.5">
+                    <span className="h-6 w-6 rounded-full bg-amber-400 text-navy-950 border border-navy-950 flex items-center justify-center font-black text-xs shrink-0">1</span>
+                    <div>
+                      <strong className="text-navy-950 block">Download the Official APK:</strong>
+                      Tap the &ldquo;Download APK&rdquo; button above to save the latest release file onto your Android device.
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-2.5">
+                    <span className="h-6 w-6 rounded-full bg-[#CEF431] text-navy-950 border border-navy-950 flex items-center justify-center font-black text-xs shrink-0">2</span>
+                    <div>
+                      <strong className="text-navy-950 block">Open File & Allow Installation:</strong>
+                      Pull down your notification shade and tap <em>Invictus.apk</em> (or open it from your phone&apos;s Downloads folder). If prompted, tap <em>Settings</em> and toggle <em>&ldquo;Allow from this source&rdquo;</em>.
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-2.5">
+                    <span className="h-6 w-6 rounded-full bg-[#03D26F] text-navy-950 border border-navy-950 flex items-center justify-center font-black text-xs shrink-0">3</span>
+                    <div>
+                      <strong className="text-navy-950 block">Install & Zero Data Loss Updates:</strong>
+                      Tap <em>Install</em>. When launched, log in with your email & password. All your habits, study logs, transactions, and categories sync seamlessly! When a new update is released, simply download the new APK and install it right over the existing app.
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Update Checker Modal */}

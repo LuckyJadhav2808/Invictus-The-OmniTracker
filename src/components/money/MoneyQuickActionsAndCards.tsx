@@ -80,7 +80,6 @@ export function MoneyQuickActionsAndCards({
     } catch {}
   };
 
-  const [walletViewMode, setWalletViewMode] = useState<"stacked" | "carousel">("stacked");
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
 
   // Use user's real category items
@@ -130,157 +129,52 @@ export function MoneyQuickActionsAndCards({
   };
 
   return (
-    <div className="space-y-6 my-4">
-      {/* Top Main Balance Header with Eye Privacy Toggle & Quick Action Pills */}
-      <div className="bg-white rounded-3xl p-6 border-2 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] space-y-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <span className="text-[10px] font-black uppercase tracking-widest text-navy-600 block">
-              Main Balance
-            </span>
-            <div className="flex items-center gap-3 mt-1">
-              <span className="text-3xl sm:text-4xl font-black text-navy-900 tracking-tight">
-                {isHideBalance ? "••••••••" : `${currencySymbol}${mainBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
-              </span>
-              <button
-                onClick={toggleHideBalance}
-                className="p-2 rounded-xl hover:bg-amber-100 border-2 border-navy-950 text-navy-950 transition-colors cursor-pointer shadow-[2px_2px_0px_0px_rgba(31,36,48,1)]"
-                title={isHideBalance ? "Show Balance" : "Hide Balance"}
-              >
-                {isHideBalance ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
-            </div>
-          </div>
-
-          {/* Quick Action Pills */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <button
-              onClick={onAddTransaction}
-              className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-amber-400 hover:bg-amber-500 text-navy-950 text-xs font-black transition-all cursor-pointer border-2 border-navy-950 shadow-[3px_3px_0px_0px_rgba(31,36,48,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]"
-            >
-              <Plus className="h-4 w-4 stroke-[3]" />
-              <span>Add</span>
-            </button>
-            <button
-              onClick={onMoveMoney || (() => toast.info("Select accounts to transfer funds 🔄"))}
-              className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-white hover:bg-amber-100 text-navy-950 text-xs font-black transition-all cursor-pointer border-2 border-navy-950 shadow-[3px_3px_0px_0px_rgba(31,36,48,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]"
-            >
-              <ArrowRightLeft className="h-4 w-4 text-navy-950" />
-              <span>Move</span>
-            </button>
-            <button
-              onClick={onSendMoney || (() => toast.info("Enter recipient details to send funds 🚀"))}
-              className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-white hover:bg-amber-100 text-navy-950 text-xs font-black transition-all cursor-pointer border-2 border-navy-950 shadow-[3px_3px_0px_0px_rgba(31,36,48,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]"
-            >
-              <Send className="h-4 w-4 text-navy-950" />
-              <span>Send</span>
-            </button>
-            <button
-              onClick={onViewDetails}
-              className="p-2.5 rounded-2xl bg-white hover:bg-amber-100 text-navy-950 transition-all cursor-pointer border-2 border-navy-950 shadow-[3px_3px_0px_0px_rgba(31,36,48,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]"
-              title="More Details"
-            >
-              <MoreHorizontal className="h-4 w-4" />
-            </button>
-          </div>
+    <div className="space-y-3">
+      {/* Category Wallets Header with Move, Send and New Category Actions */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+        <div className="flex items-center gap-2">
+          <h4 className="text-xs font-black uppercase tracking-wider text-navy-900 flex items-center gap-1.5">
+            <span>💳</span>
+            <span>Category Wallets & Envelopes</span>
+          </h4>
+          <span className="text-[10px] font-bold text-navy-600 bg-white px-2 py-0.5 rounded-full border border-navy-950/20">
+            {displayCategories.length} {displayCategories.length === 1 ? "envelope" : "envelopes"}
+          </span>
         </div>
 
-        {/* Multi-Color Spending Proportion Bar */}
-        <div className="space-y-2 pt-2 border-t-2 border-navy-950/20">
-          <div className="flex justify-between items-center text-xs font-black text-navy-900">
-            <span>Spend Analysis Breakdown</span>
-            <span className="text-navy-700 text-[11px] font-bold">
-              Total: {currencySymbol}{totalSpending.toFixed(2)}
-            </span>
-          </div>
-
-          {displayCategories.length === 0 || totalSpending === 0 ? (
-            <div className="bg-amber-50 p-3 rounded-2xl border-2 border-navy-950 text-center shadow-[2px_2px_0px_0px_rgba(31,36,48,1)]">
-              <p className="text-xs font-black text-navy-900">No expenses recorded yet! 💸</p>
-              <p className="text-[10px] text-navy-700 font-bold mt-0.5">
-                Click <span className="font-black text-amber-800">'+ Add'</span> above to log your first transaction and build your budget pie chart.
-              </p>
-            </div>
-          ) : (
-            <>
-              <div className="h-4 w-full bg-gray-100 rounded-full overflow-hidden flex gap-0.5 p-0.5 border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)]">
-                {displayCategories.map((c, idx) => {
-                  const percentage = totalSpending > 0 ? Math.round((c.amount / totalSpending) * 100) : 0;
-                  if (percentage === 0) return null;
-                  return (
-                    <div
-                      key={c.id || idx}
-                      className={cn("h-full transition-all duration-300", getSegmentColor(idx), idx === 0 && "rounded-l-full", idx === displayCategories.length - 1 && "rounded-r-full")}
-                      style={{ width: `${percentage}%` }}
-                      title={`${c.name}: ${currencySymbol}${c.amount} (${percentage}%)`}
-                    />
-                  );
-                })}
-              </div>
-
-              <div className="flex flex-wrap gap-x-4 gap-y-1 pt-1 text-[10px] font-black">
-                {displayCategories.map((c, idx) => {
-                  const percentage = totalSpending > 0 ? Math.round((c.amount / totalSpending) * 100) : 0;
-                  return (
-                    <div key={c.id || idx} className="flex items-center gap-1.5 text-navy-900">
-                      <span className={cn("h-2.5 w-2.5 rounded-full border border-black", getSegmentColor(idx))} />
-                      <span>{c.name} ({percentage}%)</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </>
+        {/* Action Buttons: Move Money, Send Money, New Category */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {onMoveMoney && (
+            <button
+              onClick={onMoveMoney}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-amber-100 text-navy-950 text-xs font-black transition-all cursor-pointer border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 shrink-0"
+              title="Transfer funds between categories"
+            >
+              <ArrowRightLeft className="h-3.5 w-3.5 text-navy-950" />
+              <span>Move</span>
+            </button>
+          )}
+          {onSendMoney && (
+            <button
+              onClick={onSendMoney}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-amber-100 text-navy-950 text-xs font-black transition-all cursor-pointer border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 shrink-0"
+              title="Record a payment to a recipient"
+            >
+              <Send className="h-3.5 w-3.5 text-navy-950" />
+              <span>Send</span>
+            </button>
+          )}
+          {onAddCategory && (
+            <button
+              onClick={onAddCategory}
+              className="text-xs font-black text-navy-950 bg-amber-400 hover:bg-amber-500 px-3 py-1.5 rounded-xl cursor-pointer transition-colors flex items-center gap-1 border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] whitespace-nowrap shrink-0 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5"
+            >
+              <Plus className="h-3.5 w-3.5 stroke-[3]" />
+              <span>New Category</span>
+            </button>
           )}
         </div>
       </div>
-
-      {/* Folder-Tab Category Wallet Cards */}
-      <div className="space-y-3">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <h4 className="text-xs font-black uppercase tracking-wider text-navy-600">
-            Category Wallets & Accounts
-          </h4>
-          <div className="flex items-center gap-2 flex-wrap">
-            {/* View Mode Toggle Button */}
-            <div className="flex items-center bg-white rounded-xl border-2 border-navy-950 p-0.5 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] shrink-0">
-              <button
-                type="button"
-                onClick={() => setWalletViewMode("stacked")}
-                className={cn(
-                  "text-[10px] font-black px-2.5 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1",
-                  walletViewMode === "stacked"
-                    ? "bg-[#CEF431] text-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]"
-                    : "text-navy-700 hover:bg-slate-100"
-                )}
-                title="Apple Wallet Overlapping Stack"
-              >
-                <span>🎴 Stack Deck</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setWalletViewMode("carousel")}
-                className={cn(
-                  "text-[10px] font-black px-2.5 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1",
-                  walletViewMode === "carousel"
-                    ? "bg-[#CEF431] text-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]"
-                    : "text-navy-700 hover:bg-slate-100"
-                )}
-                title="Horizontal Swipe Carousel"
-              >
-                <span>📱 Carousel</span>
-              </button>
-            </div>
-
-            {onAddCategory && (
-              <button
-                onClick={onAddCategory}
-                className="text-[10px] font-black text-navy-950 bg-amber-400 hover:bg-amber-500 px-3 py-1.5 rounded-xl cursor-pointer transition-colors flex items-center gap-1 border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] whitespace-nowrap shrink-0"
-              >
-                <Plus className="h-3 w-3 stroke-[3]" /> New Category
-              </button>
-            )}
-          </div>
-        </div>
 
         {displayCategories.length === 0 ? (
           <div className="bg-white rounded-3xl p-8 border-2 border-navy-950 text-center space-y-3 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)]">
@@ -304,13 +198,7 @@ export function MoneyQuickActionsAndCards({
             )}
           </div>
         ) : (
-          <div
-            className={cn(
-              walletViewMode === "carousel"
-                ? "flex gap-3.5 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-3 pt-1"
-                : "relative pt-2 pb-6 flex flex-col -space-y-12 sm:-space-y-14 max-w-2xl mx-auto w-full"
-            )}
-          >
+          <div className="flex gap-3.5 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-3 pt-1">
             {displayCategories.map((cat, idx) => {
               const theme = getCategoryColors(cat, idx);
               const isSelected = activeCardId === cat.id;
@@ -320,9 +208,8 @@ export function MoneyQuickActionsAndCards({
                   onClick={() => setActiveCardId(isSelected ? null : cat.id)}
                   style={{ zIndex: isSelected ? 40 : idx + 1 }}
                   className={cn(
-                    "relative group cursor-pointer transition-all duration-300 ease-out",
-                    walletViewMode === "carousel" ? "w-[240px] sm:w-[280px] shrink-0 snap-start" : "w-full hover:-translate-y-4 hover:z-50",
-                    walletViewMode === "stacked" && isSelected && "-translate-y-6 shadow-2xl scale-[1.01]"
+                    "w-[240px] sm:w-[280px] shrink-0 snap-start relative group cursor-pointer transition-all duration-300 ease-out hover:-translate-y-1",
+                    isSelected && "scale-[1.02]"
                   )}
                 >
                   {/* Folder Top Tab */}
@@ -396,6 +283,5 @@ export function MoneyQuickActionsAndCards({
           </div>
         )}
       </div>
-    </div>
   );
 }
