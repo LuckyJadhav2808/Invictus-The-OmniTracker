@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Eye, EyeOff, Plus, ArrowRightLeft, Send, MoreHorizontal, Wallet, Edit3, Trash2 } from "lucide-react";
+import { Eye, EyeOff, Plus, ArrowRightLeft, Send, MoreHorizontal, Wallet, Edit3, Trash2, Camera } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -43,6 +43,7 @@ interface MoneyQuickActionsProps {
   currencySymbol: string;
   categories: CategoryCardItem[];
   onAddTransaction: () => void;
+  onBulkAddExpense?: () => void;
   onMoveMoney?: () => void;
   onSendMoney?: () => void;
   onViewDetails?: () => void;
@@ -56,6 +57,7 @@ export function MoneyQuickActionsAndCards({
   currencySymbol,
   categories,
   onAddTransaction,
+  onBulkAddExpense,
   onMoveMoney,
   onSendMoney,
   onViewDetails,
@@ -162,6 +164,16 @@ export function MoneyQuickActionsAndCards({
             >
               <Send className="h-3.5 w-3.5 text-navy-950" />
               <span>Send</span>
+            </button>
+          )}
+          {onBulkAddExpense && (
+            <button
+              onClick={onBulkAddExpense}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#CEF431] hover:bg-lime-400 text-navy-950 text-xs font-black transition-all cursor-pointer border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 shrink-0"
+              title="Bulk Expense Logger & Offline OCR Scanner"
+            >
+              <Camera className="h-3.5 w-3.5 text-navy-950 stroke-[2.5]" />
+              <span>Bulk / Scan</span>
             </button>
           )}
           {onAddCategory && (

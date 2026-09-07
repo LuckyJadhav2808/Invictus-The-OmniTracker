@@ -27,6 +27,7 @@ export interface IGymRoutine extends Document {
   dayOfWeek: "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday";
   routineTitle: string;
   exercises: IGymExercise[];
+  lastActiveWeek?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -63,6 +64,7 @@ const GymRoutineSchema = new Schema<IGymRoutine>(
     },
     routineTitle: { type: String, required: true },
     exercises: [GymExerciseSchema],
+    lastActiveWeek: { type: String, default: "" },
   },
   { timestamps: true }
 );

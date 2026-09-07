@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Dumbbell, Plus, Trash2, Edit3, CheckCircle2, Circle, Flame, Sparkles, Layers, Search, Info, Eye } from "lucide-react";
+import { Dumbbell, Plus, Trash2, Edit3, CheckCircle2, Circle, Flame, Sparkles, Layers, Search, Info, Eye, ChevronDown, ChevronUp } from "lucide-react";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
 import { TemplateSelectionModal, TemplatePack } from "@/components/shared/TemplateSelectionModal";
 import { GYM_TEMPLATE_PACKS } from "@/lib/templates-data";
@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useGymRoutines, useAddGymRoutine, useUpdateGymRoutine, useDeleteGymRoutine } from "@/lib/queries/gym";
 import { useExerciseLibrary } from "@/lib/queries/exercises";
+import { getFriendlyWeekLabel } from "@/lib/utils/gym-rollover";
 
 const DAYS_OF_WEEK = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] as const;
 
@@ -40,8 +41,17 @@ export function GymRoutineTracker() {
   const [routineTitleInput, setRoutineTitleInput] = useState("");
 
   const [isAddExerciseOpen, setIsAddExerciseOpen] = useState(false);
+  const [addModalTab, setAddModalTab] = useState<"library" | "custom">("library");
   const [isChoiceOpen, setIsChoiceOpen] = useState(false);
   const [selectedGuideExercise, setSelectedGuideExercise] = useState<any | null>(null);
+  const [collapsedExercises, setCollapsedExercises] = useState<Record<string, boolean>>({});
+
+  const toggleCollapse = (exId: string) => {
+    setCollapsedExercises((prev) => ({
+      ...prev,
+      [exId]: !prev[exId],
+    }));
+  };
 
   const handleApplyGymPack = (pack: TemplatePack) => {
     const newExercises = pack.items.map((item, idx) => ({
@@ -133,6 +143,53 @@ export function GymRoutineTracker() {
     }
   };
 
+  // 1-Tap Direct Add from Library
+  const handleAddExerciseFromLibrary = async (item: any) => {
+    if (addRoutineMutation.isPending || updateRoutineMutation.isPending) return;
+
+    const newExercise = {
+      id: `ex_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+      name: item.title,
+      machineName: item.equipment || "Free Weights",
+      targetMuscle: item.bodyPart || "Chest",
+      equipment: item.equipment || "Free Weights",
+      instructions: item.instructions || [],
+      images: item.images || [],
+      gifUrl: item.gifUrl || item.images?.[0] || "",
+      secondaryMuscles: item.secondaryMuscles || [],
+      notes: item.desc ? item.desc.slice(0, 120) : `${item.level || ""} ${item.type || ""}`.trim(),
+      sets: [
+        { id: `set_1_${Date.now()}`, setNumber: 1, weight: 20, reps: 12, completed: false },
+        { id: `set_2_${Date.now()}`, setNumber: 2, weight: 25, reps: 10, completed: false },
+        { id: `set_3_${Date.now()}`, setNumber: 3, weight: 30, reps: 8, completed: false },
+      ],
+    };
+
+    const existingExercises = currentRoutine?.exercises || [];
+    const updatedExercises = [...existingExercises, newExercise];
+
+    try {
+      if (currentRoutine) {
+        await updateRoutineMutation.mutateAsync({
+          id: currentRoutine.id,
+          exercises: updatedExercises,
+        });
+      } else {
+        await addRoutineMutation.mutateAsync({
+          dayOfWeek: selectedDay,
+          routineTitle: defaultRoutineTitles[selectedDay] || "Daily Workout Split",
+          exercises: updatedExercises,
+        });
+      }
+      toast.success(`Added '${item.title}' to ${selectedDay}! 💪`);
+      setIsAddExerciseOpen(false);
+      setLibQuery("");
+    } catch {
+      toast.error("Failed to add exercise to routine");
+    }
+  };
+
+  // Add Custom Exercise from Form
   const handleAddExercise = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!exerciseName.trim()) return;
@@ -140,13 +197,13 @@ export function GymRoutineTracker() {
     const newExercise = {
       id: `ex_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
       name: exerciseName.trim(),
-      machineName: machineName.trim() || selectedLibItem?.equipment || "Free Weights",
-      targetMuscle: targetMuscle || selectedLibItem?.bodyPart || "Chest",
-      equipment: selectedLibItem?.equipment || machineName.trim(),
-      instructions: selectedLibItem?.instructions || [],
-      images: selectedLibItem?.images || [],
-      gifUrl: selectedLibItem?.gifUrl || selectedLibItem?.images?.[0] || "",
-      secondaryMuscles: selectedLibItem?.secondaryMuscles || [],
+      machineName: machineName.trim() || "Free Weights",
+      targetMuscle: targetMuscle.trim() || "Chest",
+      equipment: machineName.trim() || "Free Weights",
+      instructions: [],
+      images: [],
+      gifUrl: "",
+      secondaryMuscles: [],
       notes: exerciseNotes.trim(),
       sets: [
         { id: `set_1_${Date.now()}`, setNumber: 1, weight: 20, reps: 12, completed: false },
@@ -171,12 +228,12 @@ export function GymRoutineTracker() {
           exercises: updatedExercises,
         });
       }
-      toast.success(`Exercise '${exerciseName}' added! 💪`);
+      toast.success(`Exercise '${exerciseName}' added to ${selectedDay}! 💪`);
       setIsAddExerciseOpen(false);
       setExerciseName("");
       setMachineName("");
       setExerciseNotes("");
-      setSelectedLibItem(null);
+      setTargetMuscle("Chest");
     } catch {
       toast.error("Failed to add exercise");
     }
@@ -302,6 +359,24 @@ export function GymRoutineTracker() {
         id: currentRoutine.id,
         exercises: updatedExercises,
       });
+      if (field === "completed" && value === true) {
+        const thisEx = updatedExercises.find((e: any) => e.id === exId);
+        const thisExCompleted = thisEx && (thisEx.sets || []).length > 0 && (thisEx.sets || []).every((s: any) => s.completed);
+        if (thisExCompleted) {
+          toast.success(`'${thisEx.name}' sets crushed! 🎯`);
+          // Auto-collapse completed exercise smoothly
+          setTimeout(() => {
+            setCollapsedExercises((prev) => ({ ...prev, [exId]: true }));
+          }, 450);
+        }
+
+        const allDone = updatedExercises.every((e: any) =>
+          (e.sets || []).every((s: any) => s.completed)
+        );
+        if (allDone && updatedExercises.length > 0) {
+          toast.success(`Crushed it! All ${selectedDay} sets completed! 🏆🔥`);
+        }
+      }
     } catch {
       toast.error("Failed to update set details");
     }
@@ -319,7 +394,7 @@ export function GymRoutineTracker() {
         id: currentRoutine.id,
         exercises: updatedExercises,
       });
-      toast.success(`Reset set checkmarks for ${selectedDay}! Ready for a new week 🏋️`);
+      toast.success(`Checkmarks reset for ${selectedDay}! Ready for a fresh workout 🏋️`);
     } catch {
       toast.error("Failed to reset ticks");
     }
@@ -332,8 +407,25 @@ export function GymRoutineTracker() {
   );
   const totalSets = currentExercises.reduce((sum: number, ex: any) => sum + (ex.sets?.length || 0), 0);
 
+  const isAllCollapsed = useMemo(() => {
+    if (currentExercises.length === 0) return false;
+    return currentExercises.every((ex: any) => collapsedExercises[ex.id]);
+  }, [currentExercises, collapsedExercises]);
+
+  const toggleAllCollapse = () => {
+    if (isAllCollapsed) {
+      setCollapsedExercises({});
+    } else {
+      const all: Record<string, boolean> = {};
+      currentExercises.forEach((ex: any) => {
+        all[ex.id] = true;
+      });
+      setCollapsedExercises(all);
+    }
+  };
+
   return (
-    <div className="bg-white rounded-3xl p-5 md:p-6 border-2 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] space-y-5 my-4">
+    <div className="bg-white rounded-3xl p-4 sm:p-6 border-2 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] space-y-5">
       {/* Tracker Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b-2 border-navy-950/10">
         <div className="flex items-center gap-3">
@@ -347,8 +439,14 @@ export function GymRoutineTracker() {
             >
               GYM ROUTINE & SPLITS
             </h3>
-            <p className="text-[11px] text-navy-700 font-bold mt-0.5">
-              Logged sets today: <strong className="text-rose-600 font-black">{totalCompletedSets} / {totalSets} sets</strong>
+            <p className="text-[11px] text-navy-700 font-bold mt-0.5 flex items-center gap-2 flex-wrap">
+              <span>
+                Logged sets: <strong className="text-rose-600 font-black">{totalCompletedSets} / {totalSets} sets</strong>
+              </span>
+              <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 border border-emerald-300 inline-flex items-center gap-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                {getFriendlyWeekLabel()} (Auto-Rollover)
+              </span>
             </p>
           </div>
         </div>
@@ -357,10 +455,10 @@ export function GymRoutineTracker() {
           {totalSets > 0 && (
             <button
               onClick={handleResetWeeklyTicks}
-              className="text-[10px] font-black text-navy-950 bg-sky-200 hover:bg-sky-300 px-3 py-1.5 rounded-xl cursor-pointer transition-all border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5"
-              title="Uncheck all sets to reuse routine for a new week"
+              className="text-[10px] font-black text-navy-950 bg-sky-100 hover:bg-sky-200 px-3 py-1.5 rounded-xl cursor-pointer transition-all border border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] active:translate-y-0.5"
+              title="Uncheck all sets to re-log without losing weights/reps"
             >
-              🔄 New Week Reset
+              🔄 Reset Sets
             </button>
           )}
           <button
@@ -407,22 +505,46 @@ export function GymRoutineTracker() {
       </div>
 
       {/* Routine Title Banner */}
-      <div className="bg-cream-bg/40 rounded-2xl p-4 border border-border/70 flex items-center justify-between">
-        <div>
-          <span className="text-[9px] font-extrabold uppercase tracking-widest text-navy-600 block">
+      <div className="bg-cream-bg/50 rounded-2xl p-3.5 sm:p-4 border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <span className="text-[9.5px] font-black uppercase tracking-widest text-navy-600 block">
             {selectedDay} Workout Routine
           </span>
-          <h4 className="text-sm font-black text-navy-900 mt-0.5">
+          <h4 className="text-sm sm:text-base font-black text-navy-950 mt-0.5 leading-snug break-words">
             {currentRoutine?.routineTitle || defaultRoutineTitles[selectedDay]}
           </h4>
         </div>
 
-        <button
-          onClick={() => setIsChoiceOpen(true)}
-          className="bg-rose-400 hover:bg-rose-500 text-navy-950 font-black rounded-xl py-1.5 px-3 text-xs border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 cursor-pointer flex items-center gap-1 transition-all"
-        >
-          <Plus className="h-3.5 w-3.5 stroke-[2.5]" /> Add Exercise
-        </button>
+        <div className="flex items-center gap-2 shrink-0 self-start sm:self-center">
+          {currentExercises.length > 1 && (
+            <button
+              type="button"
+              onClick={toggleAllCollapse}
+              className="bg-white hover:bg-cream-bg text-navy-950 font-black rounded-xl py-1.5 px-2.5 text-xs border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] cursor-pointer transition-all flex items-center gap-1 active:translate-y-0.5"
+              title={isAllCollapsed ? "Expand all exercises" : "Collapse all exercises"}
+            >
+              {isAllCollapsed ? (
+                <>
+                  <ChevronDown className="h-3.5 w-3.5 stroke-[2.5]" />
+                  <span>Expand All</span>
+                </>
+              ) : (
+                <>
+                  <ChevronUp className="h-3.5 w-3.5 stroke-[2.5]" />
+                  <span>Collapse</span>
+                </>
+              )}
+            </button>
+          )}
+
+          <button
+            onClick={() => setIsChoiceOpen(true)}
+            className="bg-rose-400 hover:bg-rose-500 text-navy-950 font-black rounded-xl py-1.5 px-3.5 text-xs border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 cursor-pointer flex items-center gap-1.5 transition-all"
+          >
+            <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
+            <span>Add Exercise</span>
+          </button>
+        </div>
       </div>
 
       {/* Exercise & Machine Cards List */}
@@ -436,124 +558,265 @@ export function GymRoutineTracker() {
           </p>
         </div>
       ) : (
-        <div className="space-y-4">
-          {currentExercises.map((ex: any) => (
-            <div key={ex.id} className="bg-cream-bg/40 rounded-2xl p-4 border border-border/80 space-y-3">
-              {/* Exercise Header */}
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h5 className="font-extrabold text-sm text-navy-900">{ex.name}</h5>
-                    <span className="text-[9px] font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded-full uppercase">
-                      {ex.targetMuscle || "General"}
-                    </span>
-                  </div>
-                  {ex.machineName && (
-                    <span className="text-[10px] font-semibold text-navy-600 flex items-center gap-1 mt-0.5">
-                      <Layers className="h-3 w-3 text-rose-500" /> Machine: {ex.machineName}
-                    </span>
+        <div className="space-y-3 pb-2">
+          {currentExercises.map((ex: any) => {
+            const isCompleted = (ex.sets || []).length > 0 && (ex.sets || []).every((s: any) => s.completed);
+            const completedCount = (ex.sets || []).filter((s: any) => s.completed).length;
+            const totalCount = ex.sets?.length || 0;
+            const isCollapsed = collapsedExercises[ex.id] ?? false;
+
+            if (isCollapsed) {
+              return (
+                <div
+                  key={ex.id}
+                  className={cn(
+                    "bg-cream-bg/60 hover:bg-cream-bg rounded-2xl p-3.5 border-2 border-navy-950 transition-all shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] cursor-pointer select-none",
+                    isCompleted && "bg-emerald-50/80 border-emerald-800"
                   )}
+                  onClick={() => toggleCollapse(ex.id)}
+                >
+                  <div className="space-y-2.5">
+                    {/* Top Row: Icon + Full Exercise Name + Expand Chevron */}
+                    <div className="flex items-start justify-between gap-2.5">
+                      <div className="flex items-start gap-2.5 min-w-0 flex-1">
+                        <div
+                          className={cn(
+                            "h-8 w-8 rounded-xl border-2 border-navy-950 flex items-center justify-center text-sm shrink-0 font-black shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] mt-0.5",
+                            isCompleted ? "bg-emerald-400 text-navy-950" : "bg-amber-300 text-navy-950"
+                          )}
+                        >
+                          {isCompleted ? "✓" : "🏋️"}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <h5 className="font-black text-xs sm:text-sm text-navy-950 leading-snug break-words">
+                            {ex.name}
+                          </h5>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 shrink-0 pt-0.5">
+                        <div
+                          className="h-6 w-6 rounded-lg border border-navy-950 flex items-center justify-center text-navy-800 bg-white shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]"
+                          title="Expand exercise"
+                        >
+                          <ChevronDown className="h-3.5 w-3.5 stroke-[2.5]" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Bottom Row: Muscle & Equipment Pills + Progress Badge + Form Guide */}
+                    <div className="flex items-center justify-between gap-2 pt-2 border-t border-navy-950/10 flex-wrap">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-[8.5px] font-black uppercase px-2 py-0.5 rounded-md bg-rose-100 text-rose-800 border border-rose-200">
+                          {ex.targetMuscle || "General"}
+                        </span>
+                        {ex.machineName && (
+                          <span className="text-[9.5px] font-bold text-navy-700">
+                            • {ex.machineName}
+                          </span>
+                        )}
+                        <span className="text-[9.5px] font-black text-navy-500">
+                          • {totalCount} Sets
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 shrink-0 ml-auto">
+                        <span
+                          className={cn(
+                            "text-[9.5px] font-black px-2 py-0.5 rounded-md border border-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]",
+                            isCompleted ? "bg-emerald-300 text-emerald-950" : "bg-white text-navy-900"
+                          )}
+                        >
+                          {completedCount} / {totalCount} Done
+                        </span>
+
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedGuideExercise(ex);
+                          }}
+                          className="px-2 py-0.5 rounded-md bg-amber-300 hover:bg-amber-400 text-navy-950 text-[9.5px] font-black border border-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)] flex items-center gap-1 cursor-pointer transition-all active:translate-y-0.5 shrink-0"
+                          title="Form Guide"
+                        >
+                          <Eye className="h-3 w-3 stroke-[2.5]" />
+                          <span>Guide</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+              );
+            }
 
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedGuideExercise(ex)}
-                    className="px-2 py-1 rounded-xl bg-amber-300 hover:bg-amber-400 text-navy-950 font-black text-[10px] uppercase border border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] flex items-center gap-1 cursor-pointer transition-all active:translate-x-0.5 active:translate-y-0.5"
-                    title="View execution form guide, muscle activation & posture"
-                  >
-                    <Eye className="h-3 w-3 stroke-[2.5]" />
-                    <span>Form Guide</span>
-                  </button>
+            return (
+              <div
+                key={ex.id}
+                className={cn(
+                  "bg-cream-bg/40 rounded-2xl p-4 border-2 border-navy-950 shadow-[2.5px_2.5px_0px_0px_rgba(31,36,48,1)] space-y-3 transition-all",
+                  isCompleted && "bg-emerald-50/40 border-emerald-800"
+                )}
+              >
+                {/* Exercise Header */}
+                <div className="space-y-2">
+                  {/* Top line: Full Exercise Name + Actions (Edit, Delete, Collapse) */}
+                  <div className="flex items-start justify-between gap-2">
+                    <div
+                      onClick={() => toggleCollapse(ex.id)}
+                      className="cursor-pointer select-none min-w-0 flex-1"
+                      title="Click to collapse"
+                    >
+                      <h5 className="font-black text-sm sm:text-base text-navy-950 leading-snug break-words">
+                        {ex.name}
+                      </h5>
+                    </div>
 
-                  <button
-                    onClick={() => {
-                      setEditingExercise(ex);
-                      setEditExName(ex.name);
-                      setEditExMachine(ex.machineName || "");
-                      setEditExTarget(ex.targetMuscle || "Chest");
-                      setEditExNotes(ex.notes || "");
-                    }}
-                    className="text-navy-600 hover:text-navy-900 p-1 cursor-pointer transition-colors border-none bg-transparent"
-                    title="Edit exercise"
-                  >
-                    <Edit3 className="h-3.5 w-3.5" />
-                  </button>
-                  <button
-                    onClick={() => setDeleteExId(ex.id)}
-                    className="text-navy-600 hover:text-rose-600 p-1 cursor-pointer transition-colors border-none bg-transparent"
-                    title="Delete exercise"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Sets Table */}
-              <div className="bg-white rounded-xl border border-border/70 overflow-hidden text-xs">
-                <div className="grid grid-cols-4 bg-cream-bg/60 p-2 font-black text-[10px] text-navy-600 uppercase tracking-wider text-center border-b">
-                  <span>Set</span>
-                  <span>Weight (kg)</span>
-                  <span>Reps</span>
-                  <span>Done</span>
-                </div>
-
-                <div className="divide-y divide-border/40">
-                  {(ex.sets || []).map((st: any, idx: number) => (
-                    <div key={st.id || idx} className="grid grid-cols-4 p-2 items-center text-center">
-                      <span className="font-bold text-navy-900 text-[11px]">Set {st.setNumber}</span>
-                      <input
-                        type="number"
-                        value={st.weight}
-                        onChange={(e) => handleSetChange(ex.id, idx, "weight", Number(e.target.value))}
-                        className="w-16 mx-auto bg-cream-bg/50 border rounded-lg py-0.5 px-1 text-center font-extrabold text-navy-900 outline-none focus:ring-1 focus:ring-rose-500"
-                        min={0}
-                      />
-                      <input
-                        type="number"
-                        value={st.reps}
-                        onChange={(e) => handleSetChange(ex.id, idx, "reps", Number(e.target.value))}
-                        className="w-14 mx-auto bg-cream-bg/50 border rounded-lg py-0.5 px-1 text-center font-extrabold text-navy-900 outline-none focus:ring-1 focus:ring-rose-500"
-                        min={1}
-                      />
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <button
+                        onClick={() => {
+                          setEditingExercise(ex);
+                          setEditExName(ex.name);
+                          setEditExMachine(ex.machineName || "");
+                          setEditExTarget(ex.targetMuscle || "Chest");
+                          setEditExNotes(ex.notes || "");
+                        }}
+                        className="p-1.5 rounded-lg bg-white hover:bg-navy-100 border border-navy-950 text-navy-700 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)] cursor-pointer transition-all active:translate-y-0.5"
+                        title="Edit exercise"
+                      >
+                        <Edit3 className="h-3 w-3" />
+                      </button>
+                      <button
+                        onClick={() => setDeleteExId(ex.id)}
+                        className="p-1.5 rounded-lg bg-white hover:bg-rose-100 border border-navy-950 text-rose-600 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)] cursor-pointer transition-all active:translate-y-0.5"
+                        title="Delete exercise"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </button>
                       <button
                         type="button"
-                        onClick={() => handleSetChange(ex.id, idx, "completed", !st.completed)}
-                        className="mx-auto cursor-pointer border-none bg-transparent outline-none"
+                        onClick={() => toggleCollapse(ex.id)}
+                        className="p-1.5 rounded-lg bg-white hover:bg-navy-100 border border-navy-950 text-navy-800 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)] cursor-pointer transition-all active:translate-y-0.5"
+                        title="Collapse exercise"
                       >
-                        {st.completed ? (
-                          <CheckCircle2 className="h-5 w-5 text-emerald-600 fill-emerald-100" />
-                        ) : (
-                          <Circle className="h-5 w-5 text-navy-600/40 hover:text-navy-900" />
-                        )}
+                        <ChevronUp className="h-3 w-3 stroke-[2.5]" />
                       </button>
                     </div>
-                  ))}
-                </div>
-              </div>
+                  </div>
 
-              {/* Set Actions Bar */}
-              <div className="flex justify-between items-center pt-1 text-[10px]">
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleAddSet(ex.id)}
-                    className="font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 px-2.5 py-1 rounded-full cursor-pointer transition-colors border-none outline-none flex items-center gap-0.5"
-                  >
-                    <Plus className="h-3 w-3" /> Add Set
-                  </button>
-                  {ex.sets && ex.sets.length > 1 && (
+                  {/* Sub-line: Muscle Tag + Machine + Form Guide Button */}
+                  <div className="flex items-center justify-between gap-2 flex-wrap pt-0.5">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-md bg-rose-100 text-rose-800 border border-rose-200">
+                        {ex.targetMuscle || "General"}
+                      </span>
+                      {ex.machineName && (
+                        <span className="text-[10px] font-bold text-navy-700 flex items-center gap-1">
+                          <Layers className="h-3 w-3 text-rose-500" /> {ex.machineName}
+                        </span>
+                      )}
+                    </div>
+
                     <button
-                      onClick={() => handleRemoveSet(ex.id)}
-                      className="font-bold text-navy-600 hover:text-rose-600 bg-cream-bg px-2.5 py-1 rounded-full cursor-pointer transition-colors border-none outline-none"
+                      type="button"
+                      onClick={() => setSelectedGuideExercise(ex)}
+                      className="px-2.5 py-1 rounded-lg bg-amber-300 hover:bg-amber-400 text-navy-950 font-black text-[10px] border border-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)] flex items-center gap-1 cursor-pointer transition-all active:translate-y-0.5 shrink-0"
+                      title="View execution form guide, muscle activation & posture"
                     >
-                      Remove Set
+                      <Eye className="h-3 w-3 stroke-[2.5]" />
+                      <span>Form Guide</span>
                     </button>
-                  )}
+                  </div>
                 </div>
-                {ex.notes && <span className="text-navy-600 italic truncate max-w-[200px]">Note: {ex.notes}</span>}
+
+                {/* Sets Table */}
+                <div className="bg-white rounded-xl border border-border/80 overflow-hidden text-xs shadow-[1px_1px_0px_0px_rgba(31,36,48,0.06)]">
+                  <div className="grid grid-cols-4 gap-2 px-3 py-2 bg-cream-bg/60 font-black text-[10px] text-navy-600 uppercase tracking-wider text-center border-b">
+                    <span>Set</span>
+                    <span>Weight (kg)</span>
+                    <span>Reps</span>
+                    <span>Done</span>
+                  </div>
+
+                  <div className="divide-y divide-border/40">
+                    {(ex.sets || []).map((st: any, idx: number) => (
+                      <div key={st.id || idx} className="grid grid-cols-4 gap-2 px-3 py-2 items-center text-center">
+                        <span className="font-extrabold text-navy-900 text-[11px]">Set {st.setNumber}</span>
+                        <div className="flex justify-center">
+                          <input
+                            type="number"
+                            value={st.weight}
+                            onChange={(e) => handleSetChange(ex.id, idx, "weight", Number(e.target.value))}
+                            className="w-full max-w-[58px] bg-cream-bg/60 border border-border/90 rounded-lg py-1 px-1 text-center font-black text-navy-950 text-xs outline-none focus:ring-2 focus:ring-rose-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-all"
+                            min={0}
+                          />
+                        </div>
+                        <div className="flex justify-center">
+                          <input
+                            type="number"
+                            value={st.reps}
+                            onChange={(e) => handleSetChange(ex.id, idx, "reps", Number(e.target.value))}
+                            className="w-full max-w-[58px] bg-cream-bg/60 border border-border/90 rounded-lg py-1 px-1 text-center font-black text-navy-950 text-xs outline-none focus:ring-2 focus:ring-rose-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-all"
+                            min={1}
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleSetChange(ex.id, idx, "completed", !st.completed)}
+                          className="mx-auto cursor-pointer border-none bg-transparent outline-none flex items-center justify-center p-1 rounded-full hover:bg-emerald-50 active:scale-95 transition-all"
+                          title={st.completed ? "Mark incomplete" : "Mark completed"}
+                        >
+                          {st.completed ? (
+                            <CheckCircle2 className="h-5 w-5 text-emerald-600 fill-emerald-100 transition-transform active:scale-110" />
+                          ) : (
+                            <Circle className="h-5 w-5 text-navy-400/60 hover:text-navy-900 transition-colors" />
+                          )}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Set Actions Bar */}
+                <div className="flex items-center justify-between pt-0.5">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <button
+                      type="button"
+                      onClick={() => handleAddSet(ex.id)}
+                      className="font-bold text-[11px] text-rose-700 bg-rose-50 hover:bg-rose-100 px-3 py-1 rounded-full cursor-pointer transition-colors border border-rose-200 flex items-center gap-1 shrink-0 whitespace-nowrap active:scale-95"
+                    >
+                      <Plus className="h-3 w-3 stroke-[2.5]" />
+                      <span>Add Set</span>
+                    </button>
+                    {ex.sets && ex.sets.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveSet(ex.id)}
+                        className="font-bold text-[11px] text-navy-600 hover:text-rose-600 bg-cream-bg px-3 py-1 rounded-full cursor-pointer transition-colors border border-navy-950/10 shrink-0 whitespace-nowrap active:scale-95"
+                      >
+                        Remove Set
+                      </button>
+                    )}
+                  </div>
+
+                  <span className="text-[10px] font-extrabold text-navy-500 uppercase tracking-wider">
+                    {completedCount} / {totalCount} Done
+                  </span>
+                </div>
+
+                {/* Form Cue / Notes Banner (Zero Clipping, Dedicated Full-Width Callout) */}
+                {ex.notes && (
+                  <div className="bg-amber-50/90 rounded-xl p-2.5 border border-amber-200/90 flex items-start gap-2 shadow-[1px_1px_0px_0px_rgba(245,158,11,0.15)]">
+                    <span className="text-[9px] font-black uppercase tracking-wider bg-amber-400 text-navy-950 px-1.5 py-0.5 rounded border border-navy-950 shrink-0 mt-0.5">
+                      CUE
+                    </span>
+                    <p className="text-navy-900 text-[11px] font-bold leading-relaxed break-words flex-1">
+                      {ex.notes}
+                    </p>
+                  </div>
+                )}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -568,7 +831,10 @@ export function GymRoutineTracker() {
         templatesLabel="WORKOUT PACKS"
         templatesDesc="PUSH DAY, PULL DAY, LEGS, HYPERTROPHY..."
         templatePacks={GYM_TEMPLATE_PACKS}
-        onSelectBlank={() => setIsAddExerciseOpen(true)}
+        onSelectBlank={() => {
+          setAddModalTab("library");
+          setIsAddExerciseOpen(true);
+        }}
         onApplyTemplatePack={handleApplyGymPack}
       />
 
@@ -606,170 +872,218 @@ export function GymRoutineTracker() {
         open={isAddExerciseOpen}
         onOpenChange={setIsAddExerciseOpen}
         title={`Add Exercise to ${selectedDay}`}
-        description="Search from 2,900+ Gym Exercise Library or enter custom details"
+        description="Search 2,900+ exercises with 1-tap add, or log custom machines"
       >
-        <div className="space-y-4 pt-2">
-          {/* 🔍 DATASET 1: 2,900+ EXERCISES SEARCH & AUTO-FILL LIBRARY */}
-          <div className="bg-amber-50 rounded-2xl p-3.5 border-2 border-navy-950 shadow-[2.5px_2.5px_0px_0px_rgba(31,36,48,1)] space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-black uppercase tracking-widest text-navy-950 flex items-center gap-1.5">
-                <Search className="h-3.5 w-3.5 text-navy-950 stroke-[3]" />
-                🔍 Search 2,900+ Exercise Library
-              </span>
-              <span className="text-[9px] font-black bg-amber-400 text-navy-950 px-2 py-0.5 rounded-md border border-navy-950">
-                {libData?.totalCount || 2919} Exercises
-              </span>
-            </div>
-
-            {/* Search Input */}
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search exercise name or muscle (e.g. Bench Press, Squat, Crunch)..."
-                value={libQuery}
-                onChange={(e) => {
-                  setLibQuery(e.target.value);
-                }}
-                className="w-full bg-white rounded-xl border-2 border-navy-950 px-3.5 py-2 text-xs font-bold text-navy-950 outline-none placeholder:text-navy-400 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)]"
-              />
-            </div>
-
-            {/* Muscle Group Quick Filters */}
-            <div className="flex flex-wrap gap-1.5 pt-0.5">
-              {["all", "Abdominals", "Chest", "Back", "Biceps", "Triceps", "Shoulders", "Quadriceps", "Hamstrings", "Glutes"].map((m) => (
-                <button
-                  key={m}
-                  type="button"
-                  onClick={() => setLibBodyPart(m)}
-                  className={cn(
-                    "text-[9px] font-black px-2 py-0.5 rounded-lg border border-navy-950 transition-all cursor-pointer",
-                    libBodyPart === m
-                      ? "bg-navy-950 text-white shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]"
-                      : "bg-white text-navy-950 hover:bg-amber-100"
-                  )}
-                >
-                  {m === "all" ? "ALL MUSCLES" : m.toUpperCase()}
-                </button>
-              ))}
-            </div>
-
-            {/* Live Search Results List */}
-            {libData?.exercises && libData.exercises.length > 0 && (
-              <div className="max-h-56 overflow-y-auto space-y-2 pr-1 pt-1 divide-y divide-amber-200/60">
-                {libData.exercises.map((item) => (
-                  <div
-                    key={item.id}
-                    onClick={() => {
-                      setSelectedLibItem(item);
-                      setExerciseName(item.title);
-                      setMachineName(item.equipment || "Free Weights");
-                      setTargetMuscle(item.bodyPart || "Chest");
-                      setExerciseNotes(item.desc ? item.desc.slice(0, 120) + "..." : `${item.level} ${item.type}`);
-                      toast.success(`Selected '${item.title}' with Form Guide! 🎯`);
-                    }}
-                    className="p-2 rounded-xl bg-white hover:bg-amber-100/80 border border-navy-950 cursor-pointer transition-all flex items-center justify-between gap-2 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]"
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      {item.images && item.images[0] ? (
-                        <div className="h-10 w-10 rounded-lg bg-[#242220] border border-navy-950 overflow-hidden shrink-0 flex items-center justify-center">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={item.images[0]} alt={item.title} className="h-full w-full object-contain" />
-                        </div>
-                      ) : (
-                        <div className="h-10 w-10 rounded-lg bg-amber-200 border border-navy-950 flex items-center justify-center text-navy-950 font-black text-xs shrink-0">
-                          🏋️
-                        </div>
-                      )}
-                      <div className="min-w-0">
-                        <h5 className="font-black text-xs text-navy-950 truncate">{item.title}</h5>
-                        <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                          <span className="text-[8px] font-black uppercase px-1.5 py-0.2 rounded bg-amber-400 text-navy-950 border border-navy-950">
-                            {item.bodyPart}
-                          </span>
-                          <span className="text-[8px] font-black uppercase px-1.5 py-0.2 rounded bg-sky-200 text-navy-950 border border-navy-950">
-                            {item.equipment}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedGuideExercise(item);
-                        }}
-                        className="px-2 py-1 rounded-lg bg-amber-300 hover:bg-amber-400 text-navy-950 text-[9px] font-black border border-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)] flex items-center gap-1 cursor-pointer transition-all"
-                        title="View Exercise Form Guide"
-                      >
-                        <Eye className="h-2.5 w-2.5 stroke-[2.5]" />
-                        <span>Guide</span>
-                      </button>
-                      <span className="text-[9px] font-black bg-emerald-400 text-navy-950 px-2 py-1 rounded-lg border border-navy-950">
-                        USE ➔
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+        <div className="space-y-3 pt-1">
+          {/* Segmented Mode Toggle: Library vs Custom Exercise */}
+          <div className="flex p-1 bg-cream-100/90 rounded-2xl border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] gap-1">
+            <button
+              type="button"
+              onClick={() => setAddModalTab("library")}
+              className={cn(
+                "flex-1 py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer",
+                addModalTab === "library"
+                  ? "bg-navy-950 text-white shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]"
+                  : "text-navy-900 hover:bg-amber-100"
+              )}
+            >
+              <Search className="h-3.5 w-3.5 stroke-[2.5]" />
+              <span>Library ({libData?.totalCount || 2919})</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setAddModalTab("custom")}
+              className={cn(
+                "flex-1 py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer",
+                addModalTab === "custom"
+                  ? "bg-navy-950 text-white shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]"
+                  : "text-navy-900 hover:bg-amber-100"
+              )}
+            >
+              <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
+              <span>Custom Exercise</span>
+            </button>
           </div>
 
-          <form onSubmit={handleAddExercise} className="space-y-4 pt-1">
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Exercise Name</label>
-              <input
-                type="text"
-                placeholder="e.g. Incline Dumbbell Press, Lat Pulldown"
-                value={exerciseName}
-                onChange={(e) => setExerciseName(e.target.value)}
-                className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:ring-2 focus:ring-rose-500 font-medium"
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Machine / Equipment</label>
+          {addModalTab === "library" ? (
+            /* 🔍 2,900+ EXERCISES SEARCH & DIRECT 1-TAP ADD */
+            <div className="space-y-3">
+              {/* Search Input */}
+              <div className="relative">
                 <input
                   type="text"
-                  placeholder="e.g. Cable Station, Smith Machine"
-                  value={machineName}
-                  onChange={(e) => setMachineName(e.target.value)}
+                  placeholder="Search exercise name or muscle (e.g. Bench Press, Lat Pulldown)..."
+                  value={libQuery}
+                  onChange={(e) => setLibQuery(e.target.value)}
+                  className="w-full bg-white rounded-xl border-2 border-navy-950 px-3.5 py-2.5 text-xs font-bold text-navy-950 outline-none placeholder:text-navy-400 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] focus:ring-2 focus:ring-amber-400"
+                  autoFocus
+                />
+              </div>
+
+              {/* Muscle Group Quick Filters */}
+              <div className="flex flex-wrap gap-1.5 pt-0.5">
+                {["all", "Abdominals", "Chest", "Back", "Biceps", "Triceps", "Shoulders", "Quadriceps", "Hamstrings", "Glutes"].map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    onClick={() => setLibBodyPart(m)}
+                    className={cn(
+                      "text-[9px] font-black px-2 py-0.5 rounded-lg border border-navy-950 transition-all cursor-pointer",
+                      libBodyPart === m
+                        ? "bg-navy-950 text-white shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]"
+                        : "bg-white text-navy-950 hover:bg-amber-100"
+                    )}
+                  >
+                    {m === "all" ? "ALL MUSCLES" : m.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+
+              {/* Live Search Results List with 1-TAP DIRECT ADD */}
+              {libData?.exercises && libData.exercises.length > 0 ? (
+                <div className="max-h-[50vh] overflow-y-auto space-y-2 pr-1 pt-1 divide-y divide-amber-200/60 overscroll-contain">
+                  {libData.exercises.map((item) => (
+                    <div
+                      key={item.id}
+                      onClick={() => handleAddExerciseFromLibrary(item)}
+                      className="p-2.5 rounded-xl bg-white hover:bg-amber-100/90 border-2 border-navy-950 cursor-pointer transition-all flex items-center justify-between gap-2.5 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] active:translate-y-0.5 group"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        {item.images && item.images[0] ? (
+                          <div className="h-11 w-11 rounded-lg bg-[#242220] border border-navy-950 overflow-hidden shrink-0 flex items-center justify-center">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={item.images[0]} alt={item.title} className="h-full w-full object-contain" />
+                          </div>
+                        ) : (
+                          <div className="h-11 w-11 rounded-lg bg-amber-200 border border-navy-950 flex items-center justify-center text-navy-950 font-black text-xs shrink-0">
+                            🏋️
+                          </div>
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <h5 className="font-black text-xs text-navy-950 leading-snug break-words group-hover:text-rose-600 transition-colors">
+                            {item.title}
+                          </h5>
+                          <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                            <span className="text-[8.5px] font-black uppercase px-1.5 py-0.5 rounded bg-amber-300 text-navy-950 border border-navy-950">
+                              {item.bodyPart}
+                            </span>
+                            <span className="text-[8.5px] font-black uppercase px-1.5 py-0.5 rounded bg-sky-200 text-navy-950 border border-navy-950">
+                              {item.equipment}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedGuideExercise(item);
+                          }}
+                          className="px-2 py-1 rounded-lg bg-amber-200 hover:bg-amber-300 text-navy-950 text-[9px] font-black border border-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)] flex items-center gap-1 cursor-pointer transition-all active:translate-y-0.5"
+                          title="View Exercise Form Guide"
+                        >
+                          <Eye className="h-2.5 w-2.5 stroke-[2.5]" />
+                          <span>Guide</span>
+                        </button>
+                        <button
+                          type="button"
+                          disabled={addRoutineMutation.isPending || updateRoutineMutation.isPending}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAddExerciseFromLibrary(item);
+                          }}
+                          className="text-[9px] font-black bg-emerald-400 hover:bg-emerald-300 active:translate-y-0.5 text-navy-950 px-2.5 py-1 rounded-lg border border-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)] flex items-center gap-1 cursor-pointer transition-all"
+                        >
+                          <span>USE</span>
+                          <span className="font-black">➔</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-5 text-center bg-white rounded-2xl border-2 border-dashed border-navy-950/40 space-y-2.5">
+                  <p className="text-xs font-black text-navy-950">
+                    No exercise found matching &ldquo;{libQuery}&rdquo;
+                  </p>
+                  <p className="text-[11px] font-bold text-navy-600">
+                    Can&apos;t find this variation? Create it as a custom exercise with your own machines and target muscles.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setExerciseName(libQuery);
+                      setAddModalTab("custom");
+                    }}
+                    className="text-xs font-black bg-rose-400 hover:bg-rose-500 text-navy-950 px-3.5 py-1.5 rounded-xl border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] cursor-pointer inline-flex items-center gap-1.5 active:translate-y-0.5 transition-all"
+                  >
+                    <Plus className="h-3.5 w-3.5 stroke-[3]" />
+                    <span>Create &ldquo;{libQuery || "Custom"}&rdquo; Exercise</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            /* ✍️ CUSTOM EXERCISE CREATION FORM */
+            <form onSubmit={handleAddExercise} className="space-y-4 pt-1">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Exercise Name</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Incline Dumbbell Press, Lat Pulldown"
+                  value={exerciseName}
+                  onChange={(e) => setExerciseName(e.target.value)}
+                  className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:ring-2 focus:ring-rose-500 font-medium"
+                  required
+                  autoFocus
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Machine / Equipment</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Cable Station, Smith Machine"
+                    value={machineName}
+                    onChange={(e) => setMachineName(e.target.value)}
+                    className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:ring-2 focus:ring-rose-500 font-medium"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Target Muscle</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Chest, Back, Abdominals"
+                    value={targetMuscle}
+                    onChange={(e) => setTargetMuscle(e.target.value)}
+                    className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:ring-2 focus:ring-rose-500 font-medium"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Notes / Form Cue</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Squeeze at top, 2 second slow negative"
+                  value={exerciseNotes}
+                  onChange={(e) => setExerciseNotes(e.target.value)}
                   className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:ring-2 focus:ring-rose-500 font-medium"
                 />
               </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Target Muscle</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Chest, Back, Abdominals"
-                  value={targetMuscle}
-                  onChange={(e) => setTargetMuscle(e.target.value)}
-                  className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:ring-2 focus:ring-rose-500 font-medium"
-                />
-              </div>
-            </div>
 
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Notes / Form Cue</label>
-              <input
-                type="text"
-                placeholder="e.g. Squeeze at top, 2 second slow negative"
-                value={exerciseNotes}
-                onChange={(e) => setExerciseNotes(e.target.value)}
-                className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:ring-2 focus:ring-rose-500 font-medium"
-              />
-            </div>
-
-            <Button
-              type="submit"
-              className="w-full bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-full py-2.5 mt-2 border-none cursor-pointer"
-            >
-              Add Exercise & Start Logging
-            </Button>
-          </form>
+              <Button
+                type="submit"
+                disabled={addRoutineMutation.isPending || updateRoutineMutation.isPending}
+                className="w-full bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-full py-2.5 mt-2 border-none cursor-pointer"
+              >
+                Add Custom Exercise & Start Logging
+              </Button>
+            </form>
+          )}
         </div>
       </ResponsiveFormContainer>
 

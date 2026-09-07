@@ -151,7 +151,7 @@ export function MealTracker() {
   };
 
   return (
-    <div className="bg-white rounded-3xl p-5 md:p-6 border-2 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] space-y-5 my-4">
+    <div className="bg-white rounded-3xl p-5 md:p-6 border-2 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] space-y-5">
       {/* Header & Log Action */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">

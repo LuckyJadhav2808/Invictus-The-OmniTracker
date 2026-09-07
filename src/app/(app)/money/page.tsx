@@ -10,7 +10,7 @@ import { BUDGET_CATEGORY_TEMPLATE_PACKS } from "@/lib/templates-data";
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Wallet, Plus, Calendar as CalendarIcon, ArrowUpRight, ArrowDownRight, Trash2, Edit3, PieChart as PieIcon, TrendingUp, ShieldAlert, Tag, Search, X, Filter, ChevronLeft, ChevronRight, Copy, Eye, Receipt, FileText } from "lucide-react";
+import { Wallet, Plus, Calendar as CalendarIcon, ArrowUpRight, ArrowDownRight, Trash2, Edit3, PieChart as PieIcon, TrendingUp, ShieldAlert, Tag, Search, X, Filter, ChevronLeft, ChevronRight, Copy, Eye, Receipt, FileText, Camera } from "lucide-react";
 import { format, parseISO, isToday, isYesterday, subMonths, addMonths } from "date-fns";
 import { toast } from "sonner";
 import { useAuth } from "@/components/shared/AuthProvider";
@@ -24,6 +24,7 @@ import { SubscriptionsTracker } from "@/components/money/SubscriptionsTracker";
 import { SavingsGoals } from "@/components/money/SavingsGoals";
 import { DebtTracker } from "@/components/money/DebtTracker";
 import { PDFExportModal } from "@/components/money/PDFExportModal";
+import { BulkExpenseModal } from "@/components/money/BulkExpenseModal";
 import { DraggableDashboardGrid } from "@/components/shared/DraggableDashboardGrid";
 import { useCostOfLivingIndex } from "@/lib/queries/cost-of-living";
 import { detectCategoryFromNote } from "@/lib/utils/merchant-categorizer";
@@ -56,6 +57,7 @@ function MoneyPageContent() {
   const tabParam = searchParams.get("tab");
   const [activeTab, setActiveTab] = useState(tabParam || "ledger");
   const [isAddTxOpen, setIsAddTxOpen] = useState(false);
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
 
   useEffect(() => {
     if (tabParam) {
@@ -756,7 +758,7 @@ function MoneyPageContent() {
     <div className="min-h-screen bg-cream-bg p-4 md:p-8 space-y-6">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* 💰 EXECUTIVE FINANCIAL COMMAND HEADER */}
-        <div className="bg-[#FAF8F5] rounded-3xl p-5 md:p-6 border-2.5 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] space-y-4">
+        <div className="bg-[#FAF8F5] rounded-3xl p-3.5 sm:p-5 md:p-6 border-2.5 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] space-y-4">
           {/* Top Bar: Title, Month Stepper & Primary CTA */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b-2 border-navy-950/10 pb-3.5">
             <div className="flex items-center gap-2.5">
@@ -776,19 +778,19 @@ function MoneyPageContent() {
             </div>
 
             {/* Stepper + Action CTA */}
-            <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap self-start md:self-auto">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full md:w-auto">
               {/* 📅 FEATURE 2: MONTH STEPPER IN EXECUTIVE HEADER */}
-              <div className="flex items-center gap-1 shrink-0">
+              <div className="flex items-center gap-1.5 w-full sm:w-auto justify-between sm:justify-start">
                 <button
                   type="button"
                   onClick={handlePrevMonth}
-                  className="p-2 rounded-xl bg-white hover:bg-[#CEF431] text-[#161514] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all shrink-0"
+                  className="p-2 sm:p-2.5 rounded-xl bg-white hover:bg-[#CEF431] text-[#161514] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all shrink-0"
                   title="Previous Month"
                 >
-                  <ChevronLeft className="h-3.5 w-3.5 stroke-[3]" />
+                  <ChevronLeft className="h-4 w-4 stroke-[3]" />
                 </button>
 
-                <div className="w-36 sm:w-44">
+                <div className="flex-1 sm:flex-initial sm:w-52 min-w-0">
                   <NeobrutalistSelect
                     value={ledgerMonthFilter}
                     onChange={setLedgerMonthFilter}
@@ -800,28 +802,40 @@ function MoneyPageContent() {
                 <button
                   type="button"
                   onClick={handleNextMonth}
-                  className="p-2 rounded-xl bg-white hover:bg-[#CEF431] text-[#161514] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all shrink-0"
+                  className="p-2 sm:p-2.5 rounded-xl bg-white hover:bg-[#CEF431] text-[#161514] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all shrink-0"
                   title="Next Month"
                 >
-                  <ChevronRight className="h-3.5 w-3.5 stroke-[3]" />
+                  <ChevronRight className="h-4 w-4 stroke-[3]" />
                 </button>
               </div>
 
-              {/* Primary Action Button */}
-              <button
-                onClick={() => {
-                  if (categories.length === 0) {
-                    toast.error("Loading categories...");
-                    return;
-                  }
-                  setTxCategoryId(categories.filter((c) => c.type === txType)[0]?.id || "");
-                  setIsAddTxOpen(true);
-                }}
-                className="px-3.5 py-2.5 rounded-2xl bg-amber-400 hover:bg-amber-500 text-navy-950 text-xs font-black uppercase tracking-wider border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center justify-center gap-1.5 shrink-0"
-              >
-                <Plus className="h-4 w-4 stroke-[3]" />
-                <span>Log Transaction</span>
-              </button>
+              {/* Primary Action Buttons: Equal 2-Column Grid on Mobile */}
+              <div className="grid grid-cols-2 sm:flex items-center gap-2 w-full sm:w-auto">
+                <button
+                  type="button"
+                  onClick={() => setIsBulkModalOpen(true)}
+                  className="w-full sm:w-auto px-2.5 sm:px-3.5 py-2 sm:py-2.5 rounded-2xl bg-[#CEF431] hover:bg-lime-400 text-navy-950 text-[11px] sm:text-xs font-black uppercase tracking-tight sm:tracking-wider border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center justify-center gap-1.5 whitespace-nowrap"
+                  title="Bulk Expense Logger & Offline OCR Scanner"
+                >
+                  <Camera className="h-3.5 w-3.5 stroke-[2.5]" />
+                  <span>Bulk / Scan</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    if (categories.length === 0) {
+                      toast.error("Loading categories...");
+                      return;
+                    }
+                    setTxCategoryId(categories.filter((c) => c.type === txType)[0]?.id || "");
+                    setIsAddTxOpen(true);
+                  }}
+                  className="w-full sm:w-auto px-2.5 sm:px-3.5 py-2 sm:py-2.5 rounded-2xl bg-amber-400 hover:bg-amber-500 text-navy-950 text-[11px] sm:text-xs font-black uppercase tracking-tight sm:tracking-wider border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center justify-center gap-1.5 whitespace-nowrap"
+                >
+                  <Plus className="h-3.5 w-3.5 stroke-[3]" />
+                  <span>Log Transaction</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -977,6 +991,7 @@ function MoneyPageContent() {
                 setTxCategoryId(categories.filter((c) => c.type === txType)[0]?.id || "");
                 setIsAddTxOpen(true);
               }}
+              onBulkAddExpense={() => setIsBulkModalOpen(true)}
               onMoveMoney={() => {
                 if (categories.length < 2) {
                   toast.error("Please create at least 2 categories to move money between them!");
@@ -1356,20 +1371,32 @@ function MoneyPageContent() {
                             onClick={() => setInspectingTx(tx)}
                             className="p-3.5 flex items-center justify-between hover:bg-[#CEF431]/20 transition-colors gap-3 cursor-pointer group"
                           >
-                            <div className="flex items-center gap-3 truncate">
+                            <div className="flex items-center gap-3 min-w-0 flex-1">
                               <div className={cn("h-9 w-9 rounded-xl border-2 border-[#161514] flex items-center justify-center shrink-0 shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] group-hover:scale-105 transition-transform", tx.type === "income" ? "bg-[#03D26F] text-[#161514]" : "bg-rose-400 text-[#161514]")}>
                                 {tx.type === "income" ? <ArrowUpRight className="h-4.5 w-4.5 stroke-[3]" /> : <ArrowDownRight className="h-4.5 w-4.5 stroke-[3]" />}
                               </div>
-                              <div className="truncate">
-                                <h4 className="font-black text-xs sm:text-sm text-[#161514] flex items-center gap-1.5 truncate">
-                                  <span>{renderCategoryEmoji(category?.icon)}</span>
-                                  <span className="truncate">{category?.name || "Uncategorized"}</span>
-                                  {tx.note && <span className="text-[10px] text-[#161514]/60 font-bold truncate max-w-[150px] sm:max-w-[250px]">- {tx.note}</span>}
+                              <div className="min-w-0 flex-1">
+                                <h4 className="font-black text-xs sm:text-sm text-[#161514] truncate flex items-center gap-1.5">
+                                  {!tx.note && <span>{renderCategoryEmoji(category?.icon)}</span>}
+                                  <span className="truncate">{tx.note || category?.name || "Expense"}</span>
                                 </h4>
-                                <div className="flex items-center gap-2 mt-0.5 text-[10px] font-extrabold text-[#161514]/70">
-                                  <span className="capitalize px-1.5 py-0.2 rounded bg-amber-200 border border-[#161514]">{tx.paymentMethod || "UPI"}</span>
-                                  <span>•</span>
-                                  <span>{tx.date && tx.date.includes("T") ? format(parseISO(tx.date), "hh:mm a") : "Logged"}</span>
+                                <div className="flex items-center gap-1.5 mt-0.5 text-[10px] font-extrabold text-[#161514]/70 flex-wrap">
+                                  {tx.note && (
+                                    <>
+                                      <span className="inline-flex items-center gap-1 shrink-0 px-1.5 py-0.5 rounded-md bg-cream-100 border border-[#161514]/30 text-[#161514]">
+                                        <span>{renderCategoryEmoji(category?.icon)}</span>
+                                        <span className="font-bold">{category?.name || "Expense"}</span>
+                                      </span>
+                                      <span className="text-[#161514]/40">•</span>
+                                    </>
+                                  )}
+                                  <span className="capitalize px-1.5 py-0.5 rounded bg-amber-200 border border-[#161514] shrink-0">
+                                    {tx.paymentMethod || "UPI"}
+                                  </span>
+                                  <span className="text-[#161514]/40">•</span>
+                                  <span className="shrink-0">
+                                    {tx.date && tx.date.includes("T") ? format(parseISO(tx.date), "hh:mm a") : "Logged"}
+                                  </span>
                                 </div>
                               </div>
                             </div>
@@ -2958,6 +2985,14 @@ function MoneyPageContent() {
         currentMonthKey={ledgerMonthFilter}
         currencySymbol={currencySymbol}
         userName={user?.displayName || "Invictus Explorer"}
+      />
+
+      {/* Bulk Expense Logger & Screenshot OCR Modal */}
+      <BulkExpenseModal
+        open={isBulkModalOpen}
+        onOpenChange={setIsBulkModalOpen}
+        categories={categories}
+        currencySymbol={currencySymbol}
       />
 
       {/* Monthly Budget Allowance Setup Modal */}

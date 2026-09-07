@@ -254,6 +254,60 @@ export function useAddTransaction() {
   });
 }
 
+export function useBulkAddTransactions() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (transactions: Array<{
+      id?: string;
+      amount: number;
+      categoryId: string;
+      date: string;
+      note?: string;
+      paymentMethod?: string;
+      type?: "expense" | "income";
+      isRecurring?: boolean;
+    }>) => {
+      const userId = getActiveUserId(user);
+      if (isGuestMode()) {
+        const local = localStorage.getItem("invictus_transactions");
+        const list = local ? JSON.parse(local) : [];
+        const newTransactions = transactions.map((t, idx) => ({
+          ...t,
+          id: t.id || `tx_${Date.now()}_${idx}_${Math.random().toString(36).substring(2, 6)}`,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        }));
+        const updated = [...newTransactions, ...list];
+        localStorage.setItem("invictus_transactions", JSON.stringify(updated));
+        return { success: true, count: newTransactions.length, transactions: newTransactions };
+      }
+
+      if (!userId) throw new Error("Unauthenticated");
+
+      const res = await fetch("/api/money/transactions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, transactions }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "Failed to bulk add transactions");
+      }
+
+      return res.json();
+    },
+    onSuccess: () => {
+      const userId = getActiveUserId(user);
+      queryClient.invalidateQueries({ queryKey: ["transactions", userId] });
+      queryClient.invalidateQueries({ queryKey: ["transactions", user?.uid] });
+      queryClient.invalidateQueries({ queryKey: ["categories", userId] });
+    },
+  });
+}
+
 export function useDeleteTransaction() {
   const { user } = useAuth();
   const queryClient = useQueryClient();

@@ -358,7 +358,7 @@ function GoalsPageContent() {
           </div>
 
           {/* Tab 2: Gym & Meals Workspace (Dedicated full-width view) */}
-          <TabsContent value="gym" className="space-y-6 outline-none">
+          <TabsContent value="gym" className="space-y-4 pb-28 lg:pb-8 outline-none">
             <div id="gym-section">
               <GymRoutineTracker />
             </div>

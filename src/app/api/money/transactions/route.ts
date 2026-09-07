@@ -20,12 +20,40 @@ export async function GET(req: Request) {
   }
 }
 
-// POST /api/money/transactions
+// POST /api/money/transactions (Supports single or bulk transactions)
 export async function POST(req: Request) {
   try {
     await connectToDatabase();
     const body = await req.json();
 
+    // 1. Bulk Transactions Insertion
+    if (body.transactions && Array.isArray(body.transactions)) {
+      const { userId, transactions } = body;
+      if (!userId) {
+        return NextResponse.json({ error: "UserId is required for bulk transactions" }, { status: 400 });
+      }
+
+      if (transactions.length === 0) {
+        return NextResponse.json({ success: true, count: 0, transactions: [] }, { status: 200 });
+      }
+
+      const today = new Date().toISOString().split("T")[0];
+      const docs = transactions.map((t: any, idx: number) => ({
+        id: t.id || `tx_${Date.now()}_${idx}_${Math.random().toString(36).substring(2, 6)}`,
+        userId,
+        amount: Number(t.amount),
+        type: t.type || "expense",
+        categoryId: t.categoryId,
+        date: t.date || today,
+        note: t.note || "",
+        paymentMethod: t.paymentMethod || "UPI",
+      }));
+
+      const created = await Transaction.insertMany(docs, { ordered: false });
+      return NextResponse.json({ success: true, count: created.length, transactions: created }, { status: 201 });
+    }
+
+    // 2. Single Transaction Insertion (Backwards Compatible)
     if (!body.userId || !body.amount || !body.categoryId) {
       return NextResponse.json({ error: "UserId, categoryId, and amount are required" }, { status: 400 });
     }

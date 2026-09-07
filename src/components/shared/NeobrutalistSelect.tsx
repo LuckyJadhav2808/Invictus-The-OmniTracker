@@ -47,13 +47,13 @@ export function NeobrutalistSelect({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full bg-white rounded-2xl border-2 border-[#161514] px-4 py-2.5 text-xs sm:text-sm font-black text-[#161514] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] transition-all cursor-pointer flex items-center justify-between gap-2 text-left"
+        className="w-full bg-white rounded-2xl border-2 border-[#161514] px-3 py-2 sm:px-3.5 sm:py-2.5 text-xs sm:text-sm font-black text-[#161514] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] transition-all cursor-pointer flex items-center justify-between gap-1.5 text-left"
       >
-        <span className="flex items-center gap-2 truncate">
+        <span className="flex items-center gap-1.5 min-w-0 flex-1">
           {selectedOption ? (
             <>
-              {selectedOption.icon && <span>{renderCategoryEmoji(selectedOption.icon)}</span>}
-              <span className="truncate">{selectedOption.label}</span>
+              {selectedOption.icon && <span className="shrink-0">{renderCategoryEmoji(selectedOption.icon)}</span>}
+              <span className="truncate whitespace-nowrap font-black">{selectedOption.label}</span>
             </>
           ) : (
             <span className="text-[#161514]/50">{placeholder}</span>
@@ -61,7 +61,7 @@ export function NeobrutalistSelect({
         </span>
         <ChevronDown
           className={cn(
-            "h-4 w-4 text-[#161514] stroke-[3] shrink-0 transition-transform duration-200",
+            "h-4 w-4 text-[#161514] stroke-[3] shrink-0 ml-0.5 transition-transform duration-200",
             isOpen && "rotate-180"
           )}
         />

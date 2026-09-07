@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { GymRoutine } from "@/models/GymRoutine";
+import {
+  getCurrentISOWeekKey,
+  shouldRoutineRollover,
+  resetRoutineCheckmarks,
+} from "@/lib/utils/gym-rollover";
 
 // GET /api/gym/routines?userId=xxx&dayOfWeek=Monday
 export async function GET(req: Request) {
@@ -18,6 +23,24 @@ export async function GET(req: Request) {
     if (dayOfWeek) query.dayOfWeek = dayOfWeek;
 
     const routines = await GymRoutine.find(query).sort({ createdAt: 1 });
+    const currentWeekKey = getCurrentISOWeekKey();
+
+    // Automatic Weekly Rollover:
+    // If a routine was completed in an earlier week, automatically refresh checkboxes
+    // while strictly preserving all exercises, machines, weights, and reps.
+    for (const routine of routines) {
+      if (shouldRoutineRollover(routine, currentWeekKey)) {
+        const hasCompletedSets = (routine.exercises || []).some((ex: any) =>
+          (ex.sets || []).some((s: any) => s.completed)
+        );
+        if (hasCompletedSets || !routine.lastActiveWeek) {
+          routine.exercises = resetRoutineCheckmarks(routine.exercises || []);
+          routine.lastActiveWeek = currentWeekKey;
+          await routine.save();
+        }
+      }
+    }
+
     return NextResponse.json(routines);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -42,6 +65,7 @@ export async function POST(req: Request) {
     if (existing) {
       existing.routineTitle = routineTitle;
       if (exercises) existing.exercises = exercises;
+      existing.lastActiveWeek = getCurrentISOWeekKey();
       await existing.save();
       return NextResponse.json(existing);
     }
@@ -52,6 +76,7 @@ export async function POST(req: Request) {
       dayOfWeek,
       routineTitle,
       exercises: exercises || [],
+      lastActiveWeek: getCurrentISOWeekKey(),
     });
 
     return NextResponse.json(newRoutine, { status: 201 });
@@ -73,12 +98,15 @@ export async function PUT(req: Request) {
 
     const updateFields: any = {};
     if (routineTitle !== undefined) updateFields.routineTitle = routineTitle;
-    if (exercises !== undefined) updateFields.exercises = exercises;
+    if (exercises !== undefined) {
+      updateFields.exercises = exercises;
+      updateFields.lastActiveWeek = getCurrentISOWeekKey();
+    }
 
     const updated = await GymRoutine.findOneAndUpdate(
       { id, userId },
       { $set: updateFields },
-      { new: true }
+      { returnDocument: "after" }
     );
 
     return NextResponse.json(updated);
