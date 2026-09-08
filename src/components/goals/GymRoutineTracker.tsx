@@ -872,7 +872,7 @@ export function GymRoutineTracker() {
         open={isAddExerciseOpen}
         onOpenChange={setIsAddExerciseOpen}
         title={`Add Exercise to ${selectedDay}`}
-        description="Search 2,900+ exercises with 1-tap add, or log custom machines"
+        description="Search 4,300+ exercises with 1-tap add, animated guides, or log custom machines"
       >
         <div className="space-y-3 pt-1">
           {/* Segmented Mode Toggle: Library vs Custom Exercise */}
@@ -888,7 +888,7 @@ export function GymRoutineTracker() {
               )}
             >
               <Search className="h-3.5 w-3.5 stroke-[2.5]" />
-              <span>Library ({libData?.totalCount || 2919})</span>
+              <span>Library ({libData?.totalCount || 4325})</span>
             </button>
             <button
               type="button"
@@ -906,7 +906,7 @@ export function GymRoutineTracker() {
           </div>
 
           {addModalTab === "library" ? (
-            /* 🔍 2,900+ EXERCISES SEARCH & DIRECT 1-TAP ADD */
+            /* 🔍 4,300+ EXERCISES SEARCH & DIRECT 1-TAP ADD */
             <div className="space-y-3">
               {/* Search Input */}
               <div className="relative">
@@ -922,7 +922,7 @@ export function GymRoutineTracker() {
 
               {/* Muscle Group Quick Filters */}
               <div className="flex flex-wrap gap-1.5 pt-0.5">
-                {["all", "Abdominals", "Chest", "Back", "Biceps", "Triceps", "Shoulders", "Quadriceps", "Hamstrings", "Glutes"].map((m) => (
+                {["all", "Chest", "Back", "Shoulders", "Biceps", "Triceps", "Quadriceps", "Hamstrings", "Glutes", "Calves", "Abdominals", "Cardio"].map((m) => (
                   <button
                     key={m}
                     type="button"
@@ -942,17 +942,19 @@ export function GymRoutineTracker() {
               {/* Live Search Results List with 1-TAP DIRECT ADD */}
               {libData?.exercises && libData.exercises.length > 0 ? (
                 <div className="max-h-[50vh] overflow-y-auto space-y-2 pr-1 pt-1 divide-y divide-amber-200/60 overscroll-contain">
-                  {libData.exercises.map((item) => (
+                  {libData.exercises.map((item) => {
+                    const thumbUrl = (item.images && item.images[0]) || item.gifUrl;
+                    return (
                     <div
                       key={item.id}
                       onClick={() => handleAddExerciseFromLibrary(item)}
                       className="p-2.5 rounded-xl bg-white hover:bg-amber-100/90 border-2 border-navy-950 cursor-pointer transition-all flex items-center justify-between gap-2.5 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] active:translate-y-0.5 group"
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
-                        {item.images && item.images[0] ? (
+                        {thumbUrl ? (
                           <div className="h-11 w-11 rounded-lg bg-[#242220] border border-navy-950 overflow-hidden shrink-0 flex items-center justify-center">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={item.images[0]} alt={item.title} className="h-full w-full object-contain" />
+                            <img src={thumbUrl} alt={item.title} className="h-full w-full object-contain" />
                           </div>
                         ) : (
                           <div className="h-11 w-11 rounded-lg bg-amber-200 border border-navy-950 flex items-center justify-center text-navy-950 font-black text-xs shrink-0">
@@ -1001,7 +1003,8 @@ export function GymRoutineTracker() {
                         </button>
                       </div>
                     </div>
-                  ))}
+                  );
+                })}
                 </div>
               ) : (
                 <div className="p-5 text-center bg-white rounded-2xl border-2 border-dashed border-navy-950/40 space-y-2.5">

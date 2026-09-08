@@ -321,31 +321,37 @@ function loadExercises(): GymExerciseItem[] {
 
       const dbItems: GymExerciseItem[] = parsed.map((item: any) => {
         const primary = item.primaryMuscles || [];
-        const bodyPart = primary[0] ? capitalize(primary[0]) : capitalize(item.category || "General");
-        const images = (item.images || []).map(
-          (img: string) => `https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/${img}`
-        );
+        const bodyPart = item.bodyPart ? capitalize(item.bodyPart) : (primary[0] ? capitalize(primary[0]) : capitalize(item.category || "General"));
+        
+        // Resolve images properly: if already full URL, preserve; if relative path from free-exercise-db, expand
+        const images: string[] = (item.images || []).map((img: string) => {
+          if (!img) return "";
+          if (img.startsWith("http://") || img.startsWith("https://")) return img;
+          return `https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/${img}`;
+        }).filter(Boolean);
+
+        const gifUrl = item.gifUrl || images[0] || "";
 
         return {
-          id: item.id || `ex-${item.name?.replace(/\s+/g, "-").toLowerCase()}`,
-          title: item.name,
-          desc: item.instructions?.join(" ") || "",
-          instructions: item.instructions || [],
-          type: capitalize(item.category || "Strength"),
+          id: item.id || `ex-${(item.title || item.name || "").replace(/\s+/g, "-").toLowerCase()}`,
+          title: item.title || item.name || "Exercise",
+          desc: item.desc || (item.instructions ? item.instructions.join(" ") : ""),
+          instructions: item.instructions && item.instructions.length > 0 ? item.instructions : (item.desc ? [item.desc] : []),
+          type: capitalize(item.type || item.category || "Strength"),
           bodyPart,
-          primaryMuscles: primary,
+          primaryMuscles: primary.length > 0 ? primary : [bodyPart.toLowerCase()],
           secondaryMuscles: item.secondaryMuscles || [],
           equipment: capitalize(item.equipment || "Other"),
           level: capitalize(item.level || "Intermediate"),
           mechanic: item.mechanic || "compound",
           force: item.force || "",
-          images,
-          gifUrl: images[0] || "",
-          rating: "9.0",
+          images: images.length > 0 ? images : (gifUrl ? [gifUrl] : []),
+          gifUrl,
+          rating: item.rating || "9.0",
         };
       });
 
-      // Merge staple exercises at the top
+      // Merge staple exercises at the very top for priority visibility
       const titleSet = new Set(EVERYDAY_STAPLE_EXERCISES.map((e) => e.title.toLowerCase()));
       const filteredDb = dbItems.filter((e) => !titleSet.has(e.title.toLowerCase()));
 
@@ -362,11 +368,11 @@ function loadExercises(): GymExerciseItem[] {
 
 // Synonym/Alias Map for smart fuzzy searching
 const SEARCH_ALIASES: Record<string, string[]> = {
-  "pec": ["butterfly", "chest fly", "pec deck", "machine fly"],
+  "pec": ["butterfly", "chest fly", "pec deck", "machine fly", "bench press"],
   "pec deck": ["butterfly", "chest fly", "pec deck", "machine fly"],
   "pec fly": ["butterfly", "chest fly", "cable fly", "dumbbell fly"],
   "chest fly": ["butterfly", "flat bench cable flyes", "dumbbell flyes", "pec deck"],
-  "bench press": ["barbell flat bench press", "barbell bench press", "chest press"],
+  "bench press": ["barbell flat bench press", "barbell bench press", "chest press", "dumbbell bench press"],
   "incline bench": ["incline dumbbell chest press", "incline barbell bench press", "incline bench"],
   "incline dumbbell": ["incline dumbbell chest press", "incline dumbbell press"],
   "preacher": ["ez-bar preacher curl", "cable preacher curl", "bicep curl"],
@@ -380,28 +386,38 @@ const SEARCH_ALIASES: Record<string, string[]> = {
   "tricep": ["triceps pushdown", "rope pushdown", "skullcrushers", "lying triceps extension"],
   "tricep pushdown": ["triceps pushdown - rope attachment", "triceps pushdown", "rope pushdown"],
   "triceps pushdown": ["triceps pushdown - rope attachment", "triceps pushdown"],
-  "tricep extension": ["cable lying triceps extension", "lying triceps extension", "triceps pushdown"],
-  "bicep": ["dumbbell alternate bicep curl", "bicep curl", "hammer curl", "ez-bar preacher curl"],
+  "tricep extension": ["cable lying triceps extension", "lying triceps extension", "triceps pushdown", "overhead triceps"],
+  "bicep": ["dumbbell alternate bicep curl", "bicep curl", "hammer curl", "ez-bar preacher curl", "barbell curl"],
   "bicep curl": ["dumbbell alternate bicep curl", "biceps curl", "barbell curl"],
   "biceps curl": ["dumbbell alternate bicep curl", "biceps curl", "barbell curl"],
   "hammer curl": ["hammer curls", "dumbbell hammer curl", "bicep curl"],
-  "lateral": ["dumbbell lateral raise", "side lateral raise", "shoulder raise"],
-  "lateral raise": ["dumbbell lateral raise", "side lateral raise"],
+  "lateral": ["dumbbell lateral raise", "side lateral raise", "shoulder raise", "cable lateral raise"],
+  "lateral raise": ["dumbbell lateral raise", "side lateral raise", "cable lateral raise"],
   "side raise": ["dumbbell lateral raise", "side lateral raise"],
-  "shoulder press": ["standing military press", "overhead barbell press", "dumbbell shoulder press"],
-  "overhead press": ["standing military press", "overhead barbell press"],
+  "shoulder press": ["standing military press", "overhead barbell press", "dumbbell shoulder press", "seated shoulder press"],
+  "overhead press": ["standing military press", "overhead barbell press", "dumbbell shoulder press"],
   "military press": ["standing military press", "overhead barbell press"],
+  "arnold press": ["arnold dumbbell press", "arnold press"],
   "rdl": ["romanian deadlift", "deadlift", "hamstring"],
-  "deadlift": ["axle deadlift", "barbell deadlift", "romanian deadlift"],
-  "squat": ["barbell back squat", "barbell full squat", "squat", "leg press"],
-  "leg press": ["incline leg press", "leg press"],
+  "deadlift": ["axle deadlift", "barbell deadlift", "romanian deadlift", "sumo deadlift"],
+  "squat": ["barbell back squat", "barbell full squat", "squat", "leg press", "front squat", "goblet squat"],
+  "front squat": ["barbell front squat", "front squat"],
+  "goblet squat": ["goblet squat", "dumbbell goblet squat"],
+  "hack squat": ["hack squat", "machine hack squat"],
+  "leg press": ["incline leg press", "leg press", "45 degree leg press"],
   "leg extension": ["leg extensions", "leg extension"],
   "leg curl": ["lying leg curls", "seated leg curl", "hamstring curl"],
   "hamstring curl": ["lying leg curls", "seated leg curl"],
-  "calf raise": ["standing calf raises", "seated calf raise"],
-  "face pull": ["face pull", "cable rear delt"],
-  "skull crusher": ["cable lying triceps extension", "lying triceps extension"],
-  "skull crushers": ["cable lying triceps extension", "lying triceps extension"],
+  "calf raise": ["standing calf raises", "seated calf raise", "calf raises"],
+  "face pull": ["face pull", "cable rear delt", "rear deltoid"],
+  "skull crusher": ["cable lying triceps extension", "lying triceps extension", "skullcrushers"],
+  "skull crushers": ["cable lying triceps extension", "lying triceps extension", "skullcrushers"],
+  "hip thrust": ["barbell hip thrust", "glute bridge", "hip thrust"],
+  "pullup": ["pull-up", "chin-up", "wide-grip pullup"],
+  "pull up": ["pull-up", "chin-up", "lat pulldown"],
+  "chin up": ["chin-up", "close grip chin up"],
+  "dips": ["chest dip", "triceps dip", "parallel bar dips"],
+  "shrugs": ["barbell shrug", "dumbbell shrug", "trap bar shrug"],
 };
 
 function normalizeText(s: string): string {

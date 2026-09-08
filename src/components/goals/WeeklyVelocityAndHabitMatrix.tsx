@@ -12,9 +12,9 @@ import {
   parseISO,
 } from "date-fns";
 import { useHabits, useMonthHabitLogs, useStreaks } from "@/lib/queries/goals";
+import * as LucideIcons from "lucide-react";
 import { Flame, Trophy, Zap, Calendar, TrendingUp, Sparkles, Award, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { renderCategoryEmoji } from "@/components/money/MoneyQuickActionsAndCards";
 
 export function WeeklyVelocityAndHabitMatrix() {
   const today = useMemo(() => new Date(), []);
@@ -251,37 +251,53 @@ export function WeeklyVelocityAndHabitMatrix() {
           </div>
 
           <div className="space-y-3">
-            {habitLeaderboard.map((h) => (
-              <div key={h.id} className="p-3.5 rounded-2xl border-2 border-navy-950 bg-[#FAF8F5] shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] space-y-2">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2 truncate">
-                    <span className="text-lg">{renderCategoryEmoji(h.icon)}</span>
-                    <h4 className="font-black text-xs sm:text-sm text-navy-950 truncate">{h.title}</h4>
+            {habitLeaderboard.map((h) => {
+              const IconComp = (LucideIcons as any)[h.icon] || LucideIcons.Target;
+              const isEmoji = h.icon && /\p{Emoji}/u.test(h.icon);
+
+              return (
+                <div
+                  key={h.id}
+                  className="p-3.5 rounded-2xl border-2 border-navy-950 bg-[#FAF8F5] shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] space-y-2.5"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="h-8 w-8 rounded-xl bg-amber-300 border-2 border-navy-950 flex items-center justify-center text-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)] shrink-0">
+                        {isEmoji ? (
+                          <span className="text-sm leading-none">{h.icon}</span>
+                        ) : (
+                          <IconComp className="h-4 w-4 stroke-[2.5]" />
+                        )}
+                      </div>
+                      <h4 className="font-black text-xs sm:text-sm text-navy-950 truncate leading-snug">
+                        {h.title}
+                      </h4>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto pl-10 sm:pl-0">
+                      <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded-xl bg-amber-300 text-navy-950 border border-navy-950 flex items-center gap-1 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]">
+                        <Flame className="h-3 w-3 text-rose-600 fill-rose-600" />
+                        {h.currentStreak}D Streak
+                      </span>
+                      <span className="text-xs font-black text-emerald-800 bg-[#03D26F]/20 px-2.5 py-1 rounded-xl border border-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]">
+                        {h.consistencyPct}% Consistency
+                      </span>
+                    </div>
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded-xl bg-amber-300 text-navy-950 border border-navy-950 flex items-center gap-1">
-                      <Flame className="h-3 w-3 text-rose-600 fill-rose-600" />
-                      {h.currentStreak}D Streak
-                    </span>
-                    <span className="text-xs font-black text-emerald-700 bg-[#03D26F]/20 px-2.5 py-1 rounded-xl border border-navy-950">
-                      {h.consistencyPct}% Consistency
-                    </span>
+                  {/* Progress Bar */}
+                  <div className="w-full h-3 bg-white rounded-full border border-navy-950 p-0.5 overflow-hidden">
+                    <div
+                      style={{ width: `${h.consistencyPct}%` }}
+                      className={cn(
+                        "h-full rounded-full transition-all duration-500",
+                        h.consistencyPct >= 80 ? "bg-[#03D26F]" : h.consistencyPct >= 50 ? "bg-[#CEF431]" : "bg-amber-400"
+                      )}
+                    />
                   </div>
                 </div>
-
-                {/* Progress Bar */}
-                <div className="w-full h-3 bg-white rounded-full border border-navy-950 p-0.5 overflow-hidden">
-                  <div
-                    style={{ width: `${h.consistencyPct}%` }}
-                    className={cn(
-                      "h-full rounded-full transition-all duration-500",
-                      h.consistencyPct >= 80 ? "bg-[#03D26F]" : h.consistencyPct >= 50 ? "bg-[#CEF431]" : "bg-amber-400"
-                    )}
-                  />
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

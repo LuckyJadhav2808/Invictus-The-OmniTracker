@@ -1,0 +1,17 @@
+# Exercise Dataset
+
+This dataset contains gym and fitness exercises collected from ExerciseDB API.
+
+Columns:
+  - exercise name
+  - body part
+  - equipment
+  - target muscle
+  - GIF URL
+  - difficulty
+
+Use Cases:
+  - fitness recommendation systems
+  - ML projects
+  - fitness chatbot
+  - exercise analytics
