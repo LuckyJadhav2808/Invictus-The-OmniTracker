@@ -71,54 +71,53 @@ export default function HabitDetailPage({
       <div className="max-w-md mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <Link href="/goals" className="text-navy-600 hover:text-navy-900 flex items-center gap-1.5 text-sm font-bold">
-            <ArrowLeft className="h-4 w-4" /> Back
+          <Link
+            href="/goals"
+            className="text-[#161514] bg-[#FAF8F5] hover:bg-white flex items-center gap-1.5 text-xs font-black px-3 py-1.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+          >
+            <ArrowLeft className="h-4 w-4 stroke-[2.5]" /> Back
           </Link>
           <div className="flex gap-2">
-            <Button
+            <button
               onClick={() => setIsEditOpen(true)}
-              variant="outline"
-              size="sm"
-              className="rounded-full border-input text-navy-900 bg-white cursor-pointer"
+              className="rounded-xl border-2 border-[#161514] text-[#161514] bg-[#CEF431] hover:bg-[#bce023] font-black text-xs px-3 py-1.5 shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center gap-1"
             >
-              <Edit3 className="h-3.5 w-3.5 mr-1" /> Edit
-            </Button>
-             <Button
+              <Edit3 className="h-3.5 w-3.5" /> Edit
+            </button>
+            <button
               onClick={() => setIsDeleteOpen(true)}
-              variant="outline"
-              size="sm"
-              className="rounded-full border-danger/30 text-danger bg-white hover:bg-danger/5 cursor-pointer"
+              className="rounded-xl border-2 border-[#161514] text-rose-800 bg-rose-100 hover:bg-rose-200 font-black text-xs px-3 py-1.5 shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center gap-1"
             >
-              <Trash2 className="h-3.5 w-3.5 mr-1" /> Delete
-            </Button>
+              <Trash2 className="h-3.5 w-3.5" /> Delete
+            </button>
           </div>
         </div>
 
         {/* Content Card */}
-        <div className="bg-white rounded-[var(--radius-lg)] p-6 shadow-[0_8px_24px_rgba(31,36,48,0.06)] space-y-6">
+        <div className="bg-white rounded-2xl p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-6">
           <div className="space-y-2">
-            <h1 className="text-xl font-extrabold text-navy-900" style={{ fontFamily: "var(--font-heading)" }}>
+            <h1 className="text-2xl font-black text-[#161514]" style={{ fontFamily: "var(--font-heading)" }}>
               {habit.title}
             </h1>
-            <p className="text-xs text-navy-600 font-semibold uppercase tracking-wider">
-              Frequency: {habit.frequency.type}
+            <p className="text-xs text-[#161514]/70 font-black uppercase tracking-wider">
+              Frequency: <span className="text-[#161514] bg-amber-300 px-2 py-0.5 rounded-md border border-[#161514]">{habit.frequency.type}</span>
             </p>
           </div>
 
-          <hr className="border-border" />
+          <hr className="border-2 border-[#161514]/10" />
 
           {/* Stats grid */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-cream-bg/20 rounded-[var(--radius-md)] p-4 flex flex-col items-center justify-center text-center">
-              <Flame className="h-6 w-6 text-orange-500 fill-orange-500" />
-              <span className="text-[10px] font-bold text-navy-600 uppercase tracking-wider mt-1">Current Streak</span>
-              <span className="text-2xl font-extrabold text-navy-900 mt-0.5">{streak?.currentStreak || 0} days</span>
+            <div className="bg-[#FAF8F5] rounded-xl p-4 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex flex-col items-center justify-center text-center">
+              <Flame className="h-6 w-6 text-rose-600 fill-rose-600" />
+              <span className="text-[10px] font-black text-[#161514]/70 uppercase tracking-wider mt-1" style={{ fontFamily: "var(--font-heading)" }}>Current Streak</span>
+              <span className="text-2xl font-black text-[#161514] mt-0.5" style={{ fontFamily: "var(--font-heading)" }}>{streak?.currentStreak || 0} days</span>
             </div>
 
-            <div className="bg-cream-bg/20 rounded-[var(--radius-md)] p-4 flex flex-col items-center justify-center text-center">
+            <div className="bg-[#FAF8F5] rounded-xl p-4 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex flex-col items-center justify-center text-center">
               <Award className="h-6 w-6 text-amber-500" />
-              <span className="text-[10px] font-bold text-navy-600 uppercase tracking-wider mt-1">Longest Streak</span>
-              <span className="text-2xl font-extrabold text-navy-900 mt-0.5">{streak?.longestStreak || 0} days</span>
+              <span className="text-[10px] font-black text-[#161514]/70 uppercase tracking-wider mt-1" style={{ fontFamily: "var(--font-heading)" }}>Longest Streak</span>
+              <span className="text-2xl font-black text-[#161514] mt-0.5" style={{ fontFamily: "var(--font-heading)" }}>{streak?.longestStreak || 0} days</span>
             </div>
           </div>
         </div>

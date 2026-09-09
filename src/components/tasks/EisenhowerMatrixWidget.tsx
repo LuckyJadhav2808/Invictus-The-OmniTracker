@@ -47,11 +47,11 @@ export function EisenhowerMatrixWidget({ tasks, onUpdateTask, onOpenCreateModal 
   ];
 
   return (
-    <div className="bg-white rounded-3xl p-4 sm:p-6 border-2.5 border-[#161514] shadow-[4px_4px_0px_0px_rgba(22,21,20,1)] space-y-4">
+    <div className="bg-white rounded-3xl p-4 sm:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-[#161514]/15 pb-4">
         <div>
-          <h3 className="text-base font-black text-[#161514] uppercase tracking-wider flex items-center gap-2" style={{ fontFamily: "var(--font-heading)" }}>
+          <h3 className="text-base font-black text-[#161514] uppercase tracking-wider flex items-center gap-2 font-heading">
             <Flame className="h-5 w-5 text-rose-500" /> Eisenhower Priority Matrix
           </h3>
           <p className="text-xs font-bold text-[#161514]/70">
@@ -62,7 +62,7 @@ export function EisenhowerMatrixWidget({ tasks, onUpdateTask, onOpenCreateModal 
         <button
           type="button"
           onClick={onOpenCreateModal}
-          className="bg-[#F59E0B] hover:bg-[#d98206] text-white border-2 border-[#161514] px-4 py-2 rounded-2xl text-xs font-black shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0 uppercase tracking-wider"
+          className="bg-[#CEF431] hover:bg-[#bce028] text-[#161514] border-2 border-[#161514] px-4 py-2 rounded-xl text-xs font-black shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0 uppercase tracking-wider"
         >
           <Plus className="h-4 w-4 stroke-[3]" /> Add Task
         </button>
@@ -76,12 +76,12 @@ export function EisenhowerMatrixWidget({ tasks, onUpdateTask, onOpenCreateModal 
           return (
             <div
               key={q.id}
-              className={cn("rounded-3xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] space-y-3 min-h-[220px]", q.color)}
+              className={cn("rounded-3xl p-4 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-3 min-h-[240px]", q.color)}
             >
               {/* Quadrant Header */}
-              <div className={cn("p-2.5 rounded-2xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] flex items-center justify-between", q.headerBg)}>
-                <span className="text-xs font-black uppercase tracking-wider">{q.title}</span>
-                <span className="bg-[#161514] text-white text-[10px] font-black px-2 py-0.5 rounded-md">
+              <div className={cn("p-2.5 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-between", q.headerBg)}>
+                <span className="text-xs font-black uppercase tracking-wider font-heading">{q.title}</span>
+                <span className="bg-[#161514] text-white text-[10px] font-black px-2.5 py-0.5 rounded-lg border border-[#161514]">
                   {qTasks.length}
                 </span>
               </div>
@@ -89,14 +89,14 @@ export function EisenhowerMatrixWidget({ tasks, onUpdateTask, onOpenCreateModal 
               {/* Quadrant Task Items */}
               <div className="space-y-2">
                 {qTasks.length === 0 ? (
-                  <p className="text-[11px] font-bold opacity-60 text-center py-6">
+                  <p className="text-[11px] font-black opacity-60 text-center py-6 font-heading">
                     No active tasks in this quadrant.
                   </p>
                 ) : (
                   qTasks.map((t) => (
                     <div
                       key={t.id}
-                      className="bg-white rounded-xl p-2.5 border-1.5 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] flex items-center justify-between gap-2"
+                      className="bg-white rounded-xl p-3 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-between gap-2.5"
                     >
                       <div className="min-w-0 flex-1">
                         <span className="text-xs font-black text-[#161514] block truncate">{t.title}</span>
@@ -107,7 +107,7 @@ export function EisenhowerMatrixWidget({ tasks, onUpdateTask, onOpenCreateModal 
                       <button
                         type="button"
                         onClick={() => onUpdateTask(t.id, { status: "completed", completedAt: new Date().toISOString() })}
-                        className="bg-[#03D26F] hover:bg-emerald-500 text-[#161514] border border-[#161514] px-2 py-1 rounded-lg text-[10px] font-black cursor-pointer shrink-0"
+                        className="bg-[#03D26F] hover:bg-[#02b35d] text-[#161514] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] px-2.5 py-1 rounded-lg text-[10px] font-black cursor-pointer shrink-0 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
                       >
                         Done ✅
                       </button>

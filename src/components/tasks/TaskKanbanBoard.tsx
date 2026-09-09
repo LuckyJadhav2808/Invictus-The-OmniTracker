@@ -32,10 +32,10 @@ export function TaskKanbanBoard({
   const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
 
   const priorityStyles = {
-    p1: { label: "P1 Urgent 🔥", badge: "bg-rose-500 text-white border-[#161514]" },
-    p2: { label: "P2 High 🟠", badge: "bg-amber-400 text-[#161514] border-[#161514]" },
-    p3: { label: "P3 Medium 🟡", badge: "bg-yellow-300 text-[#161514] border-[#161514]" },
-    p4: { label: "P4 Low 🔵", badge: "bg-sky-300 text-[#161514] border-[#161514]" },
+    p1: { label: "P1 Urgent 🔥", badge: "bg-rose-500 text-white border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514]" },
+    p2: { label: "P2 High 🟠", badge: "bg-amber-400 text-[#161514] border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514]" },
+    p3: { label: "P3 Medium 🟡", badge: "bg-yellow-300 text-[#161514] border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514]" },
+    p4: { label: "P4 Low 🔵", badge: "bg-sky-300 text-[#161514] border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514]" },
   };
 
   const handleDragStart = (e: React.DragEvent, id: string) => {
@@ -70,7 +70,7 @@ export function TaskKanbanBoard({
       {/* Top Header */}
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h3 className="text-base font-black text-[#161514] uppercase tracking-wider flex items-center gap-2" style={{ fontFamily: "var(--font-heading)" }}>
+          <h3 className="text-base font-black text-[#161514] uppercase tracking-wider flex items-center gap-2 font-heading">
             <CheckSquare className="h-5 w-5 text-[#F59E0B]" /> Production Kanban Board
           </h3>
           <p className="text-xs font-bold text-[#161514]/70">
@@ -81,7 +81,7 @@ export function TaskKanbanBoard({
         <button
           type="button"
           onClick={onOpenCreateModal}
-          className="bg-[#F59E0B] hover:bg-[#d98206] text-white border-2 border-[#161514] px-4 py-2 rounded-2xl text-xs font-black shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer flex items-center gap-1.5 shrink-0 uppercase tracking-wider"
+          className="bg-[#CEF431] hover:bg-[#bce028] text-[#161514] border-2 border-[#161514] px-4 py-2.5 rounded-xl text-xs font-black shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer flex items-center gap-1.5 shrink-0 uppercase tracking-wider"
         >
           <Plus className="h-4 w-4 stroke-[3]" />
           <span>New Task</span>
@@ -98,20 +98,20 @@ export function TaskKanbanBoard({
               key={col.id}
               onDragOver={handleDragOver}
               onDrop={(e) => handleDrop(e, col.id)}
-              className="bg-[#FAF8F5] rounded-3xl p-3.5 border-2.5 border-[#161514] shadow-[4px_4px_0px_0px_rgba(22,21,20,1)] space-y-3 min-h-[420px] flex flex-col justify-between"
+              className="bg-[#FAF8F5] rounded-3xl p-3.5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-3 min-h-[440px] flex flex-col justify-between"
             >
               <div>
                 {/* Column Header */}
                 <div
                   className={cn(
-                    "p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] flex items-center justify-between mb-3",
+                    "p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-between mb-3",
                     col.headerBg
                   )}
                 >
-                  <span className="text-xs font-black uppercase tracking-wider truncate">
+                  <span className="text-xs font-black uppercase tracking-wider truncate font-heading">
                     {col.title}
                   </span>
-                  <span className="bg-[#161514] text-white text-[10px] font-black px-2 py-0.5 rounded-lg border border-[#161514]">
+                  <span className="bg-[#161514] text-white text-[10px] font-black px-2.5 py-0.5 rounded-lg border border-[#161514]">
                     {colTasks.length}
                   </span>
                 </div>
@@ -119,7 +119,7 @@ export function TaskKanbanBoard({
                 {/* Cards Container */}
                 <div className="space-y-3">
                   {colTasks.length === 0 ? (
-                    <div className="border-2 border-dashed border-[#161514]/20 rounded-2xl p-6 text-center text-[11px] font-bold text-[#161514]/50 select-none">
+                    <div className="border-2 border-dashed border-[#161514]/25 bg-white/50 rounded-2xl p-6 text-center text-xs font-black text-[#161514]/40 select-none">
                       Drop tasks here
                     </div>
                   ) : (
@@ -132,20 +132,20 @@ export function TaskKanbanBoard({
                           key={task.id}
                           draggable
                           onDragStart={(e) => handleDragStart(e, task.id)}
-                          className="bg-white rounded-2xl p-3.5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] space-y-2.5 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all cursor-grab active:cursor-grabbing group"
+                          className="bg-white rounded-2xl p-3.5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-2.5 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-grab active:cursor-grabbing group"
                         >
                           {/* Top Badges */}
                           <div className="flex items-center justify-between gap-1.5 flex-wrap">
                             <span
                               className={cn(
-                                "text-[9px] font-black px-2 py-0.5 rounded-lg border shadow-[1px_1px_0px_0px_rgba(22,21,20,1)]",
+                                "text-[9px] font-black px-2 py-0.5 rounded-lg",
                                 prio.badge
                               )}
                             >
                               {prio.label}
                             </span>
 
-                            <span className="bg-[#CEF431] text-[#161514] text-[9px] font-black px-2 py-0.5 rounded-lg border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)]">
+                            <span className="bg-[#CEF431] text-[#161514] text-[9px] font-black px-2 py-0.5 rounded-lg border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
                               #{task.projectTag}
                             </span>
                           </div>
@@ -169,12 +169,12 @@ export function TaskKanbanBoard({
 
                           {/* Subtasks Progress */}
                           {task.subtasks.length > 0 && (
-                            <div className="bg-[#FAF8F5] p-2 rounded-xl border border-[#161514]/20 space-y-1">
+                            <div className="bg-[#FAF8F5] p-2 rounded-xl border-2 border-[#161514] space-y-1">
                               <div className="flex items-center justify-between text-[9px] font-black text-[#161514]">
                                 <span>Checklist ({doneSubtasks}/{task.subtasks.length})</span>
                                 <span>{Math.round((doneSubtasks / task.subtasks.length) * 100)}%</span>
                               </div>
-                              <div className="w-full h-1.5 bg-gray-200 rounded-full border border-[#161514]/30 overflow-hidden">
+                              <div className="w-full h-2 bg-gray-200 rounded-full border border-[#161514] overflow-hidden">
                                 <div
                                   className="h-full bg-[#03D26F]"
                                   style={{ width: `${(doneSubtasks / task.subtasks.length) * 100}%` }}
@@ -195,7 +195,7 @@ export function TaskKanbanBoard({
                                   >
                                     <span
                                       className={cn(
-                                        "h-3 w-3 rounded-md border border-[#161514] flex items-center justify-center shrink-0",
+                                        "h-3.5 w-3.5 rounded-md border-2 border-[#161514] flex items-center justify-center shrink-0 shadow-[0.5px_0.5px_0px_0px_#161514]",
                                         st.completed ? "bg-[#03D26F] text-[#161514]" : "bg-white"
                                       )}
                                     >
@@ -214,7 +214,7 @@ export function TaskKanbanBoard({
                           <div className="flex items-center justify-between pt-1 border-t border-[#161514]/15">
                             {/* Due Date Indicator */}
                             {task.dueDate ? (
-                              <span className="text-[9px] font-black text-[#161514]/80 flex items-center gap-1">
+                              <span className="text-[9px] font-black text-[#161514] flex items-center gap-1">
                                 <Clock className="h-3 w-3 text-amber-600" />
                                 <span>{task.dueDate} {task.dueTime && `@ ${task.dueTime}`}</span>
                               </span>
@@ -228,7 +228,7 @@ export function TaskKanbanBoard({
                                 <button
                                   type="button"
                                   onClick={() => moveColumn(task, "prev")}
-                                  className="p-1 bg-white hover:bg-cream-bg text-[#161514] border border-[#161514] rounded-lg shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] cursor-pointer"
+                                  className="p-1 bg-white hover:bg-[#FFF9EA] text-[#161514] border-2 border-[#161514] rounded-lg shadow-[1px_1px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all"
                                   title="Move Left"
                                 >
                                   <ChevronLeft className="h-3 w-3 stroke-[3]" />
@@ -238,7 +238,7 @@ export function TaskKanbanBoard({
                                 <button
                                   type="button"
                                   onClick={() => moveColumn(task, "next")}
-                                  className="p-1 bg-white hover:bg-cream-bg text-[#161514] border border-[#161514] rounded-lg shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] cursor-pointer"
+                                  className="p-1 bg-white hover:bg-[#FFF9EA] text-[#161514] border-2 border-[#161514] rounded-lg shadow-[1px_1px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all"
                                   title="Move Right"
                                 >
                                   <ChevronRight className="h-3 w-3 stroke-[3]" />
@@ -248,7 +248,7 @@ export function TaskKanbanBoard({
                               <button
                                 type="button"
                                 onClick={() => onEditTask(task)}
-                                className="p-1 bg-amber-200 hover:bg-amber-300 text-[#161514] border border-[#161514] rounded-lg shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] cursor-pointer"
+                                className="p-1 bg-amber-200 hover:bg-amber-300 text-[#161514] border-2 border-[#161514] rounded-lg shadow-[1px_1px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all"
                                 title="Edit Task"
                               >
                                 <Edit3 className="h-3 w-3 stroke-[2.5]" />
@@ -256,7 +256,7 @@ export function TaskKanbanBoard({
                               <button
                                 type="button"
                                 onClick={() => onDeleteTask(task.id)}
-                                className="p-1 bg-rose-200 hover:bg-rose-300 text-rose-900 border border-[#161514] rounded-lg shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] cursor-pointer"
+                                className="p-1 bg-rose-200 hover:bg-rose-300 text-rose-950 border-2 border-[#161514] rounded-lg shadow-[1px_1px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all"
                                 title="Delete Task"
                               >
                                 <Trash2 className="h-3 w-3 stroke-[2.5]" />
@@ -274,7 +274,7 @@ export function TaskKanbanBoard({
               <button
                 type="button"
                 onClick={onOpenCreateModal}
-                className="w-full mt-3 p-2 bg-white hover:bg-[#CEF431] text-[#161514] border-2 border-[#161514] rounded-2xl text-xs font-black shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] transition-all cursor-pointer flex items-center justify-center gap-1 uppercase tracking-wider"
+                className="w-full mt-3 p-2.5 bg-white hover:bg-[#CEF431] text-[#161514] border-2 border-[#161514] rounded-xl text-xs font-black shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-1 uppercase tracking-wider"
               >
                 <Plus className="h-3.5 w-3.5 stroke-[3]" /> Add Task
               </button>

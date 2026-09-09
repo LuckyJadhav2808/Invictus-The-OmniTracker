@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Nunito } from "next/font/google";
+import { Inter, Space_Grotesk } from "next/font/google";
 import { Providers } from "@/components/shared/Providers";
 import "./globals.css";
 
@@ -9,10 +9,11 @@ const inter = Inter({
   display: "swap",
 });
 
-const nunito = Nunito({
+const spaceGrotesk = Space_Grotesk({
   variable: "--font-heading",
   subsets: ["latin"],
   display: "swap",
+  weight: ["500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -35,7 +36,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${nunito.variable} h-full antialiased`}
+      className={`${inter.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-cream-bg text-navy-900">
         <Providers>{children}</Providers>

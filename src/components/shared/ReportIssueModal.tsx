@@ -76,7 +76,7 @@ export function ReportIssueModal({ open, onOpenChange }: ReportIssueModalProps) 
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="e.g. PDF statement formatting on mobile..."
-            className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
+            className="w-full neo-input text-xs sm:text-sm font-bold"
           />
         </div>
 
@@ -122,14 +122,14 @@ export function ReportIssueModal({ open, onOpenChange }: ReportIssueModalProps) 
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Explain what happened or what you'd like to see improved..."
-            className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
+            className="w-full neo-input text-xs sm:text-sm font-bold resize-none min-h-[80px]"
           />
         </div>
 
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-[#CEF431] hover:bg-[#bce028] text-[#161514] font-black text-xs uppercase tracking-wider rounded-2xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+          className="w-full bg-[#CEF431] hover:bg-[#bce028] text-[#161514] font-black text-xs uppercase tracking-wider rounded-2xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center justify-center gap-2 disabled:opacity-50"
         >
           <Send className="h-4 w-4 stroke-[2.5]" />
           <span>{isSubmitting ? "Submitting Report..." : "Submit Issue Report"}</span>

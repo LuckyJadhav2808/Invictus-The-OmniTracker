@@ -154,7 +154,7 @@ export function PDFExportModal({
     >
       <div className="space-y-4 pt-1">
         {/* Export Period Selector */}
-        <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)] space-y-2">
+        <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-2">
           <label className="text-xs font-black uppercase tracking-wider text-[#161514] block">
             Select Statement Range
           </label>
@@ -170,10 +170,10 @@ export function PDFExportModal({
         </div>
 
         {/* 💵 FEATURE 6: GRANULAR CASH EXPENSES FILTER & PICKER */}
-        <div className="bg-amber-50 rounded-2xl border-2 border-[#161514] p-3.5 shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)] space-y-3">
+        <div className="bg-amber-50 rounded-2xl border-2 border-[#161514] p-3.5 shadow-[3px_3px_0px_0px_#161514] space-y-3">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <div className="h-7 w-7 rounded-xl bg-amber-400 border border-[#161514] flex items-center justify-center text-sm shrink-0">
+              <div className="h-7 w-7 rounded-xl bg-amber-400 border-2 border-[#161514] flex items-center justify-center text-sm shrink-0 shadow-[1.5px_1.5px_0px_0px_#161514]">
                 💵
               </div>
               <div>
@@ -190,7 +190,7 @@ export function PDFExportModal({
               type="button"
               onClick={() => setIncludeCashExpenses(!includeCashExpenses)}
               className={cn(
-                "px-3 py-1 rounded-xl text-xs font-black border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] transition-all cursor-pointer",
+                "px-3 py-1 rounded-xl text-xs font-black border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer",
                 includeCashExpenses ? "bg-[#CEF431] text-[#161514]" : "bg-white text-navy-600"
               )}
             >
@@ -200,7 +200,7 @@ export function PDFExportModal({
 
           {/* Granular Individual Cash Item Selection (Only if Cash is Included) */}
           {includeCashExpenses && cashTxs.length > 0 && (
-            <div className="space-y-2 pt-1 border-t border-[#161514]/15">
+            <div className="space-y-2 pt-1 border-t-2 border-[#161514]/15">
               <div className="flex items-center justify-between">
                 <button
                   type="button"
@@ -214,14 +214,14 @@ export function PDFExportModal({
                 <button
                   type="button"
                   onClick={toggleSelectAllCash}
-                  className="text-[9px] font-black uppercase px-2 py-0.5 rounded-lg bg-white border border-[#161514] hover:bg-amber-200 cursor-pointer"
+                  className="text-[9px] font-black uppercase px-2 py-0.5 rounded-lg bg-white border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:bg-amber-200 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all"
                 >
                   {selectedCashTxIds.size === cashTxs.length ? "Deselect All" : "Select All"}
                 </button>
               </div>
 
               {isCashListExpanded && (
-                <div className="max-h-48 overflow-y-auto space-y-1.5 p-1 bg-white rounded-xl border border-[#161514]">
+                <div className="max-h-48 overflow-y-auto space-y-1.5 p-1 bg-white rounded-xl border-2 border-[#161514]">
                   {cashTxs.map((tx) => {
                     const isChecked = selectedCashTxIds.has(tx.id);
                     const cat = categories.find((c) => c.id === tx.categoryId);
@@ -230,8 +230,8 @@ export function PDFExportModal({
                         key={tx.id}
                         onClick={() => toggleCashTxId(tx.id)}
                         className={cn(
-                          "p-2 rounded-lg border flex items-center justify-between gap-2 cursor-pointer transition-colors text-xs font-bold",
-                          isChecked ? "bg-[#CEF431]/20 border-[#161514]" : "bg-gray-50 border-gray-200 opacity-60"
+                          "p-2 rounded-lg border-2 flex items-center justify-between gap-2 cursor-pointer transition-all text-xs font-bold",
+                          isChecked ? "bg-[#CEF431]/20 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]" : "bg-gray-50 border-gray-200 opacity-60"
                         )}
                       >
                         <div className="flex items-center gap-2 min-w-0">
@@ -252,7 +252,7 @@ export function PDFExportModal({
                           </div>
                         </div>
 
-                        <span className="text-xs font-black text-[#161514] shrink-0">
+                        <span className="text-xs font-black text-[#161514] shrink-0" style={{ fontFamily: "var(--font-heading)" }}>
                           {currencySymbol}{tx.amount.toLocaleString()}
                         </span>
                       </div>
@@ -270,7 +270,7 @@ export function PDFExportModal({
             type="button"
             disabled={isGenerating}
             onClick={handleSaveAsPDF}
-            className="w-full bg-[#03D26F] hover:bg-[#02b35d] text-[#161514] font-black text-xs uppercase tracking-wider py-3 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center justify-center gap-1.5 disabled:opacity-50"
+            className="w-full bg-[#03D26F] hover:bg-[#02b35d] text-[#161514] font-black text-xs uppercase tracking-wider py-3 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center justify-center gap-1.5 disabled:opacity-50"
           >
             <Download className="h-4 w-4 stroke-[2.5]" />
             <span>{isGenerating ? "Generating..." : "Save as PDF"}</span>
@@ -279,7 +279,7 @@ export function PDFExportModal({
           <button
             type="button"
             onClick={handlePrintDirect}
-            className="w-full bg-[#CEF431] hover:bg-[#bce028] text-[#161514] font-black text-xs uppercase tracking-wider py-3 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center justify-center gap-1.5"
+            className="w-full bg-[#CEF431] hover:bg-[#bce028] text-[#161514] font-black text-xs uppercase tracking-wider py-3 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center justify-center gap-1.5"
           >
             <Printer className="h-4 w-4 stroke-[2.5]" />
             <span>Print Direct</span>
@@ -299,7 +299,7 @@ export function PDFExportModal({
             </span>
           </div>
 
-          <div className="max-h-[360px] overflow-y-auto rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)]">
+          <div className="max-h-[360px] overflow-y-auto rounded-2xl border-2 border-[#161514] shadow-[4px_4px_0px_0px_#161514]">
             <NeobrutalistPDFStatement
               transactions={finalExportTxs}
               categories={categories}

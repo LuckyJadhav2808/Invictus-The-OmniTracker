@@ -1,6 +1,7 @@
 "use client";
 
 import { ProgressRing } from "@/components/shared/ProgressRing";
+import { cn } from "@/lib/utils";
 
 interface StatTileProps {
   label: string;
@@ -11,6 +12,7 @@ interface StatTileProps {
   ringColorClass?: string;
   ringTrackColorClass?: string;
   onClick?: () => void;
+  className?: string;
 }
 
 export function StatTile({
@@ -18,29 +20,38 @@ export function StatTile({
   value,
   percentage = 0,
   bgClass,
-  textColorClass = "text-navy-900",
-  ringColorClass = "stroke-navy-900",
-  ringTrackColorClass = "stroke-white/25",
+  textColorClass = "text-[#161514]",
+  ringColorClass = "stroke-[#161514]",
+  ringTrackColorClass = "stroke-[#161514]/20",
   onClick,
+  className = "",
 }: StatTileProps) {
   return (
     <button
       onClick={onClick}
-      className={`${bgClass} ${textColorClass} rounded-[var(--radius-md)] p-4 text-left shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all flex flex-col justify-between h-[120px] w-full`}
+      type="button"
+      className={cn(
+        bgClass,
+        textColorClass,
+        "rounded-2xl p-4 text-left border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_0px_#161514] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all duration-150 flex flex-col justify-between h-[126px] w-full cursor-pointer select-none group",
+        className
+      )}
     >
       <div className="flex items-center justify-between w-full">
-        <span className="text-[10px] font-bold uppercase tracking-wider opacity-85">
+        <span className="font-heading font-black text-[11px] uppercase tracking-wider text-[#161514]/80 truncate pr-2">
           {label}
         </span>
-        <ProgressRing
-          percentage={percentage}
-          size={24}
-          strokeWidth={3}
-          colorClass={ringColorClass}
-          trackColorClass={ringTrackColorClass}
-        />
+        <div className="shrink-0 bg-white/40 p-1 rounded-full border border-[#161514]/40">
+          <ProgressRing
+            percentage={percentage}
+            size={22}
+            strokeWidth={3}
+            colorClass={ringColorClass}
+            trackColorClass={ringTrackColorClass}
+          />
+        </div>
       </div>
-      <span className="text-3xl font-extrabold mt-2 leading-none" style={{ fontFamily: "var(--font-heading)" }}>
+      <span className="font-heading text-2xl sm:text-3xl font-black mt-2 leading-none tracking-tight text-[#161514]">
         {value}
       </span>
     </button>

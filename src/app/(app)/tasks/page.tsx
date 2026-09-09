@@ -154,8 +154,8 @@ export default function TasksPage() {
         />
 
         {/* View Tab Switcher (Kanban ↔ List ↔ Matrix) */}
-        <div className="flex items-center justify-between gap-3 bg-white p-2 rounded-3xl border-2.5 border-[#161514] shadow-[4px_4px_0px_0px_rgba(22,21,20,1)] overflow-x-auto no-scrollbar">
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+        <div className="flex items-center justify-between gap-3 bg-white p-2.5 rounded-2xl sm:rounded-3xl border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
             {[
               { id: "kanban", label: "Kanban Board", icon: LayoutGrid },
               { id: "list", label: "Task List", icon: List },
@@ -169,10 +169,10 @@ export default function TasksPage() {
                   type="button"
                   onClick={() => setActiveTab(tb.id as any)}
                   className={cn(
-                    "px-3.5 py-2 rounded-2xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 uppercase tracking-wider shrink-0 border-2 border-[#161514]",
+                    "px-4 py-2.5 rounded-xl sm:rounded-2xl text-xs font-black transition-all cursor-pointer flex items-center gap-2 uppercase tracking-wider shrink-0 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
                     isActive
-                      ? "bg-[#F59E0B] text-white shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] scale-[1.02]"
-                      : "bg-[#FAF8F5] text-[#161514]/70 hover:bg-cream-bg"
+                      ? "bg-[#F59E0B] text-white"
+                      : "bg-[#FAF8F5] text-[#161514]/70 hover:bg-[#FFF9EA]"
                   )}
                 >
                   <Icon className="h-4 w-4 stroke-[2.5]" />
@@ -182,7 +182,7 @@ export default function TasksPage() {
             })}
           </div>
 
-          <span className="text-[10px] font-black bg-[#CEF431] text-[#161514] px-3 py-1.5 rounded-xl border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] hidden sm:inline-block">
+          <span className="text-[10px] font-black bg-[#CEF431] text-[#161514] px-3.5 py-1.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hidden sm:inline-block uppercase tracking-wider">
             {filteredTasks.length} Tasks Active
           </span>
         </div>

@@ -36,18 +36,18 @@ export function TaskListWidget({
   });
 
   const priorityBadges = {
-    p1: "bg-rose-500 text-white",
-    p2: "bg-amber-400 text-[#161514]",
-    p3: "bg-yellow-300 text-[#161514]",
-    p4: "bg-sky-300 text-[#161514]",
+    p1: "bg-rose-500 text-white border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514]",
+    p2: "bg-amber-400 text-[#161514] border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514]",
+    p3: "bg-yellow-300 text-[#161514] border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514]",
+    p4: "bg-sky-300 text-[#161514] border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514]",
   };
 
   return (
-    <div className="bg-white rounded-3xl p-4 sm:p-6 border-2.5 border-[#161514] shadow-[4px_4px_0px_0px_rgba(22,21,20,1)] space-y-4">
+    <div className="bg-white rounded-3xl p-4 sm:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
       {/* Header & Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-[#161514]/15 pb-4">
         <div>
-          <h3 className="text-base font-black text-[#161514] uppercase tracking-wider flex items-center gap-2" style={{ fontFamily: "var(--font-heading)" }}>
+          <h3 className="text-base font-black text-[#161514] uppercase tracking-wider flex items-center gap-2 font-heading">
             <CheckSquare className="h-5 w-5 text-[#F59E0B]" /> Task List & Checklist Engine
           </h3>
           <p className="text-xs font-bold text-[#161514]/70">
@@ -58,22 +58,22 @@ export function TaskListWidget({
         <button
           type="button"
           onClick={onOpenCreateModal}
-          className="bg-[#F59E0B] hover:bg-[#d98206] text-white border-2 border-[#161514] px-4 py-2 rounded-2xl text-xs font-black shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0 uppercase tracking-wider"
+          className="bg-[#CEF431] hover:bg-[#bce028] text-[#161514] border-2 border-[#161514] px-4 py-2 rounded-xl text-xs font-black shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0 uppercase tracking-wider"
         >
           <Plus className="h-4 w-4 stroke-[3]" /> Add Task
         </button>
       </div>
 
       {/* Search & Filter Bar */}
-      <div className="flex flex-col sm:flex-row items-center gap-2">
+      <div className="flex flex-col sm:flex-row items-center gap-2.5">
         <div className="relative flex-1 w-full">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#161514]/50" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#161514]/60" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search task title, notes, or tags..."
-            className="w-full bg-[#FAF8F5] rounded-2xl pl-9 pr-3 py-2 border-2 border-[#161514] text-xs font-bold text-[#161514] outline-none"
+            className="w-full bg-[#FAF8F5] rounded-xl pl-9 pr-3 py-2.5 border-2 border-[#161514] text-xs font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514] focus:bg-[#FFF9EA] focus:shadow-[4px_4px_0px_0px_#161514] outline-none transition-all"
           />
         </div>
 
@@ -84,10 +84,10 @@ export function TaskListWidget({
               type="button"
               onClick={() => setSelectedPriority(prio)}
               className={cn(
-                "px-2.5 py-1 rounded-xl text-[10px] font-black border border-[#161514] transition-all cursor-pointer uppercase shrink-0",
+                "px-3 py-1.5 rounded-xl text-[10px] font-black border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer uppercase shrink-0",
                 selectedPriority === prio
-                  ? "bg-[#161514] text-white shadow-[1px_1px_0px_0px_rgba(22,21,20,1)]"
-                  : "bg-white text-[#161514]/70 hover:bg-cream-bg"
+                  ? "bg-[#161514] text-white"
+                  : "bg-white text-[#161514]/70 hover:bg-[#FAF8F5]"
               )}
             >
               {prio === "All" ? "All Prio" : prio.toUpperCase()}
@@ -99,8 +99,8 @@ export function TaskListWidget({
       {/* Task Rows List */}
       <div className="space-y-2.5">
         {filteredTasks.length === 0 ? (
-          <div className="bg-[#FAF8F5] rounded-2xl p-8 border-2 border-dashed border-[#161514]/20 text-center space-y-2">
-            <p className="text-xs font-black text-[#161514]/60 uppercase tracking-wider">No Tasks Found</p>
+          <div className="bg-[#FAF8F5] rounded-2xl p-8 border-2 border-dashed border-[#161514]/25 text-center space-y-2">
+            <p className="text-xs font-black text-[#161514]/60 uppercase tracking-wider font-heading">No Tasks Found</p>
             <p className="text-[11px] font-bold text-[#161514]/50">
               Create your first task or clear your search filters.
             </p>
@@ -114,8 +114,8 @@ export function TaskListWidget({
               <div
                 key={task.id}
                 className={cn(
-                  "p-3.5 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all hover:-translate-x-0.5 hover:-translate-y-0.5",
-                  isDone ? "bg-emerald-50/60" : "bg-white"
+                  "p-3.5 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all hover:-translate-x-0.5 hover:-translate-y-0.5",
+                  isDone ? "bg-emerald-50/70" : "bg-white"
                 )}
               >
                 {/* Left Side: Checkbox & Info */}
@@ -129,8 +129,8 @@ export function TaskListWidget({
                       })
                     }
                     className={cn(
-                      "mt-0.5 h-5 w-5 rounded-lg border-2 border-[#161514] flex items-center justify-center shrink-0 cursor-pointer shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] transition-all",
-                      isDone ? "bg-[#03D26F] text-[#161514]" : "bg-white hover:bg-amber-100"
+                      "mt-0.5 h-5 w-5 rounded-lg border-2 border-[#161514] flex items-center justify-center shrink-0 cursor-pointer shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all",
+                      isDone ? "bg-[#03D26F] text-[#161514]" : "bg-white hover:bg-[#FFF9EA]"
                     )}
                   >
                     {isDone ? <CheckCircle2 className="h-3.5 w-3.5 stroke-[3]" /> : <Circle className="h-3.5 w-3.5 opacity-30" />}
@@ -138,20 +138,20 @@ export function TaskListWidget({
 
                   <div className="space-y-1 min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-1.5">
-                      <span className={cn("text-[9px] font-black px-2 py-0.5 rounded-md border border-[#161514]", priorityBadges[task.priority])}>
+                      <span className={cn("text-[9px] font-black px-2 py-0.5 rounded-md", priorityBadges[task.priority])}>
                         {task.priority.toUpperCase()}
                       </span>
-                      <span className="bg-[#CEF431] text-[#161514] text-[9px] font-black px-2 py-0.5 rounded-md border border-[#161514]">
+                      <span className="bg-[#CEF431] text-[#161514] text-[9px] font-black px-2 py-0.5 rounded-md border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
                         #{task.projectTag}
                       </span>
                       {task.dueDate && (
-                        <span className="text-[9px] font-bold text-[#161514]/70 flex items-center gap-1">
+                        <span className="text-[9px] font-bold text-[#161514] flex items-center gap-1">
                           <Clock className="h-3 w-3 text-amber-600" /> {task.dueDate}
                         </span>
                       )}
                     </div>
 
-                    <h4 className={cn("text-xs sm:text-sm font-black text-[#161514] tracking-tight", isDone && "line-through opacity-60")}>
+                    <h4 className={cn("text-xs sm:text-sm font-black text-[#161514] tracking-tight leading-tight", isDone && "line-through opacity-60")}>
                       {task.title}
                     </h4>
 
@@ -163,7 +163,7 @@ export function TaskListWidget({
 
                     {/* Subtasks pill overview */}
                     {task.subtasks.length > 0 && (
-                      <div className="flex items-center gap-1.5 pt-1 text-[10px] font-bold text-[#161514]/70">
+                      <div className="flex items-center gap-1.5 pt-1 text-[10px] font-black text-[#161514]/70">
                         <span>Checklist: {doneSubtasks}/{task.subtasks.length} done</span>
                       </div>
                     )}
@@ -175,7 +175,7 @@ export function TaskListWidget({
                   <button
                     type="button"
                     onClick={() => onEditTask(task)}
-                    className="bg-amber-100 hover:bg-amber-200 text-[#161514] border border-[#161514] px-2.5 py-1 rounded-xl text-xs font-black shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] cursor-pointer flex items-center gap-1"
+                    className="bg-amber-100 hover:bg-amber-200 text-[#161514] border-2 border-[#161514] px-2.5 py-1.5 rounded-xl text-xs font-black shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer flex items-center gap-1 transition-all"
                   >
                     <Edit3 className="h-3.5 w-3.5 stroke-[2.5]" /> Edit
                   </button>
@@ -183,7 +183,7 @@ export function TaskListWidget({
                   <button
                     type="button"
                     onClick={() => onDeleteTask(task.id)}
-                    className="bg-rose-100 hover:bg-rose-200 text-rose-900 border border-[#161514] px-2.5 py-1 rounded-xl text-xs font-black shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] cursor-pointer flex items-center gap-1"
+                    className="bg-rose-100 hover:bg-rose-200 text-rose-950 border-2 border-[#161514] px-2.5 py-1.5 rounded-xl text-xs font-black shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer flex items-center gap-1 transition-all"
                   >
                     <Trash2 className="h-3.5 w-3.5 stroke-[2.5]" /> Delete
                   </button>

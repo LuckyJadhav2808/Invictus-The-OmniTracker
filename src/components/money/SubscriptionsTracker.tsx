@@ -80,22 +80,22 @@ export function SubscriptionsTracker() {
   }, 0);
 
   return (
-    <div className="bg-white rounded-3xl p-5 md:p-6 border-2 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] space-y-4 my-4">
+    <div className="bg-white rounded-3xl p-5 md:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4 my-4">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="h-9 w-9 rounded-xl bg-amber-300 border-2 border-navy-950 text-navy-950 flex items-center justify-center shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)]">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-2xl bg-[#FED7AA] border-2 border-[#161514] text-[#161514] flex items-center justify-center shadow-[2px_2px_0px_0px_#161514] shrink-0">
             <CreditCard className="h-5 w-5 stroke-[2.5]" />
           </div>
           <div>
-            <h4 className="text-sm font-black text-navy-950 tracking-tight" style={{ fontFamily: "var(--font-heading)" }}>Recurring Subscriptions</h4>
-            <p className="text-[10px] text-navy-700 font-bold">
-              Monthly commitment: <strong className="text-amber-950 font-black">₹{totalMonthlyCommitment.toLocaleString()}</strong>
+            <h4 className="text-sm font-black text-[#161514] tracking-tight font-heading uppercase">Recurring Subscriptions</h4>
+            <p className="text-[10px] text-[#161514]/70 font-bold uppercase tracking-wider">
+              Monthly commitment: <strong className="text-[#161514] font-black font-heading">₹{totalMonthlyCommitment.toLocaleString()}</strong>
             </p>
           </div>
         </div>
         <button
           onClick={() => setIsChoiceOpen(true)}
-          className="text-[10px] font-black text-navy-950 bg-amber-400 hover:bg-amber-500 px-3.5 py-1.5 rounded-xl cursor-pointer transition-all flex items-center gap-1 border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-[0px_0px_0px_0px_rgba(31,36,48,1)]"
+          className="text-xs font-black text-[#161514] bg-[#CEF431] hover:bg-[#b8dd24] px-3.5 py-2 rounded-xl cursor-pointer transition-all flex items-center gap-1.5 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none uppercase tracking-wider"
         >
           <Plus className="h-3.5 w-3.5 stroke-[3]" /> Add Sub
         </button>
@@ -103,11 +103,11 @@ export function SubscriptionsTracker() {
 
       {/* Subscription Cards List */}
       {isLoading ? (
-        <div className="h-20 animate-pulse bg-cream-bg/60 rounded-2xl border-2 border-navy-950" />
+        <div className="h-20 animate-pulse bg-[#FAF8F5] rounded-2xl border-2 border-[#161514]" />
       ) : subscriptions.length === 0 ? (
-        <div className="bg-amber-50/60 rounded-2xl p-5 border-2 border-dashed border-navy-950 text-center space-y-1 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)]">
-          <p className="text-xs font-black text-navy-950">No active subscriptions added yet! 💳</p>
-          <p className="text-[10px] text-navy-700 font-bold">Click '+ Add Sub' above to log software, media & hosting recurring payments.</p>
+        <div className="bg-[#FFFDF8] rounded-2xl p-6 border-2 border-dashed border-[#161514] text-center space-y-1 shadow-[2px_2px_0px_0px_#161514]">
+          <p className="text-xs font-black text-[#161514] font-heading uppercase">No active subscriptions added yet! 💳</p>
+          <p className="text-[10px] text-[#161514]/70 font-bold">Click '+ Add Sub' above to log software, media & hosting recurring payments.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -118,27 +118,27 @@ export function SubscriptionsTracker() {
             return (
               <div
                 key={sub.id}
-                className="bg-white rounded-2xl p-4 border-2 border-navy-950 shadow-[3px_3px_0px_0px_rgba(31,36,48,1)] flex items-center justify-between gap-3 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all"
+                className="bg-white rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex items-center justify-between gap-3 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all"
               >
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <h5 className="font-black text-xs text-navy-950 truncate">{sub.name}</h5>
-                    <span className="bg-amber-300 text-navy-950 text-[9px] font-black uppercase px-2 py-0.5 rounded-lg border border-navy-950">
+                    <h5 className="font-black text-xs text-[#161514] truncate font-heading">{sub.name}</h5>
+                    <span className="bg-[#FED7AA] text-[#161514] text-[9px] font-black uppercase px-2 py-0.5 rounded-lg border-2 border-[#161514]">
                       {sub.category || "General"}
                     </span>
                   </div>
-                  <span className="text-[10px] font-bold text-navy-700 flex items-center gap-1 mt-1">
-                    <Clock className="h-3 w-3 text-amber-800" /> Renews: {renDate} ({sub.billingCycle})
+                  <span className="text-[10px] font-bold text-[#161514]/70 flex items-center gap-1 mt-1">
+                    <Clock className="h-3 w-3 text-[#EA580C] stroke-[2.5]" /> Renews: {renDate} ({sub.billingCycle})
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-sm font-black text-navy-950">
-                    ₹{cost.toLocaleString()} <span className="text-[9px] text-navy-700 font-bold">/mo</span>
+                <div className="flex items-center gap-2.5 shrink-0">
+                  <span className="text-sm font-black text-[#161514] font-heading">
+                    ₹{cost.toLocaleString()} <span className="text-[9px] text-[#161514]/70 font-bold">/mo</span>
                   </span>
                   <button
                     onClick={() => setDeleteSubId(sub.id)}
-                    className="text-rose-600 hover:scale-110 p-1 cursor-pointer transition-all border-none bg-transparent"
+                    className="bg-[#FEE2E2] hover:bg-[#FCA5A5] text-[#991B1B] p-1.5 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
                     title="Cancel subscription"
                   >
                     <Trash2 className="h-3.5 w-3.5 stroke-[2.5]" />
@@ -173,31 +173,31 @@ export function SubscriptionsTracker() {
         description="Track your active monthly/yearly subscriptions"
       >
         <form onSubmit={handleAddSub} className="space-y-4 pt-2">
-          <div className="space-y-1.5">
-            <label className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514]">Service Name *</label>
+          <div className="space-y-1">
+            <label className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">Service Name *</label>
             <input
               type="text"
               placeholder="e.g. Netflix, Gym, Notion"
               value={subName}
               onChange={(e) => setSubName(e.target.value)}
-              className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
+              className="w-full bg-[#FFFDF8] rounded-xl border-2 border-[#161514] px-3.5 py-2.5 text-xs font-black text-[#161514] shadow-[2px_2px_0px_0px_#161514] focus:outline-none focus:bg-[#FFF9EA] transition-all"
               required
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <label className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514]">Amount (₹) *</label>
+            <div className="space-y-1">
+              <label className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">Amount (₹) *</label>
               <input
                 type="number"
                 placeholder="e.g. 499"
                 value={subAmount}
                 onChange={(e) => setSubAmount(e.target.value)}
-                className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
+                className="w-full bg-[#FFFDF8] rounded-xl border-2 border-[#161514] px-3.5 py-2.5 text-xs font-black text-[#161514] shadow-[2px_2px_0px_0px_#161514] focus:outline-none focus:bg-[#FFF9EA] transition-all"
                 required
               />
             </div>
-            <div className="space-y-1.5">
-              <label className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514]">Billing Cycle</label>
+            <div className="space-y-1">
+              <label className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">Billing Cycle</label>
               <NeobrutalistSelect
                 value={subCycle}
                 onChange={(val) => setSubCycle(val as any)}
@@ -208,22 +208,22 @@ export function SubscriptionsTracker() {
               />
             </div>
           </div>
-          <div className="space-y-1.5">
-            <label className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514]">Next Renewal Date *</label>
+          <div className="space-y-1">
+            <label className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">Next Renewal Date *</label>
             <input
               type="date"
               value={subDate}
               onChange={(e) => setSubDate(e.target.value)}
-              className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
+              className="w-full bg-[#FFFDF8] rounded-xl border-2 border-[#161514] px-3.5 py-2.5 text-xs font-black text-[#161514] shadow-[2px_2px_0px_0px_#161514] focus:outline-none focus:bg-[#FFF9EA] transition-all"
               required
             />
           </div>
           <button
             type="submit"
             disabled={addSubMutation.isPending}
-            className="w-full bg-[#03D26F] hover:bg-[#02b35d] text-[#161514] font-black text-xs uppercase tracking-wider rounded-2xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all"
+            className="w-full bg-[#03D26F] hover:bg-[#02B75F] text-[#161514] font-black text-xs uppercase tracking-wider rounded-2xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all"
           >
-            {addSubMutation.isPending ? "Saving…" : "Save Subscription"}
+            {addSubMutation.isPending ? "Saving…" : "Save Subscription 💳"}
           </button>
         </form>
       </ResponsiveFormContainer>
@@ -250,4 +250,5 @@ export function SubscriptionsTracker() {
       />
     </div>
   );
+
 }

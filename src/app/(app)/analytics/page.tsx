@@ -99,86 +99,98 @@ export default function AnalyticsHubPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-cream-bg p-4 md:p-8 space-y-6">
-      <div className="max-w-4xl mx-auto space-y-6">
+    <div className="min-h-screen bg-[#FAF8F5] pb-24 p-3 sm:p-6 md:p-8 space-y-6">
+      <div className="max-w-5xl mx-auto space-y-6">
         {/* Space Hero Banner */}
         <SpaceHeroBanner
           space="analytics"
-          badgeText="📊 Performance & Analytics Hub"
+          badgeText="Performance & Analytics Hub"
           title="Unified Life Intelligence."
           subtitle="Cross-module tracking metrics, study trends, and financial health."
           stats={[
             { label: "Total Habits", value: `${totalHabits}`, icon: "🌱" },
             { label: "Study Logged", value: `${totalStudyHours}h`, icon: "📚" },
-            { label: "Net Savings", value: `$${netBalance}`, icon: "💰" },
+            { label: "Net Savings", value: `$${netBalance.toLocaleString()}`, icon: "💰" },
           ]}
         />
 
         {/* Tab Controls */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="bg-white rounded-full p-1 border border-border shadow-sm flex w-full max-w-[500px] mb-6">
-            <TabsTrigger value="goals" className="flex-1 rounded-full text-xs font-bold py-2 data-state=active:bg-navy-900 data-state=active:text-white transition-all cursor-pointer">
+          <TabsList className="bg-white rounded-2xl sm:rounded-3xl p-2 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] flex w-full max-w-[560px] mb-6 gap-1.5 overflow-x-auto no-scrollbar">
+            <TabsTrigger
+              value="goals"
+              className="flex-1 rounded-xl sm:rounded-2xl text-xs font-black py-2.5 uppercase tracking-wider border-2 border-transparent transition-all cursor-pointer data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:border-[#161514] data-[state=active]:shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+            >
               Goals
             </TabsTrigger>
-            <TabsTrigger value="study" className="flex-1 rounded-full text-xs font-bold py-2 data-state=active:bg-navy-900 data-state=active:text-white transition-all cursor-pointer">
+            <TabsTrigger
+              value="study"
+              className="flex-1 rounded-xl sm:rounded-2xl text-xs font-black py-2.5 uppercase tracking-wider border-2 border-transparent transition-all cursor-pointer data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:border-[#161514] data-[state=active]:shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+            >
               Study
             </TabsTrigger>
-            <TabsTrigger value="money" className="flex-1 rounded-full text-xs font-bold py-2 data-state=active:bg-navy-900 data-state=active:text-white transition-all cursor-pointer">
+            <TabsTrigger
+              value="money"
+              className="flex-1 rounded-xl sm:rounded-2xl text-xs font-black py-2.5 uppercase tracking-wider border-2 border-transparent transition-all cursor-pointer data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:border-[#161514] data-[state=active]:shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+            >
               Money
             </TabsTrigger>
-            <TabsTrigger value="matrix" className="flex-1 rounded-full text-xs font-bold py-2 data-state=active:bg-navy-900 data-state=active:text-white transition-all cursor-pointer">
-              ⚡ 365d Matrix
+            <TabsTrigger
+              value="matrix"
+              className="flex-1 rounded-xl sm:rounded-2xl text-xs font-black py-2.5 uppercase tracking-wider border-2 border-transparent transition-all cursor-pointer data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:border-[#161514] data-[state=active]:shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+            >
+              ⚡ Matrix
             </TabsTrigger>
           </TabsList>
 
           {/* Goals Tab */}
           <TabsContent id="goals-analytics" value="goals" className="space-y-6 scroll-mt-24">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="bg-white rounded-[var(--radius-lg)] p-5 shadow-sm border flex items-center gap-4">
-                <div className="h-10 w-10 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500">
-                  <Flame className="h-5 w-5 fill-amber-500" />
+              <div className="bg-white rounded-2xl p-4 sm:p-5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] flex items-center gap-3.5 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all">
+                <div className="h-11 w-11 rounded-xl bg-amber-400 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center text-[#161514] shrink-0">
+                  <Flame className="h-5 w-5 fill-[#161514]" />
                 </div>
                 <div>
-                  <h5 className="text-[10px] font-bold text-navy-600 uppercase tracking-wider">Active Streak</h5>
-                  <p className="text-xl font-extrabold text-navy-900 mt-0.5">{maxStreak} days</p>
+                  <h5 className="text-[10px] font-black text-[#161514]/70 uppercase tracking-wider">Active Streak</h5>
+                  <p className="text-xl font-black text-[#161514] mt-0.5 font-heading">{maxStreak} days</p>
                 </div>
               </div>
 
-              <div className="bg-white rounded-[var(--radius-lg)] p-5 shadow-sm border flex items-center gap-4">
-                <div className="h-10 w-10 rounded-full bg-mint-600/10 flex items-center justify-center text-mint-600">
-                  <Trophy className="h-5 w-5" />
+              <div className="bg-white rounded-2xl p-4 sm:p-5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] flex items-center gap-3.5 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all">
+                <div className="h-11 w-11 rounded-xl bg-[#03D26F] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center text-[#161514] shrink-0">
+                  <Trophy className="h-5 w-5 stroke-[2.5]" />
                 </div>
                 <div>
-                  <h5 className="text-[10px] font-bold text-navy-600 uppercase tracking-wider">Record Streak</h5>
-                  <p className="text-xl font-extrabold text-navy-900 mt-0.5">{longestStreakOverall} days</p>
+                  <h5 className="text-[10px] font-black text-[#161514]/70 uppercase tracking-wider">Record Streak</h5>
+                  <p className="text-xl font-black text-[#161514] mt-0.5 font-heading">{longestStreakOverall} days</p>
                 </div>
               </div>
 
-              <div className="bg-white rounded-[var(--radius-lg)] p-5 shadow-sm border flex items-center gap-4">
-                <div className="h-10 w-10 rounded-full bg-lavender-400/20 flex items-center justify-center text-lavender-600">
-                  <Calendar className="h-5 w-5" />
+              <div className="bg-white rounded-2xl p-4 sm:p-5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] flex items-center gap-3.5 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all">
+                <div className="h-11 w-11 rounded-xl bg-[#C084FC] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center text-[#161514] shrink-0">
+                  <Calendar className="h-5 w-5 stroke-[2.5]" />
                 </div>
                 <div>
-                  <h5 className="text-[10px] font-bold text-navy-600 uppercase tracking-wider">Active Habits</h5>
-                  <p className="text-xl font-extrabold text-navy-900 mt-0.5">{totalHabits}</p>
+                  <h5 className="text-[10px] font-black text-[#161514]/70 uppercase tracking-wider">Active Habits</h5>
+                  <p className="text-xl font-black text-[#161514] mt-0.5 font-heading">{totalHabits}</p>
                 </div>
               </div>
             </div>
 
             {habitsChartData.length > 0 && (
-              <div className="bg-white rounded-[var(--radius-lg)] p-6 shadow-sm border space-y-4">
-                <h3 className="font-bold text-sm text-navy-900 uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
+              <div className="bg-white rounded-3xl p-5 sm:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
+                <h3 className="font-black text-xs sm:text-sm text-[#161514] uppercase tracking-wider font-heading">
                   Streaks comparison per habit
                 </h3>
                 <div className="h-64 w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={habitsChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                      <XAxis dataKey="name" stroke="#565C6B" fontSize={11} fontWeight={600} tickLine={false} axisLine={false} />
-                      <YAxis stroke="#565C6B" fontSize={11} fontWeight={600} tickLine={false} axisLine={false} />
-                      <Tooltip contentStyle={{ borderRadius: "12px", fontSize: "12px" }} />
+                      <XAxis dataKey="name" stroke="#161514" fontSize={11} fontWeight={700} tickLine={false} axisLine={{ stroke: "#161514", strokeWidth: 2 }} />
+                      <YAxis stroke="#161514" fontSize={11} fontWeight={700} tickLine={false} axisLine={{ stroke: "#161514", strokeWidth: 2 }} />
+                      <Tooltip contentStyle={{ borderRadius: "12px", border: "2px solid #161514", boxShadow: "3px 3px 0px 0px #161514", fontWeight: "bold" }} />
                       <Legend />
-                      <Bar dataKey="Streak" fill="#F5B942" radius={[8, 8, 0, 0]} />
-                      <Bar dataKey="Record" fill="#C9BEEA" radius={[8, 8, 0, 0]} />
+                      <Bar dataKey="Streak" fill="#F59E0B" stroke="#161514" strokeWidth={1.5} radius={[6, 6, 0, 0]} />
+                      <Bar dataKey="Record" fill="#C084FC" stroke="#161514" strokeWidth={1.5} radius={[6, 6, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -189,55 +201,55 @@ export default function AnalyticsHubPage() {
           {/* Study Tab */}
           <TabsContent id="study-analytics" value="study" className="space-y-6 scroll-mt-24">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="bg-white rounded-[var(--radius-lg)] p-5 shadow-sm border flex items-center gap-4">
-                <div className="h-10 w-10 rounded-full bg-orange-500/10 flex items-center justify-center text-orange-500">
-                  <Clock className="h-5 w-5" />
+              <div className="bg-white rounded-2xl p-4 sm:p-5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] flex items-center gap-3.5 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all">
+                <div className="h-11 w-11 rounded-xl bg-orange-400 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center text-[#161514] shrink-0">
+                  <Clock className="h-5 w-5 stroke-[2.5]" />
                 </div>
                 <div>
-                  <h5 className="text-[10px] font-bold text-navy-600 uppercase tracking-wider">Total Hours</h5>
-                  <p className="text-xl font-extrabold text-navy-900 mt-0.5">{totalStudyHours}h</p>
+                  <h5 className="text-[10px] font-black text-[#161514]/70 uppercase tracking-wider">Total Hours</h5>
+                  <p className="text-xl font-black text-[#161514] mt-0.5 font-heading">{totalStudyHours}h</p>
                 </div>
               </div>
 
-              <div className="bg-white rounded-[var(--radius-lg)] p-5 shadow-sm border flex items-center gap-4">
-                <div className="h-10 w-10 rounded-full bg-mint-600/10 flex items-center justify-center text-mint-600">
-                  <Award className="h-5 w-5" />
+              <div className="bg-white rounded-2xl p-4 sm:p-5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] flex items-center gap-3.5 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all">
+                <div className="h-11 w-11 rounded-xl bg-[#CEF431] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center text-[#161514] shrink-0">
+                  <Award className="h-5 w-5 stroke-[2.5]" />
                 </div>
                 <div>
-                  <h5 className="text-[10px] font-bold text-navy-600 uppercase tracking-wider">Subjects Tracking</h5>
-                  <p className="text-xl font-extrabold text-navy-900 mt-0.5">{subjects.length}</p>
+                  <h5 className="text-[10px] font-black text-[#161514]/70 uppercase tracking-wider">Subjects Tracking</h5>
+                  <p className="text-xl font-black text-[#161514] mt-0.5 font-heading">{subjects.length}</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-[var(--radius-lg)] p-6 shadow-sm border space-y-4">
-              <h3 className="font-bold text-sm text-navy-900 uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
+            <div className="bg-white rounded-3xl p-5 sm:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
+              <h3 className="font-black text-xs sm:text-sm text-[#161514] uppercase tracking-wider font-heading">
                 Daily Focus Hours Trend
               </h3>
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={studyBarData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <XAxis dataKey="name" stroke="#565C6B" fontSize={11} fontWeight={600} tickLine={false} axisLine={false} />
-                    <YAxis stroke="#565C6B" fontSize={11} fontWeight={600} tickLine={false} axisLine={false} tickFormatter={(v) => `${v}h`} />
-                    <Tooltip formatter={(v) => [`${v}h`]} contentStyle={{ borderRadius: "12px", fontSize: "12px" }} />
-                    <Bar dataKey="hours" fill="#F0824A" radius={[8, 8, 0, 0]} />
+                    <XAxis dataKey="name" stroke="#161514" fontSize={11} fontWeight={700} tickLine={false} axisLine={{ stroke: "#161514", strokeWidth: 2 }} />
+                    <YAxis stroke="#161514" fontSize={11} fontWeight={700} tickLine={false} axisLine={{ stroke: "#161514", strokeWidth: 2 }} tickFormatter={(v) => `${v}h`} />
+                    <Tooltip formatter={(v) => [`${v}h`]} contentStyle={{ borderRadius: "12px", border: "2px solid #161514", boxShadow: "3px 3px 0px 0px #161514", fontWeight: "bold" }} />
+                    <Bar dataKey="hours" fill="#FB923C" stroke="#161514" strokeWidth={1.5} radius={[6, 6, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
             </div>
 
             {testTrendData.length > 0 && (
-              <div className="bg-white rounded-[var(--radius-lg)] p-6 shadow-sm border space-y-4">
-                <h3 className="font-bold text-sm text-navy-900 uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
+              <div className="bg-white rounded-3xl p-5 sm:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
+                <h3 className="font-black text-xs sm:text-sm text-[#161514] uppercase tracking-wider font-heading">
                   Mock Score Trends (%)
                 </h3>
                 <div className="h-64 w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={testTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                      <XAxis dataKey="name" stroke="#565C6B" fontSize={11} fontWeight={600} tickLine={false} axisLine={false} />
-                      <YAxis stroke="#565C6B" fontSize={11} fontWeight={600} tickLine={false} axisLine={false} domain={[0, 100]} />
-                      <Tooltip formatter={(v) => [`${v}%`]} contentStyle={{ borderRadius: "12px", fontSize: "12px" }} />
-                      <Line type="monotone" dataKey="score" stroke="#F5B942" strokeWidth={3} />
+                      <XAxis dataKey="name" stroke="#161514" fontSize={11} fontWeight={700} tickLine={false} axisLine={{ stroke: "#161514", strokeWidth: 2 }} />
+                      <YAxis stroke="#161514" fontSize={11} fontWeight={700} tickLine={false} axisLine={{ stroke: "#161514", strokeWidth: 2 }} domain={[0, 100]} />
+                      <Tooltip formatter={(v) => [`${v}%`]} contentStyle={{ borderRadius: "12px", border: "2px solid #161514", boxShadow: "3px 3px 0px 0px #161514", fontWeight: "bold" }} />
+                      <Line type="monotone" dataKey="score" stroke="#F59E0B" strokeWidth={3.5} dot={{ r: 5, fill: "#F59E0B", stroke: "#161514", strokeWidth: 2 }} />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
@@ -248,30 +260,30 @@ export default function AnalyticsHubPage() {
           {/* Money Tab */}
           <TabsContent id="money-analytics" value="money" className="space-y-6 scroll-mt-24">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="bg-white rounded-[var(--radius-lg)] p-5 shadow-sm border flex items-center gap-4">
-                <div className="h-10 w-10 rounded-full bg-mint-600/10 flex items-center justify-center text-mint-600">
-                  <Wallet className="h-5 w-5" />
+              <div className="bg-white rounded-2xl p-4 sm:p-5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] flex items-center gap-3.5 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all">
+                <div className="h-11 w-11 rounded-xl bg-[#03D26F] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center text-[#161514] shrink-0">
+                  <Wallet className="h-5 w-5 stroke-[2.5]" />
                 </div>
                 <div>
-                  <h5 className="text-[10px] font-bold text-navy-600 uppercase tracking-wider">Total Income</h5>
-                  <p className="text-xl font-extrabold text-navy-900 mt-0.5">{totalIncome.toLocaleString()}</p>
+                  <h5 className="text-[10px] font-black text-[#161514]/70 uppercase tracking-wider">Total Income</h5>
+                  <p className="text-xl font-black text-[#03D26F] mt-0.5 font-heading">${totalIncome.toLocaleString()}</p>
                 </div>
               </div>
 
-              <div className="bg-white rounded-[var(--radius-lg)] p-5 shadow-sm border flex items-center gap-4">
-                <div className="h-10 w-10 rounded-full bg-coral-400/20 flex items-center justify-center text-coral-500">
-                  <Wallet className="h-5 w-5" />
+              <div className="bg-white rounded-2xl p-4 sm:p-5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] flex items-center gap-3.5 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all">
+                <div className="h-11 w-11 rounded-xl bg-rose-400 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center text-[#161514] shrink-0">
+                  <Wallet className="h-5 w-5 stroke-[2.5]" />
                 </div>
                 <div>
-                  <h5 className="text-[10px] font-bold text-navy-600 uppercase tracking-wider">Total Expense</h5>
-                  <p className="text-xl font-extrabold text-navy-900 mt-0.5">{totalExpense.toLocaleString()}</p>
+                  <h5 className="text-[10px] font-black text-[#161514]/70 uppercase tracking-wider">Total Expense</h5>
+                  <p className="text-xl font-black text-rose-600 mt-0.5 font-heading">${totalExpense.toLocaleString()}</p>
                 </div>
               </div>
             </div>
 
             {expensePieData.length > 0 && (
-              <div className="bg-white rounded-[var(--radius-lg)] p-6 shadow-sm border space-y-4">
-                <h3 className="font-bold text-sm text-navy-900 uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
+              <div className="bg-white rounded-3xl p-5 sm:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
+                <h3 className="font-black text-xs sm:text-sm text-[#161514] uppercase tracking-wider font-heading">
                   Expense Share per Category
                 </h3>
                 <div className="h-64 w-full flex items-center justify-center">
@@ -281,16 +293,18 @@ export default function AnalyticsHubPage() {
                         data={expensePieData}
                         cx="50%"
                         cy="50%"
-                        innerRadius={60}
+                        innerRadius={55}
                         outerRadius={80}
-                        paddingAngle={5}
+                        paddingAngle={4}
                         dataKey="value"
+                        stroke="#161514"
+                        strokeWidth={2}
                       >
                         {expensePieData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
-                      <Tooltip />
+                      <Tooltip contentStyle={{ borderRadius: "12px", border: "2px solid #161514", boxShadow: "3px 3px 0px 0px #161514", fontWeight: "bold" }} />
                       <Legend verticalAlign="bottom" height={36} />
                     </PieChart>
                   </ResponsiveContainer>
@@ -298,19 +312,19 @@ export default function AnalyticsHubPage() {
               </div>
             )}
 
-            <div className="bg-white rounded-[var(--radius-lg)] p-6 shadow-sm border space-y-4">
-              <h3 className="font-bold text-sm text-navy-900 uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
+            <div className="bg-white rounded-3xl p-5 sm:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
+              <h3 className="font-black text-xs sm:text-sm text-[#161514] uppercase tracking-wider font-heading">
                 Income vs Expense Bar
               </h3>
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={moneyBarData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <XAxis dataKey="name" stroke="#565C6B" fontSize={11} fontWeight={600} tickLine={false} axisLine={false} />
-                    <YAxis stroke="#565C6B" fontSize={11} fontWeight={600} tickLine={false} axisLine={false} />
-                    <Tooltip contentStyle={{ borderRadius: "12px", fontSize: "12px" }} />
+                    <XAxis dataKey="name" stroke="#161514" fontSize={11} fontWeight={700} tickLine={false} axisLine={{ stroke: "#161514", strokeWidth: 2 }} />
+                    <YAxis stroke="#161514" fontSize={11} fontWeight={700} tickLine={false} axisLine={{ stroke: "#161514", strokeWidth: 2 }} />
+                    <Tooltip contentStyle={{ borderRadius: "12px", border: "2px solid #161514", boxShadow: "3px 3px 0px 0px #161514", fontWeight: "bold" }} />
                     <Legend />
-                    <Bar dataKey="Income" fill="#7CC3A2" radius={[8, 8, 0, 0]} />
-                    <Bar dataKey="Expense" fill="#F2A6A0" radius={[8, 8, 0, 0]} />
+                    <Bar dataKey="Income" fill="#03D26F" stroke="#161514" strokeWidth={1.5} radius={[6, 6, 0, 0]} />
+                    <Bar dataKey="Expense" fill="#FB7185" stroke="#161514" strokeWidth={1.5} radius={[6, 6, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>

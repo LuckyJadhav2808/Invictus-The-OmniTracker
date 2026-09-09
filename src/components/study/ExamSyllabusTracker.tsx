@@ -55,22 +55,22 @@ export function ExamSyllabusTracker({
   const completionPercentage = totalTopicsCount > 0 ? Math.round((completedTopicsCount / totalTopicsCount) * 100) : 0;
 
   return (
-    <div className="bg-white rounded-3xl p-5 md:p-6 border-2 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] space-y-5 my-4">
+    <div className="bg-white rounded-2xl p-5 md:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-5 my-4">
       {/* Header & 1-Click Exam Syllabus Generator */}
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 pb-3 border-b-2 border-navy-950/10">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 pb-3 border-b-2 border-[#161514]/10">
         <div className="flex items-center gap-3">
-          <div className="h-12 w-12 rounded-2xl bg-lavender-400 border-2 border-navy-950 flex items-center justify-center text-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] shrink-0">
+          <div className="h-12 w-12 rounded-2xl bg-[#C084FC] border-2 border-[#161514] flex items-center justify-center text-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] shrink-0">
             <BookOpen className="h-6 w-6 stroke-[2.5]" />
           </div>
           <div>
             <h3
-              className="text-base sm:text-lg font-black text-navy-950 tracking-wider uppercase flex items-center gap-2"
+              className="text-base sm:text-lg font-black text-[#161514] tracking-wider uppercase flex items-center gap-2"
               style={{ fontFamily: "var(--font-heading)" }}
             >
               EXAM SYLLABUS & REVISION TRACKER
             </h3>
-            <p className="text-[11px] text-navy-700 font-bold mt-0.5">
-              Syllabus Readiness: <strong className="text-emerald-700 font-black">{completionPercentage}% Completed</strong> ({completedTopicsCount}/{totalTopicsCount} topics)
+            <p className="text-[11px] text-[#161514]/70 font-bold mt-0.5">
+              Syllabus Readiness: <strong className="text-[#03D26F] font-black">{completionPercentage}% Completed</strong> ({completedTopicsCount}/{totalTopicsCount} topics)
             </p>
           </div>
         </div>
@@ -94,7 +94,7 @@ export function ExamSyllabusTracker({
             type="button"
             onClick={handleGenerateSyllabus}
             disabled={generateSyllabusMutation.isPending}
-            className="bg-amber-400 hover:bg-amber-500 text-navy-950 font-black text-xs uppercase px-3.5 py-1.5 rounded-xl border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 cursor-pointer shrink-0 transition-all flex items-center justify-center gap-1"
+            className="bg-[#CEF431] hover:bg-[#bce023] text-[#161514] font-black text-xs uppercase px-3.5 py-2 rounded-xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer shrink-0 transition-all flex items-center justify-center gap-1.5"
           >
             <Sparkles className="h-3.5 w-3.5 stroke-[2.5]" />
             {generateSyllabusMutation.isPending ? "Generating..." : "✨ Auto-Generate"}
@@ -115,15 +115,15 @@ export function ExamSyllabusTracker({
                 key={sub.id}
                 onClick={() => setActiveSubjectId(sub.id)}
                 className={cn(
-                  "px-3.5 py-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 shrink-0 border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5",
+                  "px-3.5 py-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 shrink-0 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
                   isSelected
-                    ? "bg-amber-300 text-navy-950 shadow-[3px_3px_0px_0px_rgba(31,36,48,1)]"
-                    : "bg-white text-navy-950 hover:bg-cream-bg"
+                    ? "bg-[#CEF431] text-[#161514] shadow-[3px_3px_0px_0px_#161514]"
+                    : "bg-white text-[#161514] hover:bg-[#FAF8F5]"
                 )}
               >
                 <span>{sub.icon || "📚"}</span>
                 <span>{sub.name}</span>
-                <span className="text-[10px] font-black bg-navy-950 text-white px-2 py-0.5 rounded-md">
+                <span className="text-[10px] font-black bg-[#161514] text-white px-2 py-0.5 rounded-md">
                   {doneCount}/{subTopics.length}
                 </span>
               </button>
@@ -134,9 +134,9 @@ export function ExamSyllabusTracker({
 
       {/* Chapter Topics Checklist & Multi-Revision Tracker */}
       {currentSubject ? (
-        <div className="bg-cream-bg/40 rounded-2xl p-4 border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] space-y-3">
-          <div className="flex items-center justify-between">
-            <h4 className="text-xs font-black uppercase text-navy-950 flex items-center gap-2">
+        <div className="bg-[#FAF8F5] rounded-2xl p-4 border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            <h4 className="text-xs font-black uppercase text-[#161514] flex items-center gap-2" style={{ fontFamily: "var(--font-heading)" }}>
               <span>{currentSubject.icon || "📚"}</span> {currentSubject.name} — Syllabus Topics
             </h4>
 
@@ -156,11 +156,11 @@ export function ExamSyllabusTracker({
                 value={newTopicTitle}
                 onChange={(e) => setNewTopicTitle(e.target.value)}
                 placeholder="+ Add Custom Topic / Chapter..."
-                className="bg-white rounded-xl border-2 border-navy-950 px-3 py-1 text-xs font-black text-navy-950 outline-none w-48 sm:w-64"
+                className="bg-white rounded-xl border-2 border-[#161514] px-3 py-1.5 text-xs font-bold text-[#161514] outline-none w-48 sm:w-64 focus:bg-[#FFF9EA] shadow-[1.5px_1.5px_0px_0px_#161514]"
               />
               <button
                 type="submit"
-                className="bg-emerald-400 hover:bg-emerald-500 text-navy-950 font-black text-xs px-3 py-1 rounded-xl border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] cursor-pointer"
+                className="bg-[#03D26F] hover:bg-[#02b861] text-[#161514] font-black text-xs px-3 py-1.5 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer transition-all"
               >
                 <Plus className="h-3.5 w-3.5 stroke-[3]" />
               </button>
@@ -169,8 +169,8 @@ export function ExamSyllabusTracker({
 
           {/* Topic Items List */}
           {currentTopics.length === 0 ? (
-            <p className="text-xs text-navy-600 font-bold italic py-4 text-center">
-              No topics in this subject yet. Click '✨ Auto-Generate' above or add custom topics!
+            <p className="text-xs text-[#161514]/60 font-bold italic py-4 text-center">
+              No topics in this subject yet. Click &apos;✨ Auto-Generate&apos; above or add custom topics!
             </p>
           ) : (
             <div className="space-y-2 pt-1">
@@ -181,7 +181,7 @@ export function ExamSyllabusTracker({
                 return (
                   <div
                     key={top.id}
-                    className="bg-white rounded-2xl p-3 border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                    className="bg-white rounded-xl p-3 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all"
                   >
                     <div className="flex items-center gap-3">
                       <button
@@ -190,28 +190,28 @@ export function ExamSyllabusTracker({
                           const nextStatus = isCompleted ? "notStarted" : "completed";
                           if (onUpdateTopicStatus) onUpdateTopicStatus(top.id, nextStatus, revs);
                         }}
-                        className="cursor-pointer text-navy-950 transition-all hover:scale-110"
+                        className="cursor-pointer text-[#161514] transition-all hover:scale-110 active:scale-95"
                       >
                         {isCompleted ? (
-                          <CheckCircle2 className="h-5 w-5 text-emerald-600 fill-emerald-100 stroke-[2.5]" />
+                          <CheckCircle2 className="h-5 w-5 text-[#03D26F] fill-[#03D26F]/20 stroke-[2.5]" />
                         ) : (
-                          <Circle className="h-5 w-5 text-navy-400 stroke-[2.5]" />
+                          <Circle className="h-5 w-5 text-[#161514]/40 stroke-[2.5]" />
                         )}
                       </button>
 
                       <div>
-                        <h5 className={cn("text-xs font-black text-navy-950", isCompleted && "line-through text-navy-400")}>
+                        <h5 className={cn("text-xs font-black text-[#161514]", isCompleted && "line-through text-[#161514]/40")}>
                           {top.title}
                         </h5>
-                        <span className="text-[9px] font-bold text-navy-600 block">
+                        <span className="text-[9px] font-bold text-[#161514]/60 block">
                           Estimated: {top.estimatedHours || 2} hours study
                         </span>
                       </div>
                     </div>
 
                     {/* 3-Stage Revision Checkmarks, Edit & Delete Controls */}
-                    <div className="flex items-center gap-2 self-end sm:self-auto">
-                      <span className="text-[9px] font-black uppercase text-navy-700">Revisions:</span>
+                    <div className="flex items-center gap-2 self-end sm:self-auto flex-wrap">
+                      <span className="text-[9px] font-black uppercase text-[#161514]/70">Revisions:</span>
                       {[1, 2, 3].map((rNum) => {
                         const hasDoneRev = revs >= rNum;
                         return (
@@ -223,10 +223,10 @@ export function ExamSyllabusTracker({
                               if (onUpdateTopicStatus) onUpdateTopicStatus(top.id, top.status, newRev);
                             }}
                             className={cn(
-                              "px-2 py-0.5 rounded-lg text-[9px] font-black border border-navy-950 cursor-pointer transition-all flex items-center gap-0.5",
+                              "px-2 py-0.5 rounded-lg text-[9px] font-black border-2 border-[#161514] cursor-pointer transition-all flex items-center gap-0.5 shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
                               hasDoneRev
-                                ? "bg-amber-300 text-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]"
-                                : "bg-cream-bg/40 text-navy-600 hover:bg-amber-100"
+                                ? "bg-[#CEF431] text-[#161514]"
+                                : "bg-[#FAF8F5] text-[#161514]/60 hover:bg-white"
                             )}
                           >
                             <RotateCcw className="h-2.5 w-2.5 stroke-[2.5]" /> Rev {rNum} {hasDoneRev ? "✓" : ""}
@@ -243,7 +243,7 @@ export function ExamSyllabusTracker({
                               onEditTopic(top.id, newTitle.trim());
                             }
                           }}
-                          className="p-1 text-navy-600 hover:text-navy-950 cursor-pointer"
+                          className="p-1 text-[#161514]/70 hover:text-[#161514] cursor-pointer"
                           title="Edit Topic Title"
                         >
                           <Edit3 className="h-3.5 w-3.5 stroke-[2.5]" />
@@ -258,7 +258,7 @@ export function ExamSyllabusTracker({
                               onDeleteTopic(top.id);
                             }
                           }}
-                          className="p-1 text-navy-600 hover:text-rose-600 cursor-pointer"
+                          className="p-1 text-[#161514]/70 hover:text-rose-600 cursor-pointer"
                           title="Delete Topic"
                         >
                           <Trash2 className="h-3.5 w-3.5 stroke-[2.5]" />
@@ -272,10 +272,10 @@ export function ExamSyllabusTracker({
           )}
         </div>
       ) : (
-        <div className="bg-amber-50/60 rounded-2xl p-6 border-2 border-dashed border-navy-950 text-center space-y-2">
-          <p className="text-xs font-black text-navy-950">No subjects loaded for study tracking!</p>
-          <p className="text-[10px] text-navy-700 font-bold">
-            Select your exam above and click <span className="font-black text-amber-900">'✨ Auto-Generate'</span> to load your exam syllabus.
+        <div className="bg-amber-50/60 rounded-2xl p-6 border-2 border-dashed border-[#161514]/40 text-center space-y-2">
+          <p className="text-xs font-black text-[#161514]">No subjects loaded for study tracking!</p>
+          <p className="text-[10px] text-[#161514]/70 font-bold">
+            Select your exam above and click <span className="font-black text-[#161514]">&apos;✨ Auto-Generate&apos;</span> to load your exam syllabus.
           </p>
         </div>
       )}

@@ -423,22 +423,23 @@ export default function TodayPage() {
 
         {/* Active stopwatch session banner */}
         {activeStopwatch && (
-          <div className="bg-white rounded-[var(--radius-lg)] p-5 shadow-[0_8px_24px_rgba(31,36,48,0.06)] border-l-4 border-mint-600 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="bg-[#ECFDF5] rounded-2xl p-5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-mint-600/10 flex items-center justify-center text-mint-600 animate-pulse">
-                <Play className="h-5 w-5 fill-mint-600" />
+              <div className="h-10 w-10 rounded-full bg-[#03D26F]/20 border-2 border-[#161514] flex items-center justify-center text-[#161514] animate-pulse">
+                <Play className="h-5 w-5 fill-[#03D26F]" />
               </div>
               <div className="text-left">
-                <h4 className="text-sm font-bold text-navy-900">Active Study Session</h4>
-                <p className="text-xs text-navy-600 mt-0.5">Currently tracking topic: "{activeStopwatch.topicTitle}"</p>
+                <h4 className="font-heading text-sm font-black text-[#161514]">Active Study Session</h4>
+                <p className="text-xs text-[#161514]/80 mt-0.5 font-bold">Currently tracking topic: "{activeStopwatch.topicTitle}"</p>
               </div>
             </div>
-            <Button
+            <button
+              type="button"
               onClick={() => router.push(`/study/${activeStopwatch.subjectId}/${activeStopwatch.topicId}`)}
-              className="bg-navy-900 hover:bg-navy-800 text-white font-bold rounded-full py-1.5 px-4 shadow-sm text-xs border-none cursor-pointer flex items-center gap-1"
+              className="neo-btn neo-btn-primary py-2 px-4 text-xs font-heading font-black cursor-pointer flex items-center gap-1.5"
             >
-              Stop & Log <ArrowRight className="h-3 w-3" />
-            </Button>
+              Stop & Log <ArrowRight className="h-3.5 w-3.5" />
+            </button>
           </div>
         )}
 
@@ -448,13 +449,18 @@ export default function TodayPage() {
         </div>
 
         {/* Daily Log summaries */}
-        <div id="today-summary-logs" className="bg-white rounded-[var(--radius-lg)] p-6 shadow-[0_8px_24px_rgba(31,36,48,0.06)] space-y-4 border scroll-mt-28">
-          <h3 className="font-bold text-xs uppercase tracking-wider text-navy-600" style={{ fontFamily: "var(--font-heading)" }}>
-            Tracking summary for {selectedDate}
-          </h3>
+        <div id="today-summary-logs" className="bg-white rounded-2xl p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4 scroll-mt-28">
+          <div className="flex items-center justify-between border-b-2 border-[#161514]/15 pb-2">
+            <h3 className="font-heading font-black text-xs uppercase tracking-wider text-[#161514]">
+              Tracking summary for {selectedDate}
+            </h3>
+            <span className="neo-badge bg-[#EAF4F4]">
+              Activity Log
+            </span>
+          </div>
 
           {!hasAnyLogs ? (
-            <p className="text-center text-xs text-navy-600 py-6 leading-relaxed">
+            <p className="text-center text-xs text-[#161514]/70 py-6 leading-relaxed font-bold">
               No habits completed, study logs, or money transactions tracked on this day yet. 
               Tap the floating button below to track your day!
             </p>
@@ -463,13 +469,13 @@ export default function TodayPage() {
               {/* Habits Completed today list */}
               {habitsDone.length > 0 && (
                 <div className="space-y-2">
-                  <h4 className="text-xs font-bold text-navy-900 flex items-center gap-1.5">
-                    <CheckSquare className="h-4 w-4 text-mint-600" /> Habits Completed
+                  <h4 className="font-heading text-xs font-black text-[#161514] flex items-center gap-1.5">
+                    <CheckSquare className="h-4 w-4 text-[#03D26F]" /> Habits Completed
                   </h4>
                   <div className="flex flex-wrap gap-2 pl-5.5">
                     {habitsDone.map((h) => (
-                      <span key={h.id} className="text-xs font-bold text-navy-900 bg-cream-bg/40 border rounded-full px-3 py-1 flex items-center gap-1">
-                        <Award className="h-3.5 w-3.5 text-amber-500" /> {h.title}
+                      <span key={h.id} className="text-xs font-heading font-black text-[#161514] bg-[#FFF9EA] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] rounded-full px-3 py-1 flex items-center gap-1.5">
+                        <Award className="h-3.5 w-3.5 text-amber-600" /> {h.title}
                       </span>
                     ))}
                   </div>
@@ -479,14 +485,14 @@ export default function TodayPage() {
               {/* Study sessions logged today list */}
               {studyToday.length > 0 && (
                 <div className="space-y-2">
-                  <h4 className="text-xs font-bold text-navy-900 flex items-center gap-1.5">
+                  <h4 className="font-heading text-xs font-black text-[#161514] flex items-center gap-1.5">
                     <BookOpen className="h-4 w-4 text-orange-500" /> Study Sessions
                   </h4>
                   <div className="space-y-1.5 pl-5.5">
                     {studyToday.map((s) => (
-                      <div key={s.id} className="text-xs font-semibold text-navy-600 flex items-center gap-2">
-                        <Clock className="h-3.5 w-3.5 text-navy-600" />
-                        <span>Studied for <strong className="text-navy-900 font-bold">{s.durationMinutes}m</strong> {s.notes && `(${s.notes})`}</span>
+                      <div key={s.id} className="text-xs font-bold text-[#161514]/80 flex items-center gap-2 bg-[#FAF8F5] p-2 rounded-xl border border-[#161514]/30">
+                        <Clock className="h-3.5 w-3.5 text-[#161514]" />
+                        <span>Studied for <strong className="text-[#161514] font-black">{s.durationMinutes}m</strong> {s.notes && `(${s.notes})`}</span>
                       </div>
                     ))}
                   </div>
@@ -496,16 +502,16 @@ export default function TodayPage() {
               {/* Transactions logged today list */}
               {txsToday.length > 0 && (
                 <div className="space-y-2">
-                  <h4 className="text-xs font-bold text-navy-900 flex items-center gap-1.5">
-                    <Wallet className="h-4 w-4 text-lavender-600" /> Transactions Logged
+                  <h4 className="font-heading text-xs font-black text-[#161514] flex items-center gap-1.5">
+                    <Wallet className="h-4 w-4 text-[#C084FC]" /> Transactions Logged
                   </h4>
                   <div className="space-y-1.5 pl-5.5">
                     {txsToday.map((t) => {
                       const category = categories.find((c) => c.id === t.categoryId);
                       return (
-                        <div key={t.id} className="text-xs font-semibold text-navy-600 flex items-center justify-between">
+                        <div key={t.id} className="text-xs font-bold text-[#161514]/80 flex items-center justify-between bg-[#FAF8F5] p-2 rounded-xl border border-[#161514]/30">
                           <span>{category?.name || "Uncategorized"} {t.note && `(${t.note})`}</span>
-                          <span className={cn("font-bold", t.type === "income" ? "text-mint-600" : "text-navy-900")}>
+                          <span className={cn("font-heading font-black", t.type === "income" ? "text-emerald-700" : "text-[#161514]")}>
                             {t.type === "income" ? "+" : "-"}{currencySymbol}{t.amount}
                           </span>
                         </div>

@@ -165,15 +165,15 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
   };
 
   return (
-    <div className="bg-white rounded-3xl p-5 sm:p-6 border-2 border-[#161514] shadow-[4px_4px_0px_0px_rgba(22,21,20,1)] text-[#161514] transition-all space-y-5">
+    <div className="bg-white rounded-3xl p-5 sm:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] text-[#161514] transition-all space-y-5">
       {/* 1. Header Row */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b-2 border-[#161514]/15">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b-[2.5px] border-[#161514]">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="bg-sky-300 text-[#161514] text-[10px] font-black px-2.5 py-1 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] uppercase flex items-center gap-1">
+            <span className="bg-sky-300 text-[#161514] text-[10px] font-black px-2.5 py-1 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] uppercase flex items-center gap-1">
               <HandCoins className="h-3.5 w-3.5" /> Debt Ledger
             </span>
-            <span className="bg-[#CEF431] text-[#161514] text-[10px] font-black px-2.5 py-1 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] uppercase">
+            <span className="bg-[#CEF431] text-[#161514] text-[10px] font-black px-2.5 py-1 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] uppercase">
               {pendingDebts.length} Pending
             </span>
           </div>
@@ -188,7 +188,7 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
         <button
           type="button"
           onClick={() => setIsAddModalOpen(true)}
-          className="h-10 px-4 rounded-xl bg-[#CEF431] hover:bg-amber-300 border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] font-black text-xs cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center gap-1.5 self-start sm:self-auto"
+          className="h-10 px-4 rounded-xl bg-[#CEF431] hover:bg-[#b8dd22] border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] font-black text-xs uppercase tracking-wider cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center gap-1.5 self-start sm:self-auto"
         >
           <Plus className="h-4 w-4 stroke-[3]" />
           <span>Record Lent / Borrowed</span>
@@ -198,22 +198,22 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
       {/* 2. KPI Summary Box */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {/* Card 1: Total Lent */}
-        <div className="bg-[#FAF8F5] rounded-2xl p-4 border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] space-y-1">
+        <div className="bg-[#FAF8F5] rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-1">
           <span className="text-[10px] font-black uppercase text-[#161514]/70 flex items-center gap-1">
             <ArrowUpRight className="h-3.5 w-3.5 text-emerald-600 stroke-[2.5]" /> You Lent (Receivable)
           </span>
-          <div className="text-xl font-black text-emerald-600">
+          <div className="text-xl font-black text-emerald-600" style={{ fontFamily: "var(--font-heading)" }}>
             +{currencySymbol}{totalLent.toLocaleString(undefined, { minimumFractionDigits: 2 })}
           </div>
           <p className="text-[10px] font-bold text-[#161514]/60">Money friends owe you</p>
         </div>
 
         {/* Card 2: Total Borrowed */}
-        <div className="bg-[#FAF8F5] rounded-2xl p-4 border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] space-y-1">
+        <div className="bg-[#FAF8F5] rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-1">
           <span className="text-[10px] font-black uppercase text-[#161514]/70 flex items-center gap-1">
             <ArrowDownLeft className="h-3.5 w-3.5 text-rose-600 stroke-[2.5]" /> You Borrowed (Payable)
           </span>
-          <div className="text-xl font-black text-rose-600">
+          <div className="text-xl font-black text-rose-600" style={{ fontFamily: "var(--font-heading)" }}>
             -{currencySymbol}{totalBorrowed.toLocaleString(undefined, { minimumFractionDigits: 2 })}
           </div>
           <p className="text-[10px] font-bold text-[#161514]/60">Money you owe to others</p>
@@ -221,14 +221,14 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
 
         {/* Card 3: Net Balance */}
         <div
-          className={`rounded-2xl p-4 border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] space-y-1 ${
+          className={`rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-1 ${
             netBalance >= 0 ? "bg-[#CEF431]" : "bg-rose-200"
           }`}
         >
           <span className="text-[10px] font-black uppercase text-[#161514] flex items-center gap-1">
             ⚖️ Net Position
           </span>
-          <div className="text-xl font-black text-[#161514]">
+          <div className="text-xl font-black text-[#161514]" style={{ fontFamily: "var(--font-heading)" }}>
             {netBalance >= 0 ? "+" : ""}{currencySymbol}{netBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
           </div>
           <p className="text-[10px] font-black uppercase text-[#161514]">
@@ -238,15 +238,15 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
       </div>
 
       {/* 3. Filter Controls Strip */}
-      <div className="flex items-center justify-between gap-2 pt-1 border-t border-[#161514]/10">
+      <div className="flex items-center justify-between gap-2 pt-1 border-t-2 border-[#161514]/10">
         <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
           <button
             type="button"
             onClick={() => setFilterStatus("pending")}
-            className={`px-3 py-1 rounded-xl text-xs font-black border-2 border-[#161514] transition-all cursor-pointer whitespace-nowrap shrink-0 ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-black border-2 border-[#161514] transition-all cursor-pointer whitespace-nowrap shrink-0 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
               filterStatus === "pending"
-                ? "bg-[#CEF431] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)]"
-                : "bg-[#FAF8F5] text-[#161514]/70 hover:bg-white"
+                ? "bg-[#CEF431] shadow-[2px_2px_0px_0px_#161514]"
+                : "bg-[#FAF8F5] text-[#161514]/70 hover:bg-white shadow-[1px_1px_0px_0px_#161514]"
             }`}
           >
             Pending ⏳ ({pendingDebts.length})
@@ -254,10 +254,10 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
           <button
             type="button"
             onClick={() => setFilterStatus("all")}
-            className={`px-3 py-1 rounded-xl text-xs font-black border-2 border-[#161514] transition-all cursor-pointer whitespace-nowrap shrink-0 ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-black border-2 border-[#161514] transition-all cursor-pointer whitespace-nowrap shrink-0 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
               filterStatus === "all"
-                ? "bg-amber-300 shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)]"
-                : "bg-[#FAF8F5] text-[#161514]/70 hover:bg-white"
+                ? "bg-amber-300 shadow-[2px_2px_0px_0px_#161514]"
+                : "bg-[#FAF8F5] text-[#161514]/70 hover:bg-white shadow-[1px_1px_0px_0px_#161514]"
             }`}
           >
             All Records ({debts.length})
@@ -265,10 +265,10 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
           <button
             type="button"
             onClick={() => setFilterStatus("settled")}
-            className={`px-3 py-1 rounded-xl text-xs font-black border-2 border-[#161514] transition-all cursor-pointer whitespace-nowrap shrink-0 ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-black border-2 border-[#161514] transition-all cursor-pointer whitespace-nowrap shrink-0 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
               filterStatus === "settled"
-                ? "bg-emerald-300 shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)]"
-                : "bg-[#FAF8F5] text-[#161514]/70 hover:bg-white"
+                ? "bg-emerald-300 shadow-[2px_2px_0px_0px_#161514]"
+                : "bg-[#FAF8F5] text-[#161514]/70 hover:bg-white shadow-[1px_1px_0px_0px_#161514]"
             }`}
           >
             Settled ✅ ({debts.filter((d) => d.status === "settled").length})
@@ -300,7 +300,7 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
             return (
               <div
                 key={d.id}
-                className={`p-3.5 sm:p-4 rounded-2xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)] space-y-2.5 transition-all ${
+                className={`p-3.5 sm:p-4 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-2.5 transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 ${
                   isSettled ? "bg-[#FAF8F5] opacity-75" : "bg-white"
                 }`}
               >
@@ -309,7 +309,7 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
                   {/* Left: Avatar & Name Details */}
                   <div className="flex items-center gap-2.5 min-w-0 flex-1">
                     <div
-                      className={`h-10 w-10 shrink-0 rounded-xl border-2 border-[#161514] flex items-center justify-center font-black text-xs shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] ${
+                      className={`h-10 w-10 shrink-0 rounded-xl border-2 border-[#161514] flex items-center justify-center font-black text-xs shadow-[2px_2px_0px_0px_#161514] ${
                         isLent ? "bg-emerald-200 text-emerald-950" : "bg-rose-200 text-rose-950"
                       }`}
                     >
@@ -320,7 +320,7 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <h4 className="font-black text-sm text-[#161514] truncate leading-tight">{d.personName}</h4>
                         <span
-                          className={`text-[9px] font-black px-1.5 py-0.5 rounded-md border border-[#161514] uppercase shrink-0 ${
+                          className={`text-[9px] font-black px-1.5 py-0.5 rounded-md border border-[#161514] uppercase shrink-0 shadow-[1px_1px_0px_0px_#161514] ${
                             isLent
                               ? "bg-emerald-100 text-emerald-900"
                               : "bg-rose-100 text-rose-900"
@@ -329,7 +329,7 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
                           {isLent ? "LENT 🟢" : "BORROWED 🔴"}
                         </span>
                         {isSettled && (
-                          <span className="text-[9px] font-black bg-emerald-300 text-emerald-950 px-1.5 py-0.5 rounded-md border border-[#161514]">
+                          <span className="text-[9px] font-black bg-emerald-300 text-emerald-950 px-1.5 py-0.5 rounded-md border border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
                             SETTLED ✅
                           </span>
                         )}
@@ -348,6 +348,7 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
                         className={`font-black text-sm sm:text-base leading-tight ${
                           isLent ? "text-emerald-600" : "text-rose-600"
                         }`}
+                        style={{ fontFamily: "var(--font-heading)" }}
                       >
                         {isLent ? "+" : "-"}{currencySymbol}
                         {d.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
@@ -370,7 +371,7 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
                               navigator.clipboard.writeText(msg);
                               toast.success(`Reminder text for ${d.personName} copied to clipboard! 📋`);
                             }}
-                            className="h-8 w-8 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-950 font-black border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] flex items-center justify-center cursor-pointer transition-all active:translate-x-0.5 active:translate-y-0.5"
+                            className="h-8 w-8 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-950 font-black border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center cursor-pointer transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
                             title="Copy Reminder Text for WhatsApp/SMS"
                           >
                             <span className="text-xs">💬</span>
@@ -382,7 +383,7 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
                               setSettlingDebt(d);
                               setAutoLogTx(true);
                             }}
-                            className="h-8 px-2 rounded-xl bg-[#03D26F] hover:bg-emerald-400 text-white font-black text-xs border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] flex items-center gap-1 cursor-pointer transition-all active:translate-x-0.5 active:translate-y-0.5"
+                            className="h-8 px-2.5 rounded-xl bg-[#03D26F] hover:bg-emerald-400 text-white font-black text-xs border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center gap-1 cursor-pointer transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
                             title="Mark Paid & Settle Up"
                           >
                             <CheckCircle2 className="h-3.5 w-3.5 stroke-[2.5]" />
@@ -394,7 +395,7 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
                       <button
                         type="button"
                         onClick={() => setDeletingDebtId(d.id)}
-                        className="h-8 w-8 rounded-xl bg-white hover:bg-rose-100 text-rose-600 font-bold border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] flex items-center justify-center cursor-pointer transition-all active:translate-x-0.5 active:translate-y-0.5"
+                        className="h-8 w-8 rounded-xl bg-white hover:bg-rose-100 text-rose-600 font-bold border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center cursor-pointer transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
                         title="Delete record"
                       >
                         <Trash2 className="h-3.5 w-3.5 stroke-[2.5]" />
@@ -407,27 +408,27 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
                 {d.dueDate && !isSettled && (
                   <div className="pt-0.5">
                     {isOverdue ? (
-                      <div className="w-full px-2.5 py-1 rounded-xl bg-rose-200 text-rose-950 border-2 border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] text-[10px] font-black flex items-center justify-between gap-2 animate-pulse">
+                      <div className="w-full px-2.5 py-1.5 rounded-xl bg-rose-200 text-rose-950 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-[10px] font-black flex items-center justify-between gap-2 animate-pulse">
                         <span className="flex items-center gap-1.5 truncate">
                           <AlertCircle className="h-3.5 w-3.5 stroke-[2.5] shrink-0" />
                           <span>OVERDUE PAYMENT</span>
                         </span>
-                        <span className="shrink-0 bg-white/80 px-1.5 py-0.5 rounded-md border border-[#161514]">
+                        <span className="shrink-0 bg-white px-2 py-0.5 rounded-md border border-[#161514] font-black">
                           Due: {d.dueDate}
                         </span>
                       </div>
                     ) : isDueToday ? (
-                      <div className="w-full px-2.5 py-1 rounded-xl bg-[#CEF431] text-[#161514] border-2 border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] text-[10px] font-black flex items-center justify-between gap-2">
+                      <div className="w-full px-2.5 py-1.5 rounded-xl bg-[#CEF431] text-[#161514] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-[10px] font-black flex items-center justify-between gap-2">
                         <span className="flex items-center gap-1.5 truncate">
                           <Calendar className="h-3.5 w-3.5 stroke-[2.5] shrink-0" />
                           <span>PAYMENT DUE TODAY!</span>
                         </span>
-                        <span className="shrink-0 bg-white/80 px-1.5 py-0.5 rounded-md border border-[#161514]">
+                        <span className="shrink-0 bg-white px-2 py-0.5 rounded-md border border-[#161514] font-black">
                           {d.dueDate}
                         </span>
                       </div>
                     ) : (
-                      <div className="w-full px-2.5 py-1 rounded-xl bg-[#FAF8F5] text-[#161514]/80 border border-[#161514]/30 text-[10px] font-bold flex items-center justify-between gap-2">
+                      <div className="w-full px-2.5 py-1 rounded-xl bg-[#FAF8F5] text-[#161514]/80 border-2 border-[#161514]/30 text-[10px] font-bold flex items-center justify-between gap-2">
                         <span className="flex items-center gap-1.5 truncate">
                           <Calendar className="h-3.5 w-3.5 stroke-[2.5] text-[#161514]/60 shrink-0" />
                           <span>Target Due Date</span>
@@ -458,9 +459,9 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
               <button
                 type="button"
                 onClick={() => setDebtType("lent")}
-                className={`py-2.5 px-3 rounded-xl font-black text-xs border-2 border-[#161514] transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                className={`py-2.5 px-3 rounded-xl font-black text-xs border-2 border-[#161514] transition-all flex items-center justify-center gap-1.5 cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
                   debtType === "lent"
-                    ? "bg-[#03D26F] text-white shadow-[2px_2px_0px_0px_rgba(22,21,20,1)]"
+                    ? "bg-[#03D26F] text-white shadow-[2px_2px_0px_0px_#161514]"
                     : "bg-[#FAF8F5] text-[#161514]/70 hover:bg-white"
                 }`}
               >
@@ -470,9 +471,9 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
               <button
                 type="button"
                 onClick={() => setDebtType("borrowed")}
-                className={`py-2.5 px-3 rounded-xl font-black text-xs border-2 border-[#161514] transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                className={`py-2.5 px-3 rounded-xl font-black text-xs border-2 border-[#161514] transition-all flex items-center justify-center gap-1.5 cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
                   debtType === "borrowed"
-                    ? "bg-[#E11D48] text-white shadow-[2px_2px_0px_0px_rgba(22,21,20,1)]"
+                    ? "bg-[#E11D48] text-white shadow-[2px_2px_0px_0px_#161514]"
                     : "bg-[#FAF8F5] text-[#161514]/70 hover:bg-white"
                 }`}
               >
@@ -491,7 +492,7 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
               placeholder="e.g. Rahul Sharma, Priya, Alex"
               value={personName}
               onChange={(e) => setPersonName(e.target.value)}
-              className="w-full h-11 px-3 rounded-xl bg-white border-2 border-[#161514] font-bold text-sm text-[#161514] focus:outline-none focus:ring-2 focus:ring-[#CEF431]"
+              className="w-full h-11 px-3 rounded-xl bg-[#FAF8F5] border-2 border-[#161514] font-bold text-sm text-[#161514] focus:bg-[#FFF9EA] focus:shadow-[2px_2px_0px_0px_#161514] focus:outline-none transition-all"
             />
           </div>
 
@@ -505,7 +506,7 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
               placeholder="e.g. 1500"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="w-full h-11 px-3 rounded-xl bg-white border-2 border-[#161514] font-bold text-sm text-[#161514] focus:outline-none focus:ring-2 focus:ring-[#CEF431]"
+              className="w-full h-11 px-3 rounded-xl bg-[#FAF8F5] border-2 border-[#161514] font-bold text-sm text-[#161514] focus:bg-[#FFF9EA] focus:shadow-[2px_2px_0px_0px_#161514] focus:outline-none transition-all"
             />
           </div>
 
@@ -516,7 +517,7 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
               type="date"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
-              className="w-full h-11 px-3 rounded-xl bg-white border-2 border-[#161514] font-bold text-sm text-[#161514] focus:outline-none focus:ring-2 focus:ring-[#CEF431]"
+              className="w-full h-11 px-3 rounded-xl bg-[#FAF8F5] border-2 border-[#161514] font-bold text-sm text-[#161514] focus:bg-[#FFF9EA] focus:shadow-[2px_2px_0px_0px_#161514] focus:outline-none transition-all"
             />
           </div>
 
@@ -528,7 +529,7 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
               placeholder="e.g. Dinner split, Rent share, Concert ticket"
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              className="w-full h-11 px-3 rounded-xl bg-white border-2 border-[#161514] font-bold text-sm text-[#161514] focus:outline-none focus:ring-2 focus:ring-[#CEF431]"
+              className="w-full h-11 px-3 rounded-xl bg-[#FAF8F5] border-2 border-[#161514] font-bold text-sm text-[#161514] focus:bg-[#FFF9EA] focus:shadow-[2px_2px_0px_0px_#161514] focus:outline-none transition-all"
             />
           </div>
 
@@ -536,14 +537,14 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
             <button
               type="button"
               onClick={() => setIsAddModalOpen(false)}
-              className="flex-1 h-11 rounded-xl bg-[#FAF8F5] border-2 border-[#161514] font-black text-xs uppercase"
+              className="flex-1 h-11 rounded-xl bg-[#FAF8F5] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:bg-white hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none font-black text-xs uppercase cursor-pointer transition-all"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={addDebtMutation.isPending}
-              className="flex-1 h-11 rounded-xl bg-[#CEF431] border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] font-black text-xs uppercase cursor-pointer"
+              className="flex-1 h-11 rounded-xl bg-[#CEF431] hover:bg-[#b8dd22] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none font-black text-xs uppercase cursor-pointer transition-all"
             >
               {addDebtMutation.isPending ? "Saving..." : "Save Record"}
             </button>
@@ -561,18 +562,18 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
         description={`Mark payment settled with ${settlingDebt?.personName}`}
       >
         <div className="space-y-4 pt-2">
-          <div className="p-3.5 rounded-2xl bg-[#FAF8F5] border-2 border-[#161514] space-y-1 text-center">
+          <div className="p-3.5 rounded-2xl bg-[#FAF8F5] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] space-y-1 text-center">
             <div className="text-xs font-bold text-[#161514]/70">
               {settlingDebt?.type === "lent" ? "You received payment from" : "You paid back"}
             </div>
             <div className="text-xl font-black text-[#161514]">{settlingDebt?.personName}</div>
-            <div className="text-2xl font-black text-emerald-600">
+            <div className="text-2xl font-black text-emerald-600" style={{ fontFamily: "var(--font-heading)" }}>
               {currencySymbol}{settlingDebt?.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
             </div>
           </div>
 
           {/* Auto-Log Transaction Checkbox */}
-          <label className="flex items-center gap-3 p-3 rounded-xl bg-white border-2 border-[#161514] cursor-pointer">
+          <label className="flex items-center gap-3 p-3 rounded-xl bg-[#FAF8F5] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] cursor-pointer hover:bg-white transition-all">
             <input
               type="checkbox"
               checked={autoLogTx}
@@ -595,7 +596,7 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
             <button
               type="button"
               onClick={() => setSettlingDebt(null)}
-              className="flex-1 h-11 rounded-xl bg-[#FAF8F5] border-2 border-[#161514] font-black text-xs uppercase"
+              className="flex-1 h-11 rounded-xl bg-[#FAF8F5] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:bg-white hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none font-black text-xs uppercase cursor-pointer transition-all"
             >
               Cancel
             </button>
@@ -603,7 +604,7 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
               type="button"
               onClick={handleConfirmSettle}
               disabled={settleDebtMutation.isPending}
-              className="flex-1 h-11 rounded-xl bg-[#03D26F] text-white border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] font-black text-xs uppercase cursor-pointer"
+              className="flex-1 h-11 rounded-xl bg-[#03D26F] hover:bg-emerald-400 text-white border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none font-black text-xs uppercase cursor-pointer transition-all"
             >
               {settleDebtMutation.isPending ? "Settling..." : "Confirm Settlement ✅"}
             </button>

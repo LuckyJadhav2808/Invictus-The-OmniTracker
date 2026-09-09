@@ -380,16 +380,16 @@ function GoalsPageContent() {
               {/* Left Column (2 cols on lg): Habits Checklist */}
               <div id="habits-section" className="lg:col-span-2 space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-black uppercase tracking-wider text-navy-950 flex items-center gap-1.5">
+                  <h3 className="text-xs font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5" style={{ fontFamily: "var(--font-heading)" }}>
                     <span>🌱 Active Habit Streaks</span>
-                    <span className="bg-[#CEF431] text-[#161514] text-[10px] px-2 py-0.5 rounded-full border border-[#161514] font-black">
+                    <span className="bg-[#CEF431] text-[#161514] text-[10px] px-2 py-0.5 rounded-full border-2 border-[#161514] font-black shadow-[1px_1px_0px_0px_#161514]">
                       {habits.length}
                     </span>
                   </h3>
                   <button
                     type="button"
                     onClick={() => setIsChoiceOpen(true)}
-                    className="text-[10px] font-black uppercase tracking-wider text-navy-950 bg-[#CEF431] border-2 border-navy-950 px-2.5 py-1 rounded-xl shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 cursor-pointer"
+                    className="text-[10px] font-black uppercase tracking-wider text-[#161514] bg-[#CEF431] border-2 border-[#161514] px-2.5 py-1 rounded-xl shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
                   >
                     + New Habit
                   </button>
@@ -398,7 +398,7 @@ function GoalsPageContent() {
                 {habitsLoading ? (
                   <div className="space-y-3">
                     {[1, 2, 3].map((i) => (
-                      <div key={i} className="bg-white rounded-2xl border-2 border-navy-950 p-4 h-16 animate-pulse shadow-[3px_3px_0px_0px_rgba(31,36,48,1)]" />
+                      <div key={i} className="bg-white rounded-2xl border-2 border-[#161514] p-4 h-16 animate-pulse shadow-[3px_3px_0px_0px_#161514]" />
                     ))}
                   </div>
                 ) : habits.length === 0 ? (
@@ -420,7 +420,7 @@ function GoalsPageContent() {
                           <div
                             key={habit.id}
                             className={cn(
-                              "bg-white rounded-2xl p-3 border-2 border-navy-950 flex items-center justify-between transition-all cursor-pointer shadow-[3px_3px_0px_0px_rgba(31,36,48,1)] hover:-translate-x-0.5 hover:-translate-y-0.5",
+                              "bg-white rounded-2xl p-3 border-2 border-[#161514] flex items-center justify-between transition-all cursor-pointer shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5",
                               isDone && "bg-emerald-50/70 opacity-90"
                             )}
                             onClick={() => router.push(`/goals/${habit.id}`)}
@@ -433,25 +433,25 @@ function GoalsPageContent() {
                                   handleToggleLog(habit.id, !isDone);
                                 }}
                                 className={cn(
-                                  "h-8 w-8 rounded-xl border-2 border-navy-950 flex items-center justify-center font-black text-sm transition-all cursor-pointer shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)]",
-                                  isDone ? "bg-emerald-400 text-navy-950" : "bg-white hover:bg-amber-100"
+                                  "h-8 w-8 rounded-xl border-2 border-[#161514] flex items-center justify-center font-black text-sm transition-all cursor-pointer shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
+                                  isDone ? "bg-[#03D26F] text-[#161514]" : "bg-white hover:bg-amber-100"
                                 )}
                               >
                                 {isDone ? "✓" : ""}
                               </button>
                               <div>
-                                <h4 className={cn("font-black text-xs text-navy-950", isDone && "line-through text-navy-600")}>
+                                <h4 className={cn("font-black text-xs text-[#161514]", isDone && "line-through text-[#161514]/50")}>
                                   {habit.title}
                                 </h4>
                                 {habitStreak?.currentStreak ? (
-                                  <span className="text-[9px] font-black text-amber-600 flex items-center gap-0.5 mt-0.5">
+                                  <span className="text-[9px] font-black text-amber-700 flex items-center gap-0.5 mt-0.5">
                                     🔥 {habitStreak.currentStreak} day streak
                                   </span>
                                 ) : null}
                               </div>
                             </div>
                             <div className="flex items-center gap-1.5">
-                              <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-lg border border-navy-950 bg-amber-400 text-navy-950">
+                              <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-lg border-2 border-[#161514] bg-amber-300 text-[#161514] shadow-[1px_1px_0px_0px_#161514]">
                                 {habit.frequency?.type || "DAILY"}
                               </span>
                             </div>
@@ -481,20 +481,20 @@ function GoalsPageContent() {
 
                 {/* Suggestions Carousel */}
                 <div className="space-y-2 pt-2">
-                  <h4 className="text-[10px] font-black uppercase tracking-widest text-navy-700">Suggested Routines</h4>
+                  <h4 className="text-[10px] font-black uppercase tracking-widest text-[#161514]/70" style={{ fontFamily: "var(--font-heading)" }}>Suggested Routines</h4>
                   <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none select-none -mx-4 px-4 md:-mx-0 md:px-0">
                     {SUGGESTED_HABITS.map((suggested) => (
                       <div
                         key={suggested.title}
-                        className="flex-shrink-0 w-[200px] bg-white rounded-2xl p-3 border-2 border-navy-950 shadow-[3px_3px_0px_0px_rgba(31,36,48,1)] flex items-center justify-between gap-2 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all"
+                        className="flex-shrink-0 w-[200px] bg-white rounded-2xl p-3 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex items-center justify-between gap-2 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all"
                       >
                         <div className="min-w-0">
-                          <span className="text-[10px] font-black text-navy-950 block truncate">{suggested.title}</span>
-                          <span className="text-[8px] text-navy-700 font-bold block truncate">{suggested.desc}</span>
+                          <span className="text-[10px] font-black text-[#161514] block truncate">{suggested.title}</span>
+                          <span className="text-[8px] text-[#161514]/70 font-bold block truncate">{suggested.desc}</span>
                         </div>
                         <button
                           onClick={() => handleAddSuggested(suggested)}
-                          className="bg-amber-400 hover:bg-amber-500 text-navy-950 p-1.5 rounded-xl border-2 border-navy-950 cursor-pointer transition-all shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] active:translate-x-0.5 active:translate-y-0.5 outline-none flex-shrink-0"
+                          className="bg-amber-400 hover:bg-amber-500 text-[#161514] p-1.5 rounded-xl border-2 border-[#161514] cursor-pointer transition-all shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none outline-none flex-shrink-0"
                         >
                           <Plus className="h-3 w-3 stroke-[3]" />
                         </button>
@@ -507,51 +507,51 @@ function GoalsPageContent() {
               {/* Right Column (1 col on lg): Hydration & Health Stats */}
               <div className="space-y-4">
                 {/* Water Log */}
-                <div className="bg-white rounded-3xl p-5 border-2 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] space-y-4">
-                  <h4 className="text-[10px] font-black uppercase tracking-widest text-navy-950">💧 Water Intake</h4>
+                <div className="bg-white rounded-2xl p-5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
+                  <h4 className="text-[10px] font-black uppercase tracking-widest text-[#161514]" style={{ fontFamily: "var(--font-heading)" }}>💧 Water Intake</h4>
                   <div className="flex gap-4 items-center">
                     <div
                       onClick={() => {
                         setCustomWaterAmount(String(waterLogged));
                         setIsWaterEditOpen(true);
                       }}
-                      className="relative w-16 h-36 border-2 border-navy-950 rounded-2xl overflow-hidden flex items-end bg-sky-50 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] cursor-pointer hover:border-sky-600 transition-colors shrink-0"
+                      className="relative w-16 h-36 border-2 border-[#161514] rounded-2xl overflow-hidden flex items-end bg-sky-50 shadow-[2px_2px_0px_0px_#161514] cursor-pointer hover:border-sky-600 transition-colors shrink-0"
                     >
-                      <div className="absolute inset-x-0 bottom-[25%] border-b border-dashed border-navy-950/20" />
-                      <div className="absolute inset-x-0 bottom-[50%] border-b border-dashed border-navy-950/25" />
-                      <div className="absolute inset-x-0 bottom-[75%] border-b border-dashed border-navy-950/30" />
+                      <div className="absolute inset-x-0 bottom-[25%] border-b border-dashed border-[#161514]/20" />
+                      <div className="absolute inset-x-0 bottom-[50%] border-b border-dashed border-[#161514]/25" />
+                      <div className="absolute inset-x-0 bottom-[75%] border-b border-dashed border-[#161514]/30" />
                       <div
                         className="w-full bg-sky-400 transition-all duration-500 ease-out"
                         style={{ height: `${Math.min(100, (waterLogged / 1000) * 100)}%` }}
                       />
                       <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none">
-                        <div className="bg-white/95 backdrop-blur-sm px-2 py-1 rounded-xl border border-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)] text-center">
-                          <span className="text-sm sm:text-base font-black text-navy-950 block leading-none">{waterLogged}</span>
-                          <span className="text-[8px] font-black uppercase text-sky-700 tracking-wider block mt-0.5">ml</span>
+                        <div className="bg-white/95 backdrop-blur-sm px-2 py-1 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] text-center">
+                          <span className="text-sm sm:text-base font-black text-[#161514] block leading-none">{waterLogged}</span>
+                          <span className="text-[8px] font-black uppercase text-sky-800 tracking-wider block mt-0.5">ml</span>
                         </div>
                       </div>
                     </div>
 
                     <div className="flex-1 space-y-2.5">
                       <div>
-                        <div className="text-xs font-black text-navy-950 uppercase flex items-center justify-between">
+                        <div className="text-xs font-black text-[#161514] uppercase flex items-center justify-between">
                           <span>{waterLogged} ml Logged</span>
-                          <span className="text-[10px] text-sky-700 font-black">({(waterLogged / 1000).toFixed(1)} L)</span>
+                          <span className="text-[10px] text-sky-800 font-black">({(waterLogged / 1000).toFixed(1)} L)</span>
                         </div>
-                        <span className="text-[9px] font-bold text-navy-600 block mt-0.5">
+                        <span className="text-[9px] font-bold text-[#161514]/70 block mt-0.5">
                           Target: 1000 ml (1.0 L) • {Math.min(100, Math.round((waterLogged / 1000) * 100))}%
                         </span>
                       </div>
                       <div className="grid grid-cols-2 gap-1.5">
                         <button
                           onClick={() => logWater(250)}
-                          className="bg-sky-200 hover:bg-sky-300 border-2 border-navy-950 text-navy-950 text-[10px] font-black py-1.5 rounded-xl cursor-pointer shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] active:translate-x-0.5 active:translate-y-0.5 transition-all"
+                          className="bg-sky-200 hover:bg-sky-300 border-2 border-[#161514] text-[#161514] text-[10px] font-black py-1.5 rounded-xl cursor-pointer shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
                         >
                           +250ml
                         </button>
                         <button
                           onClick={() => logWater(500)}
-                          className="bg-sky-300 hover:bg-sky-400 border-2 border-navy-950 text-navy-950 text-[10px] font-black py-1.5 rounded-xl cursor-pointer shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] active:translate-x-0.5 active:translate-y-0.5 transition-all"
+                          className="bg-sky-300 hover:bg-sky-400 border-2 border-[#161514] text-[#161514] text-[10px] font-black py-1.5 rounded-xl cursor-pointer shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
                         >
                           +500ml
                         </button>
@@ -559,7 +559,7 @@ function GoalsPageContent() {
                       <div className="flex gap-1.5">
                         <button
                           onClick={() => logWater(-250)}
-                          className="flex-1 bg-amber-100 hover:bg-amber-200 text-navy-950 text-[9px] font-black py-1 rounded-xl cursor-pointer border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] transition-all"
+                          className="flex-1 bg-[#FAF8F5] hover:bg-amber-100 text-[#161514] text-[9px] font-black py-1 rounded-xl cursor-pointer border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
                         >
                           -250ml
                         </button>
@@ -572,7 +572,7 @@ function GoalsPageContent() {
                               toast.error("Failed to reset water intake");
                             }
                           }}
-                          className="bg-rose-100 hover:bg-rose-200 text-rose-950 text-[9px] font-black px-2 py-1 rounded-xl cursor-pointer border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] transition-all"
+                          className="bg-rose-100 hover:bg-rose-200 text-rose-950 text-[9px] font-black px-2 py-1 rounded-xl cursor-pointer border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
                           title="Reset water intake to 0ml for selected date"
                         >
                           Reset
@@ -582,7 +582,7 @@ function GoalsPageContent() {
                             setCustomWaterAmount(String(waterLogged));
                             setIsWaterEditOpen(true);
                           }}
-                          className="bg-sky-200 hover:bg-sky-300 text-navy-950 text-[9px] font-black px-2.5 py-1 rounded-xl cursor-pointer border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] transition-all"
+                          className="bg-sky-200 hover:bg-sky-300 text-[#161514] text-[9px] font-black px-2.5 py-1 rounded-xl cursor-pointer border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
                         >
                           Edit
                         </button>
@@ -592,30 +592,30 @@ function GoalsPageContent() {
                 </div>
 
                 {/* Health & Weight Profile Card */}
-                <div className="bg-white rounded-3xl p-5 border-2 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] space-y-3">
+                <div className="bg-white rounded-2xl p-5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-3">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-navy-950">⚖️ Body & Health Stats</h4>
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-[#161514]" style={{ fontFamily: "var(--font-heading)" }}>⚖️ Body & Health Stats</h4>
                     <button
                       type="button"
                       onClick={updateProfileStat}
-                      className="px-2.5 py-1 rounded-xl bg-amber-400 hover:bg-amber-500 text-navy-950 border-2 border-navy-950 font-black text-[10px] transition-all cursor-pointer shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] active:translate-x-0.5 active:translate-y-0.5"
+                      className="px-2.5 py-1 rounded-xl bg-[#CEF431] hover:bg-[#bce023] text-[#161514] border-2 border-[#161514] font-black text-[10px] transition-all cursor-pointer shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
                     >
                       ✏️ Edit Stats
                     </button>
                   </div>
                   
                   <div className="grid grid-cols-3 gap-2 pt-1">
-                    <div className="bg-[#FAF8F5] p-2 rounded-xl border border-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)] text-center">
-                      <span className="text-[8px] font-black uppercase text-gray-500 block">Weight</span>
-                      <span className="text-xs font-black text-navy-950 block mt-0.5">{userProfile.weight || "68 kg"}</span>
+                    <div className="bg-[#FAF8F5] p-2 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-center">
+                      <span className="text-[8px] font-black uppercase text-[#161514]/60 block">Weight</span>
+                      <span className="text-xs font-black text-[#161514] block mt-0.5">{userProfile.weight || "68 kg"}</span>
                     </div>
-                    <div className="bg-[#FAF8F5] p-2 rounded-xl border border-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)] text-center">
-                      <span className="text-[8px] font-black uppercase text-gray-500 block">Age</span>
-                      <span className="text-xs font-black text-navy-950 block mt-0.5">{userProfile.age || "24 Yrs"}</span>
+                    <div className="bg-[#FAF8F5] p-2 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-center">
+                      <span className="text-[8px] font-black uppercase text-[#161514]/60 block">Age</span>
+                      <span className="text-xs font-black text-[#161514] block mt-0.5">{userProfile.age || "24 Yrs"}</span>
                     </div>
-                    <div className="bg-[#FAF8F5] p-2 rounded-xl border border-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)] text-center">
-                      <span className="text-[8px] font-black uppercase text-gray-500 block">Gender</span>
-                      <span className="text-xs font-black text-navy-950 block mt-0.5">{userProfile.gender || "Female"}</span>
+                    <div className="bg-[#FAF8F5] p-2 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-center">
+                      <span className="text-[8px] font-black uppercase text-[#161514]/60 block">Gender</span>
+                      <span className="text-xs font-black text-[#161514] block mt-0.5">{userProfile.gender || "Female"}</span>
                     </div>
                   </div>
                 </div>
@@ -624,7 +624,7 @@ function GoalsPageContent() {
 
             {/* Sleep, Energy & Mood Journal Section */}
             <div id="mood-section" className="space-y-4 pt-2">
-              <h3 className="text-xs font-black uppercase tracking-wider text-navy-950 flex items-center gap-1.5">
+              <h3 className="text-xs font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5" style={{ fontFamily: "var(--font-heading)" }}>
                 <span>😴 Sleep, Energy & Mood Journal</span>
               </h3>
               <SleepAndActiveWidgets />
@@ -634,15 +634,15 @@ function GoalsPageContent() {
 
           {/* Tab 3: Calendar Heatmap */}
           <TabsContent value="calendar">
-            <div className="bg-white rounded-[var(--radius-lg)] p-6 shadow-[0_8px_24px_rgba(31,36,48,0.06)] space-y-4">
+            <div className="bg-white rounded-2xl p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="font-bold text-sm text-navy-900 uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
+                <h3 className="font-black text-sm text-[#161514] uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
                   {format(today, "MMMM yyyy")} Heatmap
                 </h3>
               </div>
 
               {/* Day headers */}
-              <div className="grid grid-cols-7 gap-2 text-center text-[10px] font-bold text-navy-600 uppercase tracking-wider">
+              <div className="grid grid-cols-7 gap-2 text-center text-[10px] font-black text-[#161514]/70 uppercase tracking-wider">
                 <span>Sun</span>
                 <span>Mon</span>
                 <span>Tue</span>
@@ -663,18 +663,18 @@ function GoalsPageContent() {
                   const completion = getCompletionPercentage(dayStr);
                   const isCurrent = isSameDay(day, today);
 
-                  let bgClass = "bg-cream-bg/30 border-transparent text-navy-900/50";
-                  if (completion === 100) bgClass = "bg-amber-500 border-amber-500 text-navy-900";
-                  else if (completion >= 50) bgClass = "bg-amber-500/50 border-amber-500/20 text-navy-900";
-                  else if (completion >= 20) bgClass = "bg-amber-500/20 border-amber-500/10 text-navy-900";
+                  let bgClass = "bg-[#FAF8F5] text-[#161514]/40";
+                  if (completion === 100) bgClass = "bg-[#03D26F] text-[#161514] font-black shadow-[2px_2px_0px_0px_#161514]";
+                  else if (completion >= 50) bgClass = "bg-[#CEF431] text-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_#161514]";
+                  else if (completion >= 20) bgClass = "bg-[#CEF431]/40 text-[#161514] shadow-[1px_1px_0px_0px_#161514]";
 
                   return (
                     <div
                       key={dayStr}
                       className={cn(
-                        "aspect-square rounded-[var(--radius-sm)] border flex items-center justify-center text-[11px] font-bold transition-all relative",
+                        "aspect-square rounded-xl border-2 border-[#161514] flex items-center justify-center text-xs font-black transition-all relative select-none hover:-translate-x-0.5 hover:-translate-y-0.5 cursor-pointer",
                         bgClass,
-                        isCurrent && "border-2 border-navy-900"
+                        isCurrent && "ring-2 ring-[#161514] ring-offset-2"
                       )}
                       title={`${format(day, "MMM d")}: ${completion}% complete`}
                     >
@@ -684,18 +684,18 @@ function GoalsPageContent() {
                 })}
               </div>
 
-              <div className="flex items-center gap-4 pt-4 border-t text-[10px] font-semibold text-navy-600">
+              <div className="flex items-center gap-4 pt-4 border-t-2 border-[#161514]/10 text-[10px] font-black text-[#161514]/80 flex-wrap">
                 <span className="flex items-center gap-1.5">
-                  <span className="h-3.5 w-3.5 rounded bg-cream-bg/30 border" /> Not Completed
+                  <span className="h-3.5 w-3.5 rounded-md bg-[#FAF8F5] border-2 border-[#161514]" /> Not Completed
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <span className="h-3.5 w-3.5 rounded bg-amber-500/20 border" /> Some Habits Done
+                  <span className="h-3.5 w-3.5 rounded-md bg-[#CEF431]/40 border-2 border-[#161514]" /> Some Habits Done
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <span className="h-3.5 w-3.5 rounded bg-amber-500/50 border" /> Most Habits Done
+                  <span className="h-3.5 w-3.5 rounded-md bg-[#CEF431] border-2 border-[#161514]" /> Most Habits Done
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <span className="h-3.5 w-3.5 rounded bg-amber-500 border" /> Fully Completed
+                  <span className="h-3.5 w-3.5 rounded-md bg-[#03D26F] border-2 border-[#161514]" /> Fully Completed
                 </span>
               </div>
             </div>
@@ -706,51 +706,51 @@ function GoalsPageContent() {
             <div className="space-y-6">
               {/* Leaderboard Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-white rounded-[var(--radius-lg)] p-5 shadow-[0_8px_24px_rgba(31,36,48,0.04)] flex items-center gap-4">
-                  <div className="h-10 w-10 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-600">
-                    <Flame className="h-5 w-5" />
+                <div className="bg-white rounded-2xl p-5 border-[2.5px] border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex items-center gap-4">
+                  <div className="h-11 w-11 rounded-xl bg-amber-300 border-2 border-[#161514] flex items-center justify-center text-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] shrink-0">
+                    <Flame className="h-5 w-5 fill-rose-600 text-rose-600" />
                   </div>
                   <div>
-                    <h5 className="text-[10px] font-bold text-navy-600 uppercase tracking-wider">Active Streaks</h5>
-                    <p className="text-xl font-extrabold text-navy-900 mt-0.5">{activeStreaksList.length}</p>
+                    <h5 className="text-[10px] font-black text-[#161514]/70 uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>Active Streaks</h5>
+                    <p className="text-2xl font-black text-[#161514] mt-0.5" style={{ fontFamily: "var(--font-heading)" }}>{activeStreaksList.length}</p>
                   </div>
                 </div>
 
-                <div className="bg-white rounded-[var(--radius-lg)] p-5 shadow-[0_8px_24px_rgba(31,36,48,0.04)] flex items-center gap-4">
-                  <div className="h-10 w-10 rounded-full bg-orange-500/10 flex items-center justify-center text-orange-600">
+                <div className="bg-white rounded-2xl p-5 border-[2.5px] border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex items-center gap-4">
+                  <div className="h-11 w-11 rounded-xl bg-[#CEF431] border-2 border-[#161514] flex items-center justify-center text-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] shrink-0">
                     <Award className="h-5 w-5" />
                   </div>
                   <div>
-                    <h5 className="text-[10px] font-bold text-navy-600 uppercase tracking-wider">Best Streak</h5>
-                    <p className="text-xl font-extrabold text-navy-900 mt-0.5">{longestStreakValue} days</p>
+                    <h5 className="text-[10px] font-black text-[#161514]/70 uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>Best Streak</h5>
+                    <p className="text-2xl font-black text-[#161514] mt-0.5" style={{ fontFamily: "var(--font-heading)" }}>{longestStreakValue} days</p>
                   </div>
                 </div>
 
-                <div className="bg-white rounded-[var(--radius-lg)] p-5 shadow-[0_8px_24px_rgba(31,36,48,0.04)] flex items-center gap-4">
-                  <div className="h-10 w-10 rounded-full bg-mint-600/10 flex items-center justify-center text-mint-600">
+                <div className="bg-white rounded-2xl p-5 border-[2.5px] border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex items-center gap-4">
+                  <div className="h-11 w-11 rounded-xl bg-[#03D26F] border-2 border-[#161514] flex items-center justify-center text-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] shrink-0">
                     <BarChart2 className="h-5 w-5" />
                   </div>
                   <div>
-                    <h5 className="text-[10px] font-bold text-navy-600 uppercase tracking-wider">Completion Rate</h5>
-                    <p className="text-xl font-extrabold text-navy-900 mt-0.5">{overallCompletionRate}%</p>
+                    <h5 className="text-[10px] font-black text-[#161514]/70 uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>Completion Rate</h5>
+                    <p className="text-2xl font-black text-[#161514] mt-0.5" style={{ fontFamily: "var(--font-heading)" }}>{overallCompletionRate}%</p>
                   </div>
                 </div>
               </div>
 
               {/* Completion Rate Chart */}
-              <div className="bg-white rounded-[var(--radius-lg)] p-6 shadow-[0_8px_24px_rgba(31,36,48,0.06)] space-y-4">
-                <h3 className="font-bold text-sm text-navy-900 uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
+              <div className="bg-white rounded-2xl p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
+                <h3 className="font-black text-sm text-[#161514] uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
                   Completion Rate by Day of Week
                 </h3>
                 <div className="h-64 w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={barChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                      <XAxis dataKey="name" stroke="#565C6B" fontSize={11} fontWeight={600} tickLine={false} axisLine={false} />
-                      <YAxis stroke="#565C6B" fontSize={11} fontWeight={600} tickLine={false} axisLine={false} tickFormatter={(v) => `${v}%`} domain={[0, 100]} />
-                      <Tooltip formatter={(v) => [`${v}%`, "Completion Rate"]} contentStyle={{ borderRadius: "12px", fontFamily: "var(--font-sans)", fontSize: "12px" }} />
-                      <Bar dataKey="rate" radius={[8, 8, 0, 0]}>
+                      <XAxis dataKey="name" stroke="#161514" fontSize={11} fontWeight={800} tickLine={false} axisLine={false} />
+                      <YAxis stroke="#161514" fontSize={11} fontWeight={800} tickLine={false} axisLine={false} tickFormatter={(v) => `${v}%`} domain={[0, 100]} />
+                      <Tooltip formatter={(v) => [`${v}%`, "Completion Rate"]} contentStyle={{ borderRadius: "12px", border: "2px solid #161514", boxShadow: "3px 3px 0px 0px #161514", fontFamily: "var(--font-heading)", fontSize: "12px", fontWeight: 800 }} />
+                      <Bar dataKey="rate" radius={[6, 6, 0, 0]}>
                         {barChartData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.rate >= 75 ? "#7CC3A2" : entry.rate >= 50 ? "#F5B942" : "#F2A6A0"} />
+                          <Cell key={`cell-${index}`} fill={entry.rate >= 75 ? "#03D26F" : entry.rate >= 50 ? "#CEF431" : "#FBCFE8"} stroke="#161514" strokeWidth={1.5} />
                         ))}
                       </Bar>
                     </BarChart>
@@ -796,17 +796,17 @@ function GoalsPageContent() {
       >
         <form onSubmit={handleProfileSubmit} className="space-y-4 pt-2">
           <div className="space-y-1.5">
-            <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Gender</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-[#161514]/70" style={{ fontFamily: "var(--font-heading)" }}>Gender</label>
             <div className="grid grid-cols-2 gap-2">
               {["Female", "Male", "Non-binary", "Prefer not to say"].map((g) => (
                 <button
                   key={g}
                   type="button"
                   onClick={() => setProfileForm({ ...profileForm, gender: g })}
-                  className={`py-2.5 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                  className={`py-2.5 px-3 rounded-xl text-xs font-black border-2 border-[#161514] transition-all cursor-pointer ${
                     profileForm.gender === g
-                      ? "bg-amber-500 border-amber-500 text-navy-900 shadow-sm"
-                      : "bg-cream-bg border-border/85 text-navy-600 hover:border-amber-300 hover:bg-amber-50"
+                      ? "bg-[#CEF431] text-[#161514] shadow-[2px_2px_0px_0px_#161514]"
+                      : "bg-[#FAF8F5] text-[#161514]/70 hover:bg-white"
                   }`}
                 >
                   {g}
@@ -815,19 +815,19 @@ function GoalsPageContent() {
             </div>
           </div>
           <div className="space-y-1.5">
-            <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Age (Years)</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-[#161514]/70" style={{ fontFamily: "var(--font-heading)" }}>Age (Years)</label>
             <input
               type="number"
               min={1}
               max={120}
               value={ageVal}
               onChange={(e) => setAgeVal(e.target.value)}
-              className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:border-amber-500 font-medium"
+              className="w-full bg-[#FAF8F5] rounded-xl border-2 border-[#161514] px-4 py-2.5 text-xs text-[#161514] focus:outline-none focus:bg-[#FFF9EA] focus:shadow-[3px_3px_0px_0px_#161514] font-bold transition-all"
               placeholder="Enter your age"
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Current Weight</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-[#161514]/70" style={{ fontFamily: "var(--font-heading)" }}>Current Weight</label>
             <div className="flex gap-2">
               <input
                 type="number"
@@ -839,11 +839,11 @@ function GoalsPageContent() {
                   setWeightVal(e.target.value);
                   setProfileForm({ ...profileForm, weight: `${e.target.value} ${weightUnit}` });
                 }}
-                className="flex-1 bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:border-amber-500 font-medium"
+                className="flex-1 bg-[#FAF8F5] rounded-xl border-2 border-[#161514] px-4 py-2.5 text-xs text-[#161514] focus:outline-none focus:bg-[#FFF9EA] focus:shadow-[3px_3px_0px_0px_#161514] font-bold transition-all"
                 placeholder="Enter weight"
                 required
               />
-              <div className="flex rounded-xl border border-border/85 overflow-hidden">
+              <div className="flex rounded-xl border-2 border-[#161514] overflow-hidden shadow-[2px_2px_0px_0px_#161514]">
                 {["kg", "lbs"].map((u) => (
                   <button
                     key={u}
@@ -852,10 +852,10 @@ function GoalsPageContent() {
                       setWeightUnit(u);
                       setProfileForm({ ...profileForm, weight: `${weightVal} ${u}` });
                     }}
-                    className={`px-4 py-2.5 text-xs font-bold transition-all cursor-pointer ${
+                    className={`px-4 py-2.5 text-xs font-black transition-all cursor-pointer ${
                       weightUnit === u
-                        ? "bg-amber-500 text-navy-900"
-                        : "bg-cream-bg text-navy-600 hover:bg-amber-50"
+                        ? "bg-[#CEF431] text-[#161514]"
+                        : "bg-[#FAF8F5] text-[#161514]/70 hover:bg-white"
                     }`}
                   >
                     {u}
@@ -866,7 +866,7 @@ function GoalsPageContent() {
           </div>
           <Button
             type="submit"
-            className="w-full bg-amber-500 hover:bg-amber-600 text-navy-900 font-bold rounded-full py-2.5 mt-2 border-none cursor-pointer"
+            className="w-full bg-[#CEF431] hover:bg-[#bce023] text-[#161514] font-black rounded-xl py-2.5 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none cursor-pointer transition-all"
           >
             Save Profile Stats
           </Button>
@@ -882,12 +882,12 @@ function GoalsPageContent() {
       >
         <form onSubmit={handleWaterEditSubmit} className="space-y-4 pt-2">
           <div className="space-y-1.5">
-            <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Total Volume (ml)</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-[#161514]/70" style={{ fontFamily: "var(--font-heading)" }}>Total Volume (ml)</label>
             <input
               type="number"
               value={customWaterAmount}
               onChange={(e) => setCustomWaterAmount(e.target.value)}
-              className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:border-amber-500 font-medium"
+              className="w-full bg-[#FAF8F5] rounded-xl border-2 border-[#161514] px-4 py-2.5 text-xs text-[#161514] focus:outline-none focus:bg-[#FFF9EA] focus:shadow-[3px_3px_0px_0px_#161514] font-bold transition-all"
               placeholder="e.g. 2000"
               required
             />
@@ -895,7 +895,7 @@ function GoalsPageContent() {
           <Button
             type="submit"
             disabled={setWaterMutation.isPending}
-            className="w-full bg-amber-500 hover:bg-amber-600 text-navy-900 font-bold rounded-full py-2.5 mt-2 border-none cursor-pointer"
+            className="w-full bg-[#CEF431] hover:bg-[#bce023] text-[#161514] font-black rounded-xl py-2.5 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none cursor-pointer transition-all"
           >
             {setWaterMutation.isPending ? "Saving…" : "Save Intake"}
           </Button>
@@ -927,29 +927,29 @@ function GoalsPageContent() {
           className="space-y-4 pt-2"
         >
           <div className="space-y-1.5">
-            <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Habit Title</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-[#161514]/70" style={{ fontFamily: "var(--font-heading)" }}>Habit Title</label>
             <input
               type="text"
               value={editHabitTitle}
               onChange={(e) => setEditHabitTitle(e.target.value)}
-              className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:border-amber-500 font-medium"
+              className="w-full bg-[#FAF8F5] rounded-xl border-2 border-[#161514] px-4 py-2.5 text-xs text-[#161514] focus:outline-none focus:bg-[#FFF9EA] focus:shadow-[3px_3px_0px_0px_#161514] font-bold transition-all"
               required
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Reminder Time (Optional)</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-[#161514]/70" style={{ fontFamily: "var(--font-heading)" }}>Reminder Time (Optional)</label>
             <input
               type="text"
               placeholder="e.g. 08:00 AM"
               value={editHabitDesc}
               onChange={(e) => setEditHabitDesc(e.target.value)}
-              className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:border-amber-500 font-medium"
+              className="w-full bg-[#FAF8F5] rounded-xl border-2 border-[#161514] px-4 py-2.5 text-xs text-[#161514] focus:outline-none focus:bg-[#FFF9EA] focus:shadow-[3px_3px_0px_0px_#161514] font-bold transition-all"
             />
           </div>
           <Button
             type="submit"
             disabled={updateHabitMutation.isPending}
-            className="w-full bg-amber-500 hover:bg-amber-600 text-navy-900 font-bold rounded-full py-2.5 mt-2 border-none cursor-pointer"
+            className="w-full bg-[#CEF431] hover:bg-[#bce023] text-[#161514] font-black rounded-xl py-2.5 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none cursor-pointer transition-all"
           >
             {updateHabitMutation.isPending ? "Saving…" : "Save Changes"}
           </Button>

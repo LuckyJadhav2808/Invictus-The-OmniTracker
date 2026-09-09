@@ -72,7 +72,7 @@ export function LiquidPillBarChart({
   return (
     <div
       className={cn(
-        "bg-white rounded-3xl p-5 sm:p-6 border-2 border-[#161514] shadow-[4px_4px_0px_0px_rgba(22,21,20,1)] text-[#161514] transition-all duration-300 space-y-5",
+        "bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] sm:shadow-[5px_5px_0px_0px_#161514] text-[#161514] transition-all duration-300 space-y-5",
         className
       )}
     >
@@ -81,14 +81,14 @@ export function LiquidPillBarChart({
         <div className="space-y-1">
           <div className="flex items-center gap-2 flex-wrap">
             {/* Active Streak Badge */}
-            <span className="bg-amber-300 text-[#161514] text-[10px] font-black px-2.5 py-1 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] uppercase flex items-center gap-1">
+            <span className="bg-amber-300 text-[#161514] text-[10px] font-heading font-black px-2.5 py-1 rounded-full border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] uppercase flex items-center gap-1">
               <Flame className="h-3.5 w-3.5 text-rose-600 fill-rose-600" />
               {streakDays}-Day Active Streak
             </span>
 
             {/* Streak Freeze Token Badge */}
             <span
-              className="bg-sky-200 text-sky-950 text-[10px] font-black px-2.5 py-1 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] uppercase flex items-center gap-1"
+              className="bg-sky-200 text-sky-950 text-[10px] font-heading font-black px-2.5 py-1 rounded-full border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] uppercase flex items-center gap-1"
               title="Duolingo-Style Streak Freeze Protection Tokens Available"
             >
               <span>🛡️</span>
@@ -96,7 +96,7 @@ export function LiquidPillBarChart({
             </span>
 
             {/* Verified Tracking Badge */}
-            <span className="bg-[#CEF431] text-[#161514] text-[10px] font-black px-2.5 py-1 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] uppercase flex items-center gap-1">
+            <span className="bg-[#CEF431] text-[#161514] text-[10px] font-heading font-black px-2.5 py-1 rounded-full border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] uppercase flex items-center gap-1">
               <ShieldCheck className="h-3.5 w-3.5 text-emerald-700" />
               Verified Velocity
             </span>
@@ -114,7 +114,7 @@ export function LiquidPillBarChart({
         <button
           type="button"
           onClick={handleCalendarClick}
-          className="h-10 px-3.5 rounded-xl bg-[#FAF8F5] hover:bg-[#CEF431] border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] flex items-center gap-1.5 font-black text-xs cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all self-start sm:self-auto"
+          className="h-10 px-3.5 rounded-xl bg-[#FAF8F5] hover:bg-[#CEF431] border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex items-center gap-1.5 font-heading font-black text-xs cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all self-start sm:self-auto"
           title="Filter Active Date Range"
         >
           <Calendar className="h-4 w-4 stroke-[2.5]" />
@@ -125,17 +125,17 @@ export function LiquidPillBarChart({
       {/* 2. 3 Core Metric Pillar Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {/* Pillar 1: Habit Consistency */}
-        <div className="bg-[#FAF8F5] rounded-2xl p-4 border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] space-y-2">
+        <div className="bg-[#FAF8F5] rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-black uppercase text-[#161514]/70 flex items-center gap-1">
+            <span className="text-[10px] font-heading font-black uppercase text-[#161514]/70 flex items-center gap-1">
               <Target className="h-3.5 w-3.5 text-emerald-600" /> Habit Consistency
             </span>
-            <span className="text-xs font-black text-emerald-700 bg-[#03D26F]/20 px-2 py-0.5 rounded-lg border border-[#161514]">
+            <span className="text-xs font-heading font-black text-emerald-700 bg-[#03D26F]/25 px-2 py-0.5 rounded-lg border border-[#161514]">
               {avgCompletionPct}%
             </span>
           </div>
           <div className="flex items-baseline justify-between">
-            <span className="text-xl font-black text-[#161514]">{completedHabitsStr} Habits</span>
+            <span className="font-heading text-xl font-black text-[#161514]">{completedHabitsStr} Habits</span>
             <span className="text-[10px] font-bold text-[#161514]/60">Completed</span>
           </div>
           {/* Progress Bar */}
@@ -148,17 +148,17 @@ export function LiquidPillBarChart({
         </div>
 
         {/* Pillar 2: Study Target Flow */}
-        <div className="bg-[#FAF8F5] rounded-2xl p-4 border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] space-y-2">
+        <div className="bg-[#FAF8F5] rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-black uppercase text-[#161514]/70 flex items-center gap-1">
+            <span className="text-[10px] font-heading font-black uppercase text-[#161514]/70 flex items-center gap-1">
               <BookOpen className="h-3.5 w-3.5 text-blue-600" /> Study Velocity
             </span>
-            <span className="text-xs font-black text-blue-700 bg-blue-100 px-2 py-0.5 rounded-lg border border-[#161514]">
+            <span className="text-xs font-heading font-black text-blue-700 bg-blue-100 px-2 py-0.5 rounded-lg border border-[#161514]">
               {studyHours}h
             </span>
           </div>
           <div className="flex items-baseline justify-between">
-            <span className="text-xl font-black text-[#161514]">{studyHours} Hours</span>
+            <span className="font-heading text-xl font-black text-[#161514]">{studyHours} Hours</span>
             <span className="text-[10px] font-bold text-[#161514]/60">Logged</span>
           </div>
           {/* Progress Bar */}
@@ -171,17 +171,17 @@ export function LiquidPillBarChart({
         </div>
 
         {/* Pillar 3: Financial Health Status */}
-        <div className="bg-[#FAF8F5] rounded-2xl p-4 border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] space-y-2">
+        <div className="bg-[#FAF8F5] rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-black uppercase text-[#161514]/70 flex items-center gap-1">
+            <span className="text-[10px] font-heading font-black uppercase text-[#161514]/70 flex items-center gap-1">
               <DollarSign className="h-3.5 w-3.5 text-amber-600" /> Budget Pacing
             </span>
-            <span className="text-xs font-black text-amber-900 bg-amber-200 px-2 py-0.5 rounded-lg border border-[#161514]">
+            <span className="text-xs font-heading font-black text-amber-900 bg-amber-200 px-2 py-0.5 rounded-lg border border-[#161514]">
               On Track 🟢
             </span>
           </div>
           <div className="flex items-baseline justify-between">
-            <span className="text-xl font-black text-[#161514]">Healthy</span>
+            <span className="font-heading text-xl font-black text-[#161514]">Healthy</span>
             <span className="text-[10px] font-bold text-[#161514]/60">Pacing</span>
           </div>
           {/* Progress Bar */}
@@ -192,8 +192,8 @@ export function LiquidPillBarChart({
       </div>
 
       {/* 3. 7-Day Milestone Circle Badges Strip */}
-      <div className="bg-[#FAF8F5] rounded-2xl p-4 border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] space-y-2.5">
-        <span className="text-[10px] font-black uppercase tracking-wider text-[#161514]/70 flex items-center gap-1.5">
+      <div className="bg-[#FAF8F5] rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-2.5">
+        <span className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514]/70 flex items-center gap-1.5">
           <Zap className="h-3.5 w-3.5 text-amber-500 fill-amber-500" /> 7-Day Velocity Milestones
         </span>
 
@@ -208,13 +208,13 @@ export function LiquidPillBarChart({
                 {/* Milestone Badge Node */}
                 <div
                   className={cn(
-                    "h-10 w-10 sm:h-12 sm:w-12 rounded-2xl border-2 border-[#161514] flex items-center justify-center font-black text-xs sm:text-sm transition-all select-none",
+                    "h-10 w-10 sm:h-12 sm:w-12 rounded-2xl border-2 border-[#161514] flex items-center justify-center font-heading font-black text-xs sm:text-sm transition-all select-none",
                     isToday
-                      ? "bg-[#CEF431] text-[#161514] ring-2 ring-amber-400 shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] scale-105"
+                      ? "bg-[#CEF431] text-[#161514] shadow-[3px_3px_0px_0px_#161514] scale-105"
                       : isCompleted
-                      ? "bg-[#03D26F] text-white shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)]"
+                      ? "bg-[#03D26F] text-white shadow-[2px_2px_0px_0px_#161514]"
                       : isFrozen
-                      ? "bg-sky-400 text-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] ring-2 ring-sky-300"
+                      ? "bg-sky-400 text-[#161514] shadow-[2px_2px_0px_0px_#161514]"
                       : "bg-white text-[#161514]/40"
                   )}
                   title={isFrozen ? `Protected by Streak Freeze 🧊` : `${day.label}: ${day.value || `${Math.round(day.percentage)}%`}`}
@@ -232,8 +232,8 @@ export function LiquidPillBarChart({
 
                 {/* Day Label */}
                 <span className={cn(
-                  "text-[10px] font-black uppercase tracking-tight block",
-                  isToday ? "text-[#161514] underline" : "text-[#161514]/70"
+                  "text-[10px] font-heading font-black uppercase tracking-tight block",
+                  isToday ? "text-[#161514] underline font-black" : "text-[#161514]/70"
                 )}>
                   {day.label}
                 </span>

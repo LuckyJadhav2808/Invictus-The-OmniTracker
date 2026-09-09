@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Clock, Star, Plus, CheckCircle, Sparkles, Smile, Frown, Meh, X } from "lucide-react";
+import { Clock, X } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
@@ -47,11 +47,11 @@ export function StudySessionLogger({ topics = [], onLogSession }: StudySessionLo
   };
 
   const satisfactionLabels = [
-    { score: 5, label: "Peak Focus 🔥", icon: "🤩", bg: "bg-emerald-400 text-navy-950" },
-    { score: 4, label: "Good Flow 👍", icon: "😃", bg: "bg-amber-300 text-navy-950" },
-    { score: 3, label: "Moderate 😐", icon: "😐", bg: "bg-yellow-300 text-navy-950" },
-    { score: 2, label: "Distracted 🥱", icon: "😟", bg: "bg-orange-300 text-navy-950" },
-    { score: 1, label: "Struggled 😫", icon: "😫", bg: "bg-rose-400 text-navy-950" },
+    { score: 5, label: "Peak Focus 🔥", icon: "🤩", bg: "bg-[#03D26F] text-[#161514]" },
+    { score: 4, label: "Good Flow 👍", icon: "😃", bg: "bg-[#CEF431] text-[#161514]" },
+    { score: 3, label: "Moderate 😐", icon: "😐", bg: "bg-[#FACC15] text-[#161514]" },
+    { score: 2, label: "Distracted 🥱", icon: "😟", bg: "bg-[#FB923C] text-[#161514]" },
+    { score: 1, label: "Struggled 😫", icon: "😫", bg: "bg-[#F87171] text-[#161514]" },
   ];
 
   return (
@@ -60,20 +60,20 @@ export function StudySessionLogger({ topics = [], onLogSession }: StudySessionLo
         <button
           type="button"
           onClick={() => setIsOpen(true)}
-          className="w-full bg-amber-400 hover:bg-amber-500 text-navy-950 font-black text-xs uppercase py-3 rounded-2xl border-2 border-navy-950 shadow-[3px_3px_0px_0px_rgba(31,36,48,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center justify-center gap-2"
+          className="w-full bg-[#C084FC] hover:bg-[#A855F7] text-[#161514] font-black text-xs uppercase py-3.5 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center justify-center gap-2 tracking-wider"
         >
           <Clock className="h-4 w-4 stroke-[2.5]" /> Log Study Session & Satisfaction Rate
         </button>
       ) : (
-        <div className="bg-white rounded-3xl p-5 border-2 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] space-y-4">
+        <div className="bg-white rounded-3xl p-5 md:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
           <div className="flex items-center justify-between">
-            <h4 className="text-sm font-black text-navy-950 uppercase tracking-wider flex items-center gap-2">
+            <h4 className="text-xs md:text-sm font-black text-[#161514] uppercase tracking-wider flex items-center gap-2 font-heading">
               <Clock className="h-4 w-4 stroke-[2.5]" /> Log Study Session & Quality Rating
             </h4>
             <button
               type="button"
               onClick={() => setIsOpen(false)}
-              className="bg-rose-100 hover:bg-rose-300 text-[#161514] p-1 rounded-xl border-2 border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
+              className="bg-[#FED7AA] hover:bg-[#FDBA74] text-[#161514] p-1.5 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
               title="Close form"
             >
               <X className="h-4 w-4 stroke-[3]" />
@@ -83,29 +83,29 @@ export function StudySessionLogger({ topics = [], onLogSession }: StudySessionLo
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label className="text-[9px] font-black uppercase text-navy-700 block">Duration (Hours / Mins)</label>
+                <label className="text-[10px] font-black uppercase text-[#161514] tracking-wider block">Duration (Hours / Mins)</label>
                 <div className="flex items-center gap-2 mt-1">
                   <input
                     type="number"
                     value={hours}
                     onChange={(e) => setHours(e.target.value)}
                     placeholder="1"
-                    className="w-full bg-cream-bg rounded-xl border-2 border-navy-950 px-2.5 py-1 text-xs font-black text-navy-950 outline-none"
+                    className="w-full bg-[#FFFDF8] rounded-xl border-2 border-[#161514] px-2.5 py-1.5 text-xs font-black text-[#161514] outline-none focus:bg-[#FFF9EA] shadow-[2px_2px_0px_0px_#161514] transition-all"
                   />
-                  <span className="text-xs font-black">h</span>
+                  <span className="text-xs font-black text-[#161514]">h</span>
                   <input
                     type="number"
                     value={minutes}
                     onChange={(e) => setMinutes(e.target.value)}
                     placeholder="30"
-                    className="w-full bg-cream-bg rounded-xl border-2 border-navy-950 px-2.5 py-1 text-xs font-black text-navy-950 outline-none"
+                    className="w-full bg-[#FFFDF8] rounded-xl border-2 border-[#161514] px-2.5 py-1.5 text-xs font-black text-[#161514] outline-none focus:bg-[#FFF9EA] shadow-[2px_2px_0px_0px_#161514] transition-all"
                   />
-                  <span className="text-xs font-black">m</span>
+                  <span className="text-xs font-black text-[#161514]">m</span>
                 </div>
               </div>
 
               <div>
-                <label className="text-[9px] font-black uppercase text-navy-700 block mb-1">Topic / Chapter Studied</label>
+                <label className="text-[10px] font-black uppercase text-[#161514] tracking-wider block mb-1">Topic / Chapter Studied</label>
                 <NeobrutalistSelect
                   value={selectedTopicId}
                   onChange={setSelectedTopicId}
@@ -123,20 +123,20 @@ export function StudySessionLogger({ topics = [], onLogSession }: StudySessionLo
               </div>
 
               <div>
-                <label className="text-[9px] font-black uppercase text-navy-700 block">PYQs / Questions Solved</label>
+                <label className="text-[10px] font-black uppercase text-[#161514] tracking-wider block">PYQs / Questions Solved</label>
                 <input
                   type="number"
                   value={questionsSolved}
                   onChange={(e) => setQuestionsSolved(e.target.value)}
                   placeholder="15"
-                  className="w-full bg-cream-bg rounded-xl border-2 border-navy-950 px-3 py-1.5 text-xs font-black text-navy-950 outline-none mt-1"
+                  className="w-full bg-[#FFFDF8] rounded-xl border-2 border-[#161514] px-3 py-1.5 text-xs font-black text-[#161514] outline-none focus:bg-[#FFF9EA] shadow-[2px_2px_0px_0px_#161514] transition-all mt-1"
                 />
               </div>
             </div>
 
             {/* Satisfaction Rate Selector */}
             <div className="space-y-1.5">
-              <label className="text-[9px] font-black uppercase text-navy-700 block">Session Satisfaction Rate</label>
+              <label className="text-[10px] font-black uppercase text-[#161514] tracking-wider block">Session Satisfaction Rate</label>
               <div className="grid grid-cols-5 gap-2">
                 {satisfactionLabels.map((s) => {
                   const isSelected = satisfactionRate === s.score;
@@ -146,14 +146,14 @@ export function StudySessionLogger({ topics = [], onLogSession }: StudySessionLo
                       type="button"
                       onClick={() => setSatisfactionRate(s.score)}
                       className={cn(
-                        "p-2 rounded-xl text-center border-2 border-navy-950 cursor-pointer transition-all flex flex-col items-center gap-0.5 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)]",
+                        "p-2 rounded-xl text-center border-2 border-[#161514] cursor-pointer transition-all flex flex-col items-center gap-1 shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
                         isSelected
-                          ? s.bg
-                          : "bg-white text-navy-950 hover:bg-cream-bg"
+                          ? cn(s.bg, "ring-2 ring-[#161514]")
+                          : "bg-[#FFFDF8] text-[#161514] hover:bg-[#FFF9EA]"
                       )}
                     >
-                      <span className="text-base">{s.icon}</span>
-                      <span className="text-[9px] font-black truncate w-full">{s.label}</span>
+                      <span className="text-lg">{s.icon}</span>
+                      <span className="text-[9px] font-black truncate w-full tracking-tight">{s.label}</span>
                     </button>
                   );
                 })}
@@ -162,19 +162,19 @@ export function StudySessionLogger({ topics = [], onLogSession }: StudySessionLo
 
             {/* Session Notes */}
             <div className="space-y-1">
-              <label className="text-[9px] font-black uppercase text-navy-700 block">Session Key Notes (optional)</label>
+              <label className="text-[10px] font-black uppercase text-[#161514] tracking-wider block">Session Key Notes (optional)</label>
               <input
                 type="text"
                 value={sessionNotes}
                 onChange={(e) => setSessionNotes(e.target.value)}
                 placeholder="e.g. Revised TCP/IP 3-way handshake and solved 15 PYQs"
-                className="w-full bg-cream-bg rounded-xl border-2 border-navy-950 px-3 py-1.5 text-xs font-black text-navy-950 outline-none"
+                className="w-full bg-[#FFFDF8] rounded-xl border-2 border-[#161514] px-3 py-2 text-xs font-black text-[#161514] outline-none focus:bg-[#FFF9EA] shadow-[2px_2px_0px_0px_#161514] transition-all"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full bg-emerald-400 hover:bg-emerald-500 text-navy-950 font-black text-xs uppercase py-2.5 rounded-2xl border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] cursor-pointer"
+              className="w-full bg-[#03D26F] hover:bg-[#02B75F] text-[#161514] font-black text-xs uppercase py-3 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer tracking-wider"
             >
               Save Session Log 📚✨
             </button>
@@ -184,3 +184,4 @@ export function StudySessionLogger({ topics = [], onLogSession }: StudySessionLo
     </div>
   );
 }
+

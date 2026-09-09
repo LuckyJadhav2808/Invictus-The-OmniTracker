@@ -65,20 +65,20 @@ export function WeeklyOverviewWidget() {
   const weekPercentage = totalPossibleThisWeek > 0 ? Math.round((totalCompletedWeek / totalPossibleThisWeek) * 100) : 0;
 
   return (
-    <div className="bg-white rounded-3xl p-5 md:p-6 border-2 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] space-y-5 my-4">
+    <div className="bg-white rounded-2xl p-5 md:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-5 my-4">
       {/* Top Header Row */}
       <div className="flex items-start justify-between">
         <div>
-          <h3 className="text-xl md:text-2xl font-black text-navy-950 uppercase tracking-tight leading-none" style={{ fontFamily: "var(--font-heading)" }}>
+          <h3 className="text-xl md:text-2xl font-black text-[#161514] uppercase tracking-tight leading-none" style={{ fontFamily: "var(--font-heading)" }}>
             WEEKLY
           </h3>
-          <h3 className="text-xl md:text-2xl font-black text-[#007AFF] uppercase tracking-tight leading-none mt-0.5" style={{ fontFamily: "var(--font-heading)" }}>
+          <h3 className="text-xl md:text-2xl font-black text-[#03D26F] uppercase tracking-tight leading-none mt-0.5" style={{ fontFamily: "var(--font-heading)" }}>
             OVERVIEW
           </h3>
         </div>
 
         {/* Right % Week Box */}
-        <div className="bg-[#FF3B30] text-white border-2 border-navy-950 px-3.5 py-1.5 rounded-xl text-center shadow-[2px_2px_0px_0px_rgba(31,36,48,1)]">
+        <div className="bg-[#CEF431] text-[#161514] border-2 border-[#161514] px-3.5 py-1.5 rounded-xl text-center shadow-[2px_2px_0px_0px_#161514]">
           <span className="text-lg font-black block leading-none">{weekPercentage}%</span>
           <span className="text-[9px] font-black uppercase tracking-widest block opacity-90 mt-0.5">WEEK</span>
         </div>
@@ -89,7 +89,7 @@ export function WeeklyOverviewWidget() {
         {dailyStats.map((d, idx) => (
           <div key={d.dateStr || idx} className="space-y-1.5">
             {/* Day Initials Label */}
-            <span className="text-xs font-black text-navy-900 block uppercase">
+            <span className="text-xs font-black text-[#161514] block uppercase">
               {d.dayLabel}
             </span>
 
@@ -98,10 +98,10 @@ export function WeeklyOverviewWidget() {
               className={cn(
                 "h-12 sm:h-14 rounded-xl border-2 flex items-center justify-center transition-all text-xs sm:text-sm font-black select-none",
                 d.isCurrentDay
-                  ? "bg-[#FF3B30] text-white border-navy-950 shadow-[3px_3px_0px_0px_rgba(31,36,48,1)] scale-105 z-10"
+                  ? "bg-[#03D26F] text-[#161514] border-[#161514] shadow-[3px_3px_0px_0px_#161514] scale-105 z-10 font-black"
                   : d.isPastDay
-                  ? "bg-white text-navy-950 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,0.15)]"
-                  : "bg-[#EAE8E3] text-navy-900/40 border-navy-950/30"
+                  ? "bg-white text-[#161514] border-[#161514] shadow-[2px_2px_0px_0px_#161514]"
+                  : "bg-[#EAE8E3] text-[#161514]/40 border-[#161514]/30"
               )}
             >
               {activeHabitsCount === 0 ? (
@@ -119,23 +119,23 @@ export function WeeklyOverviewWidget() {
       {/* Bottom 3 Summary Stat Cards */}
       <div className="grid grid-cols-3 gap-2.5 sm:gap-3.5 pt-1">
         {/* Card 1: DONE */}
-        <div className="bg-[#FFE600] text-navy-950 border-2 border-navy-950 p-3 rounded-2xl shadow-[2.5px_2.5px_0px_0px_rgba(31,36,48,1)] text-center">
+        <div className="bg-[#CEF431] text-[#161514] border-2 border-[#161514] p-3 rounded-2xl shadow-[2.5px_2.5px_0px_0px_#161514] text-center">
           <span className="text-lg sm:text-xl font-black block leading-none">{totalCompletedWeek}</span>
-          <span className="text-[9px] font-black uppercase tracking-widest block text-navy-900 mt-1">DONE</span>
+          <span className="text-[9px] font-black uppercase tracking-widest block text-[#161514] mt-1">DONE</span>
         </div>
 
         {/* Card 2: PERFECT */}
-        <div className="bg-[#FFF8C5] text-navy-950 border-2 border-navy-950 p-3 rounded-2xl shadow-[2.5px_2.5px_0px_0px_rgba(31,36,48,1)] text-center">
+        <div className="bg-[#FFF9EA] text-[#161514] border-2 border-[#161514] p-3 rounded-2xl shadow-[2.5px_2.5px_0px_0px_#161514] text-center">
           <span className="text-lg sm:text-xl font-black block leading-none">{perfectDaysCount}</span>
-          <span className="text-[9px] font-black uppercase tracking-widest block text-navy-900 mt-1">PERFECT</span>
+          <span className="text-[9px] font-black uppercase tracking-widest block text-[#161514] mt-1">PERFECT</span>
         </div>
 
         {/* Card 3: TODAY */}
-        <div className="bg-[#EBF5FF] text-[#007AFF] border-2 border-[#007AFF] p-3 rounded-2xl shadow-[2.5px_2.5px_0px_0px_rgba(0,122,255,1)] text-center">
+        <div className="bg-[#03D26F]/20 text-[#161514] border-2 border-[#161514] p-3 rounded-2xl shadow-[2.5px_2.5px_0px_0px_#161514] text-center">
           <span className="text-lg sm:text-xl font-black block leading-none">
             {todayStat.completedCount}/{activeHabitsCount}
           </span>
-          <span className="text-[9px] font-black uppercase tracking-widest block text-[#007AFF] mt-1">TODAY</span>
+          <span className="text-[9px] font-black uppercase tracking-widest block text-[#161514] mt-1">TODAY</span>
         </div>
       </div>
     </div>

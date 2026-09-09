@@ -176,33 +176,36 @@ export default function TopicDetailPage({
       <div className="max-w-md mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <Link href={`/study/${subjectId}`} className="text-navy-600 hover:text-navy-900 flex items-center gap-1.5 text-sm font-bold">
-            <ArrowLeft className="h-4 w-4" /> Syllabus
-          </Link>
-          <Button
-            onClick={() => setIsLogOpen(true)}
-            className="bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-full py-1.5 px-3.5 shadow-sm text-xs border-none cursor-pointer"
+          <Link
+            href={`/study/${subjectId}`}
+            className="bg-white px-3.5 py-1.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-[#161514] hover:bg-[#FFF9EA] flex items-center gap-1.5 text-xs font-black uppercase tracking-wider transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer"
           >
-            Log Session
-          </Button>
+            <ArrowLeft className="h-4 w-4 stroke-[3]" /> Syllabus
+          </Link>
+          <button
+            onClick={() => setIsLogOpen(true)}
+            className="bg-[#CEF431] hover:bg-[#b8dd24] text-[#161514] font-black text-xs uppercase py-2 px-4 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center gap-1.5 cursor-pointer"
+          >
+            Log Session 📝
+          </button>
         </div>
 
         {/* Content Card */}
-        <div className="bg-white rounded-[var(--radius-lg)] p-6 shadow-[0_8px_24px_rgba(31,36,48,0.06)] space-y-6">
+        <div className="bg-white rounded-3xl p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-5">
           <div>
-            <h1 className="text-lg font-extrabold text-navy-900" style={{ fontFamily: "var(--font-heading)" }}>
+            <h1 className="text-xl font-black text-[#161514] font-heading">
               {topic.title}
             </h1>
-            <p className="text-xs text-navy-600 mt-1 uppercase tracking-wider font-semibold">
+            <span className="text-[10px] font-black text-[#161514] uppercase tracking-wider px-2 py-0.5 rounded-md bg-[#FAF8F5] border border-[#161514] inline-block mt-2">
               Subject: {subject.name}
-            </p>
+            </span>
           </div>
 
-          <hr className="border-border" />
+          <hr className="border-[#161514]/20 border-t-2" />
 
           {/* Status selector */}
           <div className="space-y-2">
-            <label className="text-xs font-bold text-navy-600 uppercase tracking-wider">Status</label>
+            <label className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">Mastery Status</label>
             <div className="grid grid-cols-2 gap-2">
               {[
                 { key: "notStarted", label: "Not Started" },
@@ -215,10 +218,10 @@ export default function TopicDetailPage({
                   onClick={() => handleStatusChange(opt.key)}
                   type="button"
                   className={cn(
-                    "py-2 rounded-[var(--radius-sm)] text-[11px] font-bold border transition-all cursor-pointer",
+                    "py-2 px-2 rounded-xl text-xs font-black border-2 border-[#161514] transition-all cursor-pointer tracking-wider uppercase",
                     topic.status === opt.key
-                      ? "bg-navy-900 border-navy-900 text-white"
-                      : "bg-cream-bg/30 border-input text-navy-600 hover:bg-cream-bg/50"
+                      ? "bg-[#C084FC] text-[#161514] shadow-[2px_2px_0px_0px_#161514] -translate-x-0.5 -translate-y-0.5"
+                      : "bg-[#FFFDF8] text-[#161514] hover:bg-[#FFF9EA]"
                   )}
                 >
                   {opt.label}
@@ -229,9 +232,11 @@ export default function TopicDetailPage({
 
           {/* Confidence scale pills */}
           <div className="space-y-2">
-            <div className="flex justify-between items-center text-xs font-bold text-navy-600 uppercase tracking-wider">
+            <div className="flex justify-between items-center text-[10px] font-black text-[#161514] uppercase tracking-wider">
               <span>Confidence Rating</span>
-              <span className="text-orange-500 font-extrabold">{topic.confidence || 1} / 5</span>
+              <span className="text-[#EA580C] font-black px-2 py-0.5 rounded-md bg-[#FED7AA] border border-[#161514]">
+                {topic.confidence || 1} / 5
+              </span>
             </div>
             <div className="grid grid-cols-5 gap-1.5 pt-1">
               {[1, 2, 3, 4, 5].map((level) => (
@@ -240,17 +245,17 @@ export default function TopicDetailPage({
                   type="button"
                   onClick={() => handleConfidenceChange(level)}
                   className={cn(
-                    "py-2 rounded-[var(--radius-sm)] text-xs font-extrabold border transition-all cursor-pointer",
+                    "py-2 rounded-xl text-xs font-black border-2 border-[#161514] transition-all cursor-pointer",
                     (topic.confidence || 1) === level
-                      ? "bg-orange-500 border-orange-500 text-white shadow-sm scale-105"
-                      : "bg-cream-bg/40 border-input text-navy-600 hover:bg-cream-bg/70"
+                      ? "bg-[#03D26F] text-[#161514] shadow-[2px_2px_0px_0px_#161514] scale-105"
+                      : "bg-[#FFFDF8] text-[#161514] hover:bg-[#FFF9EA]"
                   )}
                 >
                   {level}
                 </button>
               ))}
             </div>
-            <div className="flex justify-between text-[10px] text-navy-600 font-semibold px-0.5 pt-0.5">
+            <div className="flex justify-between text-[9px] text-[#161514]/70 font-black px-0.5 pt-0.5 uppercase tracking-wider">
               <span>1 - Needs Work</span>
               <span>5 - Mastered</span>
             </div>
@@ -258,57 +263,60 @@ export default function TopicDetailPage({
         </div>
 
         {/* Stopwatch Active Session Card */}
-        <div className="bg-white rounded-[var(--radius-lg)] p-6 shadow-[0_8px_24px_rgba(31,36,48,0.06)] space-y-4 text-center">
-          <h3 className="font-bold text-xs uppercase tracking-wider text-navy-600" style={{ fontFamily: "var(--font-heading)" }}>
-            Study Session Stopwatch
+        <div className="bg-white rounded-3xl p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4 text-center">
+          <h3 className="font-black text-xs uppercase tracking-wider text-[#161514] font-heading flex items-center justify-center gap-1.5">
+            <Clock className="h-4 w-4 stroke-[2.5]" /> Study Session Stopwatch
           </h3>
-          <div className="text-4xl font-extrabold text-navy-900 font-mono tracking-wider tabular-nums py-2">
+          <div className="text-5xl font-black text-[#161514] font-mono tracking-wider tabular-nums py-2 drop-shadow-sm">
             {formatTime(elapsedSeconds)}
           </div>
 
           <div className="flex justify-center gap-3">
             {!isTimerRunning ? (
-              <Button
+              <button
+                type="button"
                 onClick={handleStartTimer}
-                className="bg-mint-600 hover:bg-mint-700 text-white font-bold rounded-full py-2 px-5 flex items-center gap-1.5 cursor-pointer border-none shadow-sm"
+                className="bg-[#03D26F] hover:bg-[#02B75F] text-[#161514] font-black text-xs uppercase py-3 px-6 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center gap-2 tracking-wider"
               >
-                <Play className="h-4 w-4 fill-white" /> Start Timer
-              </Button>
+                <Play className="h-4 w-4 fill-[#161514]" /> Start Timer
+              </button>
             ) : (
-              <Button
+              <button
+                type="button"
                 onClick={handleStopTimer}
-                className="bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-full py-2 px-5 flex items-center gap-1.5 cursor-pointer border-none shadow-sm"
+                className="bg-[#FB923C] hover:bg-[#F97316] text-[#161514] font-black text-xs uppercase py-3 px-6 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center gap-2 tracking-wider"
               >
-                <Square className="h-4 w-4 fill-white" /> Log Session
-              </Button>
+                <Square className="h-4 w-4 fill-[#161514]" /> Log Session
+              </button>
             )}
 
             {elapsedSeconds > 0 && (
-              <Button
+              <button
+                type="button"
                 onClick={handleResetTimer}
-                className="rounded-full border border-navy-900/20 hover:bg-navy-900/5 text-navy-900 font-bold px-4 py-2 text-xs bg-white cursor-pointer"
+                className="bg-white hover:bg-[#FFF9EA] text-[#161514] font-black text-xs uppercase py-3 px-4 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all tracking-wider"
               >
                 Reset
-              </Button>
+              </button>
             )}
           </div>
         </div>
 
         {/* Logged study sessions history list */}
-        <div className="bg-white rounded-[var(--radius-lg)] p-6 shadow-[0_8px_24px_rgba(31,36,48,0.06)] space-y-4">
-          <h3 className="font-bold text-xs uppercase tracking-wider text-navy-600" style={{ fontFamily: "var(--font-heading)" }}>
-            Study Log History
+        <div className="bg-white rounded-3xl p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
+          <h3 className="font-black text-xs uppercase tracking-wider text-[#161514] font-heading flex items-center gap-1.5">
+            <BookOpen className="h-4 w-4 stroke-[2.5]" /> Study Log History
           </h3>
 
           {(() => {
             const topicSessions = sessions.filter((s) => s.topicId === topicId);
 
             if (sessionsLoading) {
-              return <div className="h-12 animate-pulse bg-cream-bg/20 rounded-[var(--radius-sm)]" />;
+              return <div className="h-14 animate-pulse bg-[#FAF8F5] rounded-2xl border-2 border-[#161514]" />;
             }
             if (topicSessions.length === 0) {
               return (
-                <p className="text-center text-xs text-navy-600 py-4 leading-relaxed">
+                <p className="text-center text-xs font-semibold text-[#161514]/70 py-4 leading-relaxed">
                   No sessions logged for this topic yet. Start the stopwatch or tap Log Session above!
                 </p>
               );
@@ -316,36 +324,36 @@ export default function TopicDetailPage({
             return (
               <div className="space-y-3">
                 {topicSessions.map((sess) => (
-                  <div key={sess.id} className="border-b pb-3 last:border-none last:pb-0 space-y-1.5">
+                  <div key={sess.id} className="bg-[#FFFDF8] rounded-2xl p-4 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] space-y-2">
                     <div className="flex justify-between items-start">
-                      <span className="text-xs font-bold text-navy-900 flex items-center gap-1 capitalize">
+                      <span className="text-xs font-black text-[#161514] flex items-center gap-1.5 capitalize font-heading">
                         {sess.type === "practice" ? (
-                          <PenTool className="h-3.5 w-3.5 text-orange-500" />
+                          <PenTool className="h-4 w-4 text-[#EA580C] stroke-[2.5]" />
                         ) : (
-                          <BookOpen className="h-3.5 w-3.5 text-orange-500" />
+                          <BookOpen className="h-4 w-4 text-[#EA580C] stroke-[2.5]" />
                         )}
                         {sess.type || "reading"}
                       </span>
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-semibold text-navy-600 flex items-center gap-1">
-                          <Clock className="h-3 w-3" /> {sess.durationMinutes}m
+                        <span className="text-[10px] font-black text-[#161514] px-2 py-0.5 rounded-lg bg-[#FAF8F5] border border-[#161514] flex items-center gap-1">
+                          <Clock className="h-3 w-3 stroke-[2.5]" /> {sess.durationMinutes}m
                         </span>
                         <button
                           onClick={() => setDeleteSessionId(sess.id)}
-                          className="text-red-500 hover:text-red-600 p-0.5 cursor-pointer transition-colors outline-none border-none bg-transparent"
+                          className="bg-[#FEE2E2] hover:bg-[#FCA5A5] text-[#991B1B] p-1 rounded-xl border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
                           title="Delete session log"
                         >
-                          <Trash2 className="h-3 w-3" />
+                          <Trash2 className="h-3 w-3 stroke-[2.5]" />
                         </button>
                       </div>
                     </div>
                     {sess.notes && (
-                      <p className="text-xs text-navy-600 leading-normal pl-4.5 border-l-2 border-orange-500/30">
+                      <p className="text-xs font-medium text-[#161514] leading-normal pl-3 border-l-2 border-[#EA580C]">
                         {sess.notes}
                       </p>
                     )}
-                    <div className="text-[9px] text-navy-600/70 font-semibold pl-4.5 flex items-center gap-1">
-                      <Calendar className="h-3 w-3" /> {sess.date}
+                    <div className="text-[9px] text-[#161514]/70 font-black pl-3 flex items-center gap-1 uppercase tracking-wider">
+                      <Calendar className="h-3 w-3 stroke-[2.5]" /> {sess.date}
                     </div>
                   </div>
                 ))}
@@ -364,7 +372,7 @@ export default function TopicDetailPage({
       >
         <form onSubmit={handleLogSessionSubmit} className="space-y-4">
           <div className="space-y-1">
-            <label htmlFor="sess-duration" className="text-xs font-bold uppercase tracking-wider text-navy-600">
+            <label htmlFor="sess-duration" className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">
               Duration (minutes)
             </label>
             <input
@@ -374,12 +382,12 @@ export default function TopicDetailPage({
               onChange={(e) => setSessionDuration(Number(e.target.value))}
               min={1}
               required
-              className="w-full rounded-[var(--radius-sm)] border border-input bg-cream-bg/50 py-2.5 px-3 text-sm outline-none text-navy-900 focus:ring-2 focus:ring-orange-500 transition-all"
+              className="w-full rounded-xl border-2 border-[#161514] bg-[#FFFDF8] py-2.5 px-3.5 text-xs font-black text-[#161514] outline-none focus:bg-[#FFF9EA] shadow-[2px_2px_0px_0px_#161514] transition-all"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-bold uppercase tracking-wider text-navy-600">
+            <label className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">
               Activity Type
             </label>
             <div className="grid grid-cols-2 gap-2">
@@ -394,10 +402,10 @@ export default function TopicDetailPage({
                   type="button"
                   onClick={() => setSessionType(opt.key as any)}
                   className={cn(
-                    "py-2 rounded-[var(--radius-sm)] text-[10px] font-bold border transition-all cursor-pointer",
+                    "py-2 px-2 rounded-xl text-xs font-black border-2 border-[#161514] transition-all cursor-pointer uppercase tracking-wider",
                     sessionType === opt.key
-                      ? "bg-navy-900 border-navy-900 text-white"
-                      : "bg-cream-bg/30 border-input text-navy-600 hover:bg-cream-bg/50"
+                      ? "bg-[#C084FC] text-[#161514] shadow-[2px_2px_0px_0px_#161514] -translate-x-0.5 -translate-y-0.5"
+                      : "bg-[#FFFDF8] text-[#161514] hover:bg-[#FFF9EA]"
                   )}
                 >
                   {opt.label}
@@ -407,7 +415,7 @@ export default function TopicDetailPage({
           </div>
 
           <div className="space-y-1">
-            <label htmlFor="sess-notes" className="text-xs font-bold uppercase tracking-wider text-navy-600">
+            <label htmlFor="sess-notes" className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">
               Notes
             </label>
             <textarea
@@ -416,17 +424,17 @@ export default function TopicDetailPage({
               onChange={(e) => setSessionNotes(e.target.value)}
               placeholder="What did you focus on? E.g., solved 10 integration questions..."
               rows={3}
-              className="w-full rounded-[var(--radius-sm)] border border-input bg-cream-bg/50 py-2.5 px-3 text-sm outline-none text-navy-900 placeholder:text-navy-600/40 focus:ring-2 focus:ring-orange-500 transition-all"
+              className="w-full rounded-xl border-2 border-[#161514] bg-[#FFFDF8] py-2.5 px-3.5 text-xs font-black text-[#161514] outline-none focus:bg-[#FFF9EA] shadow-[2px_2px_0px_0px_#161514] transition-all"
             />
           </div>
 
-          <Button
+          <button
             type="submit"
             disabled={logSessionMutation.isPending}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-full py-2.5 shadow-sm border-none cursor-pointer"
+            className="w-full bg-[#03D26F] hover:bg-[#02B75F] text-[#161514] font-black text-xs uppercase py-3 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer tracking-wider"
           >
-            {logSessionMutation.isPending ? "Logging…" : "Save Session"}
-          </Button>
+            {logSessionMutation.isPending ? "Logging…" : "Save Session 📚"}
+          </button>
         </form>
       </ResponsiveFormContainer>
 
@@ -453,3 +461,4 @@ export default function TopicDetailPage({
     </div>
   );
 }
+

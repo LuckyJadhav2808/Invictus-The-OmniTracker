@@ -37,39 +37,39 @@ export function SpaceHeroBanner({
   const themeStyles = {
     today: {
       cardBg: "bg-[#FFF9EA] text-[#161514] border-[#161514]",
-      badgeBg: "bg-[#CEF431] text-[#161514] border-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)]",
-      statBg: "bg-white text-[#161514] border-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] sm:shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)]",
-      btnBg: "bg-[#161514] text-[#CEF431] hover:bg-[#252321] border-[#161514] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)]",
+      badgeBg: "bg-[#CEF431] text-[#161514] border-[#161514] font-heading font-black shadow-[2px_2px_0px_0px_#161514]",
+      statBg: "bg-white text-[#161514] border-[#161514] font-heading font-black shadow-[2px_2px_0px_0px_#161514] sm:shadow-[3px_3px_0px_0px_#161514]",
+      btnBg: "bg-[#161514] text-[#CEF431] hover:bg-[#252321] border-[#161514] shadow-[3px_3px_0px_0px_#161514] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
     },
     life: {
       cardBg: "bg-[#ECFDF5] text-[#161514] border-[#161514]",
-      badgeBg: "bg-[#03D26F] text-[#161514] border-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)]",
-      statBg: "bg-white text-[#161514] border-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] sm:shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)]",
-      btnBg: "bg-[#161514] text-[#03D26F] hover:bg-[#252321] border-[#161514] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)]",
+      badgeBg: "bg-[#03D26F] text-[#161514] border-[#161514] font-heading font-black shadow-[2px_2px_0px_0px_#161514]",
+      statBg: "bg-white text-[#161514] border-[#161514] font-heading font-black shadow-[2px_2px_0px_0px_#161514] sm:shadow-[3px_3px_0px_0px_#161514]",
+      btnBg: "bg-[#161514] text-[#03D26F] hover:bg-[#252321] border-[#161514] shadow-[3px_3px_0px_0px_#161514] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
     },
     study: {
       cardBg: "bg-[#F5F3FF] text-[#161514] border-[#161514]",
-      badgeBg: "bg-[#C084FC] text-[#161514] border-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)]",
-      statBg: "bg-white text-[#161514] border-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] sm:shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)]",
-      btnBg: "bg-[#161514] text-[#C084FC] hover:bg-[#252321] border-[#161514] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)]",
+      badgeBg: "bg-[#C084FC] text-[#161514] border-[#161514] font-heading font-black shadow-[2px_2px_0px_0px_#161514]",
+      statBg: "bg-white text-[#161514] border-[#161514] font-heading font-black shadow-[2px_2px_0px_0px_#161514] sm:shadow-[3px_3px_0px_0px_#161514]",
+      btnBg: "bg-[#161514] text-[#C084FC] hover:bg-[#252321] border-[#161514] shadow-[3px_3px_0px_0px_#161514] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
     },
     tasks: {
       cardBg: "bg-[#FFFBEB] text-[#161514] border-[#161514]",
-      badgeBg: "bg-[#F59E0B] text-white border-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)]",
-      statBg: "bg-white text-[#161514] border-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] sm:shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)]",
-      btnBg: "bg-[#161514] text-[#F59E0B] hover:bg-[#252321] border-[#161514] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)]",
+      badgeBg: "bg-[#F59E0B] text-white border-[#161514] font-heading font-black shadow-[2px_2px_0px_0px_#161514]",
+      statBg: "bg-white text-[#161514] border-[#161514] font-heading font-black shadow-[2px_2px_0px_0px_#161514] sm:shadow-[3px_3px_0px_0px_#161514]",
+      btnBg: "bg-[#161514] text-[#F59E0B] hover:bg-[#252321] border-[#161514] shadow-[3px_3px_0px_0px_#161514] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
     },
     money: {
       cardBg: "bg-[#FFF1F2] text-[#161514] border-[#161514]",
-      badgeBg: "bg-[#FBCFE8] text-[#161514] border-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)]",
-      statBg: "bg-white text-[#161514] border-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] sm:shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)]",
-      btnBg: "bg-[#161514] text-[#FBCFE8] hover:bg-[#252321] border-[#161514] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)]",
+      badgeBg: "bg-[#FBCFE8] text-[#161514] border-[#161514] font-heading font-black shadow-[2px_2px_0px_0px_#161514]",
+      statBg: "bg-white text-[#161514] border-[#161514] font-heading font-black shadow-[2px_2px_0px_0px_#161514] sm:shadow-[3px_3px_0px_0px_#161514]",
+      btnBg: "bg-[#161514] text-[#FBCFE8] hover:bg-[#252321] border-[#161514] shadow-[3px_3px_0px_0px_#161514] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
     },
     analytics: {
       cardBg: "bg-[#F0F9FF] text-[#161514] border-[#161514]",
-      badgeBg: "bg-[#7DD3FC] text-[#161514] border-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)]",
-      statBg: "bg-white text-[#161514] border-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] sm:shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)]",
-      btnBg: "bg-[#161514] text-[#7DD3FC] hover:bg-[#252321] border-[#161514] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)]",
+      badgeBg: "bg-[#7DD3FC] text-[#161514] border-[#161514] font-heading font-black shadow-[2px_2px_0px_0px_#161514]",
+      statBg: "bg-white text-[#161514] border-[#161514] font-heading font-black shadow-[2px_2px_0px_0px_#161514] sm:shadow-[3px_3px_0px_0px_#161514]",
+      btnBg: "bg-[#161514] text-[#7DD3FC] hover:bg-[#252321] border-[#161514] shadow-[3px_3px_0px_0px_#161514] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
     },
   }[space];
 
@@ -85,7 +85,7 @@ export function SpaceHeroBanner({
   return (
     <div
       className={cn(
-        "relative w-full rounded-3xl p-3.5 sm:p-6 md:p-8 border-2.5 border-[#161514] shadow-[4px_4px_0px_0px_rgba(22,21,20,1)] sm:shadow-[5px_5px_0px_0px_rgba(22,21,20,1)] overflow-hidden transition-all duration-200 hover:-translate-x-0.5 hover:-translate-y-0.5 my-2.5 sm:my-4",
+        "relative w-full rounded-3xl p-3.5 sm:p-6 md:p-8 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] sm:shadow-[5px_5px_0px_0px_#161514] overflow-hidden transition-all duration-200 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_0px_#161514] my-2.5 sm:my-4",
         themeStyles.cardBg
       )}
     >

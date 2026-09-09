@@ -199,15 +199,16 @@ function StudyPageContent() {
     }
   };
 
-  // Color mapping utility
-  const colorMap: Record<string, { bg: string; text: string; ring: string }> = {
-    amber: { bg: "bg-amber-500/10", text: "text-amber-600", ring: "stroke-amber-500" },
-    orange: { bg: "bg-orange-500/10", text: "text-orange-600", ring: "stroke-orange-500" },
-    mint: { bg: "bg-mint-600/10", text: "text-mint-600", ring: "stroke-mint-600" },
-    lavender: { bg: "bg-lavender-400/20", text: "text-lavender-600", ring: "stroke-lavender-400" },
-    coral: { bg: "bg-coral-400/20", text: "text-coral-500", ring: "stroke-coral-400" },
-    indigo: { bg: "bg-indigo-500/10", text: "text-indigo-600", ring: "stroke-indigo-500" },
+  // Color mapping utility (Neo-Brutalist palettes)
+  const colorMap: Record<string, { bg: string; text: string; ring: string; badge: string }> = {
+    amber: { bg: "bg-[#FDE047]", text: "text-[#161514]", ring: "stroke-[#EAB308]", badge: "bg-[#FEF08A]" },
+    orange: { bg: "bg-[#FB923C]", text: "text-[#161514]", ring: "stroke-[#F97316]", badge: "bg-[#FED7AA]" },
+    mint: { bg: "bg-[#03D26F]", text: "text-[#161514]", ring: "stroke-[#059669]", badge: "bg-[#A7F3D0]" },
+    lavender: { bg: "bg-[#C084FC]", text: "text-[#161514]", ring: "stroke-[#9333EA]", badge: "bg-[#E9D5FF]" },
+    coral: { bg: "bg-[#F472B6]", text: "text-[#161514]", ring: "stroke-[#E11D48]", badge: "bg-[#FBCFE8]" },
+    indigo: { bg: "bg-[#818CF8]", text: "text-[#161514]", ring: "stroke-[#4F46E5]", badge: "bg-[#C7D2FE]" },
   };
+
 
   // Compute total logged study hours (from sessions)
   const totalLoggedMinutes = sessions.reduce((sum, s) => sum + s.durationMinutes, 0);
@@ -288,22 +289,31 @@ function StudyPageContent() {
 
         {/* Countdown Banner */}
         {studyTarget && daysLeft !== null && (
-          <div className="bg-white rounded-[var(--radius-lg)] p-5 shadow-[0_8px_24px_rgba(31,36,48,0.06)] flex flex-col sm:flex-row items-center justify-between gap-4 border-l-4 border-orange-500">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-orange-500/10 flex items-center justify-center text-orange-600">
-                <Trophy className="h-5 w-5" />
+          <div className="bg-white rounded-3xl p-5 md:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] flex flex-col sm:flex-row items-center justify-between gap-4 relative overflow-hidden">
+            <div className="flex items-center gap-3.5">
+              <div className="h-12 w-12 rounded-2xl bg-[#FED7AA] border-2 border-[#161514] flex items-center justify-center text-[#161514] shadow-[2px_2px_0px_0px_#161514] shrink-0">
+                <Trophy className="h-6 w-6 stroke-[2.5]" />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-navy-900">{studyTarget.examName} Countdown</h4>
-                <p className="text-xs text-navy-600 mt-0.5">Stay consistent and keep studying!</p>
+                <h4 className="text-sm md:text-base font-black text-[#161514] font-heading uppercase tracking-wide">
+                  {studyTarget.examName} Countdown
+                </h4>
+                <p className="text-xs font-semibold text-[#161514]/70 mt-0.5">
+                  Stay consistent, execute your schedule, and conquer the exam!
+                </p>
               </div>
             </div>
-            <div className="text-center sm:text-right shrink-0">
-              <span className="text-3xl font-extrabold text-orange-500 font-heading">{daysLeft}</span>
-              <span className="text-xs font-bold text-navy-900 ml-1.5 uppercase tracking-wide">Days Left</span>
+            <div className="flex items-center sm:flex-col sm:items-end gap-1.5 shrink-0">
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-4xl font-black text-[#EA580C] font-heading tracking-tight">{daysLeft}</span>
+                <span className="text-[10px] font-black uppercase tracking-wider text-[#161514] px-2 py-0.5 rounded-lg bg-[#FED7AA] border-2 border-[#161514]">
+                  Days Left
+                </span>
+              </div>
             </div>
           </div>
         )}
+
 
         {/* Draggable Study Widgets Grid */}
         <DraggableDashboardGrid
@@ -367,24 +377,24 @@ function StudyPageContent() {
         />
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="w-full overflow-x-auto no-scrollbar pb-1 mb-5">
-            <TabsList className="bg-[#FAF8F5] rounded-2xl p-1.5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] flex items-center gap-1.5 w-max min-w-full sm:min-w-0 sm:w-auto">
+            <TabsList className="bg-[#FAF8F5] rounded-2xl p-1.5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex items-center gap-1.5 w-max min-w-full sm:min-w-0 sm:w-auto">
               <TabsTrigger
                 value="subjects"
-                className="rounded-xl text-xs font-black py-2 px-4 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
+                className="rounded-xl text-xs font-black py-2 px-4 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#C084FC] data-[state=active]:text-[#161514] data-[state=active]:shadow-[2px_2px_0px_0px_#161514] text-[#161514]/70 hover:text-[#161514] hover:bg-white/60 transition-all flex items-center gap-1.5 shrink-0"
               >
                 <span>📚</span>
                 <span>Subjects</span>
               </TabsTrigger>
               <TabsTrigger
                 value="analytics"
-                className="rounded-xl text-xs font-black py-2 px-4 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
+                className="rounded-xl text-xs font-black py-2 px-4 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#C084FC] data-[state=active]:text-[#161514] data-[state=active]:shadow-[2px_2px_0px_0px_#161514] text-[#161514]/70 hover:text-[#161514] hover:bg-white/60 transition-all flex items-center gap-1.5 shrink-0"
               >
                 <span>📊</span>
                 <span>Analytics</span>
               </TabsTrigger>
               <TabsTrigger
                 value="tests"
-                className="rounded-xl text-xs font-black py-2 px-4 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
+                className="rounded-xl text-xs font-black py-2 px-4 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#C084FC] data-[state=active]:text-[#161514] data-[state=active]:shadow-[2px_2px_0px_0px_#161514] text-[#161514]/70 hover:text-[#161514] hover:bg-white/60 transition-all flex items-center gap-1.5 shrink-0"
               >
                 <span>📝</span>
                 <span>Mock Tests</span>
@@ -397,7 +407,7 @@ function StudyPageContent() {
             {subjectsLoading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {[1, 2].map((i) => (
-                  <div key={i} className="bg-white rounded-[var(--radius-lg)] p-5 h-24 animate-pulse" />
+                  <div key={i} className="bg-white rounded-3xl p-5 h-28 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] animate-pulse" />
                 ))}
               </div>
             ) : subjects.length === 0 ? (
@@ -422,15 +432,15 @@ function StudyPageContent() {
                     <div
                       key={sub.id}
                       onClick={() => router.push(`/study/${sub.id}`)}
-                      className="break-inside-avoid block w-full bg-white border border-border rounded-[var(--radius-lg)] p-5 flex items-center justify-between shadow-[0_8px_24px_rgba(31,36,48,0.02)] hover:shadow-[0_8px_24px_rgba(31,36,48,0.06)] hover:scale-[1.005] active:scale-[0.995] transition-all cursor-pointer select-none"
+                      className="break-inside-avoid block w-full bg-white rounded-3xl p-5 border-[2.5px] border-[#161514] shadow-[3.5px_3.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer select-none flex items-center justify-between"
                     >
-                      <div className="flex items-center gap-3">
-                        <div className={`h-11 w-11 rounded-[var(--radius-md)] flex items-center justify-center ${colors.bg} ${colors.text}`}>
-                          <BookOpen className="h-5 w-5" />
+                      <div className="flex items-center gap-3.5">
+                        <div className={`h-12 w-12 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center shrink-0 ${colors.bg} ${colors.text}`}>
+                          <BookOpen className="h-6 w-6 stroke-[2.5]" />
                         </div>
                         <div>
-                          <h4 className="font-bold text-sm text-navy-900">{sub.name}</h4>
-                          <span className="text-[10px] font-semibold text-navy-600 uppercase tracking-wide">
+                          <h4 className="font-black text-sm md:text-base text-[#161514] font-heading leading-tight">{sub.name}</h4>
+                          <span className="text-[10px] font-black text-[#161514]/70 uppercase tracking-wider block mt-1">
                             {subTopics.length} topic{subTopics.length !== 1 ? "s" : ""} • {subPercentage}% completed
                           </span>
                         </div>
@@ -445,26 +455,30 @@ function StudyPageContent() {
                               setEditSubjectName(sub.name);
                               setEditSubjectColor(sub.color);
                             }}
-                            className="text-navy-600 hover:text-navy-900 p-1 cursor-pointer transition-colors outline-none border-none bg-transparent"
+                            className="bg-[#FFFDF8] hover:bg-[#FFF9EA] text-[#161514] p-1.5 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
+                            title="Edit Subject"
                           >
-                            <Edit3 className="h-3.5 w-3.5" />
+                            <Edit3 className="h-3.5 w-3.5 stroke-[2.5]" />
                           </button>
                           <button
                             onClick={() => setDeleteSubjectId(sub.id)}
-                            className="text-red-500 hover:text-red-600 p-1 cursor-pointer transition-colors outline-none border-none bg-transparent"
+                            className="bg-[#FEE2E2] hover:bg-[#FCA5A5] text-[#991B1B] p-1.5 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
+                            title="Delete Subject"
                           >
-                            <Trash2 className="h-3.5 w-3.5" />
+                            <Trash2 className="h-3.5 w-3.5 stroke-[2.5]" />
                           </button>
                         </div>
 
                         {/* Progress ring & chevron */}
                         <ProgressRing
                           percentage={subPercentage}
-                          size={32}
-                          strokeWidth={3}
+                          size={34}
+                          strokeWidth={3.5}
                           colorClass={colors.ring}
                         />
-                        <ChevronRight className="h-4 w-4 text-navy-600" />
+                        <div className="bg-[#FAF8F5] p-1.5 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]">
+                          <ChevronRight className="h-4 w-4 text-[#161514] stroke-[3]" />
+                        </div>
                       </div>
                     </div>
                   );
@@ -478,41 +492,41 @@ function StudyPageContent() {
             <div className="space-y-6">
               {/* Stat summary grid */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-white rounded-[var(--radius-lg)] p-5 shadow-[0_8px_24px_rgba(31,36,48,0.04)] flex items-center gap-4">
-                  <div className="h-10 w-10 rounded-full bg-orange-500/10 flex items-center justify-center text-orange-600">
-                    <Clock className="h-5 w-5" />
+                <div className="bg-white rounded-3xl p-5 border-[2.5px] border-[#161514] shadow-[3.5px_3.5px_0px_0px_#161514] flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-2xl bg-[#FED7AA] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center text-[#161514] shrink-0">
+                    <Clock className="h-6 w-6 stroke-[2.5]" />
                   </div>
                   <div>
-                    <h5 className="text-[10px] font-bold text-navy-600 uppercase tracking-wider">Logged Hours</h5>
-                    <p className="text-xl font-extrabold text-navy-900 mt-0.5">{totalLoggedHours}h</p>
+                    <h5 className="text-[10px] font-black text-[#161514]/70 uppercase tracking-wider">Logged Hours</h5>
+                    <p className="text-2xl font-black text-[#161514] font-heading tracking-tight mt-0.5">{totalLoggedHours}h</p>
                   </div>
                 </div>
 
-                <div className="bg-white rounded-[var(--radius-lg)] p-5 shadow-[0_8px_24px_rgba(31,36,48,0.04)] flex items-center gap-4">
-                  <div className="h-10 w-10 rounded-full bg-mint-600/10 flex items-center justify-center text-mint-600">
-                    <Trophy className="h-5 w-5" />
+                <div className="bg-white rounded-3xl p-5 border-[2.5px] border-[#161514] shadow-[3.5px_3.5px_0px_0px_#161514] flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-2xl bg-[#CEF431] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center text-[#161514] shrink-0">
+                    <Trophy className="h-6 w-6 stroke-[2.5]" />
                   </div>
                   <div>
-                    <h5 className="text-[10px] font-bold text-navy-600 uppercase tracking-wider">Mastery Rate</h5>
-                    <p className="text-xl font-extrabold text-navy-900 mt-0.5">{masteryRate}%</p>
+                    <h5 className="text-[10px] font-black text-[#161514]/70 uppercase tracking-wider">Mastery Rate</h5>
+                    <p className="text-2xl font-black text-[#161514] font-heading tracking-tight mt-0.5">{masteryRate}%</p>
                   </div>
                 </div>
 
-                <div className="bg-white rounded-[var(--radius-lg)] p-5 shadow-[0_8px_24px_rgba(31,36,48,0.04)] flex items-center gap-4">
-                  <div className="h-10 w-10 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500">
-                    <AlertCircle className="h-5 w-5" />
+                <div className="bg-white rounded-3xl p-5 border-[2.5px] border-[#161514] shadow-[3.5px_3.5px_0px_0px_#161514] flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-2xl bg-[#FCA5A5] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center text-[#161514] shrink-0">
+                    <AlertCircle className="h-6 w-6 stroke-[2.5]" />
                   </div>
                   <div>
-                    <h5 className="text-[10px] font-bold text-navy-600 uppercase tracking-wider">Revision Due</h5>
-                    <p className="text-xl font-extrabold text-navy-900 mt-0.5">{revisionDueCount} topic{revisionDueCount !== 1 ? "s" : ""}</p>
+                    <h5 className="text-[10px] font-black text-[#161514]/70 uppercase tracking-wider">Revision Due</h5>
+                    <p className="text-2xl font-black text-[#161514] font-heading tracking-tight mt-0.5">{revisionDueCount} topic{revisionDueCount !== 1 ? "s" : ""}</p>
                   </div>
                 </div>
               </div>
 
               {/* Bar Chart Logged study hours */}
-              <div className="bg-white rounded-[var(--radius-lg)] p-6 shadow-[0_8px_24px_rgba(31,36,48,0.06)] space-y-4">
-                <h3 className="font-bold text-sm text-navy-900 uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
-                  Daily Study Hours Trend
+              <div className="bg-white rounded-3xl p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
+                <h3 className="font-black text-sm text-[#161514] uppercase tracking-wider font-heading flex items-center gap-2">
+                  <BarChart2 className="h-4 w-4 stroke-[2.5]" /> Daily Study Hours Trend
                 </h3>
                 {sessions.length === 0 ? (
                   <EmptyState
@@ -528,12 +542,12 @@ function StudyPageContent() {
                   <div className="h-64 w-full">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={barChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                        <XAxis dataKey="name" stroke="#565C6B" fontSize={11} fontWeight={600} tickLine={false} axisLine={false} />
-                        <YAxis stroke="#565C6B" fontSize={11} fontWeight={600} tickLine={false} axisLine={false} tickFormatter={(v) => `${v}h`} />
-                        <Tooltip formatter={(v) => [`${v}h`, "Logged study hours"]} contentStyle={{ borderRadius: "12px", fontFamily: "var(--font-sans)", fontSize: "12px" }} />
+                        <XAxis dataKey="name" stroke="#161514" fontSize={11} fontWeight={800} tickLine={false} axisLine={false} />
+                        <YAxis stroke="#161514" fontSize={11} fontWeight={800} tickLine={false} axisLine={false} tickFormatter={(v) => `${v}h`} />
+                        <Tooltip formatter={(v) => [`${v}h`, "Logged study hours"]} contentStyle={{ borderRadius: "12px", border: "2px solid #161514", boxShadow: "2px 2px 0px 0px #161514", fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: "12px" }} />
                         <Bar dataKey="hours" radius={[8, 8, 0, 0]}>
                           {barChartData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.hours >= 3.0 ? "#7CC3A2" : entry.hours >= 1.5 ? "#F5B942" : "#F2A6A0"} />
+                            <Cell key={`cell-${index}`} fill={entry.hours >= 3.0 ? "#03D26F" : entry.hours >= 1.5 ? "#FACC15" : "#FB923C"} stroke="#161514" strokeWidth={1.5} />
                           ))}
                         </Bar>
                       </BarChart>
@@ -548,17 +562,16 @@ function StudyPageContent() {
           <TabsContent id="mock-tests" value="tests" className="scroll-mt-24">
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h3 className="font-bold text-xs uppercase tracking-wider text-navy-600" style={{ fontFamily: "var(--font-heading)" }}>
-                  Exam Mock Scores
+                <h3 className="font-black text-sm uppercase tracking-wider text-[#161514] font-heading flex items-center gap-2">
+                  <FileText className="h-4 w-4 stroke-[2.5]" /> Exam Mock Scores
                 </h3>
-                <Button
+                <button
+                  type="button"
                   onClick={() => setIsTestChoiceOpen(true)}
-                  variant="outline"
-                  size="sm"
-                  className="rounded-full border-input text-navy-900 bg-white cursor-pointer"
+                  className="bg-[#CEF431] hover:bg-[#b8dd24] text-[#161514] font-black text-xs uppercase py-2 px-4 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center gap-1.5"
                 >
-                  <Plus className="h-3.5 w-3.5 mr-1" /> Log Test
-                </Button>
+                  <Plus className="h-4 w-4 stroke-[3]" /> Log Test
+                </button>
               </div>
 
               {tests.length === 0 ? (
@@ -574,34 +587,34 @@ function StudyPageContent() {
               ) : (
                 <div className="space-y-4">
                   {/* Scores line chart */}
-                  <div className="bg-white rounded-[var(--radius-lg)] p-6 shadow-[0_8px_24px_rgba(31,36,48,0.06)] h-64 w-full">
+                  <div className="bg-white rounded-3xl p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] h-64 w-full">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={testTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                        <XAxis dataKey="name" stroke="#565C6B" fontSize={11} fontWeight={600} tickLine={false} axisLine={false} />
-                        <YAxis stroke="#565C6B" fontSize={11} fontWeight={600} tickLine={false} axisLine={false} tickFormatter={(v) => `${v}%`} domain={[0, 100]} />
-                        <Tooltip formatter={(v) => [`${v}%`, "Test score"]} contentStyle={{ borderRadius: "12px", fontFamily: "var(--font-sans)", fontSize: "12px" }} />
-                        <Line type="monotone" dataKey="percentage" stroke="#F5B942" strokeWidth={3} activeDot={{ r: 6 }} />
+                        <XAxis dataKey="name" stroke="#161514" fontSize={11} fontWeight={800} tickLine={false} axisLine={false} />
+                        <YAxis stroke="#161514" fontSize={11} fontWeight={800} tickLine={false} axisLine={false} tickFormatter={(v) => `${v}%`} domain={[0, 100]} />
+                        <Tooltip formatter={(v) => [`${v}%`, "Test score"]} contentStyle={{ borderRadius: "12px", border: "2px solid #161514", boxShadow: "2px 2px 0px 0px #161514", fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: "12px" }} />
+                        <Line type="monotone" dataKey="percentage" stroke="#C084FC" strokeWidth={3.5} activeDot={{ r: 6, stroke: "#161514", strokeWidth: 2 }} />
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
 
                   {/* List of tests */}
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {tests.map((test) => {
                       const scorePercentage = test.totalScore > 0 ? Math.round((test.score / test.totalScore) * 100) : 0;
                       return (
                         <div
                           key={test.id}
-                          className="bg-white rounded-[var(--radius-md)] p-4 shadow-[0_4px_12px_rgba(31,36,48,0.02)] flex items-center justify-between border"
+                          className="bg-white rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex items-center justify-between hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all"
                         >
                           <div>
-                            <h4 className="font-bold text-sm text-navy-900">{test.name}</h4>
-                            <p className="text-[10px] font-semibold text-navy-600 mt-0.5">{test.date}</p>
+                            <h4 className="font-black text-sm text-[#161514] font-heading">{test.name}</h4>
+                            <p className="text-[10px] font-bold text-[#161514]/70 uppercase tracking-wider mt-0.5">{test.date}</p>
                           </div>
                           <div className="flex items-center gap-4 shrink-0">
                             <div className="text-right">
-                              <span className="text-base font-extrabold text-navy-900">{test.score}/{test.totalScore}</span>
-                              <p className="text-[10px] font-bold text-mint-600 uppercase mt-0.5">{scorePercentage}% Score</p>
+                              <span className="text-base font-black text-[#161514] font-heading">{test.score}/{test.totalScore}</span>
+                              <p className="text-[10px] font-black text-[#161514] px-2 py-0.5 rounded-lg border-2 border-[#161514] bg-[#A7F3D0] uppercase tracking-wider mt-0.5">{scorePercentage}% Score</p>
                             </div>
                             <div className="flex items-center gap-1.5">
                               <button
@@ -612,17 +625,17 @@ function StudyPageContent() {
                                   setEditTestScore(test.score);
                                   setEditTestTotalScore(test.totalScore);
                                 }}
-                                className="text-navy-600 hover:text-navy-900 transition-colors p-1 cursor-pointer outline-none border-none bg-transparent"
+                                className="bg-[#FFFDF8] hover:bg-[#FFF9EA] text-[#161514] p-1.5 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
                                 title="Edit test score"
                               >
-                                <Edit3 className="h-3.5 w-3.5" />
+                                <Edit3 className="h-3.5 w-3.5 stroke-[2.5]" />
                               </button>
                               <button
                                 onClick={() => setDeleteTestId(test.id)}
-                                className="text-red-500 hover:text-red-600 transition-colors p-1 cursor-pointer outline-none border-none bg-transparent"
+                                className="bg-[#FEE2E2] hover:bg-[#FCA5A5] text-[#991B1B] p-1.5 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
                                 title="Delete test log"
                               >
-                                <Trash2 className="h-3.5 w-3.5" />
+                                <Trash2 className="h-3.5 w-3.5 stroke-[2.5]" />
                               </button>
                             </div>
                           </div>
@@ -676,7 +689,7 @@ function StudyPageContent() {
       >
         <form onSubmit={handleAddSubject} className="space-y-4">
           <div className="space-y-1">
-            <label htmlFor="subj-name" className="text-xs font-bold uppercase tracking-wider text-navy-600">
+            <label htmlFor="subj-name" className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">
               Subject Name
             </label>
             <input
@@ -686,48 +699,48 @@ function StudyPageContent() {
               onChange={(e) => setSubjectName(e.target.value)}
               placeholder="e.g. Physics, Chemistry, Japanese N3..."
               required
-              className="w-full rounded-[var(--radius-sm)] border border-input bg-cream-bg/50 py-2.5 px-3 text-sm outline-none focus:ring-2 focus:ring-amber-500 transition-all text-navy-900"
+              className="w-full rounded-xl border-2 border-[#161514] bg-[#FFFDF8] py-2.5 px-3.5 text-xs font-black text-[#161514] outline-none focus:bg-[#FFF9EA] shadow-[2px_2px_0px_0px_#161514] transition-all"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-bold uppercase tracking-wider text-navy-600">
+            <label className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">
               Select Color
             </label>
-            <div className="flex gap-3">
+            <div className="flex gap-2.5 flex-wrap">
               {["orange", "amber", "mint", "lavender", "coral", "indigo"].map((c) => {
                 const isSelected = subjectColor === c;
                 const bgClass =
                   c === "amber"
-                    ? "bg-amber-500"
+                    ? "bg-[#FDE047]"
                     : c === "orange"
-                    ? "bg-orange-500"
+                    ? "bg-[#FB923C]"
                     : c === "mint"
-                    ? "bg-mint-600"
+                    ? "bg-[#03D26F]"
                     : c === "lavender"
-                    ? "bg-lavender-400"
+                    ? "bg-[#C084FC]"
                     : c === "coral"
-                    ? "bg-coral-400"
-                    : "bg-indigo-500";
+                    ? "bg-[#F472B6]"
+                    : "bg-[#818CF8]";
                 return (
                   <button
                     key={c}
                     type="button"
                     onClick={() => setSubjectColor(c)}
-                    className={`h-8 w-8 rounded-full transition-all border-2 border-transparent cursor-pointer ${bgClass} ${isSelected && "border-navy-900 scale-110"}`}
+                    className={`h-9 w-9 rounded-xl transition-all border-2 border-[#161514] cursor-pointer shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 ${bgClass} ${isSelected ? "ring-2 ring-offset-2 ring-[#161514] scale-110" : ""}`}
                   />
                 );
               })}
             </div>
           </div>
 
-          <Button
+          <button
             type="submit"
             disabled={addSubjectMutation.isPending}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-full py-2.5 shadow-sm border-none cursor-pointer"
+            className="w-full bg-[#03D26F] hover:bg-[#02B75F] text-[#161514] font-black text-xs uppercase py-3 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer tracking-wider"
           >
-            {addSubjectMutation.isPending ? "Adding…" : "Create Subject"}
-          </Button>
+            {addSubjectMutation.isPending ? "Adding…" : "Create Subject 📚"}
+          </button>
         </form>
       </ResponsiveFormContainer>
 
@@ -740,7 +753,7 @@ function StudyPageContent() {
       >
         <form onSubmit={handleAddTest} className="space-y-4">
           <div className="space-y-1">
-            <label htmlFor="test-title" className="text-xs font-bold uppercase tracking-wider text-navy-600">
+            <label htmlFor="test-title" className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">
               Test Name / Title
             </label>
             <input
@@ -750,13 +763,13 @@ function StudyPageContent() {
               onChange={(e) => setTestName(e.target.value)}
               placeholder="e.g. Mock Test 1, Unit Test A..."
               required
-              className="w-full rounded-[var(--radius-sm)] border border-input bg-cream-bg/50 py-2.5 px-3 text-sm outline-none focus:ring-2 focus:ring-orange-500 transition-all text-navy-900"
+              className="w-full rounded-xl border-2 border-[#161514] bg-[#FFFDF8] py-2.5 px-3.5 text-xs font-black text-[#161514] outline-none focus:bg-[#FFF9EA] shadow-[2px_2px_0px_0px_#161514] transition-all"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label htmlFor="test-score" className="text-xs font-bold uppercase tracking-wider text-navy-600">
+              <label htmlFor="test-score" className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">
                 Your Score
               </label>
               <input
@@ -766,11 +779,11 @@ function StudyPageContent() {
                 onChange={(e) => setTestScore(Number(e.target.value))}
                 min={0}
                 required
-                className="w-full rounded-[var(--radius-sm)] border border-input bg-cream-bg/50 py-2.5 px-3 text-sm outline-none focus:ring-2 focus:ring-orange-500 transition-all text-navy-900"
+                className="w-full rounded-xl border-2 border-[#161514] bg-[#FFFDF8] py-2.5 px-3.5 text-xs font-black text-[#161514] outline-none focus:bg-[#FFF9EA] shadow-[2px_2px_0px_0px_#161514] transition-all"
               />
             </div>
             <div className="space-y-1">
-              <label htmlFor="test-total" className="text-xs font-bold uppercase tracking-wider text-navy-600">
+              <label htmlFor="test-total" className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">
                 Total Score
               </label>
               <input
@@ -780,13 +793,13 @@ function StudyPageContent() {
                 onChange={(e) => setTestTotalScore(Number(e.target.value))}
                 min={1}
                 required
-                className="w-full rounded-[var(--radius-sm)] border border-input bg-cream-bg/50 py-2.5 px-3 text-sm outline-none focus:ring-2 focus:ring-orange-500 transition-all text-navy-900"
+                className="w-full rounded-xl border-2 border-[#161514] bg-[#FFFDF8] py-2.5 px-3.5 text-xs font-black text-[#161514] outline-none focus:bg-[#FFF9EA] shadow-[2px_2px_0px_0px_#161514] transition-all"
               />
             </div>
           </div>
 
           <div className="space-y-1">
-            <label htmlFor="test-date" className="text-xs font-bold uppercase tracking-wider text-navy-600">
+            <label htmlFor="test-date" className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">
               Test Date
             </label>
             <input
@@ -795,17 +808,17 @@ function StudyPageContent() {
               value={testDate}
               onChange={(e) => setTestDate(e.target.value)}
               required
-              className="w-full rounded-[var(--radius-sm)] border border-input bg-cream-bg/50 py-2.5 px-3 text-sm outline-none focus:ring-2 focus:ring-orange-500 transition-all text-navy-900"
+              className="w-full rounded-xl border-2 border-[#161514] bg-[#FFFDF8] py-2.5 px-3.5 text-xs font-black text-[#161514] outline-none focus:bg-[#FFF9EA] shadow-[2px_2px_0px_0px_#161514] transition-all"
             />
           </div>
 
-          <Button
+          <button
             type="submit"
             disabled={addTestMutation.isPending}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-full py-2.5 shadow-sm border-none cursor-pointer"
+            className="w-full bg-[#03D26F] hover:bg-[#02B75F] text-[#161514] font-black text-xs uppercase py-3 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer tracking-wider"
           >
-            {addTestMutation.isPending ? "Logging…" : "Log Score"}
-          </Button>
+            {addTestMutation.isPending ? "Logging…" : "Log Score 📝"}
+          </button>
         </form>
       </ResponsiveFormContainer>
 
@@ -820,7 +833,7 @@ function StudyPageContent() {
       >
         <form onSubmit={handleUpdateSubject} className="space-y-4">
           <div className="space-y-1">
-            <label htmlFor="edit-subject-name" className="text-xs font-bold uppercase tracking-wider text-navy-600">
+            <label htmlFor="edit-subject-name" className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">
               Subject Name
             </label>
             <input
@@ -830,46 +843,46 @@ function StudyPageContent() {
               onChange={(e) => setEditSubjectName(e.target.value)}
               placeholder="e.g. Mathematics, Biology..."
               required
-              className="w-full rounded-[var(--radius-sm)] border border-input bg-cream-bg/50 py-2.5 px-3 text-sm outline-none focus:ring-2 focus:ring-orange-500 transition-all text-navy-900"
+              className="w-full rounded-xl border-2 border-[#161514] bg-[#FFFDF8] py-2.5 px-3.5 text-xs font-black text-[#161514] outline-none focus:bg-[#FFF9EA] shadow-[2px_2px_0px_0px_#161514] transition-all"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-bold uppercase tracking-wider text-navy-600 block">Theme Color</label>
-            <div className="flex gap-3">
+            <label className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">Theme Color</label>
+            <div className="flex gap-2.5 flex-wrap">
               {["orange", "amber", "mint", "lavender", "coral", "indigo"].map((c) => {
                 const isSelected = editSubjectColor === c;
                 const bgClass =
                   c === "amber"
-                    ? "bg-amber-500"
+                    ? "bg-[#FDE047]"
                     : c === "orange"
-                    ? "bg-orange-500"
+                    ? "bg-[#FB923C]"
                     : c === "mint"
-                    ? "bg-mint-600"
+                    ? "bg-[#03D26F]"
                     : c === "lavender"
-                    ? "bg-lavender-400"
+                    ? "bg-[#C084FC]"
                     : c === "coral"
-                    ? "bg-coral-400"
-                    : "bg-indigo-500";
+                    ? "bg-[#F472B6]"
+                    : "bg-[#818CF8]";
                 return (
                   <button
                     key={c}
                     type="button"
                     onClick={() => setEditSubjectColor(c)}
-                    className={`h-8 w-8 rounded-full transition-all border-2 border-transparent cursor-pointer ${bgClass} ${isSelected && "border-navy-900 scale-110"}`}
+                    className={`h-9 w-9 rounded-xl transition-all border-2 border-[#161514] cursor-pointer shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 ${bgClass} ${isSelected ? "ring-2 ring-offset-2 ring-[#161514] scale-110" : ""}`}
                   />
                 );
               })}
             </div>
           </div>
 
-          <Button
+          <button
             type="submit"
             disabled={updateSubjectMutation.isPending}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-full py-2.5 shadow-sm border-none cursor-pointer"
+            className="w-full bg-[#03D26F] hover:bg-[#02B75F] text-[#161514] font-black text-xs uppercase py-3 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer tracking-wider"
           >
-            {updateSubjectMutation.isPending ? "Updating…" : "Save Changes"}
-          </Button>
+            {updateSubjectMutation.isPending ? "Updating…" : "Save Changes 📝"}
+          </button>
         </form>
       </ResponsiveFormContainer>
 
@@ -904,7 +917,7 @@ function StudyPageContent() {
       >
         <form onSubmit={handleUpdateTest} className="space-y-4">
           <div className="space-y-1">
-            <label htmlFor="edit-test-title" className="text-xs font-bold uppercase tracking-wider text-navy-600">
+            <label htmlFor="edit-test-title" className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">
               Test Name / Title
             </label>
             <input
@@ -914,13 +927,13 @@ function StudyPageContent() {
               onChange={(e) => setEditTestName(e.target.value)}
               placeholder="e.g. Mock Test 1, Unit Test A..."
               required
-              className="w-full rounded-[var(--radius-sm)] border border-input bg-cream-bg/50 py-2.5 px-3 text-sm outline-none text-navy-900"
+              className="w-full rounded-xl border-2 border-[#161514] bg-[#FFFDF8] py-2.5 px-3.5 text-xs font-black text-[#161514] outline-none focus:bg-[#FFF9EA] shadow-[2px_2px_0px_0px_#161514] transition-all"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label htmlFor="edit-test-score" className="text-xs font-bold uppercase tracking-wider text-navy-600">
+              <label htmlFor="edit-test-score" className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">
                 Your Score
               </label>
               <input
@@ -930,11 +943,11 @@ function StudyPageContent() {
                 onChange={(e) => setEditTestScore(Number(e.target.value))}
                 min={0}
                 required
-                className="w-full rounded-[var(--radius-sm)] border border-input bg-cream-bg/50 py-2.5 px-3 text-sm outline-none text-navy-900"
+                className="w-full rounded-xl border-2 border-[#161514] bg-[#FFFDF8] py-2.5 px-3.5 text-xs font-black text-[#161514] outline-none focus:bg-[#FFF9EA] shadow-[2px_2px_0px_0px_#161514] transition-all"
               />
             </div>
             <div className="space-y-1">
-              <label htmlFor="edit-test-total" className="text-xs font-bold uppercase tracking-wider text-navy-600">
+              <label htmlFor="edit-test-total" className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">
                 Total Score
               </label>
               <input
@@ -944,13 +957,13 @@ function StudyPageContent() {
                 onChange={(e) => setEditTestTotalScore(Number(e.target.value))}
                 min={1}
                 required
-                className="w-full rounded-[var(--radius-sm)] border border-input bg-cream-bg/50 py-2.5 px-3 text-sm outline-none text-navy-900"
+                className="w-full rounded-xl border-2 border-[#161514] bg-[#FFFDF8] py-2.5 px-3.5 text-xs font-black text-[#161514] outline-none focus:bg-[#FFF9EA] shadow-[2px_2px_0px_0px_#161514] transition-all"
               />
             </div>
           </div>
 
           <div className="space-y-1">
-            <label htmlFor="edit-test-date" className="text-xs font-bold uppercase tracking-wider text-navy-600">
+            <label htmlFor="edit-test-date" className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">
               Test Date
             </label>
             <input
@@ -959,17 +972,17 @@ function StudyPageContent() {
               value={editTestDate}
               onChange={(e) => setEditTestDate(e.target.value)}
               required
-              className="w-full rounded-[var(--radius-sm)] border border-input bg-cream-bg/50 py-2.5 px-3 text-sm outline-none text-navy-900"
+              className="w-full rounded-xl border-2 border-[#161514] bg-[#FFFDF8] py-2.5 px-3.5 text-xs font-black text-[#161514] outline-none focus:bg-[#FFF9EA] shadow-[2px_2px_0px_0px_#161514] transition-all"
             />
           </div>
 
-          <Button
+          <button
             type="submit"
             disabled={updateTestMutation.isPending}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-full py-2.5 shadow-sm border-none cursor-pointer"
+            className="w-full bg-[#03D26F] hover:bg-[#02B75F] text-[#161514] font-black text-xs uppercase py-3 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer tracking-wider"
           >
-            {updateTestMutation.isPending ? "Saving…" : "Save Changes"}
-          </Button>
+            {updateTestMutation.isPending ? "Saving…" : "Save Changes 📝"}
+          </button>
         </form>
       </ResponsiveFormContainer>
 

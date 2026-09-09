@@ -68,27 +68,27 @@ export function HabitCard({
     <div
       onClick={onClick}
       className={cn(
-        "bg-white border-2 border-navy-950 rounded-2xl p-4 flex items-center justify-between shadow-[3px_3px_0px_0px_rgba(31,36,48,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_rgba(31,36,48,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_rgba(31,36,48,1)] transition-all cursor-pointer select-none",
-        isCompletedToday && "bg-emerald-50/50"
+        "bg-white border-[2.5px] border-[#161514] rounded-2xl p-4 flex items-center justify-between shadow-[4px_4px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_0px_#161514] transition-all cursor-pointer select-none",
+        isCompletedToday && "bg-[#ECFDF5]/80"
       )}
     >
       <div className="flex items-center gap-3 flex-1 min-w-0">
         {/* Habit Icon */}
-        <div className={cn("h-10 w-10 rounded-xl border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] flex items-center justify-center shrink-0 font-black", colors.bg, colors.text)}>
+        <div className={cn("h-11 w-11 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center shrink-0 font-black", colors.bg, colors.text)}>
           <IconComponent className="h-5 w-5 stroke-[2.5]" />
         </div>
 
         {/* Title & Streak Info */}
         <div className="flex-1 min-w-0">
-          <h4 className={cn("font-black text-sm text-navy-950 truncate leading-snug", isCompletedToday && "line-through opacity-60")}>
+          <h4 className={cn("font-heading font-black text-sm text-[#161514] truncate leading-snug", isCompletedToday && "line-through opacity-55")}>
             {habit.title}
           </h4>
           <div className="flex items-center gap-2 mt-1">
-            <span className="text-[9px] font-black text-navy-950 uppercase tracking-widest bg-cream-bg px-2 py-0.5 rounded-lg border border-navy-950/40">
+            <span className="text-[9px] font-heading font-black text-[#161514] uppercase tracking-wider bg-white px-2 py-0.5 rounded-full border border-[#161514]">
               {habit.frequency?.type === "daily" ? "Daily" : habit.frequency?.type === "weekly" ? "Weekly" : "Custom"}
             </span>
             {streak && streak.currentStreak > 0 && (
-              <div className="flex items-center gap-0.5 text-amber-950 bg-amber-200 border border-navy-950 px-2 py-0.5 rounded-lg font-black text-[9px]">
+              <div className="flex items-center gap-1 text-[#161514] bg-amber-300 border border-[#161514] px-2.5 py-0.5 rounded-full font-heading font-black text-[9px] shadow-[1px_1px_0px_0px_#161514]">
                 <Flame className="h-3 w-3 fill-amber-500 text-amber-950" />
                 <span>{streak.currentStreak} day streak</span>
               </div>
@@ -106,7 +106,7 @@ export function HabitCard({
               onEdit();
             }}
             type="button"
-            className="p-1.5 rounded-xl border-2 border-navy-950 bg-white hover:bg-amber-100 text-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] transition-colors cursor-pointer"
+            className="p-2 rounded-xl border-2 border-[#161514] bg-white hover:bg-amber-200 text-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
             title="Edit Habit"
           >
             <Edit3 className="h-4 w-4 stroke-[2.5]" />
@@ -121,7 +121,7 @@ export function HabitCard({
               onDelete();
             }}
             type="button"
-            className="p-1.5 rounded-xl border-2 border-navy-950 bg-white hover:bg-rose-100 text-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] transition-colors cursor-pointer"
+            className="p-2 rounded-xl border-2 border-[#161514] bg-white hover:bg-rose-200 text-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
             title="Delete Habit"
           >
             <Trash2 className="h-4 w-4 stroke-[2.5]" />
@@ -136,14 +136,15 @@ export function HabitCard({
           }}
           type="button"
           className={cn(
-            "h-9 w-9 rounded-xl border-2 border-navy-950 flex items-center justify-center transition-all cursor-pointer shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[0px_0px_0px_0px_rgba(31,36,48,1)] ml-1",
-            isCompletedToday ? "bg-emerald-400 text-navy-950" : "bg-white text-navy-950 hover:bg-cream-bg"
+            "h-10 w-10 rounded-xl border-[2.5px] border-[#161514] flex items-center justify-center transition-all cursor-pointer shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[4px_4px_0px_0px_#161514] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none ml-1",
+            isCompletedToday ? "bg-[#03D26F] text-[#161514]" : "bg-white text-[#161514] hover:bg-[#FFF9EA]"
           )}
+          title={isCompletedToday ? "Mark Incomplete" : "Mark Complete"}
         >
           {isCompletedToday ? (
-            <CheckCircle className="h-5 w-5 fill-navy-950 text-white" />
+            <CheckCircle className="h-6 w-6 fill-[#161514] text-white" />
           ) : (
-            <Circle className="h-5 w-5 stroke-[2.5]" />
+            <Circle className="h-6 w-6 stroke-[2.5]" />
           )}
         </button>
       </div>

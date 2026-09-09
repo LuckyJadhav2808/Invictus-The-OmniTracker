@@ -758,20 +758,20 @@ function MoneyPageContent() {
     <div className="min-h-screen bg-cream-bg p-4 md:p-8 space-y-6">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* 💰 EXECUTIVE FINANCIAL COMMAND HEADER */}
-        <div className="bg-[#FAF8F5] rounded-3xl p-3.5 sm:p-5 md:p-6 border-2.5 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] space-y-4">
+        <div className="bg-[#FAF8F5] rounded-3xl p-3.5 sm:p-5 md:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4 text-[#161514]">
           {/* Top Bar: Title, Month Stepper & Primary CTA */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b-2 border-navy-950/10 pb-3.5">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b-[2.5px] border-[#161514]/15 pb-3.5">
             <div className="flex items-center gap-2.5">
-              <div className="h-10 w-10 rounded-2xl bg-[#CEF431] border-2 border-navy-950 flex items-center justify-center text-navy-950 font-black text-lg shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] shrink-0">
+              <div className="h-10 w-10 rounded-2xl bg-[#CEF431] border-2 border-[#161514] flex items-center justify-center text-[#161514] font-black text-lg shadow-[2px_2px_0px_0px_#161514] shrink-0">
                 💰
               </div>
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h2 className="font-black text-sm sm:text-base uppercase tracking-wider text-navy-950" style={{ fontFamily: "var(--font-heading)" }}>
+                  <h2 className="font-black text-sm sm:text-base uppercase tracking-wider text-[#161514]" style={{ fontFamily: "var(--font-heading)" }}>
                     Money & Ledger Space
                   </h2>
                 </div>
-                <p className="text-[10px] text-navy-700 font-bold mt-0.5">
+                <p className="text-[10px] text-[#161514]/70 font-bold mt-0.5">
                   Track daily liquidity, stay within budget & build cumulative wealth
                 </p>
               </div>
@@ -784,7 +784,7 @@ function MoneyPageContent() {
                 <button
                   type="button"
                   onClick={handlePrevMonth}
-                  className="p-2 sm:p-2.5 rounded-xl bg-white hover:bg-[#CEF431] text-[#161514] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all shrink-0"
+                  className="p-2 sm:p-2.5 rounded-xl bg-white hover:bg-[#CEF431] text-[#161514] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all shrink-0"
                   title="Previous Month"
                 >
                   <ChevronLeft className="h-4 w-4 stroke-[3]" />
@@ -802,7 +802,7 @@ function MoneyPageContent() {
                 <button
                   type="button"
                   onClick={handleNextMonth}
-                  className="p-2 sm:p-2.5 rounded-xl bg-white hover:bg-[#CEF431] text-[#161514] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all shrink-0"
+                  className="p-2 sm:p-2.5 rounded-xl bg-white hover:bg-[#CEF431] text-[#161514] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all shrink-0"
                   title="Next Month"
                 >
                   <ChevronRight className="h-4 w-4 stroke-[3]" />
@@ -814,7 +814,7 @@ function MoneyPageContent() {
                 <button
                   type="button"
                   onClick={() => setIsBulkModalOpen(true)}
-                  className="w-full sm:w-auto px-2.5 sm:px-3.5 py-2 sm:py-2.5 rounded-2xl bg-[#CEF431] hover:bg-lime-400 text-navy-950 text-[11px] sm:text-xs font-black uppercase tracking-tight sm:tracking-wider border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center justify-center gap-1.5 whitespace-nowrap"
+                  className="w-full sm:w-auto px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-[#CEF431] hover:bg-[#b8dd22] text-[#161514] text-[11px] sm:text-xs font-black uppercase tracking-tight sm:tracking-wider border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center justify-center gap-1.5 whitespace-nowrap"
                   title="Bulk Expense Logger & Offline OCR Scanner"
                 >
                   <Camera className="h-3.5 w-3.5 stroke-[2.5]" />
@@ -830,7 +830,7 @@ function MoneyPageContent() {
                     setTxCategoryId(categories.filter((c) => c.type === txType)[0]?.id || "");
                     setIsAddTxOpen(true);
                   }}
-                  className="w-full sm:w-auto px-2.5 sm:px-3.5 py-2 sm:py-2.5 rounded-2xl bg-amber-400 hover:bg-amber-500 text-navy-950 text-[11px] sm:text-xs font-black uppercase tracking-tight sm:tracking-wider border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center justify-center gap-1.5 whitespace-nowrap"
+                  className="w-full sm:w-auto px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-[#161514] text-[11px] sm:text-xs font-black uppercase tracking-tight sm:tracking-wider border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center justify-center gap-1.5 whitespace-nowrap"
                 >
                   <Plus className="h-3.5 w-3.5 stroke-[3]" />
                   <span>Log Transaction</span>
@@ -840,20 +840,20 @@ function MoneyPageContent() {
           </div>
 
           {/* Centerpiece: Safe To Spend Hero Gauge & Intelligent Burn Pace Indicator */}
-          <div className="bg-white rounded-2xl p-4 sm:p-5 border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="bg-white rounded-2xl p-4 sm:p-5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[10px] font-black uppercase tracking-widest text-navy-600">
+                <span className="text-[10px] font-black uppercase tracking-widest text-[#161514]/70">
                   Safe To Spend ({budgetStats.targetMonthLabel.split(" ")[0]})
                 </span>
                 {budgetStats.rolloverSurplus > 0 && (
-                  <span className="text-[9px] font-black bg-[#03D26F] text-[#161514] px-1.5 py-0.5 rounded-full border border-[#161514] shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]">
+                  <span className="text-[9px] font-black bg-[#03D26F] text-[#161514] px-1.5 py-0.5 rounded-full border border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
                     +{currencySymbol}{budgetStats.rolloverSurplus.toLocaleString()} Rolled
                   </span>
                 )}
                 {/* 🧭 FEATURE 3: INTELLIGENT BURN PACE BADGE */}
                 <span className={cn(
-                  "text-[9px] font-black uppercase px-2 py-0.5 rounded-full border shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] flex items-center gap-1",
+                  "text-[9px] font-black uppercase px-2 py-0.5 rounded-full border-2 shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center gap-1",
                   budgetStats.burnPaceStatus === "fast"
                     ? "bg-rose-100 text-rose-950 border-[#161514]"
                     : budgetStats.burnPaceStatus === "frugal"
@@ -863,25 +863,25 @@ function MoneyPageContent() {
                   {budgetStats.burnPaceStatus === "fast" ? "⚠️ Fast Burn" : budgetStats.burnPaceStatus === "frugal" ? "🟢 Frugal Pace" : "✨ On Track"}
                 </span>
               </div>
-              <div className="text-3xl sm:text-4xl font-black text-navy-950 tracking-tight">
+              <div className="text-3xl sm:text-4xl font-black text-[#161514] tracking-tight" style={{ fontFamily: "var(--font-heading)" }}>
                 {currencySymbol}{budgetStats.remainingBudget.toLocaleString()}
               </div>
-              <p className="text-xs text-navy-700 font-bold">
+              <p className="text-xs text-[#161514]/75 font-bold">
                 {budgetStats.burnPaceMessage}
               </p>
             </div>
 
             {/* Quick Metrics Badge Group */}
             <div className="flex flex-wrap sm:flex-nowrap gap-2 sm:self-center">
-              <div className="bg-[#FAF8F5] px-3 py-2 rounded-xl border border-navy-950 text-left shrink-0 min-w-[110px]">
-                <span className="text-[9px] font-black uppercase text-navy-600 block">Total Pool</span>
-                <span className="text-sm font-black text-navy-950 block">
+              <div className="bg-[#FAF8F5] px-3 py-2 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-left shrink-0 min-w-[110px]">
+                <span className="text-[9px] font-black uppercase text-[#161514]/60 block">Total Pool</span>
+                <span className="text-sm font-black text-[#161514] block" style={{ fontFamily: "var(--font-heading)" }}>
                   {currencySymbol}{budgetStats.totalAvailableBudget.toLocaleString()}
                 </span>
               </div>
-              <div className="bg-[#FAF8F5] px-3 py-2 rounded-xl border border-navy-950 text-left shrink-0 min-w-[110px]">
+              <div className="bg-[#FAF8F5] px-3 py-2 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-left shrink-0 min-w-[110px]">
                 <span className="text-[9px] font-black uppercase text-rose-600 block">Spent</span>
-                <span className="text-sm font-black text-rose-600 block">
+                <span className="text-sm font-black text-rose-600 block" style={{ fontFamily: "var(--font-heading)" }}>
                   -{currencySymbol}{budgetStats.monthlyExpense.toLocaleString()}
                 </span>
               </div>
@@ -889,9 +889,9 @@ function MoneyPageContent() {
           </div>
 
           {/* Bottom Status Rail: Budget Allowance, Mode Split & Lifetime Vault */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-[11px] font-bold text-navy-800">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-[11px] font-bold text-[#161514]">
             {/* Allowance Pill with Edit Button */}
-            <div className="bg-white p-2.5 rounded-xl border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] flex items-center justify-between gap-2">
+            <div className="bg-white p-2.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-between gap-2">
               <span className="truncate">
                 🎯 <strong>{currencySymbol}{budgetStats.baseBudget.toLocaleString()}</strong> Base Budget
               </span>
@@ -901,26 +901,26 @@ function MoneyPageContent() {
                   setTempBudgetInput(String(baseBudget));
                   setIsBudgetModalOpen(true);
                 }}
-                className="text-[9px] font-black uppercase px-2 py-0.5 rounded-lg bg-amber-400 hover:bg-amber-500 border border-navy-950 cursor-pointer shrink-0"
+                className="text-[9px] font-black uppercase px-2 py-0.5 rounded-lg bg-amber-400 hover:bg-amber-300 border border-[#161514] shadow-[1px_1px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all shrink-0"
               >
                 Edit
               </button>
             </div>
 
             {/* Payment Mode Ratio Pill */}
-            <div className="bg-white p-2.5 rounded-xl border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] flex items-center justify-between gap-1 truncate">
+            <div className="bg-white p-2.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-between gap-1 truncate">
               <span>💳 Spends Split:</span>
-              <span className="font-black text-navy-950 text-[10px] shrink-0">
+              <span className="font-black text-[#161514] text-[10px] shrink-0">
                 📱 {currencySymbol}{budgetStats.onlineExpense.toLocaleString()} ({budgetStats.onlinePercentage}%) • 💵 {currencySymbol}{budgetStats.cashExpense.toLocaleString()} ({budgetStats.cashPercentage}%)
               </span>
             </div>
 
             {/* Lifetime Vault Pill */}
-            <div className="bg-white p-2.5 rounded-xl border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] flex items-center justify-between gap-1">
+            <div className="bg-white p-2.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-between gap-1">
               <span>🏦 Lifetime Vault:</span>
               <span className={cn(
-                "text-[10px] font-black px-1.5 py-0.5 rounded-md border",
-                totalBalance >= 0 ? "bg-[#03D26F]/20 text-emerald-950 border-[#161514]" : "bg-rose-100 text-rose-950 border-[#161514]"
+                "text-[10px] font-black px-1.5 py-0.5 rounded-md border border-[#161514]",
+                totalBalance >= 0 ? "bg-[#03D26F]/20 text-emerald-950" : "bg-rose-100 text-rose-950"
               )}>
                 {totalBalance < 0 ? `-${currencySymbol}${Math.abs(totalBalance).toLocaleString()}` : `+${currencySymbol}${totalBalance.toLocaleString()}`}
               </span>
@@ -934,31 +934,31 @@ function MoneyPageContent() {
         {/* Tab Controls */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="w-full overflow-x-auto no-scrollbar pb-1 mb-4">
-            <TabsList className="bg-[#FAF8F5] rounded-2xl p-1.5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] flex items-center gap-1.5 w-max min-w-full sm:min-w-0 sm:w-auto">
+            <TabsList className="bg-[#FAF8F5] rounded-2xl p-1.5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex items-center gap-1.5 w-max min-w-full sm:min-w-0 sm:w-auto">
               <TabsTrigger
                 value="ledger"
-                className="rounded-xl text-xs font-black py-2 px-3.5 sm:px-4 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
+                className="rounded-xl text-xs font-black py-2 px-3.5 sm:px-4 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[2px_2px_0px_0px_#161514] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0 cursor-pointer"
               >
                 <span>📒</span>
                 <span>Daily Ledger</span>
               </TabsTrigger>
               <TabsTrigger
                 value="budgets"
-                className="rounded-xl text-xs font-black py-2 px-3.5 sm:px-4 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
+                className="rounded-xl text-xs font-black py-2 px-3.5 sm:px-4 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[2px_2px_0px_0px_#161514] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0 cursor-pointer"
               >
                 <span>🎯</span>
                 <span>Budget & Rollover</span>
               </TabsTrigger>
               <TabsTrigger
                 value="vault"
-                className="rounded-xl text-xs font-black py-2 px-3.5 sm:px-4 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
+                className="rounded-xl text-xs font-black py-2 px-3.5 sm:px-4 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[2px_2px_0px_0px_#161514] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0 cursor-pointer"
               >
                 <span>🐷</span>
                 <span>Goals & Debts</span>
               </TabsTrigger>
               <TabsTrigger
                 value="analytics"
-                className="rounded-xl text-xs font-black py-2 px-3.5 sm:px-4 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
+                className="rounded-xl text-xs font-black py-2 px-3.5 sm:px-4 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[2px_2px_0px_0px_#161514] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0 cursor-pointer"
               >
                 <span>📊</span>
                 <span>Analytics</span>
@@ -1024,24 +1024,24 @@ function MoneyPageContent() {
             />
 
             {/* Online (UPI) vs Cash Liquidity Split Card */}
-            <div className="bg-white rounded-3xl p-5 border-2.5 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-navy-950/10 pb-3">
+            <div className="bg-white rounded-3xl p-5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-[#161514]/15 pb-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="h-9 w-9 rounded-xl bg-[#03D26F] border-2 border-navy-950 flex items-center justify-center text-navy-950 font-black text-base shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] shrink-0">
+                  <div className="h-9 w-9 rounded-xl bg-[#03D26F] border-2 border-[#161514] flex items-center justify-center text-[#161514] font-black text-base shadow-[2px_2px_0px_0px_#161514] shrink-0">
                     💳
                   </div>
                   <div>
-                    <h4 className="font-black text-sm uppercase tracking-wider text-[#161514]">
+                    <h4 className="font-black text-sm uppercase tracking-wider text-[#161514]" style={{ fontFamily: "var(--font-heading)" }}>
                       Online (UPI) vs Cash Breakdown ({budgetStats.targetMonthLabel.split(" ")[0]})
                     </h4>
-                    <p className="text-[10px] text-navy-700 font-bold mt-0.5">
+                    <p className="text-[10px] text-[#161514]/70 font-bold mt-0.5">
                       Segregation of Digital Wallet / UPI spends vs Physical Cash expenses
                     </p>
                   </div>
                 </div>
 
                 {/* Quick Channel Filter Toggles */}
-                <div className="flex items-center bg-[#FAF8F5] rounded-xl border-2 border-navy-950 p-0.5 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] self-start sm:self-auto">
+                <div className="flex items-center bg-[#FAF8F5] rounded-xl border-2 border-[#161514] p-0.5 shadow-[2px_2px_0px_0px_#161514] self-start sm:self-auto">
                   {(["all", "online", "cash"] as const).map((ch) => (
                     <button
                       key={ch}
@@ -1050,8 +1050,8 @@ function MoneyPageContent() {
                       className={cn(
                         "text-[10px] font-black px-2.5 py-1 rounded-lg transition-all cursor-pointer",
                         paymentChannelFilter === ch
-                          ? "bg-[#CEF431] text-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]"
-                          : "text-navy-700 hover:bg-white"
+                          ? "bg-[#CEF431] text-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]"
+                          : "text-[#161514]/70 hover:bg-white"
                       )}
                     >
                       {ch === "all" ? "All Modes" : ch === "online" ? "📱 UPI/Online" : "💵 Cash"}
@@ -1065,7 +1065,7 @@ function MoneyPageContent() {
                 <div
                   onClick={() => setPaymentChannelFilter("online")}
                   className={cn(
-                    "p-4 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] cursor-pointer transition-all hover:-translate-y-0.5",
+                    "p-4 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] cursor-pointer transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
                     paymentChannelFilter === "online" ? "bg-[#03D26F]/20 ring-2 ring-[#03D26F]" : "bg-[#FAF8F5]"
                   )}
                 >
@@ -1074,14 +1074,14 @@ function MoneyPageContent() {
                       <Smartphone className="h-4 w-4 text-emerald-700 stroke-[2.5]" />
                       <span>Online / UPI Spends</span>
                     </span>
-                    <span className="text-xs font-black bg-[#03D26F] text-[#161514] px-2 py-0.5 rounded-full border border-[#161514]">
+                    <span className="text-xs font-black bg-[#03D26F] text-[#161514] px-2 py-0.5 rounded-full border border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
                       {budgetStats.onlinePercentage}%
                     </span>
                   </div>
-                  <span className="text-2xl font-black text-[#161514] block mt-2">
+                  <span className="text-2xl font-black text-[#161514] block mt-2" style={{ fontFamily: "var(--font-heading)" }}>
                     {currencySymbol}{budgetStats.onlineExpense.toLocaleString()}
                   </span>
-                  <span className="text-[10px] font-bold text-navy-600 block mt-1">
+                  <span className="text-[10px] font-bold text-[#161514]/60 block mt-1">
                     GPay, PhonePe, Cards & Bank Transfers
                   </span>
                 </div>
@@ -1090,7 +1090,7 @@ function MoneyPageContent() {
                 <div
                   onClick={() => setPaymentChannelFilter("cash")}
                   className={cn(
-                    "p-4 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] cursor-pointer transition-all hover:-translate-y-0.5",
+                    "p-4 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] cursor-pointer transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
                     paymentChannelFilter === "cash" ? "bg-amber-100 ring-2 ring-amber-500" : "bg-[#FAF8F5]"
                   )}
                 >
@@ -1099,21 +1099,21 @@ function MoneyPageContent() {
                       <Banknote className="h-4 w-4 text-amber-700 stroke-[2.5]" />
                       <span>Physical Cash Spends</span>
                     </span>
-                    <span className="text-xs font-black bg-amber-400 text-[#161514] px-2 py-0.5 rounded-full border border-[#161514]">
+                    <span className="text-xs font-black bg-amber-400 text-[#161514] px-2 py-0.5 rounded-full border border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
                       {budgetStats.cashPercentage}%
                     </span>
                   </div>
-                  <span className="text-2xl font-black text-[#161514] block mt-2">
+                  <span className="text-2xl font-black text-[#161514] block mt-2" style={{ fontFamily: "var(--font-heading)" }}>
                     {currencySymbol}{budgetStats.cashExpense.toLocaleString()}
                   </span>
-                  <span className="text-[10px] font-bold text-navy-600 block mt-1">
+                  <span className="text-[10px] font-bold text-[#161514]/60 block mt-1">
                     Pocket money, street vendors & cash tips
                   </span>
                 </div>
               </div>
 
               {/* Ratio bar */}
-              <div className="w-full bg-gray-100 h-3 rounded-full overflow-hidden border-2 border-navy-950 flex p-0.5 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]">
+              <div className="w-full bg-gray-100 h-3 rounded-full overflow-hidden border-2 border-[#161514] flex p-0.5 shadow-[1px_1px_0px_0px_#161514]">
                 <div
                   className="bg-[#03D26F] h-full rounded-l-full transition-all duration-500"
                   style={{ width: `${budgetStats.onlinePercentage}%` }}
@@ -1126,9 +1126,10 @@ function MoneyPageContent() {
                 />
               </div>
             </div>
+
             {/* Search, Month Selector & Multi-Filter Control Bar */}
             {transactions.length > 0 && (
-              <div className="bg-white rounded-2xl p-4 border-2 border-navy-950 shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] space-y-3">
+              <div className="bg-white rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-3">
                 {/* Top Row: Month Picker Stepper & Search */}
                 <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
                   {/* Monthly Stepper Selector */}
@@ -1136,7 +1137,7 @@ function MoneyPageContent() {
                     <button
                       type="button"
                       onClick={handlePrevMonth}
-                      className="p-2.5 rounded-2xl bg-white hover:bg-[#CEF431] text-[#161514] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all shrink-0"
+                      className="p-2.5 rounded-xl bg-white hover:bg-[#CEF431] text-[#161514] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all shrink-0"
                       title="Previous Month"
                     >
                       <ChevronLeft className="h-4 w-4 stroke-[3]" />
@@ -1154,7 +1155,7 @@ function MoneyPageContent() {
                     <button
                       type="button"
                       onClick={handleNextMonth}
-                      className="p-2.5 rounded-2xl bg-white hover:bg-[#CEF431] text-[#161514] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all shrink-0"
+                      className="p-2.5 rounded-xl bg-white hover:bg-[#CEF431] text-[#161514] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all shrink-0"
                       title="Next Month"
                     >
                       <ChevronRight className="h-4 w-4 stroke-[3]" />
@@ -1163,19 +1164,19 @@ function MoneyPageContent() {
 
                   {/* Search Input Box */}
                   <div className="relative flex-1">
-                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-navy-600 stroke-[2.5]" />
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#161514]/60 stroke-[2.5]" />
                     <input
                       type="text"
                       value={ledgerSearchQuery}
                       onChange={(e) => setLedgerSearchQuery(e.target.value)}
                       placeholder="Search notes, categories, amounts..."
-                      className="w-full bg-[#FAF8F5] rounded-xl border-2 border-[#161514] pl-10 pr-9 py-2 text-xs font-bold text-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
+                      className="w-full bg-[#FAF8F5] rounded-xl border-2 border-[#161514] pl-10 pr-9 py-2 text-xs font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514] focus:bg-[#FFF9EA] focus:shadow-[2px_2px_0px_0px_#161514] focus:outline-none transition-all"
                     />
                     {ledgerSearchQuery && (
                       <button
                         type="button"
                         onClick={() => setLedgerSearchQuery("")}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-navy-600 hover:text-navy-950 p-0.5 cursor-pointer border-none bg-transparent"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#161514]/60 hover:text-[#161514] p-0.5 cursor-pointer border-none bg-transparent"
                       >
                         <X className="h-3.5 w-3.5 stroke-[2.5]" />
                       </button>
@@ -1201,11 +1202,11 @@ function MoneyPageContent() {
                 </div>
 
                 {/* Bottom Row: Monthly Summary Stats & Type / Channel Filter Pills */}
-                <div className="flex items-center justify-between flex-wrap gap-2 pt-2 border-t border-navy-950/10 overflow-x-auto no-scrollbar py-0.5">
+                <div className="flex items-center justify-between flex-wrap gap-2 pt-2 border-t-2 border-[#161514]/10 overflow-x-auto no-scrollbar py-0.5">
                   <div className="flex items-center gap-3 flex-wrap shrink-0">
                     {/* Type Filter Pills */}
                     <div className="flex items-center gap-1.5 shrink-0">
-                      <span className="text-[10px] font-black uppercase text-navy-700 mr-1 flex items-center gap-1 whitespace-nowrap shrink-0">
+                      <span className="text-[10px] font-black uppercase text-[#161514]/70 mr-1 flex items-center gap-1 whitespace-nowrap shrink-0">
                         <Filter className="h-3 w-3 stroke-[2.5]" /> Type:
                       </span>
                       {(["all", "income", "expense"] as const).map((t) => {
@@ -1217,14 +1218,14 @@ function MoneyPageContent() {
                             type="button"
                             onClick={() => setLedgerTypeFilter(t)}
                             className={cn(
-                              "px-2.5 py-1 rounded-xl text-[10px] font-black transition-all border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] cursor-pointer whitespace-nowrap shrink-0",
+                              "px-2.5 py-1 rounded-xl text-[10px] font-black transition-all border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer whitespace-nowrap shrink-0",
                               isActive
                                 ? t === "income"
-                                  ? "bg-[#03D26F] text-[#161514] scale-105"
+                                  ? "bg-[#03D26F] text-[#161514]"
                                   : t === "expense"
-                                  ? "bg-rose-400 text-[#161514] scale-105"
-                                  : "bg-[#CEF431] text-[#161514] scale-105"
-                                : "bg-white text-navy-800 hover:bg-amber-100"
+                                  ? "bg-rose-400 text-[#161514]"
+                                  : "bg-[#CEF431] text-[#161514]"
+                                : "bg-white text-[#161514]/80 hover:bg-amber-100"
                             )}
                           >
                             {label}
@@ -1234,8 +1235,8 @@ function MoneyPageContent() {
                     </div>
 
                     {/* Payment Channel Filter Pills (UPI vs Cash) */}
-                    <div className="flex items-center gap-1.5 shrink-0 pl-1 border-l border-navy-950/20">
-                      <span className="text-[10px] font-black uppercase text-navy-700 mr-1 flex items-center gap-1 whitespace-nowrap shrink-0">
+                    <div className="flex items-center gap-1.5 shrink-0 pl-1 border-l-2 border-[#161514]/20">
+                      <span className="text-[10px] font-black uppercase text-[#161514]/70 mr-1 flex items-center gap-1 whitespace-nowrap shrink-0">
                         💳 Mode:
                       </span>
                       {(["all", "online", "cash"] as const).map((ch) => {
@@ -1247,14 +1248,14 @@ function MoneyPageContent() {
                             type="button"
                             onClick={() => setPaymentChannelFilter(ch)}
                             className={cn(
-                              "px-2.5 py-1 rounded-xl text-[10px] font-black transition-all border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] cursor-pointer whitespace-nowrap shrink-0",
+                              "px-2.5 py-1 rounded-xl text-[10px] font-black transition-all border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer whitespace-nowrap shrink-0",
                               isActive
                                 ? ch === "online"
-                                  ? "bg-[#03D26F] text-[#161514] scale-105"
+                                  ? "bg-[#03D26F] text-[#161514]"
                                   : ch === "cash"
-                                  ? "bg-amber-400 text-[#161514] scale-105"
-                                  : "bg-[#CEF431] text-[#161514] scale-105"
-                                : "bg-white text-navy-800 hover:bg-amber-100"
+                                  ? "bg-amber-400 text-[#161514]"
+                                  : "bg-[#CEF431] text-[#161514]"
+                                : "bg-white text-[#161514]/80 hover:bg-amber-100"
                             )}
                           >
                             {label}
@@ -1266,14 +1267,14 @@ function MoneyPageContent() {
 
                   {/* Monthly Summary Badges */}
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded-xl bg-[#03D26F]/20 text-emerald-950 border border-[#161514] whitespace-nowrap shrink-0">
+                    <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded-xl bg-[#03D26F]/20 text-emerald-950 border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514] whitespace-nowrap shrink-0">
                       In: +{currencySymbol}{monthlyStats.income.toLocaleString()}
                     </span>
-                    <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded-xl bg-rose-100 text-rose-950 border border-[#161514] whitespace-nowrap shrink-0">
+                    <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded-xl bg-rose-100 text-rose-950 border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514] whitespace-nowrap shrink-0">
                       Out: -{currencySymbol}{monthlyStats.expense.toLocaleString()}
                     </span>
                     <span className={cn(
-                      "text-[10px] font-black uppercase px-2.5 py-1 rounded-xl border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] whitespace-nowrap shrink-0",
+                      "text-[10px] font-black uppercase px-2.5 py-1 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] whitespace-nowrap shrink-0",
                       monthlyStats.net >= 0 ? "bg-[#CEF431] text-[#161514]" : "bg-amber-300 text-[#161514]"
                     )}>
                       Net: {monthlyStats.net >= 0 ? "+" : ""}{currencySymbol}{monthlyStats.net.toLocaleString()}
@@ -1282,7 +1283,7 @@ function MoneyPageContent() {
                     <button
                       type="button"
                       onClick={() => setIsPDFExportOpen(true)}
-                      className="px-3 py-1 rounded-xl bg-white hover:bg-[#CEF431] text-[#161514] text-[10px] font-black border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer flex items-center gap-1 shrink-0 whitespace-nowrap ml-1"
+                      className="px-3 py-1 rounded-xl bg-white hover:bg-[#CEF431] text-[#161514] text-[10px] font-black border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer flex items-center gap-1 shrink-0 whitespace-nowrap ml-1"
                     >
                       <FileText className="h-3 w-3 stroke-[2.5]" />
                       <span>Export PDF 📄</span>
@@ -1310,7 +1311,7 @@ function MoneyPageContent() {
             {txsLoading ? (
               <div className="space-y-3">
                 {[1, 2].map((i) => (
-                  <div key={i} className="bg-white rounded-[var(--radius-lg)] p-4 h-16 animate-pulse" />
+                  <div key={i} className="bg-white rounded-2xl p-4 h-16 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] animate-pulse" />
                 ))}
               </div>
             ) : transactions.length === 0 ? (
@@ -1324,9 +1325,9 @@ function MoneyPageContent() {
                  iconColorClass="text-mint-600"
                />
             ) : filteredLedgerTransactions.length === 0 ? (
-              <div className="bg-white rounded-2xl p-8 border-2 border-navy-950 text-center space-y-3 shadow-[3px_3px_0px_0px_rgba(22,21,20,1)]">
-                <p className="text-sm font-black text-navy-950">No transactions match your month/search filter 🔍</p>
-                <p className="text-xs text-navy-700 font-bold max-w-sm mx-auto">
+              <div className="bg-white rounded-2xl p-8 border-2 border-[#161514] text-center space-y-3 shadow-[4px_4px_0px_0px_#161514]">
+                <p className="text-sm font-black text-[#161514]">No transactions match your month/search filter 🔍</p>
+                <p className="text-xs text-[#161514]/70 font-bold max-w-sm mx-auto">
                   Try selecting another month or reset active filters.
                 </p>
                 <button
@@ -1337,7 +1338,7 @@ function MoneyPageContent() {
                     setLedgerTypeFilter("all");
                     setLedgerMonthFilter("all");
                   }}
-                  className="px-4 py-2 rounded-xl bg-amber-400 text-navy-950 text-xs font-black border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-[#161514] text-xs font-black border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all"
                 >
                   Show All Time Transactions ♾️
                 </button>
@@ -1348,31 +1349,31 @@ function MoneyPageContent() {
                 {groupedLedgerTransactions.map((group) => (
                   <div key={group.dateStr} className="space-y-2">
                     {/* Studio Neobrutalist Day Header */}
-                    <div className="bg-[#161514] text-white px-4 py-2 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] flex items-center justify-between gap-2">
-                      <span className="text-xs font-black tracking-wider flex items-center gap-2">
+                    <div className="bg-[#161514] text-white px-4 py-2.5 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex items-center justify-between gap-2">
+                      <span className="text-xs font-black tracking-wider flex items-center gap-2" style={{ fontFamily: "var(--font-heading)" }}>
                         <CalendarIcon className="h-3.5 w-3.5 text-[#CEF431] stroke-[2.5]" />
                         {formatTimelineDateHeader(group.dateStr)}
                       </span>
                       <span className={cn(
                         "text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full border border-white/20",
                         group.dayNet >= 0 ? "bg-[#03D26F] text-[#161514]" : "bg-[#CEF431] text-[#161514]"
-                      )}>
+                      )} style={{ fontFamily: "var(--font-heading)" }}>
                         {group.dayNet >= 0 ? `+${currencySymbol}${group.dayNet.toLocaleString()} Net` : `-${currencySymbol}${Math.abs(group.dayNet).toLocaleString()} Spent`}
                       </span>
                     </div>
 
                     {/* Day's Transactions List */}
-                    <div className="bg-white rounded-2xl shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)] border-2 border-[#161514] divide-y-2 divide-[#161514] overflow-hidden">
+                    <div className="bg-white rounded-2xl shadow-[3px_3px_0px_0px_#161514] border-2 border-[#161514] divide-y-2 divide-[#161514] overflow-hidden">
                       {group.txs.map((tx) => {
                         const category = categories.find((c) => c.id === tx.categoryId);
                         return (
                           <div
                             key={tx.id}
                             onClick={() => setInspectingTx(tx)}
-                            className="p-3.5 flex items-center justify-between hover:bg-[#CEF431]/20 transition-colors gap-3 cursor-pointer group"
+                            className="p-3.5 flex items-center justify-between hover:bg-[#CEF431]/20 transition-all gap-3 cursor-pointer group"
                           >
                             <div className="flex items-center gap-3 min-w-0 flex-1">
-                              <div className={cn("h-9 w-9 rounded-xl border-2 border-[#161514] flex items-center justify-center shrink-0 shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] group-hover:scale-105 transition-transform", tx.type === "income" ? "bg-[#03D26F] text-[#161514]" : "bg-rose-400 text-[#161514]")}>
+                              <div className={cn("h-9 w-9 rounded-xl border-2 border-[#161514] flex items-center justify-center shrink-0 shadow-[2px_2px_0px_0px_#161514] group-hover:scale-105 transition-transform", tx.type === "income" ? "bg-[#03D26F] text-[#161514]" : "bg-rose-400 text-[#161514]")}>
                                 {tx.type === "income" ? <ArrowUpRight className="h-4.5 w-4.5 stroke-[3]" /> : <ArrowDownRight className="h-4.5 w-4.5 stroke-[3]" />}
                               </div>
                               <div className="min-w-0 flex-1">
@@ -1402,14 +1403,14 @@ function MoneyPageContent() {
                             </div>
 
                             <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-                              <span className={cn("font-black text-xs sm:text-sm tracking-tight px-2 py-1 rounded-xl border border-[#161514] whitespace-nowrap", tx.type === "income" ? "bg-[#03D26F]/20 text-emerald-950" : "bg-rose-100 text-rose-950")}>
+                              <span className={cn("font-black text-xs sm:text-sm tracking-tight px-2.5 py-1 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] whitespace-nowrap", tx.type === "income" ? "bg-[#03D26F]/20 text-emerald-950" : "bg-rose-100 text-rose-950")} style={{ fontFamily: "var(--font-heading)" }}>
                                 {tx.type === "income" ? "+" : "-"}{currencySymbol}{tx.amount.toLocaleString()}
                               </span>
                               <div className="hidden sm:flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                                 <button
                                   type="button"
                                   onClick={() => handleDuplicateTx(tx)}
-                                  className="text-[#161514]/70 hover:text-[#161514] p-1.5 hover:bg-[#CEF431] rounded-lg transition-colors cursor-pointer border border-transparent hover:border-[#161514]"
+                                  className="h-8 w-8 rounded-xl bg-white hover:bg-[#CEF431] text-[#161514] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center justify-center cursor-pointer"
                                   title="1-Click Duplicate"
                                 >
                                   <Copy className="h-3.5 w-3.5 stroke-[2.5]" />
@@ -1417,7 +1418,7 @@ function MoneyPageContent() {
                                 <button
                                   type="button"
                                   onClick={() => handleOpenEditTxModal(tx)}
-                                  className="text-[#161514]/70 hover:text-[#161514] p-1.5 hover:bg-[#CEF431] rounded-lg transition-colors cursor-pointer border border-transparent hover:border-[#161514]"
+                                  className="h-8 w-8 rounded-xl bg-white hover:bg-[#CEF431] text-[#161514] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center justify-center cursor-pointer"
                                   title="Edit transaction"
                                 >
                                   <Edit3 className="h-3.5 w-3.5 stroke-[2.5]" />
@@ -1425,7 +1426,7 @@ function MoneyPageContent() {
                                 <button
                                   type="button"
                                   onClick={() => setDeleteTxId(tx.id)}
-                                  className="text-[#161514]/70 hover:text-rose-600 p-1.5 hover:bg-rose-100 rounded-lg transition-colors cursor-pointer border border-transparent hover:border-[#161514]"
+                                  className="h-8 w-8 rounded-xl bg-white hover:bg-rose-100 text-rose-600 border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center justify-center cursor-pointer"
                                   title="Delete transaction"
                                 >
                                   <Trash2 className="h-3.5 w-3.5 stroke-[2.5]" />
@@ -1446,23 +1447,23 @@ function MoneyPageContent() {
           <TabsContent id="money-budgets" value="budgets" className="space-y-4 scroll-mt-24">
             {/* 🎯 FEATURE 4 & 5: MONTHLY BUDGET CEILING & ROLLOVER ALLOWANCE CARD */}
             <div className="bg-white rounded-3xl p-5 border-2.5 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-navy-950/10 pb-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-[#161514]/15 pb-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="h-10 w-10 rounded-2xl bg-[#CEF431] border-2 border-navy-950 flex items-center justify-center text-[#161514] font-black text-lg shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] shrink-0">
+                  <div className="h-10 w-10 rounded-2xl bg-[#CEF431] border-2 border-[#161514] flex items-center justify-center text-[#161514] font-black text-lg shadow-[2px_2px_0px_0px_#161514] shrink-0">
                     🎯
                   </div>
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h4 className="font-black text-sm uppercase tracking-wider text-[#161514]">
+                      <h4 className="font-black text-sm uppercase tracking-wider text-[#161514]" style={{ fontFamily: "var(--font-heading)" }}>
                         {budgetStats.targetMonthLabel} Budget & Rollover
                       </h4>
                       {budgetStats.rolloverSurplus > 0 && (
-                        <span className="text-[10px] font-black bg-[#03D26F] text-[#161514] px-2 py-0.5 rounded-full border border-[#161514] shadow-[1px_1px_0px_0px_rgba(31,36,48,1)] flex items-center gap-1">
+                        <span className="text-[10px] font-black bg-[#03D26F] text-[#161514] px-2 py-0.5 rounded-full border border-[#161514] shadow-[1px_1px_0px_0px_#161514] flex items-center gap-1">
                           <Sparkles className="h-3 w-3 stroke-[3]" /> +{currencySymbol}{budgetStats.rolloverSurplus.toLocaleString()} Rolled from {budgetStats.previousMonthLabel.split(" ")[0]}
                         </span>
                       )}
                     </div>
-                    <p className="text-[10px] text-navy-700 font-bold mt-0.5">
+                    <p className="text-[10px] text-[#161514]/70 font-bold mt-0.5">
                       Base Income Budget: {currencySymbol}{budgetStats.baseBudget.toLocaleString()} • Daily expenses deduct from this pool
                     </p>
                   </div>
@@ -1474,7 +1475,7 @@ function MoneyPageContent() {
                     setTempBudgetInput(String(baseBudget));
                     setIsBudgetModalOpen(true);
                   }}
-                  className="self-start sm:self-auto px-3 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-500 text-navy-950 text-xs font-black border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center gap-1.5 shrink-0"
+                  className="self-start sm:self-auto px-3 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-[#161514] text-xs font-black border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center gap-1.5 shrink-0"
                 >
                   <Edit3 className="h-3.5 w-3.5 stroke-[2.5]" />
                   <span>Edit Allowance</span>
@@ -1483,35 +1484,35 @@ function MoneyPageContent() {
 
               {/* Budget Meter Metrics */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)]">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-navy-600 block">Total Available Pool</span>
-                  <span className="text-xl font-black text-[#161514] block mt-0.5">
+                <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514]">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-[#161514]/60 block">Total Available Pool</span>
+                  <span className="text-xl font-black text-[#161514] block mt-0.5" style={{ fontFamily: "var(--font-heading)" }}>
                     {currencySymbol}{budgetStats.totalAvailableBudget.toLocaleString()}
                   </span>
-                  <span className="text-[9px] font-bold text-navy-600 block mt-0.5">
+                  <span className="text-[9px] font-bold text-[#161514]/60 block mt-0.5">
                     {budgetStats.baseBudget.toLocaleString()} base {budgetStats.rolloverSurplus > 0 ? `+ ${budgetStats.rolloverSurplus.toLocaleString()} rollover` : ""}
                   </span>
                 </div>
 
-                <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)]">
+                <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514]">
                   <span className="text-[10px] font-black uppercase tracking-wider text-rose-700 block">Spent This Month</span>
-                  <span className="text-xl font-black text-rose-600 block mt-0.5">
+                  <span className="text-xl font-black text-rose-600 block mt-0.5" style={{ fontFamily: "var(--font-heading)" }}>
                     -{currencySymbol}{budgetStats.monthlyExpense.toLocaleString()}
                   </span>
-                  <span className="text-[9px] font-bold text-navy-600 block mt-0.5">
+                  <span className="text-[9px] font-bold text-[#161514]/60 block mt-0.5">
                     {budgetStats.budgetUsedPercentage}% of monthly pool used
                   </span>
                 </div>
 
                 <div className={cn(
-                  "p-3.5 rounded-2xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)]",
+                  "p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514]",
                   budgetStats.remainingBudget >= 0 ? "bg-[#CEF431]/30" : "bg-rose-100"
                 )}>
-                  <span className="text-[10px] font-black uppercase tracking-wider text-navy-800 block">Remaining Safe-to-Spend</span>
-                  <span className={cn("text-xl font-black block mt-0.5", budgetStats.remainingBudget >= 0 ? "text-emerald-900" : "text-rose-700")}>
+                  <span className="text-[10px] font-black uppercase tracking-wider text-[#161514]/80 block">Remaining Safe-to-Spend</span>
+                  <span className={cn("text-xl font-black block mt-0.5", budgetStats.remainingBudget >= 0 ? "text-emerald-900" : "text-rose-700")} style={{ fontFamily: "var(--font-heading)" }}>
                     {currencySymbol}{budgetStats.remainingBudget.toLocaleString()}
                   </span>
-                  <span className="text-[9px] font-bold text-navy-800 block mt-0.5">
+                  <span className="text-[9px] font-bold text-[#161514]/80 block mt-0.5">
                     {budgetStats.remainingBudget > 0
                       ? `~${currencySymbol}${budgetStats.dailySafeToSpend}/day safe (${budgetStats.daysRemainingInMonth}d left)`
                       : "Over-budget! Trim expenses"}
@@ -1521,11 +1522,11 @@ function MoneyPageContent() {
 
               {/* Progress Bar */}
               <div className="space-y-1.5 pt-1">
-                <div className="flex justify-between items-center text-[10px] font-black uppercase text-navy-800">
+                <div className="flex justify-between items-center text-[10px] font-black uppercase text-[#161514]">
                   <span>Budget Consumption Progress</span>
-                  <span>{budgetStats.budgetUsedPercentage}%</span>
+                  <span style={{ fontFamily: "var(--font-heading)" }}>{budgetStats.budgetUsedPercentage}%</span>
                 </div>
-                <div className="w-full bg-gray-100 h-3 rounded-full overflow-hidden border-2 border-navy-950 p-0.5 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]">
+                <div className="w-full bg-gray-100 h-3.5 rounded-full overflow-hidden border-2 border-[#161514] p-0.5 shadow-[1px_1px_0px_0px_#161514]">
                   <div
                     className={cn(
                       "h-full rounded-full transition-all duration-500",
@@ -1539,16 +1540,16 @@ function MoneyPageContent() {
 
             {/* 🐷 FEATURE 5: WHERE DID YOU SAVE LAST MONTH? CARD */}
             {(budgetStats.categorySavingsAudit.length > 0 || budgetStats.previousMonthSavings > 0) && (
-              <div className="bg-[#FAF8F5] rounded-3xl p-5 border-2.5 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] space-y-3">
+              <div className="bg-[#FAF8F5] rounded-3xl p-5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="h-9 w-9 rounded-xl bg-amber-400 border-2 border-navy-950 flex items-center justify-center text-navy-950 font-black text-base shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] shrink-0">
+                  <div className="h-9 w-9 rounded-xl bg-amber-400 border-2 border-[#161514] flex items-center justify-center text-[#161514] font-black text-base shadow-[2px_2px_0px_0px_#161514] shrink-0">
                     🐷
                   </div>
                   <div>
-                    <h4 className="font-black text-sm uppercase tracking-wider text-[#161514]">
+                    <h4 className="font-black text-sm uppercase tracking-wider text-[#161514]" style={{ fontFamily: "var(--font-heading)" }}>
                       {budgetStats.previousMonthLabel} Savings Audit & Highlights
                     </h4>
-                    <p className="text-[10px] text-navy-700 font-bold">
+                    <p className="text-[10px] text-[#161514]/70 font-bold">
                       You saved {currencySymbol}{budgetStats.previousMonthSavings.toLocaleString()} in {budgetStats.previousMonthLabel}! Here is where you stayed under budget:
                     </p>
                   </div>
@@ -1559,19 +1560,19 @@ function MoneyPageContent() {
                     {budgetStats.categorySavingsAudit.map((item) => (
                       <div
                         key={item.categoryId}
-                        className="bg-white p-3 rounded-2xl border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] flex flex-col justify-between gap-2"
+                        className="bg-white p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex flex-col justify-between gap-2"
                       >
                         <div className="flex items-center justify-between gap-2">
                           <div className="flex items-center gap-2 min-w-0">
                             <span className="text-lg shrink-0">{renderCategoryEmoji(item.icon)}</span>
                             <div className="min-w-0">
                               <span className="text-xs font-black text-[#161514] block truncate">{item.categoryName}</span>
-                              <span className="text-[9px] font-bold text-navy-600 block">
+                              <span className="text-[9px] font-bold text-[#161514]/60 block">
                                 Spent: {currencySymbol}{item.spent} / {currencySymbol}{item.budget}
                               </span>
                             </div>
                           </div>
-                          <span className="text-xs font-black text-emerald-800 bg-[#03D26F]/20 px-2 py-0.5 rounded-lg border border-emerald-800/30 shrink-0">
+                          <span className="text-xs font-black text-emerald-800 bg-[#03D26F]/20 px-2 py-0.5 rounded-lg border border-[#161514] shadow-[1px_1px_0px_0px_#161514] shrink-0" style={{ fontFamily: "var(--font-heading)" }}>
                             +{currencySymbol}{item.saved}
                           </span>
                         </div>
@@ -1581,7 +1582,7 @@ function MoneyPageContent() {
                           type="button"
                           onClick={() => handleBoostCategoryEnvelope(item)}
                           disabled={updateCatMutation.isPending}
-                          className="w-full py-1.5 px-2 rounded-xl bg-[#FAF8F5] hover:bg-[#CEF431] text-navy-950 text-[10px] font-black border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer flex items-center justify-center gap-1 disabled:opacity-50"
+                          className="w-full py-1.5 px-2 rounded-xl bg-[#FAF8F5] hover:bg-[#CEF431] text-[#161514] text-[10px] font-black border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-1 disabled:opacity-50"
                         >
                           <Sparkles className="h-3 w-3 stroke-[3]" />
                           <span>Boost {budgetStats.targetMonthLabel.split(" ")[0]} Envelope (+{currencySymbol}{item.saved})</span>
@@ -1590,23 +1591,23 @@ function MoneyPageContent() {
                     ))}
                   </div>
                 ) : (
-                  <div className="bg-white p-4 rounded-2xl border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] space-y-3">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-navy-950/10 pb-2.5">
+                  <div className="bg-white p-4 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#161514]/10 pb-2.5">
                       <div>
                         <span className="text-xs font-black text-[#161514] block">
                           Total {budgetStats.previousMonthLabel.split(" ")[0]} Rollover Surplus: +{currencySymbol}{budgetStats.previousMonthSavings.toLocaleString()}
                         </span>
-                        <span className="text-[10px] text-navy-700 font-bold mt-0.5 block">
+                        <span className="text-[10px] text-[#161514]/70 font-bold mt-0.5 block">
                           You spent {currencySymbol}{budgetStats.previousMonthExpense.toLocaleString()} of your {currencySymbol}{budgetStats.baseBudget.toLocaleString()} overall budget!
                         </span>
                       </div>
-                      <span className="text-xs font-black text-emerald-800 bg-[#03D26F]/25 px-2.5 py-1 rounded-xl border border-emerald-800/30 self-start sm:self-auto">
+                      <span className="text-xs font-black text-emerald-800 bg-[#03D26F]/25 px-2.5 py-1 rounded-xl border border-[#161514] shadow-[1px_1px_0px_0px_#161514] self-start sm:self-auto" style={{ fontFamily: "var(--font-heading)" }}>
                         +{currencySymbol}{budgetStats.previousMonthSavings.toLocaleString()} Available
                       </span>
                     </div>
 
                     <div className="space-y-2">
-                      <span className="text-[10px] font-black uppercase tracking-wider text-navy-900 flex items-center gap-1.5">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5">
                         <span>🎯</span>
                         <span>1-Tap Allocate +{currencySymbol}{budgetStats.previousMonthSavings.toLocaleString()} to a {budgetStats.targetMonthLabel.split(" ")[0]} Category Envelope:</span>
                       </span>
@@ -1623,11 +1624,11 @@ function MoneyPageContent() {
                               budget: cat.monthlyBudget || 0,
                             })}
                             disabled={updateCatMutation.isPending}
-                            className="p-3 rounded-2xl bg-[#FAF8F5] hover:bg-[#CEF431] text-navy-950 border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer flex flex-col justify-between gap-2.5 text-left disabled:opacity-50 group"
+                            className="p-3 rounded-2xl bg-[#FAF8F5] hover:bg-[#CEF431] text-[#161514] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer flex flex-col justify-between gap-2.5 text-left disabled:opacity-50 group"
                           >
                             <div className="flex items-center justify-between w-full">
                               <span className="text-xl leading-none">{renderCategoryEmoji(cat.icon)}</span>
-                              <span className="text-[10px] font-black text-emerald-950 bg-[#03D26F]/25 px-2 py-0.5 rounded-lg border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)]">
+                              <span className="text-[10px] font-black text-emerald-950 bg-[#03D26F]/25 px-2 py-0.5 rounded-lg border border-[#161514] shadow-[1px_1px_0px_0px_#161514]" style={{ fontFamily: "var(--font-heading)" }}>
                                 +{currencySymbol}{budgetStats.previousMonthSavings}
                               </span>
                             </div>
@@ -1635,7 +1636,7 @@ function MoneyPageContent() {
                               <span className="text-xs font-black text-[#161514] block leading-snug break-words">
                                 {cat.name}
                               </span>
-                              <span className="text-[9px] font-bold text-navy-600 group-hover:text-navy-950 block mt-0.5">
+                              <span className="text-[9px] font-bold text-[#161514]/60 group-hover:text-[#161514] block mt-0.5">
                                 Tap to boost 🎯
                               </span>
                             </div>
@@ -1650,53 +1651,52 @@ function MoneyPageContent() {
 
             <div className="space-y-4 pt-2">
               <div className="flex items-center justify-between">
-                <h3 className="font-bold text-xs uppercase tracking-wider text-navy-600" style={{ fontFamily: "var(--font-heading)" }}>
+                <h3 className="font-bold text-xs uppercase tracking-wider text-[#161514]" style={{ fontFamily: "var(--font-heading)" }}>
                   Category Budget Envelopes
                 </h3>
                 <div className="flex items-center gap-2">
-                  <Button
+                  <button
+                    type="button"
                     onClick={() => setIsChoiceOpen(true)}
-                    size="sm"
-                    className="rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs cursor-pointer shadow-sm border-none"
+                    className="px-3 py-1.5 rounded-xl bg-[#03D26F] hover:bg-emerald-400 text-white font-black text-xs border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center gap-1 cursor-pointer"
                   >
                     <Plus className="h-3.5 w-3.5 mr-1" /> New Category
-                  </Button>
-                  <Button
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => setIsEditBudgetOpen(true)}
-                    variant="outline"
-                    size="sm"
-                    className="rounded-full border-input text-navy-900 bg-white cursor-pointer"
+                    className="px-3 py-1.5 rounded-xl bg-white hover:bg-cream-100 text-[#161514] font-black text-xs border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
                   >
                     Edit Budgets
-                  </Button>
+                  </button>
                 </div>
               </div>
 
               {/* 🌐 DATASET 3: GLOBAL COST OF LIVING & SMART BUDGET BENCHMARK CALCULATOR */}
-              <div className="bg-amber-400 rounded-3xl p-5 border-2 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] space-y-4 text-navy-950">
+              <div className="bg-amber-400 rounded-3xl p-5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4 text-[#161514]">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <div className="h-10 w-10 rounded-2xl bg-white border-2 border-navy-950 flex items-center justify-center shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)]">
-                      <Globe className="h-5 w-5 text-navy-950 stroke-[2.5]" />
+                    <div className="h-10 w-10 rounded-2xl bg-white border-2 border-[#161514] flex items-center justify-center shadow-[2px_2px_0px_0px_#161514]">
+                      <Globe className="h-5 w-5 text-[#161514] stroke-[2.5]" />
                     </div>
                     <div>
-                      <h4 className="font-black text-sm uppercase tracking-wider">
+                      <h4 className="font-black text-sm uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
                         🌐 Global Cost of Living Budget Calculator
                       </h4>
-                      <p className="text-[10px] font-bold text-navy-800">
+                      <p className="text-[10px] font-bold text-[#161514]/80">
                         Powered by 122-country Numbeo cost indices dataset
                       </p>
                     </div>
                   </div>
-                  <span className="text-[10px] font-black bg-navy-950 text-white px-2.5 py-1 rounded-xl border border-navy-950 self-start sm:self-auto">
+                  <span className="text-[10px] font-black bg-[#161514] text-white px-2.5 py-1 rounded-xl border border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] self-start sm:self-auto">
                     Rank #{countryItem?.rank || 1} • {countryItem?.country || "India"}
                   </span>
                 </div>
 
                 {/* Country Selector & Income Inputs */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white p-3.5 rounded-2xl border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)]">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514]">
                   <div className="space-y-1">
-                    <label className="text-[9px] font-black uppercase text-navy-700 block">Select Your Country</label>
+                    <label className="text-[9px] font-black uppercase text-[#161514]/70 block">Select Your Country</label>
                     <NeobrutalistSelect
                       value={selectedCountry}
                       onChange={setSelectedCountry}
@@ -1710,12 +1710,12 @@ function MoneyPageContent() {
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-[9px] font-black uppercase text-navy-700 block">Monthly Net Income ({currencySymbol})</label>
+                    <label className="text-[9px] font-black uppercase text-[#161514]/70 block">Monthly Net Income ({currencySymbol})</label>
                     <input
                       type="number"
                       value={incomeForCalc}
                       onChange={(e) => setIncomeForCalc(e.target.value)}
-                      className="w-full bg-cream-bg rounded-xl border-2 border-navy-950 px-3 py-1.5 text-xs font-black text-navy-950 outline-none"
+                      className="w-full bg-[#FAF8F5] rounded-xl border-2 border-[#161514] px-3 py-1.5 text-xs font-black text-[#161514] focus:bg-[#FFF9EA] focus:shadow-[2px_2px_0px_0px_#161514] focus:outline-none transition-all"
                       placeholder="50000"
                     />
                   </div>
@@ -1724,9 +1724,9 @@ function MoneyPageContent() {
                 {/* Auto-Calculated Benchmark Budget Caps */}
                 {countryItem && (
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
-                    <div className="bg-white rounded-2xl p-2.5 border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] text-center">
-                      <span className="text-[9px] font-black text-navy-700 uppercase block">🛒 Groceries Cap</span>
-                      <p className="text-xs font-black text-navy-950 mt-0.5">
+                    <div className="bg-white rounded-2xl p-2.5 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-center">
+                      <span className="text-[9px] font-black text-[#161514]/70 uppercase block">🛒 Groceries Cap</span>
+                      <p className="text-xs font-black text-[#161514] mt-0.5" style={{ fontFamily: "var(--font-heading)" }}>
                         {currencySymbol}
                         {Math.round(
                           (Number(incomeForCalc) || 50000) *
@@ -1734,12 +1734,12 @@ function MoneyPageContent() {
                             ((countryItem.groceriesIndex || 50) / 50)
                         ).toLocaleString()}
                       </p>
-                      <span className="text-[8px] font-extrabold text-navy-600">Idx: {countryItem.groceriesIndex}</span>
+                      <span className="text-[8px] font-extrabold text-[#161514]/60">Idx: {countryItem.groceriesIndex}</span>
                     </div>
 
-                    <div className="bg-white rounded-2xl p-2.5 border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] text-center">
-                      <span className="text-[9px] font-black text-navy-700 uppercase block">🏠 Rent & Housing</span>
-                      <p className="text-xs font-black text-navy-950 mt-0.5">
+                    <div className="bg-white rounded-2xl p-2.5 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-center">
+                      <span className="text-[9px] font-black text-[#161514]/70 uppercase block">🏠 Rent & Housing</span>
+                      <p className="text-xs font-black text-[#161514] mt-0.5" style={{ fontFamily: "var(--font-heading)" }}>
                         {currencySymbol}
                         {Math.round(
                           (Number(incomeForCalc) || 50000) *
@@ -1747,12 +1747,12 @@ function MoneyPageContent() {
                             ((countryItem.rentIndex || 20) / 20)
                         ).toLocaleString()}
                       </p>
-                      <span className="text-[8px] font-extrabold text-navy-600">Idx: {countryItem.rentIndex}</span>
+                      <span className="text-[8px] font-extrabold text-[#161514]/60">Idx: {countryItem.rentIndex}</span>
                     </div>
 
-                    <div className="bg-white rounded-2xl p-2.5 border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] text-center">
-                      <span className="text-[9px] font-black text-navy-700 uppercase block">🍕 Dining Out</span>
-                      <p className="text-xs font-black text-navy-950 mt-0.5">
+                    <div className="bg-white rounded-2xl p-2.5 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-center">
+                      <span className="text-[9px] font-black text-[#161514]/70 uppercase block">🍕 Dining Out</span>
+                      <p className="text-xs font-black text-[#161514] mt-0.5" style={{ fontFamily: "var(--font-heading)" }}>
                         {currencySymbol}
                         {Math.round(
                           (Number(incomeForCalc) || 50000) *
@@ -1760,32 +1760,32 @@ function MoneyPageContent() {
                             ((countryItem.restaurantIndex || 50) / 50)
                         ).toLocaleString()}
                       </p>
-                      <span className="text-[8px] font-extrabold text-navy-600">Idx: {countryItem.restaurantIndex}</span>
+                      <span className="text-[8px] font-extrabold text-[#161514]/60">Idx: {countryItem.restaurantIndex}</span>
                     </div>
 
-                    <div className="bg-white rounded-2xl p-2.5 border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] text-center">
-                      <span className="text-[9px] font-black text-navy-700 uppercase block">💰 Savings Target</span>
-                      <p className="text-xs font-black text-emerald-800 mt-0.5">
+                    <div className="bg-white rounded-2xl p-2.5 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-center">
+                      <span className="text-[9px] font-black text-[#161514]/70 uppercase block">💰 Savings Target</span>
+                      <p className="text-xs font-black text-emerald-800 mt-0.5" style={{ fontFamily: "var(--font-heading)" }}>
                         {currencySymbol}
                         {Math.round((Number(incomeForCalc) || 50000) * 0.2).toLocaleString()}
                       </p>
-                      <span className="text-[8px] font-extrabold text-navy-600">Pwr: {countryItem.purchasingPowerIndex}</span>
+                      <span className="text-[8px] font-extrabold text-[#161514]/60">Pwr: {countryItem.purchasingPowerIndex}</span>
                     </div>
                   </div>
                 )}
               </div>
 
               {/* ⚡ DATASET 4: 1-CLICK TYPICAL MONTHLY BUDGET TEMPLATE CARD */}
-              <div className="bg-emerald-400 rounded-3xl p-5 border-2 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] flex flex-col sm:flex-row items-center justify-between gap-4 text-navy-950">
+              <div className="bg-emerald-400 rounded-3xl p-5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] flex flex-col sm:flex-row items-center justify-between gap-4 text-[#161514]">
                 <div className="flex items-center gap-3">
-                  <div className="h-12 w-12 rounded-2xl bg-white border-2 border-navy-950 flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] shrink-0">
-                    <Sparkles className="h-6 w-6 text-navy-950 stroke-[2.5]" />
+                  <div className="h-12 w-12 rounded-2xl bg-white border-2 border-[#161514] flex items-center justify-center shadow-[2px_2px_0px_0px_#161514] shrink-0">
+                    <Sparkles className="h-6 w-6 text-[#161514] stroke-[2.5]" />
                   </div>
                   <div>
-                    <h4 className="font-black text-sm uppercase tracking-wider">
+                    <h4 className="font-black text-sm uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
                       ⚡ 1-Click Monthly Budget Template Preset
                     </h4>
-                    <p className="text-[10px] font-bold text-navy-800 mt-0.5">
+                    <p className="text-[10px] font-bold text-[#161514]/80 mt-0.5">
                       Auto-configures 10 essential spending categories (Rent, Groceries, Utilities, Transport, Gym, Savings)
                     </p>
                   </div>
@@ -1804,7 +1804,7 @@ function MoneyPageContent() {
                         }
                       }}
                       disabled={unapplyMonthlyTemplateMutation.isPending}
-                      className="bg-rose-500 hover:bg-rose-600 text-white font-black text-xs uppercase px-4 py-2.5 rounded-2xl border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all"
+                      className="bg-rose-500 hover:bg-rose-600 text-white font-black text-xs uppercase px-4 py-2.5 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all"
                     >
                       {unapplyMonthlyTemplateMutation.isPending ? "Removing..." : "🧹 UNAPPLY TEMPLATE"}
                     </button>
@@ -1820,7 +1820,7 @@ function MoneyPageContent() {
                       }
                     }}
                     disabled={applyTemplateMutation.isPending}
-                    className="bg-navy-950 hover:bg-navy-900 text-white font-black text-xs uppercase px-4 py-2.5 rounded-2xl border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all"
+                    className="bg-[#161514] hover:bg-[#262423] text-white font-black text-xs uppercase px-4 py-2.5 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all"
                   >
                     {applyTemplateMutation.isPending ? "Applying..." : "⚡ LOAD TEMPLATE"}
                   </button>
@@ -1848,17 +1848,17 @@ function MoneyPageContent() {
                       const nearCap = percent >= 85;
 
                       return (
-                        <div key={c.id} className="break-inside-avoid block bg-white rounded-[var(--radius-lg)] p-5 shadow-[0_8px_24px_rgba(31,36,48,0.04)] border space-y-3">
+                        <div key={c.id} className="break-inside-avoid block bg-white rounded-2xl p-4 sm:p-5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-3">
                           <div className="flex justify-between items-start">
                             <div>
-                              <h4 className="font-bold text-sm text-navy-900 flex items-center gap-1.5">
+                              <h4 className="font-black text-sm text-[#161514] flex items-center gap-1.5" style={{ fontFamily: "var(--font-heading)" }}>
                                 <span>{renderCategoryEmoji(c.icon)}</span> {c.name}
                               </h4>
-                              <p className="text-[10px] text-navy-600 font-semibold mt-0.5">Budget Cap: {currencySymbol}{budget.toLocaleString()}</p>
+                              <p className="text-[10px] text-[#161514]/60 font-bold mt-0.5">Budget Cap: {currencySymbol}{budget.toLocaleString()}</p>
                             </div>
                             <div className="flex items-center gap-1.5">
                               {nearCap && (
-                                <span className="text-danger flex items-center gap-0.5 text-[9px] font-extrabold uppercase tracking-wide bg-danger/5 px-2 py-0.5 rounded-full">
+                                <span className="text-rose-700 flex items-center gap-0.5 text-[9px] font-black uppercase tracking-wide bg-rose-100 px-2 py-0.5 rounded-full border border-rose-400 shadow-[1px_1px_0px_0px_#161514]">
                                   <ShieldAlert className="h-3 w-3" /> Near Cap
                                 </span>
                               )}
@@ -1871,14 +1871,14 @@ function MoneyPageContent() {
                                   setEditCatIcon(c.icon || "💳");
                                   setEditCatMonthlyBudget(String(c.monthlyBudget || 0));
                                 }}
-                                className="text-navy-600 hover:text-navy-900 p-1 cursor-pointer transition-colors outline-none border-none bg-transparent"
+                                className="h-7 w-7 rounded-lg bg-[#FAF8F5] hover:bg-[#CEF431] text-[#161514] border border-[#161514] shadow-[1px_1px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none flex items-center justify-center cursor-pointer transition-all"
                                 title="Edit category"
                               >
                                 <Edit3 className="h-3.5 w-3.5" />
                               </button>
                               <button
                                 onClick={() => setDeleteCatId(c.id)}
-                                className="text-navy-600 hover:text-danger p-1 cursor-pointer transition-colors outline-none border-none bg-transparent"
+                                className="h-7 w-7 rounded-lg bg-[#FAF8F5] hover:bg-rose-100 text-rose-600 border border-[#161514] shadow-[1px_1px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none flex items-center justify-center cursor-pointer transition-all"
                                 title="Delete category"
                               >
                                 <Trash2 className="h-3.5 w-3.5" />
@@ -1888,15 +1888,15 @@ function MoneyPageContent() {
 
                           {/* Progress Bar */}
                           <div className="space-y-1">
-                            <div className="h-2 w-full bg-cream-bg rounded-full overflow-hidden">
+                            <div className="h-2.5 w-full bg-[#FAF8F5] rounded-full overflow-hidden border-2 border-[#161514] p-0.5 shadow-[1px_1px_0px_0px_#161514]">
                               <div
-                                className={cn("h-full rounded-full transition-all duration-500", nearCap ? "bg-danger" : "bg-mint-600")}
+                                className={cn("h-full rounded-full transition-all duration-500", nearCap ? "bg-rose-500" : "bg-[#03D26F]")}
                                 style={{ width: `${percent}%` }}
                               />
                             </div>
-                            <div className="flex justify-between text-[10px] font-bold text-navy-600">
-                              <span>{currencySymbol}{spend.toLocaleString()} spent</span>
-                              <span>{percent}%</span>
+                            <div className="flex justify-between text-[10px] font-bold text-[#161514]/70">
+                              <span style={{ fontFamily: "var(--font-heading)" }}>{currencySymbol}{spend.toLocaleString()} spent</span>
+                              <span style={{ fontFamily: "var(--font-heading)" }}>{percent}%</span>
                             </div>
                           </div>
                         </div>
@@ -1948,10 +1948,13 @@ function MoneyPageContent() {
                 <>
                   {/* Expense category share pie chart */}
                   {expensePieData.length > 0 && (
-                    <div className="bg-white rounded-[var(--radius-lg)] p-6 shadow-[0_8px_24px_rgba(31,36,48,0.06)] space-y-4">
-                      <h3 className="font-bold text-sm text-navy-900 uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
-                        Expense Categories Share
-                      </h3>
+                    <div className="bg-white rounded-[24px] p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">🥧</span>
+                        <h3 className="font-black text-sm uppercase tracking-wider text-[#161514]" style={{ fontFamily: "var(--font-heading)" }}>
+                          Expense Categories Share
+                        </h3>
+                      </div>
                       <div className="h-64 w-full flex items-center justify-center">
                         <ResponsiveContainer width="100%" height="100%">
                           <PieChart>
@@ -1965,7 +1968,7 @@ function MoneyPageContent() {
                               dataKey="value"
                             >
                               {expensePieData.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={entry.color} />
+                                <Cell key={`cell-${index}`} fill={entry.color} stroke="#161514" strokeWidth={2} />
                               ))}
                             </Pie>
                             <Tooltip formatter={(v) => [`${currencySymbol}${v}`, "Spend"]} />
@@ -1977,19 +1980,22 @@ function MoneyPageContent() {
                   )}
 
                   {/* Income vs Expenses comparisons */}
-                  <div className="bg-white rounded-[var(--radius-lg)] p-6 shadow-[0_8px_24px_rgba(31,36,48,0.06)] space-y-4">
-                    <h3 className="font-bold text-sm text-navy-900 uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
-                      Income vs Expenses Comparison
-                    </h3>
+                  <div className="bg-white rounded-[24px] p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">📊</span>
+                      <h3 className="font-black text-sm uppercase tracking-wider text-[#161514]" style={{ fontFamily: "var(--font-heading)" }}>
+                        Income vs Expenses Comparison
+                      </h3>
+                    </div>
                     <div className="h-64 w-full">
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={barChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                          <XAxis dataKey="name" stroke="#565C6B" fontSize={11} fontWeight={600} tickLine={false} axisLine={false} />
-                          <YAxis stroke="#565C6B" fontSize={11} fontWeight={600} tickLine={false} axisLine={false} tickFormatter={(v) => `${currencySymbol}${v}`} />
-                          <Tooltip formatter={(v) => [`${currencySymbol}${v}`]} contentStyle={{ borderRadius: "12px", fontSize: "12px" }} />
+                          <XAxis dataKey="name" stroke="#161514" fontSize={11} fontWeight={800} tickLine={false} axisLine={false} />
+                          <YAxis stroke="#161514" fontSize={11} fontWeight={800} tickLine={false} axisLine={false} tickFormatter={(v) => `${currencySymbol}${v}`} />
+                          <Tooltip formatter={(v) => [`${currencySymbol}${v}`]} contentStyle={{ borderRadius: "12px", border: "2px solid #161514", boxShadow: "3px 3px 0px 0px #161514", fontWeight: "bold" }} />
                           <Legend />
-                          <Bar dataKey="Income" fill="#7CC3A2" radius={[8, 8, 0, 0]} />
-                          <Bar dataKey="Expense" fill="#F2A6A0" radius={[8, 8, 0, 0]} />
+                          <Bar dataKey="Income" fill="#03D26F" stroke="#161514" strokeWidth={2} radius={[6, 6, 0, 0]} />
+                          <Bar dataKey="Expense" fill="#FB7185" stroke="#161514" strokeWidth={2} radius={[6, 6, 0, 0]} />
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
@@ -2021,7 +2027,7 @@ function MoneyPageContent() {
                     setTxCategoryId(categories.filter((c) => c.type === t)[0]?.id || "");
                   }}
                   className={cn(
-                    "flex-1 py-2 rounded-2xl border-2 border-[#161514] text-xs font-black transition-all uppercase tracking-wider cursor-pointer shadow-[2px_2px_0px_0px_rgba(22,21,20,1)]",
+                    "flex-1 py-2.5 rounded-xl border-2 border-[#161514] text-xs font-black transition-all uppercase tracking-wider cursor-pointer shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
                     txType === t
                       ? "bg-[#161514] text-white"
                       : "bg-white text-[#161514]/70 hover:bg-[#FAF8F5]"
@@ -2046,7 +2052,7 @@ function MoneyPageContent() {
                 onChange={(e) => setTxAmount(e.target.value)}
                 placeholder="e.g. 250"
                 required
-                className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
+                className="w-full neo-input text-xs sm:text-sm font-bold"
               />
             </div>
             <div className="space-y-1">
@@ -2077,7 +2083,7 @@ function MoneyPageContent() {
                 value={txDate}
                 onChange={(e) => setTxDate(e.target.value)}
                 required
-                className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-3 py-2.5 text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
+                className="w-full neo-input text-xs sm:text-sm font-bold"
               />
             </div>
             <div className="space-y-1">
@@ -2100,7 +2106,7 @@ function MoneyPageContent() {
                     type="button"
                     onClick={() => setTxPaymentMethod("upi")}
                     className={cn(
-                      "py-2.5 px-3 rounded-2xl border-2 border-[#161514] text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5",
+                      "py-2.5 px-3 rounded-xl border-2 border-[#161514] text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
                       txPaymentMethod !== "cash"
                         ? "bg-[#03D26F] text-[#161514]"
                         : "bg-white text-[#161514]/70 hover:bg-[#FAF8F5]"
@@ -2114,7 +2120,7 @@ function MoneyPageContent() {
                     type="button"
                     onClick={() => setTxPaymentMethod("cash")}
                     className={cn(
-                      "py-2.5 px-3 rounded-2xl border-2 border-[#161514] text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5",
+                      "py-2.5 px-3 rounded-xl border-2 border-[#161514] text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
                       txPaymentMethod === "cash"
                         ? "bg-amber-400 text-[#161514]"
                         : "bg-white text-[#161514]/70 hover:bg-[#FAF8F5]"
@@ -2161,7 +2167,7 @@ function MoneyPageContent() {
                       setTxCategoryId(detected.categoryId);
                     }
                   }}
-                  className="px-2.5 py-1 rounded-xl bg-white hover:bg-[#CEF431] text-[#161514] text-[10px] font-black border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center gap-1 shrink-0 cursor-pointer"
+                  className="px-2.5 py-1 rounded-xl bg-white hover:bg-[#CEF431] text-[#161514] text-[10px] font-black border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center gap-1 shrink-0 cursor-pointer"
                 >
                   <span>{pill.icon}</span>
                   <span>{pill.label}</span>
@@ -2181,7 +2187,7 @@ function MoneyPageContent() {
 
                 if (detected.categoryId) {
                   return (
-                    <span className="text-[10px] font-black text-[#161514] bg-[#CEF431] px-2 py-0.5 rounded-lg flex items-center gap-1 border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)]">
+                    <span className="text-[10px] font-black text-[#161514] bg-[#CEF431] px-2 py-0.5 rounded-lg flex items-center gap-1 border border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
                       <span>{detected.icon}</span>
                       Auto-Matched: {detected.categoryName}
                     </span>
@@ -2193,7 +2199,7 @@ function MoneyPageContent() {
                     type="button"
                     disabled={isCreatingAutoCat}
                     onClick={() => handleQuickCreateCategory(detected)}
-                    className="text-[10px] font-black text-[#161514] bg-[#CEF431] hover:bg-[#bce028] px-2 py-0.5 rounded-lg flex items-center gap-1 border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer disabled:opacity-50"
+                    className="text-[10px] font-black text-[#161514] bg-[#CEF431] hover:bg-[#bce028] px-2 py-0.5 rounded-lg flex items-center gap-1 border border-[#161514] shadow-[1px_1px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer disabled:opacity-50"
                   >
                     <span>{detected.icon}</span>
                     <span>Auto-Match: {detected.categoryName}</span>
@@ -2217,14 +2223,14 @@ function MoneyPageContent() {
                 }
               }}
               placeholder="e.g. Swiggy biryani, Uber trip, D-Mart..."
-              className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
+              className="w-full neo-input text-xs sm:text-sm font-bold"
             />
           </div>
 
           <button
             type="submit"
             disabled={addTxMutation.isPending}
-            className="w-full bg-[#03D26F] hover:bg-[#02b35d] text-[#161514] font-black text-xs uppercase tracking-wider rounded-2xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all"
+            className="w-full bg-[#03D26F] hover:bg-[#02b35d] text-[#161514] font-black text-xs uppercase tracking-wider rounded-xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all"
           >
             {addTxMutation.isPending ? "Logging…" : "Save Record"}
           </button>
@@ -2268,14 +2274,14 @@ function MoneyPageContent() {
               onChange={(e) => setCategoryBudgetAmount(e.target.value)}
               placeholder="e.g. 5000"
               required
-              className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
+              className="w-full neo-input text-xs sm:text-sm font-bold"
             />
           </div>
 
           <button
             type="submit"
             disabled={updateCatMutation.isPending}
-            className="w-full bg-[#F59E0B] hover:bg-[#d98206] text-white font-black text-xs uppercase tracking-wider rounded-2xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all"
+            className="w-full bg-[#F59E0B] hover:bg-[#d98206] text-white font-black text-xs uppercase tracking-wider rounded-xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all"
           >
             {updateCatMutation.isPending ? "Updating…" : "Save Cap"}
           </button>
@@ -2304,7 +2310,7 @@ function MoneyPageContent() {
                     setEditTxCategoryId(categories.filter((c) => c.type === t)[0]?.id || "");
                   }}
                   className={cn(
-                    "flex-1 py-2 rounded-2xl border-2 border-[#161514] text-xs font-black transition-all uppercase tracking-wider cursor-pointer shadow-[2px_2px_0px_0px_rgba(22,21,20,1)]",
+                    "flex-1 py-2.5 rounded-xl border-2 border-[#161514] text-xs font-black transition-all uppercase tracking-wider cursor-pointer shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
                     editTxType === t
                       ? "bg-[#161514] text-white"
                       : "bg-white text-[#161514]/70 hover:bg-[#FAF8F5]"
@@ -2329,7 +2335,7 @@ function MoneyPageContent() {
                 onChange={(e) => setEditTxAmount(e.target.value)}
                 placeholder="e.g. 250"
                 required
-                className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
+                className="w-full neo-input text-xs sm:text-sm font-bold"
               />
             </div>
             <div className="space-y-1">
@@ -2362,7 +2368,7 @@ function MoneyPageContent() {
                 value={editTxDate}
                 onChange={(e) => setEditTxDate(e.target.value)}
                 required
-                className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-3 py-2.5 text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
+                className="w-full neo-input text-xs sm:text-sm font-bold"
               />
             </div>
             <div className="space-y-1">
@@ -2392,14 +2398,14 @@ function MoneyPageContent() {
               value={editTxNote}
               onChange={(e) => setEditTxNote(e.target.value)}
               placeholder="e.g. bought grocery, coffee..."
-              className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
+              className="w-full neo-input text-xs sm:text-sm font-bold"
             />
           </div>
 
           <button
             type="submit"
             disabled={updateTxMutation.isPending}
-            className="w-full bg-[#03D26F] hover:bg-[#02b35d] text-[#161514] font-black text-xs uppercase tracking-wider rounded-2xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all"
+            className="w-full bg-[#03D26F] hover:bg-[#02b35d] text-[#161514] font-black text-xs uppercase tracking-wider rounded-xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all"
           >
             {updateTxMutation.isPending ? "Updating…" : "Save Changes"}
           </button>
@@ -2462,7 +2468,7 @@ function MoneyPageContent() {
               onChange={(e) => setNewCatName(e.target.value)}
               placeholder="e.g. Groceries, Investments, Dining..."
               required
-              className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
+              className="w-full neo-input text-xs sm:text-sm font-bold"
             />
           </div>
 
@@ -2474,7 +2480,7 @@ function MoneyPageContent() {
               <select
                 value={newCatType}
                 onChange={(e) => setNewCatType(e.target.value as any)}
-                className="w-full bg-white rounded-2xl border-2 border-[#161514] px-3 py-2.5 text-xs sm:text-sm font-black text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all cursor-pointer"
+                className="w-full neo-input text-xs sm:text-sm font-black cursor-pointer"
               >
                 <option value="expense">Expense</option>
                 <option value="income">Income</option>
@@ -2490,7 +2496,7 @@ function MoneyPageContent() {
                 value={newCatIcon}
                 onChange={(e) => setNewCatIcon(e.target.value)}
                 placeholder="e.g. 🛒, ☕, 💼"
-                className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-4 py-2 text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
+                className="w-full neo-input text-xs sm:text-sm font-bold"
               />
               <div className="flex flex-wrap gap-1.5 pt-1.5 max-h-24 overflow-y-auto">
                 {PRESET_CATEGORY_EMOJIS.map((emoji) => (
@@ -2499,8 +2505,8 @@ function MoneyPageContent() {
                     type="button"
                     onClick={() => setNewCatIcon(emoji)}
                     className={cn(
-                      "h-7 w-7 text-xs rounded-xl border-2 border-[#161514] flex items-center justify-center transition-all cursor-pointer shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5",
-                      newCatIcon === emoji ? "bg-[#CEF431] scale-110 font-bold" : "bg-white hover:bg-amber-100"
+                      "h-8 w-8 text-sm rounded-xl border-2 border-[#161514] flex items-center justify-center transition-all cursor-pointer shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
+                      newCatIcon === emoji ? "bg-[#CEF431] scale-105 font-bold" : "bg-white hover:bg-amber-100"
                     )}
                   >
                     {emoji}
@@ -2521,7 +2527,7 @@ function MoneyPageContent() {
                 value={newCatMonthlyBudget}
                 onChange={(e) => setNewCatMonthlyBudget(e.target.value)}
                 placeholder="e.g. 5000"
-                className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
+                className="w-full neo-input text-xs sm:text-sm font-bold"
               />
             </div>
           )}
@@ -2541,7 +2547,7 @@ function MoneyPageContent() {
                     style={{ backgroundColor: c.hex }}
                     title={c.label}
                     className={cn(
-                      "h-8 w-8 rounded-full transition-all border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] cursor-pointer flex items-center justify-center",
+                      "h-8 w-8 rounded-full transition-all border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] cursor-pointer flex items-center justify-center hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
                       isSelected ? "scale-110 ring-4 ring-[#161514] ring-offset-2" : "hover:scale-105"
                     )}
                   >
@@ -2555,7 +2561,7 @@ function MoneyPageContent() {
           <button
             type="submit"
             disabled={addCatMutation.isPending}
-            className="w-full bg-[#03D26F] hover:bg-[#02b35d] text-[#161514] font-black text-xs uppercase tracking-wider rounded-2xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all"
+            className="w-full bg-[#03D26F] hover:bg-[#02b35d] text-[#161514] font-black text-xs uppercase tracking-wider rounded-xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all"
           >
             {addCatMutation.isPending ? "Adding…" : "Create Category"}
           </button>
@@ -2583,7 +2589,7 @@ function MoneyPageContent() {
               onChange={(e) => setEditCatName(e.target.value)}
               placeholder="e.g. Groceries, Travel..."
               required
-              className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
+              className="w-full neo-input text-xs sm:text-sm font-bold"
             />
           </div>
 
@@ -2595,7 +2601,7 @@ function MoneyPageContent() {
               <select
                 value={editCatType}
                 onChange={(e) => setEditCatType(e.target.value as any)}
-                className="w-full bg-white rounded-2xl border-2 border-[#161514] px-3 py-2.5 text-xs sm:text-sm font-black text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all cursor-pointer"
+                className="w-full neo-input text-xs sm:text-sm font-black cursor-pointer"
               >
                 <option value="expense">Expense</option>
                 <option value="income">Income</option>
@@ -2611,7 +2617,7 @@ function MoneyPageContent() {
                 value={editCatIcon}
                 onChange={(e) => setEditCatIcon(e.target.value)}
                 placeholder="e.g. 🛒, ☕, 💼"
-                className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-4 py-2 text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
+                className="w-full neo-input text-xs sm:text-sm font-bold"
               />
               <div className="flex flex-wrap gap-1.5 pt-1.5 max-h-24 overflow-y-auto">
                 {PRESET_CATEGORY_EMOJIS.map((emoji) => (
@@ -2620,8 +2626,8 @@ function MoneyPageContent() {
                     type="button"
                     onClick={() => setEditCatIcon(emoji)}
                     className={cn(
-                      "h-7 w-7 text-xs rounded-xl border-2 border-[#161514] flex items-center justify-center transition-all cursor-pointer shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5",
-                      editCatIcon === emoji ? "bg-[#CEF431] scale-110 font-bold" : "bg-white hover:bg-amber-100"
+                      "h-8 w-8 text-sm rounded-xl border-2 border-[#161514] flex items-center justify-center transition-all cursor-pointer shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
+                      editCatIcon === emoji ? "bg-[#CEF431] scale-105 font-bold" : "bg-white hover:bg-amber-100"
                     )}
                   >
                     {emoji}
@@ -2642,7 +2648,7 @@ function MoneyPageContent() {
                 value={editCatMonthlyBudget}
                 onChange={(e) => setEditCatMonthlyBudget(e.target.value)}
                 placeholder="e.g. 5000"
-                className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
+                className="w-full neo-input text-xs sm:text-sm font-bold"
               />
             </div>
           )}
@@ -2662,7 +2668,7 @@ function MoneyPageContent() {
                     style={{ backgroundColor: c.hex }}
                     title={c.label}
                     className={cn(
-                      "h-8 w-8 rounded-full transition-all border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] cursor-pointer flex items-center justify-center",
+                      "h-8 w-8 rounded-full transition-all border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] cursor-pointer flex items-center justify-center hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
                       isSelected ? "scale-110 ring-4 ring-[#161514] ring-offset-2" : "hover:scale-105"
                     )}
                   >
@@ -2676,7 +2682,7 @@ function MoneyPageContent() {
           <button
             type="submit"
             disabled={updateCatMutation.isPending}
-            className="w-full bg-[#03D26F] hover:bg-[#02b35d] text-[#161514] font-black text-xs uppercase tracking-wider rounded-2xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all"
+            className="w-full bg-[#03D26F] hover:bg-[#02b35d] text-[#161514] font-black text-xs uppercase tracking-wider rounded-xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all"
           >
             {updateCatMutation.isPending ? "Updating…" : "Save Changes"}
           </button>
@@ -2736,7 +2742,7 @@ function MoneyPageContent() {
               onChange={(e) => setMoveAmount(e.target.value)}
               placeholder="0.00"
               required
-              className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
+              className="w-full neo-input text-xs sm:text-sm font-bold"
             />
           </div>
 
@@ -2750,13 +2756,13 @@ function MoneyPageContent() {
               value={moveNote}
               onChange={(e) => setMoveNote(e.target.value)}
               placeholder="e.g. Monthly SIP re-allocation, Savings transfer"
-              className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
+              className="w-full neo-input text-xs sm:text-sm font-bold"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full bg-amber-400 hover:bg-amber-500 text-navy-950 font-black text-xs uppercase tracking-wider rounded-2xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center justify-center gap-2"
+            className="w-full bg-amber-400 hover:bg-amber-500 text-navy-950 font-black text-xs uppercase tracking-wider rounded-xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center justify-center gap-2"
           >
             <span>Execute Transfer</span>
           </button>
@@ -2782,7 +2788,7 @@ function MoneyPageContent() {
               onChange={(e) => setSendRecipient(e.target.value)}
               placeholder="e.g. Khushi, Landlord, Swiggy, Gym..."
               required
-              className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
+              className="w-full neo-input text-xs sm:text-sm font-bold"
             />
           </div>
 
@@ -2799,7 +2805,7 @@ function MoneyPageContent() {
                 onChange={(e) => setSendAmount(e.target.value)}
                 placeholder="0.00"
                 required
-                className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
+                className="w-full neo-input text-xs sm:text-sm font-bold"
               />
             </div>
             <div className="space-y-1">
@@ -2845,13 +2851,13 @@ function MoneyPageContent() {
               value={sendNote}
               onChange={(e) => setSendNote(e.target.value)}
               placeholder="e.g. Dinner split, Monthly rent, Grocery bill"
-              className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-4 py-2.5 text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
+              className="w-full neo-input text-xs sm:text-sm font-bold"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full bg-[#03D26F] hover:bg-[#02b35d] text-[#161514] font-black text-xs uppercase tracking-wider rounded-2xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center justify-center gap-2"
+            className="w-full bg-[#03D26F] hover:bg-[#02b35d] text-[#161514] font-black text-xs uppercase tracking-wider rounded-xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center justify-center gap-2"
           >
             <span>Confirm & Send Payout</span>
           </button>
@@ -2874,7 +2880,7 @@ function MoneyPageContent() {
             <div className="space-y-4 pt-1">
               {/* Highlight Amount Banner */}
               <div className={cn(
-                "p-4 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] text-center space-y-1",
+                "p-4 rounded-2xl border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] text-center space-y-1",
                 isIncome ? "bg-[#03D26F]/20" : "bg-rose-100"
               )}>
                 <span className="text-[10px] font-black uppercase tracking-widest text-[#161514]/70">
@@ -2886,7 +2892,7 @@ function MoneyPageContent() {
               </div>
 
               {/* Transaction Metadata Grid */}
-              <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] space-y-2.5 text-xs font-bold text-[#161514]">
+              <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] space-y-2.5 text-xs font-bold text-[#161514]">
                 <div className="flex justify-between items-center pb-2 border-b border-[#161514]/10">
                   <span className="text-[#161514]/60 font-black uppercase text-[10px]">Category</span>
                   <span className="flex items-center gap-1.5 font-black">
@@ -2896,7 +2902,7 @@ function MoneyPageContent() {
                 </div>
                 <div className="flex justify-between items-center pb-2 border-b border-[#161514]/10">
                   <span className="text-[#161514]/60 font-black uppercase text-[10px]">Payment Method</span>
-                  <span className="capitalize font-black px-2 py-0.5 rounded-lg bg-amber-200 border border-[#161514]">
+                  <span className="capitalize font-black px-2 py-0.5 rounded-lg bg-amber-200 border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
                     {inspectingTx.paymentMethod || "UPI"}
                   </span>
                 </div>
@@ -2919,7 +2925,7 @@ function MoneyPageContent() {
                 <button
                   type="button"
                   onClick={() => handleDuplicateTx(inspectingTx)}
-                  className="w-full bg-[#CEF431] hover:bg-[#bce028] text-[#161514] font-black text-xs uppercase tracking-wider py-2.5 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center justify-center gap-1"
+                  className="w-full bg-[#CEF431] hover:bg-[#bce028] text-[#161514] font-black text-xs uppercase tracking-wider py-2.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center justify-center gap-1"
                 >
                   <Copy className="h-3.5 w-3.5 stroke-[2.5]" />
                   <span>Duplicate</span>
@@ -2932,7 +2938,7 @@ function MoneyPageContent() {
                     setInspectingTx(null);
                     handleOpenEditTxModal(txToEdit);
                   }}
-                  className="w-full bg-amber-400 hover:bg-amber-500 text-[#161514] font-black text-xs uppercase tracking-wider py-2.5 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center justify-center gap-1"
+                  className="w-full bg-amber-400 hover:bg-amber-500 text-[#161514] font-black text-xs uppercase tracking-wider py-2.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center justify-center gap-1"
                 >
                   <Edit3 className="h-3.5 w-3.5 stroke-[2.5]" />
                   <span>Edit</span>
@@ -2945,7 +2951,7 @@ function MoneyPageContent() {
                     setInspectingTx(null);
                     setDeleteTxId(txIdToDelete);
                   }}
-                  className="w-full bg-rose-400 hover:bg-rose-500 text-[#161514] font-black text-xs uppercase tracking-wider py-2.5 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center justify-center gap-1"
+                  className="w-full bg-rose-400 hover:bg-rose-500 text-[#161514] font-black text-xs uppercase tracking-wider py-2.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center justify-center gap-1"
                 >
                   <Trash2 className="h-3.5 w-3.5 stroke-[2.5]" />
                   <span>Delete</span>
@@ -3003,7 +3009,7 @@ function MoneyPageContent() {
         description="Your base monthly income/budget from which daily expenses are deducted"
       >
         <form onSubmit={handleSaveMonthlyBudget} className="space-y-4 pt-1">
-          <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] space-y-1">
+          <div className="bg-[#FFF9EA] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] space-y-1">
             <span className="text-[10px] font-black uppercase tracking-wider text-navy-600 block">
               How Monthly Budget Works
             </span>
@@ -3025,7 +3031,7 @@ function MoneyPageContent() {
               onChange={(e) => setTempBudgetInput(e.target.value)}
               placeholder="e.g. 9000, 15000, 50000"
               required
-              className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-4 py-3 text-sm font-black text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
+              className="w-full neo-input text-sm font-black"
             />
           </div>
 
@@ -3035,7 +3041,7 @@ function MoneyPageContent() {
                 key={preset}
                 type="button"
                 onClick={() => setTempBudgetInput(String(preset))}
-                className="py-1.5 rounded-xl bg-white hover:bg-[#CEF431] text-[#161514] font-black text-xs border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] cursor-pointer transition-all active:translate-x-0.5 active:translate-y-0.5"
+                className="py-2 rounded-xl bg-white hover:bg-[#CEF431] text-[#161514] font-black text-xs border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all"
               >
                 {currencySymbol}{preset.toLocaleString()}
               </button>
@@ -3044,7 +3050,7 @@ function MoneyPageContent() {
 
           <button
             type="submit"
-            className="w-full bg-[#CEF431] hover:bg-[#03D26F] text-[#161514] font-black text-xs uppercase tracking-wider py-3.5 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center justify-center gap-2 mt-2"
+            className="w-full bg-[#CEF431] hover:bg-[#03D26F] text-[#161514] font-black text-xs uppercase tracking-wider py-3.5 rounded-xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center justify-center gap-2 mt-2"
           >
             <span>Save Monthly Budget Target 🎯</span>
           </button>

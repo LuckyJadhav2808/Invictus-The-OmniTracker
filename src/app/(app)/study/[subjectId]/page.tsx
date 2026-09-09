@@ -92,10 +92,10 @@ export default function SubjectDetailPage({
   };
   // Status mapping
   const statusLabels: Record<string, { label: string; bg: string; text: string }> = {
-    notStarted: { label: "Not Started", bg: "bg-navy-900/5", text: "text-navy-600" },
-    inProgress: { label: "In Progress", bg: "bg-amber-500/10", text: "text-amber-600" },
-    completed: { label: "Completed", bg: "bg-mint-600/10", text: "text-mint-600" },
-    needsRevision: { label: "Needs Revision", bg: "bg-coral-400/20", text: "text-coral-500" },
+    notStarted: { label: "Not Started", bg: "bg-[#F3F4F6] border-2 border-[#161514]", text: "text-[#161514]" },
+    inProgress: { label: "In Progress", bg: "bg-[#FEF08A] border-2 border-[#161514]", text: "text-[#161514]" },
+    completed: { label: "Completed", bg: "bg-[#A7F3D0] border-2 border-[#161514]", text: "text-[#161514]" },
+    needsRevision: { label: "Needs Rev.", bg: "bg-[#FED7AA] border-2 border-[#161514]", text: "text-[#161514]" },
   };
 
   return (
@@ -103,24 +103,27 @@ export default function SubjectDetailPage({
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <Link href="/study" className="text-navy-600 hover:text-navy-900 flex items-center gap-1.5 text-sm font-bold">
-            <ArrowLeft className="h-4 w-4" /> Subjects
+          <Link
+            href="/study"
+            className="bg-white px-3.5 py-1.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-[#161514] hover:bg-[#FFF9EA] flex items-center gap-1.5 text-xs font-black uppercase tracking-wider transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer"
+          >
+            <ArrowLeft className="h-4 w-4 stroke-[3]" /> Subjects
           </Link>
-          <Button
+          <button
             onClick={() => setIsAddTopicOpen(true)}
-            className="bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-full py-2 px-4 shadow-sm flex items-center gap-1.5 cursor-pointer border-none"
+            className="bg-[#CEF431] hover:bg-[#b8dd24] text-[#161514] font-black text-xs uppercase py-2 px-4 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center gap-1.5 cursor-pointer"
           >
             <Plus className="h-4 w-4 stroke-[3]" /> Add Topic
-          </Button>
+          </button>
         </div>
 
         {/* Title details */}
         <div className="space-y-1">
-          <h1 className="text-2xl font-extrabold text-navy-900" style={{ fontFamily: "var(--font-heading)" }}>
+          <h1 className="text-2xl md:text-3xl font-black text-[#161514] font-heading tracking-tight">
             {subject.name}
           </h1>
-          <p className="text-navy-600 text-sm">
-            Manage your topics and check progress
+          <p className="text-xs font-bold text-[#161514]/70 uppercase tracking-wider">
+            Manage your topics, track mastery, and log revisions
           </p>
         </div>
 
@@ -128,7 +131,7 @@ export default function SubjectDetailPage({
         {topicsLoading ? (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white rounded-[var(--radius-lg)] p-4 h-16 animate-pulse" />
+              <div key={i} className="bg-white rounded-3xl p-5 h-20 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] animate-pulse" />
             ))}
           </div>
         ) : topics.length === 0 ? (
@@ -154,22 +157,22 @@ export default function SubjectDetailPage({
                 <div
                   key={topic.id}
                   onClick={() => router.push(`/study/${subjectId}/${topic.id}`)}
-                  className="break-inside-avoid block w-full bg-white border border-border rounded-[var(--radius-lg)] p-4 flex items-center justify-between shadow-[0_8px_24px_rgba(31,36,48,0.02)] hover:shadow-[0_8px_24px_rgba(31,36,48,0.06)] hover:scale-[1.002] active:scale-[0.998] transition-all cursor-pointer select-none"
+                  className="break-inside-avoid block w-full bg-white rounded-3xl p-5 border-[2.5px] border-[#161514] shadow-[3.5px_3.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer select-none flex items-center justify-between"
                 >
                   <div className="flex-1 min-w-0 pr-4">
-                    <h4 className="font-bold text-sm text-navy-900 truncate leading-snug">
+                    <h4 className="font-black text-sm md:text-base text-[#161514] truncate font-heading leading-snug">
                       {topic.title}
                     </h4>
-                    <div className="flex items-center gap-3 mt-1.5 flex-wrap">
-                      <span className={cn("text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider", status.bg, status.text)}>
+                    <div className="flex items-center gap-2 mt-2 flex-wrap">
+                      <span className={cn("text-[9px] font-black px-2 py-0.5 rounded-lg uppercase tracking-wider shadow-[1px_1px_0px_0px_#161514]", status.bg, status.text)}>
                         {status.label}
                       </span>
-                      <span className="text-[10px] font-semibold text-navy-600 flex items-center gap-1">
-                        <Clock className="h-3 w-3" /> {topicLoggedHours} / {topic.estimatedHours}h
+                      <span className="text-[10px] font-black text-[#161514] flex items-center gap-1 px-2 py-0.5 rounded-lg bg-[#FAF8F5] border border-[#161514]">
+                        <Clock className="h-3 w-3 stroke-[2.5]" /> {topicLoggedHours} / {topic.estimatedHours}h
                       </span>
                       {topic.confidence > 1 && (
-                        <span className="text-[9px] font-bold text-amber-600 flex items-center gap-0.5">
-                          <Sparkles className="h-3 w-3" /> Confidence: {topic.confidence}/5
+                        <span className="text-[9px] font-black text-[#161514] flex items-center gap-0.5 px-2 py-0.5 rounded-lg bg-[#FEF08A] border border-[#161514]">
+                          <Sparkles className="h-3 w-3 stroke-[2.5]" /> {topic.confidence}/5
                         </span>
                       )}
                     </div>
@@ -183,18 +186,22 @@ export default function SubjectDetailPage({
                           setEditTopicTitle(topic.title);
                           setEditEstimatedHours(topic.estimatedHours);
                         }}
-                        className="text-navy-600 hover:text-navy-900 p-1 cursor-pointer transition-colors outline-none border-none bg-transparent"
+                        className="bg-[#FFFDF8] hover:bg-[#FFF9EA] text-[#161514] p-1.5 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
+                        title="Edit topic"
                       >
-                        <Edit3 className="h-3.5 w-3.5" />
+                        <Edit3 className="h-3.5 w-3.5 stroke-[2.5]" />
                       </button>
                       <button
                         onClick={() => setDeleteTopicId(topic.id)}
-                        className="text-red-500 hover:text-red-600 p-1 cursor-pointer transition-colors outline-none border-none bg-transparent"
+                        className="bg-[#FEE2E2] hover:bg-[#FCA5A5] text-[#991B1B] p-1.5 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
+                        title="Delete topic"
                       >
-                        <Trash2 className="h-3.5 w-3.5" />
+                        <Trash2 className="h-3.5 w-3.5 stroke-[2.5]" />
                       </button>
                     </div>
-                    <ChevronRight className="h-4 w-4 text-navy-600" />
+                    <div className="bg-[#FAF8F5] p-1.5 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]">
+                      <ChevronRight className="h-4 w-4 text-[#161514] stroke-[3]" />
+                    </div>
                   </div>
                 </div>
               );
@@ -212,7 +219,7 @@ export default function SubjectDetailPage({
       >
         <form onSubmit={handleAddTopic} className="space-y-4">
           <div className="space-y-1">
-            <label htmlFor="topic-title" className="text-xs font-bold uppercase tracking-wider text-navy-600">
+            <label htmlFor="topic-title" className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">
               Topic Title
             </label>
             <input
@@ -222,12 +229,12 @@ export default function SubjectDetailPage({
               onChange={(e) => setTopicTitle(e.target.value)}
               placeholder="e.g. Chapter 1: Thermodynamics..."
               required
-              className="w-full rounded-[var(--radius-sm)] border border-input bg-cream-bg/50 py-2.5 px-3 text-sm outline-none text-navy-900"
+              className="w-full rounded-xl border-2 border-[#161514] bg-[#FFFDF8] py-2.5 px-3.5 text-xs font-black text-[#161514] outline-none focus:bg-[#FFF9EA] shadow-[2px_2px_0px_0px_#161514] transition-all"
             />
           </div>
 
           <div className="space-y-1">
-            <label htmlFor="est-hours" className="text-xs font-bold uppercase tracking-wider text-navy-600">
+            <label htmlFor="est-hours" className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">
               Estimated Hours
             </label>
             <input
@@ -237,17 +244,17 @@ export default function SubjectDetailPage({
               onChange={(e) => setEstimatedHours(Number(e.target.value))}
               min={1}
               required
-              className="w-full rounded-[var(--radius-sm)] border border-input bg-cream-bg/50 py-2.5 px-3 text-sm outline-none text-navy-900"
+              className="w-full rounded-xl border-2 border-[#161514] bg-[#FFFDF8] py-2.5 px-3.5 text-xs font-black text-[#161514] outline-none focus:bg-[#FFF9EA] shadow-[2px_2px_0px_0px_#161514] transition-all"
             />
           </div>
 
-          <Button
+          <button
             type="submit"
             disabled={addTopicMutation.isPending}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-full py-2.5 shadow-sm border-none cursor-pointer"
+            className="w-full bg-[#03D26F] hover:bg-[#02B75F] text-[#161514] font-black text-xs uppercase py-3 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer tracking-wider"
           >
-            {addTopicMutation.isPending ? "Adding…" : "Add Topic"}
-          </Button>
+            {addTopicMutation.isPending ? "Adding…" : "Add Topic 🎯"}
+          </button>
         </form>
       </ResponsiveFormContainer>
 
@@ -262,7 +269,7 @@ export default function SubjectDetailPage({
       >
         <form onSubmit={handleUpdateTopic} className="space-y-4">
           <div className="space-y-1">
-            <label htmlFor="edit-topic-title" className="text-xs font-bold uppercase tracking-wider text-navy-600">
+            <label htmlFor="edit-topic-title" className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">
               Topic Title
             </label>
             <input
@@ -272,12 +279,12 @@ export default function SubjectDetailPage({
               onChange={(e) => setEditTopicTitle(e.target.value)}
               placeholder="e.g. Chapter 1: Thermodynamics..."
               required
-              className="w-full rounded-[var(--radius-sm)] border border-input bg-cream-bg/50 py-2.5 px-3 text-sm outline-none text-navy-900"
+              className="w-full rounded-xl border-2 border-[#161514] bg-[#FFFDF8] py-2.5 px-3.5 text-xs font-black text-[#161514] outline-none focus:bg-[#FFF9EA] shadow-[2px_2px_0px_0px_#161514] transition-all"
             />
           </div>
 
           <div className="space-y-1">
-            <label htmlFor="edit-est-hours" className="text-xs font-bold uppercase tracking-wider text-navy-600">
+            <label htmlFor="edit-est-hours" className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">
               Estimated Hours
             </label>
             <input
@@ -287,17 +294,17 @@ export default function SubjectDetailPage({
               onChange={(e) => setEditEstimatedHours(Number(e.target.value))}
               min={1}
               required
-              className="w-full rounded-[var(--radius-sm)] border border-input bg-cream-bg/50 py-2.5 px-3 text-sm outline-none text-navy-900"
+              className="w-full rounded-xl border-2 border-[#161514] bg-[#FFFDF8] py-2.5 px-3.5 text-xs font-black text-[#161514] outline-none focus:bg-[#FFF9EA] shadow-[2px_2px_0px_0px_#161514] transition-all"
             />
           </div>
 
-          <Button
+          <button
             type="submit"
             disabled={updateTopicMutation.isPending}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-full py-2.5 shadow-sm border-none cursor-pointer"
+            className="w-full bg-[#03D26F] hover:bg-[#02B75F] text-[#161514] font-black text-xs uppercase py-3 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer tracking-wider"
           >
-            {updateTopicMutation.isPending ? "Updating…" : "Save Changes"}
-          </Button>
+            {updateTopicMutation.isPending ? "Updating…" : "Save Changes 📝"}
+          </button>
         </form>
       </ResponsiveFormContainer>
 
@@ -324,3 +331,4 @@ export default function SubjectDetailPage({
     </div>
   );
 }
+

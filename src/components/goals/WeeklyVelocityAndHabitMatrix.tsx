@@ -139,28 +139,28 @@ export function WeeklyVelocityAndHabitMatrix() {
   return (
     <div className="space-y-5 my-4">
       {/* Top Banner: Peak Productivity Insight */}
-      <div className="bg-white rounded-3xl p-5 md:p-6 border-2 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] space-y-4">
+      <div className="bg-white rounded-2xl p-5 md:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-2xl bg-[#CEF431] border-2 border-navy-950 flex items-center justify-center text-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] shrink-0">
+            <div className="h-12 w-12 rounded-2xl bg-[#CEF431] border-2 border-[#161514] flex items-center justify-center text-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] shrink-0">
               <Zap className="h-6 w-6 stroke-[2.5]" />
             </div>
             <div>
-              <h3 className="text-base sm:text-lg font-black text-navy-950 uppercase tracking-wider flex items-center gap-2" style={{ fontFamily: "var(--font-heading)" }}>
+              <h3 className="text-base sm:text-lg font-black text-[#161514] uppercase tracking-wider flex items-center gap-2" style={{ fontFamily: "var(--font-heading)" }}>
                 WEEKLY VELOCITY & CONSISTENCY MATRIX
               </h3>
-              <p className="text-xs text-navy-700 font-bold mt-0.5">
-                👑 Peak Focus Day: <strong className="text-emerald-700 font-black">{weekdayStats.peakDay.name}s</strong> (Avg {weekdayStats.peakDay.avg} logs/day)
+              <p className="text-xs text-[#161514]/70 font-bold mt-0.5">
+                👑 Peak Focus Day: <strong className="text-[#03D26F] font-black">{weekdayStats.peakDay.name}s</strong> (Avg {weekdayStats.peakDay.avg} logs/day)
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 self-start sm:self-auto">
-            <div className="bg-[#03D26F] text-[#161514] px-3.5 py-1.5 rounded-xl border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] text-center">
+            <div className="bg-[#03D26F] text-[#161514] px-3.5 py-1.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-center">
               <span className="text-sm font-black block leading-none">{total28DaysCompleted}</span>
               <span className="text-[9px] font-black uppercase tracking-widest block opacity-90 mt-0.5">28D LOGS</span>
             </div>
-            <div className="bg-[#CEF431] text-[#161514] px-3.5 py-1.5 rounded-xl border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] text-center">
+            <div className="bg-[#CEF431] text-[#161514] px-3.5 py-1.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-center">
               <span className="text-sm font-black block leading-none">{habits.length}</span>
               <span className="text-[9px] font-black uppercase tracking-widest block opacity-90 mt-0.5">HABITS</span>
             </div>
@@ -168,17 +168,17 @@ export function WeeklyVelocityAndHabitMatrix() {
         </div>
 
         {/* 4-Week Activity Heatmap Grid (28 Days) */}
-        <div className="space-y-2 pt-2 border-t-2 border-navy-950/10">
+        <div className="space-y-2 pt-2 border-t-2 border-[#161514]/10">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-black uppercase tracking-wider text-navy-950 flex items-center gap-1.5">
+            <span className="text-xs font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5">
               <Calendar className="h-4 w-4 stroke-[2.5]" /> 28-Day Consistency Heatmap Grid
             </span>
-            <div className="flex items-center gap-1 text-[10px] font-bold text-navy-700">
+            <div className="flex items-center gap-1 text-[10px] font-bold text-[#161514]/70">
               <span>Less</span>
-              <div className="h-3 w-3 rounded bg-[#FAF8F5] border border-navy-950" />
-              <div className="h-3 w-3 rounded bg-[#CEF431]/40 border border-navy-950" />
-              <div className="h-3 w-3 rounded bg-[#CEF431] border border-navy-950" />
-              <div className="h-3 w-3 rounded bg-[#03D26F] border border-navy-950" />
+              <div className="h-3 w-3 rounded bg-[#FAF8F5] border-2 border-[#161514]" />
+              <div className="h-3 w-3 rounded bg-[#CEF431]/40 border-2 border-[#161514]" />
+              <div className="h-3 w-3 rounded bg-[#CEF431] border-2 border-[#161514]" />
+              <div className="h-3 w-3 rounded bg-[#03D26F] border-2 border-[#161514]" />
               <span>More</span>
             </div>
           </div>
@@ -192,13 +192,13 @@ export function WeeklyVelocityAndHabitMatrix() {
                   onMouseEnter={() => setHoveredDay(d)}
                   onMouseLeave={() => setHoveredDay(null)}
                   className={cn(
-                    "relative aspect-square sm:aspect-auto sm:h-12 rounded-xl border-2 border-navy-950 p-1 flex flex-col items-center justify-center text-center transition-all cursor-pointer select-none overflow-hidden",
-                    d.intensity === 0 && "bg-[#FAF8F5]",
-                    d.intensity === 1 && "bg-[#CEF431]/30",
-                    d.intensity === 2 && "bg-[#CEF431]/60 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]",
-                    d.intensity === 3 && "bg-[#CEF431] shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] font-black",
-                    d.intensity === 4 && "bg-[#03D26F] text-white shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] font-black scale-[1.03]",
-                    d.isToday && "ring-2 ring-amber-400 ring-offset-1"
+                    "relative aspect-square sm:aspect-auto sm:h-12 rounded-xl border-2 border-[#161514] p-1 flex flex-col items-center justify-center text-center transition-all cursor-pointer select-none overflow-hidden hover:-translate-x-0.5 hover:-translate-y-0.5",
+                    d.intensity === 0 && "bg-[#FAF8F5] text-[#161514]",
+                    d.intensity === 1 && "bg-[#CEF431]/30 text-[#161514]",
+                    d.intensity === 2 && "bg-[#CEF431]/60 text-[#161514] shadow-[1px_1px_0px_0px_#161514]",
+                    d.intensity === 3 && "bg-[#CEF431] text-[#161514] shadow-[2px_2px_0px_0px_#161514] font-black",
+                    d.intensity === 4 && "bg-[#03D26F] text-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] font-black scale-[1.03]",
+                    d.isToday && "ring-2 ring-[#161514] ring-offset-2"
                   )}
                 >
                   <span className="text-[8px] font-black uppercase opacity-70 leading-none">{d.monthName}</span>
@@ -210,7 +210,7 @@ export function WeeklyVelocityAndHabitMatrix() {
 
                   {/* Tooltip on Hover */}
                   {isHovered && (
-                    <div className="absolute bottom-[calc(100%+6px)] left-1/2 -translate-x-1/2 z-50 bg-[#161514] text-white p-2.5 rounded-xl border-2 border-white shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] text-[10px] w-44 pointer-events-none space-y-1">
+                    <div className="absolute bottom-[calc(100%+6px)] left-1/2 -translate-x-1/2 z-50 bg-[#161514] text-white p-2.5 rounded-xl border-2 border-white shadow-[3px_3px_0px_0px_#161514] text-[10px] w-44 pointer-events-none space-y-1">
                       <div className="font-black text-[#CEF431] uppercase tracking-wider flex justify-between">
                         <span>{d.shortDate} ({d.dayName})</span>
                         <span>{d.count} Logs</span>
@@ -240,12 +240,12 @@ export function WeeklyVelocityAndHabitMatrix() {
 
       {/* Habit Streak & Consistency Leaderboard */}
       {habitLeaderboard.length > 0 && (
-        <div className="bg-white rounded-3xl p-5 md:p-6 border-2 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] space-y-4">
+        <div className="bg-white rounded-2xl p-5 md:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-black text-navy-950 uppercase tracking-wider flex items-center gap-2">
+            <h3 className="text-sm font-black text-[#161514] uppercase tracking-wider flex items-center gap-2" style={{ fontFamily: "var(--font-heading)" }}>
               <Trophy className="h-4 w-4 text-amber-500 stroke-[2.5]" /> Habit Streak & Consistency Leaderboard
             </h3>
-            <span className="text-[10px] font-black uppercase text-navy-600 bg-amber-100 px-2.5 py-1 rounded-full border border-navy-950">
+            <span className="text-[10px] font-black uppercase text-[#161514] bg-[#FFF9EA] px-2.5 py-1 rounded-full border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
               30-Day Evaluation
             </span>
           </div>
@@ -258,35 +258,35 @@ export function WeeklyVelocityAndHabitMatrix() {
               return (
                 <div
                   key={h.id}
-                  className="p-3.5 rounded-2xl border-2 border-navy-950 bg-[#FAF8F5] shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] space-y-2.5"
+                  className="p-3.5 rounded-2xl border-2 border-[#161514] bg-[#FAF8F5] shadow-[2.5px_2.5px_0px_0px_#161514] space-y-2.5"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="h-8 w-8 rounded-xl bg-amber-300 border-2 border-navy-950 flex items-center justify-center text-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)] shrink-0">
+                      <div className="h-8 w-8 rounded-xl bg-amber-300 border-2 border-[#161514] flex items-center justify-center text-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] shrink-0">
                         {isEmoji ? (
                           <span className="text-sm leading-none">{h.icon}</span>
                         ) : (
                           <IconComp className="h-4 w-4 stroke-[2.5]" />
                         )}
                       </div>
-                      <h4 className="font-black text-xs sm:text-sm text-navy-950 truncate leading-snug">
+                      <h4 className="font-black text-xs sm:text-sm text-[#161514] truncate leading-snug">
                         {h.title}
                       </h4>
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto pl-10 sm:pl-0">
-                      <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded-xl bg-amber-300 text-navy-950 border border-navy-950 flex items-center gap-1 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]">
+                      <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded-xl bg-amber-300 text-[#161514] border-2 border-[#161514] flex items-center gap-1 shadow-[1.5px_1.5px_0px_0px_#161514]">
                         <Flame className="h-3 w-3 text-rose-600 fill-rose-600" />
                         {h.currentStreak}D Streak
                       </span>
-                      <span className="text-xs font-black text-emerald-800 bg-[#03D26F]/20 px-2.5 py-1 rounded-xl border border-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]">
+                      <span className="text-xs font-black text-[#161514] bg-[#03D26F]/30 px-2.5 py-1 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]">
                         {h.consistencyPct}% Consistency
                       </span>
                     </div>
                   </div>
 
                   {/* Progress Bar */}
-                  <div className="w-full h-3 bg-white rounded-full border border-navy-950 p-0.5 overflow-hidden">
+                  <div className="w-full h-3 bg-white rounded-full border-2 border-[#161514] p-0.5 overflow-hidden">
                     <div
                       style={{ width: `${h.consistencyPct}%` }}
                       className={cn(

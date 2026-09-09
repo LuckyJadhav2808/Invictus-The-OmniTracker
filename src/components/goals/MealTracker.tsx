@@ -151,16 +151,16 @@ export function MealTracker() {
   };
 
   return (
-    <div className="bg-white rounded-3xl p-5 md:p-6 border-2 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] space-y-5">
+    <div className="bg-white rounded-2xl sm:rounded-3xl p-5 md:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] sm:shadow-[5px_5px_0px_0px_#161514] space-y-5">
       {/* Header & Log Action */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="h-10 w-10 rounded-xl bg-emerald-300 border-2 border-navy-950 text-navy-950 flex items-center justify-center font-black shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)]">
+          <div className="h-10 w-10 rounded-xl bg-[#03D26F] border-2 border-[#161514] text-[#161514] flex items-center justify-center font-black shadow-[2px_2px_0px_0px_#161514]">
             <Utensils className="h-5 w-5 stroke-[2.5]" />
           </div>
           <div>
-            <h3 className="text-sm font-black text-navy-950 tracking-tight" style={{ fontFamily: "var(--font-heading)" }}>Daily Meal Routine & Nutrition</h3>
-            <p className="text-[10px] text-navy-700 font-bold">
+            <h3 className="text-sm font-heading font-black text-[#161514] tracking-tight">Daily Meal Routine & Nutrition</h3>
+            <p className="text-[10px] text-[#161514]/80 font-bold">
               Today's Intake: <strong className="text-emerald-800 font-black">{totalCalories} kcal</strong> | {totalProtein}g P | {totalCarbs}g C | {totalFat}g F
             </p>
           </div>
@@ -168,7 +168,7 @@ export function MealTracker() {
 
         <button
           onClick={() => setIsChoiceOpen(true)}
-          className="bg-emerald-400 hover:bg-emerald-500 text-navy-950 font-black rounded-xl py-1.5 px-3.5 text-xs border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 cursor-pointer flex items-center gap-1 transition-all"
+          className="bg-[#CEF431] hover:bg-[#D8F74E] text-[#161514] font-heading font-black rounded-xl py-1.5 px-3.5 text-xs border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none cursor-pointer flex items-center gap-1 transition-all"
         >
           <Plus className="h-3.5 w-3.5 stroke-[3]" /> Log Meal
         </button>
@@ -176,31 +176,31 @@ export function MealTracker() {
 
       {/* Daily Macro Progress Summary Pills */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-        <div className="bg-white rounded-2xl p-3 border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] text-center">
-          <span className="text-[9px] font-black uppercase tracking-widest text-navy-700 block">Calories</span>
-          <span className="text-base font-black text-navy-950 block mt-0.5">{totalCalories} kcal</span>
+        <div className="bg-white rounded-2xl p-3 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] text-center">
+          <span className="text-[9px] font-heading font-black uppercase tracking-widest text-[#161514]/70 block">Calories</span>
+          <span className="text-base font-heading font-black text-[#161514] block mt-0.5">{totalCalories} kcal</span>
         </div>
-        <div className="bg-emerald-200 rounded-2xl p-3 border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] text-center">
-          <span className="text-[9px] font-black uppercase tracking-widest text-navy-950 block">Protein</span>
-          <span className="text-base font-black text-navy-950 block mt-0.5">{totalProtein} g</span>
+        <div className="bg-[#ECFDF5] rounded-2xl p-3 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] text-center">
+          <span className="text-[9px] font-heading font-black uppercase tracking-widest text-emerald-800 block">Protein</span>
+          <span className="text-base font-heading font-black text-[#161514] block mt-0.5">{totalProtein} g</span>
         </div>
-        <div className="bg-amber-200 rounded-2xl p-3 border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] text-center">
-          <span className="text-[9px] font-black uppercase tracking-widest text-navy-950 block">Carbs</span>
-          <span className="text-base font-black text-navy-950 block mt-0.5">{totalCarbs} g</span>
+        <div className="bg-[#FFF9EA] rounded-2xl p-3 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] text-center">
+          <span className="text-[9px] font-heading font-black uppercase tracking-widest text-amber-800 block">Carbs</span>
+          <span className="text-base font-heading font-black text-[#161514] block mt-0.5">{totalCarbs} g</span>
         </div>
-        <div className="bg-rose-200 rounded-2xl p-3 border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] text-center">
-          <span className="text-[9px] font-black uppercase tracking-widest text-navy-950 block">Fat</span>
-          <span className="text-base font-black text-navy-950 block mt-0.5">{totalFat} g</span>
+        <div className="bg-[#FFF1F2] rounded-2xl p-3 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] text-center">
+          <span className="text-[9px] font-heading font-black uppercase tracking-widest text-rose-800 block">Fat</span>
+          <span className="text-base font-heading font-black text-[#161514] block mt-0.5">{totalFat} g</span>
         </div>
       </div>
 
       {/* Meal List */}
       {isLoading ? (
-        <div className="h-24 animate-pulse bg-cream-bg/60 rounded-2xl border-2 border-navy-950" />
+        <div className="h-24 animate-pulse bg-cream-bg/60 rounded-2xl border-2 border-[#161514]" />
       ) : meals.length === 0 ? (
-        <div className="bg-amber-50/60 rounded-2xl p-6 border-2 border-dashed border-navy-950 text-center space-y-2 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)]">
-          <p className="text-xs font-black text-navy-950">No meals logged for today yet! 🥗</p>
-          <p className="text-[10px] text-navy-700 font-bold max-w-sm mx-auto">
+        <div className="bg-[#FFF9EA] rounded-2xl p-6 border-2 border-dashed border-[#161514] text-center space-y-2 shadow-[2px_2px_0px_0px_#161514]">
+          <p className="text-xs font-heading font-black text-[#161514]">No meals logged for today yet! 🥗</p>
+          <p className="text-[10px] text-[#161514]/80 font-bold max-w-sm mx-auto">
             Log your breakfast, pre-workout meal, lunch, and dinner to track daily calories and protein goals.
           </p>
         </div>
@@ -209,29 +209,30 @@ export function MealTracker() {
           {meals.map((m: any) => (
             <div
               key={m.id}
-              className="bg-cream-bg/40 rounded-2xl p-3.5 border border-border/80 flex items-center justify-between gap-3"
+              className="bg-white rounded-2xl p-3.5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[4px_4px_0px_0px_#161514] flex items-center justify-between gap-3 transition-all"
             >
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => handleToggleMeal(m)}
-                  className="cursor-pointer border-none bg-transparent outline-none"
+                  className="h-8 w-8 rounded-xl border-2 border-[#161514] flex items-center justify-center cursor-pointer bg-white shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+                  title={m.completed ? "Mark meal incomplete" : "Mark meal consumed"}
                 >
                   {m.completed ? (
-                    <CheckCircle2 className="h-5 w-5 text-emerald-600 fill-emerald-100" />
+                    <CheckCircle2 className="h-5 w-5 text-[#03D26F] fill-[#161514]" />
                   ) : (
-                    <Circle className="h-5 w-5 text-navy-600/40 hover:text-navy-900" />
+                    <Circle className="h-5 w-5 text-[#161514]/40 hover:text-[#161514]" />
                   )}
                 </button>
 
                 <div>
                   <div className="flex items-center gap-2">
-                    <h5 className="font-extrabold text-xs text-navy-900">{m.name}</h5>
-                    <span className="text-[9px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full uppercase">
+                    <h5 className="font-heading font-black text-xs text-[#161514]">{m.name}</h5>
+                    <span className="neo-badge bg-[#ECFDF5] text-emerald-800">
                       {m.mealType}
                     </span>
-                    {m.time && <span className="text-[9px] font-semibold text-navy-600">({m.time})</span>}
+                    {m.time && <span className="text-[9px] font-bold text-[#161514]/70">({m.time})</span>}
                   </div>
-                  <div className="text-[10px] text-navy-600 font-semibold mt-0.5 flex gap-2">
+                  <div className="text-[10px] text-[#161514]/80 font-bold mt-0.5 flex gap-2">
                     <span>🔥 {m.calories} kcal</span>
                     <span>• {m.protein}g Protein</span>
                     <span>• {m.carbs}g Carbs</span>
@@ -294,13 +295,13 @@ export function MealTracker() {
       >
         <div className="space-y-4 pt-2">
           {/* 🥗 DATASET 2: 1,000+ INDIAN DISHES & MACRO SEARCH PICKER */}
-          <div className="bg-emerald-50 rounded-2xl p-3.5 border-2 border-navy-950 shadow-[2.5px_2.5px_0px_0px_rgba(31,36,48,1)] space-y-3">
+          <div className="bg-emerald-50 rounded-2xl p-3.5 border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-black uppercase tracking-widest text-navy-950 flex items-center gap-1.5">
-                <Search className="h-3.5 w-3.5 text-navy-950 stroke-[3]" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-[#161514] flex items-center gap-1.5" style={{ fontFamily: "var(--font-heading)" }}>
+                <Search className="h-3.5 w-3.5 text-[#161514] stroke-[3]" />
                 🥗 Search 1,000+ Indian Dishes & Macros
               </span>
-              <span className="text-[9px] font-black bg-emerald-400 text-navy-950 px-2 py-0.5 rounded-md border border-navy-950">
+              <span className="text-[9px] font-black bg-[#03D26F] text-[#161514] px-2 py-0.5 rounded-md border-2 border-[#161514]">
                 {nutritionData?.totalCount || 1015} Dishes
               </span>
             </div>
@@ -312,7 +313,7 @@ export function MealTracker() {
                 placeholder="Search dish name (e.g. Garam Chai, Aam Panna, Paneer, Dal, Oats)..."
                 value={dishQuery}
                 onChange={(e) => setDishQuery(e.target.value)}
-                className="w-full bg-white rounded-xl border-2 border-navy-950 px-3.5 py-2 text-xs font-bold text-navy-950 outline-none placeholder:text-navy-400 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)]"
+                className="w-full bg-white rounded-xl border-2 border-[#161514] px-3.5 py-2 text-xs font-bold text-[#161514] outline-none placeholder:text-[#161514]/40 shadow-[2px_2px_0px_0px_#161514] focus:bg-[#FFF9EA]"
               />
             </div>
 
@@ -330,20 +331,20 @@ export function MealTracker() {
                       setFat(String(dish.fats));
                       toast.success(`Loaded macros for '${dish.dishName}'! 🥗`);
                     }}
-                    className="p-2 rounded-xl bg-white hover:bg-emerald-100/80 border border-navy-950 cursor-pointer transition-all flex items-center justify-between gap-2 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]"
+                    className="p-2 rounded-xl bg-white hover:bg-emerald-100/80 border-2 border-[#161514] cursor-pointer transition-all flex items-center justify-between gap-2 shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5"
                   >
                     <div>
-                      <h5 className="font-black text-xs text-navy-950">{dish.dishName}</h5>
+                      <h5 className="font-black text-xs text-[#161514]">{dish.dishName}</h5>
                       <div className="flex items-center gap-2 mt-0.5">
                         <span className="text-[9px] font-black text-emerald-800">
                           🔥 {dish.calories} kcal
                         </span>
-                        <span className="text-[8px] font-black uppercase text-navy-600">
+                        <span className="text-[8px] font-black uppercase text-[#161514]/70">
                           P: {dish.protein}g • C: {dish.carbs}g • F: {dish.fats}g
                         </span>
                       </div>
                     </div>
-                    <span className="text-[10px] font-black bg-emerald-400 text-navy-950 px-2 py-0.5 rounded-lg border border-navy-950 shrink-0">
+                    <span className="text-[10px] font-black bg-[#03D26F] text-[#161514] px-2 py-0.5 rounded-lg border-2 border-[#161514] shrink-0">
                       AUTO-FILL ➔
                     </span>
                   </div>

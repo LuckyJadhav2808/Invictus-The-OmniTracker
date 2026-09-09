@@ -160,7 +160,7 @@ export function ReminderManagerModal({
         )}
 
         {/* 1. Money & Expense Log Reminder */}
-        <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)] space-y-2">
+        <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="h-7 w-7 rounded-lg bg-[#03D26F]/30 border border-[#161514] flex items-center justify-center text-emerald-950 font-black">
@@ -189,7 +189,7 @@ export function ReminderManagerModal({
         </div>
 
         {/* 2. Habits & Streaks Log Reminder */}
-        <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)] space-y-2">
+        <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="h-7 w-7 rounded-lg bg-amber-300 border border-[#161514] flex items-center justify-center text-amber-950 font-black">
@@ -218,7 +218,7 @@ export function ReminderManagerModal({
         </div>
 
         {/* 3. Study Session & Exam Syllabus Reminder */}
-        <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)] space-y-2">
+        <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="h-7 w-7 rounded-lg bg-indigo-200 border border-[#161514] flex items-center justify-center text-indigo-950 font-black">
@@ -247,7 +247,7 @@ export function ReminderManagerModal({
         </div>
 
         {/* 4. Exam Targets & Countdown Review */}
-        <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)] space-y-2">
+        <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="h-7 w-7 rounded-lg bg-rose-300 border border-[#161514] flex items-center justify-center text-rose-950 font-black">
@@ -281,7 +281,7 @@ export function ReminderManagerModal({
             type="button"
             onClick={() => setConfig({ ...config, soundEnabled: !config.soundEnabled })}
             className={cn(
-              "px-3 py-1.5 rounded-xl text-xs font-black border-2 border-[#161514] flex items-center gap-1.5 shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] cursor-pointer transition-all",
+              "px-3 py-1.5 rounded-xl text-xs font-black border-2 border-[#161514] flex items-center gap-1.5 shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all",
               config.soundEnabled ? "bg-[#CEF431] text-[#161514]" : "bg-white text-gray-500"
             )}
           >
@@ -292,7 +292,7 @@ export function ReminderManagerModal({
           <button
             type="button"
             onClick={handleTestNotification}
-            className="px-3 py-1.5 rounded-xl bg-white hover:bg-amber-100 text-[#161514] text-xs font-black border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] cursor-pointer transition-all flex items-center gap-1"
+            className="px-3 py-1.5 rounded-xl bg-white hover:bg-[#FFF9EA] text-[#161514] text-xs font-black border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center gap-1"
           >
             <Bell className="h-3.5 w-3.5 stroke-[2.5]" />
             <span>Test Notification</span>
@@ -302,7 +302,7 @@ export function ReminderManagerModal({
         {/* Submit Save */}
         <button
           type="submit"
-          className="w-full bg-[#03D26F] hover:bg-[#02b35d] text-[#161514] font-black text-xs uppercase tracking-wider rounded-2xl py-3 border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center justify-center gap-2 mt-2"
+          className="w-full bg-[#03D26F] hover:bg-[#02b35d] text-[#161514] font-black text-xs uppercase tracking-wider rounded-2xl py-3 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center justify-center gap-2 mt-2"
         >
           <CheckCircle2 className="h-4 w-4 stroke-[2.5]" />
           <span>Save All Reminder Settings</span>

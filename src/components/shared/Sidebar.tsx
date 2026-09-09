@@ -65,7 +65,7 @@ function SidebarContent() {
   }
 
   return (
-    <aside className="hidden lg:flex flex-col w-64 bg-white border-r-2 border-[#161514] h-screen sticky top-0 p-6 justify-between select-none shadow-[3px_0px_0px_0px_rgba(22,21,20,0.05)]">
+    <aside className="hidden lg:flex flex-col w-64 bg-white border-r-[2.5px] border-[#161514] h-screen sticky top-0 p-6 justify-between select-none shadow-[4px_0px_0px_0px_rgba(22,21,20,0.06)]">
       <div className="space-y-8">
         {/* Logo */}
         <div className="px-1">
@@ -74,7 +74,7 @@ function SidebarContent() {
 
         {/* Space Architecture Nav */}
         <div className="space-y-3">
-          <span className="text-[10px] font-black uppercase tracking-wider text-[#161514]/70 px-2 block">
+          <span className="font-heading font-black text-[11px] uppercase tracking-wider text-[#161514]/70 px-2 block">
             Navigation Spaces
           </span>
           <nav className="space-y-2">
@@ -95,10 +95,10 @@ function SidebarContent() {
                     }
                   }}
                   className={cn(
-                    "flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-black transition-all duration-200 cursor-pointer select-none",
+                    "flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-heading font-extrabold transition-all duration-150 cursor-pointer select-none border-2",
                     isActive
                       ? item.colorBg
-                      : "text-[#161514]/80 hover:text-[#161514] hover:bg-[#EAF4F4] border-2 border-transparent"
+                      : "text-[#161514]/85 border-transparent hover:text-[#161514] hover:bg-[#EAF4F4] hover:border-[#161514] hover:shadow-[2px_2px_0px_0px_#161514] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
                   )}
                 >
                   <Icon className="h-4.5 w-4.5 stroke-[2.5]" />
@@ -114,20 +114,20 @@ function SidebarContent() {
       <Link
         href="/profile"
         className={cn(
-          "flex items-center gap-3 p-3 rounded-2xl border-2 border-[#161514] transition-all duration-200 select-none shadow-[2px_2px_0px_0px_rgba(22,21,20,1)]",
+          "flex items-center gap-3 p-3 rounded-2xl border-[2.5px] border-[#161514] transition-all duration-150 select-none shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_#161514] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
           pathname.startsWith("/profile")
             ? "bg-[#CEF431] text-[#161514]"
             : "bg-white text-[#161514] hover:bg-[#EAF4F4]"
         )}
       >
-        <div className="h-9 w-9 rounded-full bg-[#161514] text-white flex items-center justify-center font-black text-sm shrink-0">
+        <div className="h-9 w-9 rounded-full bg-[#161514] text-white flex items-center justify-center font-black text-sm shrink-0 border border-[#161514]">
           {user?.displayName ? user.displayName.charAt(0).toUpperCase() : <User className="h-4 w-4" />}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-black truncate leading-tight">
+          <p className="font-heading text-xs font-extrabold truncate leading-tight">
             {user?.displayName || "User"}
           </p>
-          <p className="text-[10px] text-[#161514]/70 truncate font-bold">{user?.email}</p>
+          <p className="text-[10px] text-[#161514]/70 truncate font-semibold">{user?.email}</p>
         </div>
       </Link>
     </aside>
