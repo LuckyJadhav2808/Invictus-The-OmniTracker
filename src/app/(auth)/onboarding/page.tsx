@@ -132,10 +132,10 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full max-w-lg mx-auto">
       <div className="text-center space-y-2">
         <h1
-          className="text-2xl font-extrabold tracking-tight"
+          className="text-2xl font-black tracking-tight text-[#161514]"
           style={{ fontFamily: "var(--font-heading)" }}
         >
           {step === 0 && "Welcome to Invictus! 👋"}
@@ -143,27 +143,27 @@ export default function OnboardingPage() {
           {step === 2 && "What do you want to track?"}
           {step === 3 && "Study Goal Setup"}
         </h1>
-        <p className="text-navy-600 text-sm">
+        <p className="text-[#161514]/60 text-sm font-bold">
           Step {step + 1} of {totalSteps}
         </p>
       </div>
 
       {/* Progress bar */}
-      <div className="w-full bg-input rounded-full h-2">
+      <div className="w-full bg-white rounded-full h-3 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] overflow-hidden">
         <div
-          className="bg-amber-500 h-2 rounded-full transition-all duration-300"
+          className="bg-[#CEF431] h-full rounded-full transition-all duration-300"
           style={{ width: `${((step + 1) / totalSteps) * 100}%` }}
         />
       </div>
 
-      <div className="bg-white rounded-[var(--radius-lg)] p-6 shadow-[0_8px_24px_rgba(31,36,48,0.08)] space-y-5">
+      <div className="bg-white rounded-3xl p-6 sm:p-8 border-[2.5px] border-[#161514] shadow-[6px_6px_0px_0px_#161514] space-y-5">
         {/* Step 0: Name */}
         {step === 0 && (
           <div className="space-y-4">
             <div className="space-y-1.5">
               <label
                 htmlFor="displayName"
-                className="text-xs font-semibold uppercase tracking-wide text-navy-600"
+                className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514]"
               >
                 What should we call you?
               </label>
@@ -173,7 +173,7 @@ export default function OnboardingPage() {
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 placeholder="Your name"
-                className="w-full rounded-[var(--radius-sm)] border border-input bg-cream-bg/50 py-2.5 px-3 text-sm outline-none focus:ring-2 focus:ring-amber-500 transition-all"
+                className="w-full neo-input text-base md:text-sm font-bold min-h-[44px]"
               />
             </div>
           </div>
@@ -185,9 +185,9 @@ export default function OnboardingPage() {
             <div className="space-y-1.5">
               <label
                 htmlFor="timezone"
-                className="text-xs font-semibold uppercase tracking-wide text-navy-600 flex items-center gap-1"
+                className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514] flex items-center gap-1"
               >
-                <Globe className="h-3 w-3" /> Timezone
+                <Globe className="h-3 w-3 stroke-[2.5]" /> Timezone
               </label>
               <NeobrutalistSelect
                 value={timezone}
@@ -202,8 +202,8 @@ export default function OnboardingPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold uppercase tracking-wide text-navy-600 flex items-center gap-1">
-                <Calendar className="h-3 w-3" /> Week starts on
+              <label className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514] flex items-center gap-1">
+                <Calendar className="h-3 w-3 stroke-[2.5]" /> Week starts on
               </label>
               <div className="flex gap-2">
                 {[
@@ -214,11 +214,11 @@ export default function OnboardingPage() {
                     key={opt.value}
                     type="button"
                     onClick={() => setWeekStartsOn(opt.value)}
-                    className={`flex-1 rounded-[var(--radius-sm)] border py-2 text-sm font-semibold transition-all ${
+                    className={`flex-1 rounded-xl border-2 border-[#161514] py-2.5 text-sm font-black transition-all cursor-pointer min-h-[44px] ${
                       weekStartsOn === opt.value
-                        ? "bg-amber-500 text-navy-900 border-amber-500"
-                        : "bg-cream-bg/50 border-input text-navy-600 hover:border-amber-500"
-                    }`}
+                        ? "bg-[#CEF431] text-[#161514] shadow-[2px_2px_0px_0px_#161514]"
+                        : "bg-white text-[#161514]/60 shadow-[1.5px_1.5px_0px_0px_#161514] hover:bg-[#FAF8F5]"
+                    } active:translate-x-0.5 active:translate-y-0.5 active:shadow-none`}
                   >
                     {opt.label}
                   </button>
@@ -229,7 +229,7 @@ export default function OnboardingPage() {
             <div className="space-y-1.5">
               <label
                 htmlFor="currency"
-                className="text-xs font-semibold uppercase tracking-wide text-navy-600"
+                className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514]"
               >
                 Currency
               </label>
@@ -250,7 +250,7 @@ export default function OnboardingPage() {
         {/* Step 2: Module selection */}
         {step === 2 && (
           <div className="space-y-3">
-            <p className="text-sm text-navy-600">
+            <p className="text-sm text-[#161514]/60 font-bold">
               Pick the modules you want. You can change this later in Settings.
             </p>
             {[
@@ -259,51 +259,54 @@ export default function OnboardingPage() {
                 label: "Goals & Habits",
                 desc: "Daily routines, streaks, wellness",
                 Icon: Target,
-                color: "bg-amber-500",
+                color: "bg-amber-400",
+                emoji: "🌱",
               },
               {
                 key: "study" as const,
                 label: "Study Tracker",
                 desc: "Subjects, sessions, tests, analytics",
                 Icon: BookOpen,
-                color: "bg-orange-500",
+                color: "bg-orange-400",
+                emoji: "📚",
               },
               {
                 key: "money" as const,
                 label: "Money Tracker",
                 desc: "Income, expenses, budgets, savings",
                 Icon: Wallet,
-                color: "bg-mint-400",
+                color: "bg-[#03D26F]",
+                emoji: "💰",
               },
-            ].map(({ key, label, desc, Icon, color }) => (
+            ].map(({ key, label, desc, Icon, color, emoji }) => (
               <button
                 key={key}
                 type="button"
                 onClick={() => toggleModule(key)}
-                className={`w-full flex items-center gap-3 p-3 rounded-[var(--radius-md)] border transition-all ${
+                className={`w-full flex items-center gap-3 p-3.5 rounded-2xl border-2 border-[#161514] transition-all cursor-pointer min-h-[60px] ${
                   modulesEnabled[key]
-                    ? "border-amber-500 bg-amber-500/5"
-                    : "border-input bg-cream-bg/30 opacity-60"
-                }`}
+                    ? "bg-[#CEF431]/20 shadow-[3px_3px_0px_0px_#161514]"
+                    : "bg-white shadow-[2px_2px_0px_0px_#161514] opacity-60"
+                } hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none`}
               >
                 <div
-                  className={`${color} rounded-[var(--radius-sm)] p-2 text-white`}
+                  className={`${color} rounded-xl p-2.5 text-white border border-[#161514] flex items-center justify-center text-lg`}
                 >
-                  <Icon className="h-5 w-5" />
+                  {emoji}
                 </div>
                 <div className="text-left flex-1">
-                  <p className="font-semibold text-sm">{label}</p>
-                  <p className="text-xs text-navy-600">{desc}</p>
+                  <p className="font-black text-sm text-[#161514]">{label}</p>
+                  <p className="text-xs text-[#161514]/60 font-bold">{desc}</p>
                 </div>
                 <div
-                  className={`h-5 w-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                  className={`h-6 w-6 rounded-lg border-2 border-[#161514] flex items-center justify-center transition-all ${
                     modulesEnabled[key]
-                      ? "bg-amber-500 border-amber-500"
-                      : "border-input"
+                      ? "bg-[#03D26F] shadow-[1px_1px_0px_0px_#161514]"
+                      : "bg-white"
                   }`}
                 >
                   {modulesEnabled[key] && (
-                    <Check className="h-3 w-3 text-white" />
+                    <Check className="h-3.5 w-3.5 text-white stroke-[3]" />
                   )}
                 </div>
               </button>
@@ -314,14 +317,14 @@ export default function OnboardingPage() {
         {/* Step 3: Study target (if study enabled) */}
         {step === 3 && (
           <div className="space-y-4">
-            <p className="text-sm text-navy-600">
+            <p className="text-sm text-[#161514]/60 font-bold">
               Optional — tell us about your study goal so we can show a
               countdown and tailor the dashboard.
             </p>
             <div className="space-y-1.5">
               <label
                 htmlFor="examName"
-                className="text-xs font-semibold uppercase tracking-wide text-navy-600"
+                className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514]"
               >
                 Exam / Study Goal Name
               </label>
@@ -331,13 +334,13 @@ export default function OnboardingPage() {
                 value={examName}
                 onChange={(e) => setExamName(e.target.value)}
                 placeholder="e.g. GATE 2027, SAT, Board Exams, Japanese N3…"
-                className="w-full rounded-[var(--radius-sm)] border border-input bg-cream-bg/50 py-2.5 px-3 text-sm outline-none focus:ring-2 focus:ring-amber-500 transition-all"
+                className="w-full neo-input text-base md:text-sm font-bold min-h-[44px]"
               />
             </div>
             <div className="space-y-1.5">
               <label
                 htmlFor="examDate"
-                className="text-xs font-semibold uppercase tracking-wide text-navy-600"
+                className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514]"
               >
                 Target Date (optional)
               </label>
@@ -346,7 +349,7 @@ export default function OnboardingPage() {
                 type="date"
                 value={examDate}
                 onChange={(e) => setExamDate(e.target.value)}
-                className="w-full rounded-[var(--radius-sm)] border border-input bg-cream-bg/50 py-2.5 px-3 text-sm outline-none focus:ring-2 focus:ring-amber-500 transition-all"
+                className="w-full neo-input text-base md:text-sm font-bold min-h-[44px]"
               />
             </div>
           </div>
@@ -355,21 +358,20 @@ export default function OnboardingPage() {
         {/* Navigation buttons */}
         <div className="flex gap-3 pt-2">
           {step > 0 && (
-            <Button
+            <button
               type="button"
-              variant="outline"
               onClick={() => setStep((s) => s - 1)}
-              className="rounded-full border-input"
+              className="px-4 py-2.5 rounded-xl border-2 border-[#161514] bg-white text-[#161514] font-black text-sm shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center gap-1 min-h-[48px]"
             >
-              <ChevronLeft className="h-4 w-4 mr-1" />
+              <ChevronLeft className="h-4 w-4 stroke-[2.5]" />
               Back
-            </Button>
+            </button>
           )}
-          <Button
+          <button
             type="button"
             onClick={handleNext}
             disabled={!canAdvance() || loading}
-            className="flex-1 bg-amber-500 hover:bg-amber-600 text-navy-900 font-bold rounded-full py-2.5 transition-all"
+            className="flex-1 bg-[#CEF431] hover:bg-[#bce028] text-[#161514] font-black rounded-xl py-2.5 text-sm uppercase tracking-wider transition-all cursor-pointer border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none disabled:opacity-50 flex items-center justify-center gap-1 min-h-[48px]"
           >
             {step === totalSteps - 1 || (step === 2 && !modulesEnabled.study)
               ? loading
@@ -378,9 +380,9 @@ export default function OnboardingPage() {
               : "Next"}
             {step < totalSteps - 1 &&
               !(step === 2 && !modulesEnabled.study) && (
-                <ChevronRight className="h-4 w-4 ml-1" />
+                <ChevronRight className="h-4 w-4 stroke-[2.5]" />
               )}
-          </Button>
+          </button>
         </div>
       </div>
     </div>

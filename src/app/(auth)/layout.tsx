@@ -6,7 +6,7 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-[#FBEFE0] p-4 md:p-8">
+    <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-[#FAF8F5] bg-graph-grid p-4 sm:p-6 md:p-8">
       {/* Background Image Layer */}
       <div className="absolute inset-0 z-0 select-none">
         <Image
@@ -14,10 +14,10 @@ export default function AuthLayout({
           alt="Invictus Background"
           fill
           priority
-          className="object-cover object-center opacity-30 transition-all duration-700"
+          className="object-cover object-center opacity-[0.08] transition-all duration-700"
         />
-        {/* Warm pastel atmospheric gradient */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#FBEFE0]/60 via-transparent to-[#FBEFE0]/70" />
+        {/* Warm studio atmospheric gradient */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#FAF8F5]/80 via-transparent to-[#FAF8F5]/90" />
       </div>
 
       {/* Main Content Area */}
@@ -27,5 +27,3 @@ export default function AuthLayout({
     </div>
   );
 }
-
-

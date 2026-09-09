@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import Link from "next/link";
-import { UserPlus, Mail, Eye, EyeOff, User, Sparkles, Flame, Award, ArrowRight } from "lucide-react";
+import { UserPlus, Eye, EyeOff, Sparkles, Flame, Award, ArrowRight } from "lucide-react";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { InvictusLogo } from "@/components/shared/InvictusLogo";
 
@@ -91,12 +91,12 @@ export default function SignupPage() {
 
   return (
     <div className="w-full max-w-md mx-auto py-4">
-      <div className="bg-white/95 backdrop-blur-md border-3 border-amber-300/80 rounded-[32px] p-6 sm:p-8 shadow-[0_16px_40px_rgba(245,185,66,0.18)] space-y-5 relative overflow-hidden">
+      <div className="bg-white rounded-3xl p-6 sm:p-8 border-[2.5px] border-[#161514] shadow-[6px_6px_0px_0px_#161514] space-y-5 relative overflow-hidden">
         
         {/* Header Mascot Badge */}
-        <div className="flex items-center justify-between border-b-2 border-navy-950/10 pb-3 mb-2">
+        <div className="flex items-center justify-between border-b-2 border-[#161514]/10 pb-3 mb-2">
           <InvictusLogo size="md" variant="full" href="/signup" />
-          <div className="bg-emerald-300 text-navy-950 text-[10px] font-black px-2.5 py-1 rounded-xl border border-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)] uppercase">
+          <div className="bg-[#03D26F] text-[#161514] text-[10px] font-black px-2.5 py-1 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] uppercase">
             Create Account
           </div>
         </div>
@@ -106,49 +106,44 @@ export default function SignupPage() {
           <div className="space-y-1">
             <label
               htmlFor="name"
-              className="text-[11px] font-black uppercase tracking-wider text-navy-700 ml-1"
+              className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-[#161514] ml-1"
             >
               Your Full Name
             </label>
-            <div className="relative">
-              <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-navy-600" />
-              <input
-                id="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="What should we call you?"
-                required
-                className="w-full rounded-2xl border-2 border-amber-200 bg-cream-bg/40 py-2.5 pl-10 pr-4 text-sm font-bold outline-none focus:border-amber-500 focus:bg-white transition-all text-navy-900 placeholder:text-navy-600/50"
-              />
-            </div>
+            <input
+              id="name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="What should we call you?"
+              required
+              className="w-full neo-input text-base md:text-sm font-bold px-4 min-h-[44px]"
+            />
           </div>
 
           <div className="space-y-1">
             <label
               htmlFor="email"
-              className="text-[11px] font-black uppercase tracking-wider text-navy-700 ml-1"
+              className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-[#161514] ml-1"
             >
               Email Address
             </label>
-            <div className="relative">
-              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-navy-600" />
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                required
-                className="w-full rounded-2xl border-2 border-amber-200 bg-cream-bg/40 py-2.5 pl-10 pr-4 text-sm font-bold outline-none focus:border-amber-500 focus:bg-white transition-all text-navy-900 placeholder:text-navy-600/50"
-              />
-            </div>
+            <input
+              id="email"
+              type="email"
+              inputMode="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              required
+              className="w-full neo-input text-base md:text-sm font-bold px-4 min-h-[44px]"
+            />
           </div>
 
           <div className="space-y-1">
             <label
               htmlFor="password"
-              className="text-[11px] font-black uppercase tracking-wider text-navy-700 ml-1"
+              className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-[#161514] ml-1"
             >
               Choose Password
             </label>
@@ -161,57 +156,57 @@ export default function SignupPage() {
                 placeholder="At least 6 characters"
                 required
                 minLength={6}
-                className="w-full rounded-2xl border-2 border-amber-200 bg-cream-bg/40 py-2.5 pl-4 pr-10 text-sm font-bold outline-none focus:border-amber-500 focus:bg-white transition-all text-navy-900 placeholder:text-navy-600/50"
+                style={{ paddingRight: "3rem" }}
+                className="w-full neo-input text-base md:text-sm font-bold px-4 min-h-[44px]"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-navy-600 hover:text-navy-900 cursor-pointer"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-[#161514]/50 hover:text-[#161514] cursor-pointer p-1 min-h-[40px] min-w-[40px] flex items-center justify-center"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
-                  <EyeOff className="h-4 w-4" />
+                  <EyeOff className="h-4 w-4 stroke-[2.5]" />
                 ) : (
-                  <Eye className="h-4 w-4" />
+                  <Eye className="h-4 w-4 stroke-[2.5]" />
                 )}
               </button>
             </div>
           </div>
 
-          <Button
+          <button
             type="submit"
             disabled={loading}
-            className="w-full bg-amber-500 hover:bg-amber-600 text-navy-900 font-black rounded-2xl py-3 text-sm transition-all duration-200 cursor-pointer shadow-[0_6px_16px_rgba(245,185,66,0.4)] active:scale-[0.98] flex items-center justify-center gap-2 border-2 border-amber-600/30"
+            className="w-full bg-[#03D26F] hover:bg-[#02b35d] text-[#161514] font-black rounded-2xl py-3 text-sm uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none min-h-[48px] disabled:opacity-50"
           >
             {loading ? (
-              <div className="h-4 w-4 rounded-full border-2 border-navy-900 border-t-transparent animate-spin" />
+              <div className="h-4 w-4 rounded-full border-2 border-[#161514] border-t-transparent animate-spin" />
             ) : (
               <>
                 <span>Create Free Account</span>
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="h-4 w-4 stroke-[2.5]" />
               </>
             )}
-          </Button>
+          </button>
         </form>
 
         {/* Or Divider */}
         <div className="relative my-3">
           <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-amber-200" />
+            <span className="w-full border-t-2 border-[#161514]/10" />
           </div>
           <div className="relative flex justify-center text-[10px] uppercase font-black tracking-widest">
-            <span className="bg-white px-3 text-navy-600 rounded-full">or</span>
+            <span className="bg-white px-3 text-[#161514]/50 rounded-full">or</span>
           </div>
         </div>
 
         {/* Alternate Options */}
-        <div className="space-y-2">
-          <Button
+        <div className="space-y-2.5">
+          <button
             type="button"
-            variant="outline"
             onClick={handleGoogleSignup}
             disabled={loading}
-            className="w-full rounded-2xl py-2.5 font-bold border-2 border-slate-200 bg-white hover:bg-slate-50 transition-all cursor-pointer flex items-center justify-center gap-2 text-navy-900 text-xs shadow-sm"
+            className="w-full rounded-2xl py-2.5 font-black border-2 border-[#161514] bg-white hover:bg-[#FAF8F5] transition-all cursor-pointer flex items-center justify-center gap-2 text-[#161514] text-xs shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none min-h-[48px] disabled:opacity-50"
           >
             <svg className="h-4 w-4" viewBox="0 0 24 24">
               <path
@@ -232,21 +227,20 @@ export default function SignupPage() {
               />
             </svg>
             <span>Continue with Google</span>
-          </Button>
+          </button>
 
-          <Button
+          <button
             type="button"
-            variant="outline"
             onClick={handleGuestSignup}
             disabled={loading}
-            className="w-full rounded-2xl py-2.5 font-black border-2 border-dashed border-amber-400 text-amber-800 bg-amber-50 hover:bg-amber-100 transition-all cursor-pointer flex items-center justify-center gap-1.5 text-xs"
+            className="w-full rounded-2xl py-2.5 font-black border-2 border-dashed border-[#161514]/40 text-[#161514] bg-amber-50 hover:bg-amber-100 transition-all cursor-pointer flex items-center justify-center gap-1.5 text-xs shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none min-h-[44px] disabled:opacity-50"
           >
             <span>🎈 Play as Offline Guest</span>
-          </Button>
+          </button>
         </div>
 
         {/* Footer prompt */}
-        <div className="text-center text-xs font-bold text-navy-600 pt-1">
+        <div className="text-center text-xs font-bold text-[#161514]/60 pt-1">
           Already have an account?{" "}
           <Link
             href="/login"
@@ -259,4 +253,3 @@ export default function SignupPage() {
     </div>
   );
 }
-

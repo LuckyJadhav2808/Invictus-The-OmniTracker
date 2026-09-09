@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import Link from "next/link";
-import { LogIn, Mail, Eye, EyeOff, Sparkles, Target, BookOpen, Wallet, Flame, Smile, CheckCircle2, Heart, Award, ArrowRight } from "lucide-react";
+import { LogIn, Eye, EyeOff, Sparkles, Target, BookOpen, Wallet, Flame, Smile, CheckCircle2, Heart, Award, ArrowRight } from "lucide-react";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { InvictusLogo } from "@/components/shared/InvictusLogo";
 
@@ -100,41 +100,41 @@ export default function LoginPage() {
   return (
     <div className="w-full max-w-4xl mx-auto flex flex-col lg:grid lg:grid-cols-12 gap-6 lg:gap-8 items-center relative py-2 md:py-4">
       
-      {/* Top Mobile Floating Stickers */}
-      <div className="flex items-center justify-center gap-2 z-20 w-full mb-1 lg:hidden">
-        <div className="bg-amber-400 text-navy-900 text-[11px] font-black px-3 py-1 rounded-full shadow-md border-2 border-white flex items-center gap-1 rotate-[-2deg]">
+      {/* Top Mobile Floating Neo-Brutalist Stickers */}
+      <div className="flex items-center justify-center gap-2.5 z-20 w-full mb-1 lg:hidden">
+        <div className="bg-amber-400 text-[#161514] text-[11px] font-black px-3 py-1.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center gap-1.5 rotate-[-2deg]">
           <Flame className="h-3.5 w-3.5 text-orange-600 fill-orange-500" />
           <span>7 Day Streak!</span>
         </div>
-        <div className="bg-mint-400 text-navy-900 text-[11px] font-black px-3 py-1 rounded-full shadow-md border-2 border-white flex items-center gap-1 rotate-[2deg]">
-          <Award className="h-3.5 w-3.5 text-emerald-700" />
+        <div className="bg-[#03D26F] text-[#161514] text-[11px] font-black px-3 py-1.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center gap-1.5 rotate-[2deg]">
+          <Award className="h-3.5 w-3.5" />
           <span>Goals on track ✨</span>
         </div>
       </div>
 
       {/* Desktop Floating Sticker Badges */}
       <div className="hidden lg:block absolute -top-2 left-6 z-20 animate-bounce duration-1000">
-        <div className="bg-amber-400 text-navy-900 text-xs font-black px-3 py-1.5 rounded-full shadow-md border-2 border-white flex items-center gap-1.5 rotate-[-4deg]">
+        <div className="bg-amber-400 text-[#161514] text-xs font-black px-3.5 py-1.5 rounded-xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] flex items-center gap-1.5 rotate-[-4deg]">
           <Flame className="h-4 w-4 text-orange-600 fill-orange-500" />
           <span>7 Day Streak!</span>
         </div>
       </div>
 
       <div className="hidden lg:block absolute -bottom-2 right-12 z-20">
-        <div className="bg-mint-400 text-navy-900 text-xs font-black px-3 py-1.5 rounded-full shadow-md border-2 border-white flex items-center gap-1.5 rotate-[5deg]">
-          <Award className="h-4 w-4 text-emerald-700" />
+        <div className="bg-[#03D26F] text-[#161514] text-xs font-black px-3.5 py-1.5 rounded-xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] flex items-center gap-1.5 rotate-[5deg]">
+          <Award className="h-4 w-4" />
           <span>Goals on track ✨</span>
         </div>
       </div>
 
       {/* Mobile Top Brand Showcase Header */}
       <div className="lg:hidden flex flex-col items-center text-center space-y-2.5 px-2">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-900 text-[11px] font-black">
-          <Smile className="h-3.5 w-3.5 text-amber-600" />
+        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-400/20 border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] text-[#161514] text-[11px] font-black">
+          <Smile className="h-3.5 w-3.5 text-amber-700 stroke-[2.5]" />
           <span>Daily Life Companion</span>
         </div>
         <h1
-          className="text-3xl font-black text-navy-900 tracking-tight leading-tight"
+          className="text-3xl font-black text-[#161514] tracking-tight leading-tight"
           style={{ fontFamily: "var(--font-heading)" }}
         >
           Welcome to{" "}
@@ -144,31 +144,31 @@ export default function LoginPage() {
         </h1>
         {/* Mobile Horizontal Space Badges */}
         <div className="flex items-center justify-center gap-2 pt-1 w-full max-w-sm">
-          <div className="flex-1 bg-white/80 backdrop-blur-md px-2.5 py-1.5 rounded-xl border border-amber-200 shadow-sm flex items-center gap-1.5 justify-center">
+          <div className="flex-1 bg-white px-2.5 py-2 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center gap-1.5 justify-center">
             <span className="text-sm">🌱</span>
-            <span className="text-[10px] font-black text-navy-900">Life</span>
+            <span className="text-[10px] font-black text-[#161514]">Life</span>
           </div>
-          <div className="flex-1 bg-white/80 backdrop-blur-md px-2.5 py-1.5 rounded-xl border border-orange-200 shadow-sm flex items-center gap-1.5 justify-center">
+          <div className="flex-1 bg-white px-2.5 py-2 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center gap-1.5 justify-center">
             <span className="text-sm">📚</span>
-            <span className="text-[10px] font-black text-navy-900">Study</span>
+            <span className="text-[10px] font-black text-[#161514]">Study</span>
           </div>
-          <div className="flex-1 bg-white/80 backdrop-blur-md px-2.5 py-1.5 rounded-xl border border-mint-200 shadow-sm flex items-center gap-1.5 justify-center">
+          <div className="flex-1 bg-white px-2.5 py-2 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center gap-1.5 justify-center">
             <span className="text-sm">💰</span>
-            <span className="text-[10px] font-black text-navy-900">Money</span>
+            <span className="text-[10px] font-black text-[#161514]">Money</span>
           </div>
         </div>
       </div>
 
       {/* Desktop Column: Cozy Hero Banner & Playful Stickers */}
       <div className="hidden lg:flex lg:col-span-6 flex-col justify-center space-y-6 pr-2">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-900 text-xs font-black w-fit">
-          <Smile className="h-4 w-4 text-amber-600" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-amber-400/20 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-[#161514] text-xs font-black w-fit">
+          <Smile className="h-4 w-4 text-amber-700 stroke-[2.5]" />
           <span>Your Daily Life Companion</span>
         </div>
 
         <div className="space-y-3">
           <h1
-            className="text-4xl xl:text-5xl font-black text-navy-900 tracking-tight leading-[1.15]"
+            className="text-4xl xl:text-5xl font-black text-[#161514] tracking-tight leading-[1.15]"
             style={{ fontFamily: "var(--font-heading)" }}
           >
             Welcome to <br />
@@ -176,40 +176,40 @@ export default function LoginPage() {
               Invictus 🌟
             </span>
           </h1>
-          <p className="text-navy-600 text-sm font-semibold leading-relaxed max-w-sm">
+          <p className="text-[#161514]/70 text-sm font-bold leading-relaxed max-w-sm">
             Track daily habits, crush exam syllabus, monitor macros & build savings — all with playful pet-app energy!
           </p>
         </div>
 
         {/* Playful Pill Tiles */}
         <div className="space-y-2.5 pt-1">
-          <div className="flex items-center gap-3 bg-white/80 backdrop-blur-md p-3 rounded-2xl border border-amber-200/60 shadow-sm hover:scale-[1.02] transition-transform">
-            <div className="h-9 w-9 rounded-xl bg-amber-400/30 flex items-center justify-center text-amber-700 font-extrabold text-lg">
+          <div className="flex items-center gap-3 bg-white p-3.5 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all cursor-default">
+            <div className="h-9 w-9 rounded-xl bg-amber-400/30 border border-[#161514] flex items-center justify-center text-amber-700 font-extrabold text-lg">
               🌱
             </div>
             <div>
-              <h3 className="text-xs font-black text-navy-900">Life & Habits Space</h3>
-              <p className="text-[11px] text-navy-600 font-medium">Daily streaks, Macros & Weight tracking</p>
+              <h3 className="text-xs font-black text-[#161514]">Life & Habits Space</h3>
+              <p className="text-[11px] text-[#161514]/60 font-bold">Daily streaks, Macros & Weight tracking</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 bg-white/80 backdrop-blur-md p-3 rounded-2xl border border-orange-200/60 shadow-sm hover:scale-[1.02] transition-transform">
-            <div className="h-9 w-9 rounded-xl bg-orange-400/30 flex items-center justify-center text-orange-700 font-extrabold text-lg">
+          <div className="flex items-center gap-3 bg-white p-3.5 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all cursor-default">
+            <div className="h-9 w-9 rounded-xl bg-orange-400/30 border border-[#161514] flex items-center justify-center text-orange-700 font-extrabold text-lg">
               📚
             </div>
             <div>
-              <h3 className="text-xs font-black text-navy-900">Study & Exam Space</h3>
-              <p className="text-[11px] text-navy-600 font-medium">Syllabus topics, countdowns & test scores</p>
+              <h3 className="text-xs font-black text-[#161514]">Study & Exam Space</h3>
+              <p className="text-[11px] text-[#161514]/60 font-bold">Syllabus topics, countdowns & test scores</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 bg-white/80 backdrop-blur-md p-3 rounded-2xl border border-mint-200/60 shadow-sm hover:scale-[1.02] transition-transform">
-            <div className="h-9 w-9 rounded-xl bg-mint-400/30 flex items-center justify-center text-mint-800 font-extrabold text-lg">
+          <div className="flex items-center gap-3 bg-white p-3.5 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all cursor-default">
+            <div className="h-9 w-9 rounded-xl bg-[#03D26F]/30 border border-[#161514] flex items-center justify-center font-extrabold text-lg">
               💰
             </div>
             <div>
-              <h3 className="text-xs font-black text-navy-900">Money & Budget Space</h3>
-              <p className="text-[11px] text-navy-600 font-medium">Income/expense ledger & savings targets</p>
+              <h3 className="text-xs font-black text-[#161514]">Money & Budget Space</h3>
+              <p className="text-[11px] text-[#161514]/60 font-bold">Income/expense ledger & savings targets</p>
             </div>
           </div>
         </div>
@@ -217,11 +217,11 @@ export default function LoginPage() {
 
       {/* Main Card (Mobile & Desktop) */}
       <div className="w-full col-span-1 lg:col-span-6 max-w-md mx-auto">
-        <div className="bg-white/95 backdrop-blur-md border-3 border-amber-300/80 rounded-[28px] md:rounded-[32px] p-6 sm:p-7 md:p-8 shadow-[0_16px_40px_rgba(245,185,66,0.18)] space-y-4 md:space-y-5 relative overflow-hidden">
+        <div className="bg-white rounded-3xl p-6 sm:p-7 md:p-8 border-[2.5px] border-[#161514] shadow-[6px_6px_0px_0px_#161514] space-y-4 md:space-y-5 relative overflow-hidden">
           
-          <div className="flex items-center justify-between border-b-2 border-navy-950/10 pb-3 mb-2">
+          <div className="flex items-center justify-between border-b-2 border-[#161514]/10 pb-3 mb-2">
             <InvictusLogo size="md" variant="full" href="/login" />
-            <div className="bg-amber-300 text-navy-950 text-[10px] font-black px-2.5 py-1 rounded-xl border border-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)] uppercase">
+            <div className="bg-amber-400 text-[#161514] text-[10px] font-black px-2.5 py-1 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] uppercase">
               Sign In
             </div>
           </div>
@@ -231,28 +231,26 @@ export default function LoginPage() {
             <div className="space-y-1">
               <label
                 htmlFor="email"
-                className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-navy-700 ml-1"
+                className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-[#161514] ml-1"
               >
                 Your Email
               </label>
-              <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-navy-600" />
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  required
-                  className="w-full rounded-2xl border-2 border-amber-200 bg-cream-bg/40 py-2.5 pl-10 pr-4 text-sm font-bold outline-none focus:border-amber-500 focus:bg-white transition-all text-navy-900 placeholder:text-navy-600/50"
-                />
-              </div>
+              <input
+                id="email"
+                type="email"
+                inputMode="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                required
+                className="w-full neo-input text-base md:text-sm font-bold min-h-[44px] px-4"
+              />
             </div>
 
             <div className="space-y-1">
               <label
                 htmlFor="password"
-                className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-navy-700 ml-1"
+                className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-[#161514] ml-1"
               >
                 Password
               </label>
@@ -264,57 +262,57 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
                   required
-                  className="w-full rounded-2xl border-2 border-amber-200 bg-cream-bg/40 py-2.5 pl-4 pr-10 text-sm font-bold outline-none focus:border-amber-500 focus:bg-white transition-all text-navy-900 placeholder:text-navy-600/50"
+                  style={{ paddingRight: "3rem" }}
+                  className="w-full neo-input text-base md:text-sm font-bold px-4 min-h-[44px]"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-navy-600 hover:text-navy-900 cursor-pointer"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-[#161514]/50 hover:text-[#161514] cursor-pointer p-1 min-h-[40px] min-w-[40px] flex items-center justify-center"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
+                    <EyeOff className="h-4 w-4 stroke-[2.5]" />
                   ) : (
-                    <Eye className="h-4 w-4" />
+                    <Eye className="h-4 w-4 stroke-[2.5]" />
                   )}
                 </button>
               </div>
             </div>
 
-            <Button
+            <button
               type="submit"
               disabled={loading}
-              className="w-full bg-amber-500 hover:bg-amber-600 text-navy-900 font-black rounded-2xl py-3 text-sm transition-all duration-200 cursor-pointer shadow-[0_6px_16px_rgba(245,185,66,0.4)] active:scale-[0.98] flex items-center justify-center gap-2 border-2 border-amber-600/30 mt-1"
+              className="w-full bg-[#CEF431] hover:bg-[#bce028] text-[#161514] font-black rounded-2xl py-3 text-sm uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none mt-1 min-h-[48px] disabled:opacity-50"
             >
               {loading ? (
-                <div className="h-4 w-4 rounded-full border-2 border-navy-900 border-t-transparent animate-spin" />
+                <div className="h-4 w-4 rounded-full border-2 border-[#161514] border-t-transparent animate-spin" />
               ) : (
                 <>
                   <span>Sign In & Continue</span>
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight className="h-4 w-4 stroke-[2.5]" />
                 </>
               )}
-            </Button>
+            </button>
           </form>
 
           {/* Or Divider */}
           <div className="relative my-2.5">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-amber-200" />
+              <span className="w-full border-t-2 border-[#161514]/10" />
             </div>
             <div className="relative flex justify-center text-[10px] uppercase font-black tracking-widest">
-              <span className="bg-white px-3 text-navy-600 rounded-full">or</span>
+              <span className="bg-white px-3 text-[#161514]/50 rounded-full">or</span>
             </div>
           </div>
 
           {/* Social / Guest Action */}
-          <div className="space-y-2">
-            <Button
+          <div className="space-y-2.5">
+            <button
               type="button"
-              variant="outline"
               onClick={handleGoogleLogin}
               disabled={loading}
-              className="w-full rounded-2xl py-2.5 font-bold border-2 border-slate-200 bg-white hover:bg-slate-50 transition-all cursor-pointer flex items-center justify-center gap-2 text-navy-900 text-xs shadow-sm"
+              className="w-full rounded-2xl py-2.5 font-black border-2 border-[#161514] bg-white hover:bg-[#FAF8F5] transition-all cursor-pointer flex items-center justify-center gap-2 text-[#161514] text-xs shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none min-h-[48px] disabled:opacity-50"
             >
               <svg className="h-4 w-4" viewBox="0 0 24 24">
                 <path
@@ -335,21 +333,20 @@ export default function LoginPage() {
                 />
               </svg>
               <span>Continue with Google</span>
-            </Button>
+            </button>
 
-            <Button
+            <button
               type="button"
-              variant="outline"
               onClick={handleGuestLogin}
               disabled={loading}
-              className="w-full rounded-2xl py-2.5 font-black border-2 border-dashed border-amber-400 text-amber-800 bg-amber-50 hover:bg-amber-100 transition-all cursor-pointer flex items-center justify-center gap-1.5 text-xs"
+              className="w-full rounded-2xl py-2.5 font-black border-2 border-dashed border-[#161514]/40 text-[#161514] bg-amber-50 hover:bg-amber-100 transition-all cursor-pointer flex items-center justify-center gap-1.5 text-xs shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none min-h-[44px] disabled:opacity-50"
             >
               <span>🎈 Play as Offline Guest</span>
-            </Button>
+            </button>
           </div>
 
           {/* Footer prompt */}
-          <div className="text-center text-xs font-bold text-navy-600 pt-0.5">
+          <div className="text-center text-xs font-bold text-[#161514]/60 pt-0.5">
             New here?{" "}
             <Link
               href="/signup"
@@ -363,6 +360,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
-
-
