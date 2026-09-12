@@ -249,31 +249,56 @@ function MoneyPageContent() {
   const [ledgerTypeFilter, setLedgerTypeFilter] = useState<"all" | "income" | "expense">("all");
   const [paymentChannelFilter, setPaymentChannelFilter] = useState<"all" | "online" | "cash">("all");
 
-  // User Base Monthly Budget Target (Defaults to ₹9,000, persisted in localStorage & User Profile)
-  const [baseBudget, setBaseBudget] = useState<number>(() => {
+  // User Dual Monthly Budgets: UPI/Digital Budget & Physical Cash Budget
+  const [baseUpiBudget, setBaseUpiBudget] = useState<number>(() => {
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("invictus_monthly_budget_target");
-      if (saved && !isNaN(Number(saved)) && Number(saved) > 0) {
-        return Number(saved);
+      const savedUpi = localStorage.getItem("invictus_monthly_upi_budget");
+      if (savedUpi && !isNaN(Number(savedUpi)) && Number(savedUpi) > 0) {
+        return Number(savedUpi);
+      }
+      // Backward compatibility: migrate legacy key
+      const legacySaved = localStorage.getItem("invictus_monthly_budget_target");
+      if (legacySaved && !isNaN(Number(legacySaved)) && Number(legacySaved) > 0) {
+        return Number(legacySaved);
       }
     }
     return 9000;
   });
+
+  const [baseCashBudget, setBaseCashBudget] = useState<number>(() => {
+    if (typeof window !== "undefined") {
+      const savedCash = localStorage.getItem("invictus_monthly_cash_budget");
+      if (savedCash && !isNaN(Number(savedCash)) && Number(savedCash) >= 0) {
+        return Number(savedCash);
+      }
+    }
+    return 0; // Default to 0 until configured by user
+  });
+
   const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
-  const [tempBudgetInput, setTempBudgetInput] = useState(String(baseBudget));
+  const [tempUpiBudgetInput, setTempUpiBudgetInput] = useState(String(baseUpiBudget));
+  const [tempCashBudgetInput, setTempCashBudgetInput] = useState(String(baseCashBudget));
 
   const handleSaveMonthlyBudget = (e: React.FormEvent) => {
     e.preventDefault();
-    const val = Number(tempBudgetInput);
-    if (isNaN(val) || val <= 0) {
-      toast.error("Please enter a valid budget amount");
+    const upiVal = Number(tempUpiBudgetInput);
+    const cashVal = Number(tempCashBudgetInput);
+    if (isNaN(upiVal) || upiVal < 0) {
+      toast.error("Please enter a valid UPI budget amount");
       return;
     }
-    setBaseBudget(val);
+    if (isNaN(cashVal) || cashVal < 0) {
+      toast.error("Please enter a valid Cash budget amount");
+      return;
+    }
+    setBaseUpiBudget(upiVal);
+    setBaseCashBudget(cashVal);
     try {
-      localStorage.setItem("invictus_monthly_budget_target", String(val));
+      localStorage.setItem("invictus_monthly_upi_budget", String(upiVal));
+      localStorage.setItem("invictus_monthly_cash_budget", String(cashVal));
+      localStorage.setItem("invictus_monthly_budget_target", String(upiVal + cashVal));
     } catch {}
-    toast.success(`Monthly Budget Target set to ${currencySymbol}${val.toLocaleString()}! 🎯`);
+    toast.success(`Dual Budgets saved! 📱 UPI: ${currencySymbol}${upiVal.toLocaleString()} • 💵 Cash: ${currencySymbol}${cashVal.toLocaleString()} 🎯`);
     setIsBudgetModalOpen(false);
   };
 
@@ -310,10 +335,11 @@ function MoneyPageContent() {
       transactions,
       categories,
       targetMonthKey: activeMonthForStats,
-      baseBudget,
+      baseUpiBudget,
+      baseCashBudget,
       enableRollover: true,
     });
-  }, [transactions, categories, activeMonthForStats, baseBudget]);
+  }, [transactions, categories, activeMonthForStats, baseUpiBudget, baseCashBudget]);
 
   const filteredLedgerTransactions = useMemo(() => {
     return transactions.filter((tx) => {
@@ -893,12 +919,18 @@ function MoneyPageContent() {
             {/* Allowance Pill with Edit Button */}
             <div className="bg-white p-2.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-between gap-2">
               <span className="truncate">
-                🎯 <strong>{currencySymbol}{budgetStats.baseBudget.toLocaleString()}</strong> Base Budget
+                🎯 <strong>{currencySymbol}{budgetStats.baseBudget.toLocaleString()}</strong> Target
+                <span className="text-[10px] text-[#161514]/70 font-bold ml-1.5 inline-flex items-center gap-1">
+                  <span>(📱 {currencySymbol}{budgetStats.baseUpiBudget.toLocaleString()}</span>
+                  <span>•</span>
+                  <span>💵 {currencySymbol}{budgetStats.baseCashBudget.toLocaleString()})</span>
+                </span>
               </span>
               <button
                 type="button"
                 onClick={() => {
-                  setTempBudgetInput(String(baseBudget));
+                  setTempUpiBudgetInput(String(baseUpiBudget));
+                  setTempCashBudgetInput(String(baseCashBudget));
                   setIsBudgetModalOpen(true);
                 }}
                 className="text-[9px] font-black uppercase px-2 py-0.5 rounded-lg bg-amber-400 hover:bg-amber-300 border border-[#161514] shadow-[1px_1px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all shrink-0"
@@ -1464,7 +1496,7 @@ function MoneyPageContent() {
                       )}
                     </div>
                     <p className="text-[10px] text-[#161514]/70 font-bold mt-0.5">
-                      Base Income Budget: {currencySymbol}{budgetStats.baseBudget.toLocaleString()} • Daily expenses deduct from this pool
+                      Base Monthly Allowance: {currencySymbol}{budgetStats.baseBudget.toLocaleString()} (📱 UPI: {currencySymbol}{budgetStats.baseUpiBudget.toLocaleString()} • 💵 Cash: {currencySymbol}{budgetStats.baseCashBudget.toLocaleString()})
                     </p>
                   </div>
                 </div>
@@ -1472,13 +1504,14 @@ function MoneyPageContent() {
                 <button
                   type="button"
                   onClick={() => {
-                    setTempBudgetInput(String(baseBudget));
+                    setTempUpiBudgetInput(String(baseUpiBudget));
+                    setTempCashBudgetInput(String(baseCashBudget));
                     setIsBudgetModalOpen(true);
                   }}
                   className="self-start sm:self-auto px-3 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-[#161514] text-xs font-black border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center gap-1.5 shrink-0"
                 >
                   <Edit3 className="h-3.5 w-3.5 stroke-[2.5]" />
-                  <span>Edit Allowance</span>
+                  <span>Edit Allowances</span>
                 </button>
               </div>
 
@@ -1523,7 +1556,7 @@ function MoneyPageContent() {
               {/* Progress Bar */}
               <div className="space-y-1.5 pt-1">
                 <div className="flex justify-between items-center text-[10px] font-black uppercase text-[#161514]">
-                  <span>Budget Consumption Progress</span>
+                  <span>Total Budget Consumption Progress</span>
                   <span style={{ fontFamily: "var(--font-heading)" }}>{budgetStats.budgetUsedPercentage}%</span>
                 </div>
                 <div className="w-full bg-gray-100 h-3.5 rounded-full overflow-hidden border-2 border-[#161514] p-0.5 shadow-[1px_1px_0px_0px_#161514]">
@@ -1534,6 +1567,189 @@ function MoneyPageContent() {
                     )}
                     style={{ width: `${Math.min(100, budgetStats.budgetUsedPercentage)}%` }}
                   />
+                </div>
+              </div>
+
+              {/* ⚡ DUAL-CHANNEL BENTO CARDS: UPI/DIGITAL & CASH WALLET */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-3 border-t-2 border-[#161514]/15">
+                {/* 📱 Card 1: UPI / Digital Channel */}
+                <div className="bg-[#FAF8F5] rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex flex-col justify-between gap-3.5">
+                  <div className="space-y-2.5">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <div className="h-8 w-8 rounded-xl bg-[#03D26F]/25 border-2 border-[#161514] flex items-center justify-center text-sm shadow-[1.5px_1.5px_0px_0px_#161514] shrink-0">
+                          📱
+                        </div>
+                        <div>
+                          <h5 className="font-black text-xs uppercase tracking-wider text-[#161514]" style={{ fontFamily: "var(--font-heading)" }}>
+                            UPI & Digital Budget
+                          </h5>
+                          <span className="text-[10px] font-bold text-[#161514]/60 block">
+                            PhonePe, GPay, Paytm & NetBanking
+                          </span>
+                        </div>
+                      </div>
+
+                      {budgetStats.upiRolloverSurplus > 0 && (
+                        <span className="text-[9px] font-black bg-[#03D26F] text-[#161514] px-2 py-0.5 rounded-full border border-[#161514] shadow-[1px_1px_0px_0px_#161514] shrink-0">
+                          +{currencySymbol}{budgetStats.upiRolloverSurplus.toLocaleString()} Roll
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Stats Trio */}
+                    <div className="grid grid-cols-3 gap-2 pt-1 text-center">
+                      <div className="bg-white p-2 rounded-xl border border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
+                        <span className="text-[9px] font-black uppercase text-[#161514]/60 block">Available</span>
+                        <span className="text-xs font-black text-[#161514] block mt-0.5" style={{ fontFamily: "var(--font-heading)" }}>
+                          {currencySymbol}{budgetStats.totalAvailableUpiBudget.toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="bg-white p-2 rounded-xl border border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
+                        <span className="text-[9px] font-black uppercase text-rose-700 block">Spent</span>
+                        <span className="text-xs font-black text-rose-600 block mt-0.5" style={{ fontFamily: "var(--font-heading)" }}>
+                          -{currencySymbol}{budgetStats.upiExpense.toLocaleString()}
+                        </span>
+                      </div>
+                      <div className={cn(
+                        "p-2 rounded-xl border border-[#161514] shadow-[1px_1px_0px_0px_#161514]",
+                        budgetStats.remainingUpiBudget >= 0 ? "bg-[#CEF431]/25" : "bg-rose-100"
+                      )}>
+                        <span className="text-[9px] font-black uppercase text-[#161514]/80 block">Left</span>
+                        <span className={cn(
+                          "text-xs font-black block mt-0.5",
+                          budgetStats.remainingUpiBudget >= 0 ? "text-emerald-950" : "text-rose-700"
+                        )} style={{ fontFamily: "var(--font-heading)" }}>
+                          {currencySymbol}{budgetStats.remainingUpiBudget.toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Meter & Pace */}
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between items-center text-[9px] font-black uppercase text-[#161514]">
+                      <span>UPI Burn ({budgetStats.upiBudgetUsedPercentage}%)</span>
+                      <span className="text-[#161514]/70 font-bold lowercase">
+                        {budgetStats.remainingUpiBudget > 0
+                          ? `~${currencySymbol}${budgetStats.dailySafeToSpendUpi}/day safe`
+                          : "Over-budget"}
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden border border-[#161514] p-0.5 shadow-[0.5px_0.5px_0px_0px_#161514]">
+                      <div
+                        className={cn(
+                          "h-full rounded-full transition-all duration-500",
+                          budgetStats.upiBudgetUsedPercentage > 90
+                            ? "bg-rose-500"
+                            : budgetStats.upiBudgetUsedPercentage > 75
+                            ? "bg-amber-400"
+                            : "bg-[#03D26F]"
+                        )}
+                        style={{ width: `${Math.min(100, budgetStats.upiBudgetUsedPercentage)}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 💵 Card 2: Physical Cash Channel */}
+                <div className="bg-[#FAF8F5] rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex flex-col justify-between gap-3.5">
+                  <div className="space-y-2.5">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <div className="h-8 w-8 rounded-xl bg-amber-400/25 border-2 border-[#161514] flex items-center justify-center text-sm shadow-[1.5px_1.5px_0px_0px_#161514] shrink-0">
+                          💵
+                        </div>
+                        <div>
+                          <h5 className="font-black text-xs uppercase tracking-wider text-[#161514]" style={{ fontFamily: "var(--font-heading)" }}>
+                            Physical Cash Wallet
+                          </h5>
+                          <span className="text-[10px] font-bold text-[#161514]/60 block">
+                            Pocket Cash, Paper Notes & Coins
+                          </span>
+                        </div>
+                      </div>
+
+                      {budgetStats.cashRolloverSurplus > 0 && (
+                        <span className="text-[9px] font-black bg-[#CEF431] text-[#161514] px-2 py-0.5 rounded-full border border-[#161514] shadow-[1px_1px_0px_0px_#161514] shrink-0">
+                          +{currencySymbol}{budgetStats.cashRolloverSurplus.toLocaleString()} Roll
+                        </span>
+                      )}
+                    </div>
+
+                    {budgetStats.baseCashBudget === 0 && budgetStats.cashExpense === 0 ? (
+                      <div className="bg-white/90 p-3 rounded-xl border border-dashed border-[#161514]/30 text-center space-y-1.5 my-1">
+                        <p className="text-[11px] text-[#161514]/70 font-bold">
+                          No cash allowance set for this month.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setTempUpiBudgetInput(String(baseUpiBudget));
+                            setTempCashBudgetInput("2000");
+                            setIsBudgetModalOpen(true);
+                          }}
+                          className="px-2.5 py-1 rounded-lg bg-amber-400 hover:bg-amber-300 text-[#161514] font-black text-[10px] border border-[#161514] shadow-[1px_1px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all inline-flex items-center gap-1"
+                        >
+                          <span>+ Set Cash Allowance</span>
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-3 gap-2 pt-1 text-center">
+                        <div className="bg-white p-2 rounded-xl border border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
+                          <span className="text-[9px] font-black uppercase text-[#161514]/60 block">Available</span>
+                          <span className="text-xs font-black text-[#161514] block mt-0.5" style={{ fontFamily: "var(--font-heading)" }}>
+                            {currencySymbol}{budgetStats.totalAvailableCashBudget.toLocaleString()}
+                          </span>
+                        </div>
+                        <div className="bg-white p-2 rounded-xl border border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
+                          <span className="text-[9px] font-black uppercase text-rose-700 block">Spent</span>
+                          <span className="text-xs font-black text-rose-600 block mt-0.5" style={{ fontFamily: "var(--font-heading)" }}>
+                            -{currencySymbol}{budgetStats.cashExpense.toLocaleString()}
+                          </span>
+                        </div>
+                        <div className={cn(
+                          "p-2 rounded-xl border border-[#161514] shadow-[1px_1px_0px_0px_#161514]",
+                          budgetStats.remainingCashBudget >= 0 ? "bg-amber-100" : "bg-rose-100"
+                        )}>
+                          <span className="text-[9px] font-black uppercase text-[#161514]/80 block">Left</span>
+                          <span className={cn(
+                            "text-xs font-black block mt-0.5",
+                            budgetStats.remainingCashBudget >= 0 ? "text-amber-950" : "text-rose-700"
+                          )} style={{ fontFamily: "var(--font-heading)" }}>
+                            {currencySymbol}{budgetStats.remainingCashBudget.toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Meter & Pace */}
+                  {(budgetStats.baseCashBudget > 0 || budgetStats.cashExpense > 0) && (
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between items-center text-[9px] font-black uppercase text-[#161514]">
+                        <span>Cash Burn ({budgetStats.cashBudgetUsedPercentage}%)</span>
+                        <span className="text-[#161514]/70 font-bold lowercase">
+                          {budgetStats.remainingCashBudget > 0
+                            ? `~${currencySymbol}${budgetStats.dailySafeToSpendCash}/day safe`
+                            : "Over-budget"}
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden border border-[#161514] p-0.5 shadow-[0.5px_0.5px_0px_0px_#161514]">
+                        <div
+                          className={cn(
+                            "h-full rounded-full transition-all duration-500",
+                            budgetStats.cashBudgetUsedPercentage > 90
+                              ? "bg-rose-500"
+                              : budgetStats.cashBudgetUsedPercentage > 75
+                              ? "bg-amber-500"
+                              : "bg-amber-400"
+                          )}
+                          style={{ width: `${Math.min(100, budgetStats.cashBudgetUsedPercentage)}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -3001,58 +3217,104 @@ function MoneyPageContent() {
         currencySymbol={currencySymbol}
       />
 
-      {/* Monthly Budget Allowance Setup Modal */}
+      {/* Monthly Dual-Channel Budget Allowance Setup Modal */}
       <ResponsiveFormContainer
         open={isBudgetModalOpen}
         onOpenChange={setIsBudgetModalOpen}
-        title="Set Monthly Budget Allowance"
-        description="Your base monthly income/budget from which daily expenses are deducted"
+        title="Set Monthly Budget Allowances"
+        description="Allocate your base monthly allowance across UPI/Digital and Physical Cash"
       >
         <form onSubmit={handleSaveMonthlyBudget} className="space-y-4 pt-1">
           <div className="bg-[#FFF9EA] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] space-y-1">
             <span className="text-[10px] font-black uppercase tracking-wider text-navy-600 block">
-              How Monthly Budget Works
+              Dual-Channel Rollover Architecture ⚡
             </span>
             <p className="text-xs text-navy-800 font-medium leading-relaxed">
-              If you set your budget to <strong>{currencySymbol}9,000</strong>, all daily expenses will be deducted from it. If you spend <strong>{currencySymbol}8,000</strong>, the remaining <strong>{currencySymbol}1,000</strong> rolls over to give you <strong>{currencySymbol}10,000</strong> next month! 🚀
+              Allocate separate ceilings for online/UPI apps and pocket cash. Any unspent balance in either channel will automatically roll over into its respective channel next month!
             </p>
           </div>
 
-          <div className="space-y-1.5">
-            <label htmlFor="budget-input" className="text-xs font-black uppercase tracking-wider text-[#161514] block">
-              Base Monthly Budget Amount ({currencySymbol}) *
-            </label>
-            <input
-              id="budget-input"
-              type="number"
-              min="100"
-              step="50"
-              value={tempBudgetInput}
-              onChange={(e) => setTempBudgetInput(e.target.value)}
-              placeholder="e.g. 9000, 15000, 50000"
-              required
-              className="w-full neo-input text-sm font-black"
-            />
+          {/* Combined Total Display Pill */}
+          <div className="bg-white p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-between">
+            <span className="text-xs font-black uppercase tracking-wider text-[#161514]">
+              Combined Monthly Pool
+            </span>
+            <span className="text-lg font-black text-[#161514]" style={{ fontFamily: "var(--font-heading)" }}>
+              {currencySymbol}{((Number(tempUpiBudgetInput) || 0) + (Number(tempCashBudgetInput) || 0)).toLocaleString()}
+            </span>
           </div>
 
-          <div className="grid grid-cols-3 gap-2">
-            {[5000, 9000, 15000, 25000, 50000, 100000].map((preset) => (
-              <button
-                key={preset}
-                type="button"
-                onClick={() => setTempBudgetInput(String(preset))}
-                className="py-2 rounded-xl bg-white hover:bg-[#CEF431] text-[#161514] font-black text-xs border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all"
-              >
-                {currencySymbol}{preset.toLocaleString()}
-              </button>
-            ))}
+          {/* 📱 UPI Budget Input */}
+          <div className="space-y-1.5 bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514]">
+            <div className="flex items-center justify-between">
+              <label htmlFor="upi-budget-input" className="text-xs font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5">
+                <span>📱 UPI & Digital Allowance ({currencySymbol})</span>
+              </label>
+              <span className="text-[10px] font-bold text-[#161514]/60">GPay, Paytm, Cards</span>
+            </div>
+            <input
+              id="upi-budget-input"
+              type="number"
+              min="0"
+              step="100"
+              value={tempUpiBudgetInput}
+              onChange={(e) => setTempUpiBudgetInput(e.target.value)}
+              placeholder="e.g. 7000, 10000"
+              required
+              className="w-full neo-input text-sm font-black bg-white"
+            />
+            <div className="flex gap-1.5 pt-1 overflow-x-auto">
+              {[5000, 8000, 12000, 20000].map((val) => (
+                <button
+                  key={`upi-${val}`}
+                  type="button"
+                  onClick={() => setTempUpiBudgetInput(String(val))}
+                  className="px-2 py-1 rounded-lg bg-white hover:bg-[#CEF431] text-[#161514] font-black text-[10px] border border-[#161514] shadow-[1px_1px_0px_0px_#161514] shrink-0 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all"
+                >
+                  {currencySymbol}{val.toLocaleString()}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 💵 Physical Cash Budget Input */}
+          <div className="space-y-1.5 bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514]">
+            <div className="flex items-center justify-between">
+              <label htmlFor="cash-budget-input" className="text-xs font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5">
+                <span>💵 Cash Wallet Allowance ({currencySymbol})</span>
+              </label>
+              <span className="text-[10px] font-bold text-[#161514]/60">ATM Notes & Coins</span>
+            </div>
+            <input
+              id="cash-budget-input"
+              type="number"
+              min="0"
+              step="50"
+              value={tempCashBudgetInput}
+              onChange={(e) => setTempCashBudgetInput(e.target.value)}
+              placeholder="e.g. 2000, 3000 (or 0 if cashless)"
+              required
+              className="w-full neo-input text-sm font-black bg-white"
+            />
+            <div className="flex gap-1.5 pt-1 overflow-x-auto">
+              {[0, 1000, 2000, 3000, 5000].map((val) => (
+                <button
+                  key={`cash-${val}`}
+                  type="button"
+                  onClick={() => setTempCashBudgetInput(String(val))}
+                  className="px-2 py-1 rounded-lg bg-white hover:bg-amber-400 text-[#161514] font-black text-[10px] border border-[#161514] shadow-[1px_1px_0px_0px_#161514] shrink-0 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all"
+                >
+                  {val === 0 ? "Cashless (0)" : `${currencySymbol}${val.toLocaleString()}`}
+                </button>
+              ))}
+            </div>
           </div>
 
           <button
             type="submit"
             className="w-full bg-[#CEF431] hover:bg-[#03D26F] text-[#161514] font-black text-xs uppercase tracking-wider py-3.5 rounded-xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center justify-center gap-2 mt-2"
           >
-            <span>Save Monthly Budget Target 🎯</span>
+            <span>Save Dual Allowances 🎯</span>
           </button>
         </form>
       </ResponsiveFormContainer>

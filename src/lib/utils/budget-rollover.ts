@@ -16,17 +16,20 @@ export interface MonthlyBudgetStats {
   targetMonthLabel: string;
   isCurrentCalendarMonth: boolean;
   baseBudget: number;
+  baseUpiBudget: number;
+  baseCashBudget: number;
   monthlyExpense: number;
   monthlyIncome: number;
   netMonthlyCashflow: number;
   // Online (UPI / Card / Bank) vs Cash Breakdown
   onlineExpense: number;
   cashExpense: number;
+  upiExpense: number;
   onlineIncome: number;
   cashIncome: number;
   onlinePercentage: number;
   cashPercentage: number;
-  // Rollover & Available Budget
+  // Rollover & Available Budget (Combined)
   previousMonthKey: string;
   previousMonthLabel: string;
   previousMonthExpense: number;
@@ -37,6 +40,21 @@ export interface MonthlyBudgetStats {
   budgetUsedPercentage: number;
   daysRemainingInMonth: number;
   dailySafeToSpend: number;
+  // Channel-Specific Budget Metrics (UPI/Digital vs Physical Cash)
+  previousMonthUpiExpense: number;
+  previousMonthCashExpense: number;
+  previousMonthUpiSavings: number;
+  previousMonthCashSavings: number;
+  upiRolloverSurplus: number;
+  cashRolloverSurplus: number;
+  totalAvailableUpiBudget: number;
+  totalAvailableCashBudget: number;
+  remainingUpiBudget: number;
+  remainingCashBudget: number;
+  upiBudgetUsedPercentage: number;
+  cashBudgetUsedPercentage: number;
+  dailySafeToSpendUpi: number;
+  dailySafeToSpendCash: number;
   // Intelligent Burn Pace
   burnPaceStatus: "fast" | "frugal" | "on_track";
   burnPaceMessage: string;
@@ -79,23 +97,33 @@ export function getPreviousMonthKey(monthKey: string): string {
 /**
  * Pure engine to compute monthly budget, rollover surplus, online vs cash breakdown,
  * and detailed "Where did you save?" audit with zero data loss.
+ * Supports dual channels: UPI/Digital Budget and Physical Cash Budget.
  */
 export function computeMonthlyBudgetStats({
   transactions,
   categories,
   targetMonthKey,
-  baseBudget = 9000,
+  baseBudget,
+  baseUpiBudget,
+  baseCashBudget = 0,
   enableRollover = true,
 }: {
   transactions: Transaction[];
   categories: Category[];
   targetMonthKey: string;
   baseBudget?: number;
+  baseUpiBudget?: number;
+  baseCashBudget?: number;
   enableRollover?: boolean;
 }): MonthlyBudgetStats {
   const today = new Date();
   const currentCalMonthKey = format(today, "yyyy-MM");
   const isCurrentCalendarMonth = targetMonthKey === currentCalMonthKey;
+
+  // Resolve Base Budgets with seamless fallback
+  const effectiveUpiBudget = baseUpiBudget !== undefined ? baseUpiBudget : (baseBudget ?? 9000);
+  const effectiveCashBudget = baseCashBudget ?? 0;
+  const effectiveBaseBudget = effectiveUpiBudget + effectiveCashBudget;
 
   // Format Labels
   let targetMonthLabel = targetMonthKey;
@@ -124,7 +152,7 @@ export function computeMonthlyBudgetStats({
 
   const netMonthlyCashflow = monthlyIncome - monthlyExpense;
 
-  // 2. Online vs Cash Breakdown for Target Month
+  // 2. Online/UPI vs Cash Breakdown for Target Month
   const cashExpense = targetMonthTxs
     .filter((t) => t.type === "expense" && isCashTransaction(t.paymentMethod))
     .reduce((sum, t) => sum + (t.amount || 0), 0);
@@ -132,6 +160,8 @@ export function computeMonthlyBudgetStats({
   const onlineExpense = targetMonthTxs
     .filter((t) => t.type === "expense" && isOnlineTransaction(t.paymentMethod))
     .reduce((sum, t) => sum + (t.amount || 0), 0);
+
+  const upiExpense = onlineExpense; // UPI and Digital pool
 
   const cashIncome = targetMonthTxs
     .filter((t) => t.type === "income" && isCashTransaction(t.paymentMethod))
@@ -145,7 +175,7 @@ export function computeMonthlyBudgetStats({
   const onlinePercentage = monthlyExpense > 0 ? Math.round((onlineExpense / totalExpenseForPercent) * 100) : 0;
   const cashPercentage = monthlyExpense > 0 ? 100 - onlinePercentage : 0;
 
-  // 3. Previous Month Performance & Rollover
+  // 3. Previous Month Performance & Independent Rollover
   const prevMonthTxs = transactions.filter(
     (t) => t.date && t.date.startsWith(previousMonthKey)
   );
@@ -154,14 +184,43 @@ export function computeMonthlyBudgetStats({
     .filter((t) => t.type === "expense")
     .reduce((sum, t) => sum + (t.amount || 0), 0);
 
-  // If user spent 8,000 on a 9,000 budget, savings = 1,000
-  // If user spent 9,500 on a 9,000 budget, savings = 0 (no negative rollover by default)
-  const previousMonthSavings = Math.max(0, baseBudget - previousMonthExpense);
-  const rolloverSurplus = enableRollover && prevMonthTxs.length > 0 ? previousMonthSavings : 0;
+  const previousMonthUpiExpense = prevMonthTxs
+    .filter((t) => t.type === "expense" && isOnlineTransaction(t.paymentMethod))
+    .reduce((sum, t) => sum + (t.amount || 0), 0);
 
-  // Total Available Starting Budget for Target Month
-  const totalAvailableBudget = baseBudget + rolloverSurplus;
-  const remainingBudget = totalAvailableBudget - monthlyExpense;
+  const previousMonthCashExpense = prevMonthTxs
+    .filter((t) => t.type === "expense" && isCashTransaction(t.paymentMethod))
+    .reduce((sum, t) => sum + (t.amount || 0), 0);
+
+  // Independent Rollover Calculations
+  const previousMonthUpiSavings = Math.max(0, effectiveUpiBudget - previousMonthUpiExpense);
+  const previousMonthCashSavings =
+    effectiveCashBudget > 0 ? Math.max(0, effectiveCashBudget - previousMonthCashExpense) : 0;
+  const previousMonthSavings = previousMonthUpiSavings + previousMonthCashSavings;
+
+  const upiRolloverSurplus = enableRollover && prevMonthTxs.length > 0 ? previousMonthUpiSavings : 0;
+  const cashRolloverSurplus = enableRollover && prevMonthTxs.length > 0 ? previousMonthCashSavings : 0;
+  const rolloverSurplus = upiRolloverSurplus + cashRolloverSurplus;
+
+  // Channel-Specific Available & Remaining Pools
+  const totalAvailableUpiBudget = effectiveUpiBudget + upiRolloverSurplus;
+  const totalAvailableCashBudget = effectiveCashBudget + cashRolloverSurplus;
+  const totalAvailableBudget = totalAvailableUpiBudget + totalAvailableCashBudget;
+
+  const remainingUpiBudget = totalAvailableUpiBudget - onlineExpense;
+  const remainingCashBudget = totalAvailableCashBudget - cashExpense;
+  const remainingBudget = remainingUpiBudget + remainingCashBudget;
+
+  const upiBudgetUsedPercentage =
+    totalAvailableUpiBudget > 0
+      ? Math.min(100, Math.round((onlineExpense / totalAvailableUpiBudget) * 100))
+      : 0;
+
+  const cashBudgetUsedPercentage =
+    totalAvailableCashBudget > 0
+      ? Math.min(100, Math.round((cashExpense / totalAvailableCashBudget) * 100))
+      : 0;
+
   const budgetUsedPercentage =
     totalAvailableBudget > 0
       ? Math.min(100, Math.round((monthlyExpense / totalAvailableBudget) * 100))
@@ -190,6 +249,10 @@ export function computeMonthlyBudgetStats({
     daysRemainingInMonth = 1;
   }
 
+  const dailySafeToSpendUpi =
+    remainingUpiBudget > 0 ? Math.round(remainingUpiBudget / daysRemainingInMonth) : 0;
+  const dailySafeToSpendCash =
+    remainingCashBudget > 0 ? Math.round(remainingCashBudget / daysRemainingInMonth) : 0;
   const dailySafeToSpend =
     remainingBudget > 0 ? Math.round(remainingBudget / daysRemainingInMonth) : 0;
 
@@ -247,12 +310,15 @@ export function computeMonthlyBudgetStats({
     targetMonthKey,
     targetMonthLabel,
     isCurrentCalendarMonth,
-    baseBudget,
+    baseBudget: effectiveBaseBudget,
+    baseUpiBudget: effectiveUpiBudget,
+    baseCashBudget: effectiveCashBudget,
     monthlyExpense,
     monthlyIncome,
     netMonthlyCashflow,
     onlineExpense,
     cashExpense,
+    upiExpense,
     onlineIncome,
     cashIncome,
     onlinePercentage,
@@ -267,6 +333,20 @@ export function computeMonthlyBudgetStats({
     budgetUsedPercentage,
     daysRemainingInMonth,
     dailySafeToSpend,
+    previousMonthUpiExpense,
+    previousMonthCashExpense,
+    previousMonthUpiSavings,
+    previousMonthCashSavings,
+    upiRolloverSurplus,
+    cashRolloverSurplus,
+    totalAvailableUpiBudget,
+    totalAvailableCashBudget,
+    remainingUpiBudget,
+    remainingCashBudget,
+    upiBudgetUsedPercentage,
+    cashBudgetUsedPercentage,
+    dailySafeToSpendUpi,
+    dailySafeToSpendCash,
     burnPaceStatus,
     burnPaceMessage,
     percentDaysPassed,
