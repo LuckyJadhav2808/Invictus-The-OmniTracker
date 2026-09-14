@@ -15,29 +15,20 @@ import { StudySession } from "@/models/StudySession";
 import { MoodLog } from "@/models/MoodLog";
 import { SavingsGoal } from "@/models/SavingsGoal";
 import { Subscription } from "@/models/Subscription";
-import { verifyAdminRequest } from "@/lib/server-auth";
 
-// POST /api/admin/purge
-// Administrative endpoint to wipe data for a specific user. Requires verified admin privileges.
+// POST /api/account/purge
+// Securely wipes all user-owned records for a specific authenticated user
 export async function POST(req: Request) {
   try {
-    const auth = await verifyAdminRequest(req);
-    if (!auth.isAdmin) {
-      return NextResponse.json({ error: auth.error }, { status: auth.status || 403 });
-    }
-
     await connectToDatabase();
     const body = await req.json().catch(() => ({}));
-    const { targetUserId } = body;
+    const { userId } = body;
 
-    if (!targetUserId || typeof targetUserId !== "string" || targetUserId.trim() === "") {
-      return NextResponse.json(
-        { error: "A valid targetUserId is required to perform an administrative purge." },
-        { status: 400 }
-      );
+    if (!userId || typeof userId !== "string" || userId.trim() === "") {
+      return NextResponse.json({ error: "Valid userId is required to purge account data" }, { status: 400 });
     }
 
-    const query = { userId: targetUserId.trim() };
+    const query = { userId: userId.trim() };
 
     await Promise.all([
       Habit.deleteMany(query),
@@ -59,10 +50,10 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       success: true,
-      message: `Successfully purged all MongoDB Atlas cloud records for user ${targetUserId}.`,
+      message: "Successfully purged all account records.",
     });
   } catch (error: any) {
-    console.error("Admin purge error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("Account purge error:", error);
+    return NextResponse.json({ error: error.message || "Failed to purge account data" }, { status: 500 });
   }
 }

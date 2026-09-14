@@ -150,60 +150,70 @@ export async function customLoginUser(payload: {
 
   let userIndex = users.findIndex((u) => u.email.toLowerCase() === normalizedEmail);
 
-  // If not found in current browser's local DB, query MongoDB Atlas Cloud DB!
-  if (userIndex === -1) {
-    try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: normalizedEmail, passwordHash }),
-      });
+  // 1. When online, verify credentials against MongoDB Cloud DB first
+  try {
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: normalizedEmail, passwordHash }),
+    });
 
-      if (res.ok) {
-        const data = await res.json();
-        if (data.user) {
-          const cloudUser: User = {
-            uid: data.user.uid || `user_${Date.now()}`,
-            email: data.user.email,
-            displayName: data.user.displayName || "Invictus Explorer",
-            role: data.user.role || (normalizedEmail === ADMIN_EMAIL.toLowerCase() ? "admin" : "user"),
-            passwordHash: passwordHash,
-            timezone: data.user.timezone || "Asia/Kolkata",
-            weekStartsOn: data.user.weekStartsOn || 1,
-            currency: data.user.currency || "INR",
-            onboarded: true,
-            modulesEnabled: data.user.modulesEnabled || { goals: true, study: true, money: true },
-            createdAt: data.user.createdAt || new Date().toISOString(),
-            lastLogin: new Date().toISOString(),
-          };
-
-          // Save cloud user to local database on this device
-          users.push(cloudUser);
-          saveRegisteredUsers(users);
-          setCustomSession(cloudUser);
-          return cloudUser;
-        }
-      }
-    } catch (err) {
-      console.warn("Cloud login fetch error:", err);
+    if (res.status === 401) {
+      throw new Error("Incorrect password. Please check your credentials and try again.");
     }
 
+    if (res.ok) {
+      const data = await res.json();
+      if (data.user) {
+        const cloudUser: User = {
+          uid: data.user.uid || `user_${Date.now()}`,
+          email: data.user.email,
+          displayName: data.user.displayName || "Invictus Explorer",
+          role: data.user.role || (normalizedEmail === ADMIN_EMAIL.toLowerCase() ? "admin" : "user"),
+          passwordHash: passwordHash,
+          timezone: data.user.timezone || "Asia/Kolkata",
+          weekStartsOn: data.user.weekStartsOn || 1,
+          currency: data.user.currency || "INR",
+          onboarded: true,
+          modulesEnabled: data.user.modulesEnabled || { goals: true, study: true, money: true },
+          createdAt: data.user.createdAt || new Date().toISOString(),
+          lastLogin: new Date().toISOString(),
+        };
+
+        if (userIndex > -1) {
+          users[userIndex] = cloudUser;
+        } else {
+          users.push(cloudUser);
+        }
+        saveRegisteredUsers(users);
+        setCustomSession(cloudUser);
+        return cloudUser;
+      }
+    } else if (res.status === 404 && userIndex === -1) {
+      throw new Error("No account found with this email. Please check your email or sign up.");
+    }
+  } catch (err: any) {
+    if (err.message && (err.message.includes("Incorrect password") || err.message.includes("No account found"))) {
+      throw err;
+    }
+    console.warn("Cloud login fetch error, falling back to local verification:", err);
+  }
+
+  // 2. Offline / Local fallback verification
+  if (userIndex === -1) {
     throw new Error("No account found with this email. Please check your email or sign up.");
   }
 
   const user = users[userIndex];
 
-  // Verify password hash
-  if (
-    user.passwordHash &&
-    user.passwordHash !== passwordHash &&
-    user.passwordHash !== "hash_default_admin" &&
-    user.passwordHash !== "hash_default"
-  ) {
+  // Verify password hash strictly
+  const hasExistingHash = user.passwordHash && user.passwordHash !== "hash_default" && user.passwordHash !== "hash_default_admin";
+  if (hasExistingHash && user.passwordHash !== passwordHash) {
     throw new Error("Incorrect password. Please try again.");
   }
 
-  if (user.passwordHash === "hash_default_admin" || user.passwordHash === "hash_default") {
+  // Set initial password if account was created with placeholder hash
+  if (!hasExistingHash) {
     user.passwordHash = passwordHash;
   }
 

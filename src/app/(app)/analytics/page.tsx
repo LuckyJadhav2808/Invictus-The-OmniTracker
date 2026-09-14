@@ -1,21 +1,51 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useHabits, useStreaks } from "@/lib/queries/goals";
 import { useSubjects, useStudySessions, useTests } from "@/lib/queries/study";
 import { useCategories, useTransactions } from "@/lib/queries/money";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar, BookOpen, Wallet, Flame, Trophy, Award, Clock } from "lucide-react";
-import { format } from "date-fns";
+import { format, startOfWeek, addDays } from "date-fns";
 import { cn } from "@/lib/utils";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Legend, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 import { SpaceHeroBanner } from "@/components/shared/SpaceHeroBanner";
 import { useUIStore } from "@/store/ui-store";
 import { YearlyActivityMatrix } from "@/components/profile/YearlyActivityMatrix";
+import { useAuth } from "@/components/shared/AuthProvider";
 
 export default function AnalyticsHubPage() {
+  const { user } = useAuth();
   const { activeTracker } = useUIStore();
   const [activeTab, setActiveTab] = useState(activeTracker === "life" ? "goals" : activeTracker);
+  const [currency, setCurrency] = useState("INR");
+
+  // Load currency preferences
+  useEffect(() => {
+    if (user?.currency) {
+      setCurrency(user.currency);
+    } else if (typeof window !== "undefined") {
+      const profileStr = localStorage.getItem("invictus_user_profile");
+      if (profileStr) {
+        try {
+          const profile = JSON.parse(profileStr);
+          if (profile.currency) setCurrency(profile.currency);
+        } catch {
+          // ignore
+        }
+      }
+    }
+  }, [user]);
+
+  const currencySymbol = useMemo(() => {
+    switch (currency) {
+      case "USD": return "$";
+      case "EUR": return "€";
+      case "GBP": return "£";
+      case "JPY": return "¥";
+      default: return "₹";
+    }
+  }, [currency]);
 
   // Synchronize tab when space is toggled
   useEffect(() => {
@@ -52,15 +82,21 @@ export default function AnalyticsHubPage() {
   const totalStudyMinutes = studySessions.reduce((sum, s) => sum + s.durationMinutes, 0);
   const totalStudyHours = (totalStudyMinutes / 60).toFixed(1);
 
-  const studyBarData = [
-    { name: "Mon", hours: 1.2 },
-    { name: "Tue", hours: 2.5 },
-    { name: "Wed", hours: 0.8 },
-    { name: "Thu", hours: 3.0 },
-    { name: "Fri", hours: 1.5 },
-    { name: "Sat", hours: 4.2 },
-    { name: "Sun", hours: 2.0 },
-  ];
+  const studyBarData = useMemo(() => {
+    const monday = startOfWeek(new Date(), { weekStartsOn: 1 });
+    return Array.from({ length: 7 }, (_, i) => {
+      const day = addDays(monday, i);
+      const dayStr = format(day, "yyyy-MM-dd");
+      const dayName = format(day, "EEE");
+      const minutes = studySessions
+        .filter((s) => s.date === dayStr)
+        .reduce((sum, s) => sum + (s.durationMinutes || 0), 0);
+      return {
+        name: dayName,
+        hours: Number((minutes / 60).toFixed(1)),
+      };
+    });
+  }, [studySessions]);
 
   const testTrendData = tests
     .map((t) => ({
@@ -110,7 +146,7 @@ export default function AnalyticsHubPage() {
           stats={[
             { label: "Total Habits", value: `${totalHabits}`, icon: "🌱" },
             { label: "Study Logged", value: `${totalStudyHours}h`, icon: "📚" },
-            { label: "Net Savings", value: `$${netBalance.toLocaleString()}`, icon: "💰" },
+            { label: "Net Savings", value: `${currencySymbol}${netBalance.toLocaleString()}`, icon: "💰" },
           ]}
         />
 
@@ -266,7 +302,7 @@ export default function AnalyticsHubPage() {
                 </div>
                 <div>
                   <h5 className="text-[10px] font-black text-[#161514]/70 uppercase tracking-wider">Total Income</h5>
-                  <p className="text-xl font-black text-[#03D26F] mt-0.5 font-heading">${totalIncome.toLocaleString()}</p>
+                  <p className="text-xl font-black text-[#03D26F] mt-0.5 font-heading">{currencySymbol}{totalIncome.toLocaleString()}</p>
                 </div>
               </div>
 
@@ -276,7 +312,7 @@ export default function AnalyticsHubPage() {
                 </div>
                 <div>
                   <h5 className="text-[10px] font-black text-[#161514]/70 uppercase tracking-wider">Total Expense</h5>
-                  <p className="text-xl font-black text-rose-600 mt-0.5 font-heading">${totalExpense.toLocaleString()}</p>
+                  <p className="text-xl font-black text-rose-600 mt-0.5 font-heading">{currencySymbol}{totalExpense.toLocaleString()}</p>
                 </div>
               </div>
             </div>

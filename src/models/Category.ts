@@ -7,6 +7,7 @@ export interface ICategory extends Document {
   color: string;
   icon: string;
   type: "income" | "expense";
+  monthlyBudget?: number;
   budgetLimit?: number;
   isTemplate?: boolean;
   templatePackId?: string;
@@ -21,6 +22,7 @@ const CategorySchema = new Schema<ICategory>(
     color: { type: String, default: "amber" },
     icon: { type: String, default: "💳" },
     type: { type: String, enum: ["income", "expense"], required: true },
+    monthlyBudget: { type: Number, default: 0 },
     budgetLimit: { type: Number },
     isTemplate: { type: Boolean, default: false },
     templatePackId: { type: String },

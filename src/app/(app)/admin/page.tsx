@@ -91,10 +91,18 @@ export default function AdminDashboardPage() {
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
   const [storageKB, setStorageKB] = useState(0);
 
+  const getAdminHeaders = () => ({
+    "Content-Type": "application/json",
+    "x-admin-email": user?.email || ADMIN_EMAIL,
+    "x-admin-uid": user?.uid || "user-admin-default",
+  });
+
   // Load Data from MongoDB & Local Stores
   const refreshData = async () => {
     try {
-      const res = await fetch("/api/admin/users");
+      const res = await fetch("/api/admin/users", {
+        headers: getAdminHeaders(),
+      });
       if (res.ok) {
         const mongoUsers = await res.json();
         setUsersList(mongoUsers);
@@ -206,7 +214,7 @@ export default function AdminDashboardPage() {
     try {
       const res = await fetch("/api/admin/users", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: getAdminHeaders(),
         body: JSON.stringify({ email: newEmail, displayName: newName, password: newPassword }),
       });
       const data = await res.json();
@@ -237,7 +245,7 @@ export default function AdminDashboardPage() {
     try {
       const res = await fetch("/api/admin/users", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: getAdminHeaders(),
         body: JSON.stringify({ uid: u.uid, role: newRole }),
       });
       if (!res.ok) throw new Error("Failed to update role in MongoDB");
@@ -261,7 +269,7 @@ export default function AdminDashboardPage() {
     try {
       const res = await fetch("/api/admin/users", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: getAdminHeaders(),
         body: JSON.stringify({ uid: u.uid, status: newStatus }),
       });
       if (!res.ok) throw new Error("Failed to update status in MongoDB");
@@ -281,7 +289,7 @@ export default function AdminDashboardPage() {
     try {
       const res = await fetch("/api/admin/users", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: getAdminHeaders(),
         body: JSON.stringify({
           uid: editingUser.uid,
           displayName: editName,
@@ -348,6 +356,7 @@ export default function AdminDashboardPage() {
     try {
       const res = await fetch(`/api/admin/users?uid=${deletingUserId}`, {
         method: "DELETE",
+        headers: getAdminHeaders(),
       });
       if (!res.ok) throw new Error("Failed to delete user from MongoDB");
 

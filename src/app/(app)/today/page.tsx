@@ -66,29 +66,40 @@ export default function TodayPage() {
 
   // Load user profile details for currency & load dismissed insights / active stopwatches
   useEffect(() => {
-    if (!user) return;
-    const loadProfile = async () => {
+    const loadProfile = () => {
+      if (typeof window === "undefined") return;
       const isGuestMode = localStorage.getItem("invictus_guest_mode") === "true";
-      if (isGuestMode) {
+      if (isGuestMode || !user) {
         const profileStr = localStorage.getItem("invictus_user_profile");
         if (profileStr) {
-          const profile = JSON.parse(profileStr);
-          if (profile.currency) setCurrency(profile.currency);
+          try {
+            const profile = JSON.parse(profileStr);
+            if (profile.currency) setCurrency(profile.currency);
+          } catch {
+            // ignore JSON parse error
+          }
         }
-      } else if (user.currency) {
+      } else if (user?.currency) {
         setCurrency(user.currency);
       }
     };
     loadProfile();
 
     // Dismissed insights
-    const dismissed = localStorage.getItem("invictus_dismissed_insights");
-    if (dismissed) {
-      setDismissedInsightIds(JSON.parse(dismissed));
+    if (typeof window !== "undefined") {
+      const dismissed = localStorage.getItem("invictus_dismissed_insights");
+      if (dismissed) {
+        try {
+          setDismissedInsightIds(JSON.parse(dismissed));
+        } catch {
+          // ignore JSON parse error
+        }
+      }
     }
 
     // Active stopwatch check
     const checkStopwatch = () => {
+      if (typeof window === "undefined") return;
       const start = localStorage.getItem("invictus_stopwatch_start");
       const subId = localStorage.getItem("invictus_stopwatch_subject_id");
       const topId = localStorage.getItem("invictus_stopwatch_topic_id");

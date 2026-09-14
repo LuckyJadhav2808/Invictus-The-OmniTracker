@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProgressRing } from "@/components/shared/ProgressRing";
 import { BookOpen, Plus, Calendar as CalendarIcon, Trophy, BarChart2, AlertCircle, FileText, ChevronRight, Clock, Sparkles, Edit3, Trash2 } from "lucide-react";
-import { format, differenceInDays, getDay, subWeeks, eachDayOfInterval } from "date-fns";
+import { format, differenceInDays, differenceInCalendarDays, parseISO, getDay, subWeeks, eachDayOfInterval } from "date-fns";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/shared/AuthProvider";
@@ -217,7 +217,10 @@ function StudyPageContent() {
   // Compute Countdown Days
   const countdownDays = () => {
     if (!studyTarget?.examDate) return null;
-    const diff = differenceInDays(new Date(studyTarget.examDate), new Date());
+    const targetDate = studyTarget.examDate.includes("T")
+      ? parseISO(studyTarget.examDate)
+      : new Date(`${studyTarget.examDate}T00:00:00`);
+    const diff = differenceInCalendarDays(targetDate, new Date());
     return diff >= 0 ? diff : 0;
   };
 

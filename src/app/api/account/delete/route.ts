@@ -31,7 +31,24 @@ export async function DELETE(req: Request) {
       );
     }
 
+    const normalizedEmail = email.toLowerCase().trim();
+    const PRIMARY_ADMIN = "luckymanojjadhav@gmail.com";
+    if (normalizedEmail === PRIMARY_ADMIN) {
+      return NextResponse.json(
+        { error: "Primary SuperAdmin account cannot be deleted." },
+        { status: 403 }
+      );
+    }
+
     await connectToDatabase();
+
+    const existingUser = await User.findOne({ uid, email: normalizedEmail });
+    if (!existingUser) {
+      return NextResponse.json(
+        { error: "User account verification failed. Account does not exist or credentials mismatch." },
+        { status: 404 }
+      );
+    }
 
     // Delete all user data across every MongoDB collection
     const results = await Promise.allSettled([

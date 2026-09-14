@@ -5,7 +5,11 @@ import { DebtModel } from "@/models/Debt";
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const userId = searchParams.get("userId") || "user-admin-default";
+    const userId = searchParams.get("userId");
+
+    if (!userId) {
+      return NextResponse.json({ error: "UserId is required for fetching debts" }, { status: 400 });
+    }
 
     await connectToDatabase();
 
@@ -38,10 +42,10 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { userId = "user-admin-default", personName, type, amount, dueDate, note } = body;
+    const { userId, personName, type, amount, dueDate, note } = body;
 
-    if (!personName || !type || amount === undefined) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    if (!userId || !personName || !type || amount === undefined) {
+      return NextResponse.json({ error: "Missing required fields: userId, personName, type, and amount are required" }, { status: 400 });
     }
 
     await connectToDatabase();

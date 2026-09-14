@@ -16,6 +16,11 @@ export async function POST(req: NextRequest) {
 
 async function handleCronReminders(req: NextRequest) {
   try {
+    const authHeader = req.headers.get("authorization");
+    if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+      return NextResponse.json({ error: "Unauthorized: Invalid or missing CRON_SECRET" }, { status: 401 });
+    }
+
     await connectToDatabase();
 
     const subscriptions = await PushSubscriptionModel.find({});

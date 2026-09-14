@@ -1,0 +1,13 @@
+{
+  "gradle.nestedProjects": [
+    "android"
+  ],
+  "java.import.exclusions": [
+    "**/node_modules/**",
+    "**/.next/**"
+  ],
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/.next/**": true
+  }
+}

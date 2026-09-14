@@ -21,7 +21,7 @@ export default function HabitDetailPage({
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
-  const { data: habits = [] } = useHabits();
+  const { data: habits = [], isLoading: habitsLoading } = useHabits();
   const { data: streaks = {} } = useStreaks();
 
   const updateHabitMutation = useUpdateHabit();
@@ -30,13 +30,26 @@ export default function HabitDetailPage({
   const habit = habits.find((h) => h.id === habitId);
   const streak = streaks[habitId];
 
+  if (habitsLoading) {
+    return (
+      <div className="min-h-screen bg-cream-bg flex items-center justify-center p-4">
+        <div className="text-center space-y-3 animate-pulse">
+          <div className="w-12 h-12 bg-amber-300 rounded-2xl mx-auto border-2 border-[#161514]" />
+          <p className="text-xs font-black text-[#161514] uppercase tracking-wider">Loading Habit...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!habit) {
     return (
       <div className="min-h-screen bg-cream-bg flex items-center justify-center p-4">
         <div className="text-center space-y-4">
-          <p className="text-navy-600 font-bold">Habit not found</p>
+          <p className="text-[#161514] font-black text-sm">Habit not found</p>
           <Link href="/goals">
-            <Button className="rounded-full bg-navy-900 text-white">Back to Goals</Button>
+            <Button className="rounded-xl border-2 border-[#161514] bg-[#CEF431] text-[#161514] font-black shadow-[2px_2px_0px_0px_#161514]">
+              Back to Goals
+            </Button>
           </Link>
         </div>
       </div>

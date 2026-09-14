@@ -72,7 +72,7 @@ export interface MonthlyBudgetStats {
 export function isCashTransaction(method?: string | null): boolean {
   if (!method) return false;
   const clean = method.toLowerCase().trim();
-  return clean === "cash";
+  return clean === "cash" || /\bcash\b/i.test(clean);
 }
 
 /**
@@ -100,22 +100,30 @@ export function getPreviousMonthKey(monthKey: string): string {
  * Supports dual channels: UPI/Digital Budget and Physical Cash Budget.
  */
 export function computeMonthlyBudgetStats({
-  transactions,
-  categories,
-  targetMonthKey,
+  transactions = [],
+  categories = [],
+  targetMonthKey = format(new Date(), "yyyy-MM"),
   baseBudget,
   baseUpiBudget,
   baseCashBudget = 0,
+  previousMonthUpiBudget,
+  previousMonthCashBudget,
   enableRollover = true,
+  currencySymbol = "₹",
 }: {
-  transactions: Transaction[];
-  categories: Category[];
-  targetMonthKey: string;
+  transactions?: Transaction[];
+  categories?: Category[];
+  targetMonthKey?: string;
   baseBudget?: number;
   baseUpiBudget?: number;
   baseCashBudget?: number;
+  previousMonthUpiBudget?: number;
+  previousMonthCashBudget?: number;
   enableRollover?: boolean;
+  currencySymbol?: string;
 }): MonthlyBudgetStats {
+  const safeTransactions = transactions || [];
+  const safeCategories = categories || [];
   const today = new Date();
   const currentCalMonthKey = format(today, "yyyy-MM");
   const isCurrentCalendarMonth = targetMonthKey === currentCalMonthKey;
@@ -138,7 +146,7 @@ export function computeMonthlyBudgetStats({
   } catch {}
 
   // 1. Current Selected Month Transactions
-  const targetMonthTxs = transactions.filter(
+  const targetMonthTxs = safeTransactions.filter(
     (t) => t.date && t.date.startsWith(targetMonthKey)
   );
 
@@ -176,7 +184,7 @@ export function computeMonthlyBudgetStats({
   const cashPercentage = monthlyExpense > 0 ? 100 - onlinePercentage : 0;
 
   // 3. Previous Month Performance & Independent Rollover
-  const prevMonthTxs = transactions.filter(
+  const prevMonthTxs = safeTransactions.filter(
     (t) => t.date && t.date.startsWith(previousMonthKey)
   );
 
@@ -192,14 +200,33 @@ export function computeMonthlyBudgetStats({
     .filter((t) => t.type === "expense" && isCashTransaction(t.paymentMethod))
     .reduce((sum, t) => sum + (t.amount || 0), 0);
 
+  // Determine effective budgets for the previous month benchmark:
+  const resolvedPrevUpiBudget =
+    previousMonthUpiBudget !== undefined
+      ? previousMonthUpiBudget
+      : (prevMonthTxs.length > 0 ? effectiveUpiBudget : 0);
+
+  // Cash rollover: only recognize previous month cash budget if:
+  // 1. It was explicitly recorded in previousMonthCashBudget, OR
+  // 2. The user actually logged cash expenses in that previous month.
+  // If previous cash spend is 0 and no prior cash budget was set, resolvedPrevCashBudget MUST be 0
+  // to avoid manufacturing a phantom 100% savings surplus on a newly set cash budget!
+  const resolvedPrevCashBudget =
+    previousMonthCashBudget !== undefined
+      ? previousMonthCashBudget
+      : (previousMonthCashExpense > 0 ? effectiveCashBudget : 0);
+
   // Independent Rollover Calculations
-  const previousMonthUpiSavings = Math.max(0, effectiveUpiBudget - previousMonthUpiExpense);
+  const previousMonthUpiSavings =
+    resolvedPrevUpiBudget > 0 ? Math.max(0, resolvedPrevUpiBudget - previousMonthUpiExpense) : 0;
   const previousMonthCashSavings =
-    effectiveCashBudget > 0 ? Math.max(0, effectiveCashBudget - previousMonthCashExpense) : 0;
+    resolvedPrevCashBudget > 0 ? Math.max(0, resolvedPrevCashBudget - previousMonthCashExpense) : 0;
   const previousMonthSavings = previousMonthUpiSavings + previousMonthCashSavings;
 
-  const upiRolloverSurplus = enableRollover && prevMonthTxs.length > 0 ? previousMonthUpiSavings : 0;
-  const cashRolloverSurplus = enableRollover && prevMonthTxs.length > 0 ? previousMonthCashSavings : 0;
+  const upiRolloverSurplus =
+    enableRollover && resolvedPrevUpiBudget > 0 && prevMonthTxs.length > 0 ? previousMonthUpiSavings : 0;
+  const cashRolloverSurplus =
+    enableRollover && resolvedPrevCashBudget > 0 ? previousMonthCashSavings : 0;
   const rolloverSurplus = upiRolloverSurplus + cashRolloverSurplus;
 
   // Channel-Specific Available & Remaining Pools
@@ -264,7 +291,7 @@ export function computeMonthlyBudgetStats({
   if (isCurrentCalendarMonth && monthlyExpense > 0) {
     if (paceDiff > 15 || remainingBudget < 0) {
       burnPaceStatus = "fast";
-      burnPaceMessage = `⚠️ Fast Burn: Used ${budgetUsedPercentage}% budget in ${percentDaysPassed}% of month. Cap to ~₹${dailySafeToSpend}/day.`;
+      burnPaceMessage = `⚠️ Fast Burn: Used ${budgetUsedPercentage}% budget in ${percentDaysPassed}% of month. Cap to ~${currencySymbol}${dailySafeToSpend}/day.`;
     } else if (paceDiff < -10) {
       burnPaceStatus = "frugal";
       burnPaceMessage = `🟢 Frugal Pace: Spending ${Math.abs(paceDiff)}% below expected monthly burn pace!`;
@@ -281,7 +308,7 @@ export function computeMonthlyBudgetStats({
   const categorySavingsAudit: CategorySavingsItem[] = [];
   let totalCategorySavings = 0;
 
-  categories
+  safeCategories
     .filter((c) => c.type === "expense")
     .forEach((cat) => {
       const catSpent = prevMonthTxs

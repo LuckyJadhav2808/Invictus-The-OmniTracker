@@ -25,7 +25,7 @@ export default function SubjectDetailPage({
   const [topicTitle, setTopicTitle] = useState("");
   const [estimatedHours, setEstimatedHours] = useState(1);
 
-  const { data: subjects = [] } = useSubjects();
+  const { data: subjects = [], isLoading: subjectsLoading } = useSubjects();
   const { data: topics = [], isLoading: topicsLoading } = useTopics(subjectId);
   const { data: sessions = [] } = useStudySessions(subjectId);
 
@@ -41,13 +41,26 @@ export default function SubjectDetailPage({
 
   const subject = subjects.find((s) => s.id === subjectId);
 
+  if (subjectsLoading) {
+    return (
+      <div className="min-h-screen bg-cream-bg flex items-center justify-center p-4">
+        <div className="text-center space-y-3 animate-pulse">
+          <div className="w-12 h-12 bg-amber-400 rounded-2xl mx-auto border-2 border-[#161514]" />
+          <p className="text-xs font-black text-[#161514] uppercase tracking-wider">Loading Subject...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!subject) {
     return (
       <div className="min-h-screen bg-cream-bg flex items-center justify-center p-4">
         <div className="text-center space-y-4">
-          <p className="text-navy-600 font-bold">Subject not found</p>
+          <p className="text-[#161514] font-black text-sm">Subject not found</p>
           <Link href="/study">
-            <Button className="rounded-full bg-navy-900 text-white">Back to Study</Button>
+            <Button className="rounded-xl border-2 border-[#161514] bg-[#CEF431] text-[#161514] font-black shadow-[2px_2px_0px_0px_#161514]">
+              Back to Study
+            </Button>
           </Link>
         </div>
       </div>

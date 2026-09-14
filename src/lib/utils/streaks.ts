@@ -1,4 +1,4 @@
-import { differenceInDays, parseISO, format, subDays } from "date-fns";
+import { differenceInCalendarDays, parseISO, format, subDays } from "date-fns";
 
 /**
  * Calculates current and longest streak from a list of completed dates.
@@ -76,7 +76,7 @@ export function calculateStreak(
     if (prevDate === null) {
       tempStreak = 1;
     } else {
-      const diff = differenceInDays(currentDate, prevDate);
+      const diff = differenceInCalendarDays(currentDate, prevDate);
       if (diff === 1) {
         tempStreak++;
       } else if (diff > 1) {

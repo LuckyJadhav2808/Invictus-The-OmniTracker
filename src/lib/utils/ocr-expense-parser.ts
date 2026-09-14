@@ -145,7 +145,6 @@ export function cleanMerchantName(line: string): string {
 export function extractDate(text: string): string {
   const now = new Date();
   const currentYear = now.getFullYear();
-  const today = now.toISOString().split("T")[0];
 
   // Pattern 1: DD MMM YYYY (e.g. "07 Sep 2026" or "7 September 2026")
   const ddmmyyyyText = text.match(/(\d{1,2})\s+([a-zA-Z]{3,10})\s+(\d{4})/i);
@@ -187,11 +186,15 @@ const SYSTEM_UI_NOISE = /\b(?:\d{1,2}:\d{2}|device|tdevice|vo\s*lte|wifi|battery
 /**
  * Detect phantom Rupee glyphs that Tesseract fuses into numbers
  * (e.g. ₹80 -> 380, ₹160 -> 2160, ₹32 -> 332, ₹99 -> 399)
+ * Only flags if the OCR text snippet actually displays signs of glyph fusion or noise.
  */
-export function detectPhantomRupee(amountVal: number): { phantomRupeeDetected: boolean; suggestedAmount?: number } {
+export function detectPhantomRupee(amountVal: number, rawSnippet?: string): { phantomRupeeDetected: boolean; suggestedAmount?: number } {
+  // If rawSnippet is provided, only flag if it exhibits OCR artifact markers or repeated symbols
+  const hasGlyphArtifact = rawSnippet ? /[₹?~|=!\\/]\s*[23]\d+/i.test(rawSnippet) || /[₹?~|=!\\/][23]/.test(rawSnippet) : false;
+
   // Pattern 1: 3-digit amount starting with '3' (e.g. 380 -> 80, 332 -> 32, 399 -> 99)
   // When Tesseract (English) sees '₹' touching digits, it mistakes the top curve & crossbars for '3'
-  if (amountVal >= 310 && amountVal <= 399 && Number.isInteger(amountVal)) {
+  if (hasGlyphArtifact && amountVal >= 310 && amountVal <= 399 && Number.isInteger(amountVal)) {
     const candidate = parseInt(String(amountVal).slice(1), 10);
     if (!isNaN(candidate) && candidate >= 10) {
       return { phantomRupeeDetected: true, suggestedAmount: candidate };
@@ -200,14 +203,14 @@ export function detectPhantomRupee(amountVal: number): { phantomRupeeDetected: b
 
   // Pattern 2: 4-digit amount starting with '21' or '31' (e.g. 2160 -> 160, 2120 -> 120, 2150 -> 150)
   // Tesseract turns '₹' into '2' or '3' before a '1'
-  if (amountVal >= 2100 && amountVal <= 2199 && Number.isInteger(amountVal)) {
+  if (hasGlyphArtifact && amountVal >= 2100 && amountVal <= 2199 && Number.isInteger(amountVal)) {
     const candidate = parseInt(String(amountVal).slice(1), 10);
     if (!isNaN(candidate) && candidate >= 100 && candidate <= 199) {
       return { phantomRupeeDetected: true, suggestedAmount: candidate };
     }
   }
 
-  if (amountVal >= 3100 && amountVal <= 3199 && Number.isInteger(amountVal)) {
+  if (hasGlyphArtifact && amountVal >= 3100 && amountVal <= 3199 && Number.isInteger(amountVal)) {
     const candidate = parseInt(String(amountVal).slice(1), 10);
     if (!isNaN(candidate) && candidate >= 100 && candidate <= 199) {
       return { phantomRupeeDetected: true, suggestedAmount: candidate };
@@ -254,7 +257,7 @@ export function parseRawOCRText(
     if (upiListMatch) {
       const rawMerchant = upiListMatch[1];
       let isCredit = upiListMatch[2] === "+";
-      let amountVal = parseFloat(upiListMatch[3]);
+      const amountVal = parseFloat(upiListMatch[3]);
 
       const cleanedName = cleanMerchantName(rawMerchant);
       // Validate that the merchant is not a UI header or short noise
@@ -292,7 +295,7 @@ export function parseRawOCRText(
         const cat = matchCategory(categoryHint ? `${finalNote} ${categoryHint}` : finalNote, categories);
 
         const isItemComplete = amountVal > 0 && cleanedName.trim().length >= 2;
-        const phantom = detectPhantomRupee(amountVal);
+        const phantom = detectPhantomRupee(amountVal, line);
 
         parsedItems.push({
           id: `upi_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
@@ -396,7 +399,7 @@ export function parseRawOCRText(
         const category = matchCategory(note, categories);
 
         const isItemComplete = amountVal > 0 && note.trim().length >= 2 && note !== "Expense";
-        const phantom = detectPhantomRupee(amountVal);
+        const phantom = detectPhantomRupee(amountVal, line);
 
         parsedItems.push({
           id: `bulk_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
@@ -445,7 +448,7 @@ export function parseRawOCRText(
         const cat = matchCategory(note, categories);
 
         const isItemComplete = amountVal > 0 && note.trim().length >= 2 && note !== "Expense";
-        const phantom = detectPhantomRupee(amountVal);
+        const phantom = detectPhantomRupee(amountVal, snippet);
 
         parsedItems.push({
           id: `bulk_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,

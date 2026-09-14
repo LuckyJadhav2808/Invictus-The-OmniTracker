@@ -1,17 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { User } from "@/models/User";
-import crypto from "crypto";
+import { hashPasswordWithSalt, verifyAdminRequest, ADMIN_EMAIL } from "@/lib/server-auth";
 
-const hashPassword = (password: string) => {
-  return crypto.createHash("sha256").update(password).digest("hex");
-};
-
-// GET /api/admin/users - List all users in MongoDB
+// GET /api/admin/users - List all users in MongoDB (Admin Only)
 export async function GET(req: NextRequest) {
   try {
+    const auth = await verifyAdminRequest(req);
+    if (!auth.isAdmin) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status || 403 });
+    }
+
     await connectToDatabase();
-    const users = await User.find({}).sort({ createdAt: -1 }).lean();
+    // Exclude passwordHash from user listings for security
+    const users = await User.find({}, { passwordHash: 0 }).sort({ createdAt: -1 }).lean();
     return NextResponse.json(
       users.map((u: any) => ({
         ...u,
@@ -28,9 +30,14 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// POST /api/admin/users - Register/Create User in MongoDB
+// POST /api/admin/users - Register/Create User in MongoDB (Admin Only)
 export async function POST(req: NextRequest) {
   try {
+    const auth = await verifyAdminRequest(req);
+    if (!auth.isAdmin) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status || 403 });
+    }
+
     await connectToDatabase();
     const body = await req.json();
     const { email, displayName, password, role } = body;
@@ -46,7 +53,7 @@ export async function POST(req: NextRequest) {
     }
 
     const uid = `usr_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-    const passwordHash = hashPassword(password);
+    const passwordHash = hashPasswordWithSalt(password);
 
     const newUser = await User.create({
       uid,
@@ -64,27 +71,34 @@ export async function POST(req: NextRequest) {
       lastLogin: new Date(),
     });
 
-    return NextResponse.json({
-      success: true,
-      user: {
-        id: newUser.uid,
-        uid: newUser.uid,
-        email: newUser.email,
-        displayName: newUser.displayName,
-        role: newUser.role,
-        status: newUser.status,
-        createdAt: newUser.createdAt,
+    return NextResponse.json(
+      {
+        success: true,
+        user: {
+          id: newUser.uid,
+          uid: newUser.uid,
+          email: newUser.email,
+          displayName: newUser.displayName,
+          role: newUser.role,
+          status: newUser.status,
+        },
       },
-    });
+      { status: 201 }
+    );
   } catch (err: any) {
     console.error("POST /api/admin/users Error:", err);
     return NextResponse.json({ error: err.message || "Failed to create user" }, { status: 500 });
   }
 }
 
-// PATCH /api/admin/users - Update Role, Display Name, Email, Status, or Password Reset
+// PATCH /api/admin/users - Update Role, Display Name, Email, Status, or Password Reset (Admin Only)
 export async function PATCH(req: NextRequest) {
   try {
+    const auth = await verifyAdminRequest(req);
+    if (!auth.isAdmin) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status || 403 });
+    }
+
     await connectToDatabase();
     const body = await req.json();
     const { uid, role, displayName, email, status, newPassword } = body;
@@ -99,8 +113,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     // Protect Primary SuperAdmin
-    const PRIMARY_ADMIN = "luckymanojjadhav@gmail.com";
-    if (targetUser.email.toLowerCase() === PRIMARY_ADMIN && role && role !== "admin") {
+    if (targetUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase() && role && role !== "admin") {
       return NextResponse.json({ error: "Primary SuperAdmin role cannot be changed." }, { status: 403 });
     }
 
@@ -121,7 +134,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     if (newPassword && newPassword.trim()) {
-      targetUser.passwordHash = hashPassword(newPassword.trim());
+      targetUser.passwordHash = hashPasswordWithSalt(newPassword.trim());
     }
 
     await targetUser.save();
@@ -143,9 +156,14 @@ export async function PATCH(req: NextRequest) {
   }
 }
 
-// DELETE /api/admin/users - Delete User Account
+// DELETE /api/admin/users - Delete User Account (Admin Only)
 export async function DELETE(req: NextRequest) {
   try {
+    const auth = await verifyAdminRequest(req);
+    if (!auth.isAdmin) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status || 403 });
+    }
+
     await connectToDatabase();
     const { searchParams } = new URL(req.url);
     const uid = searchParams.get("uid");
@@ -159,8 +177,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "User not found." }, { status: 404 });
     }
 
-    const PRIMARY_ADMIN = "luckymanojjadhav@gmail.com";
-    if (targetUser.email.toLowerCase() === PRIMARY_ADMIN) {
+    if (targetUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
       return NextResponse.json({ error: "Primary SuperAdmin account cannot be deleted." }, { status: 403 });
     }
 

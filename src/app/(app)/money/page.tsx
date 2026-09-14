@@ -95,6 +95,16 @@ function MoneyPageContent() {
   // Profile Preferences
   const [currency, setCurrency] = useState("INR");
 
+  const currencySymbol = useMemo(() => {
+    switch (currency) {
+      case "USD": return "$";
+      case "EUR": return "€";
+      case "GBP": return "£";
+      case "JPY": return "¥";
+      default: return "₹";
+    }
+  }, [currency]);
+
   // Dataset 3: Cost of Living Calculator State
   const { data: costOfLivingData } = useCostOfLivingIndex();
   const [selectedCountry, setSelectedCountry] = useState("India");
@@ -225,17 +235,47 @@ function MoneyPageContent() {
     });
   }, [transactions]);
 
-  // Granular Envelope Rollover Allocation Handler
+  // Granular Envelope Rollover Allocation Handler with Month Scoping
+  const [envelopeBoostsByMonth, setEnvelopeBoostsByMonth] = useState<Record<string, Record<string, number>>>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("invictus_envelope_boosts");
+        return saved ? JSON.parse(saved) : {};
+      } catch {}
+    }
+    return {};
+  });
+
   const handleBoostCategoryEnvelope = async (item: { categoryId: string; categoryName: string; saved: number; budget: number }) => {
+    const monthKey = activeMonthForStats;
+    const currentMonthBoosts = envelopeBoostsByMonth[monthKey] || {};
+    const totalAllocatedSoFar = Object.values(currentMonthBoosts).reduce((a, b) => a + b, 0);
+    const availableSurplus = Math.max(0, budgetStats.previousMonthSavings - totalAllocatedSoFar);
+
+    if (availableSurplus <= 0) {
+      toast.info(`All +${currencySymbol}${budgetStats.previousMonthSavings.toLocaleString()} rollover surplus has already been allocated for ${budgetStats.targetMonthLabel.split(" ")[0]}! 🎉`);
+      return;
+    }
+
+    const boostAmt = Math.min(availableSurplus, item.saved > 0 ? item.saved : availableSurplus);
     const currentCat = categories.find((c) => c.id === item.categoryId);
     const currentBudget = currentCat?.monthlyBudget || item.budget || 0;
-    const newBudget = currentBudget + item.saved;
+    const newBudget = currentBudget + boostAmt;
+
     try {
       await updateCatMutation.mutateAsync({
         id: item.categoryId,
         monthlyBudget: newBudget,
       });
-      toast.success(`🎉 Boosted ${item.categoryName} envelope by +${currencySymbol}${item.saved.toLocaleString()}! New monthly budget: ${currencySymbol}${newBudget.toLocaleString()}`);
+
+      const updatedMonthBoosts = { ...currentMonthBoosts, [item.categoryId]: (currentMonthBoosts[item.categoryId] || 0) + boostAmt };
+      const nextBoosts = { ...envelopeBoostsByMonth, [monthKey]: updatedMonthBoosts };
+      setEnvelopeBoostsByMonth(nextBoosts);
+      try {
+        localStorage.setItem("invictus_envelope_boosts", JSON.stringify(nextBoosts));
+      } catch {}
+
+      toast.success(`🎉 Boosted ${item.categoryName} envelope by +${currencySymbol}${boostAmt.toLocaleString()}! New monthly budget: ${currencySymbol}${newBudget.toLocaleString()}`);
     } catch {
       toast.error("Failed to boost category envelope.");
     }
@@ -253,12 +293,12 @@ function MoneyPageContent() {
   const [baseUpiBudget, setBaseUpiBudget] = useState<number>(() => {
     if (typeof window !== "undefined") {
       const savedUpi = localStorage.getItem("invictus_monthly_upi_budget");
-      if (savedUpi && !isNaN(Number(savedUpi)) && Number(savedUpi) > 0) {
+      if (savedUpi !== null && !isNaN(Number(savedUpi)) && Number(savedUpi) >= 0) {
         return Number(savedUpi);
       }
       // Backward compatibility: migrate legacy key
       const legacySaved = localStorage.getItem("invictus_monthly_budget_target");
-      if (legacySaved && !isNaN(Number(legacySaved)) && Number(legacySaved) > 0) {
+      if (legacySaved !== null && !isNaN(Number(legacySaved)) && Number(legacySaved) >= 0) {
         return Number(legacySaved);
       }
     }
@@ -268,16 +308,34 @@ function MoneyPageContent() {
   const [baseCashBudget, setBaseCashBudget] = useState<number>(() => {
     if (typeof window !== "undefined") {
       const savedCash = localStorage.getItem("invictus_monthly_cash_budget");
-      if (savedCash && !isNaN(Number(savedCash)) && Number(savedCash) >= 0) {
+      if (savedCash !== null && !isNaN(Number(savedCash)) && Number(savedCash) >= 0) {
         return Number(savedCash);
       }
     }
     return 0; // Default to 0 until configured by user
   });
 
+  const [enableRollover, setEnableRollover] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("invictus_budget_rollover_enabled");
+      if (saved !== null) {
+        return saved === "true";
+      }
+    }
+    return true; // Default to true, with user toggle
+  });
+
   const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
   const [tempUpiBudgetInput, setTempUpiBudgetInput] = useState(String(baseUpiBudget));
   const [tempCashBudgetInput, setTempCashBudgetInput] = useState(String(baseCashBudget));
+  const [tempEnableRollover, setTempEnableRollover] = useState(enableRollover);
+
+  const openBudgetModal = () => {
+    setTempUpiBudgetInput(String(baseUpiBudget));
+    setTempCashBudgetInput(String(baseCashBudget));
+    setTempEnableRollover(enableRollover);
+    setIsBudgetModalOpen(true);
+  };
 
   const handleSaveMonthlyBudget = (e: React.FormEvent) => {
     e.preventDefault();
@@ -293,12 +351,18 @@ function MoneyPageContent() {
     }
     setBaseUpiBudget(upiVal);
     setBaseCashBudget(cashVal);
+    setEnableRollover(tempEnableRollover);
     try {
       localStorage.setItem("invictus_monthly_upi_budget", String(upiVal));
       localStorage.setItem("invictus_monthly_cash_budget", String(cashVal));
       localStorage.setItem("invictus_monthly_budget_target", String(upiVal + cashVal));
+      localStorage.setItem("invictus_budget_rollover_enabled", String(tempEnableRollover));
     } catch {}
-    toast.success(`Dual Budgets saved! 📱 UPI: ${currencySymbol}${upiVal.toLocaleString()} • 💵 Cash: ${currencySymbol}${cashVal.toLocaleString()} 🎯`);
+    toast.success(
+      `Dual Budgets saved! 📱 UPI: ${currencySymbol}${upiVal.toLocaleString()} • 💵 Cash: ${currencySymbol}${cashVal.toLocaleString()}${
+        tempEnableRollover ? " (Rollover ON)" : " (Rollover OFF)"
+      } 🎯`
+    );
     setIsBudgetModalOpen(false);
   };
 
@@ -337,9 +401,10 @@ function MoneyPageContent() {
       targetMonthKey: activeMonthForStats,
       baseUpiBudget,
       baseCashBudget,
-      enableRollover: true,
+      enableRollover,
+      currencySymbol,
     });
-  }, [transactions, categories, activeMonthForStats, baseUpiBudget, baseCashBudget]);
+  }, [transactions, categories, activeMonthForStats, baseUpiBudget, baseCashBudget, enableRollover, currencySymbol]);
 
   const filteredLedgerTransactions = useMemo(() => {
     return transactions.filter((tx) => {
@@ -501,15 +566,7 @@ function MoneyPageContent() {
     loadProfile();
   }, [user]);
 
-  const currencySymbol = (() => {
-    switch (currency) {
-      case "USD": return "$";
-      case "EUR": return "€";
-      case "GBP": return "£";
-      case "JPY": return "¥";
-      default: return "₹";
-    }
-  })();
+
 
   const handleAddTransaction = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -928,11 +985,7 @@ function MoneyPageContent() {
               </span>
               <button
                 type="button"
-                onClick={() => {
-                  setTempUpiBudgetInput(String(baseUpiBudget));
-                  setTempCashBudgetInput(String(baseCashBudget));
-                  setIsBudgetModalOpen(true);
-                }}
+                onClick={openBudgetModal}
                 className="text-[9px] font-black uppercase px-2 py-0.5 rounded-lg bg-amber-400 hover:bg-amber-300 border border-[#161514] shadow-[1px_1px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all shrink-0"
               >
                 Edit
@@ -1093,11 +1146,11 @@ function MoneyPageContent() {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {/* Online Spends */}
+                {/* Online Spends & Liquidity Card */}
                 <div
                   onClick={() => setPaymentChannelFilter("online")}
                   className={cn(
-                    "p-4 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] cursor-pointer transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
+                    "p-4 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] cursor-pointer transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none space-y-3",
                     paymentChannelFilter === "online" ? "bg-[#03D26F]/20 ring-2 ring-[#03D26F]" : "bg-[#FAF8F5]"
                   )}
                 >
@@ -1106,23 +1159,76 @@ function MoneyPageContent() {
                       <Smartphone className="h-4 w-4 text-emerald-700 stroke-[2.5]" />
                       <span>Online / UPI Spends</span>
                     </span>
-                    <span className="text-xs font-black bg-[#03D26F] text-[#161514] px-2 py-0.5 rounded-full border border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
-                      {budgetStats.onlinePercentage}%
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      {budgetStats.upiRolloverSurplus > 0 && (
+                        <span className="text-[9px] font-black bg-[#CEF431] text-[#161514] px-1.5 py-0.5 rounded-md border border-[#161514]">
+                          +{currencySymbol}{budgetStats.upiRolloverSurplus.toLocaleString()} roll
+                        </span>
+                      )}
+                      <span className="text-xs font-black bg-[#03D26F] text-[#161514] px-2 py-0.5 rounded-full border border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
+                        {budgetStats.onlinePercentage}% of spends
+                      </span>
+                    </div>
                   </div>
-                  <span className="text-2xl font-black text-[#161514] block mt-2" style={{ fontFamily: "var(--font-heading)" }}>
-                    {currencySymbol}{budgetStats.onlineExpense.toLocaleString()}
-                  </span>
-                  <span className="text-[10px] font-bold text-[#161514]/60 block mt-1">
-                    GPay, PhonePe, Cards & Bank Transfers
-                  </span>
+
+                  {/* Dual Stat Row: Spent vs Left */}
+                  <div className="grid grid-cols-2 gap-2 bg-white p-2.5 rounded-xl border border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]">
+                    <div>
+                      <span className="text-[9px] font-black uppercase text-rose-600 block">Spent</span>
+                      <span className="text-lg sm:text-xl font-black text-[#161514] block" style={{ fontFamily: "var(--font-heading)" }}>
+                        {currencySymbol}{budgetStats.onlineExpense.toLocaleString()}
+                      </span>
+                      <span className="text-[9px] font-bold text-[#161514]/60 block truncate">
+                        of {currencySymbol}{budgetStats.totalAvailableUpiBudget.toLocaleString()} pool
+                      </span>
+                    </div>
+                    <div className="border-l border-[#161514]/15 pl-2.5">
+                      <span className="text-[9px] font-black uppercase text-[#161514]/70 block">Remaining Left</span>
+                      <span className={cn(
+                        "text-lg sm:text-xl font-black block",
+                        budgetStats.remainingUpiBudget >= 0 ? "text-emerald-700" : "text-rose-600"
+                      )} style={{ fontFamily: "var(--font-heading)" }}>
+                        {budgetStats.remainingUpiBudget < 0 ? `-${currencySymbol}${Math.abs(budgetStats.remainingUpiBudget).toLocaleString()}` : `${currencySymbol}${budgetStats.remainingUpiBudget.toLocaleString()}`}
+                      </span>
+                      <span className="text-[9px] font-bold text-[#161514]/70 block truncate">
+                        {budgetStats.remainingUpiBudget > 0
+                          ? `~${currencySymbol}${budgetStats.dailySafeToSpendUpi}/day safe`
+                          : "Exceeded budget"}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Channel Progress Bar */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center text-[9px] font-black uppercase text-[#161514]">
+                      <span>UPI Allowance Used</span>
+                      <span className={cn(
+                        budgetStats.upiBudgetUsedPercentage > 90 ? "text-rose-600" : "text-[#161514]/70"
+                      )}>
+                        {budgetStats.upiBudgetUsedPercentage}%
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden border border-[#161514]">
+                      <div
+                        className={cn(
+                          "h-full rounded-full transition-all duration-500",
+                          budgetStats.upiBudgetUsedPercentage > 90
+                            ? "bg-rose-500"
+                            : budgetStats.upiBudgetUsedPercentage > 75
+                            ? "bg-amber-400"
+                            : "bg-[#03D26F]"
+                        )}
+                        style={{ width: `${Math.min(100, budgetStats.upiBudgetUsedPercentage)}%` }}
+                      />
+                    </div>
+                  </div>
                 </div>
 
-                {/* Cash Spends */}
+                {/* Physical Cash Spends & Liquidity Card */}
                 <div
                   onClick={() => setPaymentChannelFilter("cash")}
                   className={cn(
-                    "p-4 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] cursor-pointer transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
+                    "p-4 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] cursor-pointer transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none space-y-3",
                     paymentChannelFilter === "cash" ? "bg-amber-100 ring-2 ring-amber-500" : "bg-[#FAF8F5]"
                   )}
                 >
@@ -1131,16 +1237,103 @@ function MoneyPageContent() {
                       <Banknote className="h-4 w-4 text-amber-700 stroke-[2.5]" />
                       <span>Physical Cash Spends</span>
                     </span>
-                    <span className="text-xs font-black bg-amber-400 text-[#161514] px-2 py-0.5 rounded-full border border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
-                      {budgetStats.cashPercentage}%
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      {budgetStats.cashRolloverSurplus > 0 && (
+                        <span className="text-[9px] font-black bg-[#CEF431] text-[#161514] px-1.5 py-0.5 rounded-md border border-[#161514]">
+                          +{currencySymbol}{budgetStats.cashRolloverSurplus.toLocaleString()} roll
+                        </span>
+                      )}
+                      <span className="text-xs font-black bg-amber-400 text-[#161514] px-2 py-0.5 rounded-full border border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
+                        {budgetStats.cashPercentage}% of spends
+                      </span>
+                    </div>
                   </div>
-                  <span className="text-2xl font-black text-[#161514] block mt-2" style={{ fontFamily: "var(--font-heading)" }}>
-                    {currencySymbol}{budgetStats.cashExpense.toLocaleString()}
-                  </span>
-                  <span className="text-[10px] font-bold text-[#161514]/60 block mt-1">
-                    Pocket money, street vendors & cash tips
-                  </span>
+
+                  {budgetStats.baseCashBudget === 0 && budgetStats.cashRolloverSurplus === 0 ? (
+                    /* When user hasn't configured a separate cash budget allowance */
+                    <div className="bg-white p-2.5 rounded-xl border border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center justify-between gap-2">
+                      <div>
+                        <span className="text-[9px] font-black uppercase text-amber-700 block">Cash Spent</span>
+                        <span className="text-lg sm:text-xl font-black text-[#161514] block" style={{ fontFamily: "var(--font-heading)" }}>
+                          {currencySymbol}{budgetStats.cashExpense.toLocaleString()}
+                        </span>
+                        <span className="text-[9px] font-bold text-[#161514]/60 block">
+                          No cash limit set (tracking only)
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setTempUpiBudgetInput(String(baseUpiBudget));
+                          setTempCashBudgetInput("2000");
+                          setIsBudgetModalOpen(true);
+                        }}
+                        className="px-2.5 py-1.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-[#161514] font-black text-[10px] border border-[#161514] shadow-[1px_1px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all inline-flex items-center gap-1 shrink-0"
+                      >
+                        <span>+ Set Budget</span>
+                      </button>
+                    </div>
+                  ) : (
+                    /* When user has a configured cash allowance */
+                    <div className="grid grid-cols-2 gap-2 bg-white p-2.5 rounded-xl border border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]">
+                      <div>
+                        <span className="text-[9px] font-black uppercase text-rose-600 block">Spent</span>
+                        <span className="text-lg sm:text-xl font-black text-[#161514] block" style={{ fontFamily: "var(--font-heading)" }}>
+                          {currencySymbol}{budgetStats.cashExpense.toLocaleString()}
+                        </span>
+                        <span className="text-[9px] font-bold text-[#161514]/60 block truncate">
+                          of {currencySymbol}{budgetStats.totalAvailableCashBudget.toLocaleString()} pool
+                        </span>
+                      </div>
+                      <div className="border-l border-[#161514]/15 pl-2.5">
+                        <span className="text-[9px] font-black uppercase text-[#161514]/70 block">Remaining Left</span>
+                        <span className={cn(
+                          "text-lg sm:text-xl font-black block",
+                          budgetStats.remainingCashBudget >= 0 ? "text-emerald-700" : "text-rose-600"
+                        )} style={{ fontFamily: "var(--font-heading)" }}>
+                          {budgetStats.remainingCashBudget < 0 ? `-${currencySymbol}${Math.abs(budgetStats.remainingCashBudget).toLocaleString()}` : `${currencySymbol}${budgetStats.remainingCashBudget.toLocaleString()}`}
+                        </span>
+                        <span className="text-[9px] font-bold text-[#161514]/70 block truncate">
+                          {budgetStats.remainingCashBudget > 0
+                            ? `~${currencySymbol}${budgetStats.dailySafeToSpendCash}/day safe`
+                            : "Exceeded budget"}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Channel Progress Bar (only if cash budget configured) */}
+                  {budgetStats.totalAvailableCashBudget > 0 ? (
+                    <div className="space-y-1">
+                      <div className="flex justify-between items-center text-[9px] font-black uppercase text-[#161514]">
+                        <span>Cash Allowance Used</span>
+                        <span className={cn(
+                          budgetStats.cashBudgetUsedPercentage > 90 ? "text-rose-600" : "text-[#161514]/70"
+                        )}>
+                          {budgetStats.cashBudgetUsedPercentage}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden border border-[#161514]">
+                        <div
+                          className={cn(
+                            "h-full rounded-full transition-all duration-500",
+                            budgetStats.cashBudgetUsedPercentage > 90
+                              ? "bg-rose-500"
+                              : budgetStats.cashBudgetUsedPercentage > 75
+                              ? "bg-amber-500"
+                              : "bg-amber-400"
+                          )}
+                          style={{ width: `${Math.min(100, budgetStats.cashBudgetUsedPercentage)}%` }}
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-[10px] font-bold text-[#161514]/60 flex items-center justify-between">
+                      <span>Pocket money & cash vendors</span>
+                      <span className="text-[9px] font-black bg-white px-1.5 py-0.5 rounded border border-[#161514]/20">Flexible</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -1501,18 +1694,36 @@ function MoneyPageContent() {
                   </div>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setTempUpiBudgetInput(String(baseUpiBudget));
-                    setTempCashBudgetInput(String(baseCashBudget));
-                    setIsBudgetModalOpen(true);
-                  }}
-                  className="self-start sm:self-auto px-3 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-[#161514] text-xs font-black border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center gap-1.5 shrink-0"
-                >
-                  <Edit3 className="h-3.5 w-3.5 stroke-[2.5]" />
-                  <span>Edit Allowances</span>
-                </button>
+                <div className="flex items-center gap-2 self-start sm:self-auto shrink-0 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const nextState = !enableRollover;
+                      setEnableRollover(nextState);
+                      try {
+                        localStorage.setItem("invictus_budget_rollover_enabled", String(nextState));
+                      } catch {}
+                      toast.success(nextState ? "Monthly Rollover active 🚀" : "Monthly Rollover disabled 🛑");
+                    }}
+                    title="Toggle automatic surplus rollover"
+                    className={cn(
+                      "px-3 py-1.5 rounded-xl text-xs font-black border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center gap-1.5",
+                      enableRollover ? "bg-[#CEF431] text-[#161514]" : "bg-[#FAF8F5] text-[#161514]/60"
+                    )}
+                  >
+                    <span className={cn("h-2 w-2 rounded-full border border-[#161514]", enableRollover ? "bg-[#03D26F]" : "bg-zinc-400")} />
+                    <span>Rollover: {enableRollover ? "ON" : "OFF"}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={openBudgetModal}
+                    className="px-3 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-[#161514] text-xs font-black border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center gap-1.5"
+                  >
+                    <Edit3 className="h-3.5 w-3.5 stroke-[2.5]" />
+                    <span>Edit Allowances</span>
+                  </button>
+                </div>
               </div>
 
               {/* Budget Meter Metrics */}
@@ -1817,47 +2028,77 @@ function MoneyPageContent() {
                           You spent {currencySymbol}{budgetStats.previousMonthExpense.toLocaleString()} of your {currencySymbol}{budgetStats.baseBudget.toLocaleString()} overall budget!
                         </span>
                       </div>
-                      <span className="text-xs font-black text-emerald-800 bg-[#03D26F]/25 px-2.5 py-1 rounded-xl border border-[#161514] shadow-[1px_1px_0px_0px_#161514] self-start sm:self-auto" style={{ fontFamily: "var(--font-heading)" }}>
-                        +{currencySymbol}{budgetStats.previousMonthSavings.toLocaleString()} Available
+                      <span className={cn(
+                        "text-xs font-black px-2.5 py-1 rounded-xl border border-[#161514] shadow-[1px_1px_0px_0px_#161514] self-start sm:self-auto",
+                        (() => {
+                          const monthBoosts = envelopeBoostsByMonth[activeMonthForStats] || {};
+                          const totalAllocated = Object.values(monthBoosts).reduce((a, b) => a + b, 0);
+                          const rem = Math.max(0, budgetStats.previousMonthSavings - totalAllocated);
+                          return rem > 0 ? "text-emerald-800 bg-[#03D26F]/25" : "text-amber-900 bg-amber-200";
+                        })()
+                      )} style={{ fontFamily: "var(--font-heading)" }}>
+                        {(() => {
+                          const monthBoosts = envelopeBoostsByMonth[activeMonthForStats] || {};
+                          const totalAllocated = Object.values(monthBoosts).reduce((a, b) => a + b, 0);
+                          const rem = Math.max(0, budgetStats.previousMonthSavings - totalAllocated);
+                          return rem > 0
+                            ? `+${currencySymbol}${rem.toLocaleString()} Available`
+                            : "All Allocated 🎉";
+                        })()}
                       </span>
                     </div>
 
                     <div className="space-y-2">
                       <span className="text-[10px] font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5">
                         <span>🎯</span>
-                        <span>1-Tap Allocate +{currencySymbol}{budgetStats.previousMonthSavings.toLocaleString()} to a {budgetStats.targetMonthLabel.split(" ")[0]} Category Envelope:</span>
+                        <span>1-Tap Allocate Rollover to a {budgetStats.targetMonthLabel.split(" ")[0]} Category Envelope:</span>
                       </span>
 
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                        {categories.filter((c) => c.type === "expense").slice(0, 6).map((cat) => (
-                          <button
-                            key={cat.id}
-                            type="button"
-                            onClick={() => handleBoostCategoryEnvelope({
-                              categoryId: cat.id,
-                              categoryName: cat.name,
-                              saved: budgetStats.previousMonthSavings,
-                              budget: cat.monthlyBudget || 0,
-                            })}
-                            disabled={updateCatMutation.isPending}
-                            className="p-3 rounded-2xl bg-[#FAF8F5] hover:bg-[#CEF431] text-[#161514] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer flex flex-col justify-between gap-2.5 text-left disabled:opacity-50 group"
-                          >
-                            <div className="flex items-center justify-between w-full">
-                              <span className="text-xl leading-none">{renderCategoryEmoji(cat.icon)}</span>
-                              <span className="text-[10px] font-black text-emerald-950 bg-[#03D26F]/25 px-2 py-0.5 rounded-lg border border-[#161514] shadow-[1px_1px_0px_0px_#161514]" style={{ fontFamily: "var(--font-heading)" }}>
-                                +{currencySymbol}{budgetStats.previousMonthSavings}
-                              </span>
-                            </div>
-                            <div className="w-full">
-                              <span className="text-xs font-black text-[#161514] block leading-snug break-words">
-                                {cat.name}
-                              </span>
-                              <span className="text-[9px] font-bold text-[#161514]/60 group-hover:text-[#161514] block mt-0.5">
-                                Tap to boost 🎯
-                              </span>
-                            </div>
-                          </button>
-                        ))}
+                        {categories.filter((c) => c.type === "expense").slice(0, 6).map((cat) => {
+                          const monthBoosts = envelopeBoostsByMonth[activeMonthForStats] || {};
+                          const catBoosted = monthBoosts[cat.id] || 0;
+                          const totalAllocated = Object.values(monthBoosts).reduce((a, b) => a + b, 0);
+                          const remSurplus = Math.max(0, budgetStats.previousMonthSavings - totalAllocated);
+                          const isExhausted = remSurplus <= 0;
+
+                          return (
+                            <button
+                              key={cat.id}
+                              type="button"
+                              onClick={() => handleBoostCategoryEnvelope({
+                                categoryId: cat.id,
+                                categoryName: cat.name,
+                                saved: remSurplus,
+                                budget: cat.monthlyBudget || 0,
+                              })}
+                              disabled={updateCatMutation.isPending || isExhausted}
+                              className={cn(
+                                "p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] transition-all cursor-pointer flex flex-col justify-between gap-2.5 text-left group",
+                                catBoosted > 0 ? "bg-[#CEF431]/30" : "bg-[#FAF8F5] hover:bg-[#CEF431]",
+                                isExhausted ? "opacity-60 cursor-not-allowed hover:bg-[#FAF8F5]" : "hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+                              )}
+                            >
+                              <div className="flex items-center justify-between w-full">
+                                <span className="text-xl leading-none">{renderCategoryEmoji(cat.icon)}</span>
+                                <span className={cn(
+                                  "text-[10px] font-black px-2 py-0.5 rounded-lg border border-[#161514] shadow-[1px_1px_0px_0px_#161514]",
+                                  catBoosted > 0 ? "bg-[#03D26F] text-[#161514]" : "text-emerald-950 bg-[#03D26F]/25"
+                                )} style={{ fontFamily: "var(--font-heading)" }}>
+                                  {catBoosted > 0 ? `+${currencySymbol}${catBoosted}` : `+${currencySymbol}${remSurplus}`}
+                                </span>
+                              </div>
+                              <div className="w-full">
+                                <span className="text-xs font-black text-[#161514] block leading-snug break-words">
+                                  {cat.name}
+                                </span>
+                                <span className="text-[9px] font-bold text-[#161514]/60 group-hover:text-[#161514] block mt-0.5">
+                                  {catBoosted > 0 ? "Boosted ✨" : isExhausted ? "Surplus allocated" : "Tap to boost 🎯"}
+                                </span>
+                              </div>
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
                   </div>
@@ -3309,6 +3550,92 @@ function MoneyPageContent() {
               ))}
             </div>
           </div>
+
+          {/* ⚡ Automatic Monthly Rollover Toggle Switch Card */}
+          <div className="p-3.5 bg-white rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-between gap-3">
+            <div className="space-y-0.5">
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-black uppercase tracking-wider text-[#161514]">
+                  Monthly Rollover
+                </span>
+                <span
+                  className={cn(
+                    "text-[9px] font-black px-1.5 py-0.5 rounded-full border border-[#161514]",
+                    tempEnableRollover ? "bg-[#CEF431] text-[#161514]" : "bg-zinc-100 text-[#161514]/60"
+                  )}
+                >
+                  {tempEnableRollover ? "ACTIVE" : "OFF"}
+                </span>
+              </div>
+              <p className="text-[11px] text-[#161514]/70 font-medium leading-tight">
+                Roll unspent UPI and Cash surplus into next month&apos;s allowance
+              </p>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={tempEnableRollover}
+              onClick={() => setTempEnableRollover((prev) => !prev)}
+              className={cn(
+                "h-6 w-12 rounded-full border-2 border-[#161514] transition-all relative shrink-0 cursor-pointer shadow-[1px_1px_0px_0px_#161514]",
+                tempEnableRollover ? "bg-[#CEF431]" : "bg-zinc-200"
+              )}
+            >
+              <div
+                className={cn(
+                  "absolute top-0.5 h-4 w-4 rounded-full bg-white border border-[#161514] shadow transition-all",
+                  tempEnableRollover ? "left-6" : "left-0.5"
+                )}
+              />
+            </button>
+          </div>
+
+          {/* Total Combined Allowance Live Preview with Breakdown */}
+          {(() => {
+            const parsedUpi = Math.max(0, parseFloat(tempUpiBudgetInput) || 0);
+            const parsedCash = Math.max(0, parseFloat(tempCashBudgetInput) || 0);
+            const baseTotal = parsedUpi + parsedCash;
+            const upiRoll = tempEnableRollover ? budgetStats.upiRolloverSurplus : 0;
+            const cashRoll = tempEnableRollover ? budgetStats.cashRolloverSurplus : 0;
+            const totalRoll = upiRoll + cashRoll;
+            const totalPool = baseTotal + totalRoll;
+
+            return (
+              <div className="p-3.5 bg-white rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] space-y-2 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[#161514]/70">Base Monthly Allowance:</span>
+                  <span className="font-black text-[#161514]">
+                    {currencySymbol}{baseTotal.toLocaleString()}{" "}
+                    <span className="text-[10px] text-[#161514]/50 font-medium">
+                      (📱 {currencySymbol}{parsedUpi.toLocaleString()} + 💵 {currencySymbol}{parsedCash.toLocaleString()})
+                    </span>
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[#161514]/70">Rollover from Last Month:</span>
+                  <span className={cn("font-black", tempEnableRollover && totalRoll > 0 ? "text-emerald-600" : "text-[#161514]/60")}>
+                    {tempEnableRollover ? (
+                      totalRoll > 0 ? (
+                        `+${currencySymbol}${totalRoll.toLocaleString()} (UPI: +${currencySymbol}${upiRoll.toLocaleString()} • Cash: +${currencySymbol}${cashRoll.toLocaleString()})`
+                      ) : (
+                        `+${currencySymbol}0 (No prior unspent surplus)`
+                      )
+                    ) : (
+                      "Disabled (Flat Budgeting)"
+                    )}
+                  </span>
+                </div>
+
+                <div className="pt-2 border-t border-zinc-200 flex items-center justify-between">
+                  <span className="font-black uppercase tracking-wider text-[#161514]">Total Monthly Pool:</span>
+                  <span className="font-black text-base text-[#161514]" style={{ fontFamily: "var(--font-heading)" }}>
+                    {currencySymbol}{totalPool.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            );
+          })()}
 
           <button
             type="submit"

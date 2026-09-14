@@ -393,7 +393,7 @@ export default function SettingsPage() {
       if (isGuestMode) {
         handleClearLocalData();
       } else {
-        const res = await fetch("/api/admin/purge", {
+        const res = await fetch("/api/account/purge", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ userId: user.uid, email: user.email }),
@@ -414,10 +414,10 @@ export default function SettingsPage() {
   };
 
   const handleExportBackup = async () => {
-    if (!user) return;
+    const isGuestMode = typeof window !== "undefined" && localStorage.getItem("invictus_guest_mode") === "true";
+    if (!user && !isGuestMode) return;
     setIsExporting(true);
     try {
-      const isGuestMode = localStorage.getItem("invictus_guest_mode") === "true";
       const keys = getAllInvictusKeys();
       const localData: Record<string, unknown> = {};
       keys.forEach((key) => {
@@ -427,12 +427,41 @@ export default function SettingsPage() {
         }
       });
 
+      let cloudData: Record<string, unknown> | null = null;
+      if (user?.uid && !isGuestMode) {
+        const uid = user.uid;
+        const [habitsRes, logsRes, subjectsRes, sessionsRes, testsRes, txRes, catRes, debtsRes] = await Promise.allSettled([
+          fetch(`/api/goals/habits?userId=${uid}`).then((r) => (r.ok ? r.json() : null)),
+          fetch(`/api/goals/logs?userId=${uid}`).then((r) => (r.ok ? r.json() : null)),
+          fetch(`/api/study/subjects?userId=${uid}`).then((r) => (r.ok ? r.json() : null)),
+          fetch(`/api/study/sessions?userId=${uid}`).then((r) => (r.ok ? r.json() : null)),
+          fetch(`/api/study/tests?userId=${uid}`).then((r) => (r.ok ? r.json() : null)),
+          fetch(`/api/money/transactions?userId=${uid}`).then((r) => (r.ok ? r.json() : null)),
+          fetch(`/api/money/categories?userId=${uid}`).then((r) => (r.ok ? r.json() : null)),
+          fetch(`/api/money/debts?userId=${uid}`).then((r) => (r.ok ? r.json() : null)),
+        ]);
+
+        cloudData = {
+          habits: habitsRes.status === "fulfilled" ? habitsRes.value : null,
+          habitLogs: logsRes.status === "fulfilled" ? logsRes.value : null,
+          subjects: subjectsRes.status === "fulfilled" ? subjectsRes.value : null,
+          studySessions: sessionsRes.status === "fulfilled" ? sessionsRes.value : null,
+          tests: testsRes.status === "fulfilled" ? testsRes.value : null,
+          transactions: txRes.status === "fulfilled" ? txRes.value : null,
+          categories: catRes.status === "fulfilled" ? catRes.value : null,
+          debts: debtsRes.status === "fulfilled" ? debtsRes.value : null,
+        };
+      }
+
       const backup: Record<string, unknown> = {
         exportedAt: new Date().toISOString(),
         mode: isGuestMode ? "guest" : "cloud",
         version: 1,
-        user: { uid: user.uid, email: user.email, displayName: user.displayName },
+        user: user
+          ? { uid: user.uid, email: user.email, displayName: user.displayName }
+          : { uid: "guest", email: "guest@invictus.local", displayName: "Guest" },
         data: localData,
+        ...(cloudData ? { cloudData } : {}),
       };
 
       const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
@@ -453,7 +482,8 @@ export default function SettingsPage() {
 
   const handleImportRestore = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !user) return;
+    const isGuestMode = typeof window !== "undefined" && localStorage.getItem("invictus_guest_mode") === "true";
+    if (!file || (!user && !isGuestMode)) return;
     setIsImporting(true);
     try {
       const text = await file.text();

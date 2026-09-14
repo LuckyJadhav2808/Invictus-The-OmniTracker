@@ -54,13 +54,14 @@ export async function POST(req: Request) {
     }
 
     // 2. Single Transaction Insertion (Backwards Compatible)
-    if (!body.userId || !body.amount || !body.categoryId) {
+    if (!body.userId || body.amount === undefined || !body.categoryId) {
       return NextResponse.json({ error: "UserId, categoryId, and amount are required" }, { status: 400 });
     }
 
     const newTx = await Transaction.create({
-      id: body.id || `tx_${Date.now()}`,
       ...body,
+      id: body.id || `tx_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      amount: Number(body.amount),
     });
 
     return NextResponse.json(newTx, { status: 201 });
