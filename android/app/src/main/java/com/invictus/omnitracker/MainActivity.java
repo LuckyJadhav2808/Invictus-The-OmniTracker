@@ -9,6 +9,7 @@ public class MainActivity extends BridgeActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        registerPlugin(WidgetBridgePlugin.class);
         super.onCreate(savedInstanceState);
         handleShortcutIntent(getIntent());
     }

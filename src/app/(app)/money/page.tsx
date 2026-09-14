@@ -31,6 +31,7 @@ import { detectCategoryFromNote } from "@/lib/utils/merchant-categorizer";
 import { Globe, Sparkles, Layers, DollarSign, PiggyBank, Smartphone, Banknote, ShieldCheck } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { computeMonthlyBudgetStats, isCashTransaction, isOnlineTransaction } from "@/lib/utils/budget-rollover";
+import { useWidgetSync } from "@/lib/hooks/useWidgetSync";
 
 const PRESET_CATEGORY_EMOJIS = [
   "🛒", "🍕", "☕", "🍔", "🍣", "🧋", "🍿", "🍩",
@@ -53,8 +54,10 @@ const CATEGORY_COLOR_PALETTE = [
 
 function MoneyPageContent() {
   const { user } = useAuth();
+  const { syncToWidget } = useWidgetSync();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
+  const actionParam = searchParams.get("action");
   const [activeTab, setActiveTab] = useState(tabParam || "ledger");
   const [isAddTxOpen, setIsAddTxOpen] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
@@ -64,6 +67,13 @@ function MoneyPageContent() {
       setActiveTab(tabParam);
     }
   }, [tabParam]);
+
+  useEffect(() => {
+    if (actionParam === "quick-expense" || actionParam === "add_tx") {
+      setTxType("expense");
+      setIsAddTxOpen(true);
+    }
+  }, [actionParam]);
 
   const [isEditBudgetOpen, setIsEditBudgetOpen] = useState(false);
   const [deleteTxId, setDeleteTxId] = useState<string | null>(null);
@@ -405,6 +415,21 @@ function MoneyPageContent() {
       currencySymbol,
     });
   }, [transactions, categories, activeMonthForStats, baseUpiBudget, baseCashBudget, enableRollover, currencySymbol]);
+
+  // Sync live liquidity and safe-to-spend metrics to Android home screen widget
+  useEffect(() => {
+    syncToWidget({
+      safeToSpendDaily: budgetStats.dailySafeToSpend,
+      remainingUpiBudget: budgetStats.remainingUpiBudget,
+      remainingCashBudget: budgetStats.remainingCashBudget,
+      totalAvailableUpiBudget: budgetStats.totalAvailableUpiBudget,
+      totalAvailableCashBudget: budgetStats.totalAvailableCashBudget,
+      currencySymbol,
+      daysRemainingInMonth: budgetStats.daysRemainingInMonth,
+      targetMonthLabel: budgetStats.targetMonthLabel.split(" ")[0],
+      hasCashBudget: budgetStats.baseCashBudget > 0 || budgetStats.totalAvailableCashBudget > 0,
+    });
+  }, [budgetStats, currencySymbol, syncToWidget]);
 
   const filteredLedgerTransactions = useMemo(() => {
     return transactions.filter((tx) => {

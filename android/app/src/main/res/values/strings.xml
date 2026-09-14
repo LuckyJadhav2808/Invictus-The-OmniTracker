@@ -14,4 +14,8 @@
     <string name="shortcut_gym_workout_long">Today\'s Workout Split</string>
     <string name="shortcut_log_study_short">Log Study</string>
     <string name="shortcut_log_study_long">Log Study Session</string>
+
+    <!-- Home Screen Widget Strings -->
+    <string name="widget_safe_spend_label">Safe to Spend &amp; Liquidity</string>
+    <string name="widget_safe_spend_description">Displays today\'s daily safe spend rate and remaining UPI and Cash balances.</string>
 </resources>
