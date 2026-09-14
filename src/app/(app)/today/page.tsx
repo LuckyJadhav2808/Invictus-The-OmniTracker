@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 import { useHabits, useHabitLogs, useStreaks, useStreakFreeze } from "@/lib/queries/goals";
 import { useStudySessions, useSubjects, useAllTopics } from "@/lib/queries/study";
 import { useTransactions, useCategories } from "@/lib/queries/money";
-import { computeMonthlyBudgetStats } from "@/lib/utils/budget-rollover";
+import { computeMonthlyBudgetStats, computeDailyBudgetStats } from "@/lib/utils/budget-rollover";
 import { useWidgetSync } from "@/lib/hooks/useWidgetSync";
 import { useUIStore } from "@/store/ui-store";
 import { SpaceHeroBanner } from "@/components/shared/SpaceHeroBanner";
@@ -105,6 +105,18 @@ export default function TodayPage() {
         currencySymbol,
       });
 
+      let customDailyBudget: number | null = null;
+      if (typeof window !== "undefined") {
+        const storedCustomDaily = localStorage.getItem("invictus_custom_daily_budget");
+        if (storedCustomDaily) customDailyBudget = parseFloat(storedCustomDaily) || null;
+      }
+
+      const dailyStats = computeDailyBudgetStats({
+        transactions,
+        monthlyStats: stats,
+        customDailyBudget,
+      });
+
       syncToWidget({
         safeToSpendDaily: stats.dailySafeToSpend,
         remainingUpiBudget: stats.remainingUpiBudget,
@@ -115,6 +127,11 @@ export default function TodayPage() {
         daysRemainingInMonth: stats.daysRemainingInMonth,
         targetMonthLabel: stats.targetMonthLabel.split(" ")[0],
         hasCashBudget: stats.baseCashBudget > 0 || stats.totalAvailableCashBudget > 0,
+        todayExpense: dailyStats.todayExpense,
+        todayRemaining: dailyStats.todayRemaining,
+        dailyBudgetTarget: dailyStats.dailyBudgetTarget,
+        isOverDailyBudget: dailyStats.isOverDailyBudget,
+        overDailyAmount: dailyStats.overDailyAmount,
       });
     } catch (e) {
       console.warn("Failed to sync widget from today page:", e);
@@ -176,16 +193,6 @@ export default function TodayPage() {
     const interval = setInterval(checkStopwatch, 5000);
     return () => clearInterval(interval);
   }, [user]);
-
-  const currencySymbol = (() => {
-    switch (currency) {
-      case "USD": return "$";
-      case "EUR": return "€";
-      case "GBP": return "£";
-      case "JPY": return "¥";
-      default: return "₹";
-    }
-  })();
 
   // Compute habit completed stats
   const activeHabits = habits.filter((h) => !h.archived);

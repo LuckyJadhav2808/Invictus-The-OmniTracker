@@ -28,6 +28,7 @@ import { WeeklyOverviewWidget } from "@/components/goals/WeeklyOverviewWidget";
 import { WeeklyVelocityAndHabitMatrix } from "@/components/goals/WeeklyVelocityAndHabitMatrix";
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { InvictusLoadingScreen } from "@/components/shared/InvictusLoadingScreen";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
 import { TemplateSelectionModal, TemplatePack } from "@/components/shared/TemplateSelectionModal";
 import { HABIT_TEMPLATE_PACKS } from "@/lib/templates-data";
@@ -982,11 +983,7 @@ function GoalsPageContent() {
 
 export default function GoalsPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-cream-bg">
-        <div className="h-8 w-8 rounded-full border-4 border-amber-500 border-t-transparent animate-spin" />
-      </div>
-    }>
+    <Suspense fallback={<InvictusLoadingScreen message="Loading Life & Goals…" />}>
       <GoalsPageContent />
     </Suspense>
   );

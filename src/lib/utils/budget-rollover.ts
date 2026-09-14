@@ -1,4 +1,4 @@
-import { format, parseISO, subMonths, endOfMonth, differenceInDays } from "date-fns";
+import { format, parseISO, subMonths, endOfMonth, differenceInDays, subDays } from "date-fns";
 import { type Transaction, type Category } from "@/types";
 
 export interface CategorySavingsItem {
@@ -381,5 +381,120 @@ export function computeMonthlyBudgetStats({
     totalDaysInMonth,
     categorySavingsAudit,
     totalCategorySavings,
+  };
+}
+
+export interface DailyTrendItem {
+  date: string; // "yyyy-MM-dd"
+  dayLabel: string; // "Mon", "Tue", etc.
+  dayNumber: number; // 1-31
+  expense: number;
+  isToday: boolean;
+  isOverBudget: boolean;
+}
+
+export interface DailyBudgetStats {
+  todayDate: string; // "yyyy-MM-dd"
+  todayDateLabel: string; // "September 14, 2026"
+  todayExpense: number;
+  todayUpiExpense: number;
+  todayCashExpense: number;
+  dailyBudgetTarget: number;
+  todayRemaining: number;
+  todayUsedPercentage: number;
+  isOverDailyBudget: boolean;
+  overDailyAmount: number;
+  isCustomTarget: boolean;
+  last7Days: DailyTrendItem[];
+}
+
+export interface ComputeDailyBudgetStatsOptions {
+  transactions: Transaction[];
+  monthlyStats: MonthlyBudgetStats;
+  customDailyBudget?: number | null;
+  referenceDate?: Date;
+}
+
+/**
+ * Compute Today's Daily Budget stats:
+ * Evaluates today's expenses against either custom fixed daily target or dynamic safe-to-spend pace,
+ * provides today's remaining spendable balance, channel split, and 7-day spending trend.
+ */
+export function computeDailyBudgetStats({
+  transactions,
+  monthlyStats,
+  customDailyBudget = null,
+  referenceDate = new Date(),
+}: ComputeDailyBudgetStatsOptions): DailyBudgetStats {
+  const todayKey = format(referenceDate, "yyyy-MM-dd");
+  const todayLabel = format(referenceDate, "MMMM d, yyyy");
+
+  // Determine Daily Budget Target: Custom fixed cap if set > 0, otherwise dynamic safe-to-spend pace
+  const isCustomTarget = customDailyBudget !== null && customDailyBudget !== undefined && customDailyBudget > 0;
+  const dailyBudgetTarget = isCustomTarget ? customDailyBudget : Math.max(0, monthlyStats.dailySafeToSpend);
+
+  // Today's Expense transactions
+  let todayExpense = 0;
+  let todayUpiExpense = 0;
+  let todayCashExpense = 0;
+
+  transactions.forEach((tx) => {
+    if (tx.type === "expense" && tx.date === todayKey) {
+      const amt = Number(tx.amount) || 0;
+      todayExpense += amt;
+      if (isCashTransaction(tx.paymentMethod)) {
+        todayCashExpense += amt;
+      } else {
+        todayUpiExpense += amt;
+      }
+    }
+  });
+
+  const todayRemaining = Math.max(0, dailyBudgetTarget - todayExpense);
+  const isOverDailyBudget = todayExpense > dailyBudgetTarget && dailyBudgetTarget > 0;
+  const overDailyAmount = isOverDailyBudget ? todayExpense - dailyBudgetTarget : 0;
+  const todayUsedPercentage = dailyBudgetTarget > 0
+    ? Math.min(100, Math.round((todayExpense / dailyBudgetTarget) * 100))
+    : (todayExpense > 0 ? 100 : 0);
+
+  // Compute 7-day trend (from 6 days ago to today)
+  const last7Days: DailyTrendItem[] = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = subDays(referenceDate, i);
+    const dateStr = format(d, "yyyy-MM-dd");
+    const dayLabel = format(d, "EEE");
+    const dayNumber = d.getDate();
+    const isToday = i === 0;
+
+    let dayExpense = 0;
+    transactions.forEach((tx) => {
+      if (tx.type === "expense" && tx.date === dateStr) {
+        dayExpense += (Number(tx.amount) || 0);
+      }
+    });
+
+    last7Days.push({
+      date: dateStr,
+      dayLabel,
+      dayNumber,
+      expense: dayExpense,
+      isToday,
+      isOverBudget: dailyBudgetTarget > 0 && dayExpense > dailyBudgetTarget,
+    });
+  }
+
+  return {
+    todayDate: todayKey,
+    todayDateLabel: todayLabel,
+    todayExpense,
+    todayUpiExpense,
+    todayCashExpense,
+    dailyBudgetTarget,
+    todayRemaining,
+    todayUsedPercentage,
+    isOverDailyBudget,
+    overDailyAmount,
+    isCustomTarget,
+    last7Days,
   };
 }

@@ -45,7 +45,7 @@
         android:background="@drawable/widget_card_inset"
         android:padding="8dp">
 
-        <!-- Label: Safe to spend today -->
+        <!-- Label: Spent today & Month days -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -53,10 +53,11 @@
             android:gravity="center_vertical">
 
             <TextView
+                android:id="@+id/widget_hero_label"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="SAFE TO SPEND TODAY"
+                android:text="SPENT TODAY"
                 android:textColor="#73716D"
                 android:textSize="9sp"
                 android:textStyle="bold" />
@@ -71,16 +72,35 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- Big Hero Stat: ~₹168/day -->
-        <TextView
-            android:id="@+id/widget_safe_amount"
+        <!-- Big Hero Stat: Spent Today + Remaining Badge -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:text="~₹168/day"
-            android:textColor="#037A48"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="2dp">
+
+            <TextView
+                android:id="@+id/widget_safe_amount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="₹0"
+                android:textColor="#161514"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widget_today_badge"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:text="₹168 left today"
+                android:textColor="#037A48"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:singleLine="true" />
+        </LinearLayout>
 
         <!-- Divider line -->
         <FrameLayout

@@ -7,6 +7,7 @@ import { StudySessionLogger } from "@/components/study/StudySessionLogger";
 import { DraggableDashboardGrid } from "@/components/shared/DraggableDashboardGrid";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
+import { InvictusLoadingScreen } from "@/components/shared/InvictusLoadingScreen";
 import { TemplateSelectionModal, TemplatePack } from "@/components/shared/TemplateSelectionModal";
 import { SUBJECT_TEMPLATE_PACKS, MOCK_TEST_TEMPLATE_PACKS } from "@/lib/templates-data";
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
@@ -1015,11 +1016,7 @@ function StudyPageContent() {
 
 export default function StudyPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-cream-bg">
-        <div className="h-8 w-8 rounded-full border-4 border-amber-500 border-t-transparent animate-spin" />
-      </div>
-    }>
+    <Suspense fallback={<InvictusLoadingScreen message="Loading Study Tracker…" />}>
       <StudyPageContent />
     </Suspense>
   );

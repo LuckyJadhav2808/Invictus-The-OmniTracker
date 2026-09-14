@@ -58,7 +58,9 @@ public class SafeSpendWidgetProvider extends AppWidgetProvider {
             String currency = "₹";
             String month = defaultMonth;
             String daysLeft = defaultDaysLeft + "d left";
-            String safeAmount = "~₹0/day";
+            String spentTodayFormatted = "₹0";
+            String badgeText = "Syncing...";
+            int badgeColor = android.graphics.Color.parseColor("#037A48");
             String upiLeft = "Open App";
             String cashLeft = "Open App";
 
@@ -75,12 +77,27 @@ public class SafeSpendWidgetProvider extends AppWidgetProvider {
                     double remCash = obj.optDouble("remainingCashBudget", 0.0);
                     boolean hasCashBudget = obj.optBoolean("hasCashBudget", false);
 
+                    double todayExpense = obj.optDouble("todayExpense", 0.0);
+                    double dailyBudgetTarget = obj.optDouble("dailyBudgetTarget", safeDaily);
+                    double todayRemaining = obj.has("todayRemaining") ? obj.optDouble("todayRemaining", dailyBudgetTarget - todayExpense) : (dailyBudgetTarget - todayExpense);
+                    boolean isOverDailyBudget = obj.optBoolean("isOverDailyBudget", todayExpense > dailyBudgetTarget && dailyBudgetTarget > 0);
+                    double overDailyAmount = obj.optDouble("overDailyAmount", Math.max(0, todayExpense - dailyBudgetTarget));
+
                     NumberFormat formatter = NumberFormat.getNumberInstance(Locale.US);
 
-                    if (safeDaily > 0) {
-                        safeAmount = "~" + currency + formatter.format((long) Math.round(safeDaily)) + "/day";
+                    // Hero Stat: Spent Today (e.g. ₹50 or ₹0)
+                    spentTodayFormatted = currency + formatter.format((long) Math.round(todayExpense));
+
+                    // Sub-badge: Remaining vs Limit
+                    if (isOverDailyBudget && overDailyAmount > 0) {
+                        badgeText = "⚠️ Over by " + currency + formatter.format((long) Math.round(overDailyAmount));
+                        badgeColor = android.graphics.Color.parseColor("#B42318");
+                    } else if (dailyBudgetTarget > 0) {
+                        badgeText = currency + formatter.format((long) Math.round(Math.max(0, todayRemaining))) + " left (" + currency + formatter.format((long) Math.round(dailyBudgetTarget)) + " cap)";
+                        badgeColor = android.graphics.Color.parseColor("#037A48");
                     } else {
-                        safeAmount = "Cap Spending";
+                        badgeText = "No limit set";
+                        badgeColor = android.graphics.Color.parseColor("#73716D");
                     }
 
                     if (remUpi >= 0) {
@@ -104,7 +121,9 @@ public class SafeSpendWidgetProvider extends AppWidgetProvider {
 
             views.setTextViewText(R.id.widget_month_label, month);
             views.setTextViewText(R.id.widget_days_left, daysLeft);
-            views.setTextViewText(R.id.widget_safe_amount, safeAmount);
+            views.setTextViewText(R.id.widget_safe_amount, spentTodayFormatted);
+            views.setTextViewText(R.id.widget_today_badge, badgeText);
+            views.setTextColor(R.id.widget_today_badge, badgeColor);
             views.setTextViewText(R.id.widget_upi_left, upiLeft);
             views.setTextViewText(R.id.widget_cash_left, cashLeft);
 

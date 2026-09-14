@@ -15,11 +15,22 @@ import { Suspense } from "react";
 import { QuickActionModal } from "@/components/shared/QuickActionModal";
 import { AutoUpdateBanner } from "@/components/shared/AutoUpdateBanner";
 import { APP_VERSION_CONFIG } from "@/config/version";
+import { InvictusLoadingScreen } from "@/components/shared/InvictusLoadingScreen";
+import { getCustomSession } from "@/lib/custom-auth";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const [checking, setChecking] = useState(true);
+  const [checking, setChecking] = useState(() => {
+    if (typeof window === "undefined") return true;
+    const isGuest = localStorage.getItem("invictus_guest_mode") === "true";
+    const onboardedLocal = localStorage.getItem("invictus_onboarded") === "true";
+    const session = getCustomSession();
+    if (session && (session.onboarded || onboardedLocal || isGuest)) {
+      return false;
+    }
+    return true;
+  });
   const { activeTracker, setActiveTracker } = useUIStore();
   const [isAssembling, setIsAssembling] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -54,19 +65,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }, [user, loading, router]);
 
   if (loading || checking) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-cream-bg">
-        <div className="text-center space-y-3">
-          <div className="h-10 w-10 mx-auto rounded-full border-4 border-amber-500 border-t-transparent animate-spin" />
-          <p
-            className="text-navy-600 font-semibold text-sm"
-            style={{ fontFamily: "var(--font-heading)" }}
-          >
-            Loading Invictus…
-          </p>
-        </div>
-      </div>
-    );
+    return <InvictusLoadingScreen />;
   }
 
   return (

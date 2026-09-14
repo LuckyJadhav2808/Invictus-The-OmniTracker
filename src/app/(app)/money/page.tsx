@@ -30,8 +30,10 @@ import { useCostOfLivingIndex } from "@/lib/queries/cost-of-living";
 import { detectCategoryFromNote } from "@/lib/utils/merchant-categorizer";
 import { Globe, Sparkles, Layers, DollarSign, PiggyBank, Smartphone, Banknote, ShieldCheck } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { computeMonthlyBudgetStats, isCashTransaction, isOnlineTransaction } from "@/lib/utils/budget-rollover";
+import { computeMonthlyBudgetStats, computeDailyBudgetStats, isCashTransaction, isOnlineTransaction } from "@/lib/utils/budget-rollover";
 import { useWidgetSync } from "@/lib/hooks/useWidgetSync";
+import { DailyBudgetView } from "@/components/money/DailyBudgetView";
+import { InvictusLoadingScreen } from "@/components/shared/InvictusLoadingScreen";
 
 const PRESET_CATEGORY_EMOJIS = [
   "🛒", "🍕", "☕", "🍔", "🍣", "🧋", "🍿", "🍩",
@@ -335,14 +337,36 @@ function MoneyPageContent() {
     return true; // Default to true, with user toggle
   });
 
+  const [budgetViewMode, setBudgetViewMode] = useState<"monthly" | "daily">(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("invictus_budget_view_mode");
+      if (saved === "monthly" || saved === "daily") return saved;
+    }
+    return "monthly";
+  });
+
+  const [customDailyBudget, setCustomDailyBudget] = useState<number | null>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("invictus_custom_daily_budget");
+      if (saved !== null && !isNaN(Number(saved)) && Number(saved) > 0) {
+        return Number(saved);
+      }
+    }
+    return null;
+  });
+
   const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
   const [tempUpiBudgetInput, setTempUpiBudgetInput] = useState(String(baseUpiBudget));
   const [tempCashBudgetInput, setTempCashBudgetInput] = useState(String(baseCashBudget));
+  const [tempCustomDailyInput, setTempCustomDailyInput] = useState(
+    customDailyBudget ? String(customDailyBudget) : ""
+  );
   const [tempEnableRollover, setTempEnableRollover] = useState(enableRollover);
 
   const openBudgetModal = () => {
     setTempUpiBudgetInput(String(baseUpiBudget));
     setTempCashBudgetInput(String(baseCashBudget));
+    setTempCustomDailyInput(customDailyBudget ? String(customDailyBudget) : "");
     setTempEnableRollover(enableRollover);
     setIsBudgetModalOpen(true);
   };
@@ -359,19 +383,32 @@ function MoneyPageContent() {
       toast.error("Please enter a valid Cash budget amount");
       return;
     }
+
+    const customDailyVal = tempCustomDailyInput.trim() ? Number(tempCustomDailyInput) : null;
+    if (customDailyVal !== null && (isNaN(customDailyVal) || customDailyVal < 0)) {
+      toast.error("Please enter a valid custom daily budget");
+      return;
+    }
+
     setBaseUpiBudget(upiVal);
     setBaseCashBudget(cashVal);
+    setCustomDailyBudget(customDailyVal);
     setEnableRollover(tempEnableRollover);
     try {
       localStorage.setItem("invictus_monthly_upi_budget", String(upiVal));
       localStorage.setItem("invictus_monthly_cash_budget", String(cashVal));
       localStorage.setItem("invictus_monthly_budget_target", String(upiVal + cashVal));
       localStorage.setItem("invictus_budget_rollover_enabled", String(tempEnableRollover));
+      if (customDailyVal !== null && customDailyVal > 0) {
+        localStorage.setItem("invictus_custom_daily_budget", String(customDailyVal));
+      } else {
+        localStorage.removeItem("invictus_custom_daily_budget");
+      }
     } catch {}
     toast.success(
-      `Dual Budgets saved! 📱 UPI: ${currencySymbol}${upiVal.toLocaleString()} • 💵 Cash: ${currencySymbol}${cashVal.toLocaleString()}${
-        tempEnableRollover ? " (Rollover ON)" : " (Rollover OFF)"
-      } 🎯`
+      `Allowances saved! 📱 UPI: ${currencySymbol}${upiVal.toLocaleString()} • 💵 Cash: ${currencySymbol}${cashVal.toLocaleString()}${
+        customDailyVal ? ` • ⚡ Daily Cap: ${currencySymbol}${customDailyVal.toLocaleString()}` : ""
+      }${tempEnableRollover ? " (Rollover ON)" : " (Rollover OFF)"} 🎯`
     );
     setIsBudgetModalOpen(false);
   };
@@ -416,6 +453,15 @@ function MoneyPageContent() {
     });
   }, [transactions, categories, activeMonthForStats, baseUpiBudget, baseCashBudget, enableRollover, currencySymbol]);
 
+  // Compute Today's Daily Budget & 7-day spending velocity
+  const dailyStats = useMemo(() => {
+    return computeDailyBudgetStats({
+      transactions,
+      monthlyStats: budgetStats,
+      customDailyBudget,
+    });
+  }, [transactions, budgetStats, customDailyBudget]);
+
   // Sync live liquidity and safe-to-spend metrics to Android home screen widget
   useEffect(() => {
     syncToWidget({
@@ -428,8 +474,13 @@ function MoneyPageContent() {
       daysRemainingInMonth: budgetStats.daysRemainingInMonth,
       targetMonthLabel: budgetStats.targetMonthLabel.split(" ")[0],
       hasCashBudget: budgetStats.baseCashBudget > 0 || budgetStats.totalAvailableCashBudget > 0,
+      todayExpense: dailyStats.todayExpense,
+      todayRemaining: dailyStats.todayRemaining,
+      dailyBudgetTarget: dailyStats.dailyBudgetTarget,
+      isOverDailyBudget: dailyStats.isOverDailyBudget,
+      overDailyAmount: dailyStats.overDailyAmount,
     });
-  }, [budgetStats, currencySymbol, syncToWidget]);
+  }, [budgetStats, dailyStats, currencySymbol, syncToWidget]);
 
   const filteredLedgerTransactions = useMemo(() => {
     return transactions.filter((tx) => {
@@ -1720,6 +1771,36 @@ function MoneyPageContent() {
                 </div>
 
                 <div className="flex items-center gap-2 self-start sm:self-auto shrink-0 flex-wrap">
+                  {/* View Mode Toggle: Monthly vs Daily */}
+                  <div className="flex items-center bg-[#FAF8F5] p-1 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setBudgetViewMode("monthly");
+                        try { localStorage.setItem("invictus_budget_view_mode", "monthly"); } catch {}
+                      }}
+                      className={cn(
+                        "px-2.5 py-1 rounded-lg text-xs font-black transition-all cursor-pointer",
+                        budgetViewMode === "monthly" ? "bg-[#CEF431] text-[#161514] border border-[#161514] shadow-[1px_1px_0px_0px_#161514]" : "text-[#161514]/60 hover:text-[#161514]"
+                      )}
+                    >
+                      📅 Monthly
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setBudgetViewMode("daily");
+                        try { localStorage.setItem("invictus_budget_view_mode", "daily"); } catch {}
+                      }}
+                      className={cn(
+                        "px-2.5 py-1 rounded-lg text-xs font-black transition-all cursor-pointer",
+                        budgetViewMode === "daily" ? "bg-[#03D26F] text-[#161514] border border-[#161514] shadow-[1px_1px_0px_0px_#161514]" : "text-[#161514]/60 hover:text-[#161514]"
+                      )}
+                    >
+                      ⚡ Today&apos;s Daily
+                    </button>
+                  </div>
+
                   <button
                     type="button"
                     onClick={() => {
@@ -1751,7 +1832,19 @@ function MoneyPageContent() {
                 </div>
               </div>
 
-              {/* Budget Meter Metrics */}
+              {budgetViewMode === "daily" ? (
+                <DailyBudgetView
+                  dailyStats={dailyStats}
+                  currencySymbol={currencySymbol}
+                  onOpenAddExpense={() => {
+                    setTxType("expense");
+                    setIsAddTxOpen(true);
+                  }}
+                  onOpenEditAllowances={openBudgetModal}
+                />
+              ) : (
+                <>
+                  {/* Budget Meter Metrics */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514]">
                   <span className="text-[10px] font-black uppercase tracking-wider text-[#161514]/60 block">Total Available Pool</span>
@@ -1988,6 +2081,8 @@ function MoneyPageContent() {
                   )}
                 </div>
               </div>
+                </>
+              )}
             </div>
 
             {/* 🐷 FEATURE 5: WHERE DID YOU SAVE LAST MONTH? CARD */}
@@ -3576,6 +3671,50 @@ function MoneyPageContent() {
             </div>
           </div>
 
+          {/* ⚡ Custom Fixed Daily Budget Cap (Optional) */}
+          <div className="space-y-1.5 bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514]">
+            <div className="flex items-center justify-between">
+              <label htmlFor="daily-budget-input" className="text-xs font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5">
+                <span>⚡ Custom Fixed Daily Budget Cap ({currencySymbol})</span>
+              </label>
+              <span className="text-[10px] font-bold text-[#161514]/60">Optional Daily Limit</span>
+            </div>
+            <input
+              id="daily-budget-input"
+              type="number"
+              min="0"
+              step="50"
+              value={tempCustomDailyInput}
+              onChange={(e) => setTempCustomDailyInput(e.target.value)}
+              placeholder={`Leave blank to auto-track ~${currencySymbol}${budgetStats.dailySafeToSpend}/day`}
+              className="w-full neo-input text-sm font-black bg-white"
+            />
+            <div className="flex gap-1.5 pt-1 overflow-x-auto">
+              {[200, 300, 500, 1000].map((val) => (
+                <button
+                  key={`daily-${val}`}
+                  type="button"
+                  onClick={() => setTempCustomDailyInput(String(val))}
+                  className="px-2 py-1 rounded-lg bg-white hover:bg-[#03D26F] text-[#161514] font-black text-[10px] border border-[#161514] shadow-[1px_1px_0px_0px_#161514] shrink-0 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all"
+                >
+                  {currencySymbol}{val.toLocaleString()}/day
+                </button>
+              ))}
+              {tempCustomDailyInput && (
+                <button
+                  type="button"
+                  onClick={() => setTempCustomDailyInput("")}
+                  className="px-2 py-1 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-700 font-black text-[10px] border border-[#161514] shadow-[1px_1px_0px_0px_#161514] shrink-0 cursor-pointer"
+                >
+                  Clear (Auto Pace)
+                </button>
+              )}
+            </div>
+            <p className="text-[10px] text-[#161514]/70 font-medium pt-0.5">
+              💡 Leave blank or clear to automatically pace daily spending based on days remaining in the month (~{currencySymbol}{budgetStats.dailySafeToSpend}/day).
+            </p>
+          </div>
+
           {/* ⚡ Automatic Monthly Rollover Toggle Switch Card */}
           <div className="p-3.5 bg-white rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-between gap-3">
             <div className="space-y-0.5">
@@ -3676,11 +3815,7 @@ function MoneyPageContent() {
 
 export default function MoneyPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-cream-bg">
-        <div className="h-8 w-8 rounded-full border-4 border-amber-500 border-t-transparent animate-spin" />
-      </div>
-    }>
+    <Suspense fallback={<InvictusLoadingScreen message="Loading Money Tracker…" />}>
       <MoneyPageContent />
     </Suspense>
   );

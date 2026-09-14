@@ -10,21 +10,21 @@ export interface AppVersionInfo {
 }
 
 export const APP_VERSION_CONFIG: AppVersionInfo = {
-  version: "1.3.1",
-  buildNumber: 14,
+  version: "1.3.2",
+  buildNumber: 15,
   releaseDate: "September 14, 2026",
   channel: "stable",
   minSupportedVersion: "1.0.0",
   githubRepoUrl: "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker",
   latestReleaseApiUrl: "https://api.github.com/repos/LuckyJadhav2808/Invictus-The-OmniTracker/releases/latest",
   changelog: [
-    "📱 Fix Android Home Screen Widget Inflation ('Can't load widget' resolved)",
-    "🔄 Dynamic Real-Time Home Screen Sync for Safe-to-Spend & Liquidity Rates",
+    "⚡ Dedicated Daily Budget View with Real-Time Spending vs Cap Tracking",
+    "📱 Android Home Screen Widget Upgrade: 'Spent Today' Hero & Remaining Limit Badge",
+    "📊 7-Day Daily Spending Trend Strip with Interactive Expense Tooltips",
+    "🎯 Hybrid Daily Target Engine: Auto-calculated daily pace with optional custom daily cap",
+    "📱 Fixed Android Home Screen Widget Inflation & Layout Stability",
     "💳 Active UPI vs Cash Liquidity Split with Daily Burn Pace",
-    "⚡ 1-Tap Native Android Shortcuts (Quick Expense, Habits, Gym Split, Study)",
     "🛡️ Multi-Layer Database Security Hardening & Zero-Data-Loss Architecture",
-    "📅 Streak Freeze Protection Tokens & Exam Countdown Synchronization",
-    "💧 Real-Time Water Intake Log with Visual ml Level Indicator",
     "✨ Native Haptic Feedback & Seamless Offline Cache Sync",
   ],
 };

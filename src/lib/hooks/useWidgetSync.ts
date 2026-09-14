@@ -10,6 +10,12 @@ export interface WidgetSyncData {
   daysRemainingInMonth: number;
   targetMonthLabel: string;
   hasCashBudget: boolean;
+  // Daily Tracking Additions
+  todayExpense?: number;
+  todayRemaining?: number;
+  dailyBudgetTarget?: number;
+  isOverDailyBudget?: boolean;
+  overDailyAmount?: number;
 }
 
 interface WidgetBridgePluginType {

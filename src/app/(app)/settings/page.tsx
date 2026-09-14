@@ -12,6 +12,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useUserAchievements } from "@/lib/queries/achievements";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
+import { InvictusLoadingScreen } from "@/components/shared/InvictusLoadingScreen";
 import { playCompletionSound, type SoundEffectType } from "@/lib/utils/completion-sound";
 import { enableWebPushNotifications, triggerTestPushNotification } from "@/lib/utils/push-client";
 import {
@@ -522,11 +523,7 @@ export default function SettingsPage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-cream-bg">
-        <div className="h-8 w-8 rounded-full border-4 border-amber-500 border-t-transparent animate-spin" />
-      </div>
-    );
+    return <InvictusLoadingScreen message="Loading Settings…" />;
   }
 
   return (

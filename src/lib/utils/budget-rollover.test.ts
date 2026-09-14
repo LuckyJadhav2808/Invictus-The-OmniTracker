@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeMonthlyBudgetStats, isCashTransaction } from "./budget-rollover";
+import { computeMonthlyBudgetStats, computeDailyBudgetStats, isCashTransaction } from "./budget-rollover";
 import { type Transaction, type Category } from "@/types";
 
 describe("isCashTransaction", () => {
@@ -123,3 +123,73 @@ describe("computeMonthlyBudgetStats", () => {
     }
   });
 });
+
+describe("computeDailyBudgetStats", () => {
+  const mockMonthlyStats = {
+    dailySafeToSpend: 250,
+  } as any;
+
+  const mockTransactions: Transaction[] = [
+    { id: "t1", amount: 80, date: "2026-09-14", type: "expense", categoryId: "c1", isRecurring: false, paymentMethod: "upi" },
+    { id: "t2", amount: 40, date: "2026-09-14", type: "expense", categoryId: "c2", isRecurring: false, paymentMethod: "cash" },
+    { id: "t3", amount: 500, date: "2026-09-14", type: "income", categoryId: "c3", isRecurring: false, paymentMethod: "upi" },
+    { id: "t4", amount: 150, date: "2026-09-13", type: "expense", categoryId: "c1", isRecurring: false, paymentMethod: "upi" },
+    { id: "t5", amount: 200, date: "2026-09-12", type: "expense", categoryId: "c1", isRecurring: false, paymentMethod: "upi" },
+  ];
+
+  it("calculates today expense and remaining within safe spend target", () => {
+    const daily = computeDailyBudgetStats({
+      transactions: mockTransactions,
+      monthlyStats: mockMonthlyStats,
+      customDailyBudget: null,
+      referenceDate: new Date("2026-09-14T12:00:00Z"),
+    });
+
+    expect(daily.dailyBudgetTarget).toBe(250);
+    expect(daily.isCustomTarget).toBe(false);
+    expect(daily.todayExpense).toBe(120); // 80 UPI + 40 Cash
+    expect(daily.todayUpiExpense).toBe(80);
+    expect(daily.todayCashExpense).toBe(40);
+    expect(daily.todayRemaining).toBe(130); // 250 - 120
+    expect(daily.isOverDailyBudget).toBe(false);
+    expect(daily.overDailyAmount).toBe(0);
+    expect(daily.todayUsedPercentage).toBe(48); // (120/250)*100
+  });
+
+  it("respects custom daily budget cap and detects over-budget", () => {
+    const daily = computeDailyBudgetStats({
+      transactions: mockTransactions,
+      monthlyStats: mockMonthlyStats,
+      customDailyBudget: 100, // custom cap of 100
+      referenceDate: new Date("2026-09-14T12:00:00Z"),
+    });
+
+    expect(daily.dailyBudgetTarget).toBe(100);
+    expect(daily.isCustomTarget).toBe(true);
+    expect(daily.todayExpense).toBe(120);
+    expect(daily.todayRemaining).toBe(0);
+    expect(daily.isOverDailyBudget).toBe(true);
+    expect(daily.overDailyAmount).toBe(20); // 120 - 100
+    expect(daily.todayUsedPercentage).toBe(100);
+  });
+
+  it("generates 7 days trend items ending on reference date", () => {
+    const daily = computeDailyBudgetStats({
+      transactions: mockTransactions,
+      monthlyStats: mockMonthlyStats,
+      customDailyBudget: 250,
+      referenceDate: new Date("2026-09-14T12:00:00Z"),
+    });
+
+    expect(daily.last7Days).toHaveLength(7);
+    const lastDay = daily.last7Days[6];
+    expect(lastDay.date).toBe("2026-09-14");
+    expect(lastDay.isToday).toBe(true);
+    expect(lastDay.expense).toBe(120);
+
+    const prevDay = daily.last7Days[5];
+    expect(prevDay.date).toBe("2026-09-13");
+    expect(prevDay.expense).toBe(150);
+  });
+});
+
