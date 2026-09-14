@@ -26,7 +26,7 @@ export async function GET(request: Request) {
           Accept: "application/vnd.github.v3+json",
           "User-Agent": "Invictus-App-Version-Checker",
         },
-        next: { revalidate: 60 },
+        cache: "no-store",
       });
 
       if (response.ok) {
@@ -35,33 +35,33 @@ export async function GET(request: Request) {
           const ghVersion = data.tag_name.replace(/^v/i, "");
           if (compareSemver(ghVersion, latestVersion) >= 0) {
             latestVersion = ghVersion;
-          }
-          releaseTitle = data.name || `Invictus v${latestVersion}`;
-          downloadUrl = data.html_url || downloadUrl;
-          publishedAt = data.published_at
-            ? new Date(data.published_at).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-              })
-            : publishedAt;
+            releaseTitle = data.name || `Invictus v${latestVersion}`;
+            downloadUrl = data.html_url || downloadUrl;
+            publishedAt = data.published_at
+              ? new Date(data.published_at).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })
+              : publishedAt;
 
-          if (data.body) {
-            const lines = data.body
-              .split("\n")
-              .map((l: string) => l.trim())
-              .filter((l: string) => l.startsWith("-") || l.startsWith("*") || l.startsWith("•"))
-              .map((l: string) => l.replace(/^[-*•]\s*/, ""));
-            if (lines.length > 0) {
-              releaseNotes = lines;
+            if (data.body) {
+              const lines = data.body
+                .split("\n")
+                .map((l: string) => l.trim())
+                .filter((l: string) => l.startsWith("-") || l.startsWith("*") || l.startsWith("•"))
+                .map((l: string) => l.replace(/^[-*•]\s*/, ""));
+              if (lines.length > 0) {
+                releaseNotes = lines;
+              }
             }
-          }
 
-          // Check if Invictus.apk is attached in assets
-          if (Array.isArray(data.assets)) {
-            const apkAsset = data.assets.find((a: any) => a.name?.endsWith(".apk"));
-            if (apkAsset && apkAsset.browser_download_url) {
-              apkDownloadUrl = apkAsset.browser_download_url;
+            // Check if Invictus.apk is attached in assets
+            if (Array.isArray(data.assets)) {
+              const apkAsset = data.assets.find((a: any) => a.name?.endsWith(".apk"));
+              if (apkAsset && apkAsset.browser_download_url) {
+                apkDownloadUrl = apkAsset.browser_download_url;
+              }
             }
           }
         }
