@@ -13,6 +13,8 @@ import { ChevronDown } from "lucide-react";
 
 import { Suspense } from "react";
 import { QuickActionModal } from "@/components/shared/QuickActionModal";
+import { AutoUpdateBanner } from "@/components/shared/AutoUpdateBanner";
+import { APP_VERSION_CONFIG } from "@/config/version";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -78,6 +80,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     >
       <Sidebar />
       <main className="flex-1 pb-24 lg:pb-0 min-h-screen relative overflow-y-auto flex flex-col">
+        {/* Proactive Auto-Update Notification Banner */}
+        <AutoUpdateBanner />
+
         {/* Top Header Bar with Switcher */}
         <SpaceHeader />
 
@@ -91,7 +96,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <div className="flex items-center justify-center sm:justify-start gap-2">
             <span className="font-extrabold text-navy-900">Invictus OS</span>
             <span>•</span>
-            <span className="bg-white/60 px-2 py-0.5 rounded-full border border-border/40 text-[10px]">v1.2.0 Production</span>
+            <span className="bg-white/60 px-2 py-0.5 rounded-full border border-border/40 text-[10px]">v{APP_VERSION_CONFIG.version} Production</span>
           </div>
 
           <div className="flex items-center justify-center gap-3 mt-2 sm:mt-0">

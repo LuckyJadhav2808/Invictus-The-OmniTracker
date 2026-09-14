@@ -5,64 +5,23 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const requestedVersion = searchParams.get("v") || APP_VERSION_CONFIG.version;
+  const requestedVersion = searchParams.get("v");
+  const forcePage = searchParams.get("page") === "true";
 
-  try {
-    // 1. Try to find published release asset from GitHub API
-    const res = await fetch(
-      `https://api.github.com/repos/LuckyJadhav2808/Invictus-The-OmniTracker/releases/tags/v${requestedVersion}`,
-      {
-        headers: {
-          Accept: "application/vnd.github.v3+json",
-          "User-Agent": "Invictus-App-Server",
-        },
-        next: { revalidate: 60 },
-      }
-    );
+  // Fast-path: Direct GitHub release asset redirect (zero rate-limit, instant download)
+  if (!forcePage) {
+    const directDownloadUrl = requestedVersion
+      ? `https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v${requestedVersion}/Invictus.apk`
+      : `https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/latest/download/Invictus.apk`;
 
-    if (res.ok) {
-      const releaseData = await res.json();
-      const apkAsset = releaseData.assets?.find((a: any) =>
-        a.name?.toLowerCase().endsWith(".apk")
-      );
-
-      if (apkAsset?.browser_download_url) {
-        return NextResponse.redirect(apkAsset.browser_download_url, {
-          status: 302,
-          headers: {
-            "Content-Disposition": `attachment; filename="Invictus-v${requestedVersion}.apk"`,
-            "Cache-Control": "no-cache, no-store, must-revalidate",
-          },
-        });
-      }
-    }
-
-    // 2. Try latest release if specific version tag not found
-    const latestRes = await fetch(
-      "https://api.github.com/repos/LuckyJadhav2808/Invictus-The-OmniTracker/releases/latest",
-      {
-        headers: {
-          Accept: "application/vnd.github.v3+json",
-          "User-Agent": "Invictus-App-Server",
-        },
-        next: { revalidate: 60 },
-      }
-    );
-
-    if (latestRes.ok) {
-      const latestData = await latestRes.json();
-      const apkAsset = latestData.assets?.find((a: any) =>
-        a.name?.toLowerCase().endsWith(".apk")
-      );
-
-      if (apkAsset?.browser_download_url) {
-        return NextResponse.redirect(apkAsset.browser_download_url, {
-          status: 302,
-        });
-      }
-    }
-  } catch (err) {
-    console.error("[Download Android Error]:", err);
+    return NextResponse.redirect(directDownloadUrl, {
+      status: 302,
+      headers: {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+      },
+    });
   }
 
   // 3. Resilient Fallback HTML Page

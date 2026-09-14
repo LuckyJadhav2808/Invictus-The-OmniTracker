@@ -63,6 +63,7 @@ import { ReminderManagerModal } from "@/components/shared/ReminderManagerModal";
 import { ReportIssueModal } from "@/components/shared/ReportIssueModal";
 import { UpdateCheckModal } from "@/components/shared/UpdateCheckModal";
 import { APP_VERSION_CONFIG } from "@/config/version";
+import { Capacitor } from "@capacitor/core";
 
 const TIMEZONES = [
   "Asia/Kolkata",
@@ -113,6 +114,13 @@ export default function SettingsPage() {
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleDownloadApk = (e: React.MouseEvent) => {
+    if (Capacitor.isNativePlatform()) {
+      e.preventDefault();
+      window.open("/api/download/android", "_system");
+    }
+  };
 
   // Form states
   const [displayName, setDisplayName] = useState("");
@@ -579,6 +587,7 @@ export default function SettingsPage() {
 
             <a
               href="/api/download/android"
+              onClick={handleDownloadApk}
               target="_blank"
               rel="noopener noreferrer"
               className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-[#161514] hover:bg-[#2a2725] text-white text-xs font-black uppercase tracking-wider border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center justify-center gap-1.5"
@@ -1257,6 +1266,7 @@ export default function SettingsPage() {
 
               <a
                 href="/api/download/android"
+                onClick={handleDownloadApk}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full bg-[#161514] hover:bg-[#2a2725] text-white font-black text-xs uppercase tracking-wider py-3.5 px-3 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center justify-center gap-2 text-center"

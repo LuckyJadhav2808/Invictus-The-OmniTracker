@@ -91,7 +91,7 @@ export default function ProfilePage() {
           {/* Quick Features Badges */}
           <div className="flex flex-wrap gap-1.5 pt-1">
             {[
-              { label: "⚡ v1.2.0 Updates", icon: "⚡" },
+              { label: `⚡ v${APP_VERSION_CONFIG.version} Updates`, icon: "⚡" },
               { label: "⏰ Global Wake-Up", icon: "⏰" },
               { label: "🏆 Badges & XP", icon: "🏆" },
               { label: "📂 Habit Groups", icon: "📂" },

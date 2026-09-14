@@ -3,8 +3,15 @@ import { APP_VERSION_CONFIG, compareSemver } from "@/config/version";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const clientInstalledVersion =
+      searchParams.get("installedVersion") ||
+      searchParams.get("clientVersion") ||
+      request.headers.get("x-app-version") ||
+      APP_VERSION_CONFIG.version;
+
     let latestVersion = APP_VERSION_CONFIG.version;
     let releaseTitle = `Invictus v${APP_VERSION_CONFIG.version}`;
     let releaseNotes = APP_VERSION_CONFIG.changelog;
@@ -25,10 +32,19 @@ export async function GET() {
       if (response.ok) {
         const data = await response.json();
         if (data.tag_name) {
-          latestVersion = data.tag_name.replace(/^v/i, "");
-          releaseTitle = data.name || `Invictus ${data.tag_name}`;
+          const ghVersion = data.tag_name.replace(/^v/i, "");
+          if (compareSemver(ghVersion, latestVersion) >= 0) {
+            latestVersion = ghVersion;
+          }
+          releaseTitle = data.name || `Invictus v${latestVersion}`;
           downloadUrl = data.html_url || downloadUrl;
-          publishedAt = data.published_at ? new Date(data.published_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : publishedAt;
+          publishedAt = data.published_at
+            ? new Date(data.published_at).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })
+            : publishedAt;
 
           if (data.body) {
             const lines = data.body
@@ -54,13 +70,16 @@ export async function GET() {
       // Fallback cleanly to internal version config
     }
 
-    const currentVersion = APP_VERSION_CONFIG.version;
-    const hasUpdate = compareSemver(latestVersion, currentVersion) > 0;
-    const isMandatory = compareSemver(currentVersion, APP_VERSION_CONFIG.minSupportedVersion) < 0;
+    const effectiveTargetVersion = compareSemver(latestVersion, APP_VERSION_CONFIG.version) >= 0
+      ? latestVersion
+      : APP_VERSION_CONFIG.version;
+
+    const hasUpdate = compareSemver(effectiveTargetVersion, clientInstalledVersion) > 0;
+    const isMandatory = compareSemver(clientInstalledVersion, APP_VERSION_CONFIG.minSupportedVersion) < 0;
 
     return NextResponse.json({
-      currentVersion,
-      latestVersion,
+      currentVersion: clientInstalledVersion,
+      latestVersion: effectiveTargetVersion,
       hasUpdate,
       isMandatory,
       channel: APP_VERSION_CONFIG.channel,

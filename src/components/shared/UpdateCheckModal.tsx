@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Sparkles, Download, RefreshCw, CheckCircle2, AlertCircle, ArrowUpRight, ShieldCheck, Terminal } from "lucide-react";
 import { APP_VERSION_CONFIG } from "@/config/version";
 import { toast } from "sonner";
+import { Capacitor } from "@capacitor/core";
+import { App } from "@capacitor/app";
 
 interface UpdateData {
   currentVersion: string;
@@ -29,11 +31,25 @@ export function UpdateCheckModal({ open, onOpenChange, autoCheck = false }: Upda
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<UpdateData | null>(null);
   const [lastChecked, setLastChecked] = useState<string | null>(null);
+  const [installedVersion, setInstalledVersion] = useState<string>(APP_VERSION_CONFIG.version);
 
   const fetchVersion = async (showToastOnLatest = false) => {
     setLoading(true);
     try {
-      const res = await fetch("/api/version");
+      let currentClientVer = APP_VERSION_CONFIG.version;
+      try {
+        if (Capacitor.isNativePlatform()) {
+          const info = await App.getInfo();
+          if (info?.version) {
+            currentClientVer = info.version;
+            setInstalledVersion(info.version);
+          }
+        }
+      } catch (err) {
+        console.warn("Could not read native app version:", err);
+      }
+
+      const res = await fetch(`/api/version?installedVersion=${encodeURIComponent(currentClientVer)}`);
       if (!res.ok) throw new Error("Failed to fetch version");
       const result: UpdateData = await res.json();
       setData(result);
@@ -65,6 +81,13 @@ export function UpdateCheckModal({ open, onOpenChange, autoCheck = false }: Upda
   const releaseNotes = data?.releaseNotes || APP_VERSION_CONFIG.changelog;
   const apkUrl = data?.apkDownloadUrl || `${APP_VERSION_CONFIG.githubRepoUrl}/releases/latest`;
   const releaseUrl = data?.downloadUrl || `${APP_VERSION_CONFIG.githubRepoUrl}/releases/latest`;
+
+  const handleDownloadApk = (e: React.MouseEvent) => {
+    if (Capacitor.isNativePlatform()) {
+      e.preventDefault();
+      window.open(apkUrl, "_system");
+    }
+  };
 
   return (
     <ResponsiveFormContainer
@@ -154,6 +177,7 @@ export function UpdateCheckModal({ open, onOpenChange, autoCheck = false }: Upda
           {hasUpdate ? (
             <a
               href={apkUrl}
+              onClick={handleDownloadApk}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full py-3 rounded-2xl bg-[#CEF431] hover:bg-[#bce022] text-[#161514] font-black text-xs uppercase tracking-wider border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center justify-center gap-2 cursor-pointer"
@@ -164,6 +188,7 @@ export function UpdateCheckModal({ open, onOpenChange, autoCheck = false }: Upda
           ) : (
             <a
               href={apkUrl}
+              onClick={handleDownloadApk}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full py-2.5 rounded-2xl bg-[#FAF8F5] hover:bg-white text-[#161514] font-black text-xs border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center justify-center gap-2 cursor-pointer"

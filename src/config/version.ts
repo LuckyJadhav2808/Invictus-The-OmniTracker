@@ -10,21 +10,21 @@ export interface AppVersionInfo {
 }
 
 export const APP_VERSION_CONFIG: AppVersionInfo = {
-  version: "1.2.0",
-  buildNumber: 12,
-  releaseDate: "August 27, 2026",
+  version: "1.3.0",
+  buildNumber: 13,
+  releaseDate: "September 14, 2026",
   channel: "stable",
   minSupportedVersion: "1.0.0",
   githubRepoUrl: "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker",
   latestReleaseApiUrl: "https://api.github.com/repos/LuckyJadhav2808/Invictus-The-OmniTracker/releases/latest",
   changelog: [
+    "📱 2x2 Android Home Screen Widget (Safe-to-Spend & Liquidity Tracker)",
+    "💳 Active UPI vs Cash Liquidity Split with Daily Burn Pace",
     "⚡ 1-Tap Native Android Shortcuts (Quick Expense, Habits, Gym Split, Study)",
-    "🎨 Polished Single-Row Tab Rail with Smooth Horizontal Momentum Swipe",
-    "🧮 Repositioned Bottom-Left Floating Neobrutalist Calculator",
-    "🛡️ 1-Day Missed Log Streak Protection Token System",
+    "🛡️ Multi-Layer Database Security Hardening & Zero-Data-Loss Architecture",
+    "📅 Streak Freeze Protection Tokens & Exam Countdown Synchronization",
     "💧 Real-Time Water Intake Log with Visual ml Level Indicator",
-    "📊 Unified Cross-Module Performance & Analytics Hub",
-    "✨ Native Haptic Feedback & Offline-Ready Database Sync",
+    "✨ Native Haptic Feedback & Seamless Offline Cache Sync",
   ],
 };
 
