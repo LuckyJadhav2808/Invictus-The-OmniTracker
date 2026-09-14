@@ -11,7 +11,11 @@ export async function GET(req: NextRequest) {
     await connectToDatabase();
 
     const currentMonthStr = format(new Date(), "yyyy-MM");
-    let streakFreeze = await StreakFreezeModel.findOne({ userId });
+    const targetUserIds = (userId === "user-admin-default" || userId === "user_1kapw9sad_1784744868999")
+      ? ["user-admin-default", "user_1kapw9sad_1784744868999"]
+      : [userId];
+
+    let streakFreeze = await StreakFreezeModel.findOne({ userId: { $in: targetUserIds } });
 
     if (!streakFreeze) {
       streakFreeze = await StreakFreezeModel.create({

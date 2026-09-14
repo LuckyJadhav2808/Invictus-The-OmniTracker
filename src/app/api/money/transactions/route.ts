@@ -13,7 +13,11 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "UserId is required" }, { status: 400 });
     }
 
-    const txs = await Transaction.find({ userId }).sort({ date: -1 });
+    const targetUserIds = (userId === "user-admin-default" || userId === "user_1kapw9sad_1784744868999")
+      ? ["user-admin-default", "user_1kapw9sad_1784744868999"]
+      : [userId];
+
+    const txs = await Transaction.find({ userId: { $in: targetUserIds } }).sort({ date: -1 });
     return NextResponse.json(txs);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

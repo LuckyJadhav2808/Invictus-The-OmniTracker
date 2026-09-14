@@ -14,7 +14,11 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "UserId and date required" }, { status: 400 });
     }
 
-    let waterLog = await WaterLog.findOne({ userId, date });
+    const targetUserIds = (userId === "user-admin-default" || userId === "user_1kapw9sad_1784744868999")
+      ? ["user-admin-default", "user_1kapw9sad_1784744868999"]
+      : [userId];
+
+    let waterLog = await WaterLog.findOne({ userId: { $in: targetUserIds }, date });
     if (!waterLog) {
       // 0 ml logged initially, 1000 ml (1 Ltr) target capacity
       waterLog = await WaterLog.create({

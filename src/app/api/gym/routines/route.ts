@@ -19,7 +19,11 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "UserId required for data isolation" }, { status: 400 });
     }
 
-    const query: any = { userId };
+    const targetUserIds = (userId === "user-admin-default" || userId === "user_1kapw9sad_1784744868999")
+      ? ["user-admin-default", "user_1kapw9sad_1784744868999"]
+      : [userId];
+
+    const query: any = { userId: { $in: targetUserIds } };
     if (dayOfWeek) query.dayOfWeek = dayOfWeek;
 
     const routines = await GymRoutine.find(query).sort({ createdAt: 1 });

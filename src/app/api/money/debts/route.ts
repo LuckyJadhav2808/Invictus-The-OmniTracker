@@ -11,9 +11,11 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "UserId is required for fetching debts" }, { status: 400 });
     }
 
-    await connectToDatabase();
+    const targetUserIds = (userId === "user-admin-default" || userId === "user_1kapw9sad_1784744868999")
+      ? ["user-admin-default", "user_1kapw9sad_1784744868999"]
+      : [userId];
 
-    const debts = await DebtModel.find({ userId }).sort({ createdAt: -1 });
+    const debts = await DebtModel.find({ userId: { $in: targetUserIds } }).sort({ createdAt: -1 });
 
     const formatted = debts.map((d) => ({
       id: d._id.toString(),
