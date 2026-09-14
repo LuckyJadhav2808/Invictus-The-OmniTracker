@@ -7,7 +7,7 @@ import { InsightCard } from "@/components/shared/InsightCard";
 import { FAB } from "@/components/shared/FAB";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { format, startOfWeek, addDays, isSameDay, subMonths, startOfMonth, endOfMonth } from "date-fns";
 import { BookOpen, Wallet, CheckSquare, Sparkles, Clock, LogOut, ArrowRight, Play, Square, Award } from "lucide-react";
@@ -15,6 +15,8 @@ import { useRouter } from "next/navigation";
 import { useHabits, useHabitLogs, useStreaks, useStreakFreeze } from "@/lib/queries/goals";
 import { useStudySessions, useSubjects, useAllTopics } from "@/lib/queries/study";
 import { useTransactions, useCategories } from "@/lib/queries/money";
+import { computeMonthlyBudgetStats } from "@/lib/utils/budget-rollover";
+import { useWidgetSync } from "@/lib/hooks/useWidgetSync";
 import { useUIStore } from "@/store/ui-store";
 import { SpaceHeroBanner } from "@/components/shared/SpaceHeroBanner";
 import { ProactiveReminderBanner } from "@/components/shared/ProactiveReminderBanner";
@@ -63,6 +65,61 @@ export default function TodayPage() {
   const { data: allTopics = [] } = useAllTopics();
   const { data: transactions = [] } = useTransactions();
   const { data: categories = [] } = useCategories();
+  const { syncToWidget } = useWidgetSync();
+
+  const currencySymbol = useMemo(() => {
+    switch (currency) {
+      case "USD": return "$";
+      case "EUR": return "€";
+      case "GBP": return "£";
+      case "JPY": return "¥";
+      default: return "₹";
+    }
+  }, [currency]);
+
+  // Sync Safe-to-Spend and Liquidity metrics to Android home screen widget on app startup
+  useEffect(() => {
+    if (!transactions.length && !categories.length) return;
+    try {
+      const currentMonthKey = format(new Date(), "yyyy-MM");
+      let baseUpiBudget = 10000;
+      let baseCashBudget = 3000;
+      let enableRollover = true;
+
+      if (typeof window !== "undefined") {
+        const storedUpi = localStorage.getItem("invictus_upi_budget");
+        const storedCash = localStorage.getItem("invictus_cash_budget");
+        const storedRollover = localStorage.getItem("invictus_enable_rollover");
+        if (storedUpi) baseUpiBudget = parseFloat(storedUpi) || 10000;
+        if (storedCash) baseCashBudget = parseFloat(storedCash) || 3000;
+        if (storedRollover !== null) enableRollover = storedRollover === "true";
+      }
+
+      const stats = computeMonthlyBudgetStats({
+        transactions,
+        categories,
+        targetMonthKey: currentMonthKey,
+        baseUpiBudget,
+        baseCashBudget,
+        enableRollover,
+        currencySymbol,
+      });
+
+      syncToWidget({
+        safeToSpendDaily: stats.dailySafeToSpend,
+        remainingUpiBudget: stats.remainingUpiBudget,
+        remainingCashBudget: stats.remainingCashBudget,
+        totalAvailableUpiBudget: stats.totalAvailableUpiBudget,
+        totalAvailableCashBudget: stats.totalAvailableCashBudget,
+        currencySymbol,
+        daysRemainingInMonth: stats.daysRemainingInMonth,
+        targetMonthLabel: stats.targetMonthLabel.split(" ")[0],
+        hasCashBudget: stats.baseCashBudget > 0 || stats.totalAvailableCashBudget > 0,
+      });
+    } catch (e) {
+      console.warn("Failed to sync widget from today page:", e);
+    }
+  }, [transactions, categories, currencySymbol, syncToWidget]);
 
   // Load user profile details for currency & load dismissed insights / active stopwatches
   useEffect(() => {

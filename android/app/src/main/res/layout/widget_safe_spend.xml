@@ -83,7 +83,7 @@
             android:textStyle="bold" />
 
         <!-- Divider line -->
-        <View
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="6dp"
@@ -149,21 +149,15 @@
     </LinearLayout>
 
     <!-- Bottom Action Button: + Add Expense -->
-    <LinearLayout
+    <TextView
         android:id="@+id/widget_btn_add_expense"
         android:layout_width="match_parent"
         android:layout_height="34dp"
         android:background="@drawable/widget_button_background"
         android:gravity="center"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="+ ADD EXPENSE"
-            android:textColor="#161514"
-            android:textSize="11sp"
-            android:textStyle="bold" />
-    </LinearLayout>
+        android:text="+ ADD EXPENSE"
+        android:textColor="#161514"
+        android:textSize="11sp"
+        android:textStyle="bold" />
 
 </LinearLayout>

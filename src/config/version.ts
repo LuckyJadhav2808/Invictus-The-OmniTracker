@@ -10,15 +10,16 @@ export interface AppVersionInfo {
 }
 
 export const APP_VERSION_CONFIG: AppVersionInfo = {
-  version: "1.3.0",
-  buildNumber: 13,
+  version: "1.3.1",
+  buildNumber: 14,
   releaseDate: "September 14, 2026",
   channel: "stable",
   minSupportedVersion: "1.0.0",
   githubRepoUrl: "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker",
   latestReleaseApiUrl: "https://api.github.com/repos/LuckyJadhav2808/Invictus-The-OmniTracker/releases/latest",
   changelog: [
-    "📱 2x2 Android Home Screen Widget (Safe-to-Spend & Liquidity Tracker)",
+    "📱 Fix Android Home Screen Widget Inflation ('Can't load widget' resolved)",
+    "🔄 Dynamic Real-Time Home Screen Sync for Safe-to-Spend & Liquidity Rates",
     "💳 Active UPI vs Cash Liquidity Split with Daily Burn Pace",
     "⚡ 1-Tap Native Android Shortcuts (Quick Expense, Habits, Gym Split, Study)",
     "🛡️ Multi-Layer Database Security Hardening & Zero-Data-Loss Architecture",
