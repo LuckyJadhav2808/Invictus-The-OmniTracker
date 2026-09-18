@@ -87,7 +87,7 @@ export function SubscriptionsTracker() {
             <CreditCard className="h-5 w-5 stroke-[2.5]" />
           </div>
           <div>
-            <h4 className="text-sm font-black text-[#161514] tracking-tight font-heading uppercase">Recurring Subscriptions</h4>
+            <h4 className="text-sm font-black text-[#161514] tracking-tight font-heading uppercase">Subscriptions</h4>
             <p className="text-[10px] text-[#161514]/70 font-bold uppercase tracking-wider">
               Monthly commitment: <strong className="text-[#161514] font-black font-heading">₹{totalMonthlyCommitment.toLocaleString()}</strong>
             </p>
@@ -97,7 +97,7 @@ export function SubscriptionsTracker() {
           onClick={() => setIsChoiceOpen(true)}
           className="text-xs font-black text-[#161514] bg-[#CEF431] hover:bg-[#b8dd24] px-3.5 py-2 rounded-xl cursor-pointer transition-all flex items-center gap-1.5 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none uppercase tracking-wider"
         >
-          <Plus className="h-3.5 w-3.5 stroke-[3]" /> Add Sub
+          <Plus className="h-3.5 w-3.5 stroke-[3]" /> Add Subscription
         </button>
       </div>
 
@@ -154,12 +154,12 @@ export function SubscriptionsTracker() {
       <TemplateSelectionModal
         open={isChoiceOpen}
         onOpenChange={setIsChoiceOpen}
-        title="ADD RECURRING SUBSCRIPTION"
-        subtitle="LOG A CUSTOM SUBSCRIPTION OR APPLY A READY-MADE PACK."
-        blankLabel="CUSTOM SUBSCRIPTION"
-        blankDesc="ENTER SERVICE NAME, COST & RENEWAL DATE"
-        templatesLabel="SUBSCRIPTION PACKS"
-        templatesDesc="STREAMING MEDIA, DEVELOPER SUITE, GYM..."
+        title="Add Subscription"
+        subtitle="Add a single subscription or choose a preset pack."
+        blankLabel="Custom Subscription"
+        blankDesc="Name, price, and renewal cycle"
+        templatesLabel="Preset Packs"
+        templatesDesc="Streaming, work tools, fitness, etc."
         templatePacks={SUBSCRIPTION_TEMPLATE_PACKS}
         onSelectBlank={() => setIsAddOpen(true)}
         onApplyTemplatePack={handleApplySubPack}
@@ -169,8 +169,8 @@ export function SubscriptionsTracker() {
       <ResponsiveFormContainer
         open={isAddOpen}
         onOpenChange={setIsAddOpen}
-        title="Add Recurring Subscription"
-        description="Track your active monthly/yearly subscriptions"
+        title="Add Subscription"
+        description="Track recurring bills and plans."
       >
         <form onSubmit={handleAddSub} className="space-y-4 pt-2">
           <div className="space-y-1">

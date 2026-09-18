@@ -42,6 +42,7 @@ export function QuickActionModal() {
 
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"expense" | "habits">("expense");
+  const [sessionLoggedCount, setSessionLoggedCount] = useState(0);
 
   // Expense form state
   const [amount, setAmount] = useState("");
@@ -153,6 +154,7 @@ export function QuickActionModal() {
     setIsOpen(false);
     setAmount("");
     setNote("");
+    setSessionLoggedCount(0);
     // Clean up search query param cleanly without reloading
     if (searchParams.get("action")) {
       const params = new URLSearchParams(searchParams.toString());
@@ -189,8 +191,17 @@ export function QuickActionModal() {
         isRecurring: false,
       });
 
+      setSessionLoggedCount((prev) => prev + 1);
       toast.success(`Logged ₹${numAmount.toLocaleString("en-IN")} expense! 💸`);
-      handleClose();
+      
+      // Clear input fields for seamless successive entries
+      setAmount("");
+      setNote("");
+
+      // Automatically re-focus numeric input
+      setTimeout(() => {
+        amountInputRef.current?.focus();
+      }, 60);
     } catch {
       toast.error("Failed to log expense");
     }
@@ -257,6 +268,22 @@ export function QuickActionModal() {
       {activeTab === "expense" ? (
         /* Quick Expense Form */
         <form onSubmit={handleExpenseSubmit} className="space-y-4 pt-1">
+          {sessionLoggedCount > 0 && (
+            <div className="p-2.5 bg-emerald-50 rounded-2xl border-2 border-emerald-700 text-emerald-950 text-xs font-black flex items-center justify-between shadow-[2px_2px_0px_0px_rgba(4,120,87,1)] animate-in fade-in duration-200">
+              <span className="flex items-center gap-2">
+                <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-ping" />
+                <span>{sessionLoggedCount} {sessionLoggedCount === 1 ? "expense" : "expenses"} logged</span>
+              </span>
+              <button
+                type="button"
+                onClick={handleClose}
+                className="text-[10px] uppercase font-black px-2.5 py-1 bg-emerald-200 hover:bg-emerald-300 text-emerald-950 rounded-xl border-1.5 border-emerald-800 shadow-[1px_1px_0px_0px_rgba(4,120,87,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all"
+              >
+                Done & Close
+              </button>
+            </div>
+          )}
+
           {/* Big Currency Amount Input */}
           <div className="space-y-1.5">
             <label className="text-[10px] font-black uppercase tracking-wider text-[#161514]/80">
@@ -365,15 +392,39 @@ export function QuickActionModal() {
             </div>
           </div>
 
-          {/* Big Tactile Submit Button */}
-          <button
-            type="submit"
-            disabled={addTransactionMutation.isPending}
-            className="w-full bg-[#CEF431] hover:bg-[#b8dd25] text-[#161514] font-black text-sm rounded-2xl py-3.5 mt-2 border-2 sm:border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all uppercase tracking-wider flex items-center justify-center gap-2"
-          >
-            <Zap className="h-4 w-4 fill-current" />
-            <span>{addTransactionMutation.isPending ? "Logging..." : `Log Expense ${amount ? `(₹${amount})` : ""}`}</span>
-          </button>
+          {/* Big Tactile Submit Buttons */}
+          <div className="flex items-center gap-2 pt-1">
+            <button
+              type="submit"
+              disabled={addTransactionMutation.isPending}
+              className="flex-1 bg-[#CEF431] hover:bg-[#b8dd25] text-[#161514] font-black text-sm rounded-2xl py-3.5 border-2 sm:border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all uppercase tracking-wider flex items-center justify-center gap-2"
+            >
+              <Zap className="h-4 w-4 fill-current" />
+              <span>
+                {addTransactionMutation.isPending
+                  ? "Logging..."
+                  : sessionLoggedCount > 0
+                  ? amount
+                    ? `Log Another (₹${amount})`
+                    : "Log Another Entry"
+                  : amount
+                  ? `Log Expense (₹${amount})`
+                  : "Log Expense"}
+              </span>
+            </button>
+
+            {sessionLoggedCount > 0 && (
+              <button
+                type="button"
+                onClick={handleClose}
+                className="px-4 bg-white hover:bg-[#FAF8F5] text-[#161514] font-black text-sm rounded-2xl py-3.5 border-2 sm:border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all uppercase tracking-wider flex items-center justify-center gap-1.5"
+                title="Finished logging"
+              >
+                <Check className="h-4 w-4 stroke-[3]" />
+                <span>Done</span>
+              </button>
+            )}
+          </div>
         </form>
       ) : (
         /* Quick Habits Checklist */
@@ -446,7 +497,7 @@ export function QuickActionModal() {
 
   if (isDesktop) {
     return (
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <Dialog open={isOpen} onOpenChange={(open) => { if (!open) handleClose(); else setIsOpen(true); }}>
         <DialogContent
           showCloseButton={false}
           className="sm:max-w-[480px] bg-white rounded-3xl p-0 border-2.5 border-[#161514] shadow-[6px_6px_0px_0px_rgba(22,21,20,1)] overflow-hidden"
@@ -484,7 +535,7 @@ export function QuickActionModal() {
   }
 
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+    <Sheet open={isOpen} onOpenChange={(open) => { if (!open) handleClose(); else setIsOpen(true); }}>
       <SheetContent
         side="bottom"
         showCloseButton={false}

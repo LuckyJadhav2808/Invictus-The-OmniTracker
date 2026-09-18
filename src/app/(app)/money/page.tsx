@@ -71,7 +71,7 @@ function MoneyPageContent() {
   }, [tabParam]);
 
   useEffect(() => {
-    if (actionParam === "quick-expense" || actionParam === "add_tx") {
+    if (actionParam === "add_tx") {
       setTxType("expense");
       setIsAddTxOpen(true);
     }
@@ -406,9 +406,9 @@ function MoneyPageContent() {
       }
     } catch {}
     toast.success(
-      `Allowances saved! 📱 UPI: ${currencySymbol}${upiVal.toLocaleString()} • 💵 Cash: ${currencySymbol}${cashVal.toLocaleString()}${
-        customDailyVal ? ` • ⚡ Daily Cap: ${currencySymbol}${customDailyVal.toLocaleString()}` : ""
-      }${tempEnableRollover ? " (Rollover ON)" : " (Rollover OFF)"} 🎯`
+      `Budget saved! 📱 UPI: ${currencySymbol}${upiVal.toLocaleString()} • 💵 Cash: ${currencySymbol}${cashVal.toLocaleString()}${
+        customDailyVal ? ` • ⚡ Daily: ${currencySymbol}${customDailyVal.toLocaleString()}` : ""
+      }${tempEnableRollover ? " (Rollover ON)" : ""} 🎯`
     );
     setIsBudgetModalOpen(false);
   };
@@ -927,11 +927,11 @@ function MoneyPageContent() {
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <h2 className="font-black text-sm sm:text-base uppercase tracking-wider text-[#161514]" style={{ fontFamily: "var(--font-heading)" }}>
-                    Money & Ledger Space
+                    Money & Budget
                   </h2>
                 </div>
                 <p className="text-[10px] text-[#161514]/70 font-bold mt-0.5">
-                  Track daily liquidity, stay within budget & build cumulative wealth
+                  Track expenses, balances, and monthly targets
                 </p>
               </div>
             </div>
@@ -1003,7 +1003,7 @@ function MoneyPageContent() {
             <div className="space-y-1">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-[10px] font-black uppercase tracking-widest text-[#161514]/70">
-                  Safe To Spend ({budgetStats.targetMonthLabel.split(" ")[0]})
+                  Safe Daily Spend ({budgetStats.targetMonthLabel.split(" ")[0]})
                 </span>
                 {budgetStats.rolloverSurplus > 0 && (
                   <span className="text-[9px] font-black bg-[#03D26F] text-[#161514] px-1.5 py-0.5 rounded-full border border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
@@ -1019,7 +1019,7 @@ function MoneyPageContent() {
                     ? "bg-[#03D26F]/25 text-emerald-950 border-[#161514]"
                     : "bg-[#CEF431] text-[#161514] border-[#161514]"
                 )}>
-                  {budgetStats.burnPaceStatus === "fast" ? "⚠️ Fast Burn" : budgetStats.burnPaceStatus === "frugal" ? "🟢 Frugal Pace" : "✨ On Track"}
+                  {budgetStats.burnPaceStatus === "fast" ? "⚠️ High Spending" : budgetStats.burnPaceStatus === "frugal" ? "🟢 Under Budget" : "✨ On Track"}
                 </span>
               </div>
               <div className="text-3xl sm:text-4xl font-black text-[#161514] tracking-tight" style={{ fontFamily: "var(--font-heading)" }}>
@@ -1033,7 +1033,7 @@ function MoneyPageContent() {
             {/* Quick Metrics Badge Group */}
             <div className="flex flex-wrap sm:flex-nowrap gap-2 sm:self-center">
               <div className="bg-[#FAF8F5] px-3 py-2 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-left shrink-0 min-w-[110px]">
-                <span className="text-[9px] font-black uppercase text-[#161514]/60 block">Total Pool</span>
+                <span className="text-[9px] font-black uppercase text-[#161514]/60 block">Total Budget</span>
                 <span className="text-sm font-black text-[#161514] block" style={{ fontFamily: "var(--font-heading)" }}>
                   {currencySymbol}{budgetStats.totalAvailableBudget.toLocaleString()}
                 </span>
@@ -1078,7 +1078,7 @@ function MoneyPageContent() {
 
             {/* Lifetime Vault Pill */}
             <div className="bg-white p-2.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-between gap-1">
-              <span>🏦 Lifetime Vault:</span>
+              <span>🏦 Total Savings:</span>
               <span className={cn(
                 "text-[10px] font-black px-1.5 py-0.5 rounded-md border border-[#161514]",
                 totalBalance >= 0 ? "bg-[#03D26F]/20 text-emerald-950" : "bg-rose-100 text-rose-950"
@@ -3582,23 +3582,23 @@ function MoneyPageContent() {
       <ResponsiveFormContainer
         open={isBudgetModalOpen}
         onOpenChange={setIsBudgetModalOpen}
-        title="Set Monthly Budget Allowances"
-        description="Allocate your base monthly allowance across UPI/Digital and Physical Cash"
+        title="Edit Monthly Budget"
+        description="Set your monthly spending targets for UPI and cash."
       >
         <form onSubmit={handleSaveMonthlyBudget} className="space-y-4 pt-1">
           <div className="bg-[#FFF9EA] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] space-y-1">
             <span className="text-[10px] font-black uppercase tracking-wider text-navy-600 block">
-              Dual-Channel Rollover Architecture ⚡
+              Rollover Savings
             </span>
             <p className="text-xs text-navy-800 font-medium leading-relaxed">
-              Allocate separate ceilings for online/UPI apps and pocket cash. Any unspent balance in either channel will automatically roll over into its respective channel next month!
+              Set spending limits for online/UPI and cash. Unspent money automatically carries over to next month.
             </p>
           </div>
 
           {/* Combined Total Display Pill */}
           <div className="bg-white p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-between">
             <span className="text-xs font-black uppercase tracking-wider text-[#161514]">
-              Combined Monthly Pool
+              Total Monthly Budget
             </span>
             <span className="text-lg font-black text-[#161514]" style={{ fontFamily: "var(--font-heading)" }}>
               {currencySymbol}{((Number(tempUpiBudgetInput) || 0) + (Number(tempCashBudgetInput) || 0)).toLocaleString()}
@@ -3609,7 +3609,7 @@ function MoneyPageContent() {
           <div className="space-y-1.5 bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514]">
             <div className="flex items-center justify-between">
               <label htmlFor="upi-budget-input" className="text-xs font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5">
-                <span>📱 UPI & Digital Allowance ({currencySymbol})</span>
+                <span>📱 UPI & Online Budget ({currencySymbol})</span>
               </label>
               <span className="text-[10px] font-bold text-[#161514]/60">GPay, Paytm, Cards</span>
             </div>
@@ -3642,7 +3642,7 @@ function MoneyPageContent() {
           <div className="space-y-1.5 bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514]">
             <div className="flex items-center justify-between">
               <label htmlFor="cash-budget-input" className="text-xs font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5">
-                <span>💵 Cash Wallet Allowance ({currencySymbol})</span>
+                <span>💵 Cash Budget ({currencySymbol})</span>
               </label>
               <span className="text-[10px] font-bold text-[#161514]/60">ATM Notes & Coins</span>
             </div>
@@ -3675,7 +3675,7 @@ function MoneyPageContent() {
           <div className="space-y-1.5 bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514]">
             <div className="flex items-center justify-between">
               <label htmlFor="daily-budget-input" className="text-xs font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5">
-                <span>⚡ Custom Fixed Daily Budget Cap ({currencySymbol})</span>
+                <span>⚡ Daily Spending Limit (Optional) ({currencySymbol})</span>
               </label>
               <span className="text-[10px] font-bold text-[#161514]/60">Optional Daily Limit</span>
             </div>
@@ -3792,7 +3792,7 @@ function MoneyPageContent() {
                 </div>
 
                 <div className="pt-2 border-t border-zinc-200 flex items-center justify-between">
-                  <span className="font-black uppercase tracking-wider text-[#161514]">Total Monthly Pool:</span>
+                  <span className="font-black uppercase tracking-wider text-[#161514]">Total Available Budget:</span>
                   <span className="font-black text-base text-[#161514]" style={{ fontFamily: "var(--font-heading)" }}>
                     {currencySymbol}{totalPool.toLocaleString()}
                   </span>

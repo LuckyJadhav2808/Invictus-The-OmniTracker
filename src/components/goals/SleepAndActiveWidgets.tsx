@@ -199,7 +199,7 @@ export function SleepAndActiveWidgets() {
                 <div className="bg-[#161514] text-white rounded-2xl p-3.5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-2.5">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-heading font-black uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
-                      <Brain className="h-3.5 w-3.5 text-amber-300" /> Circadian Peak Window
+                      <Brain className="h-3.5 w-3.5 text-amber-300" /> Energy & Focus Window
                     </span>
                     <span className="text-[9px] font-heading font-black bg-[#CEF431] border border-[#161514] px-2 py-0.5 rounded-full text-[#161514]">
                       {circadian.focusRating} • {circadian.energyScore}%

@@ -1,6 +1,6 @@
 export interface CircadianPredictorResult {
   energyScore: number;
-  focusRating: "PEAK FOCUS" | "OPTIMAL" | "MODERATE MODULATION" | "LOW RECOVERY";
+  focusRating: "PEAK FOCUS" | "OPTIMAL" | "MODERATE" | "LOW ENERGY";
   peakFocusWindow: string;
   caffeineCutoff: string;
   recommendation: string;
@@ -20,18 +20,20 @@ export function predictCircadianProductivity(sleepHours: number, bedtimeStr: str
     baseScore = 75;
   } else if (hours >= 5 && hours < 6) {
     baseScore = 58;
-  } else if (hours > 0 && hours < 5) {
-    baseScore = 38;
+  } else if (hours >= 4 && hours < 5) {
+    baseScore = 40;
   } else {
-    baseScore = 50;
+    baseScore = 25;
   }
 
-  // Bedtime penalty calculation
-  const [bedHour] = bedtimeStr.split(":").map(Number);
+  // Bedtime shift penalty (ideal 10 PM - 12 AM)
   let bedtimePenalty = 0;
-  if (bedHour >= 1 && bedHour <= 4) {
-    bedtimePenalty = 12; // Late night sleep penalty
-  } else if (bedHour >= 0 && bedHour < 1) {
+  const [bedHour] = bedtimeStr.split(":").map(Number);
+  if (bedHour >= 2 && bedHour <= 6) {
+    bedtimePenalty = 15;
+  } else if (bedHour >= 0 && bedHour < 2) {
+    bedtimePenalty = 8;
+  } else if (bedHour >= 18 && bedHour < 21) {
     bedtimePenalty = 6;
   }
 
@@ -41,32 +43,32 @@ export function predictCircadianProductivity(sleepHours: number, bedtimeStr: str
   let badgeColor = "bg-emerald-400 text-navy-950";
   let peakFocusWindow = "9:30 AM – 1:30 PM";
   let caffeineCutoff = "2:30 PM";
-  let recommendation = "Great circadian alignment! Expect high mental clarity and focus capacity today.";
+  let recommendation = "Great rest! Expect good mental clarity and focus today.";
 
   if (finalScore >= 88) {
     focusRating = "PEAK FOCUS";
     badgeColor = "bg-emerald-400 text-navy-950";
     peakFocusWindow = "9:00 AM – 1:30 PM";
     caffeineCutoff = "2:30 PM";
-    recommendation = "⚡ Peak Circadian State! Tackling high-priority deep work or study tasks this morning is ideal.";
+    recommendation = "⚡ High Energy! Great morning for focused work or study.";
   } else if (finalScore >= 70) {
     focusRating = "OPTIMAL";
     badgeColor = "bg-amber-400 text-navy-950";
     peakFocusWindow = "10:00 AM – 2:00 PM";
     caffeineCutoff = "2:00 PM";
-    recommendation = "👍 Steady Energy Levels. Good recovery; maintain light afternoon walks and stay hydrated.";
+    recommendation = "👍 Steady Energy. Good recovery; stay hydrated and take regular breaks.";
   } else if (finalScore >= 50) {
-    focusRating = "MODERATE MODULATION";
+    focusRating = "MODERATE";
     badgeColor = "bg-orange-400 text-navy-950";
     peakFocusWindow = "10:30 AM – 12:30 PM";
     caffeineCutoff = "1:00 PM";
-    recommendation = "⚠️ Mild Sleep Debt Detected. Take a 20-minute power nap or light walk around 2 PM.";
+    recommendation = "⚠️ Mild sleep deficit. Take a short walk or power nap around 2 PM.";
   } else {
-    focusRating = "LOW RECOVERY";
+    focusRating = "LOW ENERGY";
     badgeColor = "bg-rose-400 text-navy-950";
     peakFocusWindow = "11:00 AM – 12:30 PM";
     caffeineCutoff = "12:00 PM";
-    recommendation = "💤 High Fatigue State. Prioritize rest, light routine tasks, and aim for an earlier bedtime tonight.";
+    recommendation = "💤 High fatigue. Take it easy today and aim for an earlier bedtime tonight.";
   }
 
   return {

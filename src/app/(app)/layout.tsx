@@ -13,6 +13,7 @@ import { ChevronDown } from "lucide-react";
 
 import { Suspense } from "react";
 import { QuickActionModal } from "@/components/shared/QuickActionModal";
+import { OmniWidgetSync } from "@/components/shared/OmniWidgetSync";
 import { AutoUpdateBanner } from "@/components/shared/AutoUpdateBanner";
 import { APP_VERSION_CONFIG } from "@/config/version";
 import { InvictusLoadingScreen } from "@/components/shared/InvictusLoadingScreen";
@@ -113,6 +114,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <NeobrutalistCalculator />
       <Suspense fallback={null}>
         <QuickActionModal />
+        <OmniWidgetSync />
       </Suspense>
       <BottomNav />
     </div>

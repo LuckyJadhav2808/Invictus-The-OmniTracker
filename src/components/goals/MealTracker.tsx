@@ -275,12 +275,12 @@ export function MealTracker() {
       <TemplateSelectionModal
         open={isChoiceOpen}
         onOpenChange={setIsChoiceOpen}
-        title="ADD MEAL ROUTINE"
-        subtitle="START FROM SCRATCH OR APPLY A NUTRITION MEAL PACK."
-        blankLabel="BLANK MEAL"
-        blankDesc="CUSTOM MEAL NAME, CALORIES & MACROS"
-        templatesLabel="MEAL PACKS"
-        templatesDesc="HIGH PROTEIN BULK, LEAN MUSCLE CUT..."
+        title="Add Meal"
+        subtitle="Start from scratch or choose a meal preset."
+        blankLabel="Custom Meal"
+        blankDesc="Meal name, calories, and macros"
+        templatesLabel="Meal Presets"
+        templatesDesc="High protein, lean cut, etc."
         templatePacks={MEAL_TEMPLATE_PACKS}
         onSelectBlank={() => setIsAddMealOpen(true)}
         onApplyTemplatePack={handleApplyMealPack}
@@ -290,8 +290,8 @@ export function MealTracker() {
       <ResponsiveFormContainer
         open={isAddMealOpen}
         onOpenChange={setIsAddMealOpen}
-        title="Log Meal & Macros"
-        description="Search 1,000+ Indian Dishes & Macros or enter custom values"
+        title="Add Meal"
+        description="Search dishes or enter custom nutrition."
       >
         <div className="space-y-4 pt-2">
           {/* 🥗 DATASET 2: 1,000+ INDIAN DISHES & MACRO SEARCH PICKER */}
@@ -299,7 +299,7 @@ export function MealTracker() {
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-black uppercase tracking-widest text-[#161514] flex items-center gap-1.5" style={{ fontFamily: "var(--font-heading)" }}>
                 <Search className="h-3.5 w-3.5 text-[#161514] stroke-[3]" />
-                🥗 Search 1,000+ Indian Dishes & Macros
+                🥗 Search Dishes & Macros
               </span>
               <span className="text-[9px] font-black bg-[#03D26F] text-[#161514] px-2 py-0.5 rounded-md border-2 border-[#161514]">
                 {nutritionData?.totalCount || 1015} Dishes

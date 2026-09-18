@@ -102,7 +102,7 @@ export function SavingsGoals() {
             <PiggyBank className="h-5 w-5 stroke-[2.5]" />
           </div>
           <div>
-            <h4 className="text-sm font-black text-[#161514] tracking-tight font-heading uppercase">Savings & Piggy Banks</h4>
+            <h4 className="text-sm font-black text-[#161514] tracking-tight font-heading uppercase">Savings Goals</h4>
             <p className="text-[10px] text-[#161514]/70 font-bold uppercase tracking-wider">
               Total saved across goals: <strong className="text-[#161514] font-black font-heading">₹{totalSavedAll.toLocaleString()}</strong>
             </p>
@@ -112,7 +112,7 @@ export function SavingsGoals() {
           onClick={() => setIsChoiceOpen(true)}
           className="text-xs font-black text-[#161514] bg-[#CEF431] hover:bg-[#b8dd24] px-3.5 py-2 rounded-xl cursor-pointer transition-all flex items-center gap-1.5 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none uppercase tracking-wider"
         >
-          <Plus className="h-3.5 w-3.5 stroke-[3]" /> New Target
+          <Plus className="h-3.5 w-3.5 stroke-[3]" /> New Goal
         </button>
       </div>
 
@@ -120,8 +120,8 @@ export function SavingsGoals() {
         <div className="h-20 animate-pulse bg-[#FAF8F5] rounded-2xl border-2 border-[#161514]" />
       ) : goals.length === 0 ? (
         <div className="bg-[#FFFDF8] rounded-2xl p-6 border-2 border-dashed border-[#161514] text-center space-y-1 shadow-[2px_2px_0px_0px_#161514]">
-          <p className="text-xs font-black text-[#161514] font-heading uppercase">No savings targets created yet! 🐷</p>
-          <p className="text-[10px] text-[#161514]/70 font-bold">Click '+ New Target' above to start building your emergency fund or wishlist targets.</p>
+          <p className="text-xs font-black text-[#161514] font-heading uppercase">No savings goals created yet</p>
+          <p className="text-[10px] text-[#161514]/70 font-bold">Click '+ New Goal' above to start tracking your savings targets.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
@@ -178,12 +178,12 @@ export function SavingsGoals() {
       <TemplateSelectionModal
         open={isChoiceOpen}
         onOpenChange={setIsChoiceOpen}
-        title="ADD SAVINGS TARGET"
-        subtitle="START FROM SCRATCH OR APPLY A SAVINGS PACK."
-        blankLabel="BLANK TARGET"
-        blankDesc="CUSTOM TITLE, GOAL AMOUNT & CATEGORY"
-        templatesLabel="SAVINGS PACKS"
-        templatesDesc="EMERGENCY FUND, TECH UPGRADE, VACATION..."
+        title="Add Savings Goal"
+        subtitle="Start from scratch or choose a preset goal."
+        blankLabel="Custom Goal"
+        blankDesc="Set your own title and target amount"
+        templatesLabel="Goal Presets"
+        templatesDesc="Emergency fund, gadget, vacation, etc."
         templatePacks={SAVINGS_GOAL_TEMPLATE_PACKS}
         onSelectBlank={() => setIsAddOpen(true)}
         onApplyTemplatePack={handleApplySavingsPack}
@@ -193,12 +193,12 @@ export function SavingsGoals() {
       <ResponsiveFormContainer
         open={isAddOpen}
         onOpenChange={setIsAddOpen}
-        title="Create Savings Target"
-        description="Set a financial goal for emergency funds or purchases"
+        title="New Savings Goal"
+        description="Set a target amount and track your progress."
       >
         <form onSubmit={handleAddGoal} className="space-y-4 pt-2">
           <div className="space-y-1">
-            <label className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">Target Title *</label>
+            <label className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">Goal Name *</label>
             <input
               type="text"
               placeholder="e.g. Emergency Fund, New Laptop"
@@ -221,7 +221,7 @@ export function SavingsGoals() {
               />
             </div>
             <div className="space-y-1">
-              <label className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">Initial Saved (₹)</label>
+              <label className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">Starting Amount (₹)</label>
               <input
                 type="number"
                 placeholder="e.g. 10000"
@@ -236,7 +236,7 @@ export function SavingsGoals() {
             disabled={addGoalMutation.isPending}
             className="w-full bg-[#03D26F] hover:bg-[#02B75F] text-[#161514] font-black text-xs uppercase tracking-wider rounded-2xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all"
           >
-            {addGoalMutation.isPending ? "Creating…" : "Create Savings Target 🐷"}
+            {addGoalMutation.isPending ? "Creating…" : "Save Goal"}
           </button>
         </form>
       </ResponsiveFormContainer>
@@ -247,12 +247,12 @@ export function SavingsGoals() {
         onOpenChange={(open) => {
           if (!open) setDepositGoal(null);
         }}
-        title={`Add Deposit to ${depositGoal?.title || ""}`}
-        description="Transfer funds into your piggy bank target"
+        title={`Add to ${depositGoal?.title || "Goal"}`}
+        description="Add money toward this goal."
       >
         <form onSubmit={handleAddDeposit} className="space-y-4 pt-2">
           <div className="space-y-1">
-            <label className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">Deposit Amount (₹) *</label>
+            <label className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">Amount (₹) *</label>
             <input
               type="number"
               placeholder="e.g. 5000"
@@ -267,7 +267,7 @@ export function SavingsGoals() {
             disabled={updateGoalMutation.isPending}
             className="w-full bg-[#03D26F] hover:bg-[#02B75F] text-[#161514] font-black text-xs uppercase tracking-wider rounded-2xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all"
           >
-            {updateGoalMutation.isPending ? "Depositing…" : "Add Deposit 💰"}
+            {updateGoalMutation.isPending ? "Adding…" : "Add Money"}
           </button>
         </form>
       </ResponsiveFormContainer>
@@ -289,8 +289,8 @@ export function SavingsGoals() {
             setDeleteGoalId(null);
           }
         }}
-        title="Delete Savings Target"
-        description="Are you sure you want to delete this savings target? Any logged progress for this target will be removed."
+        title="Delete Savings Goal"
+        description="Are you sure you want to delete this savings goal?"
       />
     </div>
   );

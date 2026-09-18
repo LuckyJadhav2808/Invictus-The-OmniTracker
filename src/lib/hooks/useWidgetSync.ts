@@ -1,5 +1,12 @@
 import { Capacitor, registerPlugin } from "@capacitor/core";
 
+export interface WidgetHabitItem {
+  id: string;
+  title: string;
+  completed: boolean;
+  streak?: number;
+}
+
 export interface WidgetSyncData {
   safeToSpendDaily: number;
   remainingUpiBudget: number;
@@ -16,6 +23,10 @@ export interface WidgetSyncData {
   dailyBudgetTarget?: number;
   isOverDailyBudget?: boolean;
   overDailyAmount?: number;
+  // Habits Checklist Additions
+  habitsTotalCount?: number;
+  habitsCompletedCount?: number;
+  habitsList?: WidgetHabitItem[];
 }
 
 interface WidgetBridgePluginType {

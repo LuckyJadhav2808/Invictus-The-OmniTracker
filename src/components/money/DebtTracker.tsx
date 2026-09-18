@@ -191,7 +191,7 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
           className="h-10 px-4 rounded-xl bg-[#CEF431] hover:bg-[#b8dd22] border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] font-black text-xs uppercase tracking-wider cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center gap-1.5 self-start sm:self-auto"
         >
           <Plus className="h-4 w-4 stroke-[3]" />
-          <span>Record Lent / Borrowed</span>
+          <span>Add Loan or IOU</span>
         </button>
       </div>
 
@@ -448,8 +448,8 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
       <ResponsiveFormContainer
         open={isAddModalOpen}
         onOpenChange={setIsAddModalOpen}
-        title="Record Lent / Borrowed Money 💸"
-        description="Keep track of debts and loans with friends or family"
+        title="Add Loan or IOU"
+        description="Track money lent or borrowed."
       >
         <form onSubmit={handleAddSubmit} className="space-y-4 pt-2">
           {/* Debt Type Selector */}

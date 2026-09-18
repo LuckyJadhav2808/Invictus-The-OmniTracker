@@ -89,10 +89,10 @@ export function AutoUpdateBanner() {
                 New v{updateInfo.latestVersion} Available:
               </span>
               <span className="hidden sm:inline font-bold opacity-80">
-                Safe-to-Spend Widget, Liquidity Tracking & Security Hardening!
+                Daily budget tracking, widgets & performance updates.
               </span>
               <span className="sm:hidden font-bold opacity-80">
-                Tap to upgrade!
+                Tap to update
               </span>
             </div>
           </div>

@@ -147,10 +147,10 @@ export function WeeklyVelocityAndHabitMatrix() {
             </div>
             <div>
               <h3 className="text-base sm:text-lg font-black text-[#161514] uppercase tracking-wider flex items-center gap-2" style={{ fontFamily: "var(--font-heading)" }}>
-                WEEKLY VELOCITY & CONSISTENCY MATRIX
+                Weekly Consistency
               </h3>
               <p className="text-xs text-[#161514]/70 font-bold mt-0.5">
-                👑 Peak Focus Day: <strong className="text-[#03D26F] font-black">{weekdayStats.peakDay.name}s</strong> (Avg {weekdayStats.peakDay.avg} logs/day)
+                Most active day: <strong className="text-[#03D26F] font-black">{weekdayStats.peakDay.name}s</strong> ({weekdayStats.peakDay.avg} avg logs/day)
               </p>
             </div>
           </div>
@@ -171,7 +171,7 @@ export function WeeklyVelocityAndHabitMatrix() {
         <div className="space-y-2 pt-2 border-t-2 border-[#161514]/10">
           <div className="flex items-center justify-between">
             <span className="text-xs font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5">
-              <Calendar className="h-4 w-4 stroke-[2.5]" /> 28-Day Consistency Heatmap Grid
+              <Calendar className="h-4 w-4 stroke-[2.5]" /> 4-Week Activity
             </span>
             <div className="flex items-center gap-1 text-[10px] font-bold text-[#161514]/70">
               <span>Less</span>

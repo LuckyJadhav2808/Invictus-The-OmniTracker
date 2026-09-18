@@ -28,7 +28,7 @@ interface LiquidPillBarChartProps {
 }
 
 export function LiquidPillBarChart({
-  title = "Weekly Consistency & Tracker Flow",
+  title = "Weekly Consistency",
   totalValue = "0 Habits | 0.0h Study Logged",
   data = [],
   streakDays = 7,
@@ -98,7 +98,7 @@ export function LiquidPillBarChart({
             {/* Verified Tracking Badge */}
             <span className="bg-[#CEF431] text-[#161514] text-[10px] font-heading font-black px-2.5 py-1 rounded-full border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] uppercase flex items-center gap-1">
               <ShieldCheck className="h-3.5 w-3.5 text-emerald-700" />
-              Verified Velocity
+              Active Tracking
             </span>
           </div>
 
@@ -151,7 +151,7 @@ export function LiquidPillBarChart({
         <div className="bg-[#FAF8F5] rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-heading font-black uppercase text-[#161514]/70 flex items-center gap-1">
-              <BookOpen className="h-3.5 w-3.5 text-blue-600" /> Study Velocity
+              <BookOpen className="h-3.5 w-3.5 text-blue-600" /> Study Time
             </span>
             <span className="text-xs font-heading font-black text-blue-700 bg-blue-100 px-2 py-0.5 rounded-lg border border-[#161514]">
               {studyHours}h
@@ -194,7 +194,7 @@ export function LiquidPillBarChart({
       {/* 3. 7-Day Milestone Circle Badges Strip */}
       <div className="bg-[#FAF8F5] rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-2.5">
         <span className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514]/70 flex items-center gap-1.5">
-          <Zap className="h-3.5 w-3.5 text-amber-500 fill-amber-500" /> 7-Day Velocity Milestones
+          <Zap className="h-3.5 w-3.5 text-amber-500 fill-amber-500" /> 7-Day Summary
         </span>
 
         <div className="grid grid-cols-7 gap-1.5 sm:gap-3 text-center">

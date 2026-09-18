@@ -780,7 +780,7 @@ export default function SettingsPage() {
         {/* ORGANIZE SECTION */}
         <div className="space-y-3 pt-2">
           <span className="text-[10px] font-black text-[#161514]/70 uppercase tracking-widest px-1">
-            ORGANIZE
+            Organize
           </span>
 
           {/* FEATURE 4A: 📂 HABIT GROUPS CARD */}
@@ -795,10 +795,10 @@ export default function SettingsPage() {
               </div>
               <div className="text-left">
                 <h4 className="font-black text-sm text-[#161514] tracking-tight uppercase font-heading">
-                  HABIT GROUPS
+                  Habit Groups
                 </h4>
-                <p className="text-[10px] text-[#161514]/70 font-black uppercase tracking-wide">
-                  BUNDLE HABITS INTO ROUTINES
+                <p className="text-[10px] text-[#161514]/70 font-bold tracking-wide">
+                  Organize habits into routines
                 </p>
               </div>
             </div>
@@ -813,10 +813,10 @@ export default function SettingsPage() {
               </div>
               <div className="text-left">
                 <h4 className="font-black text-sm text-[#161514] tracking-tight uppercase font-heading">
-                  HABIT LAYOUT
+                  Habit Layout
                 </h4>
-                <p className="text-[10px] text-[#161514]/70 font-black uppercase tracking-wide">
-                  {habitLayoutStyle === "cards" ? "CARDS VIEW" : "COMPACT LIST VIEW"}
+                <p className="text-[10px] text-[#161514]/70 font-bold tracking-wide">
+                  {habitLayoutStyle === "cards" ? "Cards view" : "Compact list view"}
                 </p>
               </div>
             </div>
@@ -838,8 +838,8 @@ export default function SettingsPage() {
         <ResponsiveFormContainer
           open={isHabitGroupsOpen}
           onOpenChange={setIsHabitGroupsOpen}
-          title="📂 HABIT GROUPS & ROUTINE BUNDLES"
-          description="Group your habits into morning, work, or night routine bundles"
+          title="Habit Groups"
+          description="Group your habits into routine bundles."
         >
           <div className="space-y-4 pt-2">
             <div className="grid grid-cols-1 gap-3">
@@ -890,10 +890,10 @@ export default function SettingsPage() {
               </div>
               <div className="text-left">
                 <h4 className="font-black text-sm text-[#161514] tracking-tight uppercase font-heading">
-                  PREMIUM STATS & CSV
+                  Data Export (CSV)
                 </h4>
-                <p className="text-[10px] text-[#161514]/70 font-black uppercase tracking-wide">
-                  LIFETIME PRO REPORTS
+                <p className="text-[10px] text-[#161514]/70 font-bold tracking-wide">
+                  Export habits, finance, and study logs
                 </p>
               </div>
             </div>
@@ -912,10 +912,10 @@ export default function SettingsPage() {
               </div>
               <div className="text-left">
                 <h4 className="font-black text-sm text-[#161514] tracking-tight uppercase font-heading">
-                  WIDGET VARIANTS
+                  Widget Themes
                 </h4>
-                <p className="text-[10px] text-[#161514]/70 font-black uppercase tracking-wide">
-                  COMPACT, EXPANDED & DARK MODE
+                <p className="text-[10px] text-[#161514]/70 font-bold tracking-wide">
+                  Choose widget appearance and style
                 </p>
               </div>
             </div>
@@ -934,10 +934,10 @@ export default function SettingsPage() {
               </div>
               <div className="text-left">
                 <h4 className="font-black text-sm text-[#161514] tracking-tight uppercase font-heading">
-                  REPORT ISSUE OR FEEDBACK
+                  Feedback & Support
                 </h4>
-                <p className="text-[10px] text-[#161514]/90 font-black uppercase tracking-wide">
-                  SUBMIT BUGS & REQUESTS TO ADMIN BOARD
+                <p className="text-[10px] text-[#161514]/90 font-bold tracking-wide">
+                  Report an issue or send feedback
                 </p>
               </div>
             </div>
@@ -949,8 +949,8 @@ export default function SettingsPage() {
         <ResponsiveFormContainer
           open={isCSVModalOpen}
           onOpenChange={setIsCSVModalOpen}
-          title="📊 PREMIUM STATS & CSV REPORTS"
-          description="Export lifetime habit logs, financial ledger, and study focus hours to CSV spreadsheets"
+          title="Data Export (CSV)"
+          description="Export your habit logs, finances, and study sessions to CSV."
         >
           <div className="space-y-4 pt-2">
             <div className="grid grid-cols-1 gap-3">
@@ -1029,7 +1029,7 @@ export default function SettingsPage() {
         {/* REMINDERS & FEEDBACK SECTION */}
         <div className="space-y-3 pt-2">
           <span className="text-[10px] font-black text-[#161514]/70 uppercase tracking-widest px-1">
-            REMINDERS & FEEDBACK
+            Reminders & Feedback
           </span>
 
           {/* FEATURE 6A: ⚡ SMART REMINDERS */}
@@ -1040,10 +1040,10 @@ export default function SettingsPage() {
               </div>
               <div className="text-left">
                 <h4 className="font-black text-sm text-[#161514] tracking-tight uppercase font-heading">
-                  SMART REMINDERS
+                  Daily Reminders
                 </h4>
-                <p className="text-[10px] text-[#161514]/70 font-black uppercase tracking-wide">
-                  {smartReminders ? "ON — STREAK SAVES & DAILY RECAP" : "OFF — MUTED"}
+                <p className="text-[10px] text-[#161514]/70 font-bold tracking-wide">
+                  {smartReminders ? "On — Daily alerts active" : "Off — Muted"}
                 </p>
               </div>
             </div>
@@ -1072,10 +1072,10 @@ export default function SettingsPage() {
               </div>
               <div className="text-left">
                 <h4 className="font-black text-sm text-[#161514] tracking-tight uppercase font-heading">
-                  PUSH NOTIFICATIONS
+                  Push Notifications
                 </h4>
-                <p className="text-[10px] text-[#161514]/70 font-black uppercase tracking-wide">
-                  {pushNotifications ? "ON — SYSTEM PUSH ACTIVE" : "OFF — MUTED"}
+                <p className="text-[10px] text-[#161514]/70 font-bold tracking-wide">
+                  {pushNotifications ? "On — System notifications active" : "Off — Muted"}
                 </p>
               </div>
             </div>
@@ -1122,10 +1122,10 @@ export default function SettingsPage() {
               </div>
               <div className="text-left">
                 <h4 className="font-black text-sm text-[#161514] tracking-tight uppercase font-heading">
-                  WAKE-UP ALARM
+                  Wake-Up Alarm
                 </h4>
-                <p className="text-[10px] text-[#161514]/70 font-black uppercase tracking-wide">
-                  {wakeUpAlarm ? "ON — DAILY ALARM TO DO YOUR HABITS" : "OFF — DISABLED"}
+                <p className="text-[10px] text-[#161514]/70 font-bold tracking-wide">
+                  {wakeUpAlarm ? "On — Daily morning reminder" : "Off — Disabled"}
                 </p>
               </div>
             </div>
@@ -1158,10 +1158,10 @@ export default function SettingsPage() {
               </div>
               <div className="text-left">
                 <h4 className="font-black text-sm text-[#161514] tracking-tight uppercase font-heading">
-                  COMPLETION SOUNDS
+                  Completion Sound
                 </h4>
-                <p className="text-[10px] text-[#161514]/70 font-black uppercase tracking-wide">
-                  ACTIVE: {completionSound.toUpperCase()}
+                <p className="text-[10px] text-[#161514]/70 font-bold tracking-wide">
+                  Active: {completionSound}
                 </p>
               </div>
             </div>
@@ -1173,8 +1173,8 @@ export default function SettingsPage() {
         <ResponsiveFormContainer
           open={isCompletionSoundOpen}
           onOpenChange={setIsCompletionSoundOpen}
-          title="🔊 COMPLETION SOUND FEEDBACK"
-          description="Choose audio feedback sound effect triggered when checking off daily habits"
+          title="Completion Sound"
+          description="Choose the sound effect played when completing a habit."
         >
           <div className="space-y-4 pt-2">
             <div className="grid grid-cols-1 gap-3">
@@ -1225,7 +1225,7 @@ export default function SettingsPage() {
         {/* 📱 FEATURE 7: INVICTUS FOR ANDROID (OFFICIAL APK & UPDATES) */}
         <div className="space-y-3 pt-2">
           <span className="text-[10px] font-black text-[#161514]/70 uppercase tracking-widest px-1">
-            ANDROID APP & SYSTEM UPDATES
+            Android App & Updates
           </span>
 
           <div className="w-full bg-white rounded-3xl p-5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
@@ -1243,8 +1243,8 @@ export default function SettingsPage() {
                       v{APP_VERSION_CONFIG.version} (Build {APP_VERSION_CONFIG.buildNumber})
                     </span>
                   </div>
-                  <p className="text-[10px] text-[#161514]/70 font-black uppercase tracking-wide mt-0.5">
-                    Official Android APK • Native Haptics • Instant Shortcuts • Zero Data Loss
+                  <p className="text-[10px] text-[#161514]/70 font-bold tracking-wide mt-0.5">
+                    Official Android APK • Native Widgets • Fast Offline Support
                   </p>
                 </div>
               </div>
@@ -1316,8 +1316,8 @@ export default function SettingsPage() {
                   <div className="flex items-start gap-2.5">
                     <span className="h-6 w-6 rounded-full bg-[#03D26F] text-[#161514] border-2 border-[#161514] flex items-center justify-center font-black text-xs shrink-0 shadow-[1px_1px_0px_0px_#161514]">3</span>
                     <div>
-                      <strong className="text-[#161514] block font-heading">Install & Zero Data Loss Updates:</strong>
-                      Tap <em>Install</em>. When launched, log in with your email & password. All your habits, study logs, transactions, and categories sync seamlessly! When a new update is released, simply download the new APK and install it right over the existing app.
+                      <strong className="text-[#161514] block font-heading">Install & Update:</strong>
+                      Tap <em>Install</em> and log in. Your data syncs automatically across devices. Future updates install directly over the existing app.
                     </div>
                   </div>
                 </div>
@@ -1504,7 +1504,7 @@ export default function SettingsPage() {
                 : "border-transparent text-[#161514]/70 hover:text-[#161514] hover:bg-[#FAF8F5] hover:-translate-x-0.5 hover:-translate-y-0.5"
             )}
           >
-            <Database className="h-3.5 w-3.5 stroke-[2.5]" /> Data Vault
+            <Database className="h-3.5 w-3.5 stroke-[2.5]" /> Data & Backup
           </button>
         </div>
 
@@ -1888,14 +1888,14 @@ export default function SettingsPage() {
           </div>
         )}
 
-        {/* TAB 4: Data Vault */}
+        {/* TAB 4: Data & Backup */}
         {activeTab === "datavault" && (
           <div className="bg-white rounded-3xl p-6 border-[2.5px] border-[#161514] shadow-[5px_5px_0px_0px_#161514] space-y-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Database className="h-4 w-4 text-amber-500 stroke-[2.5]" />
                 <h2 className="text-xs font-black uppercase tracking-wider text-[#161514]/70 font-heading">
-                  Data Vault & Backups
+                  Data & Backup
                 </h2>
               </div>
               <span className="text-[10px] font-black text-[#161514] bg-amber-200 px-3 py-1 rounded-xl border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514]">

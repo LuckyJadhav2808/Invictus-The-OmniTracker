@@ -94,10 +94,10 @@ export function DailyBudgetView({
         <div className="flex items-center justify-between">
           <span className="text-xs font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5">
             <span>📊</span>
-            <span>Past 7 Days Daily Spending vs Target ({currencySymbol}{dailyStats.dailyBudgetTarget.toLocaleString()}/day)</span>
+            <span>Past 7 Days vs Target ({currencySymbol}{dailyStats.dailyBudgetTarget.toLocaleString()}/day)</span>
           </span>
           <span className="text-[10px] font-bold text-[#161514]/60">
-            7-Day Velocity
+            Last 7 Days
           </span>
         </div>
 

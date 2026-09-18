@@ -258,9 +258,9 @@ export default function TodayPage() {
         {/* Space Hero Banner */}
         <SpaceHeroBanner
           space="today"
-          badgeText="Daily Overview"
+          badgeText="Today's Overview"
           title={`Welcome back, ${user?.displayName || "Champion"}! 👋`}
-          subtitle="Here's a snapshot of your daily habits, study hours, and financial tracking for today."
+          subtitle="Your habits, study time, and spending for today."
           stats={[
             { label: "Habits Done", value: `${completedHabitsCount}/${totalHabitsCount}`, icon: "🌱" },
             { label: "Study Today", value: `${studyHoursToday}h`, icon: "📚" },
@@ -281,7 +281,7 @@ export default function TodayPage() {
           widgets={[
             {
               id: "analytics-chart",
-              title: "📊 Performance Analytics & Calendar Strip",
+              title: "📊 Activity & Calendar",
               category: "today",
               component: (
                 <div className="space-y-4">
@@ -310,7 +310,7 @@ export default function TodayPage() {
 
                       return (
                         <LiquidPillBarChart
-                          title="Monthly Performance & Tracker Flow"
+                          title="Monthly Activity"
                           totalValue={`${logs.filter((l) => l.completed).length} Total Habits | ${(studySessions.reduce((a, c) => a + (c.durationMinutes || 0), 0) / 60).toFixed(1)}h Total Study`}
                           data={monthlyBars}
                           streakFreezeTokens={streakFreeze.tokensAvailable}
@@ -352,7 +352,7 @@ export default function TodayPage() {
 
                     return (
                       <LiquidPillBarChart
-                        title="Weekly Consistency & Tracker Flow"
+                        title="Weekly Activity"
                         totalValue={`${completedHabitsCount} Habits | ${studyHoursToday}h Study`}
                         data={weeklyBars}
                         streakFreezeTokens={streakFreeze.tokensAvailable}
@@ -373,19 +373,19 @@ export default function TodayPage() {
           availableWidgets={[
             {
               id: "gym-section",
-              title: "🏋️ Gym Splits & Workout Routines",
+              title: "🏋️ Workout Routines",
               category: "goals",
               component: <GymRoutineTracker />,
             },
             {
               id: "nutrition-section",
-              title: "🥗 Nutrition & Meal Tracker",
+              title: "🥗 Nutrition & Meals",
               category: "goals",
               component: <MealTracker />,
             },
             {
               id: "mood-section",
-              title: "😴 Sleep, Energy & Mood Journal",
+              title: "😴 Sleep & Mood",
               category: "goals",
               component: (
                 <div className="space-y-4">
@@ -396,7 +396,7 @@ export default function TodayPage() {
             },
             {
               id: "syllabus-tracker",
-              title: "📚 Exam Syllabus & Revision Tracker",
+              title: "📚 Syllabus Tracker",
               category: "study",
               component: (
                 <ExamSyllabusTracker
@@ -407,7 +407,7 @@ export default function TodayPage() {
             },
             {
               id: "session-logger",
-              title: "✍️ Study Session Logger & Focus Meter",
+              title: "✍️ Study Sessions",
               category: "study",
               component: (
                 <StudySessionLogger
@@ -420,7 +420,7 @@ export default function TodayPage() {
             },
             {
               id: "category-wallets",
-              title: "💳 Category Wallets & Accounts",
+              title: "💳 Spending by Category",
               category: "money",
               component: (
                 <MoneyQuickActionsAndCards
@@ -443,13 +443,13 @@ export default function TodayPage() {
             },
             {
               id: "subscriptions",
-              title: "🔁 Active Subscriptions",
+              title: "🔁 Subscriptions",
               category: "money",
               component: <SubscriptionsTracker />,
             },
             {
               id: "savings-goals",
-              title: "🐷 Savings Goals & Piggy Bank",
+              title: "🐷 Savings Goals",
               category: "money",
               component: <SavingsGoals />,
             },

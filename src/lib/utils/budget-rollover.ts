@@ -285,19 +285,19 @@ export function computeMonthlyBudgetStats({
 
   // Pace Evaluation
   let burnPaceStatus: "fast" | "frugal" | "on_track" = "on_track";
-  let burnPaceMessage = "Spending is on track with your monthly calendar.";
+  let burnPaceMessage = "Spending is on track with your monthly plan.";
   const paceDiff = budgetUsedPercentage - percentDaysPassed;
 
   if (isCurrentCalendarMonth && monthlyExpense > 0) {
     if (paceDiff > 15 || remainingBudget < 0) {
       burnPaceStatus = "fast";
-      burnPaceMessage = `⚠️ Fast Burn: Used ${budgetUsedPercentage}% budget in ${percentDaysPassed}% of month. Cap to ~${currencySymbol}${dailySafeToSpend}/day.`;
+      burnPaceMessage = `⚠️ Spending faster than planned (~${currencySymbol}${dailySafeToSpend}/day recommended).`;
     } else if (paceDiff < -10) {
       burnPaceStatus = "frugal";
-      burnPaceMessage = `🟢 Frugal Pace: Spending ${Math.abs(paceDiff)}% below expected monthly burn pace!`;
+      burnPaceMessage = `🟢 Under budget! You have room to spend comfortably.`;
     } else {
       burnPaceStatus = "on_track";
-      burnPaceMessage = `✨ Balanced Pace: Daily spending velocity matches your calendar pace.`;
+      burnPaceMessage = `✨ Spending is on track with your monthly plan.`;
     }
   } else if (!isCurrentCalendarMonth) {
     burnPaceStatus = remainingBudget >= 0 ? "on_track" : "fast";

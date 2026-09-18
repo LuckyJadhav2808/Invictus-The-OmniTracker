@@ -823,12 +823,12 @@ export function GymRoutineTracker() {
       <TemplateSelectionModal
         open={isChoiceOpen}
         onOpenChange={setIsChoiceOpen}
-        title="ADD GYM ROUTINE"
-        subtitle="START FROM SCRATCH OR APPLY A WORKOUT SPLIT PACK."
-        blankLabel="BLANK EXERCISE"
-        blankDesc="CUSTOM MACHINE, TARGET MUSCLE & SETS"
-        templatesLabel="WORKOUT PACKS"
-        templatesDesc="PUSH DAY, PULL DAY, LEGS, HYPERTROPHY..."
+        title="Add Workout Routine"
+        subtitle="Start from scratch or choose a workout preset."
+        blankLabel="Custom Exercise"
+        blankDesc="Exercise name, muscle, and sets"
+        templatesLabel="Workout Presets"
+        templatesDesc="Push day, pull day, legs, etc."
         templatePacks={GYM_TEMPLATE_PACKS}
         onSelectBlank={() => {
           setAddModalTab("library");
@@ -871,7 +871,7 @@ export function GymRoutineTracker() {
         open={isAddExerciseOpen}
         onOpenChange={setIsAddExerciseOpen}
         title={`Add Exercise to ${selectedDay}`}
-        description="Search 4,300+ exercises with 1-tap add, animated guides, or log custom machines"
+        description="Search movements or add a custom exercise."
       >
         <div className="space-y-3 pt-1">
           {/* Segmented Mode Toggle: Library vs Custom Exercise */}

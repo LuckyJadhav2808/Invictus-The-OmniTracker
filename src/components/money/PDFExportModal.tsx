@@ -149,8 +149,8 @@ export function PDFExportModal({
     <ResponsiveFormContainer
       open={open}
       onOpenChange={onOpenChange}
-      title="EXPORT LEDGER PDF STATEMENT"
-      description="Download or print a Studio Neobrutalist financial statement with granular Cash expense selection"
+      title="Export Statement (PDF)"
+      description="Download or print your monthly expense report."
     >
       <div className="space-y-4 pt-1">
         {/* Export Period Selector */}

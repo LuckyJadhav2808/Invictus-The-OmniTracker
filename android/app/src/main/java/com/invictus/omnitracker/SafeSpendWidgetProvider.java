@@ -9,7 +9,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.util.Log;
+import android.view.View;
 import android.widget.RemoteViews;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -64,6 +66,10 @@ public class SafeSpendWidgetProvider extends AppWidgetProvider {
             String upiLeft = "Open App";
             String cashLeft = "Open App";
 
+            int habitsTotal = 0;
+            int habitsCompleted = 0;
+            JSONArray habitsArray = null;
+
             if (jsonStr != null) {
                 try {
                     JSONObject obj = new JSONObject(jsonStr);
@@ -82,6 +88,10 @@ public class SafeSpendWidgetProvider extends AppWidgetProvider {
                     double todayRemaining = obj.has("todayRemaining") ? obj.optDouble("todayRemaining", dailyBudgetTarget - todayExpense) : (dailyBudgetTarget - todayExpense);
                     boolean isOverDailyBudget = obj.optBoolean("isOverDailyBudget", todayExpense > dailyBudgetTarget && dailyBudgetTarget > 0);
                     double overDailyAmount = obj.optDouble("overDailyAmount", Math.max(0, todayExpense - dailyBudgetTarget));
+
+                    habitsTotal = obj.optInt("habitsTotalCount", 0);
+                    habitsCompleted = obj.optInt("habitsCompletedCount", 0);
+                    habitsArray = obj.optJSONArray("habitsList");
 
                     NumberFormat formatter = NumberFormat.getNumberInstance(Locale.US);
 
@@ -121,14 +131,92 @@ public class SafeSpendWidgetProvider extends AppWidgetProvider {
 
             views.setTextViewText(R.id.widget_month_label, month);
             views.setTextViewText(R.id.widget_days_left, daysLeft);
+            views.setTextViewText(R.id.widget_hero_label, "SPENT TODAY");
             views.setTextViewText(R.id.widget_safe_amount, spentTodayFormatted);
             views.setTextViewText(R.id.widget_today_badge, badgeText);
             views.setTextColor(R.id.widget_today_badge, badgeColor);
             views.setTextViewText(R.id.widget_upi_left, upiLeft);
             views.setTextViewText(R.id.widget_cash_left, cashLeft);
 
+            // Bind Habits Checklist Section
+            if (habitsTotal > 0 && habitsArray != null && habitsArray.length() > 0) {
+                views.setViewVisibility(R.id.widget_habits_section, View.VISIBLE);
+                views.setViewVisibility(R.id.widget_habits_empty, View.GONE);
+
+                String progressText = habitsCompleted + "/" + habitsTotal + " DONE";
+                if (habitsCompleted == habitsTotal) {
+                    progressText = "ALL DONE 🎉";
+                }
+                views.setTextViewText(R.id.widget_habits_progress, progressText);
+                views.setTextColor(R.id.widget_habits_progress, habitsCompleted == habitsTotal 
+                    ? android.graphics.Color.parseColor("#037A48") 
+                    : android.graphics.Color.parseColor("#161514"));
+
+                // Habit 1
+                if (habitsArray.length() > 0) {
+                    JSONObject h1 = habitsArray.optJSONObject(0);
+                    if (h1 != null) {
+                        views.setViewVisibility(R.id.widget_habit_row_1, View.VISIBLE);
+                        boolean done1 = h1.optBoolean("completed", false);
+                        String title1 = h1.optString("title", "Habit 1");
+                        int streak1 = h1.optInt("streak", 0);
+
+                        views.setTextViewText(R.id.widget_habit_1_title, title1);
+                        views.setTextViewText(R.id.widget_habit_1_check, done1 ? "✓" : "○");
+                        views.setTextColor(R.id.widget_habit_1_check, done1 
+                            ? android.graphics.Color.parseColor("#037A48") 
+                            : android.graphics.Color.parseColor("#73716D"));
+
+                        if (streak1 > 0) {
+                            views.setViewVisibility(R.id.widget_habit_1_streak, View.VISIBLE);
+                            views.setTextViewText(R.id.widget_habit_1_streak, "🔥 " + streak1 + "d");
+                        } else {
+                            views.setViewVisibility(R.id.widget_habit_1_streak, View.GONE);
+                        }
+                    } else {
+                        views.setViewVisibility(R.id.widget_habit_row_1, View.GONE);
+                    }
+                } else {
+                    views.setViewVisibility(R.id.widget_habit_row_1, View.GONE);
+                }
+
+                // Habit 2
+                if (habitsArray.length() > 1) {
+                    JSONObject h2 = habitsArray.optJSONObject(1);
+                    if (h2 != null) {
+                        views.setViewVisibility(R.id.widget_habit_row_2, View.VISIBLE);
+                        boolean done2 = h2.optBoolean("completed", false);
+                        String title2 = h2.optString("title", "Habit 2");
+                        int streak2 = h2.optInt("streak", 0);
+
+                        views.setTextViewText(R.id.widget_habit_2_title, title2);
+                        views.setTextViewText(R.id.widget_habit_2_check, done2 ? "✓" : "○");
+                        views.setTextColor(R.id.widget_habit_2_check, done2 
+                            ? android.graphics.Color.parseColor("#037A48") 
+                            : android.graphics.Color.parseColor("#73716D"));
+
+                        if (streak2 > 0) {
+                            views.setViewVisibility(R.id.widget_habit_2_streak, View.VISIBLE);
+                            views.setTextViewText(R.id.widget_habit_2_streak, "🔥 " + streak2 + "d");
+                        } else {
+                            views.setViewVisibility(R.id.widget_habit_2_streak, View.GONE);
+                        }
+                    } else {
+                        views.setViewVisibility(R.id.widget_habit_row_2, View.GONE);
+                    }
+                } else {
+                    views.setViewVisibility(R.id.widget_habit_row_2, View.GONE);
+                }
+            } else {
+                views.setViewVisibility(R.id.widget_habits_section, View.VISIBLE);
+                views.setViewVisibility(R.id.widget_habits_empty, View.VISIBLE);
+                views.setViewVisibility(R.id.widget_habit_row_1, View.GONE);
+                views.setViewVisibility(R.id.widget_habit_row_2, View.GONE);
+                views.setTextViewText(R.id.widget_habits_progress, "0/0");
+            }
+
             // 1. PendingIntent for opening the Money page on widget background tap
-            Intent openAppIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://invictus-the-omni-tracker.vercel.app/money"));
+            Intent openAppIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://invictus-the-omni-tracker.vercel.app/today"));
             openAppIntent.setClass(context, MainActivity.class);
             openAppIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
             PendingIntent openAppPending = PendingIntent.getActivity(
@@ -150,6 +238,19 @@ public class SafeSpendWidgetProvider extends AppWidgetProvider {
                     PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
             );
             views.setOnClickPendingIntent(R.id.widget_btn_add_expense, addExpensePending);
+
+            // 3. PendingIntent for "✓ Check Habits" / Habit Section tap
+            Intent checkHabitsIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://invictus-the-omni-tracker.vercel.app/goals?action=quick-habit"));
+            checkHabitsIntent.setClass(context, MainActivity.class);
+            checkHabitsIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            PendingIntent checkHabitsPending = PendingIntent.getActivity(
+                    context,
+                    2,
+                    checkHabitsIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+            );
+            views.setOnClickPendingIntent(R.id.widget_habits_section, checkHabitsPending);
+            views.setOnClickPendingIntent(R.id.widget_btn_check_habits, checkHabitsPending);
 
             appWidgetManager.updateAppWidget(appWidgetId, views);
         } catch (Throwable t) {

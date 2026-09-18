@@ -67,10 +67,10 @@ export function ExamSyllabusTracker({
               className="text-base sm:text-lg font-black text-[#161514] tracking-wider uppercase flex items-center gap-2"
               style={{ fontFamily: "var(--font-heading)" }}
             >
-              EXAM SYLLABUS & REVISION TRACKER
+              Syllabus Progress
             </h3>
             <p className="text-[11px] text-[#161514]/70 font-bold mt-0.5">
-              Syllabus Readiness: <strong className="text-[#03D26F] font-black">{completionPercentage}% Completed</strong> ({completedTopicsCount}/{totalTopicsCount} topics)
+              Overall progress: <strong className="text-[#03D26F] font-black">{completionPercentage}%</strong> ({completedTopicsCount}/{totalTopicsCount} topics completed)
             </p>
           </div>
         </div>
@@ -97,7 +97,7 @@ export function ExamSyllabusTracker({
             className="bg-[#CEF431] hover:bg-[#bce023] text-[#161514] font-black text-xs uppercase px-3.5 py-2 rounded-xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer shrink-0 transition-all flex items-center justify-center gap-1.5"
           >
             <Sparkles className="h-3.5 w-3.5 stroke-[2.5]" />
-            {generateSyllabusMutation.isPending ? "Generating..." : "✨ Auto-Generate"}
+            {generateSyllabusMutation.isPending ? "Generating..." : "Auto-Generate"}
           </button>
         </div>
       </div>

@@ -62,13 +62,13 @@ export function StudySessionLogger({ topics = [], onLogSession }: StudySessionLo
           onClick={() => setIsOpen(true)}
           className="w-full bg-[#C084FC] hover:bg-[#A855F7] text-[#161514] font-black text-xs uppercase py-3.5 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center justify-center gap-2 tracking-wider"
         >
-          <Clock className="h-4 w-4 stroke-[2.5]" /> Log Study Session & Satisfaction Rate
+          <Clock className="h-4 w-4 stroke-[2.5]" /> Log Study Session
         </button>
       ) : (
         <div className="bg-white rounded-3xl p-5 md:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
           <div className="flex items-center justify-between">
             <h4 className="text-xs md:text-sm font-black text-[#161514] uppercase tracking-wider flex items-center gap-2 font-heading">
-              <Clock className="h-4 w-4 stroke-[2.5]" /> Log Study Session & Quality Rating
+              <Clock className="h-4 w-4 stroke-[2.5]" /> Log Study Session
             </h4>
             <button
               type="button"
@@ -136,7 +136,7 @@ export function StudySessionLogger({ topics = [], onLogSession }: StudySessionLo
 
             {/* Satisfaction Rate Selector */}
             <div className="space-y-1.5">
-              <label className="text-[10px] font-black uppercase text-[#161514] tracking-wider block">Session Satisfaction Rate</label>
+              <label className="text-[10px] font-black uppercase text-[#161514] tracking-wider block">Focus Rating</label>
               <div className="grid grid-cols-5 gap-2">
                 {satisfactionLabels.map((s) => {
                   const isSelected = satisfactionRate === s.score;

@@ -275,9 +275,9 @@ function GoalsPageContent() {
         {/* Space Hero Banner */}
         <SpaceHeroBanner
           space="life"
-          badgeText="🌱 Life & Habits Space"
-          title="Build Routines. Track Wellness."
-          subtitle={`Today is ${format(new Date(selectedDate), "EEEE, MMM d, yyyy")}. Keep your streaks glowing!`}
+          badgeText="Habits & Wellness"
+          title="Daily Habits & Routines"
+          subtitle="Build daily routines and track your progress."
           stats={[
             { label: "Total Habits", value: `${totalHabits}`, icon: "🌱" },
             { label: "Longest Streak", value: `${longestStreakValue}d`, icon: "🔥" },
@@ -309,8 +309,8 @@ function GoalsPageContent() {
               </div>
               <p className="text-[10px] text-[#161514]/70 font-medium truncate pt-0.5">
                 {streakFreeze.tokensAvailable > 0
-                  ? "1-day missed log bridge active (travel & sickness protection)"
-                  : "0 Tokens available. Refills 1st of month"}
+                  ? "Protects your streak if you miss a day."
+                  : "0 freeze tokens left. Refills on the 1st."}
               </p>
             </div>
           </div>

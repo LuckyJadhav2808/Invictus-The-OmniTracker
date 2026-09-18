@@ -70,10 +70,10 @@ export function ProactiveReminderBanner({ space = "today" }: ProactiveReminderBa
 
           <div>
             <h4 className="font-black text-xs sm:text-sm uppercase tracking-wider text-[#161514] flex items-center gap-1.5">
-              <span>Never miss a streak or budget log! 🔔</span>
+              <span>Stay consistent with daily reminders 🔔</span>
             </h4>
-            <p className="text-[11px] sm:text-xs font-extrabold text-[#161514]/80 mt-0.5 leading-tight">
-              Proactive Suggestion: Set daily reminders for Expenses, Habits & Exam Study sessions at your preferred times.
+            <p className="text-[11px] sm:text-xs font-bold text-[#161514]/80 mt-0.5 leading-tight">
+              Set daily reminders for your habits, study sessions, and expenses.
             </p>
           </div>
         </div>
@@ -85,7 +85,7 @@ export function ProactiveReminderBanner({ space = "today" }: ProactiveReminderBa
             className="px-3 py-1.5 rounded-xl bg-[#03D26F] text-[#161514] font-black text-xs uppercase tracking-wider border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center gap-1"
           >
             <Check className="h-3.5 w-3.5 stroke-[3]" />
-            <span>Enable 8:00 PM Reminders</span>
+            <span>Enable Reminders</span>
           </button>
 
           <button
@@ -94,7 +94,7 @@ export function ProactiveReminderBanner({ space = "today" }: ProactiveReminderBa
             className="px-3 py-1.5 rounded-xl bg-white text-[#161514] font-black text-xs uppercase tracking-wider border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center gap-1"
           >
             <Clock className="h-3.5 w-3.5 stroke-[2.5]" />
-            <span>Customize Time ⚙️</span>
+            <span>Customize Times</span>
           </button>
         </div>
       </div>

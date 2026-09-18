@@ -274,9 +274,9 @@ function StudyPageContent() {
         {/* Space Hero Banner */}
         <SpaceHeroBanner
           space="study"
-          badgeText="📚 Study & Exam Focus Space"
-          title="Master Your Syllabus. Achieve Excellence."
-          subtitle={studyTarget?.examName ? `Target Exam: ${studyTarget.examName} (${daysLeft !== null ? `${daysLeft} days remaining` : "Scheduled"})` : "Level up your learning at your own pace."}
+          badgeText="Study & Exams"
+          title="Study & Revision"
+          subtitle={studyTarget?.examName ? `Target Exam: ${studyTarget.examName} (${daysLeft !== null ? `${daysLeft} days remaining` : "Scheduled"})` : "Track subjects, topics, and revision progress."}
           stats={[
             { label: "Subjects", value: `${subjects.length}`, icon: "📖" },
             { label: "Total Studied", value: `${totalLoggedHours}h`, icon: "⏱️" },
@@ -303,7 +303,7 @@ function StudyPageContent() {
                   {studyTarget.examName} Countdown
                 </h4>
                 <p className="text-xs font-semibold text-[#161514]/70 mt-0.5">
-                  Stay consistent, execute your schedule, and conquer the exam!
+                  Stay consistent with daily study and revision sessions.
                 </p>
               </div>
             </div>
