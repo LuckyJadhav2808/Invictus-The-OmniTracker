@@ -199,8 +199,8 @@ function GoalsPageContent() {
       await addHabitMutation.mutateAsync(data);
       toast.success("Habit created! Let's get to work 💪");
       setIsAddOpen(false);
-    } catch {
-      toast.error("Failed to create habit");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to create habit");
     }
   };
 

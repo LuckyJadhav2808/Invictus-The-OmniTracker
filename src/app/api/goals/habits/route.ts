@@ -32,10 +32,21 @@ export async function POST(req: Request) {
     }
 
     const habitId = body.id || `h_${Date.now()}`;
+    
+    // Normalize targetValue/goalTarget and unit/goalUnit for cross-schema compatibility
+    const targetValue = body.targetValue ?? body.goalTarget;
+    const goalTarget = body.goalTarget ?? body.targetValue;
+    const unit = body.unit ?? body.goalUnit;
+    const goalUnit = body.goalUnit ?? body.unit;
+
     const newHabit = await Habit.create({
       ...body,
       id: habitId,
       archived: false,
+      targetValue,
+      goalTarget,
+      unit,
+      goalUnit,
     });
 
     return NextResponse.json(newHabit, { status: 201 });

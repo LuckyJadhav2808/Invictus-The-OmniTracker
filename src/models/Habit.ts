@@ -8,15 +8,19 @@ export interface IHabit extends Document {
   icon: string;
   archived: boolean;
   frequency: {
-    type: "daily" | "weekly" | "custom";
+    type: "daily" | "weekly" | "custom" | "customDays";
     daysOfWeek?: number[];
     targetPerDay?: number;
   };
+  reminderTime?: string;
   allowGraceSkip?: boolean;
   isGoalStyle?: boolean;
   targetValue?: number;
   unit?: string;
+  goalTarget?: number;
+  goalUnit?: string;
   createdAt: Date;
+  updatedAt?: Date;
 }
 
 const HabitSchema = new Schema<IHabit>(
@@ -28,14 +32,17 @@ const HabitSchema = new Schema<IHabit>(
     icon: { type: String, default: "Target" },
     archived: { type: Boolean, default: false },
     frequency: {
-      type: { type: String, enum: ["daily", "weekly", "custom"], default: "daily" },
+      type: { type: String, enum: ["daily", "weekly", "custom", "customDays"], default: "daily" },
       daysOfWeek: [{ type: Number }],
       targetPerDay: { type: Number, default: 1 },
     },
+    reminderTime: { type: String },
     allowGraceSkip: { type: Boolean, default: false },
     isGoalStyle: { type: Boolean, default: false },
     targetValue: { type: Number },
     unit: { type: String },
+    goalTarget: { type: Number },
+    goalUnit: { type: String },
     createdAt: { type: Date, default: Date.now },
   },
   { timestamps: true }
