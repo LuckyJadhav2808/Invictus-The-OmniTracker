@@ -43,3 +43,9 @@ next-env.d.ts
 # scratch
 scratch/
 .playwright-mcp/
+
+# agent & ide configs
+.agent/
+.agents/
+.claude/
+mcp_config.json

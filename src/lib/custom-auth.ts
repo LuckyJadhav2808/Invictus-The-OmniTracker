@@ -30,7 +30,7 @@ export function getRegisteredUsers(): User[] {
   if (!data) {
     // Initialize default seed accounts if DB is empty
     const seedAdmin: User = {
-      uid: "user-admin-default",
+      uid: "user_1kapw9sad_1784744868999",
       email: ADMIN_EMAIL,
       displayName: "Lucky Manoj Jadhav",
       role: "admin",
@@ -48,7 +48,18 @@ export function getRegisteredUsers(): User[] {
     return [seedAdmin];
   }
   try {
-    return JSON.parse(data);
+    const parsed: User[] = JSON.parse(data);
+    let modified = false;
+    parsed.forEach((u) => {
+      if (u.email.toLowerCase() === ADMIN_EMAIL.toLowerCase() && u.uid === "user-admin-default") {
+        u.uid = "user_1kapw9sad_1784744868999";
+        modified = true;
+      }
+    });
+    if (modified) {
+      localStorage.setItem(USERS_DB_KEY, JSON.stringify(parsed));
+    }
+    return parsed;
   } catch {
     return [];
   }
@@ -276,8 +287,14 @@ export function getCustomSession(): User | null {
     const users = getRegisteredUsers();
     const dbUser = users.find((u) => u.uid === user.uid || u.email.toLowerCase() === user.email.toLowerCase());
     
-    // Merge dbUser updates into active user session so user updates are never lost!
-    const finalUser: User = dbUser ? { ...user, ...dbUser } : user;
+    // Merge dbUser profile updates into active session, but preserve authenticated user UID
+    const finalUser: User = dbUser ? { ...dbUser, ...user } : user;
+
+    // Migrate legacy admin UID to official cloud UID
+    if (finalUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase() && finalUser.uid === "user-admin-default") {
+      finalUser.uid = "user_1kapw9sad_1784744868999";
+      localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(finalUser));
+    }
 
     if (finalUser.email.toLowerCase().includes("luckymanojjadhav") || finalUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
       finalUser.role = "admin";

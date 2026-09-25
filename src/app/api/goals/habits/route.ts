@@ -14,7 +14,11 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "UserId is required" }, { status: 400 });
     }
 
-    const habits = await Habit.find({ userId, archived: { $ne: true } }).sort({ createdAt: -1 });
+    const targetUserIds = (userId === "user-admin-default" || userId === "user_1kapw9sad_1784744868999")
+      ? ["user-admin-default", "user_1kapw9sad_1784744868999"]
+      : [userId];
+
+    const habits = await Habit.find({ userId: { $in: targetUserIds }, archived: { $ne: true } }).sort({ createdAt: -1 });
     return NextResponse.json(habits);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -66,8 +70,12 @@ export async function PUT(req: Request) {
       return NextResponse.json({ error: "Habit id and userId are required" }, { status: 400 });
     }
 
+    const targetUserIds = (userId === "user-admin-default" || userId === "user_1kapw9sad_1784744868999")
+      ? ["user-admin-default", "user_1kapw9sad_1784744868999"]
+      : [userId];
+
     const updated = await Habit.findOneAndUpdate(
-      { id, userId },
+      { id, userId: { $in: targetUserIds } },
       { $set: { ...updates, updatedAt: new Date() } },
       { new: true }
     );
@@ -90,9 +98,13 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: "Habit id and userId are required" }, { status: 400 });
     }
 
+    const targetUserIds = (userId === "user-admin-default" || userId === "user_1kapw9sad_1784744868999")
+      ? ["user-admin-default", "user_1kapw9sad_1784744868999"]
+      : [userId];
+
     // Permanently delete habit document and all its logs from MongoDB
-    await Habit.deleteOne({ id, userId });
-    await HabitLog.deleteMany({ habitId: id, userId });
+    await Habit.deleteOne({ id, userId: { $in: targetUserIds } });
+    await HabitLog.deleteMany({ habitId: id, userId: { $in: targetUserIds } });
 
     return NextResponse.json({ success: true, id });
   } catch (error: any) {

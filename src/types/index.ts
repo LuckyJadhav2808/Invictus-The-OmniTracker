@@ -12,6 +12,7 @@ export interface Subtask {
 
 export interface TaskItem {
   id: string;
+  userId?: string;
   title: string;
   description?: string;
   status: "backlog" | "todo" | "in_progress" | "review" | "completed";

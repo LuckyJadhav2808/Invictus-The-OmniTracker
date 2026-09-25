@@ -16,7 +16,11 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "UserId is required for data isolation" }, { status: 400 });
     }
 
-    const query: Record<string, unknown> = { userId };
+    const targetUserIds = (userId === "user-admin-default" || userId === "user_1kapw9sad_1784744868999")
+      ? ["user-admin-default", "user_1kapw9sad_1784744868999"]
+      : [userId];
+
+    const query: Record<string, unknown> = { userId: { $in: targetUserIds } };
     if (date) {
       query.date = date;
     } else if (startDate && endDate) {

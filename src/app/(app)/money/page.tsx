@@ -34,6 +34,8 @@ import { computeMonthlyBudgetStats, computeDailyBudgetStats, isCashTransaction, 
 import { useWidgetSync } from "@/lib/hooks/useWidgetSync";
 import { DailyBudgetView } from "@/components/money/DailyBudgetView";
 import { InvictusLoadingScreen } from "@/components/shared/InvictusLoadingScreen";
+import { SmsAutoTrackerCard } from "@/components/money/SmsAutoTrackerCard";
+import { PendingInflowReviewBanner } from "@/components/money/PendingInflowReviewBanner";
 
 const PRESET_CATEGORY_EMOJIS = [
   "🛒", "🍕", "☕", "🍔", "🍣", "🧋", "🍿", "🍩",
@@ -1091,6 +1093,12 @@ function MoneyPageContent() {
 
         {/* Proactive Reminder Banner */}
         <ProactiveReminderBanner space="money" />
+
+        {/* Pending Inflow Review Inbox */}
+        <PendingInflowReviewBanner />
+
+        {/* Bank SMS Auto-Pilot Tracker */}
+        <SmsAutoTrackerCard />
 
         {/* Tab Controls */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

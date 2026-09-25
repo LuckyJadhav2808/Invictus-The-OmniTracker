@@ -24,6 +24,15 @@ export const TransactionSchema = z.object({
   attachmentUrl: z.string().optional(),
   isRecurring: z.boolean().default(false),
   recurringRuleId: z.string().optional(),
+  source: z.enum(["manual", "bank_sms", "recurring"]).default("manual").optional(),
+  dedupSignature: z.string().optional(),
+  sourceMetadata: z
+    .object({
+      bankName: z.string().optional(),
+      accountMasked: z.string().optional(),
+      rawSender: z.string().optional(),
+    })
+    .optional(),
   createdAt: z.any().optional(),
   updatedAt: z.any().optional(),
 });
