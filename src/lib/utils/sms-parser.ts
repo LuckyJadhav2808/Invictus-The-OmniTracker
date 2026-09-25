@@ -29,6 +29,7 @@ export const APPROVED_BANK_HEADERS = [
   "HDFCBK", // HDFC Bank
   "SBINB",  // State Bank of India
   "SBIPSG", // SBI Payment Gateway
+  "SBIUPI", // SBI UPI
   "ICICIB", // ICICI Bank
   "AXISBK", // Axis Bank
   "KOTAKB", // Kotak Mahindra
@@ -38,17 +39,29 @@ export const APPROVED_BANK_HEADERS = [
   "BOISMS", // Bank of India
   "CANBNK", // Canara Bank
   "UBISMS", // Union Bank of India
+  "UNIONB", // Union Bank
   "IDFCFB", // IDFC First Bank
   "FEDBNK", // Federal Bank
   "PAYTMB", // Paytm Payments Bank
   "CREDBK", // CRED Financial
-  "AMEXIN", // American Express India
+  "CENTBK", // Central Bank of India
+  "BOBSMS", // Bank of Baroda
+  "MAHBK",  // Bank of Maharashtra
+  "IOB",    // Indian Overseas Bank
+  "UCOBNK", // UCO Bank
+  "RBLBNK", // RBL Bank
+  "AUFINB", // AU Small Finance Bank
+  "BANDHN", // Bandhan Bank
+  "IDBIBK", // IDBI Bank
   "SCISMS", // Standard Chartered India
+  "AMEXIN", // American Express India
+  "AIRTEL", // Airtel Payments Bank
+  "JIOBNK", // Jio Payments Bank
 ];
 
 // Regex matching 2-letter operator prefix + hyphen + bank header + optional DLT route suffix (e.g. AD-HDFCBK, JK-PNBSMS-S, VM-SBINB-G)
 export const TRAI_SENDER_REGEX = new RegExp(
-  `^(?:[A-Za-z]{2}[-_])?(?:${APPROVED_BANK_HEADERS.join("|")})(?:[-_][A-Za-z0-9]+)?$`,
+  `^(?:[A-Za-z]{2}[-_]?)?(?:${APPROVED_BANK_HEADERS.join("|")})(?:[-_][A-Za-z0-9]+)?$`,
   "i"
 );
 
@@ -197,8 +210,8 @@ export function parseBankSms(sender: string, body: string, customDate?: string):
   const bodyForAmount = cleanBody.replace(/(?:AvlBal|Avail\s*Bal|Available\s*Balance|Bal:|Total\s*Bal).*$/i, "");
 
   const amountMatch =
-    bodyForAmount.match(/(?:(?:Rs\.?|INR|₹)\s*([\d,]+(?:\.\d{1,2})?))|(?:([\d,]+(?:\.\d{1,2})?)\s*(?:INR|Rs\.?|₹))/i) ||
-    bodyForAmount.match(/(?:debited\s*(?:by|with|for)|credited\s*(?:by|with|for)|paid|sent)\s*(?:Rs\.?|INR|₹)?\s*([\d,]+(?:\.\d{1,2})?)/i);
+    bodyForAmount.match(/(?:(?:Rs\.?|Re\.?|INR|₹)\s*([\d,]+(?:\.\d{1,2})?))|(?:([\d,]+(?:\.\d{1,2})?)\s*(?:INR|Rs\.?|Re\.?|₹))/i) ||
+    bodyForAmount.match(/(?:debited\s*(?:by|with|for)|credited\s*(?:by|with|for)|paid|sent)\s*(?:Rs\.?|Re\.?|INR|₹)?\s*([\d,]+(?:\.\d{1,2})?)/i);
 
   if (!amountMatch) {
     return { isDrop: true, dropReason: "INVALID_AMOUNT" };
@@ -217,9 +230,43 @@ export function parseBankSms(sender: string, body: string, customDate?: string):
   // Step 6: Identify Bank Name from Sender
   let bankName = "Bank";
   const upperSender = sender.toUpperCase();
+  const BANK_NAMES: Record<string, string> = {
+    HDFCBK: "HDFC",
+    SBINB: "SBI",
+    SBIPSG: "SBI",
+    SBIUPI: "SBI",
+    ICICIB: "ICICI",
+    AXISBK: "Axis",
+    KOTAKB: "Kotak",
+    INDUSB: "IndusInd",
+    YESBNK: "Yes Bank",
+    PNBSMS: "PNB",
+    BOISMS: "BOI",
+    CANBNK: "Canara",
+    UBISMS: "Union Bank",
+    UNIONB: "Union Bank",
+    IDFCFB: "IDFC First",
+    FEDBNK: "Federal Bank",
+    PAYTMB: "Paytm",
+    CREDBK: "CRED",
+    CENTBK: "Central Bank",
+    BOBSMS: "Bank of Baroda",
+    MAHBK: "Bank of Maharashtra",
+    IOB: "IOB",
+    UCOBNK: "UCO Bank",
+    RBLBNK: "RBL Bank",
+    AUFINB: "AU Bank",
+    BANDHN: "Bandhan Bank",
+    IDBIBK: "IDBI",
+    SCISMS: "Standard Chartered",
+    AMEXIN: "Amex",
+    AIRTEL: "Airtel Payments",
+    JIOBNK: "Jio Payments",
+  };
+
   for (const b of APPROVED_BANK_HEADERS) {
     if (upperSender.includes(b)) {
-      bankName = b.replace(/BK|SMS|PSG/g, "");
+      bankName = BANK_NAMES[b] || b.replace(/(?:BK|SMS|PSG)$/g, "");
       break;
     }
   }

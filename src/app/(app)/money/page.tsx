@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, Suspense } from "react";
-import { useCategories, useAddCategory, useUpdateCategory, useDeleteCategory, useTransactions, useAddTransaction, useDeleteTransaction, useUpdateTransaction } from "@/lib/queries/money";
+import { useCategories, useAddCategory, useUpdateCategory, useDeleteCategory, useTransactions, useAddTransaction, useDeleteTransaction, useUpdateTransaction, useBudgetPreferences, useUpdateBudgetPreferences } from "@/lib/queries/money";
 import { useApplyMonthlyBudgetTemplate, useUnapplyMonthlyBudgetTemplate } from "@/lib/queries/spending";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
@@ -34,7 +34,6 @@ import { computeMonthlyBudgetStats, computeDailyBudgetStats, isCashTransaction, 
 import { useWidgetSync } from "@/lib/hooks/useWidgetSync";
 import { DailyBudgetView } from "@/components/money/DailyBudgetView";
 import { InvictusLoadingScreen } from "@/components/shared/InvictusLoadingScreen";
-import { SmsAutoTrackerCard } from "@/components/money/SmsAutoTrackerCard";
 import { PendingInflowReviewBanner } from "@/components/money/PendingInflowReviewBanner";
 
 const PRESET_CATEGORY_EMOJIS = [
@@ -357,6 +356,41 @@ function MoneyPageContent() {
     return null;
   });
 
+  const { data: cloudBudgetPrefs } = useBudgetPreferences();
+  const updateBudgetMutation = useUpdateBudgetPreferences();
+
+  // Cloud Hydration for Daily & Monthly Budget Caps
+  useEffect(() => {
+    if (cloudBudgetPrefs) {
+      if (cloudBudgetPrefs.upiBudget !== undefined && cloudBudgetPrefs.upiBudget > 0) {
+        setBaseUpiBudget(cloudBudgetPrefs.upiBudget);
+        try { localStorage.setItem("invictus_monthly_upi_budget", String(cloudBudgetPrefs.upiBudget)); } catch {}
+      }
+      if (cloudBudgetPrefs.cashBudget !== undefined && cloudBudgetPrefs.cashBudget >= 0) {
+        setBaseCashBudget(cloudBudgetPrefs.cashBudget);
+        try { localStorage.setItem("invictus_monthly_cash_budget", String(cloudBudgetPrefs.cashBudget)); } catch {}
+      }
+      if (cloudBudgetPrefs.customDailyBudget !== undefined) {
+        setCustomDailyBudget(cloudBudgetPrefs.customDailyBudget);
+        try {
+          if (cloudBudgetPrefs.customDailyBudget !== null && cloudBudgetPrefs.customDailyBudget > 0) {
+            localStorage.setItem("invictus_custom_daily_budget", String(cloudBudgetPrefs.customDailyBudget));
+          } else {
+            localStorage.removeItem("invictus_custom_daily_budget");
+          }
+        } catch {}
+      }
+      if (cloudBudgetPrefs.enableRollover !== undefined) {
+        setEnableRollover(cloudBudgetPrefs.enableRollover);
+        try { localStorage.setItem("invictus_budget_rollover_enabled", String(cloudBudgetPrefs.enableRollover)); } catch {}
+      }
+      if (cloudBudgetPrefs.budgetViewMode) {
+        setBudgetViewMode(cloudBudgetPrefs.budgetViewMode);
+        try { localStorage.setItem("invictus_budget_view_mode", cloudBudgetPrefs.budgetViewMode); } catch {}
+      }
+    }
+  }, [cloudBudgetPrefs]);
+
   const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
   const [tempUpiBudgetInput, setTempUpiBudgetInput] = useState(String(baseUpiBudget));
   const [tempCashBudgetInput, setTempCashBudgetInput] = useState(String(baseCashBudget));
@@ -407,8 +441,19 @@ function MoneyPageContent() {
         localStorage.removeItem("invictus_custom_daily_budget");
       }
     } catch {}
+
+    // Synchronize to MongoDB Cloud
+    updateBudgetMutation.mutate({
+      upiBudget: upiVal,
+      cashBudget: cashVal,
+      monthlyBudget: upiVal + cashVal,
+      customDailyBudget: customDailyVal,
+      enableRollover: tempEnableRollover,
+      budgetViewMode: budgetViewMode,
+    });
+
     toast.success(
-      `Budget saved! 📱 UPI: ${currencySymbol}${upiVal.toLocaleString()} • 💵 Cash: ${currencySymbol}${cashVal.toLocaleString()}${
+      `Budget saved & cloud synced! 📱 UPI: ${currencySymbol}${upiVal.toLocaleString()} • 💵 Cash: ${currencySymbol}${cashVal.toLocaleString()}${
         customDailyVal ? ` • ⚡ Daily: ${currencySymbol}${customDailyVal.toLocaleString()}` : ""
       }${tempEnableRollover ? " (Rollover ON)" : ""} 🎯`
     );
@@ -1096,9 +1141,6 @@ function MoneyPageContent() {
 
         {/* Pending Inflow Review Inbox */}
         <PendingInflowReviewBanner />
-
-        {/* Bank SMS Auto-Pilot Tracker */}
-        <SmsAutoTrackerCard />
 
         {/* Tab Controls */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

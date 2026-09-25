@@ -764,3 +764,56 @@ export function useDeleteDebt() {
     },
   });
 }
+
+// --- CLOUD BUDGET PREFERENCES (Daily Budget Cap & Rollover Sync) ---
+
+export interface BudgetPreferences {
+  upiBudget: number;
+  cashBudget: number;
+  monthlyBudget: number;
+  customDailyBudget: number | null;
+  enableRollover: boolean;
+  budgetViewMode: "monthly" | "daily";
+  smsReaderEnabled: boolean;
+}
+
+export function useBudgetPreferences() {
+  const { user } = useAuth();
+  const userId = getActiveUserId(user);
+
+  return useQuery<BudgetPreferences>({
+    queryKey: ["budgetPreferences", userId],
+    queryFn: async () => {
+      const res = await fetch(`/api/money/budget?userId=${userId}`);
+      if (!res.ok) {
+        throw new Error("Failed to load budget preferences");
+      }
+      const data = await res.json();
+      return data.budgetPreferences;
+    },
+    staleTime: 1000 * 60 * 5, // 5 mins cache
+  });
+}
+
+export function useUpdateBudgetPreferences() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const userId = getActiveUserId(user);
+
+  return useMutation({
+    mutationFn: async (prefs: Partial<BudgetPreferences>) => {
+      const res = await fetch("/api/money/budget", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, ...prefs }),
+      });
+      if (!res.ok) throw new Error("Failed to save budget preferences");
+      return res.json();
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(["budgetPreferences", userId], data.budgetPreferences);
+      queryClient.invalidateQueries({ queryKey: ["budgetPreferences"] });
+    },
+  });
+}
+

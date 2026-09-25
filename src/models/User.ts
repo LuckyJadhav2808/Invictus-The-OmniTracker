@@ -13,6 +13,15 @@ export interface IUser extends Document {
   onboarded: boolean;
   modulesEnabled: { goals: boolean; study: boolean; money: boolean };
   studyTarget?: { examName?: string; examDate?: string };
+  budgetPreferences?: {
+    upiBudget: number;
+    cashBudget: number;
+    monthlyBudget: number;
+    customDailyBudget?: number | null;
+    enableRollover: boolean;
+    budgetViewMode: "monthly" | "daily";
+    smsReaderEnabled?: boolean;
+  };
   createdAt: Date;
   lastLogin: Date;
 }
@@ -37,6 +46,15 @@ const UserSchema = new Schema<IUser>(
     studyTarget: {
       examName: { type: String },
       examDate: { type: String },
+    },
+    budgetPreferences: {
+      upiBudget: { type: Number, default: 0 },
+      cashBudget: { type: Number, default: 0 },
+      monthlyBudget: { type: Number, default: 0 },
+      customDailyBudget: { type: Number, default: null },
+      enableRollover: { type: Boolean, default: true },
+      budgetViewMode: { type: String, default: "monthly" },
+      smsReaderEnabled: { type: Boolean, default: false },
     },
     createdAt: { type: Date, default: Date.now },
     lastLogin: { type: Date, default: Date.now },

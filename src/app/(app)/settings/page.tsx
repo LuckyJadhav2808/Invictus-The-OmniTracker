@@ -65,6 +65,7 @@ import { ReportIssueModal } from "@/components/shared/ReportIssueModal";
 import { UpdateCheckModal } from "@/components/shared/UpdateCheckModal";
 import { APP_VERSION_CONFIG } from "@/config/version";
 import { Capacitor } from "@capacitor/core";
+import { SmsAutoTrackerCard } from "@/components/money/SmsAutoTrackerCard";
 
 const TIMEZONES = [
   "Asia/Kolkata",
@@ -603,6 +604,9 @@ export default function SettingsPage() {
             </button>
           </div>
         </div>
+
+        {/* ⚡ NATIVE BANK SMS AUTO-TRACKER SETTINGS */}
+        <SmsAutoTrackerCard />
 
         {/* FEATURE 1: ⏰ GLOBAL WAKE-UP HERO WIDGET */}
         <div className="bg-amber-400 rounded-3xl p-6 border-[2.5px] border-[#161514] shadow-[5px_5px_0px_0px_#161514] space-y-5 text-center">

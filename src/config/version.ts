@@ -10,20 +10,19 @@ export interface AppVersionInfo {
 }
 
 export const APP_VERSION_CONFIG: AppVersionInfo = {
-  version: "1.4.0",
-  buildNumber: 17,
+  version: "1.4.1",
+  buildNumber: 18,
   releaseDate: "September 25, 2026",
   channel: "stable",
   minSupportedVersion: "1.0.0",
   githubRepoUrl: "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker",
   latestReleaseApiUrl: "https://api.github.com/repos/LuckyJadhav2808/Invictus-The-OmniTracker/releases/latest",
   changelog: [
-    "⚡ Zero-Knowledge Bank SMS Auto-Tracker: Automated expense detection with TRAI DLT header whitelist",
-    "🛡️ Strict Privacy Engine: Automatic balance clause and OTP stripper (0 private balances or credentials stored)",
-    "📥 Pending Inflow Review Inbox: Granular review workflow for credited transactions (Confirm Income vs Bill Split vs Dismiss)",
-    "📱 Native Android Background Receiver: Headless SMS broadcast listener wakes up instantly even when Invictus is closed",
-    "🧠 Historical Merchant Memory: Learns and auto-categorizes recurring peer & vendor transactions (e.g. UPI contacts)",
-    "☁️ Task Space Cloud Sync: Full cloud CRUD persistence with real-time multi-device sync and auth session alignment",
+    "🔑 Native Android SMS Permission Bridge: Interactive system dialog with granular permission granting & app settings fallback",
+    "☁️ Cloud Budget Sync: Daily budget cap and monthly budget preferences are now permanently backed up to MongoDB Atlas across app updates",
+    "⚡ Enhanced 1-Rupee & UPI Extraction: Added Re. singular support and expanded bank header directory across all Indian financial institutions",
+    "🎨 Neobrutalist SMS Settings Card: Relocated tracker toggle to Settings with high-contrast tactile styling and live sync indicator",
+    "🛠️ Fixed Android Broadcast Receiver Bug: Removed signature-level permission restriction to guarantee instant SMS interception",
   ],
 };
 

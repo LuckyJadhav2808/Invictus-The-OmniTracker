@@ -138,6 +138,18 @@ describe("Invictus Bank SMS Parser Engine", () => {
       expect(serialized).not.toContain("AvlBal");
       expect(serialized).not.toContain("659143578131");
     });
+
+    it("should parse 1 rupee (Re. 1.00) credit transaction successfully", () => {
+      const sms = "A/c X1234 credited for Re 1.00 on 25-09-26 by Test User thru UPI. AvlBal INR 5400.00";
+      const res = parseBankSms("VM-SBINB-G", sms);
+
+      expect(res.isDrop).toBe(false);
+      expect(res.transaction).toBeDefined();
+      expect(res.transaction?.amount).toBe(1.0);
+      expect(res.transaction?.type).toBe("income");
+      expect(res.transaction?.merchant).toBe("Test User");
+      expect(res.transaction?.bankName).toBe("SBI");
+    });
   });
 
   describe("Deduplication Signature Generation", () => {

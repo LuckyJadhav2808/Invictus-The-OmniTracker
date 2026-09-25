@@ -39,7 +39,7 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
 
     // 1. TRAI Approved Bank Headers (Pre-compiled Regex)
     private static final Pattern BANK_HEADER_PATTERN = Pattern.compile(
-            "^(?:[A-Za-z]{2}[-_])?(HDFCBK|SBINB|SBIPSG|ICICIB|AXISBK|KOTAKB|INDUSB|YESBNK|PNBSMS|BOISMS|CANBNK|UBISMS|IDFCFB|FEDBNK|PAYTMB|CREDBK)(?:[-_][A-Za-z0-9]+)?$",
+            "^(?:[A-Za-z]{2}[-_]?)?(HDFCBK|SBINB|SBIPSG|SBIUPI|ICICIB|AXISBK|KOTAKB|INDUSB|YESBNK|PNBSMS|BOISMS|CANBNK|UBISMS|UNIONB|IDFCFB|FEDBNK|PAYTMB|CREDBK|CENTBK|BOBSMS|MAHBK|IOB|UCOBNK|RBLBNK|AUFINB|BANDHN|IDBIBK|SCISMS|AMEXIN|AIRTEL|JIOBNK)(?:[-_][A-Za-z0-9]+)?$",
             Pattern.CASE_INSENSITIVE
     );
 
@@ -55,9 +55,9 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
             Pattern.CASE_INSENSITIVE
     );
 
-    // 4. Amount Pattern
+    // 4. Amount Pattern (Supports Rs, Re, INR, ₹, and singular Re. 1.00 amounts)
     private static final Pattern AMOUNT_PATTERN = Pattern.compile(
-            "(?:(?:Rs\\.?|INR|₹)\\s*([\\d,]+(?:\\.\\d{1,2})?))|(?:debited\\s*(?:by|with|for)|credited\\s*(?:by|with|for)|paid|sent)\\s*(?:Rs\\.?|INR|₹)?\\s*([\\d,]+(?:\\.\\d{1,2})?)",
+            "(?:(?:Rs\\.?|Re\\.?|INR|₹)\\s*([\\d,]+(?:\\.\\d{1,2})?))|(?:debited\\s*(?:by|with|for)|credited\\s*(?:by|with|for)|paid|sent)\\s*(?:Rs\\.?|Re\\.?|INR|₹)?\\s*([\\d,]+(?:\\.\\d{1,2})?)",
             Pattern.CASE_INSENSITIVE
     );
 
@@ -144,7 +144,20 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
             String bankName = "Bank";
             Matcher bankMatcher = BANK_HEADER_PATTERN.matcher(sender.trim());
             if (bankMatcher.find() && bankMatcher.group(1) != null) {
-                bankName = bankMatcher.group(1).replaceAll("(?i)(BK|SMS|PSG)", "");
+                String code = bankMatcher.group(1).toUpperCase();
+                if (code.contains("HDFC")) bankName = "HDFC";
+                else if (code.contains("SBI")) bankName = "SBI";
+                else if (code.contains("ICICI")) bankName = "ICICI";
+                else if (code.contains("AXIS")) bankName = "Axis";
+                else if (code.contains("KOTAK")) bankName = "Kotak";
+                else if (code.contains("PNB")) bankName = "PNB";
+                else if (code.contains("BOI")) bankName = "BOI";
+                else if (code.contains("CAN")) bankName = "Canara";
+                else if (code.contains("PAYTM")) bankName = "Paytm";
+                else if (code.contains("CRED")) bankName = "CRED";
+                else if (code.contains("UBI") || code.contains("UNION")) bankName = "Union Bank";
+                else if (code.contains("IDFC")) bankName = "IDFC First";
+                else bankName = code.replaceAll("(?i)(BK|SMS|PSG)$", "");
             }
 
             // Step 7: Extract Merchant Name
@@ -239,9 +252,10 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                 NotificationChannel channel = new NotificationChannel(
                         CHANNEL_ID,
                         "Money Auto-Tracker Alerts",
-                        NotificationManager.IMPORTANCE_DEFAULT
+                        NotificationManager.IMPORTANCE_HIGH
                 );
                 channel.setDescription("Instant transaction alerts from Bank SMS");
+                channel.enableVibration(true);
                 nm.createNotificationChannel(channel);
             }
 
@@ -257,7 +271,10 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
             );
 
             boolean isExpense = "expense".equals(type);
-            String title = (isExpense ? "⚡ Spent ₹" : "⚡ Received ₹") + String.format(Locale.getDefault(), "%,.0f", amount);
+            String formattedAmt = (amount % 1 == 0)
+                    ? String.format(Locale.getDefault(), "%,.0f", amount)
+                    : String.format(Locale.getDefault(), "%,.2f", amount);
+            String title = (isExpense ? "⚡ Spent ₹" : "⚡ Received ₹") + formattedAmt;
             String body = (isExpense ? "Paid to " : "From ") + merchant + " (" + bank + ")";
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
@@ -266,7 +283,8 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                     .setContentText(body)
                     .setAutoCancel(true)
                     .setContentIntent(pendingIntent)
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setDefaults(NotificationCompat.DEFAULT_ALL);
 
             nm.notify((int) (System.currentTimeMillis() % 100000), builder.build());
         } catch (Exception e) {
