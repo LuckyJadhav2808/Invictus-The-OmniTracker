@@ -10,20 +10,20 @@ export interface AppVersionInfo {
 }
 
 export const APP_VERSION_CONFIG: AppVersionInfo = {
-  version: "1.3.3",
-  buildNumber: 16,
-  releaseDate: "September 18, 2026",
+  version: "1.4.0",
+  buildNumber: 17,
+  releaseDate: "September 25, 2026",
   channel: "stable",
   minSupportedVersion: "1.0.0",
   githubRepoUrl: "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker",
   latestReleaseApiUrl: "https://api.github.com/repos/LuckyJadhav2808/Invictus-The-OmniTracker/releases/latest",
   changelog: [
-    "🌱 3x3 Android Widget Upgrade: Live Habits Checklist with streak tracking",
-    "⚡ Dual Widget Quick Action Buttons: '+ EXPENSE' and '✓ HABITS' direct shortcuts",
-    "🔄 Continuous Quick Add Logging: Log back-to-back expenses without modal closing",
-    "🛠️ Fixed Modal Conflict Bug: Resolved deep-link collision between quick and main modals",
-    "🧹 Comprehensive UI Cleanup: Removed jargon, marketing copy, and cleaned typography",
-    "🌐 OmniWidgetSync: Real-time synchronization of money and habits with Android home screen",
+    "⚡ Zero-Knowledge Bank SMS Auto-Tracker: Automated expense detection with TRAI DLT header whitelist",
+    "🛡️ Strict Privacy Engine: Automatic balance clause and OTP stripper (0 private balances or credentials stored)",
+    "📥 Pending Inflow Review Inbox: Granular review workflow for credited transactions (Confirm Income vs Bill Split vs Dismiss)",
+    "📱 Native Android Background Receiver: Headless SMS broadcast listener wakes up instantly even when Invictus is closed",
+    "🧠 Historical Merchant Memory: Learns and auto-categorizes recurring peer & vendor transactions (e.g. UPI contacts)",
+    "☁️ Task Space Cloud Sync: Full cloud CRUD persistence with real-time multi-device sync and auth session alignment",
   ],
 };
 
