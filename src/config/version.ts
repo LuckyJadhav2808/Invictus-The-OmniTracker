@@ -10,19 +10,19 @@ export interface AppVersionInfo {
 }
 
 export const APP_VERSION_CONFIG: AppVersionInfo = {
-  version: "1.4.1",
-  buildNumber: 18,
-  releaseDate: "September 25, 2026",
+  version: "1.5.0",
+  buildNumber: 19,
+  releaseDate: "September 26, 2026",
   channel: "stable",
   minSupportedVersion: "1.0.0",
   githubRepoUrl: "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker",
   latestReleaseApiUrl: "https://api.github.com/repos/LuckyJadhav2808/Invictus-The-OmniTracker/releases/latest",
   changelog: [
-    "🔑 Native Android SMS Permission Bridge: Interactive system dialog with granular permission granting & app settings fallback",
-    "☁️ Cloud Budget Sync: Daily budget cap and monthly budget preferences are now permanently backed up to MongoDB Atlas across app updates",
-    "⚡ Enhanced 1-Rupee & UPI Extraction: Added Re. singular support and expanded bank header directory across all Indian financial institutions",
-    "🎨 Neobrutalist SMS Settings Card: Relocated tracker toggle to Settings with high-contrast tactile styling and live sync indicator",
-    "🛠️ Fixed Android Broadcast Receiver Bug: Removed signature-level permission restriction to guarantee instant SMS interception",
+    "📅 On-Demand Bank SMS Fetcher: Read and import transactions from your Android message inbox by specific day, past 3-7 days, or custom date",
+    "🎚️ Tracking Mode Preference: Switch between Manual Only mode (zero permissions) and SMS-Assisted Mode with 1 tap",
+    "📋 Smart SMS Batch Importer: Paste and parse multiple bank SMS messages on desktop and web with instant category suggestions",
+    "⚡ Batch Ledger Sync: High-efficiency bulk transaction processing with automatic duplicate suppression",
+    "🔄 Dynamic User SharedPreferences: Native background SMS receiver automatically links alerts to the active logged-in user",
   ],
 };
 

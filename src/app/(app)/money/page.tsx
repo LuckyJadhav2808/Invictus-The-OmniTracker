@@ -35,6 +35,7 @@ import { useWidgetSync } from "@/lib/hooks/useWidgetSync";
 import { DailyBudgetView } from "@/components/money/DailyBudgetView";
 import { InvictusLoadingScreen } from "@/components/shared/InvictusLoadingScreen";
 import { PendingInflowReviewBanner } from "@/components/money/PendingInflowReviewBanner";
+import { SmsFetchModal } from "@/components/money/SmsFetchModal";
 
 const PRESET_CATEGORY_EMOJIS = [
   "🛒", "🍕", "☕", "🍔", "🍣", "🧋", "🍿", "🍩",
@@ -64,6 +65,7 @@ function MoneyPageContent() {
   const [activeTab, setActiveTab] = useState(tabParam || "ledger");
   const [isAddTxOpen, setIsAddTxOpen] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
+  const [isSmsFetchOpen, setIsSmsFetchOpen] = useState(false);
 
   useEffect(() => {
     if (tabParam) {
@@ -1204,6 +1206,7 @@ function MoneyPageContent() {
                   setIsAddTxOpen(true);
                 }}
                 onBulkAddExpense={() => setIsBulkModalOpen(true)}
+                onFetchSms={() => setIsSmsFetchOpen(true)}
                 onMoveMoney={() => {
                   if (categories.length < 2) {
                     toast.error("Please create at least 2 categories to move money between them!");
@@ -3861,6 +3864,11 @@ function MoneyPageContent() {
           </button>
         </form>
       </ResponsiveFormContainer>
+
+      <SmsFetchModal
+        open={isSmsFetchOpen}
+        onOpenChange={setIsSmsFetchOpen}
+      />
     </div>
   );
 }

@@ -23,7 +23,7 @@ export function setSmsTrackerEnabled(enabled: boolean): void {
 /**
  * In-memory / local storage duplicate prevention cache
  */
-function isLocallyProcessed(sig: string): boolean {
+export function isLocallyProcessed(sig: string): boolean {
   if (typeof window === "undefined") return false;
   try {
     const raw = localStorage.getItem(LAST_PROCESSED_SIGS_KEY);
@@ -34,14 +34,14 @@ function isLocallyProcessed(sig: string): boolean {
   }
 }
 
-function markLocallyProcessed(sig: string): void {
+export function markLocallyProcessed(sig: string): void {
   if (typeof window === "undefined") return;
   try {
     const raw = localStorage.getItem(LAST_PROCESSED_SIGS_KEY);
     let sigs: string[] = raw ? JSON.parse(raw) : [];
     if (!sigs.includes(sig)) {
       sigs.push(sig);
-      if (sigs.length > 50) sigs = sigs.slice(-50); // Keep last 50
+      if (sigs.length > 100) sigs = sigs.slice(-100); // Keep last 100
       localStorage.setItem(LAST_PROCESSED_SIGS_KEY, JSON.stringify(sigs));
     }
   } catch {}

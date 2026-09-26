@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Eye, EyeOff, Plus, ArrowRightLeft, Send, MoreHorizontal, Wallet, Edit3, Trash2, Camera } from "lucide-react";
+import { Eye, EyeOff, Plus, ArrowRightLeft, Send, MoreHorizontal, Wallet, Edit3, Trash2, Camera, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -44,6 +44,7 @@ interface MoneyQuickActionsProps {
   categories: CategoryCardItem[];
   onAddTransaction: () => void;
   onBulkAddExpense?: () => void;
+  onFetchSms?: () => void;
   onMoveMoney?: () => void;
   onSendMoney?: () => void;
   onViewDetails?: () => void;
@@ -58,6 +59,7 @@ export function MoneyQuickActionsAndCards({
   categories,
   onAddTransaction,
   onBulkAddExpense,
+  onFetchSms,
   onMoveMoney,
   onSendMoney,
   onViewDetails,
@@ -164,11 +166,21 @@ export function MoneyQuickActionsAndCards({
           {onBulkAddExpense && (
             <button
               onClick={onBulkAddExpense}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#CEF431] hover:bg-[#b8dd24] text-[#161514] text-xs font-black uppercase tracking-wider transition-all cursor-pointer border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none shrink-0"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-[#FAF8F5] text-[#161514] text-xs font-black uppercase tracking-wider transition-all cursor-pointer border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none shrink-0"
               title="Bulk Expense Logger & Offline OCR Scanner"
             >
               <Camera className="h-3.5 w-3.5 stroke-[2.5]" />
               <span>Bulk / Scan</span>
+            </button>
+          )}
+          {onFetchSms && (
+            <button
+              onClick={onFetchSms}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#CEF431] hover:bg-[#b8dd24] text-[#161514] text-xs font-black uppercase tracking-wider transition-all cursor-pointer border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none shrink-0"
+              title="Fetch Bank SMS Transactions by Date"
+            >
+              <Zap className="h-3.5 w-3.5 stroke-[2.5]" />
+              <span>Fetch SMS</span>
             </button>
           )}
           {onAddCategory && (

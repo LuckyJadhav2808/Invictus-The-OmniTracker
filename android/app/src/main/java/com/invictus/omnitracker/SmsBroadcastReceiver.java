@@ -211,8 +211,12 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
 
     private void syncToCloud(Context context, double amount, String type, String merchant, String date, String bank, String acc, String sender, String dedupSig) {
         try {
+            android.content.SharedPreferences prefs = context.getSharedPreferences("invictus_sms_prefs", Context.MODE_PRIVATE);
+            String targetUserId = prefs.getString("userId", DEFAULT_USER_ID);
+            String targetEndpoint = prefs.getString("endpoint", SYNC_ENDPOINT);
+
             JSONObject payload = new JSONObject();
-            payload.put("userId", DEFAULT_USER_ID);
+            payload.put("userId", targetUserId);
             payload.put("amount", amount);
             payload.put("type", type);
             payload.put("merchant", merchant);
@@ -222,7 +226,7 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
             payload.put("rawSender", sender);
             payload.put("dedupSignature", dedupSig);
 
-            URL url = new URL(SYNC_ENDPOINT);
+            URL url = new URL(targetEndpoint);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json; utf-8");
