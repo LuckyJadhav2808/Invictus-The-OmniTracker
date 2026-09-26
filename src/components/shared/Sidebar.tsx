@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/components/shared/AuthProvider";
-import { Suspense } from "react";
+import { Suspense, useRef } from "react";
 import {
   Home,
   BookOpen,
@@ -22,6 +22,7 @@ function SidebarContent() {
   const pathname = usePathname();
   const { user } = useAuth();
   const { setActiveTracker } = useUIStore();
+  const lastNavClickRef = useRef<number>(0);
 
   const spaceNavItems = [
     {
@@ -89,7 +90,13 @@ function SidebarContent() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  onClick={() => {
+                  onClick={(e) => {
+                    const now = Date.now();
+                    if (now - lastNavClickRef.current < 250 && isActive) {
+                      e.preventDefault();
+                      return;
+                    }
+                    lastNavClickRef.current = now;
                     if (item.value !== "today" && item.value !== "admin") {
                       setActiveTracker(item.value as any);
                     }

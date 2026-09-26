@@ -1180,59 +1180,61 @@ function MoneyPageContent() {
           {/* 📒 Tab 1: Daily Ledger */}
           <TabsContent id="money-ledger" value="ledger" className="space-y-4 scroll-mt-24">
             {/* Category Wallets Carousel */}
-            <MoneyQuickActionsAndCards
-              mainBalance={budgetStats.remainingBudget}
-              currencySymbol={currencySymbol}
-              categories={categories.map((c) => ({
-                id: c.id,
-                name: c.name,
-                amount: transactions
-                  .filter((t) => t.categoryId === c.id && t.type === "expense" && (ledgerMonthFilter === "all" ? true : t.date?.startsWith(activeMonthForStats)))
-                  .reduce((sum, t) => sum + t.amount, 0),
-                color: c.color,
-                icon: c.icon || "💳",
-                type: c.type,
-                monthlyBudget: c.monthlyBudget,
-              }))}
-              onAddTransaction={() => {
-                if (categories.length === 0) {
-                  toast.error("Loading categories...");
-                  return;
-                }
-                setTxCategoryId(categories.filter((c) => c.type === txType)[0]?.id || "");
-                setIsAddTxOpen(true);
-              }}
-              onBulkAddExpense={() => setIsBulkModalOpen(true)}
-              onMoveMoney={() => {
-                if (categories.length < 2) {
-                  toast.error("Please create at least 2 categories to move money between them!");
-                  return;
-                }
-                setMoveFromCatId(categories[0]?.id || "");
-                setMoveToCatId(categories[1]?.id || "");
-                setIsMoveMoneyOpen(true);
-              }}
-              onSendMoney={() => {
-                if (categories.length === 0) {
-                  toast.error("Please create a category first!");
-                  return;
-                }
-                setSendCatId(categories[0]?.id || "");
-                setIsSendMoneyOpen(true);
-              }}
-              onViewDetails={() => setActiveTab("analytics")}
-              onAddCategory={() => setIsChoiceOpen(true)}
-              onEditCategory={(cat) => {
-                const full = categories.find((c) => c.id === cat.id);
-                setEditingCat(full || cat);
-                setEditCatName(full?.name || cat.name);
-                setEditCatType(full?.type || "expense");
-                setEditCatColor(full?.color || "orange");
-                setEditCatIcon(full?.icon || "💳");
-                setEditCatMonthlyBudget(String(full?.monthlyBudget || 0));
-              }}
-              onDeleteCategory={(catId) => setDeleteCatId(catId)}
-            />
+            <div id="category-wallets" className="scroll-mt-24">
+              <MoneyQuickActionsAndCards
+                mainBalance={budgetStats.remainingBudget}
+                currencySymbol={currencySymbol}
+                categories={categories.map((c) => ({
+                  id: c.id,
+                  name: c.name,
+                  amount: transactions
+                    .filter((t) => t.categoryId === c.id && t.type === "expense" && (ledgerMonthFilter === "all" ? true : t.date?.startsWith(activeMonthForStats)))
+                    .reduce((sum, t) => sum + t.amount, 0),
+                  color: c.color,
+                  icon: c.icon || "💳",
+                  type: c.type,
+                  monthlyBudget: c.monthlyBudget,
+                }))}
+                onAddTransaction={() => {
+                  if (categories.length === 0) {
+                    toast.error("Loading categories...");
+                    return;
+                  }
+                  setTxCategoryId(categories.filter((c) => c.type === txType)[0]?.id || "");
+                  setIsAddTxOpen(true);
+                }}
+                onBulkAddExpense={() => setIsBulkModalOpen(true)}
+                onMoveMoney={() => {
+                  if (categories.length < 2) {
+                    toast.error("Please create at least 2 categories to move money between them!");
+                    return;
+                  }
+                  setMoveFromCatId(categories[0]?.id || "");
+                  setMoveToCatId(categories[1]?.id || "");
+                  setIsMoveMoneyOpen(true);
+                }}
+                onSendMoney={() => {
+                  if (categories.length === 0) {
+                    toast.error("Please create a category first!");
+                    return;
+                  }
+                  setSendCatId(categories[0]?.id || "");
+                  setIsSendMoneyOpen(true);
+                }}
+                onViewDetails={() => setActiveTab("analytics")}
+                onAddCategory={() => setIsChoiceOpen(true)}
+                onEditCategory={(cat) => {
+                  const full = categories.find((c) => c.id === cat.id);
+                  setEditingCat(full || cat);
+                  setEditCatName(full?.name || cat.name);
+                  setEditCatType(full?.type || "expense");
+                  setEditCatColor(full?.color || "orange");
+                  setEditCatIcon(full?.icon || "💳");
+                  setEditCatMonthlyBudget(String(full?.monthlyBudget || 0));
+                }}
+                onDeleteCategory={(catId) => setDeleteCatId(catId)}
+              />
+            </div>
 
             {/* Online (UPI) vs Cash Liquidity Split Card */}
             <div className="bg-white rounded-3xl p-5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">

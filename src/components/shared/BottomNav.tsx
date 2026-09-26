@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Home, Target, User, CheckSquare, BookOpen, Trophy, Wallet, TrendingUp, ShieldCheck } from "lucide-react";
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useUIStore } from "@/store/ui-store";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { cn } from "@/lib/utils";
@@ -12,16 +12,19 @@ function BottomNavContent() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const currentTab = searchParams.get("tab");
-  const { activeTracker } = useUIStore();
+  const { activeTracker, setActiveTracker } = useUIStore();
   const { user } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const lastNavClickRef = useRef<number>(0);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
 
+    let debounceTimer: NodeJS.Timeout;
     const checkModalOpen = () => {
+      // Only detect explicitly open modal dialogs / sheets, never generic regions or body styles
       const hasOpenModal = !!document.querySelector(
-        '[data-state="open"][role="dialog"], [data-state="open"][role="region"], [data-state="open"].fixed, body[style*="overflow: hidden"]'
+        '[role="dialog"][data-state="open"], [role="alertdialog"][data-state="open"], [aria-modal="true"][data-state="open"]'
       );
       setIsModalOpen(hasOpenModal);
     };
@@ -29,43 +32,59 @@ function BottomNavContent() {
     checkModalOpen();
 
     const observer = new MutationObserver(() => {
-      checkModalOpen();
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(checkModalOpen, 100);
     });
 
     observer.observe(document.body, {
       childList: true,
       subtree: true,
       attributes: true,
-      attributeFilter: ["data-state", "style", "class"],
+      attributeFilter: ["data-state", "role", "aria-modal"],
     });
 
-    return () => observer.disconnect();
+    return () => {
+      clearTimeout(debounceTimer);
+      observer.disconnect();
+    };
   }, []);
 
-  const getNavItems = () => {
-    const items = [
+  interface NavItem {
+    href: string;
+    icon: any;
+    label: string;
+    value?: string;
+    activeColor: string;
+  }
+
+  const getNavItems = (): NavItem[] => {
+    const items: NavItem[] = [
       {
         href: "/today",
         icon: Home,
         label: "Today",
+        value: "today",
         activeColor: "bg-[#CEF431] text-[#161514] border-[#161514] shadow-[2px_2px_0px_0px_#161514]",
       },
       {
         href: "/goals",
         icon: Target,
         label: "Habits",
+        value: "life",
         activeColor: "bg-[#03D26F] text-[#161514] border-[#161514] shadow-[2px_2px_0px_0px_#161514]",
       },
       {
         href: "/study",
         icon: BookOpen,
         label: "Study",
+        value: "study",
         activeColor: "bg-[#C084FC] text-[#161514] border-[#161514] shadow-[2px_2px_0px_0px_#161514]",
       },
       {
         href: "/money",
         icon: Wallet,
         label: "Money",
+        value: "money",
         activeColor: "bg-[#FBCFE8] text-[#161514] border-[#161514] shadow-[2px_2px_0px_0px_#161514]",
       },
     ];
@@ -75,6 +94,7 @@ function BottomNavContent() {
         href: "/admin",
         icon: ShieldCheck,
         label: "Admin",
+        value: "admin",
         activeColor: "bg-[#FDE68A] text-[#161514] border-[#161514] shadow-[2px_2px_0px_0px_#161514]",
       });
     } else {
@@ -82,6 +102,7 @@ function BottomNavContent() {
         href: "/profile",
         icon: User,
         label: "Profile",
+        value: "profile",
         activeColor: "bg-[#FDE68A] text-[#161514] border-[#161514] shadow-[2px_2px_0px_0px_#161514]",
       });
     }
@@ -122,7 +143,19 @@ function BottomNavContent() {
           <Link
             key={item.href}
             href={item.href}
-            onClick={triggerHaptic}
+            onClick={(e) => {
+              const now = Date.now();
+              // Prevent queuing rapid duplicate route transitions on the active route
+              if (now - lastNavClickRef.current < 250 && isActive) {
+                e.preventDefault();
+                return;
+              }
+              lastNavClickRef.current = now;
+              triggerHaptic();
+              if (item.value && item.value !== "today" && item.value !== "admin") {
+                setActiveTracker(item.value as any);
+              }
+            }}
             className={cn(
               "flex flex-col items-center justify-center py-1.5 px-2 rounded-xl border-2 cursor-pointer flex-1 mx-0.5 transition-all duration-150 active:scale-90 select-none",
               isActive

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { Sidebar } from "@/components/shared/Sidebar";
 import { BottomNav } from "@/components/shared/BottomNav";
@@ -22,6 +22,7 @@ import { getCustomSession } from "@/lib/custom-auth";
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const [checking, setChecking] = useState(() => {
     if (typeof window === "undefined") return true;
     const isGuest = localStorage.getItem("invictus_guest_mode") === "true";
@@ -33,14 +34,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     return true;
   });
   const { activeTracker, setActiveTracker } = useUIStore();
-  const [isAssembling, setIsAssembling] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-
-  useEffect(() => {
-    setIsAssembling(true);
-    const timer = setTimeout(() => setIsAssembling(false), 650);
-    return () => clearTimeout(timer);
-  }, [activeTracker]);
 
   useEffect(() => {
     if (loading) return;
@@ -72,22 +66,22 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div
       className={cn(
-        "min-h-screen flex flex-col lg:flex-row bg-cream-bg text-navy-900 transition-colors duration-500",
-        activeTracker === "life" && "theme-life",
-        activeTracker === "study" && "theme-study",
-        activeTracker === "money" && "theme-money"
+        "min-h-screen flex flex-col lg:flex-row bg-cream-bg text-navy-900 transition-colors duration-300",
+        (activeTracker === "life" || pathname.startsWith("/goals")) && "theme-life",
+        (activeTracker === "study" || pathname.startsWith("/study")) && "theme-study",
+        (activeTracker === "money" || pathname.startsWith("/money")) && "theme-money"
       )}
     >
       <Sidebar />
-      <main className="flex-1 pb-24 lg:pb-0 min-h-screen relative overflow-y-auto flex flex-col">
+      <main id="main-scroll-container" className="flex-1 pb-24 lg:pb-0 min-h-screen relative overflow-y-auto flex flex-col">
         {/* Proactive Auto-Update Notification Banner */}
         <AutoUpdateBanner />
 
         {/* Top Header Bar with Switcher */}
         <SpaceHeader />
 
-        {/* Content with playful springy parallax-like assemble animation */}
-        <div className={cn("flex-1", isAssembling && "animate-playful-assemble")}>
+        {/* Content container */}
+        <div className="flex-1">
           {children}
         </div>
 

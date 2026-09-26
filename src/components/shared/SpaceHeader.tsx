@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useUIStore } from "@/store/ui-store";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -22,6 +22,9 @@ export function SpaceHeader() {
   
   // Toggle sub-nav visibility state with localStorage persistence
   const [isSubNavVisible, setIsSubNavVisible] = useState<boolean>(true);
+
+  const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastSubNavClickRef = useRef<number>(0);
 
   useEffect(() => {
     const fetchAnnouncement = async () => {
@@ -168,12 +171,12 @@ export function SpaceHeader() {
     }
     if (pathname.startsWith("/money")) {
       return [
-        { label: "Wallets & Cards", icon: Wallet, targetId: "category-wallets", spaceHref: "/money" },
-        { label: "Subscriptions", icon: Sparkles, targetId: "subscriptions", spaceHref: "/money" },
-        { label: "Savings Goals", icon: Trophy, targetId: "savings-goals", spaceHref: "/money" },
-        { label: "Debt Ledger", icon: ArrowRight, targetId: "debt-tracker", spaceHref: "/money" },
+        { label: "Wallets & Cards", icon: Wallet, targetId: "category-wallets", spaceHref: "/money", tab: "ledger" },
         { label: "Transaction Ledger", icon: CheckSquare, targetId: "money-ledger", spaceHref: "/money", tab: "ledger" },
         { label: "Monthly Budgets", icon: Target, targetId: "money-budgets", spaceHref: "/money", tab: "budgets" },
+        { label: "Subscriptions", icon: Sparkles, targetId: "subscriptions", spaceHref: "/money", tab: "vault" },
+        { label: "Savings Goals", icon: Trophy, targetId: "savings-goals", spaceHref: "/money", tab: "vault" },
+        { label: "Debt Ledger", icon: ArrowRight, targetId: "debt-tracker", spaceHref: "/money", tab: "vault" },
       ];
     }
     if (pathname.startsWith("/goals")) {
@@ -195,25 +198,47 @@ export function SpaceHeader() {
   const subFeatures = getSubFeatures();
 
   const scrollToTargetWithRetry = (targetId: string, attempts = 0) => {
+    if (retryTimeoutRef.current) {
+      clearTimeout(retryTimeoutRef.current);
+      retryTimeoutRef.current = null;
+    }
+
     const el = document.getElementById(targetId);
     if (el) {
-      const headerOffset = 120;
-      const elementPosition = el.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+      const mainContainer = document.getElementById("main-scroll-container") || document.querySelector("main");
+      if (mainContainer) {
+        const containerRect = mainContainer.getBoundingClientRect();
+        const elementRect = el.getBoundingClientRect();
+        const headerOffset = 90;
+        const targetScrollTop = mainContainer.scrollTop + (elementRect.top - containerRect.top) - headerOffset;
 
-      window.scrollTo({
-        top: Math.max(0, offsetPosition),
-        behavior: "smooth",
-      });
+        mainContainer.scrollTo({
+          top: Math.max(0, targetScrollTop),
+          behavior: "smooth",
+        });
+      } else {
+        el.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
 
       el.classList.add("ring-4", "ring-[#CEF431]", "scale-[1.01]", "transition-all", "duration-300");
       setTimeout(() => {
         el.classList.remove("ring-4", "ring-[#CEF431]", "scale-[1.01]");
-      }, 2000);
-    } else if (attempts < 15) {
-      setTimeout(() => scrollToTargetWithRetry(targetId, attempts + 1), 150);
+      }, 1500);
+    } else if (attempts < 12) {
+      retryTimeoutRef.current = setTimeout(() => scrollToTargetWithRetry(targetId, attempts + 1), 120);
     }
   };
+
+  useEffect(() => {
+    return () => {
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const jumpId = searchParams.get("jump") || (typeof window !== "undefined" ? window.location.hash.replace("#", "") : "");
@@ -223,12 +248,17 @@ export function SpaceHeader() {
   }, [pathname, searchParams]);
 
   const handleSubFeatureClick = (targetId: string, spaceHref?: string, tab?: string) => {
+    const now = Date.now();
+    const isRapidClick = now - lastSubNavClickRef.current < 250;
+    lastSubNavClickRef.current = now;
+
     const currentTab = searchParams.get("tab");
     const targetSpace = spaceHref || "/today";
-    const needsTabSwitch = tab && currentTab !== tab;
+    const needsTabSwitch = Boolean(tab && currentTab !== tab);
     const needsPageNavigation = !pathname.startsWith(targetSpace);
 
     if (needsPageNavigation || needsTabSwitch) {
+      if (isRapidClick) return; // Ignore rapid multi-click spam to prevent router queue thrashing
       const queryTab = tab ? `&tab=${tab}` : "";
       router.push(`${targetSpace}?jump=${targetId}${queryTab}`);
       return;
