@@ -1,26 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Invictus Daily Overview — Refined Neobrutalist Split Deck
+    Authentic Invictus Design System: Warm cream, solid #161514 borders, #CEF431 accents.
+    High-contrast financial pacing on the left, live habit checklist on the right.
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@drawable/widget_background"
+    android:orientation="vertical"
     android:padding="10dp">
 
-    <!-- Top Sanctuary Header: Brand Mark & Live Date Chip -->
+    <!-- Top Bar: Branded Invictus Header & Date / Days Left Pill -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_marginBottom="7dp"
         android:gravity="center_vertical"
-        android:layout_marginBottom="6dp">
+        android:orientation="horizontal">
 
         <TextView
             android:id="@+id/widget_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="🌿 INVICTUS SANCTUARY"
+            android:text="⚡ INVICTUS DAILY"
             android:textColor="@color/widget_text_primary"
             android:textSize="11sp"
             android:textStyle="bold" />
@@ -29,278 +34,265 @@
             android:id="@+id/widget_date_chip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Sat, 3 Oct • Autumn Bloom"
+            android:text="TODAY • 24d left"
             android:textColor="@color/widget_text_muted"
-            android:textSize="9.5sp"
+            android:textSize="9sp"
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Top Terrace Card: Living Biome & Clear Brook (Daily Budget) -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@drawable/widget_card_inset"
-        android:padding="8dp"
-        android:layout_marginBottom="6dp">
-
-        <!-- Weather Status & Brook Flow Remaining -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <TextView
-                android:id="@+id/widget_weather_label"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="☀️ GOLDEN SUNLIGHT"
-                android:textColor="@color/widget_accent_emerald"
-                android:textSize="9sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/widget_safe_amount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="₹650 FLOW LEFT"
-                android:textColor="@color/widget_text_primary"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <!-- Cap Subtext / Weather Alert Badge -->
-        <TextView
-            android:id="@+id/widget_today_badge"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="1dp"
-            android:text="₹350 spent of ₹800 cap"
-            android:textColor="@color/widget_text_muted"
-            android:textSize="9sp"
-            android:singleLine="true" />
-
-        <!-- Brook Water Flow Stream Progress Bar -->
-        <ProgressBar
-            android:id="@+id/widget_stream_bar"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="6dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:max="100"
-            android:progress="70"
-            android:progressDrawable="@drawable/widget_stream_progress" />
-
-        <!-- River Pebble Liquidity Chips -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <TextView
-                android:id="@+id/widget_upi_left"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="📱 UPI: ₹9,400"
-                android:textColor="@color/widget_text_muted"
-                android:textSize="8.5sp"
-                android:textStyle="bold"
-                android:singleLine="true" />
-
-            <TextView
-                android:id="@+id/widget_cash_left"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="💵 Cash: ₹2,000"
-                android:textColor="@color/widget_text_muted"
-                android:textSize="8.5sp"
-                android:textStyle="bold"
-                android:singleLine="true" />
-
-            <TextView
-                android:id="@+id/widget_days_left"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="28d left"
-                android:textColor="@color/widget_text_muted"
-                android:textSize="8.5sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-    </LinearLayout>
-
-    <!-- Split Middle Section: Sacred Flora (Left) & Torii Pathway (Right) -->
+    <!-- Main Content: Dual Split Deck Cards (Finances Left • Habits Right) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
         android:layout_weight="1"
-        android:orientation="horizontal"
-        android:layout_marginBottom="6dp">
+        android:baselineAligned="false"
+        android:orientation="horizontal">
 
-        <!-- Left Card: Sacred Flora (Habit Checklist) -->
+        <!-- Left Card: Financial Pace & Liquidity Cockpit -->
+        <LinearLayout
+            android:id="@+id/widget_finance_section"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="4dp"
+            android:layout_weight="1"
+            android:background="@drawable/widget_card_inset"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <!-- Card Header: Spent Today & Allowance Status -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/widget_hero_label"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="SPENT TODAY"
+                    android:textColor="@color/widget_text_muted"
+                    android:textSize="8.5sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/widget_days_left"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="24d left"
+                    android:textColor="@color/widget_text_muted"
+                    android:textSize="8sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <!-- Big Bold Hero Stat: Spent Today -->
+            <TextView
+                android:id="@+id/widget_safe_amount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="₹0"
+                android:textColor="@color/widget_text_primary"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <!-- Remaining Allowance Pill Sub-badge -->
+            <TextView
+                android:id="@+id/widget_today_badge"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:singleLine="true"
+                android:text="₹168 left (₹500 cap)"
+                android:textColor="@color/widget_accent_emerald"
+                android:textSize="8.5sp"
+                android:textStyle="bold" />
+
+            <!-- Hairline Divider -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:background="@color/widget_border_subtle" />
+
+            <!-- Liquidity Breakdown: UPI & Cash Balances -->
+            <TextView
+                android:id="@+id/widget_upi_left"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="📱 UPI: ₹12,400"
+                android:textColor="@color/widget_text_primary"
+                android:textSize="8.5sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widget_cash_left"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1.5dp"
+                android:singleLine="true"
+                android:text="💵 Cash: ₹3,200"
+                android:textColor="@color/widget_text_muted"
+                android:textSize="8.5sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Right Card: Today's Habits Checklist -->
         <LinearLayout
             android:id="@+id/widget_habits_section"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginStart="4dp"
             android:layout_weight="1"
-            android:layout_marginEnd="4dp"
-            android:orientation="vertical"
             android:background="@drawable/widget_card_inset"
-            android:padding="7dp">
+            android:orientation="vertical"
+            android:padding="8dp">
 
-            <!-- Flora Header -->
+            <!-- Card Header: Title & Progress Count -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:layout_marginBottom="4dp"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="3dp">
+                android:orientation="horizontal">
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="🌸 SACRED FLORA"
+                    android:text="TODAY'S HABITS"
                     android:textColor="@color/widget_text_muted"
-                    android:textSize="8sp"
+                    android:textSize="8.5sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/widget_habits_progress"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="3/4 BLOOMED"
+                    android:text="0/0 DONE"
                     android:textColor="@color/widget_accent_emerald"
-                    android:textSize="8sp"
+                    android:textSize="8.5sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- Full Bloom Celebration Banner -->
-            <TextView
-                android:id="@+id/widget_bloom_celebration"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="3dp"
-                android:text="🌸 FULL BLOOM ACHIEVED ✨"
-                android:textColor="@color/widget_accent_emerald"
-                android:textSize="8sp"
-                android:textStyle="bold"
-                android:singleLine="true"
-                android:visibility="gone" />
-
-            <!-- Habit Row 1 -->
+            <!-- Habit Item Row 1 -->
             <LinearLayout
                 android:id="@+id/widget_habit_row_1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:layout_marginBottom="3dp"
                 android:gravity="center_vertical"
-                android:layout_marginTop="1dp">
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/widget_habit_1_check"
-                    android:layout_width="16dp"
+                    android:layout_width="14dp"
                     android:layout_height="wrap_content"
-                    android:text="🌸"
-                    android:textSize="9.5sp" />
+                    android:text="○"
+                    android:textColor="@color/widget_text_muted"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/widget_habit_1_title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Morning Workout"
+                    android:singleLine="true"
+                    android:text="Habit 1"
                     android:textColor="@color/widget_text_primary"
-                    android:textSize="9.5sp"
-                    android:textStyle="bold"
-                    android:singleLine="true" />
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/widget_habit_1_streak"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="🔥 5d"
+                    android:text="🔥 3d"
                     android:textColor="@color/widget_accent_amber"
-                    android:textSize="7.5sp"
+                    android:textSize="8sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- Habit Row 2 -->
+            <!-- Habit Item Row 2 -->
             <LinearLayout
                 android:id="@+id/widget_habit_row_2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:layout_marginBottom="3dp"
                 android:gravity="center_vertical"
-                android:layout_marginTop="2dp">
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/widget_habit_2_check"
-                    android:layout_width="16dp"
+                    android:layout_width="14dp"
                     android:layout_height="wrap_content"
-                    android:text="🌸"
-                    android:textSize="9.5sp" />
+                    android:text="○"
+                    android:textColor="@color/widget_text_muted"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/widget_habit_2_title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Hydration 3L"
+                    android:singleLine="true"
+                    android:text="Habit 2"
                     android:textColor="@color/widget_text_primary"
-                    android:textSize="9.5sp"
-                    android:textStyle="bold"
-                    android:singleLine="true" />
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/widget_habit_2_streak"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="🔥 12d"
+                    android:text="🔥 5d"
                     android:textColor="@color/widget_accent_amber"
-                    android:textSize="7.5sp"
+                    android:textSize="8sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- Habit Row 3 -->
+            <!-- Habit Item Row 3 -->
             <LinearLayout
                 android:id="@+id/widget_habit_row_3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginTop="2dp">
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/widget_habit_3_check"
-                    android:layout_width="16dp"
+                    android:layout_width="14dp"
                     android:layout_height="wrap_content"
-                    android:text="🌱"
-                    android:textSize="9.5sp" />
+                    android:text="○"
+                    android:textColor="@color/widget_text_muted"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/widget_habit_3_title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="DSA Sprint 2h"
+                    android:singleLine="true"
+                    android:text="Habit 3"
                     android:textColor="@color/widget_text_primary"
-                    android:textSize="9.5sp"
-                    android:textStyle="bold"
-                    android:singleLine="true" />
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/widget_habit_3_streak"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="🔥 3d"
+                    android:text="🔥 1d"
                     android:textColor="@color/widget_accent_amber"
-                    android:textSize="7.5sp"
+                    android:textSize="8sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -309,97 +301,18 @@
                 android:id="@+id/widget_habits_empty"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="🌱 Tap to tend flora"
+                android:layout_marginTop="6dp"
+                android:singleLine="true"
+                android:text="🌱 Tap to check habits"
                 android:textColor="@color/widget_text_muted"
                 android:textSize="9sp"
+                android:textStyle="bold"
                 android:visibility="gone" />
-        </LinearLayout>
 
-        <!-- Right Card: Sacred Torii Pathway (Active Goal) -->
-        <LinearLayout
-            android:id="@+id/widget_goal_section"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:layout_marginStart="4dp"
-            android:orientation="vertical"
-            android:background="@drawable/widget_card_inset"
-            android:padding="7dp">
-
-            <!-- Torii Header -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="3dp">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="⛩️ TORII PATHWAY"
-                    android:textColor="@color/widget_text_muted"
-                    android:textSize="8sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/widget_goal_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🎯"
-                    android:textSize="9sp" />
-            </LinearLayout>
-
-            <!-- Goal Title -->
-            <TextView
-                android:id="@+id/widget_goal_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Master System Design"
-                android:textColor="@color/widget_text_primary"
-                android:textSize="10.5sp"
-                android:textStyle="bold"
-                android:singleLine="true" />
-
-            <!-- Torii Gate Checkpoint Status -->
-            <TextView
-                android:id="@+id/widget_goal_gate_status"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="⛩️ Gate 3 of 5 Passed"
-                android:textColor="@color/widget_accent_emerald"
-                android:textSize="8.5sp"
-                android:textStyle="bold"
-                android:singleLine="true" />
-
-            <!-- Torii Pathway Stepped Progress Bar -->
-            <ProgressBar
-                android:id="@+id/widget_goal_progress_bar"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="5dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="3dp"
-                android:max="100"
-                android:progress="65"
-                android:progressDrawable="@drawable/widget_torii_progress" />
-
-            <!-- Milestone Completion Subtext -->
-            <TextView
-                android:id="@+id/widget_goal_percentage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="65% • Summit Ascent"
-                android:textColor="@color/widget_text_muted"
-                android:textSize="8sp"
-                android:singleLine="true" />
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Bottom Bar: Minimal Zen Action Controls -->
+    <!-- Bottom Bar: Dual Neobrutalist Action Buttons (+ EXPENSE & ✓ HABITS) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="32dp"
@@ -409,12 +322,12 @@
             android:id="@+id/widget_btn_add_expense"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginEnd="4dp"
             android:layout_weight="1"
-            android:layout_marginEnd="3dp"
-            android:background="@drawable/widget_button_log"
+            android:background="@drawable/widget_button_background"
             android:gravity="center"
-            android:text="💧 Log"
-            android:textColor="@color/widget_border"
+            android:text="+ EXPENSE"
+            android:textColor="#161514"
             android:textSize="10.5sp"
             android:textStyle="bold" />
 
@@ -422,26 +335,12 @@
             android:id="@+id/widget_btn_check_habits"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginStart="4dp"
             android:layout_weight="1"
-            android:layout_marginStart="2dp"
-            android:layout_marginEnd="2dp"
-            android:background="@drawable/widget_button_habit"
+            android:background="@drawable/widget_button_secondary"
             android:gravity="center"
-            android:text="🌸 Habits"
-            android:textColor="@color/widget_text_primary"
-            android:textSize="10.5sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/widget_btn_active_goal"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:layout_marginStart="3dp"
-            android:background="@drawable/widget_button_goal"
-            android:gravity="center"
-            android:text="⛩️ Path"
-            android:textColor="@color/widget_border"
+            android:text="✓ HABITS"
+            android:textColor="#161514"
             android:textSize="10.5sp"
             android:textStyle="bold" />
     </LinearLayout>

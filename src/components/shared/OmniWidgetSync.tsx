@@ -11,7 +11,6 @@ import { format } from "date-fns";
 
 export function OmniWidgetSync() {
   const { user } = useAuth();
-  const { widgetTheme } = useUIStore();
   const { syncToWidget } = useWidgetSync();
   const todayStr = useMemo(() => format(new Date(), "yyyy-MM-dd"), []);
   const currentMonthKey = useMemo(() => format(new Date(), "yyyy-MM"), []);
@@ -201,9 +200,8 @@ export function OmniWidgetSync() {
       habitsCompletedCount,
       habitsList,
       activeGoal,
-      widgetTheme,
     });
-  }, [budgetStats, dailyStats, currencySymbol, habits.length, habitsCompletedCount, habitsList, activeGoal, widgetTheme, syncToWidget]);
+  }, [budgetStats, dailyStats, currencySymbol, habits.length, habitsCompletedCount, habitsList, activeGoal, syncToWidget]);
 
   return null;
 }

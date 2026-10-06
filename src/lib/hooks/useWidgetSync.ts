@@ -37,8 +37,6 @@ export interface WidgetSyncData {
   habitsList?: WidgetHabitItem[];
   // Active Goal Additions
   activeGoal?: WidgetGoalItem;
-  // Widget Theme Switcher
-  widgetTheme?: "zen" | "speedway";
 }
 
 interface WidgetBridgePluginType {

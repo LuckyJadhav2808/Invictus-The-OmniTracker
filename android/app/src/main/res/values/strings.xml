@@ -16,6 +16,6 @@
     <string name="shortcut_log_study_long">Log Study Session</string>
 
     <!-- Home Screen Widget Strings -->
-    <string name="widget_safe_spend_label">Invictus Sanctuary &amp; Torii Pathway</string>
-    <string name="widget_safe_spend_description">Daily Zen Sanctuary: Brook budget flow, blooming sacred flora habits, and sacred Torii gate goal checkpoints.</string>
+    <string name="widget_safe_spend_label">Invictus Daily Overview</string>
+    <string name="widget_safe_spend_description">Daily safe-to-spend rate, remaining liquidity balances, and habit checklist.</string>
 </resources>

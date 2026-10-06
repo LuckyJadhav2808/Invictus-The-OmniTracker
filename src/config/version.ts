@@ -18,7 +18,7 @@ export const APP_VERSION_CONFIG: AppVersionInfo = {
   githubRepoUrl: "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker",
   latestReleaseApiUrl: "https://api.github.com/repos/LuckyJadhav2808/Invictus-The-OmniTracker/releases/latest",
   changelog: [
-    "🏎️ Dual Android Widgets: Invictus Speedway Arcade (fuel gauge, turbo cruise, pit crew) and Zen Sanctuary (brook water flow, sacred flora, Torii gates)",
+    "⚡ Refined Neobrutalist Android Widget: Clean split-deck daily overview featuring real-time safe-to-spend pacing, liquidity pills, and interactive habit checklist",
     "📲 In-App APK Updater: Instant background download with live progress and native Android package installer integration",
     "🦊 Interactive Vix Vector Mascot: Expressive animated SVG mascot with glance/blink autonomy, audio feedback, and mood states",
     "🛠️ Neobrutalist UI Upgrades: AdaptiveDrawerDialog, NeobrutalistDateTimePickerModal, and CloudSyncDrawer",
