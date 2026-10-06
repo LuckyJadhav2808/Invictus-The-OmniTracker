@@ -4,6 +4,8 @@ import path from "path";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Category } from "@/models/Category";
 
+export const dynamic = "force-dynamic";
+
 export interface MonthlySpendingRecord {
   month: string;
   groceries: number;

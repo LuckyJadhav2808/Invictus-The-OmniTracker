@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { IssueReport } from "@/models/IssueReport";
 
+export const dynamic = "force-dynamic";
+
 // GET /api/admin/issues - Fetch all issue reports from MongoDB
 export async function GET(req: NextRequest) {
   try {

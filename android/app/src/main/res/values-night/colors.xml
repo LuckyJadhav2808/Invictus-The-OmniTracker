@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Neobrutalist Zen Sanctuary Palette (Night / Obsidian) -->
+    <color name="widget_bg">#161514</color>
+    <color name="widget_card_bg">#22201E</color>
+    <color name="widget_card_inset">#2A2725</color>
+    <color name="widget_border">#3A3734</color>
+    <color name="widget_border_subtle">#55FFFFFF</color>
+    <color name="widget_text_primary">#FAF8F5</color>
+    <color name="widget_text_muted">#A8A29E</color>
+    <color name="widget_accent_lime">#CEF431</color>
+    <color name="widget_accent_emerald">#03D26F</color>
+    <color name="widget_accent_rose">#FDA4AF</color>
+    <color name="widget_accent_amber">#F59E0B</color>
+    <color name="widget_accent_red">#F87171</color>
+    <color name="widget_stream_track">#082F49</color>
+    <color name="widget_stream_water">#38BDF8</color>
+    <color name="widget_torii_track">#451A03</color>
+    <color name="widget_torii_fill">#03D26F</color>
+
+    <!-- Speedway Arcade Palette -->
+    <color name="widget_speedway_bg">#121214</color>
+    <color name="widget_speedway_card">#1A1A1E</color>
+    <color name="widget_speedway_card_inner">#222228</color>
+    <color name="widget_speedway_border">#CEF431</color>
+    <color name="widget_speedway_border_dark">#2A2A30</color>
+    <color name="widget_speedway_cyan">#00E5FF</color>
+    <color name="widget_speedway_yellow">#FACC15</color>
+    <color name="widget_speedway_text">#FFFFFF</color>
+    <color name="widget_speedway_text_muted">#9E9EA8</color>
+</resources>

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { HabitLog } from "@/models/HabitLog";
 
+export const dynamic = "force-dynamic";
+
 // GET /api/goals/logs?userId=xxx&date=yyyy-mm-dd&startDate=xxx&endDate=yyy
 export async function GET(req: Request) {
   try {

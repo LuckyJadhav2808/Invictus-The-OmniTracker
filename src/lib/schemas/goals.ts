@@ -55,6 +55,8 @@ export const HealthProfileSchema = z.object({
   gender: z.string().default("Female"),
   age: z.string().default("24 Years"),
   weight: z.string().default("68 kg"),
+  height: z.string().optional(),
+  waterGoal: z.number().optional(),
 });
 
 export const WaterLogSchema = z.object({

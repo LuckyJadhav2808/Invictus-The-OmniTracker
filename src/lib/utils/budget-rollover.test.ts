@@ -167,7 +167,7 @@ describe("computeDailyBudgetStats", () => {
     expect(daily.dailyBudgetTarget).toBe(100);
     expect(daily.isCustomTarget).toBe(true);
     expect(daily.todayExpense).toBe(120);
-    expect(daily.todayRemaining).toBe(0);
+    expect(daily.todayRemaining).toBe(-20);
     expect(daily.isOverDailyBudget).toBe(true);
     expect(daily.overDailyAmount).toBe(20); // 120 - 100
     expect(daily.todayUsedPercentage).toBe(100);

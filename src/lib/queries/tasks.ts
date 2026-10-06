@@ -7,80 +7,7 @@ import { useAuth } from "@/components/shared/AuthProvider";
 import { getCustomSession } from "@/lib/custom-auth";
 
 const TASKS_STORAGE_KEY = "invictus_tasks_db";
-
-const DEFAULT_SEED_TASKS: TaskItem[] = [
-  {
-    id: "task_seed_1",
-    title: "Design Invictus Production Task Board & Kanban",
-    description: "Build a sleek Neobrutalist task tracker space with full CRUD, P1-P4 priority matrix, and subtask checklists.",
-    status: "in_progress",
-    priority: "p1",
-    dueDate: new Date().toISOString().split("T")[0],
-    dueTime: "18:00",
-    estimatedMinutes: 120,
-    loggedMinutes: 45,
-    projectTag: "Dev",
-    subtasks: [
-      { id: "sub_1", title: "Create TaskItem Schema & React Query hooks", completed: true },
-      { id: "sub_2", title: "Build TaskKanbanBoard & TaskListWidget", completed: true },
-      { id: "sub_3", title: "Integrate Robot Taskmaster Mascot & Header Switcher", completed: false },
-    ],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: "task_seed_2",
-    title: "Review Weekly Habits & Gym Workout Log",
-    description: "Check off weekly streak targets and log today's Push/Pull workout session.",
-    status: "todo",
-    priority: "p2",
-    dueDate: new Date(Date.now() + 86400000).toISOString().split("T")[0],
-    estimatedMinutes: 45,
-    loggedMinutes: 0,
-    projectTag: "Health",
-    subtasks: [
-      { id: "sub_4", title: "Log 3L water target", completed: false },
-      { id: "sub_5", title: "Track Gym Bench Press sets", completed: false },
-    ],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: "task_seed_3",
-    title: "GATE Syllabus Engineering Maths Revision",
-    description: "Solve 25 previous year questions on Linear Algebra and Calculus.",
-    status: "todo",
-    priority: "p1",
-    dueDate: new Date().toISOString().split("T")[0],
-    dueTime: "21:00",
-    estimatedMinutes: 90,
-    loggedMinutes: 0,
-    projectTag: "Study",
-    subtasks: [
-      { id: "sub_6", title: "Eigenvalues PyQ practice", completed: false },
-      { id: "sub_7", title: "Review Formula Sheet", completed: false },
-    ],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: "task_seed_4",
-    title: "Monthly Budget & Wallet Allocation Check",
-    description: "Verify category budgets and record recent subscriptions.",
-    status: "completed",
-    priority: "p3",
-    dueDate: new Date(Date.now() - 86400000).toISOString().split("T")[0],
-    estimatedMinutes: 30,
-    loggedMinutes: 30,
-    projectTag: "Finance",
-    subtasks: [
-      { id: "sub_8", title: "Log monthly bills", completed: true },
-    ],
-    completedAt: new Date().toISOString(),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-];
+const DEFAULT_SEED_TASKS: TaskItem[] = [];
 
 const getActiveUserId = (user: any) => {
   if (user?.uid) return user.uid;
@@ -93,16 +20,22 @@ const getActiveUserId = (user: any) => {
 
 // Helper to get local tasks
 export function getLocalTasks(): TaskItem[] {
-  if (typeof window === "undefined") return DEFAULT_SEED_TASKS;
+  if (typeof window === "undefined") return [];
   const data = localStorage.getItem(TASKS_STORAGE_KEY);
-  if (!data) {
-    localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(DEFAULT_SEED_TASKS));
-    return DEFAULT_SEED_TASKS;
-  }
+  if (!data) return [];
   try {
-    return JSON.parse(data);
+    const parsed: TaskItem[] = JSON.parse(data);
+    if (Array.isArray(parsed)) {
+      // Strip any legacy mock seed tasks
+      const sanitized = parsed.filter((t) => !t.id?.startsWith("task_seed_"));
+      if (sanitized.length !== parsed.length) {
+        saveLocalTasks(sanitized);
+      }
+      return sanitized;
+    }
+    return [];
   } catch {
-    return DEFAULT_SEED_TASKS;
+    return [];
   }
 }
 
@@ -124,30 +57,11 @@ export function useTasks() {
         const res = await fetch(`/api/tasks?userId=${userId}`);
         if (res.ok) {
           const data = await res.json();
-          if (Array.isArray(data) && data.length > 0) {
-            saveLocalTasks(data);
-            return data;
-          } else if (Array.isArray(data) && data.length === 0) {
-            // If MongoDB has no tasks yet for this user, check local storage and auto-migrate them
-            const local = getLocalTasks();
-            if (local.length > 0) {
-              for (const t of local) {
-                await fetch("/api/tasks", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ ...t, userId }),
-                }).catch(() => {});
-              }
-              const reloaded = await fetch(`/api/tasks?userId=${userId}`);
-              if (reloaded.ok) {
-                const refreshed = await reloaded.json();
-                if (Array.isArray(refreshed) && refreshed.length > 0) {
-                  saveLocalTasks(refreshed);
-                  return refreshed;
-                }
-              }
-            }
-            return local;
+          if (Array.isArray(data)) {
+            // Strip any legacy mock seed tasks
+            const sanitized = data.filter((t: any) => !t.id?.startsWith("task_seed_"));
+            saveLocalTasks(sanitized);
+            return sanitized;
           }
         }
       } catch (err) {

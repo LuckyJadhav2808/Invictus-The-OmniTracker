@@ -1,17 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { Sidebar } from "@/components/shared/Sidebar";
 import { BottomNav } from "@/components/shared/BottomNav";
 import { SpaceHeader } from "@/components/shared/SpaceHeader";
-import { NeobrutalistCalculator } from "@/components/shared/NeobrutalistCalculator";
-import { useUIStore } from "@/store/ui-store";
-import { cn } from "@/lib/utils";
-import { ChevronDown } from "lucide-react";
-
-import { Suspense } from "react";
 import { QuickActionModal } from "@/components/shared/QuickActionModal";
 import { OmniWidgetSync } from "@/components/shared/OmniWidgetSync";
 import { AutoUpdateBanner } from "@/components/shared/AutoUpdateBanner";
@@ -33,8 +27,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     }
     return true;
   });
-  const { activeTracker, setActiveTracker } = useUIStore();
-  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     if (loading) return;
@@ -64,52 +56,58 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div
-      className={cn(
-        "min-h-screen flex flex-col lg:flex-row bg-cream-bg text-navy-900 transition-colors duration-300",
-        (activeTracker === "life" || pathname.startsWith("/goals")) && "theme-life",
-        (activeTracker === "study" || pathname.startsWith("/study")) && "theme-study",
-        (activeTracker === "money" || pathname.startsWith("/money")) && "theme-money"
-      )}
-    >
+    <div className="min-h-screen flex flex-col lg:flex-row bg-[#FBF9F5] text-[#161514]">
+      {/* Desktop Persistent Sidebar */}
       <Sidebar />
-      <main id="main-scroll-container" className="flex-1 pb-24 lg:pb-0 min-h-screen relative overflow-y-auto flex flex-col">
+
+      {/* Main Content Viewport */}
+      <main
+        id="main-scroll-container"
+        className="flex-1 pb-24 lg:pb-0 min-h-screen relative overflow-y-auto flex flex-col"
+      >
         {/* Proactive Auto-Update Notification Banner */}
         <AutoUpdateBanner />
 
-        {/* Top Header Bar with Switcher */}
+        {/* Clean Production Top Bar */}
         <SpaceHeader />
 
-        {/* Content container */}
-        <div className="flex-1">
-          {children}
+        {/* Dynamic Route Content */}
+        <div className="flex-1 w-full max-w-6xl mx-auto">
+          <Suspense fallback={<InvictusLoadingScreen message="Loading Space…" />}>
+            {children}
+          </Suspense>
         </div>
 
-        {/* Production Footer */}
-        <footer className="mt-auto border-t border-border/50 py-6 px-6 text-center sm:flex sm:items-center sm:justify-between max-w-6xl mx-auto w-full text-navy-600/70 text-[11px] font-semibold gap-4">
+        {/* Minimalist Production Status Footer */}
+        <footer className="mt-auto border-t-2 border-[#161514]/15 py-4 px-6 text-center sm:flex sm:items-center sm:justify-between max-w-6xl mx-auto w-full text-[#161514]/60 text-[11px] font-semibold gap-4 select-none">
           <div className="flex items-center justify-center sm:justify-start gap-2">
-            <span className="font-extrabold text-navy-900">Invictus OS</span>
+            <span className="font-heading font-black text-[#161514]">Invictus OS</span>
             <span>•</span>
-            <span className="bg-white/60 px-2 py-0.5 rounded-full border border-border/40 text-[10px]">v{APP_VERSION_CONFIG.version} Production</span>
+            <span className="bg-white px-2 py-0.5 rounded-md border border-[#161514]/30 text-[10px] font-mono">
+              v{APP_VERSION_CONFIG.version} Production
+            </span>
           </div>
 
-          <div className="flex items-center justify-center gap-3 mt-2 sm:mt-0">
-            <span className="bg-white/80 border px-2.5 py-1 rounded-full text-[10px] font-bold text-navy-900 flex items-center gap-1 shadow-2xs">
-              <kbd className="font-mono bg-cream-bg px-1 rounded border">⌘ K</kbd> Quick Actions
+          <div className="flex items-center justify-center gap-3">
+            <span className="bg-white border-2 border-[#161514] px-2.5 py-1 rounded-lg text-[10px] font-heading font-extrabold text-[#161514] flex items-center gap-1 shadow-[1.5px_1.5px_0px_0px_#161514]">
+              <kbd className="font-mono bg-[#F1EFEA] px-1 rounded border border-[#161514]/30">⌘ K</kbd> Quick Actions
             </span>
             <span>•</span>
-            <span className="flex items-center gap-1">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              All systems operational
+            <span className="flex items-center gap-1.5">
+              <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span>All systems healthy</span>
             </span>
           </div>
         </footer>
       </main>
-      <NeobrutalistCalculator />
+
+      {/* Global Modals & Background Synchronization */}
       <Suspense fallback={null}>
         <QuickActionModal />
         <OmniWidgetSync />
       </Suspense>
+
+      {/* Mobile 5-Tab Persistent Navigation */}
       <BottomNav />
     </div>
   );

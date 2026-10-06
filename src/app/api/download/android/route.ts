@@ -8,11 +8,37 @@ export async function GET(request: Request) {
   const requestedVersion = searchParams.get("v");
   const forcePage = searchParams.get("page") === "true";
 
-  // Fast-path: Direct GitHub release asset redirect (zero rate-limit, instant download)
+  // Resolve real APK asset URL from GitHub releases
   if (!forcePage) {
-    const directDownloadUrl = requestedVersion
+    let directDownloadUrl = requestedVersion
       ? `https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v${requestedVersion}/Invictus.apk`
       : `https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/latest/download/Invictus.apk`;
+
+    try {
+      const releaseApiUrl = requestedVersion
+        ? `https://api.github.com/repos/LuckyJadhav2808/Invictus-The-OmniTracker/releases/tags/v${requestedVersion}`
+        : `https://api.github.com/repos/LuckyJadhav2808/Invictus-The-OmniTracker/releases/latest`;
+
+      const ghRes = await fetch(releaseApiUrl, {
+        headers: {
+          Accept: "application/vnd.github.v3+json",
+          "User-Agent": "Invictus-Downloader",
+        },
+        cache: "no-store",
+      });
+
+      if (ghRes.ok) {
+        const data = await ghRes.json();
+        if (Array.isArray(data.assets)) {
+          const apk = data.assets.find((a: any) => a.name?.endsWith(".apk"));
+          if (apk && apk.browser_download_url) {
+            directDownloadUrl = apk.browser_download_url;
+          }
+        }
+      }
+    } catch {
+      // Fallback cleanly
+    }
 
     return NextResponse.redirect(directDownloadUrl, {
       status: 302,

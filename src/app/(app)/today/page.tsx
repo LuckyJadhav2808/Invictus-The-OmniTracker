@@ -1,71 +1,105 @@
 "use client";
 
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useAuth } from "@/components/shared/AuthProvider";
-import { CalendarStrip } from "@/components/shared/CalendarStrip";
-import { StatTile } from "@/components/shared/StatTile";
-import { InsightCard } from "@/components/shared/InsightCard";
-import { FAB } from "@/components/shared/FAB";
-import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
-import { Button } from "@/components/ui/button";
-import { useState, useEffect, useMemo } from "react";
-import { toast } from "sonner";
-import { format, startOfWeek, addDays, isSameDay, subMonths, startOfMonth, endOfMonth } from "date-fns";
-import { BookOpen, Wallet, CheckSquare, Sparkles, Clock, LogOut, ArrowRight, Play, Square, Award } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useHabits, useHabitLogs, useStreaks, useStreakFreeze } from "@/lib/queries/goals";
-import { useStudySessions, useSubjects, useAllTopics } from "@/lib/queries/study";
-import { useTransactions, useCategories } from "@/lib/queries/money";
+import { useUIStore } from "@/store/ui-store";
+import {
+  useHabits,
+  useHabitLogs,
+  useToggleHabitLog,
+  useStreaks,
+  useStreakFreeze,
+  useMoodLog,
+  useSaveMoodLog,
+  useWaterLog,
+  useLogWater,
+  useHealthProfile,
+} from "@/lib/queries/goals";
+import { soundFX } from "@/components/shared/SoundFX";
+import { useStudySessions, useSubjects, useAllTopics, useAddStudySession } from "@/lib/queries/study";
+import { useTransactions, useCategories, useAddTransaction } from "@/lib/queries/money";
+import { useTasks, useUpdateTask } from "@/lib/queries/tasks";
 import { computeMonthlyBudgetStats, computeDailyBudgetStats } from "@/lib/utils/budget-rollover";
 import { useWidgetSync } from "@/lib/hooks/useWidgetSync";
-import { useUIStore } from "@/store/ui-store";
-import { SpaceHeroBanner } from "@/components/shared/SpaceHeroBanner";
-import { ProactiveReminderBanner } from "@/components/shared/ProactiveReminderBanner";
-import { LiquidPillBarChart } from "@/components/shared/LiquidPillBarChart";
-import { DraggableDashboardGrid } from "@/components/shared/DraggableDashboardGrid";
-import { QuickThoughtsWidget } from "@/components/shared/QuickThoughtsWidget";
-import { GymRoutineTracker } from "@/components/goals/GymRoutineTracker";
-import { MealTracker } from "@/components/goals/MealTracker";
-import { MoodJournalWidget } from "@/components/goals/MoodJournalWidget";
-import { SleepAndActiveWidgets } from "@/components/goals/SleepAndActiveWidgets";
-import { ExamSyllabusTracker } from "@/components/study/ExamSyllabusTracker";
-import { StudySessionLogger } from "@/components/study/StudySessionLogger";
-import { MoneyQuickActionsAndCards } from "@/components/money/MoneyQuickActionsAndCards";
-import { SubscriptionsTracker } from "@/components/money/SubscriptionsTracker";
-import { SavingsGoals } from "@/components/money/SavingsGoals";
-import { generateInsights, type Insight } from "@/lib/utils/insights";
-import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import {
+  format,
+  parseISO,
+  addDays,
+  subDays,
+  isToday as checkIsToday,
+} from "date-fns";
+
+// Modular Today Cockpit & Mascot Components
+import { TodayGreetingHero } from "@/components/today/TodayGreetingHero";
+import { QuickActionDock } from "@/components/today/QuickActionDock";
+import { HabitMomentumCard } from "@/components/today/HabitMomentumCard";
+import { StudySprintWidget } from "@/components/today/StudySprintWidget";
+import { SafeToSpendGauge } from "@/components/today/SafeToSpendGauge";
+import { TaskBattleQueue } from "@/components/today/TaskBattleQueue";
+import { EveningReflectionCard } from "@/components/today/EveningReflectionCard";
+import { ConfettiCelebration } from "@/components/common/ConfettiCelebration";
 
 export default function TodayPage() {
   const { user } = useAuth();
-  const router = useRouter();
   const { selectedDate, setSelectedDate } = useUIStore();
-  const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
-  const [chartViewMode, setChartViewMode] = useState<"week" | "month">("week");
 
-  // Profile preferences
-  const [currency, setCurrency] = useState("INR");
-
-  // Dismissed insights list
-  const [dismissedInsightIds, setDismissedInsightIds] = useState<string[]>([]);
-
-  // Active Session states
-  const [activeStopwatch, setActiveStopwatch] = useState<{
-    start: string;
-    subjectId: string;
-    topicId: string;
-    topicTitle: string;
-  } | null>(null);
-
+  // Queries
   const { data: habits = [] } = useHabits();
   const { data: logs = [] } = useHabitLogs(selectedDate);
   const { data: streaks = {} } = useStreaks();
-  const { data: streakFreeze = { tokensAvailable: 1, frozenDates: [] as string[] } } = useStreakFreeze();
+  const { data: streakFreeze = { tokensAvailable: 1, frozenDates: [] } } = useStreakFreeze();
+  const toggleHabitMutation = useToggleHabitLog();
+
   const { data: studySessions = [] } = useStudySessions();
   const { data: subjects = [] } = useSubjects();
   const { data: allTopics = [] } = useAllTopics();
+  const addStudySessionMutation = useAddStudySession();
+
   const { data: transactions = [] } = useTransactions();
   const { data: categories = [] } = useCategories();
+  const addTransactionMutation = useAddTransaction();
+
+  const { data: tasks = [] } = useTasks();
+  const updateTaskMutation = useUpdateTask();
+
+  const { data: moodLog } = useMoodLog(selectedDate);
+  const saveMoodMutation = useSaveMoodLog();
+
+  // Hydration sync
+  const { data: waterLog = { id: selectedDate, date: selectedDate, amount: 0 } } = useWaterLog(selectedDate);
+  const { data: healthProfile } = useHealthProfile();
+  const logWaterMutation = useLogWater();
+  const waterTarget = healthProfile?.waterGoal || 2000;
+  const waterAmount = waterLog?.amount || 0;
+
+  const handleQuickLogWater = (amount = 250) => {
+    soundFX.playSplash();
+    soundFX.vibrate(15);
+    logWaterMutation.mutate({ date: selectedDate, amount });
+    toast.success(`Logged +${amount}ml water! Stay hydrated 🌊`);
+  };
+
   const { syncToWidget } = useWidgetSync();
+
+  // Celebration state
+  const [showConfetti, setShowConfetti] = useState(false);
+  const previousConqueredRef = useRef(false);
+
+  // Currency resolution
+  const [currency, setCurrency] = useState("INR");
+  useEffect(() => {
+    if (user?.currency) setCurrency(user.currency);
+    else if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("invictus_user_profile");
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (parsed.currency) setCurrency(parsed.currency);
+        } catch {}
+      }
+    }
+  }, [user]);
 
   const currencySymbol = useMemo(() => {
     switch (currency) {
@@ -77,592 +111,347 @@ export default function TodayPage() {
     }
   }, [currency]);
 
-  // Sync Safe-to-Spend and Liquidity metrics to Android home screen widget on app startup
+  // Date Navigation
+  const currentDateObj = useMemo(() => {
+    try {
+      return parseISO(selectedDate);
+    } catch {
+      return new Date();
+    }
+  }, [selectedDate]);
+
+  const isCurrentDayToday = checkIsToday(currentDateObj);
+
+  const handlePrevDay = () => {
+    const prev = subDays(currentDateObj, 1);
+    setSelectedDate(format(prev, "yyyy-MM-dd"));
+  };
+
+  const handleNextDay = () => {
+    const next = addDays(currentDateObj, 1);
+    setSelectedDate(format(next, "yyyy-MM-dd"));
+  };
+
+  const handleJumpToToday = () => {
+    setSelectedDate(format(new Date(), "yyyy-MM-dd"));
+  };
+
+  // Habit metrics
+  const activeHabits = useMemo(() => habits.filter((h) => !h.archived), [habits]);
+  const activeHabitIds = useMemo(() => new Set(activeHabits.map((h) => h.id)), [activeHabits]);
+  const completedHabitLogs = useMemo(
+    () => logs.filter((l) => activeHabitIds.has(l.habitId) && l.completed),
+    [logs, activeHabitIds]
+  );
+  const totalHabitsCount = activeHabits.length;
+  const completedHabitsCount = completedHabitLogs.length;
+  const allHabitsConquered = totalHabitsCount > 0 && completedHabitsCount === totalHabitsCount;
+
+  // Trigger confetti when hitting 100% completion
+  useEffect(() => {
+    if (allHabitsConquered && !previousConqueredRef.current) {
+      setShowConfetti(true);
+      toast.success("🔥 VICTORY! All daily habits conquered. Vix salutes you!");
+    }
+    previousConqueredRef.current = allHabitsConquered;
+  }, [allHabitsConquered]);
+
+  // Streak days max
+  const streakDays = useMemo(() => {
+    return Object.values(streaks).reduce(
+      (max: number, s: any) => Math.max(max, s?.currentStreak || 0),
+      0
+    );
+  }, [streaks]);
+
+  // Study metrics
+  const todayStudySessions = useMemo(
+    () => studySessions.filter((s) => s.date === selectedDate),
+    [studySessions, selectedDate]
+  );
+  const todayStudyMinutes = useMemo(
+    () => todayStudySessions.reduce((acc, s) => acc + (s.durationMinutes || 0), 0),
+    [todayStudySessions]
+  );
+  const todayStudyHours = (todayStudyMinutes / 60).toFixed(1);
+  const studyTargetHours = 4.0;
+  const studyCompletionPercent = Math.min(
+    100,
+    Math.round(((todayStudyMinutes / 60) / studyTargetHours) * 100)
+  );
+
+  // Money & Safe-to-Spend metrics
+  const todayTransactions = useMemo(
+    () => transactions.filter((t) => t.date === selectedDate),
+    [transactions, selectedDate]
+  );
+  const spentToday = useMemo(
+    () =>
+      todayTransactions
+        .filter((t) => t.type === "expense")
+        .reduce((acc, t) => acc + (t.amount || 0), 0),
+    [todayTransactions]
+  );
+
+  const budgetStats = useMemo(() => {
+    const currentMonthKey = format(currentDateObj, "yyyy-MM");
+    return computeMonthlyBudgetStats({
+      transactions,
+      categories,
+      targetMonthKey: currentMonthKey,
+      baseUpiBudget: 10000,
+      baseCashBudget: 3000,
+      enableRollover: true,
+      currencySymbol,
+    });
+  }, [transactions, categories, currentDateObj, currencySymbol]);
+
+  const dailyBudgetStats = useMemo(() => {
+    return computeDailyBudgetStats({
+      transactions,
+      monthlyStats: budgetStats,
+      customDailyBudget: null,
+    });
+  }, [transactions, budgetStats]);
+
+  // Sync to widget
   useEffect(() => {
     if (!transactions.length && !categories.length) return;
     try {
-      const currentMonthKey = format(new Date(), "yyyy-MM");
-      let baseUpiBudget = 10000;
-      let baseCashBudget = 3000;
-      let enableRollover = true;
-
-      if (typeof window !== "undefined") {
-        const storedUpi = localStorage.getItem("invictus_upi_budget");
-        const storedCash = localStorage.getItem("invictus_cash_budget");
-        const storedRollover = localStorage.getItem("invictus_enable_rollover");
-        if (storedUpi) baseUpiBudget = parseFloat(storedUpi) || 10000;
-        if (storedCash) baseCashBudget = parseFloat(storedCash) || 3000;
-        if (storedRollover !== null) enableRollover = storedRollover === "true";
-      }
-
-      const stats = computeMonthlyBudgetStats({
-        transactions,
-        categories,
-        targetMonthKey: currentMonthKey,
-        baseUpiBudget,
-        baseCashBudget,
-        enableRollover,
-        currencySymbol,
-      });
-
-      let customDailyBudget: number | null = null;
-      if (typeof window !== "undefined") {
-        const storedCustomDaily = localStorage.getItem("invictus_custom_daily_budget");
-        if (storedCustomDaily) customDailyBudget = parseFloat(storedCustomDaily) || null;
-      }
-
-      const dailyStats = computeDailyBudgetStats({
-        transactions,
-        monthlyStats: stats,
-        customDailyBudget,
-      });
-
       syncToWidget({
-        safeToSpendDaily: stats.dailySafeToSpend,
-        remainingUpiBudget: stats.remainingUpiBudget,
-        remainingCashBudget: stats.remainingCashBudget,
-        totalAvailableUpiBudget: stats.totalAvailableUpiBudget,
-        totalAvailableCashBudget: stats.totalAvailableCashBudget,
+        safeToSpendDaily: budgetStats.dailySafeToSpend,
+        remainingUpiBudget: budgetStats.remainingUpiBudget,
+        remainingCashBudget: budgetStats.remainingCashBudget,
+        totalAvailableUpiBudget: budgetStats.totalAvailableUpiBudget,
+        totalAvailableCashBudget: budgetStats.totalAvailableCashBudget,
         currencySymbol,
-        daysRemainingInMonth: stats.daysRemainingInMonth,
-        targetMonthLabel: stats.targetMonthLabel.split(" ")[0],
-        hasCashBudget: stats.baseCashBudget > 0 || stats.totalAvailableCashBudget > 0,
-        todayExpense: dailyStats.todayExpense,
-        todayRemaining: dailyStats.todayRemaining,
-        dailyBudgetTarget: dailyStats.dailyBudgetTarget,
-        isOverDailyBudget: dailyStats.isOverDailyBudget,
-        overDailyAmount: dailyStats.overDailyAmount,
+        daysRemainingInMonth: budgetStats.daysRemainingInMonth,
+        targetMonthLabel: budgetStats.targetMonthLabel.split(" ")[0],
+        hasCashBudget: budgetStats.baseCashBudget > 0 || budgetStats.totalAvailableCashBudget > 0,
+        todayExpense: dailyBudgetStats.todayExpense,
+        todayRemaining: dailyBudgetStats.todayRemaining,
+        dailyBudgetTarget: dailyBudgetStats.dailyBudgetTarget,
+        isOverDailyBudget: dailyBudgetStats.isOverDailyBudget,
+        overDailyAmount: dailyBudgetStats.overDailyAmount,
       });
-    } catch (e) {
-      console.warn("Failed to sync widget from today page:", e);
-    }
-  }, [transactions, categories, currencySymbol, syncToWidget]);
+    } catch {}
+  }, [transactions, categories, budgetStats, dailyBudgetStats, currencySymbol, syncToWidget]);
 
-  // Load user profile details for currency & load dismissed insights / active stopwatches
+  // Active Stopwatch State
+  const [stopwatchSeconds, setStopwatchSeconds] = useState(0);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [selectedSubjectId, setSelectedSubjectId] = useState("");
+  const [selectedTopicId, setSelectedTopicId] = useState("");
+
   useEffect(() => {
-    const loadProfile = () => {
-      if (typeof window === "undefined") return;
-      const isGuestMode = localStorage.getItem("invictus_guest_mode") === "true";
-      if (isGuestMode || !user) {
-        const profileStr = localStorage.getItem("invictus_user_profile");
-        if (profileStr) {
-          try {
-            const profile = JSON.parse(profileStr);
-            if (profile.currency) setCurrency(profile.currency);
-          } catch {
-            // ignore JSON parse error
-          }
-        }
-      } else if (user?.currency) {
-        setCurrency(user.currency);
-      }
-    };
-    loadProfile();
-
-    // Dismissed insights
-    if (typeof window !== "undefined") {
-      const dismissed = localStorage.getItem("invictus_dismissed_insights");
-      if (dismissed) {
-        try {
-          setDismissedInsightIds(JSON.parse(dismissed));
-        } catch {
-          // ignore JSON parse error
-        }
-      }
+    let interval: NodeJS.Timeout;
+    if (isTimerRunning) {
+      interval = setInterval(() => {
+        setStopwatchSeconds((s) => s + 1);
+      }, 1000);
     }
-
-    // Active stopwatch check
-    const checkStopwatch = () => {
-      if (typeof window === "undefined") return;
-      const start = localStorage.getItem("invictus_stopwatch_start");
-      const subId = localStorage.getItem("invictus_stopwatch_subject_id");
-      const topId = localStorage.getItem("invictus_stopwatch_topic_id");
-      const title = localStorage.getItem("invictus_stopwatch_topic_title");
-      if (start && subId && topId && title) {
-        setActiveStopwatch({
-          start,
-          subjectId: subId,
-          topicId: topId,
-          topicTitle: title,
-        });
-      } else {
-        setActiveStopwatch(null);
-      }
-    };
-    checkStopwatch();
-    const interval = setInterval(checkStopwatch, 5000);
     return () => clearInterval(interval);
-  }, [user]);
+  }, [isTimerRunning]);
 
-  // Compute habit completed stats
-  const activeHabits = habits.filter((h) => !h.archived);
-  const activeHabitIds = new Set(activeHabits.map((h) => h.id));
-  const completedLogs = logs.filter((l) => activeHabitIds.has(l.habitId) && l.completed);
-  const totalHabitsCount = activeHabits.length;
-  const completedHabitsCount = completedLogs.length;
-
-  const needsSatisfaction =
-    totalHabitsCount > 0
-      ? Math.round((completedHabitsCount / totalHabitsCount) * 100)
-      : 0;
-
-  // Compute study stats
-  const studyMinutesToday = studySessions
-    .filter((s) => s.date === selectedDate)
-    .reduce((sum, s) => sum + s.durationMinutes, 0);
-
-  const studyHoursToday = (studyMinutesToday / 60).toFixed(1);
-  const studyPercentage = Math.min(100, Math.round((studyMinutesToday / 240) * 100)); // 4h target
-
-  // Compute money stats
-  const spentToday = transactions
-    .filter((t) => t.date === selectedDate && t.type === "expense")
-    .reduce((sum, t) => sum + t.amount, 0);
-
-  const activeExpenseCats = categories.filter((c) => c.type === "expense" && !c.archived);
-  const totalMonthlyBudget = activeExpenseCats.reduce((sum, c) => sum + (c.monthlyBudget || 0), 0);
-  const dailyBudget = totalMonthlyBudget > 0 ? totalMonthlyBudget / 30 : 500;
-  const moneyPercentage = Math.min(100, Math.round((spentToday / dailyBudget) * 100));
-
-  // Generate dynamic client-side insights
-  const allInsights = generateInsights({
-    habits,
-    streaks,
-    categories,
-    transactions,
-    studySessions,
-  });
-
-  const activeInsights = allInsights.filter((ins) => !dismissedInsightIds.includes(ins.id));
-
-  const handleDismissInsight = (id: string) => {
-    const nextDismissed = [...dismissedInsightIds, id];
-    setDismissedInsightIds(nextDismissed);
-    localStorage.setItem("invictus_dismissed_insights", JSON.stringify(nextDismissed));
+  const handleSaveTimerSession = async () => {
+    if (stopwatchSeconds < 60) {
+      toast.error("Sessions must be at least 1 minute to save.");
+      return;
+    }
+    const durationMinutes = Math.max(1, Math.round(stopwatchSeconds / 60));
+    try {
+      await addStudySessionMutation.mutateAsync({
+        subjectId: selectedSubjectId || (subjects[0]?.id || "general"),
+        topicId: selectedTopicId || "general",
+        durationMinutes,
+        date: selectedDate,
+        type: "practice",
+        notes: `Focus sprint recorded on ${selectedDate}`,
+      });
+      toast.success(`Logged ${durationMinutes}m focus session!`);
+      setStopwatchSeconds(0);
+      setIsTimerRunning(false);
+    } catch {
+      toast.error("Could not save session.");
+    }
   };
 
-  // Filter logs for lists
-  const habitsDone = habits.filter((h) => {
-    const log = logs.find((l) => l.habitId === h.id);
-    return log?.completed && !h.archived;
-  });
+  // Quick Expense Modal state
+  const [isQuickExpenseOpen, setIsQuickExpenseOpen] = useState(false);
+  const [isSavingExpense, setIsSavingExpense] = useState(false);
 
-  const studyToday = studySessions.filter((s) => s.date === selectedDate);
-  const txsToday = transactions.filter((t) => t.date === selectedDate);
+  const handleAddExpense = async (amount: number, categoryId: string, note: string) => {
+    setIsSavingExpense(true);
+    try {
+      await addTransactionMutation.mutateAsync({
+        amount,
+        type: "expense",
+        categoryId: categoryId || (categories[0]?.id || "cat-food"),
+        date: selectedDate,
+        paymentMethod: "upi",
+        note: note.trim() || "Quick expense",
+        isRecurring: false,
+      });
+      toast.success(`Recorded ${currencySymbol}${amount}!`);
+      setIsQuickExpenseOpen(false);
+    } catch {
+      toast.error("Could not record expense.");
+    } finally {
+      setIsSavingExpense(false);
+    }
+  };
 
-  const hasAnyLogs = habitsDone.length > 0 || studyToday.length > 0 || txsToday.length > 0;
+  // Mood and Notes State
+  const [currentMood, setCurrentMood] = useState<string>(moodLog?.mood || "good");
+  const [reflectionNote, setReflectionNote] = useState<string>(moodLog?.note || "");
+  const [isSavingMood, setIsSavingMood] = useState(false);
+
+  useEffect(() => {
+    if (moodLog) {
+      setCurrentMood(moodLog.mood || "good");
+      setReflectionNote(moodLog.note || "");
+    }
+  }, [moodLog]);
+
+  const handleSaveMood = async (newMood?: string) => {
+    const targetMood = newMood || currentMood;
+    setIsSavingMood(true);
+    try {
+      await saveMoodMutation.mutateAsync({
+        date: selectedDate,
+        mood: targetMood,
+        energy: 4,
+        note: reflectionNote.trim(),
+      });
+      toast.success("Mindset reflection saved!");
+    } catch {
+      toast.error("Could not save reflection.");
+    } finally {
+      setIsSavingMood(false);
+    }
+  };
+
+  // Smooth scroll helper for quick dock
+  const scrollToHabits = () => {
+    const el = document.getElementById("habits-section");
+    if (el) el.scrollIntoView({ behavior: "smooth" });
+  };
 
   return (
-    <div className="min-h-screen bg-cream-bg p-4 md:p-8 pb-28 lg:pb-12 space-y-6">
-      <div className="max-w-4xl mx-auto space-y-6">
-        {/* Space Hero Banner */}
-        <SpaceHeroBanner
-          space="today"
-          badgeText="Today's Overview"
-          title={`Welcome back, ${user?.displayName || "Champion"}! 👋`}
-          subtitle="Your habits, study time, and spending for today."
-          stats={[
-            { label: "Habits Done", value: `${completedHabitsCount}/${totalHabitsCount}`, icon: "🌱" },
-            { label: "Study Today", value: `${studyHoursToday}h`, icon: "📚" },
-            { label: "Spent Today", value: `${currencySymbol}${spentToday}`, icon: "💰" },
-          ]}
-          actionButton={{
-            label: "Quick Log Habits",
-            onClick: () => router.push("/goals"),
-          }}
-        />
+    <div className="space-y-6 py-4 px-3 sm:px-6 max-w-5xl mx-auto">
+      {/* Milestone Confetti Explosion */}
+      <ConfettiCelebration active={showConfetti} onComplete={() => setShowConfetti(false)} />
 
-        {/* Proactive Reminder Banner */}
-        <ProactiveReminderBanner space="today" />
+      {/* 1. Dynamic Greeting Hero & Vix the Gladiator Bot Cockpit */}
+      <TodayGreetingHero
+        currentDateObj={currentDateObj}
+        isToday={isCurrentDayToday}
+        onPrevDay={handlePrevDay}
+        onNextDay={handleNextDay}
+        onJumpToToday={handleJumpToToday}
+        streakDays={streakDays}
+        streakFreezeTokens={streakFreeze.tokensAvailable || 0}
+        completedHabitsCount={completedHabitsCount}
+        totalHabitsCount={totalHabitsCount}
+        studyMinutesToday={todayStudyMinutes}
+        isStudyingActive={isTimerRunning}
+        allHabitsConquered={allHabitsConquered}
+      />
 
-        {/* Draggable Today Dashboard Grid with Pinning Support from Goals, Study & Money Spaces */}
-        <DraggableDashboardGrid
-          storageKey="today"
-          widgets={[
-            {
-              id: "analytics-chart",
-              title: "📊 Activity & Calendar",
-              category: "today",
-              component: (
-                <div className="space-y-4">
-                  <CalendarStrip activityDays={{}} />
-                  {(() => {
-                    const todayDate = new Date();
-                    if (chartViewMode === "month") {
-                      const monthlyBars = Array.from({ length: 6 }, (_, i) => {
-                        const monthDate = subMonths(todayDate, 5 - i);
-                        const mStart = format(startOfMonth(monthDate), "yyyy-MM-dd");
-                        const mEnd = format(endOfMonth(monthDate), "yyyy-MM-dd");
-                        const isCurrentMonth = i === 5;
-                        const habitsInMonth = logs.filter((l) => l.date >= mStart && l.date <= mEnd && l.completed).length;
-                        const studySecsInMonth = studySessions
-                          .filter((s) => s.date >= mStart && s.date <= mEnd)
-                          .reduce((acc, curr) => acc + ((curr.durationMinutes || 0) * 60), 0);
-                        const scorePct = Math.min(100, Math.round((habitsInMonth * 10) + ((studySecsInMonth / 3600) * 15)));
-                        return {
-                          label: format(monthDate, "MMM"),
-                          percentage: scorePct,
-                          value: scorePct > 0 ? `${scorePct}%` : "0%",
-                          highlighted: isCurrentMonth,
-                          color: isCurrentMonth ? "#FB7185" : "#38BDF8",
-                        };
-                      });
+      {/* 2. Ergonomic Quick Action Dock (44px Touch Targets) */}
+      <QuickActionDock
+        isTimerRunning={isTimerRunning}
+        onToggleTimer={() => setIsTimerRunning(!isTimerRunning)}
+        onOpenExpenseModal={() => setIsQuickExpenseOpen(true)}
+        onScrollToHabits={scrollToHabits}
+      />
 
-                      return (
-                        <LiquidPillBarChart
-                          title="Monthly Activity"
-                          totalValue={`${logs.filter((l) => l.completed).length} Total Habits | ${(studySessions.reduce((a, c) => a + (c.durationMinutes || 0), 0) / 60).toFixed(1)}h Total Study`}
-                          data={monthlyBars}
-                          streakFreezeTokens={streakFreeze.tokensAvailable}
-                          frozenDates={streakFreeze.frozenDates}
-                          onCalendarClick={() => {
-                            setSelectedDate(format(todayDate, "yyyy-MM-dd"));
-                            toast.success("Jumped to Today 📅");
-                          }}
-                          onViewModeToggle={(nextMode) => setChartViewMode(nextMode)}
-                          className="my-4"
-                        />
-                      );
-                    }
-
-                    const mondayDate = startOfWeek(todayDate, { weekStartsOn: 1 });
-                    const weeklyBars = Array.from({ length: 7 }, (_, i) => {
-                      const day = addDays(mondayDate, i);
-                      const dayStr = format(day, "yyyy-MM-dd");
-                      const isToday = isSameDay(day, todayDate);
-                      const habitsDoneOnDay = logs.filter((l) => l.date === dayStr && l.completed).length;
-                      const studySecsOnDay = studySessions
-                        .filter((s) => s.date === dayStr)
-                        .reduce((acc, curr) => acc + ((curr.durationMinutes || 0) * 60), 0);
-                      const habitPct = totalHabitsCount > 0 ? (habitsDoneOnDay / totalHabitsCount) * 50 : 0;
-                      const studyPct = Math.min(50, (studySecsOnDay / 3600) * 25);
-                      const scorePct = Math.min(100, Math.round(habitPct + studyPct));
-                      const isFrozen = streakFreeze.frozenDates?.includes(dayStr);
-
-                      return {
-                        label: format(day, "eee"),
-                        percentage: scorePct,
-                        value: scorePct > 0 ? `${scorePct}%` : "0%",
-                        highlighted: isToday,
-                        color: isToday ? "#FB7185" : "#38BDF8",
-                        dateKey: dayStr,
-                        isFrozen,
-                      };
-                    });
-
-                    return (
-                      <LiquidPillBarChart
-                        title="Weekly Activity"
-                        totalValue={`${completedHabitsCount} Habits | ${studyHoursToday}h Study`}
-                        data={weeklyBars}
-                        streakFreezeTokens={streakFreeze.tokensAvailable}
-                        frozenDates={streakFreeze.frozenDates}
-                        onCalendarClick={() => {
-                          setSelectedDate(format(todayDate, "yyyy-MM-dd"));
-                          toast.success("Jumped to Today 📅");
-                        }}
-                        onViewModeToggle={(nextMode) => setChartViewMode(nextMode)}
-                        className="my-4"
-                      />
-                    );
-                  })()}
-                </div>
-              ),
-            },
-          ]}
-          availableWidgets={[
-            {
-              id: "gym-section",
-              title: "🏋️ Workout Routines",
-              category: "goals",
-              component: <GymRoutineTracker />,
-            },
-            {
-              id: "nutrition-section",
-              title: "🥗 Nutrition & Meals",
-              category: "goals",
-              component: <MealTracker />,
-            },
-            {
-              id: "mood-section",
-              title: "😴 Sleep & Mood",
-              category: "goals",
-              component: (
-                <div className="space-y-4">
-                  <SleepAndActiveWidgets />
-                  <MoodJournalWidget dateStr={selectedDate} />
-                </div>
-              ),
-            },
-            {
-              id: "syllabus-tracker",
-              title: "📚 Syllabus Tracker",
-              category: "study",
-              component: (
-                <ExamSyllabusTracker
-                  subjects={subjects}
-                  allTopics={allTopics}
-                />
-              ),
-            },
-            {
-              id: "session-logger",
-              title: "✍️ Study Sessions",
-              category: "study",
-              component: (
-                <StudySessionLogger
-                  topics={allTopics}
-                  onLogSession={(data) => {
-                    toast.success(`Logged ${data.durationMinutes} min study session! 📚`);
-                  }}
-                />
-              ),
-            },
-            {
-              id: "category-wallets",
-              title: "💳 Spending by Category",
-              category: "money",
-              component: (
-                <MoneyQuickActionsAndCards
-                  mainBalance={0}
-                  currencySymbol={currencySymbol}
-                  categories={categories.map((c) => ({
-                    id: c.id,
-                    name: c.name,
-                    amount: transactions
-                      .filter((t) => t.categoryId === c.id && t.type === "expense")
-                      .reduce((sum, t) => sum + t.amount, 0),
-                    color: c.color,
-                    icon: c.icon || "💳",
-                    type: c.type,
-                    monthlyBudget: c.monthlyBudget,
-                  }))}
-                  onAddTransaction={() => router.push("/money")}
-                />
-              ),
-            },
-            {
-              id: "subscriptions",
-              title: "🔁 Subscriptions",
-              category: "money",
-              component: <SubscriptionsTracker />,
-            },
-            {
-              id: "savings-goals",
-              title: "🐷 Savings Goals",
-              category: "money",
-              component: <SavingsGoals />,
-            },
-          ]}
-        />
-
-        {/* Stats Grid */}
-        <div id="today-stats-grid" className="grid grid-cols-2 md:grid-cols-4 gap-4 scroll-mt-28">
-          <StatTile
-            label="Needs Satisfaction"
-            value={`${needsSatisfaction}%`}
-            percentage={needsSatisfaction}
-            bgClass="bg-amber-500"
-            textColorClass="text-navy-900"
-            ringColorClass="stroke-navy-900"
-            onClick={() => router.push("/goals")}
-          />
-          <StatTile
-            label="Habits Done"
-            value={`${completedHabitsCount} / ${totalHabitsCount}`}
-            percentage={totalHabitsCount > 0 ? (completedHabitsCount / totalHabitsCount) * 100 : 0}
-            bgClass="bg-mint-400"
-            textColorClass="text-navy-900"
-            ringColorClass="stroke-navy-900"
-            onClick={() => router.push("/goals")}
-          />
-          <StatTile
-            label="Study Time"
-            value={`${studyHoursToday}h`}
-            percentage={studyPercentage}
-            bgClass="bg-orange-500"
-            textColorClass="text-white"
-            ringColorClass="stroke-white"
-            onClick={() => router.push("/study")}
-          />
-          <StatTile
-            label="Money Spent"
-            value={`${currencySymbol}${spentToday}`}
-            percentage={moneyPercentage}
-            bgClass="bg-lavender-400"
-            textColorClass="text-navy-900"
-            ringColorClass="stroke-navy-900"
-            onClick={() => router.push("/money")}
+      {/* 3. Bento Row 1: Habit Momentum Ring & Study Focus Hub */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Habit Momentum Card (7 Cols) */}
+        <div className="lg:col-span-7">
+          <HabitMomentumCard
+            habits={habits}
+            logs={logs}
+            streaks={streaks}
+            selectedDate={selectedDate}
+            waterAmount={waterAmount}
+            waterTarget={waterTarget}
+            onQuickLogWater={() => handleQuickLogWater(250)}
+            onToggleHabit={(habitId, completed) => {
+              toggleHabitMutation.mutate({
+                habitId,
+                date: selectedDate,
+                completed,
+              });
+            }}
           />
         </div>
 
-        {/* Active stopwatch session banner */}
-        {activeStopwatch && (
-          <div className="bg-[#ECFDF5] rounded-2xl p-5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-[#03D26F]/20 border-2 border-[#161514] flex items-center justify-center text-[#161514] animate-pulse">
-                <Play className="h-5 w-5 fill-[#03D26F]" />
-              </div>
-              <div className="text-left">
-                <h4 className="font-heading text-sm font-black text-[#161514]">Active Study Session</h4>
-                <p className="text-xs text-[#161514]/80 mt-0.5 font-bold">Currently tracking topic: "{activeStopwatch.topicTitle}"</p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => router.push(`/study/${activeStopwatch.subjectId}/${activeStopwatch.topicId}`)}
-              className="neo-btn neo-btn-primary py-2 px-4 text-xs font-heading font-black cursor-pointer flex items-center gap-1.5"
-            >
-              Stop & Log <ArrowRight className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        )}
-
-        {/* Quick Thoughts & Scratchpad Widget */}
-        <div id="today-quick-thoughts" className="scroll-mt-28">
-          <QuickThoughtsWidget />
-        </div>
-
-        {/* Daily Log summaries */}
-        <div id="today-summary-logs" className="bg-white rounded-2xl p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4 scroll-mt-28">
-          <div className="flex items-center justify-between border-b-2 border-[#161514]/15 pb-2">
-            <h3 className="font-heading font-black text-xs uppercase tracking-wider text-[#161514]">
-              Tracking summary for {selectedDate}
-            </h3>
-            <span className="neo-badge bg-[#EAF4F4]">
-              Activity Log
-            </span>
-          </div>
-
-          {!hasAnyLogs ? (
-            <p className="text-center text-xs text-[#161514]/70 py-6 leading-relaxed font-bold">
-              No habits completed, study logs, or money transactions tracked on this day yet. 
-              Tap the floating button below to track your day!
-            </p>
-          ) : (
-            <div className="space-y-4">
-              {/* Habits Completed today list */}
-              {habitsDone.length > 0 && (
-                <div className="space-y-2">
-                  <h4 className="font-heading text-xs font-black text-[#161514] flex items-center gap-1.5">
-                    <CheckSquare className="h-4 w-4 text-[#03D26F]" /> Habits Completed
-                  </h4>
-                  <div className="flex flex-wrap gap-2 pl-5.5">
-                    {habitsDone.map((h) => (
-                      <span key={h.id} className="text-xs font-heading font-black text-[#161514] bg-[#FFF9EA] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] rounded-full px-3 py-1 flex items-center gap-1.5">
-                        <Award className="h-3.5 w-3.5 text-amber-600" /> {h.title}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Study sessions logged today list */}
-              {studyToday.length > 0 && (
-                <div className="space-y-2">
-                  <h4 className="font-heading text-xs font-black text-[#161514] flex items-center gap-1.5">
-                    <BookOpen className="h-4 w-4 text-orange-500" /> Study Sessions
-                  </h4>
-                  <div className="space-y-1.5 pl-5.5">
-                    {studyToday.map((s) => (
-                      <div key={s.id} className="text-xs font-bold text-[#161514]/80 flex items-center gap-2 bg-[#FAF8F5] p-2 rounded-xl border border-[#161514]/30">
-                        <Clock className="h-3.5 w-3.5 text-[#161514]" />
-                        <span>Studied for <strong className="text-[#161514] font-black">{s.durationMinutes}m</strong> {s.notes && `(${s.notes})`}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Transactions logged today list */}
-              {txsToday.length > 0 && (
-                <div className="space-y-2">
-                  <h4 className="font-heading text-xs font-black text-[#161514] flex items-center gap-1.5">
-                    <Wallet className="h-4 w-4 text-[#C084FC]" /> Transactions Logged
-                  </h4>
-                  <div className="space-y-1.5 pl-5.5">
-                    {txsToday.map((t) => {
-                      const category = categories.find((c) => c.id === t.categoryId);
-                      return (
-                        <div key={t.id} className="text-xs font-bold text-[#161514]/80 flex items-center justify-between bg-[#FAF8F5] p-2 rounded-xl border border-[#161514]/30">
-                          <span>{category?.name || "Uncategorized"} {t.note && `(${t.note})`}</span>
-                          <span className={cn("font-heading font-black", t.type === "income" ? "text-emerald-700" : "text-[#161514]")}>
-                            {t.type === "income" ? "+" : "-"}{currencySymbol}{t.amount}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Insights Section */}
-        {activeInsights.length > 0 && (
-          <InsightCard
-            insights={activeInsights.map((ins) => ({
-              id: ins.id,
-              module: ins.module,
-              text: ins.text,
-            }))}
-            onDismiss={handleDismissInsight}
+        {/* Study Sprint Stopwatch Widget (5 Cols) */}
+        <div className="lg:col-span-5">
+          <StudySprintWidget
+            stopwatchSeconds={stopwatchSeconds}
+            isTimerRunning={isTimerRunning}
+            onToggleTimer={() => setIsTimerRunning(!isTimerRunning)}
+            onResetTimer={() => {
+              setIsTimerRunning(false);
+              setStopwatchSeconds(0);
+            }}
+            onSaveSession={handleSaveTimerSession}
+            selectedSubjectId={selectedSubjectId}
+            onChangeSubject={setSelectedSubjectId}
+            selectedTopicId={selectedTopicId}
+            onChangeTopic={setSelectedTopicId}
+            subjects={subjects}
+            allTopics={allTopics}
+            todayStudyHours={todayStudyHours}
+            studyCompletionPercent={studyCompletionPercent}
           />
-        )}
+        </div>
       </div>
 
-      {/* Floating Action Button (FAB) */}
-      <FAB onClick={() => setIsQuickAddOpen(true)} />
-
-      {/* Quick Add Form Container */}
-      <ResponsiveFormContainer
-        open={isQuickAddOpen}
-        onOpenChange={setIsQuickAddOpen}
-        title="Quick Log"
-        description="Select an action to track your day"
-      >
-        <div className="grid grid-cols-1 gap-3">
-          <Button
-            onClick={() => {
-              setIsQuickAddOpen(false);
-              router.push("/goals");
-            }}
-            className="w-full rounded-[var(--radius-md)] border border-input py-6 text-sm font-bold hover:bg-cream-bg/30 bg-white text-navy-900 flex items-center justify-start gap-3 shadow-none cursor-pointer"
-          >
-            <div className="bg-amber-500/15 text-amber-600 rounded-[var(--radius-sm)] p-2">
-              <CheckSquare className="h-5 w-5" />
-            </div>
-            <span>Check Off Habits</span>
-          </Button>
-
-          <Button
-            onClick={() => {
-              setIsQuickAddOpen(false);
-              router.push("/study");
-            }}
-            className="w-full rounded-[var(--radius-md)] border border-input py-6 text-sm font-bold hover:bg-cream-bg/30 bg-white text-navy-900 flex items-center justify-start gap-3 shadow-none cursor-pointer"
-          >
-            <div className="bg-orange-500/15 text-orange-500 rounded-[var(--radius-sm)] p-2">
-              <BookOpen className="h-5 w-5" />
-            </div>
-            <span>Log Study Session</span>
-          </Button>
-
-          <Button
-            onClick={() => {
-              setIsQuickAddOpen(false);
-              router.push("/money");
-            }}
-            className="w-full rounded-[var(--radius-md)] border border-input py-6 text-sm font-bold hover:bg-cream-bg/30 bg-white text-navy-900 flex items-center justify-start gap-3 shadow-none cursor-pointer"
-          >
-            <div className="bg-mint-600/15 text-mint-600 rounded-[var(--radius-sm)] p-2">
-              <Wallet className="h-5 w-5" />
-            </div>
-            <span>Log Money Transaction</span>
-          </Button>
+      {/* 4. Bento Row 2: Financial Safe-to-Spend Gauge & Priority Battle Queue */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Safe-to-Spend Financial Gauge (6 Cols) */}
+        <div className="lg:col-span-6">
+          <SafeToSpendGauge
+            spentToday={spentToday}
+            dailySafeToSpend={budgetStats.dailySafeToSpend}
+            currencySymbol={currencySymbol}
+            transactions={todayTransactions}
+            categories={categories}
+            isQuickExpenseOpen={isQuickExpenseOpen}
+            onToggleQuickExpense={() => setIsQuickExpenseOpen(!isQuickExpenseOpen)}
+            onAddExpense={handleAddExpense}
+            isSavingExpense={isSavingExpense}
+          />
         </div>
-      </ResponsiveFormContainer>
+
+        {/* Priority Battle Queue (6 Cols) */}
+        <div className="lg:col-span-6">
+          <TaskBattleQueue
+            tasks={tasks}
+            selectedDate={selectedDate}
+            onCompleteTask={(taskId, title) => {
+              updateTaskMutation.mutate({
+                id: taskId,
+                updates: { status: "completed" },
+              });
+              toast.success(`Conquered: ${title}`);
+            }}
+          />
+        </div>
+      </div>
+
+      {/* 5. Bento Row 3: Daily Reflection & Mindset */}
+      <EveningReflectionCard
+        currentMood={currentMood}
+        reflectionNote={reflectionNote}
+        onChangeNote={setReflectionNote}
+        onSaveMood={handleSaveMood}
+        isSaving={isSavingMood}
+      />
     </div>
   );
 }

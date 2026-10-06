@@ -56,6 +56,7 @@ import {
   ChevronDown,
   ChevronUp,
   ExternalLink,
+  LifeBuoy,
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -65,7 +66,6 @@ import { ReportIssueModal } from "@/components/shared/ReportIssueModal";
 import { UpdateCheckModal } from "@/components/shared/UpdateCheckModal";
 import { APP_VERSION_CONFIG } from "@/config/version";
 import { Capacitor } from "@capacitor/core";
-import { SmsAutoTrackerCard } from "@/components/money/SmsAutoTrackerCard";
 
 const TIMEZONES = [
   "Asia/Kolkata",
@@ -94,6 +94,8 @@ export default function SettingsPage() {
     setHabitLayoutStyle,
     widgetVariantStyle,
     setWidgetVariantStyle,
+    widgetTheme,
+    setWidgetTheme,
   } = useUIStore();
   const queryClient = useQueryClient();
   const achievements = useUserAchievements();
@@ -545,18 +547,18 @@ export default function SettingsPage() {
             LIFE ENGINE
           </h1>
           <button
-            onClick={() => toast.info("Life Engine Settings Active ⚙️")}
+            onClick={() => toast.info("Life Engine Settings Active")}
             className="h-11 w-11 bg-amber-400 hover:bg-amber-500 text-[#161514] rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer"
           >
             <Sliders className="h-5 w-5 stroke-[2.5]" />
           </button>
         </div>
 
-        {/* 📱 FEATURE 7: WEB-TO-APP DOWNLOAD DISCOVERY HINT CARD */}
+        {/* FEATURE: WEB-TO-APP DOWNLOAD DISCOVERY HINT CARD */}
         <div className="bg-[#CEF431] rounded-3xl p-5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-2xl bg-white border-2 border-[#161514] flex items-center justify-center text-2xl shadow-[2px_2px_0px_0px_#161514] shrink-0">
-              📱
+            <div className="h-12 w-12 rounded-2xl bg-white border-2 border-[#161514] flex items-center justify-center shadow-[2px_2px_0px_0px_#161514] shrink-0">
+              <Smartphone className="h-6 w-6 stroke-[2.5] text-[#161514]" />
             </div>
             <div>
               <div className="flex items-center gap-2 flex-wrap">
@@ -605,13 +607,10 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* ⚡ NATIVE BANK SMS AUTO-TRACKER SETTINGS */}
-        <SmsAutoTrackerCard />
-
-        {/* FEATURE 1: ⏰ GLOBAL WAKE-UP HERO WIDGET */}
+        {/* FEATURE: GLOBAL WAKE-UP HERO WIDGET */}
         <div className="bg-amber-400 rounded-3xl p-6 border-[2.5px] border-[#161514] shadow-[5px_5px_0px_0px_#161514] space-y-5 text-center">
           <div className="flex items-center justify-center gap-2 text-[#161514] font-black text-xs uppercase tracking-widest font-heading">
-            <span className="text-base">⏰</span> GLOBAL WAKE-UP
+            <AlarmClock className="h-4 w-4 stroke-[2.5]" /> GLOBAL WAKE-UP
           </div>
 
           {/* Interactive Time Display */}
@@ -691,7 +690,7 @@ export default function SettingsPage() {
               </div>
               <div className="text-left">
                 <h4 className="font-black text-sm text-[#161514] tracking-tight uppercase font-heading">
-                  DAILY LOG REMINDERS & NOTIFICATIONS 🔔
+                  DAILY LOG REMINDERS & NOTIFICATIONS
                 </h4>
                 <p className="text-[10px] text-[#161514]/80 font-black uppercase tracking-wide">
                   EXPENSES, HABITS & EXAM STUDY TIMES
@@ -904,22 +903,35 @@ export default function SettingsPage() {
             <ChevronRight className="h-5 w-5 text-[#161514] stroke-[3]" />
           </button>
 
-          {/* FEATURE 5B: 🎛️ WIDGET VARIANTS CARD */}
+          {/* FEATURE 5B: 🎛️ WIDGET THEMES CARD */}
           <button
             type="button"
             onClick={() => setIsWidgetVariantsOpen(true)}
             className="w-full bg-white hover:bg-[#FAF8F5] rounded-2xl p-4 border-2 border-[#161514] shadow-[4px_4px_0px_0px_#161514] flex items-center justify-between transition-all cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
           >
             <div className="flex items-center gap-3.5">
-              <div className="h-11 w-11 rounded-xl bg-amber-400 border-2 border-[#161514] flex items-center justify-center text-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] shrink-0">
-                <Sliders className="h-5 w-5 stroke-[2.5]" />
+              <div className={cn(
+                "h-11 w-11 rounded-xl border-2 border-[#161514] flex items-center justify-center text-lg shadow-[1.5px_1.5px_0px_0px_#161514] shrink-0 font-black",
+                widgetTheme === "speedway" ? "bg-[#CEF431] text-[#161514]" : "bg-emerald-300 text-[#161514]"
+              )}>
+                {widgetTheme === "speedway" ? "🏎️" : "🌿"}
               </div>
               <div className="text-left">
-                <h4 className="font-black text-sm text-[#161514] tracking-tight uppercase font-heading">
-                  Widget Themes
-                </h4>
-                <p className="text-[10px] text-[#161514]/70 font-bold tracking-wide">
-                  Choose widget appearance and style
+                <div className="flex items-center gap-2">
+                  <h4 className="font-black text-sm text-[#161514] tracking-tight uppercase font-heading">
+                    Widget Theme
+                  </h4>
+                  <span className={cn(
+                    "text-[9px] font-black uppercase px-2 py-0.5 rounded-full border border-[#161514]",
+                    widgetTheme === "speedway" ? "bg-[#CEF431] text-[#161514]" : "bg-[#03D26F] text-white"
+                  )}>
+                    {widgetTheme === "speedway" ? "🏎️ Speedway" : "🌿 Zen Sanctuary"}
+                  </span>
+                </div>
+                <p className="text-[10px] text-[#161514]/70 font-bold tracking-wide mt-0.5">
+                  {widgetTheme === "speedway" 
+                    ? "Active: Turbo Highway, Fuel Tank & Pit Crew LEDs" 
+                    : "Active: Serene Brook, Sacred Flora & Torii Ascent"}
                 </p>
               </div>
             </div>
@@ -933,8 +945,8 @@ export default function SettingsPage() {
             className="w-full bg-[#CEF431] hover:bg-[#bce028] rounded-2xl p-4 border-2 border-[#161514] shadow-[4px_4px_0px_0px_#161514] flex items-center justify-between transition-all cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
           >
             <div className="flex items-center gap-3.5">
-              <div className="h-11 w-11 rounded-xl bg-white border-2 border-[#161514] flex items-center justify-center text-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] shrink-0 font-black text-lg">
-                🛠️
+              <div className="h-11 w-11 rounded-xl bg-white border-2 border-[#161514] flex items-center justify-center text-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] shrink-0 font-black">
+                <LifeBuoy className="h-5 w-5 stroke-[2.5]" />
               </div>
               <div className="text-left">
                 <h4 className="font-black text-sm text-[#161514] tracking-tight uppercase font-heading">
@@ -982,50 +994,114 @@ export default function SettingsPage() {
           </div>
         </ResponsiveFormContainer>
 
-        {/* FEATURE 5B: WIDGET VARIANTS MODAL */}
+        {/* FEATURE 5B: WIDGET THEME SWITCHER MODAL */}
         <ResponsiveFormContainer
           open={isWidgetVariantsOpen}
           onOpenChange={setIsWidgetVariantsOpen}
-          title="🎛️ WIDGET VARIANTS & THEME"
-          description="Choose theme variants and card dimensions for dashboard widgets"
+          title="🎛️ NATIVE WIDGET THEMES"
+          description="Choose your Android widget aesthetic. Your home screen widget immediately adapts."
         >
           <div className="space-y-4 pt-2">
-            <div className="grid grid-cols-1 gap-3">
-              {[
-                { id: "classic", name: "Classic Neubrutalist Yellow", desc: "Solid 2px black borders & gold drop shadows", badge: "ACTIVE DEFAULT" },
-                { id: "expanded", name: "Expanded Cards Variant", desc: "Large spacious cards with extra data metrics", badge: "PRO EXPANDED" },
-                { id: "dark", name: "Dark Mode Stealth Variant", desc: "Sleek dark theme cards with high-contrast text", badge: "DARK MODE" },
-              ].map((varItem) => (
-                <div
-                  key={varItem.id}
-                  onClick={() => {
-                    setWidgetVariantStyle(varItem.id as any);
-                    toast.success(`Activated ${varItem.name}! 🎛️`);
-                  }}
-                  className={cn(
-                    "rounded-2xl p-4 border-2 border-[#161514] cursor-pointer transition-all flex items-center justify-between gap-3 hover:-translate-x-0.5 hover:-translate-y-0.5",
-                    widgetVariantStyle === varItem.id
-                      ? "bg-amber-100 shadow-[4px_4px_0px_0px_#161514]"
-                      : "bg-white hover:bg-[#FAF8F5] shadow-[2px_2px_0px_0px_#161514]"
-                  )}
-                >
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h5 className="font-black text-xs text-[#161514] font-heading">{varItem.name}</h5>
-                      <span className="bg-[#161514] text-white text-[8px] font-black uppercase px-2 py-0.5 rounded-md">
-                        {varItem.badge}
+            <div className="grid grid-cols-1 gap-3.5">
+              {/* THEME 1: 🌿 ZEN SANCTUARY */}
+              <div
+                onClick={() => {
+                  setWidgetTheme("zen");
+                  toast.success("🌿 Zen Sanctuary Activated! Android widget synchronized.");
+                }}
+                className={cn(
+                  "rounded-2xl p-4 border-2 border-[#161514] cursor-pointer transition-all space-y-3 hover:-translate-x-0.5 hover:-translate-y-0.5",
+                  widgetTheme === "zen"
+                    ? "bg-[#FAF8F5] ring-2 ring-[#03D26F] shadow-[4px_4px_0px_0px_#161514]"
+                    : "bg-white hover:bg-[#FAF8F5] shadow-[2px_2px_0px_0px_#161514] opacity-80"
+                )}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl">🌿</span>
+                    <div>
+                      <h5 className="font-black text-xs text-[#161514] uppercase font-heading">
+                        Zen Sanctuary & Torii Pathway
+                      </h5>
+                      <span className="inline-block bg-[#03D26F] text-white text-[8px] font-black uppercase px-2 py-0.5 rounded-md mt-0.5">
+                        Calming Mindfulness
                       </span>
                     </div>
-                    <p className="text-[10px] text-[#161514]/70 font-bold mt-1">{varItem.desc}</p>
                   </div>
                   <span className={cn(
-                    "h-5 w-5 rounded-full border-2 border-[#161514] flex items-center justify-center font-black text-xs",
-                    widgetVariantStyle === varItem.id ? "bg-[#161514] text-white" : "bg-white text-transparent"
+                    "h-6 w-6 rounded-full border-2 border-[#161514] flex items-center justify-center font-black text-xs shrink-0",
+                    widgetTheme === "zen" ? "bg-[#03D26F] text-white" : "bg-white text-transparent"
                   )}>
                     ✓
                   </span>
                 </div>
-              ))}
+
+                <p className="text-[11px] text-[#161514]/80 font-bold leading-relaxed">
+                  Reduces financial anxiety by framing daily spending as a living mountain brook and habits as blooming sacred flora.
+                </p>
+
+                <div className="grid grid-cols-3 gap-1.5 pt-1 text-[9px] font-black">
+                  <div className="bg-emerald-50 border border-emerald-300 rounded-lg p-1.5 text-center text-emerald-900">
+                    💧 Brook Flow
+                  </div>
+                  <div className="bg-rose-50 border border-rose-300 rounded-lg p-1.5 text-center text-rose-900">
+                    🌸 Sacred Flora
+                  </div>
+                  <div className="bg-amber-50 border border-amber-300 rounded-lg p-1.5 text-center text-amber-900">
+                    ⛩️ Torii Ascent
+                  </div>
+                </div>
+              </div>
+
+              {/* THEME 2: 🏎️ SPEEDWAY CRUISER */}
+              <div
+                onClick={() => {
+                  setWidgetTheme("speedway");
+                  toast.success("🏎️ Speedway Cruiser Activated! Android widget synchronized.");
+                }}
+                className={cn(
+                  "rounded-2xl p-4 border-2 border-[#161514] cursor-pointer transition-all space-y-3 hover:-translate-x-0.5 hover:-translate-y-0.5",
+                  widgetTheme === "speedway"
+                    ? "bg-[#161514] text-white ring-2 ring-[#CEF431] shadow-[4px_4px_0px_0px_#CEF431]"
+                    : "bg-[#1f1e1c] text-white/90 hover:bg-[#161514] shadow-[2px_2px_0px_0px_#161514] opacity-80"
+                )}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl">🏎️</span>
+                    <div>
+                      <h5 className="font-black text-xs text-white uppercase font-heading">
+                        Speedway Cruiser & Turbo Highway
+                      </h5>
+                      <span className="inline-block bg-[#CEF431] text-[#161514] text-[8px] font-black uppercase px-2 py-0.5 rounded-md mt-0.5">
+                        Arcade Telemetry
+                      </span>
+                    </div>
+                  </div>
+                  <span className={cn(
+                    "h-6 w-6 rounded-full border-2 border-white flex items-center justify-center font-black text-xs shrink-0",
+                    widgetTheme === "speedway" ? "bg-[#CEF431] text-[#161514]" : "bg-transparent text-transparent"
+                  )}>
+                    ✓
+                  </span>
+                </div>
+
+                <p className="text-[11px] text-white/80 font-bold leading-relaxed">
+                  High-octane automotive dashboard. Features fuel tank capacity, asphalt highway lane, roadside milestone signs, and pit crew LEDs.
+                </p>
+
+                <div className="grid grid-cols-3 gap-1.5 pt-1 text-[9px] font-black">
+                  <div className="bg-[#2a2926] border border-[#CEF431]/40 text-[#CEF431] rounded-lg p-1.5 text-center">
+                    ⛽ Fuel Range
+                  </div>
+                  <div className="bg-[#2a2926] border border-cyan-400/40 text-cyan-300 rounded-lg p-1.5 text-center">
+                    🛣️ Highway Signs
+                  </div>
+                  <div className="bg-[#2a2926] border border-amber-400/40 text-amber-300 rounded-lg p-1.5 text-center">
+                    🏁 Pit Crew LEDs
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </ResponsiveFormContainer>
@@ -1235,8 +1311,8 @@ export default function SettingsPage() {
           <div className="w-full bg-white rounded-3xl p-5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
             <div className="flex items-start sm:items-center justify-between gap-3">
               <div className="flex items-center gap-3.5">
-                <div className="h-12 w-12 rounded-2xl bg-[#CEF431] border-2 border-[#161514] flex items-center justify-center text-[#161514] shadow-[2px_2px_0px_0px_#161514] shrink-0 font-black text-2xl">
-                  🤖
+                <div className="h-12 w-12 rounded-2xl bg-[#CEF431] border-2 border-[#161514] flex items-center justify-center text-[#161514] shadow-[2px_2px_0px_0px_#161514] shrink-0 font-black">
+                  <Smartphone className="h-6 w-6 stroke-[2.5]" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
@@ -1294,7 +1370,8 @@ export default function SettingsPage() {
                 className="w-full flex items-center justify-between text-xs font-black uppercase text-[#161514] hover:text-[#161514]/80 cursor-pointer"
               >
                 <span className="flex items-center gap-1.5 font-heading">
-                  <span>📖 How to Install & Update the Android App</span>
+                  <BookOpen className="h-4 w-4 stroke-[2.5]" />
+                  <span>How to Install & Update the Android App</span>
                 </span>
                 {isInstallGuideOpen ? <ChevronUp className="h-4 w-4 stroke-[2.5]" /> : <ChevronDown className="h-4 w-4 stroke-[2.5]" />}
               </button>
@@ -1883,7 +1960,7 @@ export default function SettingsPage() {
                       }}
                       className="rounded-xl bg-red-600 hover:bg-red-700 text-white cursor-pointer text-xs flex-1 disabled:opacity-40 font-black uppercase border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
                     >
-                      {isDeletingAccount ? "Deleting Account…" : "🗑️ Permanently Delete Account"}
+                      {isDeletingAccount ? "Deleting Account…" : "Permanently Delete Account"}
                     </Button>
                   </div>
                 </div>

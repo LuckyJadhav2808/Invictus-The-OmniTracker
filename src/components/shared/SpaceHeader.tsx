@@ -1,32 +1,51 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { useUIStore } from "@/store/ui-store";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Sparkles, ArrowRight, Megaphone, X, Home, BookOpen, Wallet, CheckSquare, Dumbbell, Utensils, Moon, Trophy, ChevronDown, Bell, Eye, EyeOff, Zap, User, Flame, Settings, Target } from "lucide-react";
+import {
+  SunMedium,
+  CheckSquare,
+  GraduationCap,
+  Kanban,
+  Wallet,
+  BarChart2,
+  Settings,
+  User,
+  ShieldCheck,
+  Bell,
+  Sparkles,
+  Wifi,
+  WifiOff,
+  LogOut,
+  ChevronDown,
+  Megaphone,
+  X,
+  Calendar,
+  RefreshCw,
+} from "lucide-react";
 import { InvictusLogo } from "@/components/shared/InvictusLogo";
+import { useAuth } from "@/components/shared/AuthProvider";
 import { getGlobalAnnouncement, type GlobalAnnouncement } from "@/lib/custom-auth";
 import { ReminderManagerModal } from "@/components/shared/ReminderManagerModal";
-import { toast } from "sonner";
+import { CloudSyncDrawer } from "@/components/shared/CloudSyncDrawer";
+import { useOfflineSync } from "@/lib/offline/sync-manager";
+import { format } from "date-fns";
+import Link from "next/link";
 
 export function SpaceHeader() {
   const pathname = usePathname();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const { activeTracker, setActiveTracker } = useUIStore();
-  const [isOpen, setIsOpen] = useState(false);
+  const { user, signOut } = useAuth();
   const [announcement, setAnnouncement] = useState<GlobalAnnouncement | null>(null);
   const [dismissedAnn, setDismissedAnn] = useState(false);
   const [isReminderModalOpen, setIsReminderModalOpen] = useState(false);
-  
-  // Toggle sub-nav visibility state with localStorage persistence
-  const [isSubNavVisible, setIsSubNavVisible] = useState<boolean>(true);
-
-  const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const lastSubNavClickRef = useRef<number>(0);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [isSyncDrawerOpen, setIsSyncDrawerOpen] = useState(false);
+  const { isOnline, isSyncing, pendingCount } = useOfflineSync();
 
   useEffect(() => {
+
     const fetchAnnouncement = async () => {
       try {
         const res = await fetch("/api/admin/announcement");
@@ -43,459 +62,308 @@ export function SpaceHeader() {
       }
     };
     fetchAnnouncement();
-
-    try {
-      const savedSubNav = localStorage.getItem("invictus_show_subnav");
-      if (savedSubNav !== null) {
-        setIsSubNavVisible(savedSubNav === "true");
-      }
-    } catch {}
   }, []);
 
-  const toggleSubNav = () => {
-    const next = !isSubNavVisible;
-    setIsSubNavVisible(next);
-    try {
-      localStorage.setItem("invictus_show_subnav", String(next));
-    } catch {}
-    toast.info(next ? "Sub-navigation bar visible 📍" : "Sub-navigation bar hidden 🙈");
-  };
-
-  const spaces = [
-    {
-      value: "today" as const,
-      label: "🔥 Today Overview",
-      shortLabel: "🔥 Today Space",
-      mobileLabel: "🔥 Today",
-      desc: "Daily flow, habits summary & liquid chart",
-      activeBg: "bg-[#CEF431] text-[#161514]",
-      accentBg: "bg-[#CEF431]/30 text-[#161514]",
-      href: "/today",
-    },
-    {
-      value: "life" as const,
-      label: "🌱 Goals & Life",
-      shortLabel: "🌱 Goals Space",
-      mobileLabel: "🌱 Goals",
-      desc: "Habits, gym splits, nutrition & sleep",
-      activeBg: "bg-[#03D26F] text-[#161514]",
-      accentBg: "bg-[#03D26F]/30 text-[#161514]",
-      href: "/goals",
-    },
-    {
-      value: "study" as const,
-      label: "📚 Study & Exams",
-      shortLabel: "📚 Study Space",
-      mobileLabel: "📚 Study",
-      desc: "GATE syllabus, revision & mock tests",
-      activeBg: "bg-[#C084FC] text-[#161514]",
-      accentBg: "bg-[#C084FC]/30 text-[#161514]",
-      href: "/study",
-    },
-    {
-      value: "tasks" as const,
-      label: "📋 Tasks & Projects",
-      shortLabel: "📋 Tasks Space",
-      mobileLabel: "📋 Tasks",
-      desc: "Kanban board, P1-P4 matrix & subtasks",
-      activeBg: "bg-[#F59E0B] text-white",
-      accentBg: "bg-[#F59E0B]/30 text-[#161514]",
-      href: "/tasks",
-    },
-    {
-      value: "money" as const,
-      label: "💰 Money & Ledger",
-      shortLabel: "💰 Money Space",
-      mobileLabel: "💰 Money",
-      desc: "Category wallets, budgets & savings",
-      activeBg: "bg-[#FBCFE8] text-[#161514]",
-      accentBg: "bg-[#FBCFE8]/30 text-[#161514]",
-      href: "/money",
-    },
-  ];
-
-  const currentSpace =
-    spaces.find(
-      (s) =>
-        s.href === "/today"
-          ? pathname === "/today"
-          : pathname.startsWith(s.href)
-    ) || spaces[0];
-
-  const handleSpaceChange = (spaceValue: string, href: string) => {
-    if (spaceValue !== "today") {
-      setActiveTracker(spaceValue as any);
-    }
-    setIsOpen(false);
-    router.push(href);
-  };
-
-  interface SubFeatureItem {
-    label: string;
-    icon: any;
-    targetId: string;
-    spaceHref: string;
-    tab?: string;
-  }
-
-  const getSubFeatures = (): SubFeatureItem[] => {
-    if (pathname.startsWith("/profile")) {
-      return [
-        { label: "Profile Info", icon: User, targetId: "user-profile-card", spaceHref: "/profile" },
-        { label: "365d Matrix", icon: Flame, targetId: "activity-matrix-section", spaceHref: "/profile" },
-        { label: "Settings Center", icon: Settings, targetId: "settings-discovery-card", spaceHref: "/profile" },
-      ];
-    }
-    if (pathname.startsWith("/analytics")) {
-      return [
-        { label: "Goals Analytics", icon: Target, targetId: "goals-analytics", spaceHref: "/analytics", tab: "goals" },
-        { label: "Study Analytics", icon: BookOpen, targetId: "study-analytics", spaceHref: "/analytics", tab: "study" },
-        { label: "Money Analytics", icon: Wallet, targetId: "money-analytics", spaceHref: "/analytics", tab: "money" },
-        { label: "365d Matrix", icon: Sparkles, targetId: "matrix-analytics", spaceHref: "/analytics", tab: "matrix" },
-      ];
-    }
-    if (pathname.startsWith("/tasks")) {
-      return [
-        { label: "Kanban Board", icon: CheckSquare, targetId: "kanban-board", spaceHref: "/tasks", tab: "kanban" },
-        { label: "Task List", icon: Sparkles, targetId: "task-list", spaceHref: "/tasks", tab: "list" },
-        { label: "Eisenhower Matrix", icon: Trophy, targetId: "matrix-view", spaceHref: "/tasks", tab: "matrix" },
-      ];
-    }
-    if (pathname.startsWith("/study")) {
-      return [
-        { label: "Syllabus Tracker", icon: BookOpen, targetId: "syllabus-tracker", spaceHref: "/study" },
-        { label: "Study Logger", icon: Sparkles, targetId: "session-logger", spaceHref: "/study" },
-        { label: "Subjects List", icon: CheckSquare, targetId: "subjects-list", spaceHref: "/study", tab: "subjects" },
-        { label: "Mock Tests", icon: Trophy, targetId: "mock-tests", spaceHref: "/study", tab: "tests" },
-      ];
-    }
-    if (pathname.startsWith("/money")) {
-      return [
-        { label: "Wallets & Cards", icon: Wallet, targetId: "category-wallets", spaceHref: "/money", tab: "ledger" },
-        { label: "Transaction Ledger", icon: CheckSquare, targetId: "money-ledger", spaceHref: "/money", tab: "ledger" },
-        { label: "Monthly Budgets", icon: Target, targetId: "money-budgets", spaceHref: "/money", tab: "budgets" },
-        { label: "Subscriptions", icon: Sparkles, targetId: "subscriptions", spaceHref: "/money", tab: "vault" },
-        { label: "Savings Goals", icon: Trophy, targetId: "savings-goals", spaceHref: "/money", tab: "vault" },
-        { label: "Debt Ledger", icon: ArrowRight, targetId: "debt-tracker", spaceHref: "/money", tab: "vault" },
-      ];
+  const getSpaceInfo = () => {
+    if (pathname === "/today") {
+      return {
+        title: "Today",
+        subtitle: "Daily Action Cockpit",
+        icon: SunMedium,
+        accentColor: "bg-[#CEF431] text-[#161514]",
+      };
     }
     if (pathname.startsWith("/goals")) {
-      return [
-        { label: "Habits List", icon: CheckSquare, targetId: "habits-section", spaceHref: "/goals", tab: "list" },
-        { label: "Gym Splits", icon: Dumbbell, targetId: "gym-section", spaceHref: "/goals", tab: "gym" },
-        { label: "Nutrition & Meals", icon: Utensils, targetId: "nutrition-section", spaceHref: "/goals", tab: "gym" },
-        { label: "Sleep & Mood", icon: Moon, targetId: "mood-section", spaceHref: "/goals", tab: "list" },
-      ];
+      return {
+        title: "Habits & Health",
+        subtitle: "Routines, Streaks & Wellness",
+        icon: CheckSquare,
+        accentColor: "bg-[#03D26F] text-[#161514]",
+      };
     }
-    return [
-      { label: "Flow Analytics", icon: Sparkles, targetId: "analytics-chart", spaceHref: "/today" },
-      { label: "Stats Scorecard", icon: Target, targetId: "today-stats-grid", spaceHref: "/today" },
-      { label: "Quick Thoughts", icon: Flame, targetId: "today-quick-thoughts", spaceHref: "/today" },
-      { label: "Daily Summary", icon: CheckSquare, targetId: "today-summary-logs", spaceHref: "/today" },
-    ];
-  };
-
-  const subFeatures = getSubFeatures();
-
-  const scrollToTargetWithRetry = (targetId: string, attempts = 0) => {
-    if (retryTimeoutRef.current) {
-      clearTimeout(retryTimeoutRef.current);
-      retryTimeoutRef.current = null;
+    if (pathname.startsWith("/study")) {
+      return {
+        title: "Study & Exams",
+        subtitle: "Syllabus, Sessions & Mock Tests",
+        icon: GraduationCap,
+        accentColor: "bg-[#C084FC] text-[#161514]",
+      };
     }
-
-    const el = document.getElementById(targetId);
-    if (el) {
-      const mainContainer = document.getElementById("main-scroll-container") || document.querySelector("main");
-      if (mainContainer) {
-        const containerRect = mainContainer.getBoundingClientRect();
-        const elementRect = el.getBoundingClientRect();
-        const headerOffset = 90;
-        const targetScrollTop = mainContainer.scrollTop + (elementRect.top - containerRect.top) - headerOffset;
-
-        mainContainer.scrollTo({
-          top: Math.max(0, targetScrollTop),
-          behavior: "smooth",
-        });
-      } else {
-        el.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }
-
-      el.classList.add("ring-4", "ring-[#CEF431]", "scale-[1.01]", "transition-all", "duration-300");
-      setTimeout(() => {
-        el.classList.remove("ring-4", "ring-[#CEF431]", "scale-[1.01]");
-      }, 1500);
-    } else if (attempts < 12) {
-      retryTimeoutRef.current = setTimeout(() => scrollToTargetWithRetry(targetId, attempts + 1), 120);
+    if (pathname.startsWith("/tasks")) {
+      return {
+        title: "Tasks & Projects",
+        subtitle: "Kanban, Priorities & Subtasks",
+        icon: Kanban,
+        accentColor: "bg-[#F59E0B] text-[#161514]",
+      };
     }
-  };
-
-  useEffect(() => {
-    return () => {
-      if (retryTimeoutRef.current) {
-        clearTimeout(retryTimeoutRef.current);
-      }
+    if (pathname.startsWith("/money")) {
+      return {
+        title: "Money & Ledger",
+        subtitle: "Cash Flow, Budgets & Vault",
+        icon: Wallet,
+        accentColor: "bg-[#03D26F] text-[#161514]",
+      };
+    }
+    if (pathname.startsWith("/analytics")) {
+      return {
+        title: "Analytics Hub",
+        subtitle: "Cross-Module Insights & Performance",
+        icon: BarChart2,
+        accentColor: "bg-white text-[#161514]",
+      };
+    }
+    if (pathname.startsWith("/settings")) {
+      return {
+        title: "Settings",
+        subtitle: "Preferences, Backup & Configuration",
+        icon: Settings,
+        accentColor: "bg-white text-[#161514]",
+      };
+    }
+    if (pathname.startsWith("/profile")) {
+      return {
+        title: "Profile",
+        subtitle: "Account Details & Activity Matrix",
+        icon: User,
+        accentColor: "bg-white text-[#161514]",
+      };
+    }
+    if (pathname.startsWith("/admin")) {
+      return {
+        title: "Admin Panel",
+        subtitle: "System Management & Health",
+        icon: ShieldCheck,
+        accentColor: "bg-amber-300 text-[#161514]",
+      };
+    }
+    return {
+      title: "Invictus",
+      subtitle: "OmniTracker",
+      icon: Sparkles,
+      accentColor: "bg-[#CEF431] text-[#161514]",
     };
-  }, []);
-
-  useEffect(() => {
-    const jumpId = searchParams.get("jump") || (typeof window !== "undefined" ? window.location.hash.replace("#", "") : "");
-    if (jumpId) {
-      scrollToTargetWithRetry(jumpId);
-    }
-  }, [pathname, searchParams]);
-
-  const handleSubFeatureClick = (targetId: string, spaceHref?: string, tab?: string) => {
-    const now = Date.now();
-    const isRapidClick = now - lastSubNavClickRef.current < 250;
-    lastSubNavClickRef.current = now;
-
-    const currentTab = searchParams.get("tab");
-    const targetSpace = spaceHref || "/today";
-    const needsTabSwitch = Boolean(tab && currentTab !== tab);
-    const needsPageNavigation = !pathname.startsWith(targetSpace);
-
-    if (needsPageNavigation || needsTabSwitch) {
-      if (isRapidClick) return; // Ignore rapid multi-click spam to prevent router queue thrashing
-      const queryTab = tab ? `&tab=${tab}` : "";
-      router.push(`${targetSpace}?jump=${targetId}${queryTab}`);
-      return;
-    }
-
-    scrollToTargetWithRetry(targetId);
   };
+
+  const space = getSpaceInfo();
+  const Icon = space.icon;
+  const todayFormatted = format(new Date(), "EEE, d MMM");
 
   return (
-    <>
-      {announcement && !dismissedAnn && (
-        <div className="bg-[#CEF431] text-[#161514] px-3 sm:px-4 py-2 text-xs font-black flex items-center justify-between border-b-2 border-[#161514] relative z-[110]">
-          <div className="flex items-center gap-2 max-w-6xl mx-auto flex-1 min-w-0 pr-2">
-            <Megaphone className="h-4 w-4 shrink-0 animate-bounce text-[#161514]" />
-            <span className="text-[11px] sm:text-xs font-bold leading-tight break-words line-clamp-2 sm:line-clamp-none">
-              {announcement.message}
-            </span>
+    <header className="sticky top-0 z-30 w-full bg-[#FBF9F5]/90 backdrop-blur-md border-b-2 border-[#161514] select-none">
+      {/* Optional Announcement Banner */}
+      {announcement && announcement.message && !dismissedAnn && (
+        <div className="bg-[#CEF431] text-[#161514] px-4 py-2 text-xs font-bold border-b-2 border-[#161514] flex items-center justify-between">
+          <div className="flex items-center gap-2 max-w-4xl mx-auto flex-1 min-w-0">
+            <Megaphone className="size-4 shrink-0 stroke-[2.5]" />
+            <span className="truncate">{announcement.message}</span>
           </div>
           <button
             onClick={() => setDismissedAnn(true)}
-            className="text-[#161514] hover:bg-[#161514]/10 p-1 rounded-lg cursor-pointer shrink-0 transition-colors"
-            title="Dismiss Announcement"
+            className="p-1 hover:bg-[#161514]/10 rounded-md transition-colors"
+            aria-label="Dismiss announcement"
           >
-            <X className="h-4 w-4 stroke-[3]" />
+            <X className="size-3.5 stroke-[2.5]" />
           </button>
         </div>
       )}
 
-      {/* Main Sticky Header */}
-      <header className="sticky top-0 z-[100] w-full bg-white/95 backdrop-blur-md border-b-2 border-[#161514] transition-all">
-        <div className="max-w-6xl mx-auto px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-2">
-          
-          {/* Left side: Brand Logo & Desktop Active Space Badge */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <InvictusLogo size="sm" variant="horizontal" href="/today" />
-            
-            {/* Desktop Only Active Space Badge */}
-            <div
-              className={cn(
-                "hidden sm:flex px-3 py-1 rounded-xl text-xs font-black border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] items-center gap-1.5 shrink-0 whitespace-nowrap",
-                currentSpace.accentBg
-              )}
-            >
-              <span className="relative flex h-2 w-2 shrink-0">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#161514] opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#161514]" />
-              </span>
-              <span className="font-black">{currentSpace.shortLabel}</span>
-            </div>
+      {/* Main Header Container */}
+      <div className="max-w-6xl mx-auto px-4 py-2.5 flex items-center justify-between gap-4">
+        {/* Left: Mobile Brand or Desktop Breadcrumb */}
+        <div className="flex items-center gap-3">
+          <div className="lg:hidden">
+            <InvictusLogo size="sm" variant="icon-only" href="/today" />
           </div>
 
-          {/* Right side: Actions & Switch Space Dropdown Popover Button */}
-          <div className="relative flex items-center gap-1.5 sm:gap-2 shrink-0">
-            {/* Sub-Nav Show / Hide Toggle Button */}
-            {subFeatures.length > 0 && (
-              <button
-                type="button"
-                onClick={toggleSubNav}
-                className={cn(
-                  "p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl border-1.5 sm:border-2 border-[#161514] text-xs font-black shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] transition-all cursor-pointer flex items-center gap-1 shrink-0",
-                  isSubNavVisible
-                    ? "bg-[#CEF431] text-[#161514]"
-                    : "bg-white text-[#161514]/70 hover:text-[#161514]"
-                )}
-                title={isSubNavVisible ? "Hide sub-navigation bar" : "Show sub-navigation bar"}
-              >
-                {isSubNavVisible ? <Eye className="h-4 w-4 stroke-[2.5]" /> : <EyeOff className="h-4 w-4 stroke-[2.5]" />}
-                <span className="hidden md:inline">Sub-Nav</span>
-              </button>
-            )}
-
-            {/* Instant Quick Action (Back Tap / Shortcut / Ctrl+E) */}
-            <button
-              type="button"
-              onClick={() => {
-                const params = new URLSearchParams(searchParams ? searchParams.toString() : "");
-                params.set("action", "quick-expense");
-                router.push(`${pathname}?${params.toString()}`);
-              }}
-              className="p-1.5 sm:px-2.5 sm:py-1.5 bg-[#CEF431] hover:bg-[#b8dd25] text-[#161514] rounded-xl sm:rounded-2xl border-1.5 sm:border-2 border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] sm:shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] transition-all cursor-pointer flex items-center gap-1 shrink-0 font-black text-xs"
-              title="Instant Quick Input (Ctrl+E / Back-Tap)"
-            >
-              <Zap className="h-3.5 w-3.5 sm:h-4 sm:w-4 fill-current stroke-[2.5]" />
-              <span className="hidden md:inline">Quick Log</span>
-            </button>
-
-            {/* Notification Bell */}
-            <button
-              type="button"
-              onClick={() => setIsReminderModalOpen(true)}
-              className="p-1.5 sm:p-2 bg-amber-100 hover:bg-amber-200 text-[#161514] rounded-xl sm:rounded-2xl border-1.5 sm:border-2 border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] sm:shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] transition-all cursor-pointer shrink-0"
-              title="Manage Daily Reminders & Notification Alarms"
-            >
-              <Bell className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2.5]" />
-            </button>
-
-            {/* Switch Space Popover Button (Displays Active Space Indicator on Mobile) */}
-            <button
-              type="button"
-              onClick={() => setIsOpen(!isOpen)}
+          <div className="flex items-center gap-2.5">
+            <div
               className={cn(
-                "flex items-center gap-1 sm:gap-2 rounded-xl sm:rounded-2xl px-2.5 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-black shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] sm:shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] border-1.5 sm:border-2 border-[#161514] transition-all duration-200 cursor-pointer uppercase tracking-wider select-none hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 whitespace-nowrap shrink-0",
-                currentSpace.activeBg
+                "size-8 rounded-lg border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center justify-center shrink-0",
+                space.accentColor
               )}
             >
-              <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2.5] shrink-0" />
-              <span className="hidden sm:inline">Switch Space</span>
-              <span className="sm:hidden font-black">{currentSpace.mobileLabel}</span>
-              <ChevronDown
-                className={cn("h-3.5 w-3.5 sm:h-4 sm:w-4 transition-transform duration-200 stroke-[2.5] shrink-0", isOpen && "rotate-180")}
-              />
+              <Icon className="size-4 stroke-[2.5]" />
+            </div>
+            <div>
+              <h1 className="font-heading font-black text-sm lg:text-base leading-none text-[#161514] tracking-tight">
+                {space.title}
+              </h1>
+              <p className="hidden sm:block text-[11px] font-semibold text-[#161514]/65 leading-tight mt-0.5">
+                {space.subtitle}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Right: Actions, Date, Sync & User Profile */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Date Indicator (Tablet & Desktop) */}
+          <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] text-xs font-heading font-extrabold text-[#161514]">
+            <Calendar className="size-3.5 stroke-[2.5]" />
+            <span>{todayFormatted}</span>
+          </div>
+
+          {/* Cloud Sync Telemetry Trigger Badge */}
+          <button
+            type="button"
+            onClick={() => setIsSyncDrawerOpen(true)}
+            className={cn(
+              "flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[10px] font-black border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer",
+              !isOnline
+                ? "bg-rose-100 text-rose-950"
+                : isSyncing
+                ? "bg-amber-100 text-amber-950"
+                : pendingCount > 0
+                ? "bg-amber-200 text-amber-950"
+                : "bg-emerald-100 text-emerald-950"
+            )}
+            title="Inspect Cloud Data Sync & Database Latency"
+          >
+            {!isOnline ? (
+              <>
+                <WifiOff className="size-3 text-rose-600 shrink-0" />
+                <span className="hidden sm:inline">Offline {pendingCount > 0 ? `(${pendingCount})` : ""}</span>
+              </>
+            ) : isSyncing ? (
+              <>
+                <RefreshCw className="size-3 animate-spin text-amber-600 shrink-0" />
+                <span className="hidden sm:inline">Syncing...</span>
+              </>
+            ) : pendingCount > 0 ? (
+              <>
+                <span className="size-2 rounded-full bg-amber-500 animate-pulse shrink-0" />
+                <span className="hidden sm:inline">{pendingCount} Queued</span>
+              </>
+            ) : (
+              <>
+                <span className="size-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                <span className="hidden sm:inline">Synced</span>
+              </>
+            )}
+          </button>
+
+          {/* Reminder Manager Bell */}
+          <button
+            onClick={() => setIsReminderModalOpen(true)}
+            aria-label="Manage Reminders"
+            className="size-9 rounded-lg bg-white border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center hover:bg-[#F1EFEA] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
+          >
+            <Bell className="size-4 stroke-[2.2] text-[#161514]" />
+          </button>
+
+          {/* User Profile Avatar Dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+              aria-label="User Menu"
+              aria-expanded={isProfileMenuOpen}
+              className="flex items-center gap-2 p-1 pl-1.5 sm:px-2 py-1 bg-white border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] rounded-xl hover:bg-[#F1EFEA] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
+            >
+              <div className="size-7 rounded-lg bg-[#161514] text-white flex items-center justify-center font-black text-xs shrink-0">
+                {user?.displayName ? (
+                  user.displayName.charAt(0).toUpperCase()
+                ) : (
+                  <User className="size-3.5 stroke-[2.5]" />
+                )}
+              </div>
+              <span className="hidden sm:inline-block font-heading font-extrabold text-xs max-w-[90px] truncate text-[#161514]">
+                {user?.displayName || "Account"}
+              </span>
+              <ChevronDown className="size-3.5 stroke-[2.5] text-[#161514]/70" />
             </button>
 
-            {/* Backdrop for click outside */}
-            {isOpen && (
-              <div
-                className="fixed inset-0 z-[110] bg-[#161514]/25 backdrop-blur-2xs"
-                onClick={() => setIsOpen(false)}
-              />
-            )}
+            {/* Dropdown Menu Modal */}
+            {isProfileMenuOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setIsProfileMenuOpen(false)}
+                />
+                <div className="absolute right-0 mt-2 w-56 bg-white border-2 border-[#161514] shadow-[4px_4px_0px_0px_#161514] rounded-xl py-2 z-50 animate-in fade-in-50 zoom-in-95">
+                  <div className="px-3 py-2 border-b border-[#161514]/15">
+                    <p className="font-heading font-extrabold text-xs text-[#161514] truncate">
+                      {user?.displayName || "Invictus User"}
+                    </p>
+                    <p className="text-[10px] text-[#161514]/60 truncate font-mono">
+                      {user?.email || "Local Guest"}
+                    </p>
+                  </div>
 
-            {/* Space Switcher Popover Menu */}
-            {isOpen && (
-              <div className="absolute right-0 top-full mt-2.5 w-72 sm:w-80 bg-white border-2.5 border-[#161514] rounded-3xl shadow-[6px_6px_0px_0px_rgba(22,21,20,1)] p-3 z-[120] animate-in fade-in slide-in-from-top-3 duration-200 origin-top-right space-y-2">
-                
-                {/* Popover Header with Explicit Close X Button */}
-                <div className="px-3 py-1.5 flex items-center justify-between border-b-2 border-[#161514]/15">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-[#161514]">
-                    Select Workspace
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[9px] font-black bg-[#CEF431] text-[#161514] px-2 py-0.5 rounded-lg border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)]">
-                      4 Active
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setIsOpen(false)}
-                      className="p-1 rounded-xl bg-rose-100 hover:bg-rose-300 text-[#161514] border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
-                      title="Close workspace switcher"
+                  <div className="py-1">
+                    <Link
+                      href="/profile"
+                      onClick={() => setIsProfileMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-[#161514] hover:bg-[#F1EFEA] transition-colors"
                     >
-                      <X className="h-3.5 w-3.5 stroke-[3]" />
+                      <User className="size-4 stroke-[2]" />
+                      <span>Profile & Activity</span>
+                    </Link>
+
+                    <Link
+                      href="/settings"
+                      onClick={() => setIsProfileMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-[#161514] hover:bg-[#F1EFEA] transition-colors"
+                    >
+                      <Settings className="size-4 stroke-[2]" />
+                      <span>Settings & Backups</span>
+                    </Link>
+
+                    <Link
+                      href="/analytics"
+                      onClick={() => setIsProfileMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-[#161514] hover:bg-[#F1EFEA] transition-colors"
+                    >
+                      <BarChart2 className="size-4 stroke-[2]" />
+                      <span>Analytics Hub</span>
+                    </Link>
+
+                    {(user?.role === "admin" ||
+                      user?.email?.toLowerCase() === "luckymanojjadhav@gmail.com") && (
+                      <Link
+                        href="/admin"
+                        onClick={() => setIsProfileMenuOpen(false)}
+                        className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 transition-colors"
+                      >
+                        <ShieldCheck className="size-4 stroke-[2.2]" />
+                        <span>Admin Console</span>
+                      </Link>
+                    )}
+                  </div>
+
+                  <div className="pt-1 border-t border-[#161514]/15">
+                    <button
+                      onClick={async () => {
+                        setIsProfileMenuOpen(false);
+                        await signOut();
+                        router.push("/login");
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50 transition-colors cursor-pointer text-left"
+                    >
+                      <LogOut className="size-4 stroke-[2]" />
+                      <span>Sign Out</span>
                     </button>
                   </div>
                 </div>
-
-                <div className="space-y-1.5 pt-1">
-                  {spaces.map((sp) => {
-                    const isActive = currentSpace.value === sp.value;
-                    return (
-                      <button
-                        key={sp.value}
-                        type="button"
-                        onClick={() => handleSpaceChange(sp.value, sp.href)}
-                        className={cn(
-                          "w-full text-left p-3 rounded-2xl transition-all duration-200 flex items-center justify-between group cursor-pointer border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] hover:-translate-x-0.5 hover:-translate-y-0.5",
-                          isActive
-                            ? `${sp.activeBg} font-black shadow-[4px_4px_0px_0px_rgba(22,21,20,1)]`
-                            : "bg-white hover:bg-[#EAF4F4] text-[#161514]"
-                        )}
-                      >
-                        <div className="flex flex-col gap-0.5">
-                          <span className="text-xs font-black tracking-wide flex items-center gap-1.5">
-                            <span>{sp.label}</span>
-                          </span>
-                          <span
-                            className={cn(
-                              "text-[10px] font-bold opacity-80",
-                              isActive ? "text-[#161514]" : "text-[#161514]/70"
-                            )}
-                          >
-                            {sp.desc}
-                          </span>
-                        </div>
-
-                        <ArrowRight
-                          className={cn(
-                            "h-4 w-4 transition-transform group-hover:translate-x-1 stroke-[2.5]",
-                            isActive ? "opacity-100 text-[#161514]" : "opacity-0 group-hover:opacity-100 text-[#161514]"
-                          )}
-                        />
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <div className="pt-2 border-t border-[#161514]/15">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsOpen(false);
-                      setIsReminderModalOpen(true);
-                    }}
-                    className="w-full p-2 rounded-xl bg-amber-100 hover:bg-amber-200 text-[#161514] text-xs font-black border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] transition-all cursor-pointer flex items-center justify-center gap-2"
-                  >
-                    <Bell className="h-3.5 w-3.5" />
-                    <span>Daily Reminders & Alarms 🔔</span>
-                  </button>
-                </div>
-              </div>
+              </>
             )}
           </div>
-
         </div>
+      </div>
 
-        {/* Sub-Feature Navigation Quick-Jump Pill Bar (Toggleable via isSubNavVisible) */}
-        {subFeatures.length > 0 && isSubNavVisible && (
-          <div className="bg-[#EAF4F4]/70 border-t border-[#161514]/15 px-3 sm:px-6 py-1.5 overflow-x-auto no-scrollbar animate-in fade-in slide-in-from-top-1 duration-200">
-            <div className="max-w-6xl mx-auto flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-[#161514]/80">
-              <span className="shrink-0 text-[9px] bg-white px-2 py-0.5 rounded-md border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] font-black">
-                📍 SECTIONS
-              </span>
-              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-                {subFeatures.map((sf, idx) => {
-                  const Icon = sf.icon;
-                  return (
-                    <button
-                      key={idx}
-                      onClick={() => handleSubFeatureClick(sf.targetId, sf.spaceHref, sf.tab)}
-                      className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-[#CEF431] text-[#161514] border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer shrink-0 whitespace-nowrap"
-                    >
-                      <Icon className="h-3 w-3 stroke-[2.5]" />
-                      <span>{sf.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        )}
-      </header>
+      {/* Reminder Manager Modal */}
+      {isReminderModalOpen && (
+        <ReminderManagerModal
+          open={isReminderModalOpen}
+          onOpenChange={setIsReminderModalOpen}
+        />
+      )}
 
-      {/* Daily Reminders & Alarm Manager Modal */}
-      <ReminderManagerModal
-        open={isReminderModalOpen}
-        onOpenChange={setIsReminderModalOpen}
-        defaultSpace="all"
+      {/* Cloud Sync Telemetry Drawer */}
+      <CloudSyncDrawer
+        open={isSyncDrawerOpen}
+        onOpenChange={setIsSyncDrawerOpen}
       />
-    </>
+    </header>
   );
 }

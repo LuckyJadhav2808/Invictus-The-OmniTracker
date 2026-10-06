@@ -10,19 +10,19 @@ export interface AppVersionInfo {
 }
 
 export const APP_VERSION_CONFIG: AppVersionInfo = {
-  version: "1.5.0",
-  buildNumber: 19,
-  releaseDate: "September 26, 2026",
+  version: "1.6.0",
+  buildNumber: 20,
+  releaseDate: "October 6, 2026",
   channel: "stable",
   minSupportedVersion: "1.0.0",
   githubRepoUrl: "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker",
   latestReleaseApiUrl: "https://api.github.com/repos/LuckyJadhav2808/Invictus-The-OmniTracker/releases/latest",
   changelog: [
-    "📅 On-Demand Bank SMS Fetcher: Read and import transactions from your Android message inbox by specific day, past 3-7 days, or custom date",
-    "🎚️ Tracking Mode Preference: Switch between Manual Only mode (zero permissions) and SMS-Assisted Mode with 1 tap",
-    "📋 Smart SMS Batch Importer: Paste and parse multiple bank SMS messages on desktop and web with instant category suggestions",
-    "⚡ Batch Ledger Sync: High-efficiency bulk transaction processing with automatic duplicate suppression",
-    "🔄 Dynamic User SharedPreferences: Native background SMS receiver automatically links alerts to the active logged-in user",
+    "🏎️ Dual Android Widgets: Invictus Speedway Arcade (fuel gauge, turbo cruise, pit crew) and Zen Sanctuary (brook water flow, sacred flora, Torii gates)",
+    "📲 In-App APK Updater: Instant background download with live progress and native Android package installer integration",
+    "🦊 Interactive Vix Vector Mascot: Expressive animated SVG mascot with glance/blink autonomy, audio feedback, and mood states",
+    "🛠️ Neobrutalist UI Upgrades: AdaptiveDrawerDialog, NeobrutalistDateTimePickerModal, and CloudSyncDrawer",
+    "⚡ CI/CD Build Hardening: Fixed Capacitor native Android plugin dependencies in GitHub Actions automated Gradle pipeline",
   ],
 };
 

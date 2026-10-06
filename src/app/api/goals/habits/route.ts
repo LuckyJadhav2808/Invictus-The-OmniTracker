@@ -3,6 +3,8 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { Habit } from "@/models/Habit";
 import { HabitLog } from "@/models/HabitLog";
 
+export const dynamic = "force-dynamic";
+
 // GET /api/goals/habits?userId=xxx
 export async function GET(req: Request) {
   try {

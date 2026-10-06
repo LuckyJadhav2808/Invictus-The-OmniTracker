@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { WaterLog } from "@/models/WaterLog";
 
+export const dynamic = "force-dynamic";
+
 // GET /api/goals/water?userId=xxx&date=yyyy-mm-dd
 export async function GET(req: Request) {
   try {

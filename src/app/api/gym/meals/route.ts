@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { MealPlan } from "@/models/MealPlan";
 
+export const dynamic = "force-dynamic";
+
 // GET /api/gym/meals?userId=xxx&date=2026-07-27
 export async function GET(req: Request) {
   try {

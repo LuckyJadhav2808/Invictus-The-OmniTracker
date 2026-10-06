@@ -66,7 +66,7 @@ export function useAddGymRoutine() {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["gymRoutines", user?.uid] });
+      queryClient.invalidateQueries({ queryKey: ["gymRoutines"] });
     },
   });
 }
@@ -99,7 +99,7 @@ export function useUpdateGymRoutine() {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["gymRoutines", user?.uid] });
+      queryClient.invalidateQueries({ queryKey: ["gymRoutines"] });
     },
   });
 }
@@ -127,7 +127,7 @@ export function useDeleteGymRoutine() {
       return routineId;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["gymRoutines", user?.uid] });
+      queryClient.invalidateQueries({ queryKey: ["gymRoutines"] });
     },
   });
 }

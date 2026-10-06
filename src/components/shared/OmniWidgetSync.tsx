@@ -1,15 +1,17 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import { useCategories, useTransactions } from "@/lib/queries/money";
+import { useCategories, useTransactions, useSavingsGoals } from "@/lib/queries/money";
 import { useHabits, useHabitLogs, useStreaks } from "@/lib/queries/goals";
 import { useAuth } from "@/components/shared/AuthProvider";
+import { useUIStore } from "@/store/ui-store";
 import { useWidgetSync } from "@/lib/hooks/useWidgetSync";
 import { computeMonthlyBudgetStats, computeDailyBudgetStats } from "@/lib/utils/budget-rollover";
 import { format } from "date-fns";
 
 export function OmniWidgetSync() {
   const { user } = useAuth();
+  const { widgetTheme } = useUIStore();
   const { syncToWidget } = useWidgetSync();
   const todayStr = useMemo(() => format(new Date(), "yyyy-MM-dd"), []);
   const currentMonthKey = useMemo(() => format(new Date(), "yyyy-MM"), []);
@@ -17,6 +19,7 @@ export function OmniWidgetSync() {
   // Queries
   const { data: categories = [] } = useCategories();
   const { data: transactions = [] } = useTransactions();
+  const { data: savingsGoals = [] } = useSavingsGoals();
   const { data: habits = [] } = useHabits();
   const { data: logs = [] } = useHabitLogs(todayStr);
   const { data: streaks = {} } = useStreaks();
@@ -133,6 +136,50 @@ export function OmniWidgetSync() {
     return habits.filter((h) => logs.some((l) => l.habitId === h.id && l.completed)).length;
   }, [habits, logs]);
 
+  // Compute Active Goal for Widget
+  const activeGoal = useMemo(() => {
+    // 1. Check savings goals first
+    if (savingsGoals && savingsGoals.length > 0) {
+      const topSaving = savingsGoals.find((g: any) => {
+        const curr = Number(g.currentAmount || 0);
+        const tgt = Number(g.targetAmount || 1);
+        return curr < tgt;
+      }) || savingsGoals[0];
+
+      if (topSaving) {
+        const curr = Number(topSaving.currentAmount || 0);
+        const tgt = Number(topSaving.targetAmount || 1);
+        const pct = Math.min(100, Math.round((curr / tgt) * 100));
+        return {
+          id: topSaving.id || topSaving._id || "goal_saving",
+          title: topSaving.name || topSaving.title || "Savings Milestone",
+          progressPercentage: pct,
+          icon: topSaving.icon || "💰",
+          targetDate: topSaving.targetDate,
+        };
+      }
+    }
+
+    // 2. Check study target from user profile
+    if ((user as any)?.studyTarget) {
+      return {
+        id: "goal_study",
+        title: (user as any).studyTarget.examName || "Exam Preparation",
+        progressPercentage: 60,
+        icon: "📚",
+        targetDate: (user as any).studyTarget.examDate,
+      };
+    }
+
+    // 3. Fallback inspiring goal
+    return {
+      id: "goal_default",
+      title: "Mastery & Focus",
+      progressPercentage: 65,
+      icon: "🎯",
+    };
+  }, [savingsGoals, user]);
+
   // Global Widget Sync Effect
   useEffect(() => {
     syncToWidget({
@@ -153,8 +200,10 @@ export function OmniWidgetSync() {
       habitsTotalCount: habits.length,
       habitsCompletedCount,
       habitsList,
+      activeGoal,
+      widgetTheme,
     });
-  }, [budgetStats, dailyStats, currencySymbol, habits.length, habitsCompletedCount, habitsList, syncToWidget]);
+  }, [budgetStats, dailyStats, currencySymbol, habits.length, habitsCompletedCount, habitsList, activeGoal, widgetTheme, syncToWidget]);
 
   return null;
 }

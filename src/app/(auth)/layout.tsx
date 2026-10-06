@@ -21,7 +21,7 @@ export default function AuthLayout({
       </div>
 
       {/* Main Content Area */}
-      <div className="relative z-10 w-full max-w-4xl flex items-center justify-center">
+      <div className="relative z-10 w-full max-w-5xl flex items-center justify-center">
         {children}
       </div>
     </div>

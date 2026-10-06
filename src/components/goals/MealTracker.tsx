@@ -2,7 +2,8 @@
 
 import { useState, useMemo } from "react";
 import { Utensils, Plus, Trash2, Edit3, CheckCircle2, Circle, Flame, Sparkles } from "lucide-react";
-import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
+import { AdaptiveDrawerDialog } from "@/components/shared/AdaptiveDrawerDialog";
+import { soundFX } from "@/components/shared/SoundFX";
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
 import { TemplateSelectionModal, TemplatePack } from "@/components/shared/TemplateSelectionModal";
 import { MEAL_TEMPLATE_PACKS } from "@/lib/templates-data";
@@ -287,7 +288,7 @@ export function MealTracker() {
       />
 
       {/* Add Meal Modal */}
-      <ResponsiveFormContainer
+      <AdaptiveDrawerDialog
         open={isAddMealOpen}
         onOpenChange={setIsAddMealOpen}
         title="Add Meal"
@@ -441,10 +442,10 @@ export function MealTracker() {
             </Button>
           </form>
         </div>
-      </ResponsiveFormContainer>
+      </AdaptiveDrawerDialog>
 
       {/* Edit Meal Modal */}
-      <ResponsiveFormContainer
+      <AdaptiveDrawerDialog
         open={editingMeal !== null}
         onOpenChange={(open) => {
           if (!open) setEditingMeal(null);
@@ -452,21 +453,25 @@ export function MealTracker() {
         title="Edit Meal & Macros"
         description="Update your logged food item"
       >
-        <form onSubmit={handleUpdateMealSubmit} className="space-y-4 pt-2">
+        <form onSubmit={handleUpdateMealSubmit} className="space-y-4 pt-1">
           <div className="space-y-1.5">
-            <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Meal / Dish Name *</label>
+            <label className="text-xs font-heading font-black uppercase tracking-wider text-[#161514]">
+              Meal / Dish Name *
+            </label>
             <input
               type="text"
               value={editMealName}
               onChange={(e) => setEditMealName(e.target.value)}
-              className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium"
+              className="w-full bg-white rounded-xl border-2 border-[#161514] px-4 py-2.5 text-base font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514] focus:outline-none focus:ring-2 focus:ring-[#161514]"
               required
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Meal Type</label>
+              <label className="text-xs font-heading font-black uppercase tracking-wider text-[#161514]">
+                Meal Type
+              </label>
               <NeobrutalistSelect
                 value={editMealType}
                 onChange={(val) => setEditMealType(val as any)}
@@ -478,51 +483,53 @@ export function MealTracker() {
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Time</label>
+              <label className="text-xs font-heading font-black uppercase tracking-wider text-[#161514]">
+                Time
+              </label>
               <input
                 type="text"
                 value={editTime}
                 onChange={(e) => setEditTime(e.target.value)}
-                className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium"
+                className="w-full bg-white rounded-xl border-2 border-[#161514] px-4 py-2.5 text-base font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514] focus:outline-none focus:ring-2 focus:ring-[#161514]"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
             <div className="space-y-1">
-              <label className="text-[9px] font-bold text-navy-600 uppercase">Calories</label>
+              <label className="text-[10px] font-heading font-black text-[#161514] uppercase">Calories</label>
               <input
                 type="number"
                 value={editCalories}
                 onChange={(e) => setEditCalories(e.target.value)}
-                className="w-full bg-cream-bg rounded-xl border border-border/85 px-3 py-2 text-xs text-navy-900 font-bold"
+                className="w-full bg-white rounded-xl border-2 border-[#161514] px-3 py-2 text-base font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514]"
               />
             </div>
             <div className="space-y-1">
-              <label className="text-[9px] font-bold text-navy-600 uppercase">Protein (g)</label>
+              <label className="text-[10px] font-heading font-black text-[#161514] uppercase">Protein (g)</label>
               <input
                 type="number"
                 value={editProtein}
                 onChange={(e) => setEditProtein(e.target.value)}
-                className="w-full bg-cream-bg rounded-xl border border-border/85 px-3 py-2 text-xs text-navy-900 font-bold"
+                className="w-full bg-white rounded-xl border-2 border-[#161514] px-3 py-2 text-base font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514]"
               />
             </div>
             <div className="space-y-1">
-              <label className="text-[9px] font-bold text-navy-600 uppercase">Carbs (g)</label>
+              <label className="text-[10px] font-heading font-black text-[#161514] uppercase">Carbs (g)</label>
               <input
                 type="number"
                 value={editCarbs}
                 onChange={(e) => setEditCarbs(e.target.value)}
-                className="w-full bg-cream-bg rounded-xl border border-border/85 px-3 py-2 text-xs text-navy-900 font-bold"
+                className="w-full bg-white rounded-xl border-2 border-[#161514] px-3 py-2 text-base font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514]"
               />
             </div>
             <div className="space-y-1">
-              <label className="text-[9px] font-bold text-navy-600 uppercase">Fat (g)</label>
+              <label className="text-[10px] font-heading font-black text-[#161514] uppercase">Fat (g)</label>
               <input
                 type="number"
                 value={editFat}
                 onChange={(e) => setEditFat(e.target.value)}
-                className="w-full bg-cream-bg rounded-xl border border-border/85 px-3 py-2 text-xs text-navy-900 font-bold"
+                className="w-full bg-white rounded-xl border-2 border-[#161514] px-3 py-2 text-base font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514]"
               />
             </div>
           </div>
@@ -530,12 +537,12 @@ export function MealTracker() {
           <Button
             type="submit"
             disabled={updateMealMutation.isPending}
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-full py-2.5 mt-2 border-none cursor-pointer"
+            className="w-full min-h-[48px] bg-[#03D26F] hover:bg-[#02b861] text-[#161514] font-heading font-black text-sm rounded-xl py-3 mt-3 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none cursor-pointer transition-all uppercase tracking-wider"
           >
             Save Changes
           </Button>
         </form>
-      </ResponsiveFormContainer>
+      </AdaptiveDrawerDialog>
 
       {/* Delete Meal Modal */}
       <DeleteConfirmationModal

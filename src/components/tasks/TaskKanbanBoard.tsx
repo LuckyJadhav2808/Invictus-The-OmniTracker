@@ -14,11 +14,11 @@ interface TaskKanbanBoardProps {
   onOpenCreateModal: () => void;
 }
 
-const COLUMNS: { id: TaskItem["status"]; title: string; icon: string; headerBg: string }[] = [
-  { id: "todo", title: "⏳ To Do", icon: "⏳", headerBg: "bg-[#FFF9EA]" },
-  { id: "in_progress", title: "⚡ In Progress", icon: "⚡", headerBg: "bg-[#CEF431]" },
-  { id: "review", title: "👀 Under Review", icon: "👀", headerBg: "bg-[#C084FC] text-white" },
-  { id: "completed", title: "✅ Completed", icon: "✅", headerBg: "bg-[#03D26F]" },
+const COLUMNS: { id: TaskItem["status"]; title: string; headerBg: string }[] = [
+  { id: "todo", title: "To Do", headerBg: "bg-[#FFF9EA]" },
+  { id: "in_progress", title: "In Progress", headerBg: "bg-[#CEF431]" },
+  { id: "review", title: "Under Review", headerBg: "bg-[#C084FC] text-white" },
+  { id: "completed", title: "Completed", headerBg: "bg-[#03D26F]" },
 ];
 
 export function TaskKanbanBoard({
@@ -32,10 +32,10 @@ export function TaskKanbanBoard({
   const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
 
   const priorityStyles = {
-    p1: { label: "P1 Urgent 🔥", badge: "bg-rose-500 text-white border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514]" },
-    p2: { label: "P2 High 🟠", badge: "bg-amber-400 text-[#161514] border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514]" },
-    p3: { label: "P3 Medium 🟡", badge: "bg-yellow-300 text-[#161514] border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514]" },
-    p4: { label: "P4 Low 🔵", badge: "bg-sky-300 text-[#161514] border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514]" },
+    p1: { label: "P1 Urgent", badge: "bg-rose-500 text-white border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514]" },
+    p2: { label: "P2 High", badge: "bg-amber-400 text-[#161514] border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514]" },
+    p3: { label: "P3 Medium", badge: "bg-yellow-300 text-[#161514] border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514]" },
+    p4: { label: "P4 Low", badge: "bg-sky-300 text-[#161514] border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514]" },
   };
 
   const handleDragStart = (e: React.DragEvent, id: string) => {

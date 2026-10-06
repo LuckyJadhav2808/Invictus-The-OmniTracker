@@ -3,6 +3,8 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { User } from "@/models/User";
 import { hashPasswordWithSalt, verifyAdminRequest, ADMIN_EMAIL } from "@/lib/server-auth";
 
+export const dynamic = "force-dynamic";
+
 // GET /api/admin/users - List all users in MongoDB (Admin Only)
 export async function GET(req: NextRequest) {
   try {

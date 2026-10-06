@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Task } from "@/models/Task";
 
+export const dynamic = "force-dynamic";
+
 const ADMIN_UID = "user_1kapw9sad_1784744868999";
 const LEGACY_ADMIN_UID = "user-admin-default";
 

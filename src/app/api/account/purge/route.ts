@@ -16,6 +16,8 @@ import { MoodLog } from "@/models/MoodLog";
 import { SavingsGoal } from "@/models/SavingsGoal";
 import { Subscription } from "@/models/Subscription";
 
+export const dynamic = "force-dynamic";
+
 // POST /api/account/purge
 // Securely wipes all user-owned records for a specific authenticated user
 export async function POST(req: Request) {

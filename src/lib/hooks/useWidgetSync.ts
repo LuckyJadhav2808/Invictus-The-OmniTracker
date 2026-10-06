@@ -7,6 +7,14 @@ export interface WidgetHabitItem {
   streak?: number;
 }
 
+export interface WidgetGoalItem {
+  id: string;
+  title: string;
+  progressPercentage: number;
+  targetDate?: string;
+  icon?: string;
+}
+
 export interface WidgetSyncData {
   safeToSpendDaily: number;
   remainingUpiBudget: number;
@@ -27,6 +35,10 @@ export interface WidgetSyncData {
   habitsTotalCount?: number;
   habitsCompletedCount?: number;
   habitsList?: WidgetHabitItem[];
+  // Active Goal Additions
+  activeGoal?: WidgetGoalItem;
+  // Widget Theme Switcher
+  widgetTheme?: "zen" | "speedway";
 }
 
 interface WidgetBridgePluginType {

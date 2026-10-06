@@ -17,6 +17,8 @@ import { SavingsGoal } from "@/models/SavingsGoal";
 import { Subscription } from "@/models/Subscription";
 import { verifyAdminRequest } from "@/lib/server-auth";
 
+export const dynamic = "force-dynamic";
+
 // POST /api/admin/purge
 // Administrative endpoint to wipe data for a specific user. Requires verified admin privileges.
 export async function POST(req: Request) {

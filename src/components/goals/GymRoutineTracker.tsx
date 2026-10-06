@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { Dumbbell, Plus, Trash2, Edit3, CheckCircle2, Circle, Flame, Sparkles, Layers, Search, Info, Eye, ChevronDown, ChevronUp } from "lucide-react";
-import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
+import { useState, useMemo, useEffect, useDeferredValue, useRef } from "react";
+import { Dumbbell, Plus, Trash2, Edit3, CheckCircle2, Circle, Flame, Sparkles, Layers, Search, Info, Eye, ChevronDown, ChevronUp, Timer, Play, Pause, X, RotateCcw } from "lucide-react";
+import { AdaptiveDrawerDialog } from "@/components/shared/AdaptiveDrawerDialog";
+import { soundFX } from "@/components/shared/SoundFX";
 import { TemplateSelectionModal, TemplatePack } from "@/components/shared/TemplateSelectionModal";
 import { GYM_TEMPLATE_PACKS } from "@/lib/templates-data";
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
@@ -25,6 +26,41 @@ export function GymRoutineTracker() {
   }, []);
 
   const [selectedDay, setSelectedDay] = useState<typeof DAYS_OF_WEEK[number]>(currentDayName);
+
+  // Automatic Gladiator Rest Timer State
+  const [restSecondsLeft, setRestSecondsLeft] = useState<number | null>(null);
+  const [restDuration, setRestDuration] = useState<number>(60);
+  const [isTimerPaused, setIsTimerPaused] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (restSecondsLeft === null || isTimerPaused) return;
+    if (restSecondsLeft <= 0) {
+      soundFX.playRestDoneBeep();
+      soundFX.vibrate([40, 80, 40]);
+      toast.success("REST OVER — GET ON THE BAR! 💥");
+      setRestSecondsLeft(null);
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setRestSecondsLeft((prev) => {
+        if (prev === null) return null;
+        if (prev <= 4 && prev > 1) {
+          soundFX.vibrate(15);
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [restSecondsLeft, isTimerPaused]);
+
+  const startRestTimer = (seconds: number = restDuration) => {
+    setRestDuration(seconds);
+    setRestSecondsLeft(seconds);
+    setIsTimerPaused(false);
+    soundFX.playPop();
+  };
 
   const { data: routines = [], isLoading } = useGymRoutines();
   const addRoutineMutation = useAddGymRoutine();
@@ -87,16 +123,40 @@ export function GymRoutineTracker() {
   const [exerciseNotes, setExerciseNotes] = useState("");
   const [selectedLibItem, setSelectedLibItem] = useState<any | null>(null);
 
-  // 800+ Exercise Library Search State
+  // 4,300+ Exercise Library Search & Progressive Loading State
   const [libQuery, setLibQuery] = useState("");
+  const deferredLibQuery = useDeferredValue(libQuery);
   const [libBodyPart, setLibBodyPart] = useState("all");
   const [libEquipment, setLibEquipment] = useState("all");
-  const { data: libData } = useExerciseLibrary({
-    query: libQuery,
+  const [displayLimit, setDisplayLimit] = useState(50);
+  const loadMoreSentinelRef = useRef<HTMLDivElement | null>(null);
+
+  // Reset display limit to 50 whenever filter or search query changes
+  useEffect(() => {
+    setDisplayLimit(50);
+  }, [deferredLibQuery, libBodyPart, libEquipment]);
+
+  const { data: libData, isLoading: isLibLoading, isFetching: isLibFetching } = useExerciseLibrary({
+    query: deferredLibQuery,
     bodyPart: libBodyPart,
     equipment: libEquipment,
-    limit: 25,
+    limit: displayLimit,
   });
+
+  // Infinite scroll observer: Automatically loads more items as user scrolls near bottom
+  useEffect(() => {
+    if (!loadMoreSentinelRef.current || !libData?.hasMore) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isLibFetching) {
+          setDisplayLimit((prev) => prev + 50);
+        }
+      },
+      { rootMargin: "200px" }
+    );
+    observer.observe(loadMoreSentinelRef.current);
+    return () => observer.disconnect();
+  }, [libData?.hasMore, isLibFetching]);
 
   const [editingExercise, setEditingExercise] = useState<any | null>(null);
   const [editExName, setEditExName] = useState("");
@@ -359,22 +419,30 @@ export function GymRoutineTracker() {
         id: currentRoutine.id,
         exercises: updatedExercises,
       });
-      if (field === "completed" && value === true) {
-        const thisEx = updatedExercises.find((e: any) => e.id === exId);
-        const thisExCompleted = thisEx && (thisEx.sets || []).length > 0 && (thisEx.sets || []).every((s: any) => s.completed);
-        if (thisExCompleted) {
-          toast.success(`'${thisEx.name}' sets crushed! 🎯`);
-          // Auto-collapse completed exercise smoothly
-          setTimeout(() => {
-            setCollapsedExercises((prev) => ({ ...prev, [exId]: true }));
-          }, 450);
-        }
+      if (field === "completed") {
+        if (value === true) {
+          soundFX.playPop();
+          soundFX.vibrate(25);
+          startRestTimer(restDuration);
+          const thisEx = updatedExercises.find((e: any) => e.id === exId);
+          const thisExCompleted = thisEx && (thisEx.sets || []).length > 0 && (thisEx.sets || []).every((s: any) => s.completed);
+          if (thisExCompleted) {
+            soundFX.playCompleteChime();
+            toast.success(`'${thisEx.name}' sets crushed! 🎯`);
+            // Auto-collapse completed exercise smoothly
+            setTimeout(() => {
+              setCollapsedExercises((prev) => ({ ...prev, [exId]: true }));
+            }, 450);
+          }
 
-        const allDone = updatedExercises.every((e: any) =>
-          (e.sets || []).every((s: any) => s.completed)
-        );
-        if (allDone && updatedExercises.length > 0) {
-          toast.success(`Crushed it! All ${selectedDay} sets completed! 🏆🔥`);
+          const allDone = updatedExercises.every((e: any) =>
+            (e.sets || []).every((s: any) => s.completed)
+          );
+          if (allDone && updatedExercises.length > 0) {
+            toast.success(`Crushed it! All ${selectedDay} sets completed! 🏆🔥`);
+          }
+        } else {
+          soundFX.playPop();
         }
       }
     } catch {
@@ -502,6 +570,101 @@ export function GymRoutineTracker() {
           );
         })}
       </div>
+
+      {/* Gladiator Automatic Rest Timer HUD */}
+      {restSecondsLeft !== null && (
+        <div className="bg-[#FAF8F5] border-[2.5px] border-[#161514] rounded-2xl p-4 shadow-[4px_4px_0px_0px_#161514] space-y-3 animate-in fade-in duration-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="size-9 rounded-xl bg-amber-300 border-2 border-[#161514] flex items-center justify-center shadow-[1.5px_1.5px_0px_0px_#161514]">
+                <Timer className="size-5 text-[#161514] stroke-[2.5]" />
+              </div>
+              <div>
+                <h4 className="text-xs font-heading font-black text-[#161514] uppercase tracking-wider">
+                  Gladiator Rest Clock
+                </h4>
+                <p className="text-[10px] font-bold text-[#161514]/70">
+                  {restSecondsLeft > 0 ? "Breathe, hydrate, prepare for next set" : "Rest complete — attack next set!"}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => setIsTimerPaused(!isTimerPaused)}
+                className="size-8 rounded-xl border-2 border-[#161514] bg-white hover:bg-[#FFF9EA] text-[#161514] flex items-center justify-center shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-y-0.5"
+                title={isTimerPaused ? "Resume" : "Pause"}
+              >
+                {isTimerPaused ? <Play className="size-3.5 fill-current" /> : <Pause className="size-3.5 fill-current" />}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  soundFX.playPop();
+                  setRestSecondsLeft((prev) => (prev !== null ? prev + 15 : 15));
+                }}
+                className="px-2.5 py-1 rounded-xl border-2 border-[#161514] bg-white hover:bg-[#FFF9EA] text-[#161514] font-heading font-black text-[10px] shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-y-0.5"
+                title="Add 15s"
+              >
+                +15s
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  soundFX.playPop();
+                  setRestSecondsLeft(null);
+                }}
+                className="size-8 rounded-xl border-2 border-[#161514] bg-rose-100 hover:bg-rose-200 text-[#161514] flex items-center justify-center shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-y-0.5"
+                title="Dismiss timer"
+              >
+                <X className="size-4 stroke-[2.5]" />
+              </button>
+            </div>
+          </div>
+
+          {/* Big Digital Countdown & Progress Bar */}
+          <div className="space-y-1.5">
+            <div className="flex items-baseline justify-between">
+              <span className={cn(
+                "text-2xl sm:text-3xl font-heading font-black tracking-tight",
+                restSecondsLeft <= 5 ? "text-rose-600 animate-pulse" : "text-[#161514]"
+              )}>
+                {Math.floor(restSecondsLeft / 60)}:{(restSecondsLeft % 60).toString().padStart(2, "0")}
+              </span>
+              <div className="flex gap-1.5">
+                {[30, 45, 60, 90, 120].map((sec) => (
+                  <button
+                    key={sec}
+                    type="button"
+                    onClick={() => startRestTimer(sec)}
+                    className={cn(
+                      "text-[10px] font-heading font-black px-2 py-0.5 rounded-lg border-2 border-[#161514] transition-all",
+                      restDuration === sec
+                        ? "bg-[#CEF431] text-[#161514] shadow-[1px_1px_0px_0px_#161514]"
+                        : "bg-white text-[#161514]/70 hover:bg-slate-50"
+                    )}
+                  >
+                    {sec}s
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="w-full h-3 bg-white rounded-full border-2 border-[#161514] overflow-hidden p-0.5">
+              <div
+                className={cn(
+                  "h-full rounded-full transition-all duration-1000 ease-linear",
+                  restSecondsLeft <= 5 ? "bg-rose-500" : "bg-[#03D26F]"
+                )}
+                style={{
+                  width: `${Math.min(100, Math.max(0, (restSecondsLeft / Math.max(restDuration, 1)) * 100))}%`,
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Routine Title Banner */}
       <div className="bg-cream-bg/50 rounded-2xl p-3.5 sm:p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -738,14 +901,14 @@ export function GymRoutineTracker() {
 
                   <div className="divide-y divide-[#161514]/10">
                     {(ex.sets || []).map((st: any, idx: number) => (
-                      <div key={st.id || idx} className="grid grid-cols-4 gap-2 px-3 py-2 items-center text-center">
-                        <span className="font-black text-[#161514] text-[11px]">Set {st.setNumber}</span>
+                      <div key={st.id || idx} className="grid grid-cols-4 gap-2 px-3 py-2.5 items-center text-center">
+                        <span className="font-heading font-black text-[#161514] text-xs">Set {st.setNumber}</span>
                         <div className="flex justify-center">
                           <input
                             type="number"
                             value={st.weight}
                             onChange={(e) => handleSetChange(ex.id, idx, "weight", Number(e.target.value))}
-                            className="w-full max-w-[58px] bg-[#FAF8F5] border-2 border-[#161514] rounded-lg py-1 px-1 text-center font-black text-[#161514] text-xs outline-none focus:bg-[#FFF9EA] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-all"
+                            className="w-full max-w-[64px] bg-[#FAF8F5] border-2 border-[#161514] rounded-xl py-1.5 px-1 text-center font-heading font-black text-[#161514] text-base sm:text-xs outline-none focus:bg-[#FFF9EA] shadow-[1.5px_1.5px_0px_0px_#161514] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-all"
                             min={0}
                           />
                         </div>
@@ -754,22 +917,30 @@ export function GymRoutineTracker() {
                             type="number"
                             value={st.reps}
                             onChange={(e) => handleSetChange(ex.id, idx, "reps", Number(e.target.value))}
-                            className="w-full max-w-[58px] bg-[#FAF8F5] border-2 border-[#161514] rounded-lg py-1 px-1 text-center font-black text-[#161514] text-xs outline-none focus:bg-[#FFF9EA] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-all"
+                            className="w-full max-w-[64px] bg-[#FAF8F5] border-2 border-[#161514] rounded-xl py-1.5 px-1 text-center font-heading font-black text-[#161514] text-base sm:text-xs outline-none focus:bg-[#FFF9EA] shadow-[1.5px_1.5px_0px_0px_#161514] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-all"
                             min={1}
                           />
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => handleSetChange(ex.id, idx, "completed", !st.completed)}
-                          className="mx-auto cursor-pointer border-none bg-transparent outline-none flex items-center justify-center p-1 rounded-full hover:bg-emerald-50 active:scale-95 transition-all"
-                          title={st.completed ? "Mark incomplete" : "Mark completed"}
-                        >
-                          {st.completed ? (
-                            <CheckCircle2 className="h-5 w-5 text-[#03D26F] fill-[#03D26F]/20 transition-transform active:scale-110" />
-                          ) : (
-                            <Circle className="h-5 w-5 text-[#161514]/40 hover:text-[#161514] transition-colors" />
-                          )}
-                        </button>
+                        <div className="flex justify-center">
+                          <button
+                            type="button"
+                            onClick={() => handleSetChange(ex.id, idx, "completed", !st.completed)}
+                            className={cn(
+                              "min-w-[44px] min-h-[44px] size-11 rounded-xl border-2 border-[#161514] flex items-center justify-center cursor-pointer transition-all",
+                              "shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
+                              st.completed
+                                ? "bg-[#03D26F] text-[#161514]"
+                                : "bg-white text-[#161514]/40 hover:bg-[#FFF9EA] hover:text-[#161514]"
+                            )}
+                            title={st.completed ? "Mark incomplete" : "Mark completed (Starts Rest Timer)"}
+                          >
+                            {st.completed ? (
+                              <CheckCircle2 className="size-6 stroke-[2.2] fill-[#161514] text-white" />
+                            ) : (
+                              <Circle className="size-6 stroke-[2.5]" />
+                            )}
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -838,7 +1009,7 @@ export function GymRoutineTracker() {
       />
 
       {/* Routine Title Modal */}
-      <ResponsiveFormContainer
+      <AdaptiveDrawerDialog
         open={isRoutineTitleOpen}
         onOpenChange={setIsRoutineTitleOpen}
         title={`Set ${selectedDay} Routine Title`}
@@ -846,28 +1017,28 @@ export function GymRoutineTracker() {
       >
         <form onSubmit={handleSaveRoutineTitle} className="space-y-4 pt-2">
           <div className="space-y-1.5">
-            <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Routine Title</label>
+            <label className="text-xs font-heading font-black uppercase tracking-wider text-[#161514]">Routine Title</label>
             <input
               type="text"
               placeholder="e.g. Chest & Triceps Focus, Leg Day Blitz"
               value={routineTitleInput}
               onChange={(e) => setRoutineTitleInput(e.target.value)}
-              className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:ring-2 focus:ring-rose-500 font-medium"
+              className="w-full bg-white rounded-xl border-2 border-[#161514] px-4 py-2.5 text-base font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514] focus:outline-none focus:ring-2 focus:ring-[#161514]"
               required
             />
           </div>
           <Button
             type="submit"
             disabled={updateRoutineMutation.isPending || addRoutineMutation.isPending}
-            className="w-full bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-full py-2.5 mt-2 border-none cursor-pointer"
+            className="w-full min-h-[48px] bg-rose-500 hover:bg-rose-600 text-white font-heading font-black text-sm rounded-xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] cursor-pointer"
           >
             Save Routine Title
           </Button>
         </form>
-      </ResponsiveFormContainer>
+      </AdaptiveDrawerDialog>
 
       {/* Add Exercise Modal */}
-      <ResponsiveFormContainer
+      <AdaptiveDrawerDialog
         open={isAddExerciseOpen}
         onOpenChange={setIsAddExerciseOpen}
         title={`Add Exercise to ${selectedDay}`}
@@ -907,16 +1078,26 @@ export function GymRoutineTracker() {
           {addModalTab === "library" ? (
             /* 🔍 4,300+ EXERCISES SEARCH & DIRECT 1-TAP ADD */
             <div className="space-y-3">
-              {/* Search Input */}
+              {/* Search Input with Clear Button */}
               <div className="relative">
                 <input
                   type="text"
                   placeholder="Search exercise name or muscle (e.g. Bench Press, Lat Pulldown)..."
                   value={libQuery}
                   onChange={(e) => setLibQuery(e.target.value)}
-                  className="w-full bg-white rounded-xl border-2 border-[#161514] px-3.5 py-2.5 text-xs font-bold text-[#161514] outline-none placeholder:text-[#161514]/40 shadow-[2px_2px_0px_0px_#161514] focus:bg-[#FFF9EA]"
+                  className="w-full bg-white rounded-xl border-2 border-[#161514] pl-3.5 pr-8 py-2.5 text-xs font-bold text-[#161514] outline-none placeholder:text-[#161514]/40 shadow-[2px_2px_0px_0px_#161514] focus:bg-[#FFF9EA]"
                   autoFocus
                 />
+                {libQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setLibQuery("")}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-[#161514]/60 hover:text-[#161514] hover:bg-[#161514]/10 cursor-pointer transition-colors"
+                    title="Clear search"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                )}
               </div>
 
               {/* Muscle Group Quick Filters */}
@@ -938,6 +1119,19 @@ export function GymRoutineTracker() {
                 ))}
               </div>
 
+              {/* Counter & Search Status */}
+              <div className="flex items-center justify-between text-[11px] font-bold text-[#161514]/70 px-0.5">
+                <span>
+                  Showing <strong className="text-[#161514] font-black">{libData?.exercises ? Math.min(libData.exercises.length, libData.totalCount) : 0}</strong> of <strong className="text-[#161514] font-black">{libData?.totalCount || 4334}</strong> exercises
+                </span>
+                {isLibFetching && (
+                  <span className="text-rose-600 font-black text-[10px] uppercase tracking-wider animate-pulse flex items-center gap-1">
+                    <span className="size-1.5 rounded-full bg-rose-500 animate-ping inline-block" />
+                    Searching...
+                  </span>
+                )}
+              </div>
+
               {/* Live Search Results List with 1-TAP DIRECT ADD */}
               {libData?.exercises && libData.exercises.length > 0 ? (
                 <div className="max-h-[50vh] overflow-y-auto space-y-2 pr-1 pt-1 divide-y divide-amber-200/60 overscroll-contain">
@@ -953,7 +1147,15 @@ export function GymRoutineTracker() {
                         {thumbUrl ? (
                           <div className="h-11 w-11 rounded-lg bg-[#242220] border-2 border-[#161514] overflow-hidden shrink-0 flex items-center justify-center">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={thumbUrl} alt={item.title} className="h-full w-full object-contain" />
+                            <img
+                              src={thumbUrl}
+                              alt={item.title}
+                              loading="lazy"
+                              onError={(e) => {
+                                (e.currentTarget as HTMLElement).style.display = "none";
+                              }}
+                              className="h-full w-full object-contain"
+                            />
                           </div>
                         ) : (
                           <div className="h-11 w-11 rounded-lg bg-amber-200 border-2 border-[#161514] flex items-center justify-center text-[#161514] font-black text-xs shrink-0">
@@ -1004,6 +1206,28 @@ export function GymRoutineTracker() {
                     </div>
                   );
                 })}
+
+                  {/* Infinite Scroll Sentinel */}
+                  <div ref={loadMoreSentinelRef} className="h-2 w-full" />
+
+                  {/* Load More Button */}
+                  {libData && libData.totalCount > libData.exercises.length && (
+                    <div className="pt-2 pb-1 text-center">
+                      <button
+                        type="button"
+                        onClick={() => setDisplayLimit((prev) => prev + 50)}
+                        disabled={isLibFetching}
+                        className="w-full py-2.5 px-4 rounded-xl bg-amber-300 hover:bg-amber-400 text-[#161514] font-heading font-black text-xs border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-y-0.5 cursor-pointer flex items-center justify-center gap-2 transition-all disabled:opacity-60"
+                      >
+                        <span>
+                          {isLibFetching
+                            ? "Loading More Exercises..."
+                            : `Load More Movements (${libData.totalCount - libData.exercises.length} remaining)`}
+                        </span>
+                        <ChevronDown className="h-4 w-4 stroke-[3]" />
+                      </button>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="p-5 text-center bg-white rounded-2xl border-2 border-dashed border-[#161514]/40 space-y-2.5">
@@ -1087,10 +1311,10 @@ export function GymRoutineTracker() {
             </form>
           )}
         </div>
-      </ResponsiveFormContainer>
+      </AdaptiveDrawerDialog>
 
       {/* Edit Exercise Modal */}
-      <ResponsiveFormContainer
+      <AdaptiveDrawerDialog
         open={editingExercise !== null}
         onOpenChange={(open) => {
           if (!open) setEditingExercise(null);
@@ -1098,33 +1322,39 @@ export function GymRoutineTracker() {
         title="Edit Exercise Details"
         description="Update exercise title, equipment, or muscle group"
       >
-        <form onSubmit={handleUpdateExercise} className="space-y-4 pt-2">
+        <form onSubmit={handleUpdateExercise} className="space-y-4 pt-1">
           <div className="space-y-1.5">
-            <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Exercise Name</label>
+            <label className="text-xs font-heading font-black uppercase tracking-wider text-[#161514]">
+              Exercise Name
+            </label>
             <input
               type="text"
               value={editExName}
               onChange={(e) => setEditExName(e.target.value)}
-              className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:ring-2 focus:ring-rose-500 font-medium"
+              className="w-full bg-white rounded-xl border-2 border-[#161514] px-4 py-2.5 text-base font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514] focus:outline-none focus:ring-2 focus:ring-[#161514]"
               required
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Machine / Equipment</label>
+              <label className="text-xs font-heading font-black uppercase tracking-wider text-[#161514]">
+                Machine / Equipment
+              </label>
               <input
                 type="text"
                 value={editExMachine}
                 onChange={(e) => setEditExMachine(e.target.value)}
-                className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:ring-2 focus:ring-rose-500 font-medium"
+                className="w-full bg-white rounded-xl border-2 border-[#161514] px-4 py-2.5 text-base font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514] focus:outline-none focus:ring-2 focus:ring-[#161514]"
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Target Muscle</label>
+              <label className="text-xs font-heading font-black uppercase tracking-wider text-[#161514]">
+                Target Muscle
+              </label>
               <select
                 value={editExTarget}
                 onChange={(e) => setEditExTarget(e.target.value)}
-                className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:ring-2 focus:ring-rose-500 font-medium"
+                className="w-full bg-white rounded-xl border-2 border-[#161514] px-4 py-2.5 text-base font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514] focus:outline-none focus:ring-2 focus:ring-[#161514]"
               >
                 {["Chest", "Back", "Shoulders", "Biceps", "Triceps", "Legs", "Abs/Core", "Cardio"].map((m) => (
                   <option key={m} value={m}>
@@ -1136,12 +1366,12 @@ export function GymRoutineTracker() {
           </div>
           <Button
             type="submit"
-            className="w-full bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-full py-2.5 mt-2 border-none cursor-pointer"
+            className="w-full min-h-[48px] bg-rose-500 hover:bg-rose-600 text-white font-heading font-black text-sm rounded-xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] cursor-pointer"
           >
             Save Changes
           </Button>
         </form>
-      </ResponsiveFormContainer>
+      </AdaptiveDrawerDialog>
 
       {/* Delete Exercise Modal */}
       <DeleteConfirmationModal

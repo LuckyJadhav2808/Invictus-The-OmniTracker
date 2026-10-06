@@ -30,34 +30,50 @@ export function InvictusLogo({
   const logoGraphic = (
     <div
       className={cn(
-        "relative rounded-2xl flex items-center justify-center border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)] overflow-hidden shrink-0 transition-transform duration-200 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5",
+        "relative rounded-xl flex items-center justify-center border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)] overflow-hidden shrink-0 transition-transform duration-200 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5",
         currentSize.icon,
-        "bg-gradient-to-br from-[#CEF431] via-[#03D26F] to-[#014651]"
+        "bg-[#CEF431]"
       )}
     >
-      {/* Sleek Vector Trinity Monogram "I" + Polaris Sparkle */}
-      <svg viewBox="0 0 100 100" className="w-full h-full p-2" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Vix Gladiator Brand Mark */}
+      <svg viewBox="0 0 100 100" className="w-full h-full p-1" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* Plume Crest */}
         <path
-          d="M32 20 H68 M50 20 V80 M32 80 H68"
+          d="M36 22C34 8 44 4 50 4C56 4 66 8 64 22H36Z"
+          fill="#E61919"
           stroke="#161514"
-          strokeWidth="14"
-          strokeLinecap="round"
+          strokeWidth="3.5"
           strokeLinejoin="round"
         />
-        <path
-          d="M32 20 H68 M50 20 V80 M32 80 H68"
-          stroke="#FFFFFF"
-          strokeWidth="8"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M50 32 Q50 50 68 50 Q50 50 50 68 Q50 50 32 50 Q50 50 50 32 Z"
+        <line x1="43" y1="19" x2="42" y2="9" stroke="#161514" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="50" y1="18" x2="50" y2="6" stroke="#161514" strokeWidth="2.5" strokeLinecap="round" />
+        <line x1="57" y1="19" x2="58" y2="9" stroke="#161514" strokeWidth="2.5" strokeLinecap="round" />
+        <rect x="41" y="19" width="18" height="5" rx="1.5" fill="#FFB800" stroke="#161514" strokeWidth="3" />
+
+        {/* Ear Bolts */}
+        <rect x="20" y="42" width="6" height="15" rx="2" fill="#CBD5E1" stroke="#161514" strokeWidth="3" />
+        <rect x="74" y="42" width="6" height="15" rx="2" fill="#CBD5E1" stroke="#161514" strokeWidth="3" />
+
+        {/* Helmet Dome */}
+        <rect x="25" y="23" width="50" height="50" rx="9" fill="#FFFDF8" stroke="#161514" strokeWidth="4" />
+        <line x1="25" y1="34" x2="75" y2="34" stroke="#161514" strokeWidth="3" />
+        <rect x="46" y="26" width="8" height="5" rx="1" fill="#CEF431" stroke="#161514" strokeWidth="2" />
+
+        {/* Digital Visor */}
+        <rect x="31" y="38" width="38" height="22" rx="4" fill="#161514" />
+        <rect x="37" y="44" width="8" height="8" rx="2" fill="#38BDF8" />
+        <rect x="55" y="44" width="8" height="8" rx="2" fill="#38BDF8" />
+        <circle cx="40" cy="47" r="1.5" fill="#FFFFFF" />
+        <circle cx="58" cy="47" r="1.5" fill="#FFFFFF" />
+
+        {/* Invictus 'V' Chin Emblem */}
+        <polygon
+          points="50,84 38,64 44,64 50,74 56,64 62,64"
           fill="#CEF431"
           stroke="#161514"
           strokeWidth="3"
+          strokeLinejoin="round"
         />
-        <circle cx="50" cy="50" r="3.5" fill="#161514" />
       </svg>
     </div>
   );

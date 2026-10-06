@@ -5,6 +5,8 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { Subject } from "@/models/Subject";
 import { Topic } from "@/models/Topic";
 
+export const dynamic = "force-dynamic";
+
 export interface ExamPreset {
   id: string;
   name: string;

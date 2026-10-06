@@ -20,6 +20,7 @@ import {
 import { useUserAchievements } from "@/lib/queries/achievements";
 import { HabitCard } from "@/components/goals/HabitCard";
 import { NewHabitForm } from "@/components/goals/NewHabitForm";
+import { WaterTracker } from "@/components/goals/WaterTracker";
 import { MoodJournalWidget } from "@/components/goals/MoodJournalWidget";
 import { SleepAndActiveWidgets } from "@/components/goals/SleepAndActiveWidgets";
 import { GymRoutineTracker } from "@/components/goals/GymRoutineTracker";
@@ -29,18 +30,37 @@ import { WeeklyVelocityAndHabitMatrix } from "@/components/goals/WeeklyVelocityA
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { InvictusLoadingScreen } from "@/components/shared/InvictusLoadingScreen";
-import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
+import { AdaptiveDrawerDialog } from "@/components/shared/AdaptiveDrawerDialog";
+import { soundFX } from "@/components/shared/SoundFX";
 import { TemplateSelectionModal, TemplatePack } from "@/components/shared/TemplateSelectionModal";
 import { HABIT_TEMPLATE_PACKS } from "@/lib/templates-data";
+import { HabitCompanionSprite } from "@/components/mascot/HabitCompanionSprite";
+import { VixPixelCompanion } from "@/components/mascot/VixPixelCompanion";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Target, Plus, Flame, Award, BarChart2 } from "lucide-react";
+import {
+  Target,
+  Plus,
+  Flame,
+  Award,
+  BarChart2,
+  CheckSquare,
+  Sparkles,
+  Droplets,
+  Dumbbell,
+  Calendar as CalendarIcon,
+  Activity,
+  Edit3,
+  Moon,
+  Shield,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isSameDay, subWeeks } from "date-fns";
 import { toast } from "sonner";
 import { useUIStore } from "@/store/ui-store";
 import { cn } from "@/lib/utils";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from "recharts";
-import { SpaceHeroBanner } from "@/components/shared/SpaceHeroBanner";
 import { ProactiveReminderBanner } from "@/components/shared/ProactiveReminderBanner";
 import { useSearchParams, useRouter } from "next/navigation";
 
@@ -52,6 +72,7 @@ function GoalsPageContent() {
   const [activeTab, setActiveTab] = useState(tabParam || "list");
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isChoiceOpen, setIsChoiceOpen] = useState(false);
+  const [soundMuted, setSoundMuted] = useState(soundFX.isMuted());
 
   const handleApplyHabitPack = (pack: TemplatePack) => {
     pack.items.forEach((item) => {
@@ -105,10 +126,6 @@ function GoalsPageContent() {
   const toggleLogMutation = useToggleHabitLog();
   const setWaterMutation = useSetWater();
 
-  // Water edit states
-  const [isWaterEditOpen, setIsWaterEditOpen] = useState(false);
-  const [customWaterAmount, setCustomWaterAmount] = useState("");
-
   // Habit Edit/Delete states
   const [editingHabit, setEditingHabit] = useState<any | null>(null);
   const [editHabitTitle, setEditHabitTitle] = useState("");
@@ -152,19 +169,6 @@ function GoalsPageContent() {
 
   const logWater = (amount: number) => {
     logWaterMutation.mutate({ date: selectedDate, amount });
-  };
-
-  const handleWaterEditSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const parsed = parseInt(customWaterAmount);
-    if (isNaN(parsed) || parsed < 0) return;
-    try {
-      await setWaterMutation.mutateAsync({ date: selectedDate, amount: parsed });
-      toast.success("Water intake updated!");
-      setIsWaterEditOpen(false);
-    } catch {
-      toast.error("Failed to update water intake");
-    }
   };
 
   const SUGGESTED_HABITS = [
@@ -272,53 +276,104 @@ function GoalsPageContent() {
   return (
     <div className="min-h-screen bg-cream-bg p-4 md:p-8 space-y-6">
       <div className="max-w-4xl mx-auto space-y-6">
-        {/* Space Hero Banner */}
-        <SpaceHeroBanner
-          space="life"
-          badgeText="Habits & Wellness"
-          title="Daily Habits & Routines"
-          subtitle="Build daily routines and track your progress."
-          stats={[
-            { label: "Total Habits", value: `${totalHabits}`, icon: "🌱" },
-            { label: "Longest Streak", value: `${longestStreakValue}d`, icon: "🔥" },
-            { label: "Level & XP", value: `Lvl ${achievements.userLevel} (${achievements.totalXP} XP)`, icon: "⭐" },
-          ]}
-          actionButton={{
-            label: "+ New Habit",
-            onClick: () => setIsChoiceOpen(true),
-          }}
-        />
+        {/* Clean Neobrutalist Goals Header Card */}
+        <div className="neo-card p-5 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-heading font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border-2 border-[#161514] bg-[#03D26F] text-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]">
+                Habits & Wellness
+              </span>
+              <span className="text-[10px] font-heading font-black text-[#161514]/70">
+                Lvl {achievements.userLevel} • {achievements.totalXP} XP
+              </span>
+            </div>
+            <h1 className="text-xl sm:text-2xl font-heading font-black text-[#161514] tracking-tight">
+              Habits & Routines
+            </h1>
+            <p className="text-xs font-medium text-[#161514]/70 max-w-lg">
+              Build daily consistency, workout routines, and track streaks.
+            </p>
+          </div>
+
+          {/* Quick Metrics & Actions */}
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <div className="px-3 py-2 rounded-xl border-2 border-[#161514] bg-[#FAF8F5] shadow-[2px_2px_0px_0px_#161514] text-center min-w-[70px]">
+              <span className="text-[9px] font-heading font-black uppercase text-[#161514]/60 block leading-tight">Habits</span>
+              <span className="text-sm font-heading font-black text-[#161514]">{totalHabits}</span>
+            </div>
+            <div className="px-3 py-2 rounded-xl border-2 border-[#161514] bg-amber-50 shadow-[2px_2px_0px_0px_#161514] text-center min-w-[70px]">
+              <span className="text-[9px] font-heading font-black uppercase text-amber-700 block leading-tight">Best Streak</span>
+              <span className="text-sm font-heading font-black text-[#161514] flex items-center justify-center gap-1">
+                <Flame className="size-3.5 fill-rose-500 text-rose-500" />
+                {longestStreakValue}d
+              </span>
+            </div>
+            {/* Tactile Audio Mute Toggle */}
+            <button
+              type="button"
+              onClick={() => {
+                const nextMuted = soundFX.toggleMute();
+                setSoundMuted(nextMuted);
+                toast.info(nextMuted ? "Tactile audio muted" : "Tactile audio active 🔊");
+              }}
+              className="size-10 rounded-xl border-2 border-[#161514] bg-white hover:bg-[#FFF9EA] text-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all flex items-center justify-center cursor-pointer shrink-0"
+              title={soundMuted ? "Unmute tactile sounds" : "Mute tactile sounds"}
+              aria-label="Toggle sound"
+            >
+              {soundMuted ? <VolumeX className="size-4 stroke-[2.5]" /> : <Volume2 className="size-4 stroke-[2.5]" />}
+            </button>
+
+            <Button
+              onClick={() => {
+                soundFX.playPop();
+                setIsAddOpen(true);
+              }}
+              className="bg-[#CEF431] hover:bg-[#D8F74E] text-[#161514] font-heading font-black text-xs px-3.5 py-2.5 h-auto rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center gap-1.5 cursor-pointer"
+            >
+              <Plus className="size-4 stroke-[3]" />
+              <span>New Habit</span>
+            </Button>
+
+            {/* Interactive Fitness Vix Companion */}
+            <VixPixelCompanion
+              gear="fitness"
+              state={longestStreakValue >= 3 ? "fire" : "idle"}
+              size={42}
+              onClick={() => setIsAddOpen(true)}
+              title="Vix: Fitness Companion (Click for New Habit)"
+            />
+          </div>
+        </div>
 
         {/* Proactive Reminder Banner */}
         <ProactiveReminderBanner space="goals" />
 
         {/* Sleek Ultra-Compact Streak Freeze Pill Banner */}
-        <div className="bg-[#FAF8F5] rounded-xl p-3 border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] flex items-center justify-between gap-2">
+        <div className="bg-white rounded-xl p-3 border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] flex items-center justify-between gap-2">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="h-8 w-8 shrink-0 rounded-lg bg-sky-200 border-2 border-[#161514] flex items-center justify-center text-base shadow-[1px_1px_0px_0px_rgba(22,21,20,1)]">
-              🛡️
+            <div className="size-8 shrink-0 rounded-lg bg-cyan-100 border-2 border-[#161514] flex items-center justify-center text-[#161514] shadow-[1px_1px_0px_0px_#161514]">
+              <Target className="size-4 stroke-[2.5]" />
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 flex-wrap">
-                <h4 className="font-black text-xs text-[#161514] uppercase tracking-tight truncate">
+                <h4 className="font-heading font-black text-xs text-[#161514] uppercase tracking-tight truncate">
                   Streak Protection
                 </h4>
-                <span className="bg-sky-400 text-navy-950 font-black text-[9px] px-1.5 py-0.5 rounded-md border border-[#161514] shrink-0">
+                <span className="bg-[#CEF431] text-[#161514] font-heading font-black text-[9px] px-1.5 py-0.5 rounded-md border border-[#161514] shrink-0">
                   {streakFreeze.tokensAvailable}/2 Active
                 </span>
               </div>
               <p className="text-[10px] text-[#161514]/70 font-medium truncate pt-0.5">
                 {streakFreeze.tokensAvailable > 0
                   ? "Protects your streak if you miss a day."
-                  : "0 freeze tokens left. Refills on the 1st."}
+                  : "0 freeze tokens remaining. Refills on the 1st."}
               </p>
             </div>
           </div>
 
           <div className="shrink-0">
-            <span className="text-[10px] font-black text-sky-950 bg-sky-200 px-2 py-1 rounded-lg border border-[#161514] flex items-center gap-1 shadow-[1px_1px_0px_0px_rgba(22,21,20,1)]">
-              <span>🧊</span>
-              <span className="hidden xs:inline">Armed</span>
+            <span className="text-[10px] font-heading font-black text-[#161514] bg-[#F1EFEA] px-2.5 py-1 rounded-lg border border-[#161514] flex items-center gap-1 shadow-[1px_1px_0px_0px_#161514]">
+              <span>Active</span>
             </span>
           </div>
         </div>
@@ -329,30 +384,30 @@ function GoalsPageContent() {
             <TabsList className="bg-[#FAF8F5] rounded-2xl p-1.5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] flex items-center gap-1.5 w-max min-w-full sm:min-w-0 sm:w-auto">
               <TabsTrigger
                 value="list"
-                className="rounded-xl text-xs font-black py-2 px-3.5 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
+                className="rounded-xl text-xs font-heading font-extrabold py-2 px-3.5 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#03D26F] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#161514] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
               >
-                <span>🌱</span>
-                <span>Habits & Life</span>
+                <CheckSquare className="size-3.5 stroke-[2.2]" />
+                <span>Habits</span>
               </TabsTrigger>
               <TabsTrigger
                 value="gym"
-                className="rounded-xl text-xs font-black py-2 px-3.5 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
+                className="rounded-xl text-xs font-heading font-extrabold py-2 px-3.5 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#03D26F] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#161514] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
               >
-                <span>🏋️</span>
+                <Dumbbell className="size-3.5 stroke-[2.2]" />
                 <span>Gym & Meals</span>
               </TabsTrigger>
               <TabsTrigger
                 value="calendar"
-                className="rounded-xl text-xs font-black py-2 px-3.5 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
+                className="rounded-xl text-xs font-heading font-extrabold py-2 px-3.5 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#03D26F] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#161514] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
               >
-                <span>📅</span>
-                <span>Calendar</span>
+                <CalendarIcon className="size-3.5 stroke-[2.2]" />
+                <span>Heatmap</span>
               </TabsTrigger>
               <TabsTrigger
                 value="analytics"
-                className="rounded-xl text-xs font-black py-2 px-3.5 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
+                className="rounded-xl text-xs font-heading font-extrabold py-2 px-3.5 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#03D26F] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#161514] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
               >
-                <span>📊</span>
+                <BarChart2 className="size-3.5 stroke-[2.2]" />
                 <span>Analytics</span>
               </TabsTrigger>
             </TabsList>
@@ -382,7 +437,8 @@ function GoalsPageContent() {
               <div id="habits-section" className="lg:col-span-2 space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-xs font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5" style={{ fontFamily: "var(--font-heading)" }}>
-                    <span>🌱 Active Habit Streaks</span>
+                    <Sparkles className="size-3.5 text-[#03D26F]" />
+                    <span>Active Habit Streaks</span>
                     <span className="bg-[#CEF431] text-[#161514] text-[10px] px-2 py-0.5 rounded-full border-2 border-[#161514] font-black shadow-[1px_1px_0px_0px_#161514]">
                       {habits.length}
                     </span>
@@ -404,7 +460,7 @@ function GoalsPageContent() {
                   </div>
                 ) : habits.length === 0 ? (
                   <EmptyState
-                    title="Ready to build a new habit? 🚀"
+                    title="Ready to build a new habit?"
                     description="Habits help you build daily routines and streaks. Pick a suggestion below or click 'Create a Habit'!"
                     Icon={Target}
                     ctaText="Create a Habit"
@@ -507,101 +563,34 @@ function GoalsPageContent() {
 
               {/* Right Column (1 col on lg): Hydration & Health Stats */}
               <div className="space-y-4">
-                {/* Water Log */}
-                <div className="bg-white rounded-2xl p-5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
-                  <h4 className="text-[10px] font-black uppercase tracking-widest text-[#161514]" style={{ fontFamily: "var(--font-heading)" }}>💧 Water Intake</h4>
-                  <div className="flex gap-4 items-center">
-                    <div
-                      onClick={() => {
-                        setCustomWaterAmount(String(waterLogged));
-                        setIsWaterEditOpen(true);
-                      }}
-                      className="relative w-16 h-36 border-2 border-[#161514] rounded-2xl overflow-hidden flex items-end bg-sky-50 shadow-[2px_2px_0px_0px_#161514] cursor-pointer hover:border-sky-600 transition-colors shrink-0"
-                    >
-                      <div className="absolute inset-x-0 bottom-[25%] border-b border-dashed border-[#161514]/20" />
-                      <div className="absolute inset-x-0 bottom-[50%] border-b border-dashed border-[#161514]/25" />
-                      <div className="absolute inset-x-0 bottom-[75%] border-b border-dashed border-[#161514]/30" />
-                      <div
-                        className="w-full bg-sky-400 transition-all duration-500 ease-out"
-                        style={{ height: `${Math.min(100, (waterLogged / 1000) * 100)}%` }}
-                      />
-                      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none">
-                        <div className="bg-white/95 backdrop-blur-sm px-2 py-1 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] text-center">
-                          <span className="text-sm sm:text-base font-black text-[#161514] block leading-none">{waterLogged}</span>
-                          <span className="text-[8px] font-black uppercase text-sky-800 tracking-wider block mt-0.5">ml</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex-1 space-y-2.5">
-                      <div>
-                        <div className="text-xs font-black text-[#161514] uppercase flex items-center justify-between">
-                          <span>{waterLogged} ml Logged</span>
-                          <span className="text-[10px] text-sky-800 font-black">({(waterLogged / 1000).toFixed(1)} L)</span>
-                        </div>
-                        <span className="text-[9px] font-bold text-[#161514]/70 block mt-0.5">
-                          Target: 1000 ml (1.0 L) • {Math.min(100, Math.round((waterLogged / 1000) * 100))}%
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-2 gap-1.5">
-                        <button
-                          onClick={() => logWater(250)}
-                          className="bg-sky-200 hover:bg-sky-300 border-2 border-[#161514] text-[#161514] text-[10px] font-black py-1.5 rounded-xl cursor-pointer shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
-                        >
-                          +250ml
-                        </button>
-                        <button
-                          onClick={() => logWater(500)}
-                          className="bg-sky-300 hover:bg-sky-400 border-2 border-[#161514] text-[#161514] text-[10px] font-black py-1.5 rounded-xl cursor-pointer shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
-                        >
-                          +500ml
-                        </button>
-                      </div>
-                      <div className="flex gap-1.5">
-                        <button
-                          onClick={() => logWater(-250)}
-                          className="flex-1 bg-[#FAF8F5] hover:bg-amber-100 text-[#161514] text-[9px] font-black py-1 rounded-xl cursor-pointer border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
-                        >
-                          -250ml
-                        </button>
-                        <button
-                          onClick={async () => {
-                            try {
-                              await setWaterMutation.mutateAsync({ date: selectedDate, amount: 0 });
-                              toast.success("Water reset to 0ml for today 💧");
-                            } catch {
-                              toast.error("Failed to reset water intake");
-                            }
-                          }}
-                          className="bg-rose-100 hover:bg-rose-200 text-rose-950 text-[9px] font-black px-2 py-1 rounded-xl cursor-pointer border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
-                          title="Reset water intake to 0ml for selected date"
-                        >
-                          Reset
-                        </button>
-                        <button
-                          onClick={() => {
-                            setCustomWaterAmount(String(waterLogged));
-                            setIsWaterEditOpen(true);
-                          }}
-                          className="bg-sky-200 hover:bg-sky-300 text-[#161514] text-[9px] font-black px-2.5 py-1 rounded-xl cursor-pointer border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
-                        >
-                          Edit
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                {/* Neobrutalist Living Hydro-Tumbler */}
+                <WaterTracker
+                  amount={waterLogged}
+                  targetAmount={(waterLog as any)?.waterGoal || 2000}
+                  onLogWater={logWater}
+                  onSetWater={async (amt, target) => {
+                    await setWaterMutation.mutateAsync({
+                      date: selectedDate,
+                      amount: amt,
+                      ...(target ? { waterGoal: target } : {}),
+                    });
+                  }}
+                />
 
                 {/* Health & Weight Profile Card */}
                 <div className="bg-white rounded-2xl p-5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-3">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-[#161514]" style={{ fontFamily: "var(--font-heading)" }}>⚖️ Body & Health Stats</h4>
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-[#161514] flex items-center gap-1.5" style={{ fontFamily: "var(--font-heading)" }}>
+                      <Activity className="size-3.5 text-emerald-600" />
+                      <span>Body & Health Stats</span>
+                    </h4>
                     <button
                       type="button"
                       onClick={updateProfileStat}
-                      className="px-2.5 py-1 rounded-xl bg-[#CEF431] hover:bg-[#bce023] text-[#161514] border-2 border-[#161514] font-black text-[10px] transition-all cursor-pointer shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+                      className="px-2.5 py-1 rounded-xl bg-[#CEF431] hover:bg-[#bce023] text-[#161514] border-2 border-[#161514] font-black text-[10px] transition-all cursor-pointer shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none flex items-center gap-1"
                     >
-                      ✏️ Edit Stats
+                      <Edit3 className="size-3" />
+                      <span>Edit Stats</span>
                     </button>
                   </div>
                   
@@ -626,7 +615,8 @@ function GoalsPageContent() {
             {/* Sleep, Energy & Mood Journal Section */}
             <div id="mood-section" className="space-y-4 pt-2">
               <h3 className="text-xs font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5" style={{ fontFamily: "var(--font-heading)" }}>
-                <span>😴 Sleep, Energy & Mood Journal</span>
+                <Moon className="size-3.5 text-indigo-600" />
+                <span>Sleep, Energy & Mood Journal</span>
               </h3>
               <SleepAndActiveWidgets />
               <MoodJournalWidget dateStr={selectedDate} />
@@ -778,57 +768,63 @@ function GoalsPageContent() {
         onApplyTemplatePack={handleApplyHabitPack}
       />
 
-      {/* Add Habit Responsive Form */}
-      <ResponsiveFormContainer
+      {/* Add Habit Adaptive Drawer Dialog */}
+      <AdaptiveDrawerDialog
         open={isAddOpen}
         onOpenChange={setIsAddOpen}
         title="Create a Habit"
         description="Build consistency with a new daily or weekly routine"
       >
         <NewHabitForm onSubmit={handleAddHabit} loading={addHabitMutation.isPending} />
-      </ResponsiveFormContainer>
+      </AdaptiveDrawerDialog>
 
-      {/* Edit Health Profile Modal */}
-      <ResponsiveFormContainer
+      {/* Edit Health Profile Adaptive Drawer Dialog */}
+      <AdaptiveDrawerDialog
         open={isProfileOpen}
         onOpenChange={setIsProfileOpen}
         title="Edit Health Stats"
         description="Update your gender, age, and weight information"
       >
-        <form onSubmit={handleProfileSubmit} className="space-y-4 pt-2">
+        <form onSubmit={handleProfileSubmit} className="space-y-4 pt-1">
           <div className="space-y-1.5">
-            <label className="text-[10px] font-black uppercase tracking-widest text-[#161514]/70" style={{ fontFamily: "var(--font-heading)" }}>Gender</label>
+            <label className="text-xs font-heading font-black uppercase tracking-wider text-[#161514]">Gender</label>
             <div className="grid grid-cols-2 gap-2">
               {["Female", "Male", "Non-binary", "Prefer not to say"].map((g) => (
                 <button
                   key={g}
                   type="button"
-                  onClick={() => setProfileForm({ ...profileForm, gender: g })}
-                  className={`py-2.5 px-3 rounded-xl text-xs font-black border-2 border-[#161514] transition-all cursor-pointer ${
+                  onClick={() => {
+                    soundFX.playPop();
+                    setProfileForm({ ...profileForm, gender: g });
+                  }}
+                  className={cn(
+                    "min-h-[44px] py-2.5 px-3 rounded-xl text-xs font-heading font-black border-2 border-[#161514] transition-all cursor-pointer",
                     profileForm.gender === g
                       ? "bg-[#CEF431] text-[#161514] shadow-[2px_2px_0px_0px_#161514]"
                       : "bg-[#FAF8F5] text-[#161514]/70 hover:bg-white"
-                  }`}
+                  )}
                 >
                   {g}
                 </button>
               ))}
             </div>
           </div>
+
           <div className="space-y-1.5">
-            <label className="text-[10px] font-black uppercase tracking-widest text-[#161514]/70" style={{ fontFamily: "var(--font-heading)" }}>Age (Years)</label>
+            <label className="text-xs font-heading font-black uppercase tracking-wider text-[#161514]">Age (Years)</label>
             <input
               type="number"
               min={1}
               max={120}
               value={ageVal}
               onChange={(e) => setAgeVal(e.target.value)}
-              className="w-full bg-[#FAF8F5] rounded-xl border-2 border-[#161514] px-4 py-2.5 text-xs text-[#161514] focus:outline-none focus:bg-[#FFF9EA] focus:shadow-[3px_3px_0px_0px_#161514] font-bold transition-all"
+              className="w-full bg-white rounded-xl border-2 border-[#161514] px-4 py-2.5 text-base font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514] focus:outline-none focus:ring-2 focus:ring-[#161514]"
               placeholder="Enter your age"
             />
           </div>
+
           <div className="space-y-1.5">
-            <label className="text-[10px] font-black uppercase tracking-widest text-[#161514]/70" style={{ fontFamily: "var(--font-heading)" }}>Current Weight</label>
+            <label className="text-xs font-heading font-black uppercase tracking-wider text-[#161514]">Current Weight</label>
             <div className="flex gap-2">
               <input
                 type="number"
@@ -840,7 +836,7 @@ function GoalsPageContent() {
                   setWeightVal(e.target.value);
                   setProfileForm({ ...profileForm, weight: `${e.target.value} ${weightUnit}` });
                 }}
-                className="flex-1 bg-[#FAF8F5] rounded-xl border-2 border-[#161514] px-4 py-2.5 text-xs text-[#161514] focus:outline-none focus:bg-[#FFF9EA] focus:shadow-[3px_3px_0px_0px_#161514] font-bold transition-all"
+                className="flex-1 bg-white rounded-xl border-2 border-[#161514] px-4 py-2.5 text-base font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514] focus:outline-none focus:ring-2 focus:ring-[#161514]"
                 placeholder="Enter weight"
                 required
               />
@@ -850,14 +846,16 @@ function GoalsPageContent() {
                     key={u}
                     type="button"
                     onClick={() => {
+                      soundFX.playPop();
                       setWeightUnit(u);
                       setProfileForm({ ...profileForm, weight: `${weightVal} ${u}` });
                     }}
-                    className={`px-4 py-2.5 text-xs font-black transition-all cursor-pointer ${
+                    className={cn(
+                      "min-w-[44px] min-h-[44px] px-4 py-2.5 text-xs font-heading font-black transition-all cursor-pointer flex items-center justify-center",
                       weightUnit === u
                         ? "bg-[#CEF431] text-[#161514]"
                         : "bg-[#FAF8F5] text-[#161514]/70 hover:bg-white"
-                    }`}
+                    )}
                   >
                     {u}
                   </button>
@@ -865,97 +863,107 @@ function GoalsPageContent() {
               </div>
             </div>
           </div>
+
           <Button
             type="submit"
-            className="w-full bg-[#CEF431] hover:bg-[#bce023] text-[#161514] font-black rounded-xl py-2.5 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none cursor-pointer transition-all"
+            className="w-full min-h-[48px] bg-[#CEF431] hover:bg-[#bce023] text-[#161514] font-heading font-black rounded-xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none cursor-pointer transition-all uppercase tracking-wider"
           >
             Save Profile Stats
           </Button>
         </form>
-      </ResponsiveFormContainer>
+      </AdaptiveDrawerDialog>
 
-      {/* Edit Water Intake Modal */}
-      <ResponsiveFormContainer
-        open={isWaterEditOpen}
-        onOpenChange={setIsWaterEditOpen}
-        title="Edit Water Intake"
-        description="Set custom water consumption volume in ml"
-      >
-        <form onSubmit={handleWaterEditSubmit} className="space-y-4 pt-2">
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-black uppercase tracking-widest text-[#161514]/70" style={{ fontFamily: "var(--font-heading)" }}>Total Volume (ml)</label>
-            <input
-              type="number"
-              value={customWaterAmount}
-              onChange={(e) => setCustomWaterAmount(e.target.value)}
-              className="w-full bg-[#FAF8F5] rounded-xl border-2 border-[#161514] px-4 py-2.5 text-xs text-[#161514] focus:outline-none focus:bg-[#FFF9EA] focus:shadow-[3px_3px_0px_0px_#161514] font-bold transition-all"
-              placeholder="e.g. 2000"
-              required
-            />
-          </div>
-          <Button
-            type="submit"
-            disabled={setWaterMutation.isPending}
-            className="w-full bg-[#CEF431] hover:bg-[#bce023] text-[#161514] font-black rounded-xl py-2.5 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none cursor-pointer transition-all"
-          >
-            {setWaterMutation.isPending ? "Saving…" : "Save Intake"}
-          </Button>
-        </form>
-      </ResponsiveFormContainer>
-
-      {/* Edit Habit Modal */}
-      <ResponsiveFormContainer
+      {/* Edit Habit Adaptive Drawer Dialog */}
+      <AdaptiveDrawerDialog
         open={editingHabit !== null}
         onOpenChange={(open) => {
           if (!open) setEditingHabit(null);
         }}
         title="Edit Habit Goal"
-        description="Update your habit details"
+        description="Update your habit details and reminder schedule"
       >
         <form
           onSubmit={(e) => {
             e.preventDefault();
             if (editingHabit) {
+              soundFX.playCompleteChime();
               updateHabitMutation.mutate({
                 id: editingHabit.id,
                 title: editHabitTitle,
                 reminderTime: editHabitDesc,
               });
-              toast.success("Habit updated!");
+              toast.success("Habit updated! 🌟");
               setEditingHabit(null);
             }
           }}
-          className="space-y-4 pt-2"
+          className="space-y-4 pt-1"
         >
+          {/* Companion guidance sprite in Edit mode */}
+          <HabitCompanionSprite
+            iconName={editingHabit?.icon || "Target"}
+            habitTitle={editHabitTitle}
+          />
+
           <div className="space-y-1.5">
-            <label className="text-[10px] font-black uppercase tracking-widest text-[#161514]/70" style={{ fontFamily: "var(--font-heading)" }}>Habit Title</label>
+            <label className="text-xs font-heading font-black uppercase tracking-wider text-[#161514]">
+              Habit Title *
+            </label>
             <input
               type="text"
               value={editHabitTitle}
               onChange={(e) => setEditHabitTitle(e.target.value)}
-              className="w-full bg-[#FAF8F5] rounded-xl border-2 border-[#161514] px-4 py-2.5 text-xs text-[#161514] focus:outline-none focus:bg-[#FFF9EA] focus:shadow-[3px_3px_0px_0px_#161514] font-bold transition-all"
+              className="w-full bg-white rounded-xl border-2 border-[#161514] px-4 py-2.5 text-base font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514] focus:outline-none focus:ring-2 focus:ring-[#161514]"
               required
             />
           </div>
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-black uppercase tracking-widest text-[#161514]/70" style={{ fontFamily: "var(--font-heading)" }}>Reminder Time (Optional)</label>
+
+          <div className="space-y-2">
+            <label className="text-xs font-heading font-black uppercase tracking-wider text-[#161514]">
+              Reminder Time
+            </label>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+              {[
+                { label: "🌅 Morning", time: "08:00 AM" },
+                { label: "☀️ Noon", time: "12:00 PM" },
+                { label: "🌆 Evening", time: "07:00 PM" },
+                { label: "🌙 Night", time: "10:00 PM" },
+              ].map((preset) => (
+                <button
+                  key={preset.label}
+                  type="button"
+                  onClick={() => {
+                    soundFX.playPop();
+                    setEditHabitDesc(preset.time);
+                  }}
+                  className={cn(
+                    "min-h-[38px] py-1.5 px-2 rounded-xl text-xs font-bold border-2 border-[#161514] transition-all cursor-pointer flex items-center justify-center text-center",
+                    editHabitDesc === preset.time
+                      ? "bg-[#CEF431] text-[#161514] font-black shadow-[2px_2px_0px_0px_#161514]"
+                      : "bg-white hover:bg-slate-50 text-[#161514]/80 shadow-[1px_1px_0px_0px_#161514]"
+                  )}
+                >
+                  <span>{preset.label}</span>
+                </button>
+              ))}
+            </div>
             <input
               type="text"
-              placeholder="e.g. 08:00 AM"
+              placeholder="Or custom: e.g. 08:00 AM"
               value={editHabitDesc}
               onChange={(e) => setEditHabitDesc(e.target.value)}
-              className="w-full bg-[#FAF8F5] rounded-xl border-2 border-[#161514] px-4 py-2.5 text-xs text-[#161514] focus:outline-none focus:bg-[#FFF9EA] focus:shadow-[3px_3px_0px_0px_#161514] font-bold transition-all"
+              className="w-full bg-white rounded-xl border-2 border-[#161514] px-4 py-2 text-base font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514] focus:outline-none focus:ring-2 focus:ring-[#161514] mt-1"
             />
           </div>
+
           <Button
             type="submit"
             disabled={updateHabitMutation.isPending}
-            className="w-full bg-[#CEF431] hover:bg-[#bce023] text-[#161514] font-black rounded-xl py-2.5 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none cursor-pointer transition-all"
+            className="w-full min-h-[48px] bg-[#03D26F] hover:bg-[#02b861] text-[#161514] font-heading font-black rounded-xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none cursor-pointer transition-all uppercase tracking-wider"
           >
             {updateHabitMutation.isPending ? "Saving…" : "Save Changes"}
           </Button>
         </form>
-      </ResponsiveFormContainer>
+      </AdaptiveDrawerDialog>
 
       {/* Delete Habit Confirmation Modal */}
       <DeleteConfirmationModal

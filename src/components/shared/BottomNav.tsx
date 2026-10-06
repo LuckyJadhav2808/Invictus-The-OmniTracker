@@ -1,19 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
-import { Home, Target, User, CheckSquare, BookOpen, Trophy, Wallet, TrendingUp, ShieldCheck } from "lucide-react";
+import { usePathname } from "next/navigation";
+import {
+  SunMedium,
+  CheckSquare,
+  GraduationCap,
+  Kanban,
+  Wallet,
+} from "lucide-react";
 import { useState, useEffect, useRef, Suspense } from "react";
 import { useUIStore } from "@/store/ui-store";
-import { useAuth } from "@/components/shared/AuthProvider";
 import { cn } from "@/lib/utils";
 
 function BottomNavContent() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const currentTab = searchParams.get("tab");
-  const { activeTracker, setActiveTracker } = useUIStore();
-  const { user } = useAuth();
+  const { setActiveTracker } = useUIStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const lastNavClickRef = useRef<number>(0);
 
@@ -49,68 +51,43 @@ function BottomNavContent() {
     };
   }, []);
 
-  interface NavItem {
-    href: string;
-    icon: any;
-    label: string;
-    value?: string;
-    activeColor: string;
-  }
-
-  const getNavItems = (): NavItem[] => {
-    const items: NavItem[] = [
-      {
-        href: "/today",
-        icon: Home,
-        label: "Today",
-        value: "today",
-        activeColor: "bg-[#CEF431] text-[#161514] border-[#161514] shadow-[2px_2px_0px_0px_#161514]",
-      },
-      {
-        href: "/goals",
-        icon: Target,
-        label: "Habits",
-        value: "life",
-        activeColor: "bg-[#03D26F] text-[#161514] border-[#161514] shadow-[2px_2px_0px_0px_#161514]",
-      },
-      {
-        href: "/study",
-        icon: BookOpen,
-        label: "Study",
-        value: "study",
-        activeColor: "bg-[#C084FC] text-[#161514] border-[#161514] shadow-[2px_2px_0px_0px_#161514]",
-      },
-      {
-        href: "/money",
-        icon: Wallet,
-        label: "Money",
-        value: "money",
-        activeColor: "bg-[#FBCFE8] text-[#161514] border-[#161514] shadow-[2px_2px_0px_0px_#161514]",
-      },
-    ];
-
-    if (user?.email?.toLowerCase() === "luckymanojjadhav@gmail.com" || user?.role === "admin") {
-      items.push({
-        href: "/admin",
-        icon: ShieldCheck,
-        label: "Admin",
-        value: "admin",
-        activeColor: "bg-[#FDE68A] text-[#161514] border-[#161514] shadow-[2px_2px_0px_0px_#161514]",
-      });
-    } else {
-      items.push({
-        href: "/profile",
-        icon: User,
-        label: "Profile",
-        value: "profile",
-        activeColor: "bg-[#FDE68A] text-[#161514] border-[#161514] shadow-[2px_2px_0px_0px_#161514]",
-      });
-    }
-
-    return items;
-  };
-
-  const navItems = getNavItems();
+  const navItems = [
+    {
+      href: "/today",
+      icon: SunMedium,
+      label: "Today",
+      value: "today",
+      activeColor: "bg-[#CEF431] text-[#161514] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]",
+    },
+    {
+      href: "/goals",
+      icon: CheckSquare,
+      label: "Habits",
+      value: "life",
+      activeColor: "bg-[#03D26F] text-[#161514] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]",
+    },
+    {
+      href: "/study",
+      icon: GraduationCap,
+      label: "Study",
+      value: "study",
+      activeColor: "bg-[#C084FC] text-[#161514] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]",
+    },
+    {
+      href: "/tasks",
+      icon: Kanban,
+      label: "Tasks",
+      value: "tasks",
+      activeColor: "bg-[#F59E0B] text-[#161514] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]",
+    },
+    {
+      href: "/money",
+      icon: Wallet,
+      label: "Money",
+      value: "money",
+      activeColor: "bg-[#03D26F] text-[#161514] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]",
+    },
+  ];
 
   const isLinkActive = (href: string) => {
     const targetPath = href.split("?")[0];
@@ -129,9 +106,9 @@ function BottomNavContent() {
 
   return (
     <nav
-      aria-label="Mobile Navigation"
+      aria-label="Mobile Primary Navigation"
       className={cn(
-        "fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom,0px))] left-1/2 -translate-x-1/2 w-[94%] max-w-[420px] h-[64px] bg-[#161514] border-[2.5px] border-[#161514] rounded-2xl px-2 flex items-center justify-between shadow-[4px_4px_0px_0px_#161514] z-40 lg:hidden transition-all duration-300 transform",
+        "fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom,0px))] left-1/2 -translate-x-1/2 w-[94%] max-w-[420px] h-[60px] bg-[#161514] border-2 border-[#161514] rounded-2xl px-2 flex items-center justify-between shadow-[3px_3px_0px_0px_#161514] z-40 lg:hidden transition-all duration-200 transform",
         isModalOpen ? "translate-y-28 opacity-0 pointer-events-none" : "translate-y-0 opacity-100"
       )}
     >
@@ -145,25 +122,29 @@ function BottomNavContent() {
             href={item.href}
             onClick={(e) => {
               const now = Date.now();
-              // Prevent queuing rapid duplicate route transitions on the active route
               if (now - lastNavClickRef.current < 250 && isActive) {
                 e.preventDefault();
                 return;
               }
               lastNavClickRef.current = now;
               triggerHaptic();
-              if (item.value && item.value !== "today" && item.value !== "admin") {
+              if (item.value && item.value !== "today") {
                 setActiveTracker(item.value as any);
               }
             }}
             className={cn(
-              "flex flex-col items-center justify-center py-1.5 px-2 rounded-xl border-2 cursor-pointer flex-1 mx-0.5 transition-all duration-150 active:scale-90 select-none",
+              "flex flex-col items-center justify-center py-1 px-1.5 rounded-xl cursor-pointer flex-1 mx-0.5 transition-all duration-150 active:scale-95 select-none",
               isActive
-                ? cn(item.activeColor, "scale-105")
-                : "bg-transparent text-white/75 border-transparent hover:text-white hover:bg-white/10"
+                ? cn(item.activeColor)
+                : "bg-transparent text-white/70 border-2 border-transparent hover:text-white hover:bg-white/10"
             )}
           >
-            <Icon className={cn("h-4.5 w-4.5 stroke-[2.5]", isActive ? "text-[#161514]" : "text-white/80")} />
+            <Icon
+              className={cn(
+                "size-4.5 stroke-[2.4]",
+                isActive ? "text-[#161514]" : "text-white/80"
+              )}
+            />
             <span
               className={cn(
                 "font-heading font-extrabold text-[10px] tracking-tight uppercase mt-0.5 leading-none",

@@ -17,6 +17,8 @@ import { SavingsGoal } from "@/models/SavingsGoal";
 import { Subscription } from "@/models/Subscription";
 import { User } from "@/models/User";
 
+export const dynamic = "force-dynamic";
+
 // DELETE /api/account/delete
 // Permanently deletes user account and all associated data from MongoDB
 export async function DELETE(req: Request) {

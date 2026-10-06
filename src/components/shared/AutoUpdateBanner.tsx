@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Sparkles, Download, X } from "lucide-react";
+import { Sparkles, Download, RefreshCw, X } from "lucide-react";
 import { Capacitor } from "@capacitor/core";
 import { App } from "@capacitor/app";
 import { APP_VERSION_CONFIG } from "@/config/version";
@@ -98,13 +98,23 @@ export function AutoUpdateBanner() {
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
-            <button
-              onClick={() => setModalOpen(true)}
-              className="px-3 py-1 rounded-lg bg-[#161514] hover:bg-[#252321] text-white font-black text-[11px] uppercase tracking-wider flex items-center gap-1.5 shadow-[1.5px_1.5px_0px_0px_#FAF8F5] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all"
-            >
-              <Download className="h-3 w-3 text-[#CEF431]" />
-              <span>Update Now</span>
-            </button>
+            {Capacitor.isNativePlatform() ? (
+              <button
+                onClick={() => setModalOpen(true)}
+                className="px-3 py-1 rounded-lg bg-[#161514] hover:bg-[#252321] text-white font-black text-[11px] uppercase tracking-wider flex items-center gap-1.5 shadow-[1.5px_1.5px_0px_0px_#FAF8F5] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all"
+              >
+                <Download className="h-3 w-3 text-[#CEF431]" />
+                <span>Update Now</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => window.location.reload()}
+                className="px-3 py-1 rounded-lg bg-[#161514] hover:bg-[#252321] text-white font-black text-[11px] uppercase tracking-wider flex items-center gap-1.5 shadow-[1.5px_1.5px_0px_0px_#FAF8F5] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all"
+              >
+                <RefreshCw className="h-3 w-3 text-[#CEF431]" />
+                <span>Reload ⚡</span>
+              </button>
+            )}
 
             <button
               onClick={handleDismiss}

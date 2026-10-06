@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 
+export const dynamic = "force-dynamic";
+
 export interface GymExerciseItem {
   id: string;
   title: string;
@@ -498,7 +500,8 @@ export async function GET(req: NextRequest) {
     const bodyPart = (searchParams.get("bodyPart") || searchParams.get("targetMuscle") || "").toLowerCase().trim();
     const equipment = (searchParams.get("equipment") || "").toLowerCase().trim();
     const level = (searchParams.get("level") || "").toLowerCase().trim();
-    const limit = parseInt(searchParams.get("limit") || "40", 10);
+    const offset = Math.max(0, parseInt(searchParams.get("offset") || "0", 10));
+    const limit = Math.min(250, Math.max(1, parseInt(searchParams.get("limit") || "50", 10)));
 
     const allExercises = loadExercises();
 
@@ -506,7 +509,14 @@ export async function GET(req: NextRequest) {
     if (nameLookup) {
       const match = findBestGuideExercise(allExercises, nameLookup, bodyPart);
       if (match) {
-        return NextResponse.json({ success: true, exercise: match });
+        return NextResponse.json(
+          { success: true, exercise: match },
+          {
+            headers: {
+              "Cache-Control": "public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400",
+            },
+          }
+        );
       }
     }
 
@@ -558,13 +568,25 @@ export async function GET(req: NextRequest) {
     const bodyPartsSet = new Set(allExercises.map((e) => e.bodyPart).filter(Boolean));
     const equipmentSet = new Set(allExercises.map((e) => e.equipment).filter(Boolean));
 
-    return NextResponse.json({
-      success: true,
-      totalCount: filtered.length,
-      exercises: filtered.slice(0, limit),
-      availableBodyParts: Array.from(bodyPartsSet).sort(),
-      availableEquipment: Array.from(equipmentSet).sort(),
-    });
+    const pagedExercises = filtered.slice(offset, offset + limit);
+
+    return NextResponse.json(
+      {
+        success: true,
+        totalCount: filtered.length,
+        offset,
+        limit,
+        hasMore: offset + limit < filtered.length,
+        exercises: pagedExercises,
+        availableBodyParts: Array.from(bodyPartsSet).sort(),
+        availableEquipment: Array.from(equipmentSet).sort(),
+      },
+      {
+        headers: {
+          "Cache-Control": "public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400",
+        },
+      }
+    );
   } catch (err: any) {
     console.error("Gym exercises API error:", err);
     return NextResponse.json({ error: err?.message || "Failed to search exercises" }, { status: 500 });

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Announcement } from "@/models/Announcement";
 
+export const dynamic = "force-dynamic";
+
 // GET /api/admin/announcement - Get current active announcement from MongoDB
 export async function GET(req: NextRequest) {
   try {

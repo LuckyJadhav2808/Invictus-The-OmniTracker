@@ -3,6 +3,8 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { PushSubscriptionModel } from "@/lib/models/push-subscription";
 import { webpush } from "@/lib/web-push-service";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: NextRequest) {
   try {
     const { userId, title, body, url } = await req.json();

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Macros } from "@/models/Macros";
 
+export const dynamic = "force-dynamic";
+
 // GET /api/goals/macros?userId=xxx&date=YYYY-MM-DD
 export async function GET(req: Request) {
   try {

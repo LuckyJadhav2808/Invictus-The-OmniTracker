@@ -49,6 +49,7 @@ import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormConta
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
 import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 const ADMIN_EMAIL = "luckymanojjadhav@gmail.com";
 
@@ -414,31 +415,30 @@ export default function AdminDashboardPage() {
   const openIssuesCount = issuesList.filter((i) => i.status === "open").length;
 
   return (
-    <div className="min-h-screen bg-cream-bg p-3 sm:p-8 space-y-4 sm:space-y-6 w-full max-w-full overflow-x-hidden">
+    <div className="min-h-screen bg-[#FAF8F5] pb-24 p-3 sm:p-6 md:p-8 space-y-6 w-full max-w-full overflow-x-hidden">
       <div className="max-w-5xl mx-auto space-y-6">
         
         {/* Admin Header Banner */}
-        <div className="bg-gradient-to-r from-navy-900 via-navy-800 to-amber-900 rounded-[32px] p-6 sm:p-8 text-white shadow-xl border-2 border-amber-400/30 relative overflow-hidden">
-          <div className="absolute -right-10 -bottom-10 h-44 w-44 rounded-full bg-amber-400/10 blur-xl pointer-events-none" />
+        <div className="bg-[#161514] text-white rounded-3xl p-6 sm:p-8 border-[2.5px] border-[#161514] shadow-[5px_5px_0px_0px_#CEF431] relative overflow-hidden">
           <div className="relative z-10 space-y-3 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 text-xs font-black">
-              <ShieldCheck className="h-4 w-4" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-[#CEF431] text-[#161514] border-2 border-[#161514] text-xs font-black">
+              <ShieldCheck className="h-4 w-4 stroke-[2.5]" />
               <span>SUPER ADMIN GOVERNANCE SUITE</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight" style={{ fontFamily: "var(--font-heading)" }}>
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight uppercase font-heading">
               Invictus System & Telemetry Center
             </h1>
-            <p className="text-xs sm:text-sm font-semibold opacity-90">
-              Authorized session: <strong className="text-amber-300">{user?.email}</strong>. Manage account roles, global announcements, system audit trails, and issue reports.
+            <p className="text-xs sm:text-sm font-bold text-white/80">
+              Authorized session: <strong className="text-amber-300 font-mono">{user?.email}</strong>. Manage account roles, global announcements, system audit trails, and issue reports.
             </p>
             <div className="pt-1">
               <button
                 type="button"
                 onClick={() => router.push("/profile")}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-amber-400 text-[#161514] hover:bg-amber-300 font-black text-xs border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-400 text-[#161514] hover:bg-amber-300 font-black text-xs border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
               >
                 <UserCheck className="h-4 w-4 stroke-[2.5]" />
-                <span>My Profile 👤</span>
+                <span>My Profile</span>
               </button>
             </div>
           </div>
@@ -446,90 +446,93 @@ export default function AdminDashboardPage() {
 
         {/* System Telemetry Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white rounded-2xl p-5 shadow-xs border border-border/60 space-y-1">
+          <div className="bg-white rounded-2xl p-4 sm:p-5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-1">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-black uppercase tracking-wider text-navy-600">Total Registered</span>
-              <Users className="h-4 w-4 text-amber-500" />
+              <span className="text-[10px] font-black uppercase tracking-wider text-[#161514]/70 font-heading">Total Registered</span>
+              <Users className="h-4 w-4 text-amber-500 stroke-[2.5]" />
             </div>
-            <p className="text-2xl font-black text-navy-900">{usersList.length}</p>
-            <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full inline-block">
+            <p className="text-2xl font-black text-[#161514] font-heading">{usersList.length}</p>
+            <span className="text-[9px] font-black text-emerald-950 bg-emerald-300 px-2 py-0.5 rounded-lg border border-[#161514] inline-block">
               Custom SHA-256 Auth
             </span>
           </div>
 
-          <div className="bg-white rounded-2xl p-5 shadow-xs border border-border/60 space-y-1">
+          <div className="bg-white rounded-2xl p-4 sm:p-5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-1">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-black uppercase tracking-wider text-navy-600">Open Issues</span>
-              <AlertTriangle className="h-4 w-4 text-orange-500" />
+              <span className="text-[10px] font-black uppercase tracking-wider text-[#161514]/70 font-heading">Open Issues</span>
+              <AlertTriangle className="h-4 w-4 text-orange-500 stroke-[2.5]" />
             </div>
-            <p className="text-2xl font-black text-navy-900">{openIssuesCount}</p>
-            <span className="text-[9px] font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full inline-block">
+            <p className="text-2xl font-black text-[#161514] font-heading">{openIssuesCount}</p>
+            <span className="text-[9px] font-black text-orange-950 bg-orange-300 px-2 py-0.5 rounded-lg border border-[#161514] inline-block">
               {issuesList.length} Total Reports
             </span>
           </div>
 
-          <div className="bg-white rounded-2xl p-5 shadow-xs border border-border/60 space-y-1">
+          <div className="bg-white rounded-2xl p-4 sm:p-5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-1">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-black uppercase tracking-wider text-navy-600">Local Storage</span>
-              <HardDrive className="h-4 w-4 text-sky-500" />
+              <span className="text-[10px] font-black uppercase tracking-wider text-[#161514]/70 font-heading">Local Storage</span>
+              <HardDrive className="h-4 w-4 text-sky-500 stroke-[2.5]" />
             </div>
-            <p className="text-2xl font-black text-navy-900">{storageKB} KB</p>
-            <span className="text-[9px] font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-full inline-block">
+            <p className="text-2xl font-black text-[#161514] font-heading">{storageKB} KB</p>
+            <span className="text-[9px] font-black text-sky-950 bg-sky-300 px-2 py-0.5 rounded-lg border border-[#161514] inline-block">
               Client DB Healthy
             </span>
           </div>
 
-          <div className="bg-white rounded-2xl p-5 shadow-xs border border-border/60 space-y-1">
+          <div className="bg-white rounded-2xl p-4 sm:p-5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-1">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-black uppercase tracking-wider text-navy-600">Security State</span>
-              <Lock className="h-4 w-4 text-emerald-500" />
+              <span className="text-[10px] font-black uppercase tracking-wider text-[#161514]/70 font-heading">Security State</span>
+              <Lock className="h-4 w-4 text-emerald-500 stroke-[2.5]" />
             </div>
-            <p className="text-sm font-black text-emerald-600">100% Operational</p>
-            <span className="text-[9px] font-bold text-navy-600 bg-navy-50 px-2 py-0.5 rounded-full inline-block">
+            <p className="text-sm font-black text-emerald-600 font-heading">100% Operational</p>
+            <span className="text-[9px] font-black text-[#161514] bg-[#FAF8F5] px-2 py-0.5 rounded-lg border border-[#161514] inline-block">
               Audit Trail Active
             </span>
           </div>
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex items-center justify-between border-b border-border/60 pb-3 flex-wrap gap-2">
+        <div className="flex items-center justify-between border-b-2 border-[#161514]/10 pb-3 flex-wrap gap-2">
           <div className="flex items-center gap-2">
             <button
               onClick={() => setActiveTab("users")}
-              className={`px-4 py-2 rounded-full text-xs font-black transition-all cursor-pointer ${
+              className={cn(
+                "px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 border-2 font-heading",
                 activeTab === "users"
-                  ? "bg-navy-900 text-white shadow-sm"
-                  : "bg-white text-navy-900 hover:bg-cream-bg border border-border/60"
-              }`}
+                  ? "bg-[#161514] text-white border-[#161514] shadow-[2px_2px_0px_0px_#161514]"
+                  : "bg-white text-[#161514] border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:bg-[#FAF8F5]"
+              )}
             >
-              👥 Users ({usersList.length})
+              <Users className="h-3.5 w-3.5 stroke-[2.5]" /> Users ({usersList.length})
             </button>
             <button
               onClick={() => setActiveTab("issues")}
-              className={`px-4 py-2 rounded-full text-xs font-black transition-all cursor-pointer ${
+              className={cn(
+                "px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 border-2 font-heading",
                 activeTab === "issues"
-                  ? "bg-navy-900 text-white shadow-sm"
-                  : "bg-white text-navy-900 hover:bg-cream-bg border border-border/60"
-              }`}
+                  ? "bg-[#161514] text-white border-[#161514] shadow-[2px_2px_0px_0px_#161514]"
+                  : "bg-white text-[#161514] border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:bg-[#FAF8F5]"
+              )}
             >
-              🛠️ Issue Board ({issuesList.length})
+              <AlertTriangle className="h-3.5 w-3.5 stroke-[2.5]" /> Issue Board ({issuesList.length})
             </button>
             <button
               onClick={() => setActiveTab("audit_announcements")}
-              className={`px-4 py-2 rounded-full text-xs font-black transition-all cursor-pointer ${
+              className={cn(
+                "px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 border-2 font-heading",
                 activeTab === "audit_announcements"
-                  ? "bg-navy-900 text-white shadow-sm"
-                  : "bg-white text-navy-900 hover:bg-cream-bg border border-border/60"
-              }`}
+                  ? "bg-[#161514] text-white border-[#161514] shadow-[2px_2px_0px_0px_#161514]"
+                  : "bg-white text-[#161514] border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:bg-[#FAF8F5]"
+              )}
             >
-              📢 Announcements & Audit Logs
+              <Megaphone className="h-3.5 w-3.5 stroke-[2.5]" /> Announcements & Logs
             </button>
           </div>
 
           {activeTab === "users" && (
             <Button
               onClick={() => setIsAddUserOpen(true)}
-              className="bg-amber-500 hover:bg-amber-600 text-navy-900 font-bold rounded-full text-xs py-2 px-4 shadow-xs flex items-center gap-1.5 cursor-pointer border-none"
+              className="bg-amber-400 hover:bg-amber-500 text-[#161514] font-black rounded-xl text-xs py-2 px-4 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center gap-1.5 cursor-pointer uppercase transition-all"
             >
               <Plus className="h-4 w-4 stroke-[3]" /> Add User
             </Button>
@@ -538,7 +541,7 @@ export default function AdminDashboardPage() {
           {activeTab === "issues" && (
             <Button
               onClick={() => setIsAddIssueOpen(true)}
-              className="bg-amber-500 hover:bg-amber-600 text-navy-900 font-bold rounded-full text-xs py-2 px-4 shadow-xs flex items-center gap-1.5 cursor-pointer border-none"
+              className="bg-amber-400 hover:bg-amber-500 text-[#161514] font-black rounded-xl text-xs py-2 px-4 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center gap-1.5 cursor-pointer uppercase transition-all"
             >
               <Plus className="h-4 w-4 stroke-[3]" /> Report Issue
             </Button>
@@ -547,17 +550,17 @@ export default function AdminDashboardPage() {
 
         {/* Tab 1: Users Table & Role Switcher */}
         {activeTab === "users" && (
-          <div className="bg-white rounded-3xl p-6 shadow-md border border-border/60 space-y-4">
+          <div className="bg-white rounded-3xl p-5 sm:p-6 border-[2.5px] border-[#161514] shadow-[5px_5px_0px_0px_#161514] space-y-4">
             
             {/* Search Bar */}
             <div className="relative max-w-sm">
-              <Search className="absolute left-3.5 top-3 h-4 w-4 text-navy-600" />
+              <Search className="absolute left-3.5 top-3 h-4 w-4 text-[#161514]/60 stroke-[2.5]" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search users by name or email..."
-                className="w-full bg-cream-bg/60 rounded-xl pl-10 pr-4 py-2 text-xs font-medium text-navy-900 border border-border/80 focus:outline-none focus:border-amber-500"
+                className="w-full bg-[#FAF8F5] rounded-xl pl-10 pr-4 py-2 text-xs font-bold text-[#161514] border-2 border-[#161514] focus:outline-none focus:bg-[#FFF9EA] focus:shadow-[2px_2px_0px_0px_#161514] transition-all"
               />
             </div>
 
@@ -565,18 +568,18 @@ export default function AdminDashboardPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-border/60 text-[10px] font-black text-navy-600 uppercase tracking-widest bg-cream-bg/40">
-                    <th className="p-3 rounded-l-xl">User Profile</th>
-                    <th className="p-3">Role Governance</th>
-                    <th className="p-3">Account Status</th>
-                    <th className="p-3">Joined Date</th>
-                    <th className="p-3 text-right rounded-r-xl">Actions</th>
+                  <tr className="border-b-2 border-[#161514] text-[10px] font-black text-[#161514] uppercase tracking-widest bg-[#FAF8F5]">
+                    <th className="p-3 rounded-l-xl font-heading">User Profile</th>
+                    <th className="p-3 font-heading">Role Governance</th>
+                    <th className="p-3 font-heading">Account Status</th>
+                    <th className="p-3 font-heading">Joined Date</th>
+                    <th className="p-3 text-right rounded-r-xl font-heading">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border/40 text-xs">
+                <tbody className="divide-y-2 divide-[#161514]/10 text-xs font-bold">
                   {filteredUsers.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="py-8 text-center text-navy-600 font-medium">
+                      <td colSpan={5} className="py-8 text-center text-[#161514]/60 font-bold">
                         No user accounts match your search.
                       </td>
                     </tr>
@@ -585,15 +588,15 @@ export default function AdminDashboardPage() {
                       const isSeedAdmin = u.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
                       const statusVal = (u as any).status || "active";
                       return (
-                        <tr key={u.uid} className="hover:bg-cream-bg/30 transition-colors">
+                        <tr key={u.uid} className="hover:bg-[#FAF8F5] transition-colors">
                           <td className="p-3">
                             <div className="flex items-center gap-3">
-                              <div className="h-9 w-9 rounded-full bg-amber-400/20 text-amber-900 font-extrabold flex items-center justify-center text-xs">
+                              <div className="h-9 w-9 rounded-xl bg-amber-400 border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] text-[#161514] font-black flex items-center justify-center text-xs">
                                 {u.displayName ? u.displayName.charAt(0).toUpperCase() : "U"}
                               </div>
                               <div>
-                                <p className="font-bold text-navy-900 leading-tight">{u.displayName}</p>
-                                <p className="text-[11px] text-navy-600">{u.email}</p>
+                                <p className="font-black text-[#161514] leading-tight font-heading">{u.displayName}</p>
+                                <p className="text-[11px] text-[#161514]/70 font-mono">{u.email}</p>
                               </div>
                             </div>
                           </td>
@@ -602,13 +605,13 @@ export default function AdminDashboardPage() {
                               onClick={() => handleToggleUserRole(u)}
                               disabled={isSeedAdmin}
                               title={isSeedAdmin ? "Primary SuperAdmin" : "Click to toggle role"}
-                              className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase flex items-center gap-1 cursor-pointer transition-all ${
+                              className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase flex items-center gap-1 cursor-pointer transition-all border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514] ${
                                 u.role === "admin"
-                                  ? "bg-amber-100 text-amber-900 border border-amber-300 hover:bg-amber-200"
-                                  : "bg-navy-50 text-navy-800 hover:bg-navy-100"
+                                  ? "bg-amber-300 text-[#161514] hover:bg-amber-400"
+                                  : "bg-[#FAF8F5] text-[#161514] hover:bg-white"
                               } ${isSeedAdmin ? "cursor-not-allowed opacity-90" : ""}`}
                             >
-                              <Shield className="h-3 w-3" />
+                              <Shield className="h-3 w-3 stroke-[2.5]" />
                               {u.role || "user"}
                             </button>
                           </td>
@@ -617,16 +620,16 @@ export default function AdminDashboardPage() {
                               onClick={() => handleToggleUserStatus(u)}
                               disabled={isSeedAdmin}
                               title={isSeedAdmin ? "Primary SuperAdmin" : "Click to toggle active/suspended status"}
-                              className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase flex items-center gap-1 cursor-pointer transition-all ${
+                              className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase flex items-center gap-1 cursor-pointer transition-all border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514] ${
                                 statusVal === "suspended"
-                                  ? "bg-red-100 text-red-800 border border-red-300 hover:bg-red-200"
-                                  : "bg-emerald-100 text-emerald-800 border border-emerald-300 hover:bg-emerald-200"
+                                  ? "bg-red-100 text-red-900 hover:bg-red-200"
+                                  : "bg-emerald-100 text-emerald-900 hover:bg-emerald-200"
                               } ${isSeedAdmin ? "cursor-not-allowed opacity-90" : ""}`}
                             >
-                              <span>{statusVal === "suspended" ? "🔴 Suspended" : "🟢 Active"}</span>
+                              <span>{statusVal === "suspended" ? "Suspended" : "Active"}</span>
                             </button>
                           </td>
-                          <td className="p-3 text-navy-600 text-[11px]">
+                          <td className="p-3 text-[#161514]/70 text-[11px]">
                             {u.createdAt ? format(new Date(u.createdAt), "MMM d, yyyy") : "Initial Seed"}
                           </td>
                           <td className="p-3 text-right space-x-1.5 whitespace-nowrap">
@@ -637,19 +640,19 @@ export default function AdminDashboardPage() {
                                 setEditEmail(u.email);
                                 setEditPassword("");
                               }}
-                              className="text-navy-700 hover:text-navy-900 bg-cream-bg hover:bg-amber-100 p-1.5 rounded-lg border border-border/60 transition-colors cursor-pointer"
+                              className="text-[#161514] hover:bg-amber-100 p-1.5 rounded-lg border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514] transition-colors cursor-pointer bg-white"
                               title="Edit user & password reset"
                             >
-                              <Edit3 className="h-3.5 w-3.5" />
+                              <Edit3 className="h-3.5 w-3.5 stroke-[2.5]" />
                             </button>
 
                             {!isSeedAdmin && (
                               <button
                                 onClick={() => setDeletingUserId(u.uid)}
-                                className="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-1.5 rounded-lg border border-red-200 transition-colors cursor-pointer"
+                                className="text-red-600 hover:bg-red-100 p-1.5 rounded-lg border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514] transition-colors cursor-pointer bg-white"
                                 title="Delete user"
                               >
-                                <Trash2 className="h-3.5 w-3.5" />
+                                <Trash2 className="h-3.5 w-3.5 stroke-[2.5]" />
                               </button>
                             )}
                           </td>
@@ -670,27 +673,27 @@ export default function AdminDashboardPage() {
               {issuesList.map((issue) => (
                 <div
                   key={issue.id}
-                  className="bg-white rounded-3xl p-5 shadow-sm border border-border/60 space-y-3 hover:shadow-md transition-all"
+                  className="bg-white rounded-3xl p-5 border-2 border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-3 transition-all"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <span
-                          className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase ${
+                          className={`px-2 py-0.5 rounded-lg text-[9px] font-black uppercase border border-[#161514] ${
                             issue.severity === "high"
-                              ? "bg-red-100 text-red-800 border border-red-200"
+                              ? "bg-red-200 text-red-950"
                               : issue.severity === "medium"
-                              ? "bg-amber-100 text-amber-900 border border-amber-200"
-                              : "bg-sky-100 text-sky-800 border border-sky-200"
+                              ? "bg-amber-200 text-amber-950"
+                              : "bg-sky-200 text-sky-950"
                           }`}
                         >
                           {issue.severity} priority
                         </span>
-                        <span className="text-[9px] font-bold text-navy-600 uppercase tracking-wider bg-cream-bg px-2 py-0.5 rounded-md">
+                        <span className="text-[9px] font-black text-[#161514] uppercase tracking-wider bg-[#FAF8F5] px-2 py-0.5 rounded-lg border border-[#161514]">
                           {issue.category}
                         </span>
                       </div>
-                      <h4 className="font-extrabold text-sm text-navy-900 leading-snug">{issue.title}</h4>
+                      <h4 className="font-black text-sm text-[#161514] leading-snug font-heading">{issue.title}</h4>
                     </div>
 
                     <button
@@ -705,20 +708,20 @@ export default function AdminDashboardPage() {
                           toast.error("Failed to delete issue");
                         }
                       }}
-                      className="text-navy-600 hover:text-red-500 p-1 cursor-pointer outline-none border-none bg-transparent"
+                      className="text-[#161514]/60 hover:text-red-600 p-1 cursor-pointer outline-none border-none bg-transparent"
                     >
-                      <Trash2 className="h-3.5 w-3.5" />
+                      <Trash2 className="h-4 w-4 stroke-[2.5]" />
                     </button>
                   </div>
 
                   {issue.description && (
-                    <p className="text-xs text-navy-600 leading-relaxed font-medium bg-cream-bg/40 p-3 rounded-xl">
+                    <p className="text-xs text-[#161514] leading-relaxed font-bold bg-[#FAF8F5] p-3 rounded-xl border border-[#161514]/20">
                       {issue.description}
                     </p>
                   )}
 
-                  <div className="flex items-center justify-between pt-1 border-t border-border/40 text-[10px]">
-                    <span className="text-navy-600 font-semibold">
+                  <div className="flex items-center justify-between pt-1 border-t-2 border-[#161514]/10 text-[10px]">
+                    <span className="text-[#161514]/70 font-bold font-mono">
                       By: {issue.reportedBy}
                     </span>
                     
@@ -740,17 +743,17 @@ export default function AdminDashboardPage() {
                           toast.error("Failed to update status");
                         }
                       }}
-                      className={`font-black uppercase px-2.5 py-1 rounded-full border cursor-pointer outline-none ${
+                      className={`font-black uppercase px-2.5 py-1 rounded-xl border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514] cursor-pointer outline-none ${
                         issue.status === "resolved"
-                          ? "bg-emerald-100 text-emerald-900 border-emerald-300"
+                          ? "bg-emerald-200 text-emerald-950"
                           : issue.status === "in_progress"
-                          ? "bg-amber-100 text-amber-900 border-amber-300"
-                          : "bg-red-50 text-red-800 border-red-200"
+                          ? "bg-amber-200 text-amber-950"
+                          : "bg-red-200 text-red-950"
                       }`}
                     >
-                      <option value="open">🔴 Open</option>
-                      <option value="in_progress">🟡 In Progress</option>
-                      <option value="resolved">🟢 Resolved</option>
+                      <option value="open">Open</option>
+                      <option value="in_progress">In Progress</option>
+                      <option value="resolved">Resolved</option>
                     </select>
                   </div>
                 </div>
@@ -764,45 +767,45 @@ export default function AdminDashboardPage() {
           <div className="space-y-6">
             
             {/* Global Announcement Broadcaster */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border border-border/60 space-y-4">
+            <div className="bg-white rounded-3xl p-5 sm:p-6 border-[2.5px] border-[#161514] shadow-[5px_5px_0px_0px_#161514] space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Megaphone className="h-5 w-5 text-amber-500" />
-                  <h3 className="font-extrabold text-sm text-navy-900 uppercase tracking-wider">
+                  <Megaphone className="h-5 w-5 text-amber-500 stroke-[2.5]" />
+                  <h3 className="font-black text-sm text-[#161514] uppercase tracking-wider font-heading">
                     Site-Wide Global Announcement Banner
                   </h3>
                 </div>
                 {announcement && (
-                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">
-                    🟢 Active Banner
+                  <span className="text-[10px] font-black text-emerald-950 bg-emerald-300 px-2.5 py-0.5 rounded-lg border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
+                    Active Banner
                   </span>
                 )}
               </div>
 
               <form onSubmit={handleSaveAnnouncement} className="space-y-4">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Announcement Text</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-[#161514]/70 font-heading">Announcement Text</label>
                   <input
                     type="text"
                     value={announcementMsg}
                     onChange={(e) => setAnnouncementMsg(e.target.value)}
-                    placeholder="e.g. 🚀 Scheduled maintenance tonight at 11:00 PM IST."
-                    className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:border-amber-500 font-medium"
+                    placeholder="e.g. Scheduled maintenance tonight at 11:00 PM IST."
+                    className="w-full bg-[#FAF8F5] rounded-xl border-2 border-[#161514] px-4 py-2.5 text-xs text-[#161514] focus:outline-none focus:bg-[#FFF9EA] focus:shadow-[2px_2px_0px_0px_#161514] font-bold transition-all"
                   />
                 </div>
 
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600 w-full sm:w-auto">Banner Style:</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[#161514]/70 w-full sm:w-auto font-heading">Banner Style:</span>
                     {(["info", "warning", "success", "alert"] as const).map((st) => (
                       <button
                         type="button"
                         key={st}
                         onClick={() => setAnnouncementType(st)}
-                        className={`px-3 py-1 rounded-full text-[10px] font-black capitalize cursor-pointer transition-all ${
+                        className={`px-3 py-1 rounded-xl text-[10px] font-black uppercase cursor-pointer border-2 border-[#161514] transition-all ${
                           announcementType === st
-                            ? "bg-navy-900 text-white"
-                            : "bg-cream-bg text-navy-700 border border-border/60"
+                            ? "bg-[#161514] text-white shadow-[1.5px_1.5px_0px_0px_#161514]"
+                            : "bg-[#FAF8F5] text-[#161514] hover:bg-white"
                         }`}
                       >
                         {st}
@@ -826,14 +829,14 @@ export default function AdminDashboardPage() {
                           refreshData();
                         }}
                         variant="outline"
-                        className="rounded-full text-xs font-bold py-2 border-red-200 text-red-600 hover:bg-red-50 cursor-pointer w-full sm:w-auto"
+                        className="rounded-xl text-xs font-black uppercase py-2 border-2 border-red-600 text-red-600 hover:bg-red-50 shadow-[2px_2px_0px_0px_#dc2626] cursor-pointer w-full sm:w-auto transition-all"
                       >
                         Clear Banner
                       </Button>
                     )}
                     <Button
                       type="submit"
-                      className="bg-amber-500 hover:bg-amber-600 text-navy-900 font-bold rounded-full text-xs py-2.5 px-5 cursor-pointer border-none w-full sm:w-auto"
+                      className="bg-amber-400 hover:bg-amber-500 text-[#161514] font-black uppercase tracking-wider rounded-xl text-xs py-2.5 px-5 cursor-pointer border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] w-full sm:w-auto transition-all"
                     >
                       Publish Announcement
                     </Button>
@@ -843,10 +846,10 @@ export default function AdminDashboardPage() {
             </div>
 
             {/* System Audit Logs */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border border-border/60 space-y-4">
+            <div className="bg-white rounded-3xl p-5 sm:p-6 border-[2.5px] border-[#161514] shadow-[5px_5px_0px_0px_#161514] space-y-4">
               <div className="flex items-center gap-2">
-                <History className="h-5 w-5 text-amber-500" />
-                <h3 className="font-extrabold text-sm text-navy-900 uppercase tracking-wider">
+                <History className="h-5 w-5 text-amber-500 stroke-[2.5]" />
+                <h3 className="font-black text-sm text-[#161514] uppercase tracking-wider font-heading">
                   Governance Audit Trail ({auditLogs.length})
                 </h3>
               </div>
@@ -855,18 +858,18 @@ export default function AdminDashboardPage() {
                 {auditLogs.map((log) => (
                   <div
                     key={log.id}
-                    className="bg-cream-bg/40 rounded-xl p-3 border border-border/50 text-xs flex items-start justify-between gap-3"
+                    className="bg-[#FAF8F5] rounded-xl p-3 border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] text-xs flex items-start justify-between gap-3"
                   >
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="font-black text-[10px] text-navy-900 bg-amber-400/30 px-2 py-0.5 rounded-md uppercase">
+                        <span className="font-black text-[10px] text-[#161514] bg-amber-400 px-2 py-0.5 rounded-md border border-[#161514] uppercase">
                           {log.action}
                         </span>
-                        <span className="text-[10px] font-bold text-navy-600">By: {log.performedBy}</span>
+                        <span className="text-[10px] font-bold text-[#161514]/70">By: {log.performedBy}</span>
                       </div>
-                      <p className="text-navy-900 font-medium text-xs">{log.details}</p>
+                      <p className="text-[#161514] font-bold text-xs">{log.details}</p>
                     </div>
-                    <span className="text-[10px] font-bold text-navy-600 whitespace-nowrap">
+                    <span className="text-[10px] font-bold text-[#161514]/60 whitespace-nowrap font-mono">
                       {format(new Date(log.timestamp), "MMM d, h:mm a")}
                     </span>
                   </div>
@@ -886,41 +889,41 @@ export default function AdminDashboardPage() {
       >
         <form onSubmit={handleCreateUser} className="space-y-4 pt-2">
           <div className="space-y-1.5">
-            <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Full Name</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-[#161514]/70 font-heading">Full Name</label>
             <input
               type="text"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
-              className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:border-amber-500 font-medium"
+              className="neo-input w-full bg-[#FAF8F5] rounded-xl border-2 border-[#161514] px-4 py-2.5 text-xs text-[#161514] font-bold outline-none focus:bg-[#FFF9EA] focus:shadow-[2px_2px_0px_0px_#161514] transition-all"
               placeholder="e.g. Manoj Jadhav"
               required
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Email Address</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-[#161514]/70 font-heading">Email Address</label>
             <input
               type="email"
               value={newEmail}
               onChange={(e) => setNewEmail(e.target.value)}
-              className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:border-amber-500 font-medium"
+              className="neo-input w-full bg-[#FAF8F5] rounded-xl border-2 border-[#161514] px-4 py-2.5 text-xs text-[#161514] font-bold outline-none focus:bg-[#FFF9EA] focus:shadow-[2px_2px_0px_0px_#161514] transition-all"
               placeholder="e.g. user@example.com"
               required
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Password</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-[#161514]/70 font-heading">Password</label>
             <input
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:border-amber-500 font-medium"
+              className="neo-input w-full bg-[#FAF8F5] rounded-xl border-2 border-[#161514] px-4 py-2.5 text-xs text-[#161514] font-bold outline-none focus:bg-[#FFF9EA] focus:shadow-[2px_2px_0px_0px_#161514] transition-all"
               placeholder="Min 4 characters"
               required
             />
           </div>
           <Button
             type="submit"
-            className="w-full bg-amber-500 hover:bg-amber-600 text-navy-900 font-bold rounded-full py-2.5 mt-2 border-none cursor-pointer"
+            className="w-full bg-amber-400 hover:bg-amber-500 text-[#161514] font-black uppercase tracking-wider rounded-2xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] cursor-pointer transition-all"
           >
             Create User Account
           </Button>
@@ -936,40 +939,40 @@ export default function AdminDashboardPage() {
       >
         <form onSubmit={handleSaveUserEdits} className="space-y-4 pt-2">
           <div className="space-y-1.5">
-            <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Full Display Name</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-[#161514]/70 font-heading">Full Display Name</label>
             <input
               type="text"
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
-              className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:border-amber-500 font-medium"
+              className="neo-input w-full bg-[#FAF8F5] rounded-xl border-2 border-[#161514] px-4 py-2.5 text-xs text-[#161514] font-bold outline-none focus:bg-[#FFF9EA] focus:shadow-[2px_2px_0px_0px_#161514] transition-all"
               required
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Email Address</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-[#161514]/70 font-heading">Email Address</label>
             <input
               type="email"
               value={editEmail}
               onChange={(e) => setEditEmail(e.target.value)}
-              className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:border-amber-500 font-medium"
+              className="neo-input w-full bg-[#FAF8F5] rounded-xl border-2 border-[#161514] px-4 py-2.5 text-xs text-[#161514] font-bold outline-none focus:bg-[#FFF9EA] focus:shadow-[2px_2px_0px_0px_#161514] transition-all"
               required
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">
+            <label className="text-[10px] font-black uppercase tracking-widest text-[#161514]/70 font-heading">
               Reset Password (leave blank to keep unchanged)
             </label>
             <input
               type="password"
               value={editPassword}
               onChange={(e) => setEditPassword(e.target.value)}
-              className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:border-amber-500 font-medium"
+              className="neo-input w-full bg-[#FAF8F5] rounded-xl border-2 border-[#161514] px-4 py-2.5 text-xs text-[#161514] font-bold outline-none focus:bg-[#FFF9EA] focus:shadow-[2px_2px_0px_0px_#161514] transition-all"
               placeholder="Enter new password"
             />
           </div>
           <Button
             type="submit"
-            className="w-full bg-amber-500 hover:bg-amber-600 text-navy-900 font-bold rounded-full py-2.5 mt-2 border-none cursor-pointer"
+            className="w-full bg-amber-400 hover:bg-amber-500 text-[#161514] font-black uppercase tracking-wider rounded-2xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] cursor-pointer transition-all"
           >
             Save User Changes
           </Button>
@@ -985,29 +988,29 @@ export default function AdminDashboardPage() {
       >
         <form onSubmit={handleCreateIssue} className="space-y-4 pt-2">
           <div className="space-y-1.5">
-            <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Issue Title</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-[#161514]/70 font-heading">Issue Title</label>
             <input
               type="text"
               value={issueTitle}
               onChange={(e) => setIssueTitle(e.target.value)}
-              className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:border-amber-500 font-medium"
+              className="neo-input w-full bg-[#FAF8F5] rounded-xl border-2 border-[#161514] px-4 py-2.5 text-xs text-[#161514] font-bold outline-none focus:bg-[#FFF9EA] focus:shadow-[2px_2px_0px_0px_#161514] transition-all"
               placeholder="Summary of issue..."
               required
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Description</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-[#161514]/70 font-heading">Description</label>
             <textarea
               value={issueDesc}
               onChange={(e) => setIssueDesc(e.target.value)}
               rows={3}
-              className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:border-amber-500 font-medium"
+              className="neo-input w-full bg-[#FAF8F5] rounded-xl border-2 border-[#161514] px-4 py-2.5 text-xs text-[#161514] font-bold outline-none focus:bg-[#FFF9EA] focus:shadow-[2px_2px_0px_0px_#161514] transition-all"
               placeholder="Detailed steps or feedback..."
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Category</label>
+              <label className="text-[10px] font-black uppercase tracking-widest text-[#161514]/70 font-heading">Category</label>
               <NeobrutalistSelect
                 value={issueCategory}
                 onChange={(val) => setIssueCategory(val as any)}
@@ -1020,7 +1023,7 @@ export default function AdminDashboardPage() {
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Severity</label>
+              <label className="text-[10px] font-black uppercase tracking-widest text-[#161514]/70 font-heading">Severity</label>
               <NeobrutalistSelect
                 value={issueSeverity}
                 onChange={(val) => setIssueSeverity(val as any)}
@@ -1034,7 +1037,7 @@ export default function AdminDashboardPage() {
           </div>
           <Button
             type="submit"
-            className="w-full bg-amber-500 hover:bg-amber-600 text-navy-900 font-bold rounded-full py-2.5 mt-2 border-none cursor-pointer"
+            className="w-full bg-amber-400 hover:bg-amber-500 text-[#161514] font-black uppercase tracking-wider rounded-2xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] cursor-pointer transition-all"
           >
             Submit Issue Report
           </Button>

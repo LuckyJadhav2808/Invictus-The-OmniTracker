@@ -3,6 +3,8 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { PushSubscriptionModel } from "@/lib/models/push-subscription";
 import { scheduleAllUserReminders } from "@/lib/services/qstash-service";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: NextRequest) {
   try {
     const { userId, subscription, timezone, config } = await req.json();

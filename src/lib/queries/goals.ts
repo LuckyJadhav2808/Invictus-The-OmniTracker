@@ -72,7 +72,9 @@ export function useAddHabit() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["habits", user?.uid] });
+      queryClient.invalidateQueries({ queryKey: ["habits"] });
+      queryClient.invalidateQueries({ queryKey: ["habitLogs"] });
+      queryClient.invalidateQueries({ queryKey: ["streaks"] });
     },
   });
 }
@@ -105,7 +107,8 @@ export function useUpdateHabit() {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["habits", user?.uid] });
+      queryClient.invalidateQueries({ queryKey: ["habits"] });
+      queryClient.invalidateQueries({ queryKey: ["streaks"] });
     },
   });
 }
@@ -133,9 +136,10 @@ export function useDeleteHabit() {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["habits", user?.uid] });
-      queryClient.invalidateQueries({ queryKey: ["habitLogs", user?.uid] });
-      queryClient.invalidateQueries({ queryKey: ["streaks", user?.uid] });
+      queryClient.invalidateQueries({ queryKey: ["habits"] });
+      queryClient.invalidateQueries({ queryKey: ["habitLogs"] });
+      queryClient.invalidateQueries({ queryKey: ["habitLogsRange"] });
+      queryClient.invalidateQueries({ queryKey: ["streaks"] });
     },
   });
 }
@@ -325,9 +329,10 @@ export function useToggleHabitLog() {
       });
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["habitLogs", user?.uid, variables.date] });
-      queryClient.invalidateQueries({ queryKey: ["habitLogsRange", user?.uid] });
-      queryClient.invalidateQueries({ queryKey: ["streaks", user?.uid] });
+      queryClient.invalidateQueries({ queryKey: ["habitLogs"] });
+      queryClient.invalidateQueries({ queryKey: ["habitLogsRange"] });
+      queryClient.invalidateQueries({ queryKey: ["streaks"] });
+      queryClient.invalidateQueries({ queryKey: ["todayMetrics"] });
     },
   });
 }
@@ -460,11 +465,27 @@ export function useLogWater() {
         }
       );
     },
-    onSuccess: (_, variables) => {
-      if (variables?.date) {
-        queryClient.invalidateQueries({ queryKey: ["waterLog", user?.uid, variables.date] });
+    onMutate: async ({ date, amount }) => {
+      await queryClient.cancelQueries({ queryKey: ["waterLog", user?.uid, date] });
+      const prevData = queryClient.getQueryData<any>(["waterLog", user?.uid, date]);
+      const current = prevData?.amount !== undefined ? prevData.amount : 0;
+      const next = Math.max(0, current + amount);
+      queryClient.setQueryData(["waterLog", user?.uid, date], {
+        ...prevData,
+        id: date,
+        date,
+        amount: next,
+      });
+      return { prevData };
+    },
+    onError: (err, variables, context: any) => {
+      if (context?.prevData) {
+        queryClient.setQueryData(["waterLog", user?.uid, variables.date], context.prevData);
       }
-      queryClient.invalidateQueries({ queryKey: ["waterLog", user?.uid] });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["waterLog"] });
+      queryClient.invalidateQueries({ queryKey: ["healthProfile"] });
     },
   });
 }
@@ -474,30 +495,49 @@ export function useSetWater() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ date, amount }: { date: string; amount: number }) => {
+    mutationFn: async ({ date, amount, waterGoal }: { date: string; amount: number; waterGoal?: number }) => {
       const next = Math.max(0, amount);
       if (isGuestMode()) {
         localStorage.setItem(`invictus_water_${date}`, next.toString());
-        return { id: date, date, amount: next };
+        if (waterGoal) {
+          localStorage.setItem("invictus_water_goal", waterGoal.toString());
+        }
+        return { id: date, date, amount: next, waterGoal };
       }
       if (!user) throw new Error("Unauthenticated");
 
       return executeOfflineMutation(
-        { userId: user.uid, date, amount: next, mode: "set" },
+        { userId: user.uid, date, amount: next, waterGoal, mode: "set" },
         {
           endpoint: "/api/goals/water",
           method: "POST",
           type: "goals",
           label: `Set Water (${next}ml)`,
-          getOptimisticResult: () => ({ id: date, date, amount: next }),
+          getOptimisticResult: () => ({ id: date, date, amount: next, waterGoal }),
         }
       );
     },
-    onSuccess: (_, variables) => {
-      if (variables?.date) {
-        queryClient.invalidateQueries({ queryKey: ["waterLog", user?.uid, variables.date] });
+    onMutate: async ({ date, amount, waterGoal }) => {
+      await queryClient.cancelQueries({ queryKey: ["waterLog", user?.uid, date] });
+      const prevData = queryClient.getQueryData<any>(["waterLog", user?.uid, date]);
+      const next = Math.max(0, amount);
+      queryClient.setQueryData(["waterLog", user?.uid, date], {
+        ...prevData,
+        id: date,
+        date,
+        amount: next,
+        ...(waterGoal ? { waterGoal } : {}),
+      });
+      return { prevData };
+    },
+    onError: (err, variables, context: any) => {
+      if (context?.prevData) {
+        queryClient.setQueryData(["waterLog", user?.uid, variables.date], context.prevData);
       }
-      queryClient.invalidateQueries({ queryKey: ["waterLog", user?.uid] });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["waterLog"] });
+      queryClient.invalidateQueries({ queryKey: ["healthProfile"] });
     },
   });
 }

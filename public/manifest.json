@@ -4,8 +4,8 @@
   "description": "Unified tracker for Health & Goals, Studies & Exams, and Personal Finances",
   "start_url": "/today",
   "display": "standalone",
-  "background_color": "#FAF7F2",
-  "theme_color": "#1F2430",
+  "background_color": "#FFFDF8",
+  "theme_color": "#161514",
   "icons": [
     {
       "src": "/icons/icon-192.png",

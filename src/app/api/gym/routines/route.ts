@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
+
+export const dynamic = "force-dynamic";
 import { GymRoutine } from "@/models/GymRoutine";
 import {
   getCurrentISOWeekKey,

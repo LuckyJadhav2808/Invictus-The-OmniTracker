@@ -450,9 +450,10 @@ export function computeDailyBudgetStats({
     }
   });
 
-  const todayRemaining = Math.max(0, dailyBudgetTarget - todayExpense);
+  const rawRemaining = dailyBudgetTarget - todayExpense;
   const isOverDailyBudget = todayExpense > dailyBudgetTarget && dailyBudgetTarget > 0;
   const overDailyAmount = isOverDailyBudget ? todayExpense - dailyBudgetTarget : 0;
+  const todayRemaining = isOverDailyBudget ? -overDailyAmount : Math.max(0, rawRemaining);
   const todayUsedPercentage = dailyBudgetTarget > 0
     ? Math.min(100, Math.round((todayExpense / dailyBudgetTarget) * 100))
     : (todayExpense > 0 ? 100 : 0);

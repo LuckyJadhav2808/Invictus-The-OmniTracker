@@ -4,6 +4,8 @@ import { Subject } from "@/models/Subject";
 import { Topic } from "@/models/Topic";
 import { StudySession } from "@/models/StudySession";
 
+export const dynamic = "force-dynamic";
+
 // GET /api/study/subjects?userId=xxx
 export async function GET(req: Request) {
   try {

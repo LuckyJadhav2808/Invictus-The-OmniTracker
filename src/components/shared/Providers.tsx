@@ -42,10 +42,21 @@ export function Providers({ children }: { children: React.ReactNode }) {
           closeButton
           toastOptions={{
             style: {
-              borderRadius: "1.25rem",
+              borderRadius: "1rem",
               fontFamily: "var(--font-sans)",
+              fontWeight: 800,
+              fontSize: "0.875rem",
               border: "2.5px solid #161514",
-              boxShadow: "4px 4px 0px 0px rgba(22,21,20,1)",
+              boxShadow: "4px 4px 0px 0px #161514",
+              color: "#161514",
+            },
+            classNames: {
+              toast: "font-bold text-sm",
+              title: "font-heading font-black",
+              description: "text-xs font-bold",
+              actionButton: "bg-[#161514] text-white font-black border border-[#161514] rounded-lg",
+              cancelButton: "bg-white text-[#161514] font-black border-2 border-[#161514] rounded-lg",
+              closeButton: "!border-2 !border-[#161514] !bg-white !text-[#161514] !shadow-[1.5px_1.5px_0px_#161514] hover:!bg-rose-100",
             },
           }}
         />

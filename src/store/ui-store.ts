@@ -5,6 +5,7 @@ type ActiveTab = "today" | "goals" | "study" | "money" | "tasks" | "profile";
 type ActiveTracker = "life" | "study" | "money" | "tasks";
 type HabitLayoutStyle = "cards" | "compact";
 type WidgetVariantStyle = "classic" | "expanded" | "dark";
+export type WidgetTheme = "zen" | "speedway";
 
 interface UIState {
   activeTab: ActiveTab;
@@ -21,6 +22,8 @@ interface UIState {
   setHabitLayoutStyle: (style: HabitLayoutStyle) => void;
   widgetVariantStyle: WidgetVariantStyle;
   setWidgetVariantStyle: (style: WidgetVariantStyle) => void;
+  widgetTheme: WidgetTheme;
+  setWidgetTheme: (theme: WidgetTheme) => void;
 }
 
 export const useUIStore = create<UIState>()(
@@ -40,6 +43,8 @@ export const useUIStore = create<UIState>()(
       setHabitLayoutStyle: (style) => set({ habitLayoutStyle: style }),
       widgetVariantStyle: "classic",
       setWidgetVariantStyle: (style) => set({ widgetVariantStyle: style }),
+      widgetTheme: "zen",
+      setWidgetTheme: (theme) => set({ widgetTheme: theme }),
     }),
     {
       name: "invictus-ui-store",

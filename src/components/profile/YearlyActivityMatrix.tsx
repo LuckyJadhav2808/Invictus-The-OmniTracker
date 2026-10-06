@@ -178,8 +178,8 @@ export function YearlyActivityMatrix({
       {/* 1. Header & Title Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="h-11 w-11 rounded-2xl bg-[#CEF431] border-2 border-[#161514] flex items-center justify-center text-[#161514] shadow-[2px_2px_0px_0px_#161514] shrink-0 font-black text-xl">
-            ⚡
+          <div className="h-11 w-11 rounded-2xl bg-[#CEF431] border-2 border-[#161514] flex items-center justify-center text-[#161514] shadow-[2px_2px_0px_0px_#161514] shrink-0 font-black">
+            <Calendar className="h-5 w-5 stroke-[2.5]" />
           </div>
           <div>
             <h2 className="font-black text-base md:text-lg text-[#161514] uppercase tracking-tight font-heading">
@@ -214,10 +214,10 @@ export function YearlyActivityMatrix({
       {/* 2. Cross-Module Filter Tabs */}
       <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
         {[
-          { id: "all" as const, label: "⚡ All Combined", count: stats.totalActions },
-          { id: "habits" as const, label: "🌱 Habits", count: stats.totalHabitsCompleted },
-          { id: "study" as const, label: "📚 Study Sessions", count: `${Math.round(stats.totalStudyMinutes / 60)}h` },
-          { id: "money" as const, label: "💰 Financial Ledger", count: stats.totalTransactions },
+          { id: "all" as const, label: "All Combined", Icon: Layers, count: stats.totalActions },
+          { id: "habits" as const, label: "Habits", Icon: CheckCircle2, count: stats.totalHabitsCompleted },
+          { id: "study" as const, label: "Study Sessions", Icon: BookOpen, count: `${Math.round(stats.totalStudyMinutes / 60)}h` },
+          { id: "money" as const, label: "Financial Ledger", Icon: Wallet, count: stats.totalTransactions },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -230,6 +230,7 @@ export function YearlyActivityMatrix({
                 : "bg-white text-[#161514] border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:bg-[#FFF9EA]"
             )}
           >
+            <tab.Icon className="h-3.5 w-3.5 stroke-[2.5]" />
             <span>{tab.label}</span>
             <span className={cn(
               "text-[9px] px-1.5 py-0.5 rounded-full font-black",
@@ -410,7 +411,7 @@ export function YearlyActivityMatrix({
               {/* Habits */}
               <div className="bg-white rounded-xl p-3 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] space-y-1">
                 <span className="text-[9px] font-black uppercase text-emerald-800 block">
-                  🌱 Habits Completed ({selectedDay.habitCount})
+                  Habits Completed ({selectedDay.habitCount})
                 </span>
                 {selectedDay.habitTitles.length > 0 ? (
                   <div className="space-y-0.5 max-h-24 overflow-y-auto no-scrollbar">
@@ -428,13 +429,13 @@ export function YearlyActivityMatrix({
               {/* Study */}
               <div className="bg-white rounded-xl p-3 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] space-y-1">
                 <span className="text-[9px] font-black uppercase text-purple-800 block">
-                  📚 Study ({selectedDay.studyMinutes}m)
+                  Study ({selectedDay.studyMinutes}m)
                 </span>
                 {selectedDay.studyTopics.length > 0 ? (
                   <div className="space-y-0.5 max-h-24 overflow-y-auto no-scrollbar">
                     {selectedDay.studyTopics.map((t, idx) => (
                       <p key={idx} className="text-[11px] font-bold text-[#161514] truncate flex items-center gap-1">
-                        <span className="text-purple-600 font-black">📖</span> {t}
+                        <span className="text-purple-600 font-black">•</span> {t}
                       </p>
                     ))}
                   </div>
@@ -446,13 +447,13 @@ export function YearlyActivityMatrix({
               {/* Finance */}
               <div className="bg-white rounded-xl p-3 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] space-y-1">
                 <span className="text-[9px] font-black uppercase text-amber-800 block">
-                  💰 Ledger Logs ({selectedDay.transactionCount})
+                  Ledger Logs ({selectedDay.transactionCount})
                 </span>
                 {selectedDay.transactionSummaries.length > 0 ? (
                   <div className="space-y-0.5 max-h-24 overflow-y-auto no-scrollbar">
                     {selectedDay.transactionSummaries.map((s, idx) => (
                       <p key={idx} className="text-[11px] font-bold text-[#161514] truncate flex items-center gap-1">
-                        <span className="text-amber-600 font-black">💸</span> {s}
+                        <span className="text-amber-600 font-black">•</span> {s}
                       </p>
                     ))}
                   </div>

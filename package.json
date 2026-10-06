@@ -1,6 +1,6 @@
 {
   "name": "invictus-life-tracker",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "private": true,
   "scripts": {
     "clean": "rimraf .next",
@@ -9,7 +9,10 @@
     "build": "rimraf .next && next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run src"
+    "test": "vitest run src",
+    "db:verify": "node scripts/verify-data.mjs",
+    "version:check": "node scripts/bump-version.mjs --check",
+    "version:bump": "node scripts/bump-version.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.0",

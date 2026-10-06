@@ -1,86 +1,82 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import Link from "next/link";
-import { LogIn, Eye, EyeOff, Sparkles, Target, BookOpen, Wallet, Flame, Smile, CheckCircle2, Heart, Award, ArrowRight } from "lucide-react";
+import {
+  LogIn,
+  UserPlus,
+  Eye,
+  EyeOff,
+  Compass,
+  Mail,
+  Lock,
+  User,
+  CheckCircle2,
+  Shield,
+  Zap,
+  Flame,
+  Wallet,
+  Sparkles,
+  ArrowRight,
+} from "lucide-react";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { InvictusLogo } from "@/components/shared/InvictusLogo";
+import { DoodleInvictusTitle } from "@/components/auth/DoodleInvictusTitle";
+import {
+  DoodleArrow,
+  DoodleStickyNote,
+  DoodleStamp,
+  AuthBackgroundDoodles,
+} from "@/components/auth/AuthDoodles";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const defaultTab = searchParams.get("tab") === "signup" ? "signup" : "login";
+
   const { enterGuestMode, login, signup } = useAuth();
+  const [activeTab, setActiveTab] = useState<"login" | "signup">(defaultTab);
+
+  // Form states
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleEmailLogin = async (e: React.FormEvent) => {
+  const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    try {
-      const loggedUser = await login(email, password);
-      toast.success(`Account Found! Welcome back, ${loggedUser.displayName || "Champion"}! 🥳✨`, {
-        description: `Logged in as ${loggedUser.email}`,
-      });
-      if (!loggedUser.onboarded) {
-        router.push("/onboarding");
-      } else {
-        router.push("/today");
-      }
-    } catch (error: unknown) {
-      const message =
-        error instanceof Error ? error.message : `No account found with ${email || "this email"}. Please check or Sign Up below! 📝❌`;
-      toast.error(message, {
-        description: "Double check your credentials or click 'Create a free account' below.",
-      });
-    } finally {
-      setLoading(false);
+    if (!email.trim() || !password) {
+      toast.error("Please provide both email and password.");
+      return;
     }
-  };
 
-  const handleGoogleLogin = async () => {
     setLoading(true);
     try {
-      let targetEmail = email.trim();
-      if (!targetEmail) {
-        const input = window.prompt("Enter your Google Account email address:", "you@gmail.com");
-        if (!input) {
+      if (activeTab === "login") {
+        const loggedUser = await login(email.trim(), password);
+        toast.success(`Welcome back, ${loggedUser.displayName || "Champion"}!`);
+        if (!loggedUser.onboarded) {
+          router.push("/onboarding");
+        } else {
+          router.push("/today");
+        }
+      } else {
+        if (password.length < 4) {
+          toast.error("Password must be at least 4 characters long.");
           setLoading(false);
           return;
         }
-        targetEmail = input.trim();
-        setEmail(targetEmail);
+        const newUser = await signup(email.trim(), password, name.trim());
+        toast.success(`Account created successfully! Welcome, ${newUser.displayName}!`);
+        router.push("/onboarding");
       }
-
-      const displayName = targetEmail.includes("@") ? targetEmail.split("@")[0] : "Google User";
-      
-      let loggedUser: any;
-      let isNewAccount = false;
-      try {
-        loggedUser = await login(targetEmail, "hash_default");
-      } catch {
-        loggedUser = await signup(targetEmail, "hash_default", displayName);
-        isNewAccount = true;
-      }
-
-      if (isNewAccount) {
-        toast.success(`New Google Account Created! Welcome to Invictus 🎉✨`, {
-          description: `Signed in as ${targetEmail}`,
-        });
-      } else {
-        toast.success(`Google Account Found! Welcome back, ${loggedUser?.displayName || "Champion"}! 🚀✨`, {
-          description: `Logged in as ${targetEmail}`,
-        });
-      }
-      router.push("/today");
-    } catch (err: any) {
-      console.warn("Google Sign-In error:", err);
-      toast.info(`Signed in as Google Guest (${email || "Google User"})! 🎈`);
-      enterGuestMode(email ? email.split("@")[0] : "Google User");
-      router.push("/today");
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Authentication failed. Please verify credentials.";
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -88,7 +84,7 @@ export default function LoginPage() {
 
   const handleGuestLogin = () => {
     enterGuestMode("Guest Explorer");
-    toast.success("Welcome to Offline Guest Mode! 🎈");
+    toast.success("Entered offline sandbox mode.");
     const onboarded = localStorage.getItem("invictus_onboarded") === "true";
     if (onboarded) {
       router.push("/today");
@@ -98,265 +94,330 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto flex flex-col lg:grid lg:grid-cols-12 gap-6 lg:gap-8 items-center relative py-2 md:py-4">
-      
-      {/* Top Mobile Floating Neo-Brutalist Stickers */}
-      <div className="flex items-center justify-center gap-2.5 z-20 w-full mb-1 lg:hidden">
-        <div className="bg-amber-400 text-[#161514] text-[11px] font-black px-3 py-1.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center gap-1.5 rotate-[-2deg]">
-          <Flame className="h-3.5 w-3.5 text-orange-600 fill-orange-500" />
-          <span>7 Day Streak!</span>
-        </div>
-        <div className="bg-[#03D26F] text-[#161514] text-[11px] font-black px-3 py-1.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center gap-1.5 rotate-[2deg]">
-          <Award className="h-3.5 w-3.5" />
-          <span>Goals on track ✨</span>
-        </div>
-      </div>
+    <div className="relative w-full max-w-5xl mx-auto py-4 sm:py-8 md:py-10 px-4 flex flex-col lg:grid lg:grid-cols-12 gap-8 lg:gap-12 items-center justify-center">
+      {/* Background Hand-Drawn Sketch Annotations */}
+      <AuthBackgroundDoodles />
 
-      {/* Desktop Floating Sticker Badges */}
-      <div className="hidden lg:block absolute -top-2 left-6 z-20 animate-bounce duration-1000">
-        <div className="bg-amber-400 text-[#161514] text-xs font-black px-3.5 py-1.5 rounded-xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] flex items-center gap-1.5 rotate-[-4deg]">
-          <Flame className="h-4 w-4 text-orange-600 fill-orange-500" />
-          <span>7 Day Streak!</span>
-        </div>
-      </div>
-
-      <div className="hidden lg:block absolute -bottom-2 right-12 z-20">
-        <div className="bg-[#03D26F] text-[#161514] text-xs font-black px-3.5 py-1.5 rounded-xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] flex items-center gap-1.5 rotate-[5deg]">
-          <Award className="h-4 w-4" />
-          <span>Goals on track ✨</span>
-        </div>
-      </div>
-
-      {/* Mobile Top Brand Showcase Header */}
-      <div className="lg:hidden flex flex-col items-center text-center space-y-2.5 px-2">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-400/20 border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] text-[#161514] text-[11px] font-black">
-          <Smile className="h-3.5 w-3.5 text-amber-700 stroke-[2.5]" />
-          <span>Daily Life Companion</span>
-        </div>
-        <h1
-          className="text-3xl font-black text-[#161514] tracking-tight leading-tight"
-          style={{ fontFamily: "var(--font-heading)" }}
-        >
-          Welcome to{" "}
-          <span className="text-amber-600 underline decoration-amber-400 decoration-wavy decoration-2">
-            Invictus 🌟
-          </span>
-        </h1>
-        {/* Mobile Horizontal Space Badges */}
-        <div className="flex items-center justify-center gap-2 pt-1 w-full max-w-sm">
-          <div className="flex-1 bg-white px-2.5 py-2 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center gap-1.5 justify-center">
-            <span className="text-sm">🌱</span>
-            <span className="text-[10px] font-black text-[#161514]">Life</span>
+      {/* Brand Header & Value Proposition (Desktop: Left Column, Mobile: Top + Bottom) */}
+      <div className="lg:col-span-6 space-y-5 text-center lg:text-left z-10 w-full flex flex-col items-center lg:items-start">
+        {/* Brand Mascot + Letter-by-Letter Handwritten Doodle Title */}
+        <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-2.5 sm:gap-4">
+          <div className="relative flex items-center gap-2">
+            <InvictusLogo size="lg" variant="icon-only" href="/" className="shrink-0" />
+            <div className="inline-flex sm:hidden font-doodle text-[11px] font-bold text-[#161514] bg-[#CEF431] border-1.5 border-[#161514] rounded-md px-2 py-0.5 shadow-[1px_1px_0px_0px_#161514] -rotate-2">
+              <span>Ready to crush it? ⚡</span>
+            </div>
           </div>
-          <div className="flex-1 bg-white px-2.5 py-2 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center gap-1.5 justify-center">
-            <span className="text-sm">📚</span>
-            <span className="text-[10px] font-black text-[#161514]">Study</span>
-          </div>
-          <div className="flex-1 bg-white px-2.5 py-2 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center gap-1.5 justify-center">
-            <span className="text-sm">💰</span>
-            <span className="text-[10px] font-black text-[#161514]">Money</span>
+          <div className="flex flex-col items-center lg:items-start">
+            <DoodleInvictusTitle size="lg" showReplay={true} showSubtitle={true} />
           </div>
         </div>
-      </div>
 
-      {/* Desktop Column: Cozy Hero Banner & Playful Stickers */}
-      <div className="hidden lg:flex lg:col-span-6 flex-col justify-center space-y-6 pr-2">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-amber-400/20 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-[#161514] text-xs font-black w-fit">
-          <Smile className="h-4 w-4 text-amber-700 stroke-[2.5]" />
-          <span>Your Daily Life Companion</span>
-        </div>
-
-        <div className="space-y-3">
-          <h1
-            className="text-4xl xl:text-5xl font-black text-[#161514] tracking-tight leading-[1.15]"
-            style={{ fontFamily: "var(--font-heading)" }}
-          >
-            Welcome to <br />
-            <span className="relative inline-block text-amber-600 underline decoration-amber-400 decoration-wavy decoration-2">
-              Invictus 🌟
-            </span>
+        {/* Catchy Editorial Heading & Subtext */}
+        <div className="space-y-1.5 max-w-md mx-auto lg:mx-0">
+          <h1 className="font-heading font-black text-xl sm:text-2xl md:text-3xl text-[#161514] tracking-tight leading-snug">
+            Personal life, study & money.
           </h1>
-          <p className="text-[#161514]/70 text-sm font-bold leading-relaxed max-w-sm">
-            Track daily habits, crush exam syllabus, monitor macros & build savings — all with playful pet-app energy!
+          <div className="inline-block px-2.5 py-0.5 bg-[#FEF08A] border-1.5 border-[#161514] rounded shadow-[1.5px_1.5px_0px_0px_#161514] -rotate-1">
+            <span className="font-doodle text-xs sm:text-sm font-bold text-[#161514]">
+              ~ All together in one focused cockpit 🎯
+            </span>
+          </div>
+          <p className="text-xs sm:text-sm font-medium text-[#161514]/75 leading-relaxed pt-1 hidden sm:block">
+            A tactile Neobrutalist OmniTracker designed for relentless daily execution,
+            zero cognitive clutter, and complete local privacy.
           </p>
         </div>
 
-        {/* Playful Pill Tiles */}
-        <div className="space-y-2.5 pt-1">
-          <div className="flex items-center gap-3 bg-white p-3.5 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all cursor-default">
-            <div className="h-9 w-9 rounded-xl bg-amber-400/30 border border-[#161514] flex items-center justify-center text-amber-700 font-extrabold text-lg">
-              🌱
+        {/* Feature Highlights Grid with Doodle Accents (Shown on desktop, or below on mobile) */}
+        <div className="hidden lg:grid grid-cols-2 gap-2.5 max-w-md w-full pt-1">
+          <div className="p-2.5 bg-white border-2 border-[#161514] rounded-xl shadow-[2px_2px_0px_0px_#161514] flex items-center gap-2.5 transition-transform hover:-translate-y-0.5">
+            <div className="size-7 rounded-lg bg-[#CEF431] border-2 border-[#161514] flex items-center justify-center shrink-0">
+              <CheckCircle2 className="size-4 text-[#161514] stroke-[2.5]" />
             </div>
-            <div>
-              <h3 className="text-xs font-black text-[#161514]">Life & Habits Space</h3>
-              <p className="text-[11px] text-[#161514]/60 font-bold">Daily streaks, Macros & Weight tracking</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 bg-white p-3.5 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all cursor-default">
-            <div className="h-9 w-9 rounded-xl bg-orange-400/30 border border-[#161514] flex items-center justify-center text-orange-700 font-extrabold text-lg">
-              📚
-            </div>
-            <div>
-              <h3 className="text-xs font-black text-[#161514]">Study & Exam Space</h3>
-              <p className="text-[11px] text-[#161514]/60 font-bold">Syllabus topics, countdowns & test scores</p>
+            <div className="flex flex-col text-left">
+              <span className="font-heading font-extrabold text-xs text-[#161514]">Habits & Streaks</span>
+              <span className="font-doodle text-[10px] text-[#161514]/65">chain unbreakable ⚡</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 bg-white p-3.5 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all cursor-default">
-            <div className="h-9 w-9 rounded-xl bg-[#03D26F]/30 border border-[#161514] flex items-center justify-center font-extrabold text-lg">
-              💰
+          <div className="p-2.5 bg-white border-2 border-[#161514] rounded-xl shadow-[2px_2px_0px_0px_#161514] flex items-center gap-2.5 transition-transform hover:-translate-y-0.5">
+            <div className="size-7 rounded-lg bg-[#C084FC] border-2 border-[#161514] flex items-center justify-center shrink-0">
+              <Zap className="size-4 text-[#161514] stroke-[2.5]" />
             </div>
-            <div>
-              <h3 className="text-xs font-black text-[#161514]">Money & Budget Space</h3>
-              <p className="text-[11px] text-[#161514]/60 font-bold">Income/expense ledger & savings targets</p>
+            <div className="flex flex-col text-left">
+              <span className="font-heading font-extrabold text-xs text-[#161514]">Exams & Syllabus</span>
+              <span className="font-doodle text-[10px] text-[#161514]/65">100% syllabus prep 📚</span>
+            </div>
+          </div>
+
+          <div className="p-2.5 bg-white border-2 border-[#161514] rounded-xl shadow-[2px_2px_0px_0px_#161514] flex items-center gap-2.5 transition-transform hover:-translate-y-0.5">
+            <div className="size-7 rounded-lg bg-[#F59E0B] border-2 border-[#161514] flex items-center justify-center shrink-0">
+              <Flame className="size-4 text-[#161514] stroke-[2.5]" />
+            </div>
+            <div className="flex flex-col text-left">
+              <span className="font-heading font-extrabold text-xs text-[#161514]">Daily Priority</span>
+              <span className="font-doodle text-[10px] text-[#161514]/65">crush daily targets 🔥</span>
+            </div>
+          </div>
+
+          <div className="p-2.5 bg-white border-2 border-[#161514] rounded-xl shadow-[2px_2px_0px_0px_#161514] flex items-center gap-2.5 transition-transform hover:-translate-y-0.5">
+            <div className="size-7 rounded-lg bg-[#03D26F] border-2 border-[#161514] flex items-center justify-center shrink-0">
+              <Wallet className="size-4 text-[#161514] stroke-[2.5]" />
+            </div>
+            <div className="flex flex-col text-left">
+              <span className="font-heading font-extrabold text-xs text-[#161514]">Cash & Budgets</span>
+              <span className="font-doodle text-[10px] text-[#161514]/65">zero financial leaks 💰</span>
             </div>
           </div>
         </div>
+
+        {/* Real Tactile Sticky Note with Hand-Drawn Washi Tape (Desktop) */}
+        <div className="hidden lg:block max-w-md w-full pt-1">
+          <DoodleStickyNote
+            title="AGENT INTEL NOTE"
+            content="Invictus is built offline-first. Your private journal, syllabus tracking, and expense logs stay encrypted on this device."
+            footer="— Zero ads • Zero spyware • Pure flow state 🚀"
+            color="yellow"
+            rot="-1deg"
+          />
+        </div>
+
+        {/* Directional Doodle Arrow pointing towards login form on desktop */}
+        <div className="hidden lg:flex items-center justify-end max-w-md w-full pt-1 pr-4">
+          <DoodleArrow
+            direction="curved-up-right"
+            label="Claim your cockpit ➔"
+            color="#FF4F17"
+          />
+        </div>
       </div>
 
-      {/* Main Card (Mobile & Desktop) */}
-      <div className="w-full col-span-1 lg:col-span-6 max-w-md mx-auto">
-        <div className="bg-white rounded-3xl p-6 sm:p-7 md:p-8 border-[2.5px] border-[#161514] shadow-[6px_6px_0px_0px_#161514] space-y-4 md:space-y-5 relative overflow-hidden">
-          
-          <div className="flex items-center justify-between border-b-2 border-[#161514]/10 pb-3 mb-2">
-            <InvictusLogo size="md" variant="full" href="/login" />
-            <div className="bg-amber-400 text-[#161514] text-[10px] font-black px-2.5 py-1 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] uppercase">
-              Sign In
-            </div>
+      {/* Right Column: Unified Neobrutalist Auth Card with Doodle Accents */}
+      <div className="lg:col-span-6 w-full max-w-md mx-auto z-10 relative">
+        {/* Playful Floating Stamp Badge */}
+        <div className="absolute -top-3.5 right-4 sm:right-6 z-20 pointer-events-none">
+          <DoodleStamp
+            text="AGENT ENTRY"
+            subtext="VAULT ACCESS"
+            variant="lime"
+            rot="2.5deg"
+          />
+        </div>
+
+        <div className="neo-card p-5 sm:p-8 bg-white border-2 border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-5 sm:space-y-6 relative overflow-visible">
+          {/* Dual Tabs Switcher */}
+          <div className="grid grid-cols-2 p-1 bg-[#F1EFEA] border-2 border-[#161514] rounded-xl gap-1">
+            <button
+              type="button"
+              onClick={() => setActiveTab("login")}
+              className={`py-2 text-xs font-heading font-extrabold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                activeTab === "login"
+                  ? "bg-[#CEF431] text-[#161514] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]"
+                  : "text-[#161514]/70 hover:text-[#161514]"
+              }`}
+            >
+              <LogIn className="size-3.5" />
+              <span>Sign In</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab("signup")}
+              className={`py-2 text-xs font-heading font-extrabold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                activeTab === "signup"
+                  ? "bg-[#03D26F] text-[#161514] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]"
+                  : "text-[#161514]/70 hover:text-[#161514]"
+              }`}
+            >
+              <UserPlus className="size-3.5" />
+              <span>Create Account</span>
+            </button>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleEmailLogin} className="space-y-3">
-            <div className="space-y-1">
-              <label
-                htmlFor="email"
-                className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-[#161514] ml-1"
-              >
-                Your Email
-              </label>
+          <form onSubmit={handleEmailSubmit} className="space-y-4">
+            {activeTab === "signup" && (
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-heading font-extrabold text-[#161514] flex items-center gap-1.5">
+                    <User className="size-3.5" />
+                    <span>Full Name</span>
+                  </label>
+                  <span className="font-doodle text-[11px] text-[#161514]/60 font-semibold">
+                    codename or name 🏷️
+                  </span>
+                </div>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="e.g. Alex Morgan"
+                  required
+                  className="w-full neo-input"
+                />
+              </div>
+            )}
+
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-heading font-extrabold text-[#161514] flex items-center gap-1.5">
+                  <Mail className="size-3.5" />
+                  <span>Email Address</span>
+                </label>
+                <span className="font-doodle text-[11px] text-[#FF4F17] font-bold">
+                  write here ✍️
+                </span>
+              </div>
               <input
-                id="email"
                 type="email"
                 inputMode="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 required
-                className="w-full neo-input text-base md:text-sm font-bold min-h-[44px] px-4"
+                className="w-full neo-input"
               />
             </div>
 
-            <div className="space-y-1">
-              <label
-                htmlFor="password"
-                className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-[#161514] ml-1"
-              >
-                Password
-              </label>
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-heading font-extrabold text-[#161514] flex items-center gap-1.5">
+                  <Lock className="size-3.5" />
+                  <span>Password</span>
+                </label>
+                <span className="font-doodle text-[11px] text-[#03D26F] font-bold">
+                  secret key 🔑
+                </span>
+              </div>
               <div className="relative">
                 <input
-                  id="password"
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••••••"
+                  placeholder={activeTab === "signup" ? "At least 4 characters" : "Your password"}
                   required
-                  style={{ paddingRight: "3rem" }}
-                  className="w-full neo-input text-base md:text-sm font-bold px-4 min-h-[44px]"
+                  className="w-full neo-input pr-10"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-[#161514]/50 hover:text-[#161514] cursor-pointer p-1 min-h-[40px] min-w-[40px] flex items-center justify-center"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-[#161514]/60 hover:text-[#161514] cursor-pointer"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4 stroke-[2.5]" />
-                  ) : (
-                    <Eye className="h-4 w-4 stroke-[2.5]" />
-                  )}
+                  {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                 </button>
               </div>
             </div>
 
-            <button
+            <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#CEF431] hover:bg-[#bce028] text-[#161514] font-black rounded-2xl py-3 text-sm uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none mt-1 min-h-[48px] disabled:opacity-50"
+              className={`w-full py-2.5 font-black text-sm uppercase tracking-wider ${
+                activeTab === "signup" ? "bg-[#03D26F] hover:bg-[#10E57E]" : "bg-[#CEF431] hover:bg-[#D8F74E]"
+              }`}
             >
               {loading ? (
-                <div className="h-4 w-4 rounded-full border-2 border-[#161514] border-t-transparent animate-spin" />
+                <span className="flex items-center gap-2">
+                  <span className="size-4 rounded-full border-2 border-[#161514] border-t-transparent animate-spin" />
+                  <span>Processing...</span>
+                </span>
+              ) : activeTab === "login" ? (
+                <span className="flex items-center gap-2">
+                  <LogIn className="size-4" />
+                  <span>Enter Vault</span>
+                </span>
               ) : (
-                <>
-                  <span>Sign In & Continue</span>
-                  <ArrowRight className="h-4 w-4 stroke-[2.5]" />
-                </>
+                <span className="flex items-center gap-2">
+                  <UserPlus className="size-4" />
+                  <span>Create My Vault</span>
+                </span>
               )}
-            </button>
+            </Button>
           </form>
 
-          {/* Or Divider */}
-          <div className="relative my-2.5">
+          {/* Divider with Doodle Label */}
+          <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t-2 border-[#161514]/10" />
+              <span className="w-full border-t-2 border-dashed border-[#161514]/20" />
             </div>
-            <div className="relative flex justify-center text-[10px] uppercase font-black tracking-widest">
-              <span className="bg-white px-3 text-[#161514]/50 rounded-full">or</span>
+            <div className="relative flex justify-center text-[10px] uppercase font-mono font-bold">
+              <span className="bg-white px-2.5 text-[#161514]/60">or instant guest access</span>
             </div>
           </div>
 
-          {/* Social / Guest Action */}
-          <div className="space-y-2.5">
-            <button
-              type="button"
-              onClick={handleGoogleLogin}
-              disabled={loading}
-              className="w-full rounded-2xl py-2.5 font-black border-2 border-[#161514] bg-white hover:bg-[#FAF8F5] transition-all cursor-pointer flex items-center justify-center gap-2 text-[#161514] text-xs shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none min-h-[48px] disabled:opacity-50"
-            >
-              <svg className="h-4 w-4" viewBox="0 0 24 24">
-                <path
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
-                  fill="#4285F4"
-                />
-                <path
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                  fill="#34A853"
-                />
-                <path
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                  fill="#FBBC05"
-                />
-                <path
-                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                  fill="#EA4335"
-                />
-              </svg>
-              <span>Continue with Google</span>
-            </button>
-
+          {/* Sandbox & Guest Access with Sketched Doodle Pointer */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-center -mb-0.5">
+              <DoodleArrow
+                direction="curved-down-right"
+                label="Just testing? Jump right in! ↷"
+                color="#161514"
+              />
+            </div>
             <button
               type="button"
               onClick={handleGuestLogin}
-              disabled={loading}
-              className="w-full rounded-2xl py-2.5 font-black border-2 border-dashed border-[#161514]/40 text-[#161514] bg-amber-50 hover:bg-amber-100 transition-all cursor-pointer flex items-center justify-center gap-1.5 text-xs shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none min-h-[44px] disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border-2 border-dashed border-[#161514] bg-[#F1EFEA] hover:bg-[#E5E2D8] text-xs font-heading font-black text-[#161514] transition-all cursor-pointer shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none min-h-[44px]"
             >
-              <span>🎈 Play as Offline Guest</span>
+              <Compass className="size-4 stroke-[2.2] text-[#FF4F17]" />
+              <span>Explore as Offline Guest (No Account)</span>
             </button>
           </div>
 
-          {/* Footer prompt */}
-          <div className="text-center text-xs font-bold text-[#161514]/60 pt-0.5">
-            New here?{" "}
-            <Link
-              href="/signup"
-              className="text-amber-700 underline underline-offset-2 hover:text-amber-800 font-black"
-            >
-              Create a free account! ✨
-            </Link>
+          {/* Reassurance Badge */}
+          <div className="pt-1 flex items-center justify-center gap-2 text-[11px] font-doodle font-bold text-[#161514]/70">
+            <Shield className="size-3.5 text-emerald-600 stroke-[2.5]" />
+            <span>100% offline-first • zero telemetry lock-in</span>
           </div>
         </div>
       </div>
+
+      {/* Mobile-Only Feature Highlights and Sticky Note below Auth Card */}
+      <div className="lg:hidden w-full max-w-md mx-auto space-y-4 pt-2 z-10">
+        <div className="grid grid-cols-2 gap-2">
+          <div className="p-2.5 bg-white border-2 border-[#161514] rounded-xl shadow-[2px_2px_0px_0px_#161514] flex items-center gap-2">
+            <div className="size-6 rounded-lg bg-[#CEF431] border-2 border-[#161514] flex items-center justify-center shrink-0">
+              <CheckCircle2 className="size-3.5 text-[#161514] stroke-[2.5]" />
+            </div>
+            <div className="flex flex-col text-left">
+              <span className="font-heading font-extrabold text-[11px] text-[#161514]">Habits & Streaks</span>
+              <span className="font-doodle text-[9px] text-[#161514]/65">unbreakable ⚡</span>
+            </div>
+          </div>
+
+          <div className="p-2.5 bg-white border-2 border-[#161514] rounded-xl shadow-[2px_2px_0px_0px_#161514] flex items-center gap-2">
+            <div className="size-6 rounded-lg bg-[#C084FC] border-2 border-[#161514] flex items-center justify-center shrink-0">
+              <Zap className="size-3.5 text-[#161514] stroke-[2.5]" />
+            </div>
+            <div className="flex flex-col text-left">
+              <span className="font-heading font-extrabold text-[11px] text-[#161514]">Exams & Syllabus</span>
+              <span className="font-doodle text-[9px] text-[#161514]/65">100% prep 📚</span>
+            </div>
+          </div>
+        </div>
+
+        <DoodleStickyNote
+          title="AGENT INTEL NOTE"
+          content="Invictus runs offline-first. Your private habits, syllabus & money logs stay on this phone."
+          footer="— Pure flow state 🚀"
+          color="yellow"
+          rot="-1deg"
+        />
+      </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#FBF9F5] flex items-center justify-center p-4">
+          <div className="h-8 w-8 rounded-full border-2 border-[#161514] border-t-transparent animate-spin" />
+        </div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }

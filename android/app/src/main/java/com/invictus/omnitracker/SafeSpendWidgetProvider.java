@@ -7,6 +7,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.Uri;
 import android.util.Log;
 import android.view.View;
@@ -44,15 +45,30 @@ public class SafeSpendWidgetProvider extends AppWidgetProvider {
 
     private static void updateWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
         try {
-            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_safe_spend);
-
-            // Read stored data
+            // Read stored data from SharedPreferences
             SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
             String jsonStr = prefs.getString(KEY_WIDGET_JSON, null);
 
-            // Compute dynamic fallback values from local calendar
+            String widgetTheme = "zen";
+            if (jsonStr != null) {
+                try {
+                    JSONObject rawObj = new JSONObject(jsonStr);
+                    widgetTheme = rawObj.optString("widgetTheme", "zen");
+                } catch (Exception ignored) {}
+            }
+            boolean isSpeedway = "speedway".equalsIgnoreCase(widgetTheme);
+
+            // Dynamically inflate either Speedway or Zen Sanctuary layout based on user theme
+            RemoteViews views = new RemoteViews(
+                    context.getPackageName(),
+                    isSpeedway ? R.layout.widget_speedway : R.layout.widget_safe_spend
+            );
+
+            // Compute dynamic fallback values from calendar
             Calendar cal = Calendar.getInstance();
             String defaultMonth = new SimpleDateFormat("MMMM", Locale.getDefault()).format(cal.getTime());
+            String zenDateChip = new SimpleDateFormat("EEE, d MMM", Locale.getDefault()).format(cal.getTime()) + " • Zen Bloom";
+            String speedwayDateChip = new SimpleDateFormat("EEE, d MMM", Locale.getDefault()).format(cal.getTime()) + " • Turbo Cruise";
             int currentDay = cal.get(Calendar.DAY_OF_MONTH);
             int maxDays = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
             int defaultDaysLeft = Math.max(1, maxDays - currentDay + 1);
@@ -60,15 +76,26 @@ public class SafeSpendWidgetProvider extends AppWidgetProvider {
             String currency = "₹";
             String month = defaultMonth;
             String daysLeft = defaultDaysLeft + "d left";
-            String spentTodayFormatted = "₹0";
-            String badgeText = "Syncing...";
-            int badgeColor = android.graphics.Color.parseColor("#037A48");
+            String streamFlowFormatted = "₹0 FLOW LEFT";
+            String weatherLabel = "☀️ GOLDEN SUNLIGHT";
+            int weatherColor = Color.parseColor("#03D26F");
+            String capSubtext = "Syncing sanctuary...";
+            int streamProgressPercent = 100;
             String upiLeft = "Open App";
             String cashLeft = "Open App";
+            double todayRemainingVal = 0.0;
+            double todayExpenseVal = 0.0;
+            double dailyBudgetTargetVal = 0.0;
+            boolean isOverBudgetVal = false;
+            double overAmountVal = 0.0;
 
             int habitsTotal = 0;
             int habitsCompleted = 0;
             JSONArray habitsArray = null;
+
+            String goalTitle = "Mastery & Focus";
+            int goalProgressPct = 65;
+            String goalIcon = "🎯";
 
             if (jsonStr != null) {
                 try {
@@ -85,43 +112,73 @@ public class SafeSpendWidgetProvider extends AppWidgetProvider {
 
                     double todayExpense = obj.optDouble("todayExpense", 0.0);
                     double dailyBudgetTarget = obj.optDouble("dailyBudgetTarget", safeDaily);
-                    double todayRemaining = obj.has("todayRemaining") ? obj.optDouble("todayRemaining", dailyBudgetTarget - todayExpense) : (dailyBudgetTarget - todayExpense);
+                    double todayRemaining = obj.has("todayRemaining")
+                            ? obj.optDouble("todayRemaining", dailyBudgetTarget - todayExpense)
+                            : (dailyBudgetTarget - todayExpense);
                     boolean isOverDailyBudget = obj.optBoolean("isOverDailyBudget", todayExpense > dailyBudgetTarget && dailyBudgetTarget > 0);
                     double overDailyAmount = obj.optDouble("overDailyAmount", Math.max(0, todayExpense - dailyBudgetTarget));
+
+                    todayRemainingVal = todayRemaining;
+                    todayExpenseVal = todayExpense;
+                    dailyBudgetTargetVal = dailyBudgetTarget;
+                    isOverBudgetVal = isOverDailyBudget;
+                    overAmountVal = overDailyAmount;
 
                     habitsTotal = obj.optInt("habitsTotalCount", 0);
                     habitsCompleted = obj.optInt("habitsCompletedCount", 0);
                     habitsArray = obj.optJSONArray("habitsList");
 
-                    NumberFormat formatter = NumberFormat.getNumberInstance(Locale.US);
-
-                    // Hero Stat: Spent Today (e.g. ₹50 or ₹0)
-                    spentTodayFormatted = currency + formatter.format((long) Math.round(todayExpense));
-
-                    // Sub-badge: Remaining vs Limit
-                    if (isOverDailyBudget && overDailyAmount > 0) {
-                        badgeText = "⚠️ Over by " + currency + formatter.format((long) Math.round(overDailyAmount));
-                        badgeColor = android.graphics.Color.parseColor("#B42318");
-                    } else if (dailyBudgetTarget > 0) {
-                        badgeText = currency + formatter.format((long) Math.round(Math.max(0, todayRemaining))) + " left (" + currency + formatter.format((long) Math.round(dailyBudgetTarget)) + " cap)";
-                        badgeColor = android.graphics.Color.parseColor("#037A48");
-                    } else {
-                        badgeText = "No limit set";
-                        badgeColor = android.graphics.Color.parseColor("#73716D");
+                    // Parse active goal if available
+                    JSONObject activeGoal = obj.optJSONObject("activeGoal");
+                    if (activeGoal != null) {
+                        goalTitle = activeGoal.optString("title", "Mastery & Focus");
+                        goalProgressPct = activeGoal.optInt("progressPercentage", 65);
+                        goalIcon = activeGoal.optString("icon", "🎯");
                     }
 
+                    NumberFormat formatter = NumberFormat.getNumberInstance(Locale.US);
+
+                    // Brook Stream Flow Stat
+                    double streamLeft = Math.max(0, todayRemaining);
+                    streamFlowFormatted = "💧 " + currency + formatter.format((long) Math.round(streamLeft)) + " FLOW LEFT";
+
+                    // Weather Status Telemetry
+                    if (isOverDailyBudget && overDailyAmount > 0) {
+                        weatherLabel = "⛈️ DROUGHT / STORM ALERT";
+                        weatherColor = Color.parseColor("#B42318");
+                        capSubtext = "⚠️ Parched soil: Over by " + currency + formatter.format((long) Math.round(overDailyAmount));
+                        streamProgressPercent = 0;
+                    } else if (dailyBudgetTarget > 0) {
+                        double spentRatio = todayExpense / dailyBudgetTarget;
+                        if (spentRatio > 0.75) {
+                            weatherLabel = "🌧️ NOURISHING MIST";
+                            weatherColor = Color.parseColor("#F59E0B");
+                        } else {
+                            weatherLabel = "☀️ GOLDEN SUNLIGHT";
+                            weatherColor = Color.parseColor("#03D26F");
+                        }
+                        capSubtext = currency + formatter.format((long) Math.round(todayExpense)) + " spent of " + currency + formatter.format((long) Math.round(dailyBudgetTarget)) + " daily cap";
+                        streamProgressPercent = Math.max(5, Math.min(100, (int) Math.round((streamLeft / dailyBudgetTarget) * 100)));
+                    } else {
+                        weatherLabel = "☀️ TRANQUIL DAWN";
+                        weatherColor = Color.parseColor("#03D26F");
+                        capSubtext = "No cap set • Brook flows unmetered";
+                        streamProgressPercent = 100;
+                    }
+
+                    // UPI & Cash balances
                     if (remUpi >= 0) {
                         upiLeft = currency + formatter.format((long) Math.round(remUpi));
                     } else {
-                        upiLeft = "Over-budget";
+                        upiLeft = "Over";
                     }
 
                     if (!hasCashBudget && remCash <= 0) {
-                        cashLeft = "No limit set";
+                        cashLeft = "None";
                     } else if (remCash >= 0) {
                         cashLeft = currency + formatter.format((long) Math.round(remCash));
                     } else {
-                        cashLeft = "Over-budget";
+                        cashLeft = "Over";
                     }
 
                 } catch (Exception e) {
@@ -129,93 +186,252 @@ public class SafeSpendWidgetProvider extends AppWidgetProvider {
                 }
             }
 
-            views.setTextViewText(R.id.widget_month_label, month);
-            views.setTextViewText(R.id.widget_days_left, daysLeft);
-            views.setTextViewText(R.id.widget_hero_label, "SPENT TODAY");
-            views.setTextViewText(R.id.widget_safe_amount, spentTodayFormatted);
-            views.setTextViewText(R.id.widget_today_badge, badgeText);
-            views.setTextColor(R.id.widget_today_badge, badgeColor);
-            views.setTextViewText(R.id.widget_upi_left, upiLeft);
-            views.setTextViewText(R.id.widget_cash_left, cashLeft);
+            NumberFormat numFmt = NumberFormat.getNumberInstance(Locale.US);
 
-            // Bind Habits Checklist Section
-            if (habitsTotal > 0 && habitsArray != null && habitsArray.length() > 0) {
-                views.setViewVisibility(R.id.widget_habits_section, View.VISIBLE);
-                views.setViewVisibility(R.id.widget_habits_empty, View.GONE);
+            // ==========================================
+            // BIND THEME SPECIFIC VIEWS
+            // ==========================================
+            if (isSpeedway) {
+                // Speedway Header
+                views.setTextViewText(R.id.widget_speedway_title, "🏎️ INVICTUS SPEEDWAY");
+                views.setTextViewText(R.id.widget_speedway_date_chip, speedwayDateChip);
 
-                String progressText = habitsCompleted + "/" + habitsTotal + " DONE";
-                if (habitsCompleted == habitsTotal) {
-                    progressText = "ALL DONE 🎉";
+                // Fuel Gauge & Speedometer Telemetry
+                double fuelLeft = Math.max(0, todayRemainingVal);
+                String fuelLabel = "⛽ FUEL: " + streamProgressPercent + "% • " + currency + numFmt.format((long) Math.round(fuelLeft)) + " RANGE";
+                views.setTextViewText(R.id.widget_speedway_fuel_label, fuelLabel);
+
+                if (isOverBudgetVal && overAmountVal > 0) {
+                    views.setTextViewText(R.id.widget_speedway_pace_label, "TRAFFIC JAM ⚠️");
+                    views.setTextColor(R.id.widget_speedway_pace_label, Color.parseColor("#EF4444"));
+                    views.setTextViewText(R.id.widget_speedway_telemetry_subtext, "⚠️ Fuel Depleted: Over by " + currency + numFmt.format((long) Math.round(overAmountVal)) + " • Redline");
+                } else if (dailyBudgetTargetVal > 0) {
+                    double spentRatio = todayExpenseVal / dailyBudgetTargetVal;
+                    if (spentRatio > 0.75) {
+                        views.setTextViewText(R.id.widget_speedway_pace_label, "CAUTION 65 KM/H");
+                        views.setTextColor(R.id.widget_speedway_pace_label, Color.parseColor("#F59E0B"));
+                    } else {
+                        views.setTextViewText(R.id.widget_speedway_pace_label, "CRUISING 98 KM/H");
+                        views.setTextColor(R.id.widget_speedway_pace_label, Color.parseColor("#00E5FF"));
+                    }
+                    views.setTextViewText(R.id.widget_speedway_telemetry_subtext, currency + numFmt.format((long) Math.round(todayExpenseVal)) + " used of " + currency + numFmt.format((long) Math.round(dailyBudgetTargetVal)) + " tank cap • 4,200 RPM");
+                } else {
+                    views.setTextViewText(R.id.widget_speedway_pace_label, "CRUISING 98 KM/H");
+                    views.setTextColor(R.id.widget_speedway_pace_label, Color.parseColor("#00E5FF"));
+                    views.setTextViewText(R.id.widget_speedway_telemetry_subtext, "Unmetered Highway • Optimal Throttle");
                 }
-                views.setTextViewText(R.id.widget_habits_progress, progressText);
-                views.setTextColor(R.id.widget_habits_progress, habitsCompleted == habitsTotal 
-                    ? android.graphics.Color.parseColor("#037A48") 
-                    : android.graphics.Color.parseColor("#161514"));
 
-                // Habit 1
-                if (habitsArray.length() > 0) {
-                    JSONObject h1 = habitsArray.optJSONObject(0);
-                    if (h1 != null) {
-                        views.setViewVisibility(R.id.widget_habit_row_1, View.VISIBLE);
-                        boolean done1 = h1.optBoolean("completed", false);
-                        String title1 = h1.optString("title", "Habit 1");
-                        int streak1 = h1.optInt("streak", 0);
+                views.setProgressBar(R.id.widget_speedway_fuel_bar, 100, streamProgressPercent, false);
+                views.setTextViewText(R.id.widget_speedway_upi_left, "📱 Tank: " + upiLeft);
+                views.setTextViewText(R.id.widget_speedway_cash_left, "💵 Nitro: " + cashLeft);
+                views.setTextViewText(R.id.widget_speedway_days_left, daysLeft + " to Checkpoint");
 
-                        views.setTextViewText(R.id.widget_habit_1_title, title1);
-                        views.setTextViewText(R.id.widget_habit_1_check, done1 ? "✓" : "○");
-                        views.setTextColor(R.id.widget_habit_1_check, done1 
-                            ? android.graphics.Color.parseColor("#037A48") 
-                            : android.graphics.Color.parseColor("#73716D"));
+                // Milestone Sign
+                views.setTextViewText(R.id.widget_speedway_goal_icon, goalIcon);
+                views.setTextViewText(R.id.widget_speedway_goal_title, goalTitle);
+                views.setTextViewText(R.id.widget_speedway_goal_status, "Next Exit • " + goalProgressPct + "% Reached");
+                views.setProgressBar(R.id.widget_speedway_goal_progress_bar, 100, Math.max(0, Math.min(100, goalProgressPct)), false);
+                views.setTextViewText(R.id.widget_speedway_goal_telemetry, "Speedway Lane 1 • Full Throttle");
 
-                        if (streak1 > 0) {
-                            views.setViewVisibility(R.id.widget_habit_1_streak, View.VISIBLE);
-                            views.setTextViewText(R.id.widget_habit_1_streak, "🔥 " + streak1 + "d");
+                // Pit Crew Diagnostics (Habits)
+                if (habitsTotal > 0 && habitsArray != null && habitsArray.length() > 0) {
+                    views.setViewVisibility(R.id.widget_speedway_habits_section, View.VISIBLE);
+                    views.setViewVisibility(R.id.widget_speedway_habits_empty, View.GONE);
+
+                    views.setTextViewText(R.id.widget_speedway_habits_progress, habitsCompleted + "/" + habitsTotal + " READY");
+                    boolean allDone = (habitsCompleted == habitsTotal);
+                    views.setViewVisibility(R.id.widget_speedway_all_clear, allDone ? View.VISIBLE : View.GONE);
+
+                    // Habit Row 1
+                    if (habitsArray.length() > 0) {
+                        JSONObject h1 = habitsArray.optJSONObject(0);
+                        if (h1 != null) {
+                            views.setViewVisibility(R.id.widget_speedway_habit_row_1, View.VISIBLE);
+                            boolean done1 = h1.optBoolean("completed", false);
+                            views.setTextViewText(R.id.widget_speedway_habit_1_led, done1 ? "🟢" : "🟠");
+                            views.setTextViewText(R.id.widget_speedway_habit_1_title, h1.optString("title", "Habit 1"));
+                            int s1 = h1.optInt("streak", 0);
+                            views.setTextViewText(R.id.widget_speedway_habit_1_streak, s1 > 0 ? "🔥 " + s1 + "d" : "");
                         } else {
-                            views.setViewVisibility(R.id.widget_habit_1_streak, View.GONE);
+                            views.setViewVisibility(R.id.widget_speedway_habit_row_1, View.GONE);
+                        }
+                    } else {
+                        views.setViewVisibility(R.id.widget_speedway_habit_row_1, View.GONE);
+                    }
+
+                    // Habit Row 2
+                    if (habitsArray.length() > 1) {
+                        JSONObject h2 = habitsArray.optJSONObject(1);
+                        if (h2 != null) {
+                            views.setViewVisibility(R.id.widget_speedway_habit_row_2, View.VISIBLE);
+                            boolean done2 = h2.optBoolean("completed", false);
+                            views.setTextViewText(R.id.widget_speedway_habit_2_led, done2 ? "🟢" : "🟠");
+                            views.setTextViewText(R.id.widget_speedway_habit_2_title, h2.optString("title", "Habit 2"));
+                            int s2 = h2.optInt("streak", 0);
+                            views.setTextViewText(R.id.widget_speedway_habit_2_streak, s2 > 0 ? "🔥 " + s2 + "d" : "");
+                        } else {
+                            views.setViewVisibility(R.id.widget_speedway_habit_row_2, View.GONE);
+                        }
+                    } else {
+                        views.setViewVisibility(R.id.widget_speedway_habit_row_2, View.GONE);
+                    }
+
+                    // Habit Row 3
+                    if (habitsArray.length() > 2) {
+                        JSONObject h3 = habitsArray.optJSONObject(2);
+                        if (h3 != null) {
+                            views.setViewVisibility(R.id.widget_speedway_habit_row_3, View.VISIBLE);
+                            boolean done3 = h3.optBoolean("completed", false);
+                            views.setTextViewText(R.id.widget_speedway_habit_3_led, done3 ? "🟢" : "🟠");
+                            views.setTextViewText(R.id.widget_speedway_habit_3_title, h3.optString("title", "Habit 3"));
+                            int s3 = h3.optInt("streak", 0);
+                            views.setTextViewText(R.id.widget_speedway_habit_3_streak, s3 > 0 ? "🔥 " + s3 + "d" : "");
+                        } else {
+                            views.setViewVisibility(R.id.widget_speedway_habit_row_3, View.GONE);
+                        }
+                    } else {
+                        views.setViewVisibility(R.id.widget_speedway_habit_row_3, View.GONE);
+                    }
+                } else {
+                    views.setViewVisibility(R.id.widget_speedway_habits_section, View.VISIBLE);
+                    views.setViewVisibility(R.id.widget_speedway_habits_empty, View.VISIBLE);
+                    views.setViewVisibility(R.id.widget_speedway_all_clear, View.GONE);
+                    views.setViewVisibility(R.id.widget_speedway_habit_row_1, View.GONE);
+                    views.setViewVisibility(R.id.widget_speedway_habit_row_2, View.GONE);
+                    views.setViewVisibility(R.id.widget_speedway_habit_row_3, View.GONE);
+                    views.setTextViewText(R.id.widget_speedway_habits_progress, "0/0 READY");
+                }
+
+            } else {
+                // ==========================================
+                // ZEN SANCTUARY THEME BINDINGS
+                // ==========================================
+                views.setTextViewText(R.id.widget_title, "🌿 INVICTUS SANCTUARY");
+                views.setTextViewText(R.id.widget_date_chip, zenDateChip);
+                views.setTextViewText(R.id.widget_weather_label, weatherLabel);
+                views.setTextColor(R.id.widget_weather_label, weatherColor);
+                views.setTextViewText(R.id.widget_safe_amount, streamFlowFormatted);
+                views.setTextViewText(R.id.widget_today_badge, capSubtext);
+                views.setProgressBar(R.id.widget_stream_bar, 100, streamProgressPercent, false);
+
+                views.setTextViewText(R.id.widget_upi_left, "📱 UPI: " + upiLeft);
+                views.setTextViewText(R.id.widget_cash_left, "💵 Cash: " + cashLeft);
+                views.setTextViewText(R.id.widget_days_left, daysLeft);
+
+                // Bind Sacred Flora (Habit Checklist)
+                if (habitsTotal > 0 && habitsArray != null && habitsArray.length() > 0) {
+                    views.setViewVisibility(R.id.widget_habits_section, View.VISIBLE);
+                    views.setViewVisibility(R.id.widget_habits_empty, View.GONE);
+
+                    String progressText = habitsCompleted + "/" + habitsTotal + " BLOOMED";
+                    boolean allDone = (habitsCompleted == habitsTotal);
+                    views.setTextViewText(R.id.widget_habits_progress, progressText);
+
+                    if (allDone) {
+                        views.setViewVisibility(R.id.widget_bloom_celebration, View.VISIBLE);
+                        views.setTextViewText(R.id.widget_bloom_celebration, "🌸 FULL BLOOM ACHIEVED ✨");
+                    } else {
+                        views.setViewVisibility(R.id.widget_bloom_celebration, View.GONE);
+                    }
+
+                    // Habit Row 1
+                    if (habitsArray.length() > 0) {
+                        JSONObject h1 = habitsArray.optJSONObject(0);
+                        if (h1 != null) {
+                            views.setViewVisibility(R.id.widget_habit_row_1, View.VISIBLE);
+                            boolean done1 = h1.optBoolean("completed", false);
+                            String title1 = h1.optString("title", "Habit 1");
+                            int streak1 = h1.optInt("streak", 0);
+
+                            views.setTextViewText(R.id.widget_habit_1_title, title1);
+                            views.setTextViewText(R.id.widget_habit_1_check, done1 ? "🌸" : "🌱");
+
+                            if (streak1 > 0) {
+                                views.setViewVisibility(R.id.widget_habit_1_streak, View.VISIBLE);
+                                views.setTextViewText(R.id.widget_habit_1_streak, "🔥 " + streak1 + "d");
+                            } else {
+                                views.setViewVisibility(R.id.widget_habit_1_streak, View.GONE);
+                            }
+                        } else {
+                            views.setViewVisibility(R.id.widget_habit_row_1, View.GONE);
                         }
                     } else {
                         views.setViewVisibility(R.id.widget_habit_row_1, View.GONE);
                     }
-                } else {
-                    views.setViewVisibility(R.id.widget_habit_row_1, View.GONE);
-                }
 
-                // Habit 2
-                if (habitsArray.length() > 1) {
-                    JSONObject h2 = habitsArray.optJSONObject(1);
-                    if (h2 != null) {
-                        views.setViewVisibility(R.id.widget_habit_row_2, View.VISIBLE);
-                        boolean done2 = h2.optBoolean("completed", false);
-                        String title2 = h2.optString("title", "Habit 2");
-                        int streak2 = h2.optInt("streak", 0);
+                    // Habit Row 2
+                    if (habitsArray.length() > 1) {
+                        JSONObject h2 = habitsArray.optJSONObject(1);
+                        if (h2 != null) {
+                            views.setViewVisibility(R.id.widget_habit_row_2, View.VISIBLE);
+                            boolean done2 = h2.optBoolean("completed", false);
+                            String title2 = h2.optString("title", "Habit 2");
+                            int streak2 = h2.optInt("streak", 0);
 
-                        views.setTextViewText(R.id.widget_habit_2_title, title2);
-                        views.setTextViewText(R.id.widget_habit_2_check, done2 ? "✓" : "○");
-                        views.setTextColor(R.id.widget_habit_2_check, done2 
-                            ? android.graphics.Color.parseColor("#037A48") 
-                            : android.graphics.Color.parseColor("#73716D"));
+                            views.setTextViewText(R.id.widget_habit_2_title, title2);
+                            views.setTextViewText(R.id.widget_habit_2_check, done2 ? "🌸" : "🌱");
 
-                        if (streak2 > 0) {
-                            views.setViewVisibility(R.id.widget_habit_2_streak, View.VISIBLE);
-                            views.setTextViewText(R.id.widget_habit_2_streak, "🔥 " + streak2 + "d");
+                            if (streak2 > 0) {
+                                views.setViewVisibility(R.id.widget_habit_2_streak, View.VISIBLE);
+                                views.setTextViewText(R.id.widget_habit_2_streak, "🔥 " + streak2 + "d");
+                            } else {
+                                views.setViewVisibility(R.id.widget_habit_2_streak, View.GONE);
+                            }
                         } else {
-                            views.setViewVisibility(R.id.widget_habit_2_streak, View.GONE);
+                            views.setViewVisibility(R.id.widget_habit_row_2, View.GONE);
                         }
                     } else {
                         views.setViewVisibility(R.id.widget_habit_row_2, View.GONE);
                     }
+
+                    // Habit Row 3
+                    if (habitsArray.length() > 2) {
+                        JSONObject h3 = habitsArray.optJSONObject(2);
+                        if (h3 != null) {
+                            views.setViewVisibility(R.id.widget_habit_row_3, View.VISIBLE);
+                            boolean done3 = h3.optBoolean("completed", false);
+                            String title3 = h3.optString("title", "Habit 3");
+                            int streak3 = h3.optInt("streak", 0);
+
+                            views.setTextViewText(R.id.widget_habit_3_title, title3);
+                            views.setTextViewText(R.id.widget_habit_3_check, done3 ? "🌸" : "🌱");
+
+                            if (streak3 > 0) {
+                                views.setViewVisibility(R.id.widget_habit_row_3, View.VISIBLE);
+                                views.setTextViewText(R.id.widget_habit_3_streak, "🔥 " + streak3 + "d");
+                            } else {
+                                views.setViewVisibility(R.id.widget_habit_row_3, View.GONE);
+                            }
+                        } else {
+                            views.setViewVisibility(R.id.widget_habit_row_3, View.GONE);
+                        }
+                    } else {
+                        views.setViewVisibility(R.id.widget_habit_row_3, View.GONE);
+                    }
+
                 } else {
+                    views.setViewVisibility(R.id.widget_habits_section, View.VISIBLE);
+                    views.setViewVisibility(R.id.widget_habits_empty, View.VISIBLE);
+                    views.setViewVisibility(R.id.widget_bloom_celebration, View.GONE);
+                    views.setViewVisibility(R.id.widget_habit_row_1, View.GONE);
                     views.setViewVisibility(R.id.widget_habit_row_2, View.GONE);
+                    views.setViewVisibility(R.id.widget_habit_row_3, View.GONE);
+                    views.setTextViewText(R.id.widget_habits_progress, "0/0 BLOOMED");
                 }
-            } else {
-                views.setViewVisibility(R.id.widget_habits_section, View.VISIBLE);
-                views.setViewVisibility(R.id.widget_habits_empty, View.VISIBLE);
-                views.setViewVisibility(R.id.widget_habit_row_1, View.GONE);
-                views.setViewVisibility(R.id.widget_habit_row_2, View.GONE);
-                views.setTextViewText(R.id.widget_habits_progress, "0/0");
+
+                // Bind Sacred Torii Pathway (Active Goal)
+                views.setTextViewText(R.id.widget_goal_icon, goalIcon);
+                views.setTextViewText(R.id.widget_goal_title, goalTitle);
+                int gateNumber = Math.max(1, Math.min(5, (int) Math.ceil(goalProgressPct / 20.0)));
+                views.setTextViewText(R.id.widget_goal_gate_status, "⛩️ Gate " + gateNumber + " of 5 Passed");
+                views.setProgressBar(R.id.widget_goal_progress_bar, 100, Math.max(0, Math.min(100, goalProgressPct)), false);
+                views.setTextViewText(R.id.widget_goal_percentage, goalProgressPct + "% • Summit Ascent");
             }
 
-            // 1. PendingIntent for opening the Money page on widget background tap
+            // ==========================================
+            // ATTACH PENDING INTENTS & DEEP LINKS
+            // ==========================================
+            // 1. PendingIntent for opening the Today page on widget background tap
             Intent openAppIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://invictus-the-omni-tracker.vercel.app/today"));
             openAppIntent.setClass(context, MainActivity.class);
             openAppIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -227,7 +443,7 @@ public class SafeSpendWidgetProvider extends AppWidgetProvider {
             );
             views.setOnClickPendingIntent(R.id.widget_container, openAppPending);
 
-            // 2. PendingIntent for "+ Add Expense" action
+            // 2. PendingIntent for "Log Expense" action (+ Expense modal)
             Intent addExpenseIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://invictus-the-omni-tracker.vercel.app/money?action=quick-expense"));
             addExpenseIntent.setClass(context, MainActivity.class);
             addExpenseIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -237,9 +453,8 @@ public class SafeSpendWidgetProvider extends AppWidgetProvider {
                     addExpenseIntent,
                     PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
             );
-            views.setOnClickPendingIntent(R.id.widget_btn_add_expense, addExpensePending);
 
-            // 3. PendingIntent for "✓ Check Habits" / Habit Section tap
+            // 3. PendingIntent for "Habits" action (Check-in sheet)
             Intent checkHabitsIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://invictus-the-omni-tracker.vercel.app/goals?action=quick-habit"));
             checkHabitsIntent.setClass(context, MainActivity.class);
             checkHabitsIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -249,8 +464,31 @@ public class SafeSpendWidgetProvider extends AppWidgetProvider {
                     checkHabitsIntent,
                     PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
             );
-            views.setOnClickPendingIntent(R.id.widget_habits_section, checkHabitsPending);
-            views.setOnClickPendingIntent(R.id.widget_btn_check_habits, checkHabitsPending);
+
+            // 4. PendingIntent for "Active Goal" action (Goals tab)
+            Intent goalIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://invictus-the-omni-tracker.vercel.app/goals?tab=goals"));
+            goalIntent.setClass(context, MainActivity.class);
+            goalIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            PendingIntent goalPending = PendingIntent.getActivity(
+                    context,
+                    3,
+                    goalIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+            );
+
+            if (isSpeedway) {
+                views.setOnClickPendingIntent(R.id.widget_speedway_btn_refuel, addExpensePending);
+                views.setOnClickPendingIntent(R.id.widget_speedway_btn_pitcrew, checkHabitsPending);
+                views.setOnClickPendingIntent(R.id.widget_speedway_habits_section, checkHabitsPending);
+                views.setOnClickPendingIntent(R.id.widget_speedway_btn_routemap, goalPending);
+                views.setOnClickPendingIntent(R.id.widget_speedway_milestone_card, goalPending);
+            } else {
+                views.setOnClickPendingIntent(R.id.widget_btn_add_expense, addExpensePending);
+                views.setOnClickPendingIntent(R.id.widget_btn_check_habits, checkHabitsPending);
+                views.setOnClickPendingIntent(R.id.widget_habits_section, checkHabitsPending);
+                views.setOnClickPendingIntent(R.id.widget_btn_active_goal, goalPending);
+                views.setOnClickPendingIntent(R.id.widget_goal_section, goalPending);
+            }
 
             appWidgetManager.updateAppWidget(appWidgetId, views);
         } catch (Throwable t) {

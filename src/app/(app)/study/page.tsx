@@ -1,27 +1,54 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import { useSubjects, useAddSubject, useUpdateSubject, useDeleteSubject, useTests, useAddTest, useUpdateTest, useDeleteTest, useStudySessions, useAllTopics, useAddTopic, useUpdateTopic, useDeleteTopic, useAddStudySession } from "@/lib/queries/study";
+import {
+  useSubjects,
+  useAddSubject,
+  useUpdateSubject,
+  useDeleteSubject,
+  useTests,
+  useAddTest,
+  useUpdateTest,
+  useDeleteTest,
+  useStudySessions,
+  useAllTopics,
+  useAddTopic,
+  useUpdateTopic,
+  useDeleteTopic,
+  useAddStudySession,
+} from "@/lib/queries/study";
 import { ExamSyllabusTracker } from "@/components/study/ExamSyllabusTracker";
 import { StudySessionLogger } from "@/components/study/StudySessionLogger";
-import { DraggableDashboardGrid } from "@/components/shared/DraggableDashboardGrid";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
 import { InvictusLoadingScreen } from "@/components/shared/InvictusLoadingScreen";
 import { TemplateSelectionModal, TemplatePack } from "@/components/shared/TemplateSelectionModal";
 import { SUBJECT_TEMPLATE_PACKS, MOCK_TEST_TEMPLATE_PACKS } from "@/lib/templates-data";
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
+import { VixPixelCompanion } from "@/components/mascot/VixPixelCompanion";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProgressRing } from "@/components/shared/ProgressRing";
-import { BookOpen, Plus, Calendar as CalendarIcon, Trophy, BarChart2, AlertCircle, FileText, ChevronRight, Clock, Sparkles, Edit3, Trash2 } from "lucide-react";
-import { format, differenceInDays, differenceInCalendarDays, parseISO, getDay, subWeeks, eachDayOfInterval } from "date-fns";
+import {
+  BookOpen,
+  Plus,
+  Calendar as CalendarIcon,
+  Trophy,
+  BarChart2,
+  AlertCircle,
+  FileText,
+  ChevronRight,
+  Clock,
+  Sparkles,
+  Edit3,
+  Trash2,
+} from "lucide-react";
+import { format, differenceInCalendarDays, parseISO, getDay, subWeeks, eachDayOfInterval } from "date-fns";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { cn } from "@/lib/utils";
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell, LineChart, Line, Legend } from "recharts";
-import { SpaceHeroBanner } from "@/components/shared/SpaceHeroBanner";
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell, LineChart, Line } from "recharts";
 import { ProactiveReminderBanner } from "@/components/shared/ProactiveReminderBanner";
 
 function StudyPageContent() {
@@ -75,7 +102,7 @@ function StudyPageContent() {
       addSubjectMutation.mutate({
         name: item.title,
         color: "indigo",
-        icon: "📚",
+        icon: "BookOpen",
       });
     });
     toast.success(`Applied ${pack.name} syllabus!`);
@@ -138,7 +165,7 @@ function StudyPageContent() {
         color: subjectColor,
         icon: "BookOpen",
       });
-      toast.success("Subject added! Time to learn 📖");
+      toast.success("Subject added successfully!");
       setSubjectName("");
       setIsAddSubjectOpen(false);
     } catch {
@@ -155,7 +182,7 @@ function StudyPageContent() {
         name: editSubjectName,
         color: editSubjectColor,
       });
-      toast.success("Subject updated successfully! 📝");
+      toast.success("Subject updated successfully!");
       setEditingSubject(null);
     } catch {
       toast.error("Failed to update subject");
@@ -174,7 +201,7 @@ function StudyPageContent() {
         scope: [],
         weakAreas: [],
       });
-      toast.success("Mock test logged! Keep pushing 🏆");
+      toast.success("Mock test logged!");
       setTestName("");
       setIsAddTestOpen(false);
     } catch {
@@ -193,7 +220,7 @@ function StudyPageContent() {
         score: Number(editTestScore),
         totalScore: Number(editTestTotalScore),
       });
-      toast.success("Mock test updated successfully! 📝");
+      toast.success("Mock test updated successfully!");
       setEditingTest(null);
     } catch {
       toast.error("Failed to update test");
@@ -209,7 +236,6 @@ function StudyPageContent() {
     coral: { bg: "bg-[#F472B6]", text: "text-[#161514]", ring: "stroke-[#E11D48]", badge: "bg-[#FBCFE8]" },
     indigo: { bg: "bg-[#818CF8]", text: "text-[#161514]", ring: "stroke-[#4F46E5]", badge: "bg-[#C7D2FE]" },
   };
-
 
   // Compute total logged study hours (from sessions)
   const totalLoggedMinutes = sessions.reduce((sum, s) => sum + s.durationMinutes, 0);
@@ -230,16 +256,13 @@ function StudyPageContent() {
   // Real study hours per day of week from sessions
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const barChartData = (() => {
-    // Group sessions by day-of-week
     const dayCounts: Record<number, { totalHours: number; totalDays: number }> = {};
     for (let i = 0; i < 7; i++) dayCounts[i] = { totalHours: 0, totalDays: 0 };
-    // Count weekdays in the past 4 weeks
     const fourWeekStart = subWeeks(new Date(), 4);
     const windowDays = eachDayOfInterval({ start: fourWeekStart, end: new Date() });
     for (const day of windowDays) {
       dayCounts[getDay(day)].totalDays++;
     }
-    // Accumulate session hours per day-of-week
     for (const session of sessions) {
       if (!session.date) continue;
       const dow = getDay(new Date(session.date));
@@ -270,317 +293,364 @@ function StudyPageContent() {
 
   return (
     <div className="min-h-screen bg-cream-bg p-4 md:p-8 space-y-6">
-      <div className="max-w-4xl mx-auto space-y-6">
-        {/* Space Hero Banner */}
-        <SpaceHeroBanner
-          space="study"
-          badgeText="Study & Exams"
-          title="Study & Revision"
-          subtitle={studyTarget?.examName ? `Target Exam: ${studyTarget.examName} (${daysLeft !== null ? `${daysLeft} days remaining` : "Scheduled"})` : "Track subjects, topics, and revision progress."}
-          stats={[
-            { label: "Subjects", value: `${subjects.length}`, icon: "📖" },
-            { label: "Total Studied", value: `${totalLoggedHours}h`, icon: "⏱️" },
-            { label: "Mastery Rate", value: `${masteryRate}%`, icon: "🏆" },
-          ]}
-          actionButton={{
-            label: "+ Add Subject",
-            onClick: () => setIsSubjectChoiceOpen(true),
-          }}
-        />
+      <div className="max-w-5xl mx-auto space-y-6">
+        
+        {/* Clean Neobrutalist Study Header Card */}
+        <div className="neo-card p-5 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-heading font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border-2 border-[#161514] bg-[#C084FC] text-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center gap-1">
+                <BookOpen className="size-3 stroke-[2.5]" />
+                <span>Study & Academics</span>
+              </span>
+              {studyTarget?.examName && (
+                <span className="text-[10px] font-heading font-black text-[#161514]/70">
+                  Target: {studyTarget.examName} ({daysLeft !== null ? `${daysLeft}d left` : "Scheduled"})
+                </span>
+              )}
+            </div>
+            <h1 className="text-xl sm:text-2xl font-heading font-black text-[#161514] tracking-tight">
+              Study & Revision
+            </h1>
+            <p className="text-xs font-medium text-[#161514]/70 max-w-lg">
+              Track subjects, syllabus mastery, focus sessions, and mock test scores.
+            </p>
+          </div>
+
+          {/* Quick Metrics & Actions */}
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <div className="px-3 py-2 rounded-xl border-2 border-[#161514] bg-[#FAF8F5] shadow-[2px_2px_0px_0px_#161514] text-center min-w-[65px]">
+              <span className="text-[9px] font-heading font-black uppercase text-[#161514]/60 block leading-tight">Subjects</span>
+              <span className="text-sm font-heading font-black text-[#161514]">{subjects.length}</span>
+            </div>
+            <div className="px-3 py-2 rounded-xl border-2 border-[#161514] bg-purple-50 shadow-[2px_2px_0px_0px_#161514] text-center min-w-[65px]">
+              <span className="text-[9px] font-heading font-black uppercase text-purple-700 block leading-tight">Hours</span>
+              <span className="text-sm font-heading font-black text-[#161514] flex items-center justify-center gap-1">
+                <Clock className="size-3 text-purple-700" />
+                {totalLoggedHours}h
+              </span>
+            </div>
+            <div className="px-3 py-2 rounded-xl border-2 border-[#161514] bg-[#03D26F]/20 shadow-[2px_2px_0px_0px_#161514] text-center min-w-[65px]">
+              <span className="text-[9px] font-heading font-black uppercase text-emerald-800 block leading-tight">Mastery</span>
+              <span className="text-sm font-heading font-black text-emerald-900 flex items-center justify-center gap-1">
+                <Trophy className="size-3 text-emerald-700" />
+                {masteryRate}%
+              </span>
+            </div>
+            <Button
+              onClick={() => setIsSubjectChoiceOpen(true)}
+              className="bg-[#CEF431] hover:bg-[#D8F74E] text-[#161514] font-heading font-black text-xs px-3.5 py-2.5 h-auto rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center gap-1.5"
+            >
+              <Plus className="size-4 stroke-[3]" />
+              <span>New Subject</span>
+            </Button>
+
+            {/* Interactive Scholar Vix Companion */}
+            <VixPixelCompanion
+              gear="study"
+              state="focus"
+              size={42}
+              onClick={() => setIsSubjectChoiceOpen(true)}
+              title="Vix: Scholar Companion (Click for New Subject)"
+            />
+          </div>
+        </div>
 
         {/* Proactive Reminder Banner */}
         <ProactiveReminderBanner space="study" />
 
-        {/* Countdown Banner */}
-        {studyTarget && daysLeft !== null && (
-          <div className="bg-white rounded-3xl p-5 md:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] flex flex-col sm:flex-row items-center justify-between gap-4 relative overflow-hidden">
-            <div className="flex items-center gap-3.5">
-              <div className="h-12 w-12 rounded-2xl bg-[#FED7AA] border-2 border-[#161514] flex items-center justify-center text-[#161514] shadow-[2px_2px_0px_0px_#161514] shrink-0">
-                <Trophy className="h-6 w-6 stroke-[2.5]" />
-              </div>
-              <div>
-                <h4 className="text-sm md:text-base font-black text-[#161514] font-heading uppercase tracking-wide">
-                  {studyTarget.examName} Countdown
-                </h4>
-                <p className="text-xs font-semibold text-[#161514]/70 mt-0.5">
-                  Stay consistent with daily study and revision sessions.
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center sm:flex-col sm:items-end gap-1.5 shrink-0">
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-4xl font-black text-[#EA580C] font-heading tracking-tight">{daysLeft}</span>
-                <span className="text-[10px] font-black uppercase tracking-wider text-[#161514] px-2 py-0.5 rounded-lg bg-[#FED7AA] border-2 border-[#161514]">
-                  Days Left
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
-
-
-        {/* Draggable Study Widgets Grid */}
-        <DraggableDashboardGrid
-          storageKey="study"
-          widgets={[
-            {
-              id: "syllabus-tracker",
-              title: "📚 Exam Syllabus & Revision Tracker",
-              component: (
-                <ExamSyllabusTracker
-                  subjects={subjects}
-                  allTopics={allTopics}
-                  onAddTopic={(subjectId, title) => {
-                    addTopicMutation.mutate({
-                      subjectId,
-                      title,
-                      status: "notStarted",
-                      confidence: 1,
-                      estimatedHours: 2,
-                    } as any);
-                    toast.success("Topic added to syllabus! 📚");
-                  }}
-                  onUpdateTopicStatus={(topicId, status, revisionsCount) => {
-                    updateTopicMutation.mutate({
-                      id: topicId,
-                      status: status as any,
-                      revisionsCount,
-                    } as any);
-                  }}
-                  onEditTopic={(topicId, title) => {
-                    updateTopicMutation.mutate({
-                      id: topicId,
-                      title,
-                    } as any);
-                    toast.success("Topic title updated! 📝");
-                  }}
-                  onDeleteTopic={(topicId) => {
-                    deleteTopicMutation.mutate(topicId);
-                    toast.success("Topic removed 🗑️");
-                  }}
-                />
-              ),
-            },
-            {
-              id: "session-logger",
-              title: "✍️ Study Session Logger & Focus Meter",
-              component: (
-                <StudySessionLogger
-                  topics={allTopics}
-                  onLogSession={(data) => {
-                    logSessionMutation.mutate({
-                      durationMinutes: data.durationMinutes,
-                      topicId: data.topicId || "",
-                      notes: data.notes,
-                    } as any);
-                  }}
-                />
-              ),
-            },
-          ]}
-        />
+        {/* Tab Controls */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="w-full overflow-x-auto no-scrollbar pb-1 mb-5">
-            <TabsList className="bg-[#FAF8F5] rounded-2xl p-1.5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex items-center gap-1.5 w-max min-w-full sm:min-w-0 sm:w-auto">
+            <TabsList className="bg-[#FAF8F5] rounded-2xl p-1.5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] flex items-center gap-1.5 w-max min-w-full sm:min-w-0 sm:w-auto">
               <TabsTrigger
                 value="subjects"
-                className="rounded-xl text-xs font-black py-2 px-4 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#C084FC] data-[state=active]:text-[#161514] data-[state=active]:shadow-[2px_2px_0px_0px_#161514] text-[#161514]/70 hover:text-[#161514] hover:bg-white/60 transition-all flex items-center gap-1.5 shrink-0"
+                className="rounded-xl text-xs font-heading font-extrabold py-2 px-3.5 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#C084FC] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#161514] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
               >
-                <span>📚</span>
-                <span>Subjects</span>
+                <BookOpen className="size-3.5 stroke-[2.2]" />
+                <span>Subjects & Syllabus</span>
               </TabsTrigger>
               <TabsTrigger
-                value="analytics"
-                className="rounded-xl text-xs font-black py-2 px-4 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#C084FC] data-[state=active]:text-[#161514] data-[state=active]:shadow-[2px_2px_0px_0px_#161514] text-[#161514]/70 hover:text-[#161514] hover:bg-white/60 transition-all flex items-center gap-1.5 shrink-0"
+                value="sessions"
+                className="rounded-xl text-xs font-heading font-extrabold py-2 px-3.5 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#C084FC] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#161514] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
               >
-                <span>📊</span>
-                <span>Analytics</span>
+                <Clock className="size-3.5 stroke-[2.2]" />
+                <span>Study Sessions</span>
               </TabsTrigger>
               <TabsTrigger
                 value="tests"
-                className="rounded-xl text-xs font-black py-2 px-4 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#C084FC] data-[state=active]:text-[#161514] data-[state=active]:shadow-[2px_2px_0px_0px_#161514] text-[#161514]/70 hover:text-[#161514] hover:bg-white/60 transition-all flex items-center gap-1.5 shrink-0"
+                className="rounded-xl text-xs font-heading font-extrabold py-2 px-3.5 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#C084FC] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#161514] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
               >
-                <span>📝</span>
-                <span>Mock Tests</span>
+                <BarChart2 className="size-3.5 stroke-[2.2]" />
+                <span>Mock Tests & Analytics</span>
               </TabsTrigger>
             </TabsList>
           </div>
 
-          {/* Subjects List Tab */}
-          <TabsContent id="subjects-list" value="subjects" className="scroll-mt-24">
-            {subjectsLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {[1, 2].map((i) => (
-                  <div key={i} className="bg-white rounded-3xl p-5 h-28 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] animate-pulse" />
-                ))}
-              </div>
-            ) : subjects.length === 0 ? (
-              <EmptyState
-                title="Start your learning path! 📖"
-                description="Break down your studies into organized subjects (e.g. Mathematics, Science, Literature) to track topic mastery."
-                Icon={BookOpen}
-                ctaText="Create a Subject"
-                onCtaClick={() => setIsSubjectChoiceOpen(true)}
-                iconBgClass="bg-orange-500/15"
-                iconColorClass="text-orange-500"
-              />
-            ) : (
-              <div className="columns-1 md:columns-2 gap-4 space-y-4 [column-fill:_balance]">
-                {subjects.map((sub) => {
-                  const colors = colorMap[sub.color] || colorMap.orange;
-                  const subTopics = allTopics.filter((t) => t.subjectId === sub.id);
-                  const subCompleted = subTopics.filter((t) => t.status === "completed").length;
-                  const subPercentage = subTopics.length > 0 ? Math.round((subCompleted / subTopics.length) * 100) : 0;
-
-                  return (
-                    <div
-                      key={sub.id}
-                      onClick={() => router.push(`/study/${sub.id}`)}
-                      className="break-inside-avoid block w-full bg-white rounded-3xl p-5 border-[2.5px] border-[#161514] shadow-[3.5px_3.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer select-none flex items-center justify-between"
-                    >
-                      <div className="flex items-center gap-3.5">
-                        <div className={`h-12 w-12 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center shrink-0 ${colors.bg} ${colors.text}`}>
-                          <BookOpen className="h-6 w-6 stroke-[2.5]" />
-                        </div>
-                        <div>
-                          <h4 className="font-black text-sm md:text-base text-[#161514] font-heading leading-tight">{sub.name}</h4>
-                          <span className="text-[10px] font-black text-[#161514]/70 uppercase tracking-wider block mt-1">
-                            {subTopics.length} topic{subTopics.length !== 1 ? "s" : ""} • {subPercentage}% completed
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        {/* Edit & Delete Action Buttons */}
-                        <div className="flex items-center gap-1.5 mr-1" onClick={(e) => e.stopPropagation()}>
-                          <button
-                            onClick={() => {
-                              setEditingSubject(sub);
-                              setEditSubjectName(sub.name);
-                              setEditSubjectColor(sub.color);
-                            }}
-                            className="bg-[#FFFDF8] hover:bg-[#FFF9EA] text-[#161514] p-1.5 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
-                            title="Edit Subject"
-                          >
-                            <Edit3 className="h-3.5 w-3.5 stroke-[2.5]" />
-                          </button>
-                          <button
-                            onClick={() => setDeleteSubjectId(sub.id)}
-                            className="bg-[#FEE2E2] hover:bg-[#FCA5A5] text-[#991B1B] p-1.5 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
-                            title="Delete Subject"
-                          >
-                            <Trash2 className="h-3.5 w-3.5 stroke-[2.5]" />
-                          </button>
-                        </div>
-
-                        {/* Progress ring & chevron */}
-                        <ProgressRing
-                          percentage={subPercentage}
-                          size={34}
-                          strokeWidth={3.5}
-                          colorClass={colors.ring}
-                        />
-                        <div className="bg-[#FAF8F5] p-1.5 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]">
-                          <ChevronRight className="h-4 w-4 text-[#161514] stroke-[3]" />
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+          {/* Tab 1: Subjects & Syllabus */}
+          <TabsContent value="subjects" className="space-y-6 outline-none">
+            {/* Exam Countdown Banner (if configured) */}
+            {studyTarget && daysLeft !== null && (
+              <div className="bg-white rounded-2xl p-4 md:p-5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="size-11 rounded-xl bg-[#FED7AA] border-2 border-[#161514] flex items-center justify-center text-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] shrink-0">
+                    <Trophy className="size-5 stroke-[2.5]" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-heading font-black text-[#161514] uppercase tracking-wide">
+                      {studyTarget.examName} Countdown
+                    </h4>
+                    <p className="text-xs font-medium text-[#161514]/70">
+                      Stay consistent with daily study and revision sessions.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-baseline gap-2 shrink-0">
+                  <span className="text-3xl font-heading font-black text-[#EA580C]">{daysLeft}</span>
+                  <span className="text-[10px] font-heading font-black uppercase text-[#161514] px-2 py-0.5 rounded-lg bg-[#FED7AA] border border-[#161514]">
+                    Days Left
+                  </span>
+                </div>
               </div>
             )}
-          </TabsContent>
 
-          {/* Analytics Tab */}
-          <TabsContent value="analytics">
-            <div className="space-y-6">
-              {/* Stat summary grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-white rounded-3xl p-5 border-[2.5px] border-[#161514] shadow-[3.5px_3.5px_0px_0px_#161514] flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-2xl bg-[#FED7AA] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center text-[#161514] shrink-0">
-                    <Clock className="h-6 w-6 stroke-[2.5]" />
-                  </div>
-                  <div>
-                    <h5 className="text-[10px] font-black text-[#161514]/70 uppercase tracking-wider">Logged Hours</h5>
-                    <p className="text-2xl font-black text-[#161514] font-heading tracking-tight mt-0.5">{totalLoggedHours}h</p>
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-3xl p-5 border-[2.5px] border-[#161514] shadow-[3.5px_3.5px_0px_0px_#161514] flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-2xl bg-[#CEF431] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center text-[#161514] shrink-0">
-                    <Trophy className="h-6 w-6 stroke-[2.5]" />
-                  </div>
-                  <div>
-                    <h5 className="text-[10px] font-black text-[#161514]/70 uppercase tracking-wider">Mastery Rate</h5>
-                    <p className="text-2xl font-black text-[#161514] font-heading tracking-tight mt-0.5">{masteryRate}%</p>
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-3xl p-5 border-[2.5px] border-[#161514] shadow-[3.5px_3.5px_0px_0px_#161514] flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-2xl bg-[#FCA5A5] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center text-[#161514] shrink-0">
-                    <AlertCircle className="h-6 w-6 stroke-[2.5]" />
-                  </div>
-                  <div>
-                    <h5 className="text-[10px] font-black text-[#161514]/70 uppercase tracking-wider">Revision Due</h5>
-                    <p className="text-2xl font-black text-[#161514] font-heading tracking-tight mt-0.5">{revisionDueCount} topic{revisionDueCount !== 1 ? "s" : ""}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Bar Chart Logged study hours */}
-              <div className="bg-white rounded-3xl p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
-                <h3 className="font-black text-sm text-[#161514] uppercase tracking-wider font-heading flex items-center gap-2">
-                  <BarChart2 className="h-4 w-4 stroke-[2.5]" /> Daily Study Hours Trend
+            {/* Subjects List */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xs font-heading font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5">
+                  <BookOpen className="size-3.5 text-purple-700" />
+                  <span>Subjects</span>
+                  <span className="bg-[#CEF431] text-[#161514] text-[10px] px-2 py-0.5 rounded-full border-2 border-[#161514] font-black shadow-[1px_1px_0px_0px_#161514]">
+                    {subjects.length}
+                  </span>
                 </h3>
-                {sessions.length === 0 ? (
-                  <EmptyState
-                    title="No study sessions logged yet! ⏱️"
-                    description="Start the stopwatch or log a study session in any topic to see your weekly study trend analytics."
-                    Icon={Clock}
-                    ctaText="Go to Subjects"
-                    onCtaClick={() => setActiveTab("subjects")}
-                    iconBgClass="bg-orange-500/15"
-                    iconColorClass="text-orange-500"
-                  />
-                ) : (
-                  <div className="h-64 w-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={barChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                        <XAxis dataKey="name" stroke="#161514" fontSize={11} fontWeight={800} tickLine={false} axisLine={false} />
-                        <YAxis stroke="#161514" fontSize={11} fontWeight={800} tickLine={false} axisLine={false} tickFormatter={(v) => `${v}h`} />
-                        <Tooltip formatter={(v) => [`${v}h`, "Logged study hours"]} contentStyle={{ borderRadius: "12px", border: "2px solid #161514", boxShadow: "2px 2px 0px 0px #161514", fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: "12px" }} />
-                        <Bar dataKey="hours" radius={[8, 8, 0, 0]}>
-                          {barChartData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.hours >= 3.0 ? "#03D26F" : entry.hours >= 1.5 ? "#FACC15" : "#FB923C"} stroke="#161514" strokeWidth={1.5} />
-                          ))}
-                        </Bar>
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                )}
+                <button
+                  type="button"
+                  onClick={() => setIsSubjectChoiceOpen(true)}
+                  className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514] bg-[#CEF431] border-2 border-[#161514] px-2.5 py-1 rounded-xl shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
+                >
+                  + Add Subject
+                </button>
               </div>
+
+              {subjectsLoading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {[1, 2].map((i) => (
+                    <div key={i} className="bg-white rounded-2xl p-5 h-24 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] animate-pulse" />
+                  ))}
+                </div>
+              ) : subjects.length === 0 ? (
+                <EmptyState
+                  title="Start your learning path"
+                  description="Break down your studies into organized subjects (e.g. Mathematics, Science, Literature) to track topic mastery."
+                  Icon={BookOpen}
+                  ctaText="Create a Subject"
+                  onCtaClick={() => setIsSubjectChoiceOpen(true)}
+                  iconBgClass="bg-orange-500/15"
+                  iconColorClass="text-orange-500"
+                />
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                  {subjects.map((sub) => {
+                    const colors = colorMap[sub.color] || colorMap.orange;
+                    const subTopics = allTopics.filter((t) => t.subjectId === sub.id);
+                    const subCompleted = subTopics.filter((t) => t.status === "completed").length;
+                    const subPercentage = subTopics.length > 0 ? Math.round((subCompleted / subTopics.length) * 100) : 0;
+
+                    return (
+                      <div
+                        key={sub.id}
+                        onClick={() => router.push(`/study/${sub.id}`)}
+                        className="w-full bg-white rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer select-none flex items-center justify-between"
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className={`size-10 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center justify-center shrink-0 ${colors.bg} ${colors.text}`}>
+                            <BookOpen className="size-5 stroke-[2.2]" />
+                          </div>
+                          <div className="min-w-0">
+                            <h4 className="font-heading font-black text-sm text-[#161514] truncate">{sub.name}</h4>
+                            <span className="text-[10px] font-bold text-[#161514]/70 uppercase tracking-wider block mt-0.5">
+                              {subTopics.length} topic{subTopics.length !== 1 ? "s" : ""} • {subPercentage}% mastered
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 shrink-0">
+                          <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                            <button
+                              onClick={() => {
+                                setEditingSubject(sub);
+                                setEditSubjectName(sub.name);
+                                setEditSubjectColor(sub.color);
+                              }}
+                              className="bg-[#FFFDF8] hover:bg-[#FFF9EA] text-[#161514] p-1.5 rounded-lg border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514] transition-all cursor-pointer"
+                              title="Edit Subject"
+                            >
+                              <Edit3 className="size-3.5 stroke-[2.2]" />
+                            </button>
+                            <button
+                              onClick={() => setDeleteSubjectId(sub.id)}
+                              className="bg-[#FEE2E2] hover:bg-[#FCA5A5] text-[#991B1B] p-1.5 rounded-lg border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514] transition-all cursor-pointer"
+                              title="Archive Subject"
+                            >
+                              <Trash2 className="size-3.5 stroke-[2.2]" />
+                            </button>
+                          </div>
+
+                          <ProgressRing
+                            percentage={subPercentage}
+                            size={32}
+                            strokeWidth={3}
+                            colorClass={colors.ring}
+                          />
+                          <div className="bg-[#FAF8F5] p-1 rounded-lg border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
+                            <ChevronRight className="size-3.5 text-[#161514] stroke-[3]" />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Exam Syllabus Tracker */}
+            <div className="pt-2">
+              <ExamSyllabusTracker
+                subjects={subjects}
+                allTopics={allTopics}
+                onAddTopic={(subjectId, title) => {
+                  addTopicMutation.mutate({
+                    subjectId,
+                    title,
+                    status: "notStarted",
+                    confidence: 1,
+                    estimatedHours: 2,
+                  } as any);
+                  toast.success("Topic added to syllabus!");
+                }}
+                onUpdateTopicStatus={(topicId, status, revisionsCount) => {
+                  updateTopicMutation.mutate({
+                    id: topicId,
+                    status: status as any,
+                    revisionsCount,
+                  } as any);
+                }}
+                onEditTopic={(topicId, title) => {
+                  updateTopicMutation.mutate({
+                    id: topicId,
+                    title,
+                  } as any);
+                  toast.success("Topic title updated!");
+                }}
+                onDeleteTopic={(topicId) => {
+                  deleteTopicMutation.mutate(topicId);
+                  toast.success("Topic removed");
+                }}
+              />
             </div>
           </TabsContent>
 
-          {/* Mock Tests Tab */}
-          <TabsContent id="mock-tests" value="tests" className="scroll-mt-24">
-            <div className="space-y-6">
+          {/* Tab 2: Study Sessions */}
+          <TabsContent value="sessions" className="space-y-6 outline-none">
+            <StudySessionLogger
+              topics={allTopics}
+              onLogSession={(data) => {
+                logSessionMutation.mutate({
+                  durationMinutes: data.durationMinutes,
+                  topicId: data.topicId || "",
+                  notes: data.notes,
+                } as any);
+              }}
+            />
+          </TabsContent>
+
+          {/* Tab 3: Mock Tests & Analytics */}
+          <TabsContent value="tests" className="space-y-6 outline-none">
+            {/* Stat summary grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+              <div className="bg-white rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex items-center gap-3.5">
+                <div className="size-11 rounded-xl bg-[#FED7AA] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center justify-center text-[#161514] shrink-0">
+                  <Clock className="size-5 stroke-[2.2]" />
+                </div>
+                <div>
+                  <h5 className="text-[10px] font-heading font-black text-[#161514]/70 uppercase tracking-wider">Logged Hours</h5>
+                  <p className="text-xl font-heading font-black text-[#161514] mt-0.5">{totalLoggedHours}h</p>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex items-center gap-3.5">
+                <div className="size-11 rounded-xl bg-[#CEF431] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center justify-center text-[#161514] shrink-0">
+                  <Trophy className="size-5 stroke-[2.2]" />
+                </div>
+                <div>
+                  <h5 className="text-[10px] font-heading font-black text-[#161514]/70 uppercase tracking-wider">Mastery Rate</h5>
+                  <p className="text-xl font-heading font-black text-[#161514] mt-0.5">{masteryRate}%</p>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex items-center gap-3.5">
+                <div className="size-11 rounded-xl bg-[#FCA5A5] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center justify-center text-[#161514] shrink-0">
+                  <AlertCircle className="size-5 stroke-[2.2]" />
+                </div>
+                <div>
+                  <h5 className="text-[10px] font-heading font-black text-[#161514]/70 uppercase tracking-wider">Revision Due</h5>
+                  <p className="text-xl font-heading font-black text-[#161514] mt-0.5">{revisionDueCount} topic{revisionDueCount !== 1 ? "s" : ""}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Daily study hours trend chart */}
+            <div className="bg-white rounded-2xl p-5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-3">
+              <h3 className="font-heading font-black text-xs text-[#161514] uppercase tracking-wider flex items-center gap-2">
+                <BarChart2 className="size-4 stroke-[2.5]" /> Daily Study Hours Trend
+              </h3>
+              {sessions.length === 0 ? (
+                <EmptyState
+                  title="No study sessions logged yet"
+                  description="Start the stopwatch or log a study session in any topic to see your weekly study trend analytics."
+                  Icon={Clock}
+                  ctaText="Go to Subjects"
+                  onCtaClick={() => setActiveTab("subjects")}
+                  iconBgClass="bg-orange-500/15"
+                  iconColorClass="text-orange-500"
+                />
+              ) : (
+                <div className="h-56 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={barChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                      <XAxis dataKey="name" stroke="#161514" fontSize={11} fontWeight={800} tickLine={false} axisLine={false} />
+                      <YAxis stroke="#161514" fontSize={11} fontWeight={800} tickLine={false} axisLine={false} tickFormatter={(v) => `${v}h`} />
+                      <Tooltip formatter={(v) => [`${v}h`, "Logged study hours"]} contentStyle={{ borderRadius: "12px", border: "2px solid #161514", boxShadow: "2px 2px 0px 0px #161514", fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: "12px" }} />
+                      <Bar dataKey="hours" radius={[6, 6, 0, 0]}>
+                        {barChartData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.hours >= 3.0 ? "#03D26F" : entry.hours >= 1.5 ? "#FACC15" : "#FB923C"} stroke="#161514" strokeWidth={1.5} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </div>
+
+            {/* Mock Tests Section */}
+            <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="font-black text-sm uppercase tracking-wider text-[#161514] font-heading flex items-center gap-2">
-                  <FileText className="h-4 w-4 stroke-[2.5]" /> Exam Mock Scores
+                <h3 className="font-heading font-black text-xs uppercase tracking-wider text-[#161514] flex items-center gap-2">
+                  <FileText className="size-4 stroke-[2.2]" /> Exam Mock Scores
                 </h3>
                 <button
                   type="button"
                   onClick={() => setIsTestChoiceOpen(true)}
-                  className="bg-[#CEF431] hover:bg-[#b8dd24] text-[#161514] font-black text-xs uppercase py-2 px-4 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center gap-1.5"
+                  className="bg-[#CEF431] hover:bg-[#b8dd24] text-[#161514] font-heading font-black text-xs uppercase py-1.5 px-3 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer transition-all flex items-center gap-1.5"
                 >
-                  <Plus className="h-4 w-4 stroke-[3]" /> Log Test
+                  <Plus className="size-3.5 stroke-[3]" /> Log Test
                 </button>
               </div>
 
               {tests.length === 0 ? (
                 <EmptyState
-                  title="Track your readiness! 📝"
+                  title="Track your readiness"
                   description="Keep track of mock exam sheets or test results to gauge syllabus readiness."
                   Icon={FileText}
                   ctaText="Log Mock Test"
@@ -591,36 +661,36 @@ function StudyPageContent() {
               ) : (
                 <div className="space-y-4">
                   {/* Scores line chart */}
-                  <div className="bg-white rounded-3xl p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] h-64 w-full">
+                  <div className="bg-white rounded-2xl p-5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] h-56 w-full">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={testTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                         <XAxis dataKey="name" stroke="#161514" fontSize={11} fontWeight={800} tickLine={false} axisLine={false} />
                         <YAxis stroke="#161514" fontSize={11} fontWeight={800} tickLine={false} axisLine={false} tickFormatter={(v) => `${v}%`} domain={[0, 100]} />
                         <Tooltip formatter={(v) => [`${v}%`, "Test score"]} contentStyle={{ borderRadius: "12px", border: "2px solid #161514", boxShadow: "2px 2px 0px 0px #161514", fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: "12px" }} />
-                        <Line type="monotone" dataKey="percentage" stroke="#C084FC" strokeWidth={3.5} activeDot={{ r: 6, stroke: "#161514", strokeWidth: 2 }} />
+                        <Line type="monotone" dataKey="percentage" stroke="#C084FC" strokeWidth={3} activeDot={{ r: 5, stroke: "#161514", strokeWidth: 2 }} />
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
 
                   {/* List of tests */}
-                  <div className="space-y-3">
+                  <div className="space-y-2.5">
                     {tests.map((test) => {
                       const scorePercentage = test.totalScore > 0 ? Math.round((test.score / test.totalScore) * 100) : 0;
                       return (
                         <div
                           key={test.id}
-                          className="bg-white rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex items-center justify-between hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all"
+                          className="bg-white rounded-xl p-3.5 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-between hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all"
                         >
                           <div>
-                            <h4 className="font-black text-sm text-[#161514] font-heading">{test.name}</h4>
+                            <h4 className="font-heading font-black text-xs text-[#161514]">{test.name}</h4>
                             <p className="text-[10px] font-bold text-[#161514]/70 uppercase tracking-wider mt-0.5">{test.date}</p>
                           </div>
-                          <div className="flex items-center gap-4 shrink-0">
+                          <div className="flex items-center gap-3 shrink-0">
                             <div className="text-right">
-                              <span className="text-base font-black text-[#161514] font-heading">{test.score}/{test.totalScore}</span>
-                              <p className="text-[10px] font-black text-[#161514] px-2 py-0.5 rounded-lg border-2 border-[#161514] bg-[#A7F3D0] uppercase tracking-wider mt-0.5">{scorePercentage}% Score</p>
+                              <span className="text-sm font-heading font-black text-[#161514]">{test.score}/{test.totalScore}</span>
+                              <p className="text-[9px] font-heading font-black text-[#161514] px-1.5 py-0.5 rounded-md border border-[#161514] bg-[#A7F3D0] uppercase tracking-wider mt-0.5">{scorePercentage}% Score</p>
                             </div>
-                            <div className="flex items-center gap-1.5">
+                            <div className="flex items-center gap-1">
                               <button
                                 onClick={() => {
                                   setEditingTest(test);
@@ -629,17 +699,17 @@ function StudyPageContent() {
                                   setEditTestScore(test.score);
                                   setEditTestTotalScore(test.totalScore);
                                 }}
-                                className="bg-[#FFFDF8] hover:bg-[#FFF9EA] text-[#161514] p-1.5 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
+                                className="bg-[#FFFDF8] hover:bg-[#FFF9EA] text-[#161514] p-1.5 rounded-lg border border-[#161514] shadow-[1px_1px_0px_0px_#161514] transition-all cursor-pointer"
                                 title="Edit test score"
                               >
-                                <Edit3 className="h-3.5 w-3.5 stroke-[2.5]" />
+                                <Edit3 className="size-3.5 stroke-[2.2]" />
                               </button>
                               <button
                                 onClick={() => setDeleteTestId(test.id)}
-                                className="bg-[#FEE2E2] hover:bg-[#FCA5A5] text-[#991B1B] p-1.5 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
+                                className="bg-[#FEE2E2] hover:bg-[#FCA5A5] text-[#991B1B] p-1.5 rounded-lg border border-[#161514] shadow-[1px_1px_0px_0px_#161514] transition-all cursor-pointer"
                                 title="Delete test log"
                               >
-                                <Trash2 className="h-3.5 w-3.5 stroke-[2.5]" />
+                                <Trash2 className="size-3.5 stroke-[2.2]" />
                               </button>
                             </div>
                           </div>
@@ -693,7 +763,7 @@ function StudyPageContent() {
       >
         <form onSubmit={handleAddSubject} className="space-y-4">
           <div className="space-y-1">
-            <label htmlFor="subj-name" className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">
+            <label htmlFor="subj-name" className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514] block">
               Subject Name
             </label>
             <input
@@ -708,7 +778,7 @@ function StudyPageContent() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">
+            <label className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514] block">
               Select Color
             </label>
             <div className="flex gap-2.5 flex-wrap">
@@ -731,20 +801,20 @@ function StudyPageContent() {
                     key={c}
                     type="button"
                     onClick={() => setSubjectColor(c)}
-                    className={`h-9 w-9 rounded-xl transition-all border-2 border-[#161514] cursor-pointer shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 ${bgClass} ${isSelected ? "ring-2 ring-offset-2 ring-[#161514] scale-110" : ""}`}
+                    className={`h-9 w-9 rounded-xl transition-all border-2 border-[#161514] cursor-pointer shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] ${bgClass} ${isSelected ? "ring-2 ring-offset-2 ring-[#161514] scale-110" : ""}`}
                   />
                 );
               })}
             </div>
           </div>
 
-          <button
+          <Button
             type="submit"
             disabled={addSubjectMutation.isPending}
-            className="w-full bg-[#03D26F] hover:bg-[#02B75F] text-[#161514] font-black text-xs uppercase py-3 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer tracking-wider"
+            className="w-full bg-[#03D26F] hover:bg-[#02B75F] text-[#161514] font-heading font-black text-xs uppercase py-3 rounded-xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-pointer tracking-wider"
           >
-            {addSubjectMutation.isPending ? "Adding…" : "Create Subject 📚"}
-          </button>
+            {addSubjectMutation.isPending ? "Adding…" : "Create Subject"}
+          </Button>
         </form>
       </ResponsiveFormContainer>
 
@@ -757,7 +827,7 @@ function StudyPageContent() {
       >
         <form onSubmit={handleAddTest} className="space-y-4">
           <div className="space-y-1">
-            <label htmlFor="test-title" className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">
+            <label htmlFor="test-title" className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514] block">
               Test Name / Title
             </label>
             <input
@@ -773,7 +843,7 @@ function StudyPageContent() {
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label htmlFor="test-score" className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">
+              <label htmlFor="test-score" className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514] block">
                 Your Score
               </label>
               <input
@@ -787,7 +857,7 @@ function StudyPageContent() {
               />
             </div>
             <div className="space-y-1">
-              <label htmlFor="test-total" className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">
+              <label htmlFor="test-total" className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514] block">
                 Total Score
               </label>
               <input
@@ -803,7 +873,7 @@ function StudyPageContent() {
           </div>
 
           <div className="space-y-1">
-            <label htmlFor="test-date" className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">
+            <label htmlFor="test-date" className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514] block">
               Test Date
             </label>
             <input
@@ -816,13 +886,13 @@ function StudyPageContent() {
             />
           </div>
 
-          <button
+          <Button
             type="submit"
             disabled={addTestMutation.isPending}
-            className="w-full bg-[#03D26F] hover:bg-[#02B75F] text-[#161514] font-black text-xs uppercase py-3 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer tracking-wider"
+            className="w-full bg-[#03D26F] hover:bg-[#02B75F] text-[#161514] font-heading font-black text-xs uppercase py-3 rounded-xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-pointer tracking-wider"
           >
-            {addTestMutation.isPending ? "Logging…" : "Log Score 📝"}
-          </button>
+            {addTestMutation.isPending ? "Logging…" : "Log Score"}
+          </Button>
         </form>
       </ResponsiveFormContainer>
 
@@ -837,7 +907,7 @@ function StudyPageContent() {
       >
         <form onSubmit={handleUpdateSubject} className="space-y-4">
           <div className="space-y-1">
-            <label htmlFor="edit-subject-name" className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">
+            <label htmlFor="edit-subject-name" className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514] block">
               Subject Name
             </label>
             <input
@@ -852,7 +922,7 @@ function StudyPageContent() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">Theme Color</label>
+            <label className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514] block">Theme Color</label>
             <div className="flex gap-2.5 flex-wrap">
               {["orange", "amber", "mint", "lavender", "coral", "indigo"].map((c) => {
                 const isSelected = editSubjectColor === c;
@@ -873,20 +943,20 @@ function StudyPageContent() {
                     key={c}
                     type="button"
                     onClick={() => setEditSubjectColor(c)}
-                    className={`h-9 w-9 rounded-xl transition-all border-2 border-[#161514] cursor-pointer shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 ${bgClass} ${isSelected ? "ring-2 ring-offset-2 ring-[#161514] scale-110" : ""}`}
+                    className={`h-9 w-9 rounded-xl transition-all border-2 border-[#161514] cursor-pointer shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] ${bgClass} ${isSelected ? "ring-2 ring-offset-2 ring-[#161514] scale-110" : ""}`}
                   />
                 );
               })}
             </div>
           </div>
 
-          <button
+          <Button
             type="submit"
             disabled={updateSubjectMutation.isPending}
-            className="w-full bg-[#03D26F] hover:bg-[#02B75F] text-[#161514] font-black text-xs uppercase py-3 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer tracking-wider"
+            className="w-full bg-[#03D26F] hover:bg-[#02B75F] text-[#161514] font-heading font-black text-xs uppercase py-3 rounded-xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-pointer tracking-wider"
           >
-            {updateSubjectMutation.isPending ? "Updating…" : "Save Changes 📝"}
-          </button>
+            {updateSubjectMutation.isPending ? "Updating…" : "Save Changes"}
+          </Button>
         </form>
       </ResponsiveFormContainer>
 
@@ -910,6 +980,7 @@ function StudyPageContent() {
         title="Archive Subject"
         description="Are you sure you want to archive this subject? You will not lose study statistics."
       />
+
       {/* Edit Mock Test Dialog Form */}
       <ResponsiveFormContainer
         open={editingTest !== null}
@@ -921,7 +992,7 @@ function StudyPageContent() {
       >
         <form onSubmit={handleUpdateTest} className="space-y-4">
           <div className="space-y-1">
-            <label htmlFor="edit-test-title" className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">
+            <label htmlFor="edit-test-title" className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514] block">
               Test Name / Title
             </label>
             <input
@@ -937,7 +1008,7 @@ function StudyPageContent() {
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label htmlFor="edit-test-score" className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">
+              <label htmlFor="edit-test-score" className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514] block">
                 Your Score
               </label>
               <input
@@ -951,7 +1022,7 @@ function StudyPageContent() {
               />
             </div>
             <div className="space-y-1">
-              <label htmlFor="edit-test-total" className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">
+              <label htmlFor="edit-test-total" className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514] block">
                 Total Score
               </label>
               <input
@@ -967,7 +1038,7 @@ function StudyPageContent() {
           </div>
 
           <div className="space-y-1">
-            <label htmlFor="edit-test-date" className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">
+            <label htmlFor="edit-test-date" className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514] block">
               Test Date
             </label>
             <input
@@ -980,13 +1051,13 @@ function StudyPageContent() {
             />
           </div>
 
-          <button
+          <Button
             type="submit"
             disabled={updateTestMutation.isPending}
-            className="w-full bg-[#03D26F] hover:bg-[#02B75F] text-[#161514] font-black text-xs uppercase py-3 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer tracking-wider"
+            className="w-full bg-[#03D26F] hover:bg-[#02B75F] text-[#161514] font-heading font-black text-xs uppercase py-3 rounded-xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-pointer tracking-wider"
           >
-            {updateTestMutation.isPending ? "Saving…" : "Save Changes 📝"}
-          </button>
+            {updateTestMutation.isPending ? "Saving…" : "Save Changes"}
+          </Button>
         </form>
       </ResponsiveFormContainer>
 

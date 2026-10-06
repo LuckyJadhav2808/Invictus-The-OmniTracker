@@ -3,6 +3,8 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { StreakFreezeModel } from "@/models/StreakFreeze";
 import { format } from "date-fns";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);

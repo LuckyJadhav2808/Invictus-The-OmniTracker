@@ -1,39 +1,65 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
-  <defs>
-    <linearGradient id="invictus-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#F59E0B" />
-      <stop offset="50%" stop-color="#FB7185" />
-      <stop offset="100%" stop-color="#6366F1" />
-    </linearGradient>
-  </defs>
+  <!-- Neobrutalist Electric Lime Squircle Container -->
+  <rect x="16" y="16" width="480" height="480" rx="120" fill="#CEF431" stroke="#161514" stroke-width="24" stroke-linejoin="round" />
 
-  <!-- Squircle Container -->
-  <rect width="512" height="512" rx="124" fill="url(#invictus-gradient)" />
-  <rect x="20" y="20" width="472" height="472" rx="104" fill="none" stroke="#1E232A" stroke-width="20" />
+  <!-- Hard Drop Shadow for Helmet -->
+  <path
+    d="M142 126 H394 V386 H142 Z"
+    fill="#161514"
+    rx="44"
+    transform="translate(12, 12)"
+  />
 
-  <!-- Monogram "I" -->
-  <g transform="translate(10, 10)">
+  <!-- GLADIATOR CREST / PLUME -->
+  <g id="crest">
+    <!-- Plume Bristles -->
     <path
-      d="M160 110 H332 M246 110 V382 M160 382 H332"
-      stroke="#1E232A"
-      stroke-width="64"
-      stroke-linecap="round"
+      d="M180 110C170 36 225 18 256 18C287 18 342 36 332 110H180Z"
+      fill="#E61919"
+      stroke="#161514"
+      stroke-width="18"
       stroke-linejoin="round"
     />
-    <path
-      d="M160 110 H332 M246 110 V382 M160 382 H332"
-      stroke="#FFFFFF"
-      stroke-width="36"
-      stroke-linecap="round"
+    <!-- Segmented Plume Cuts -->
+    <line x1="220" y1="96" x2="214" y2="44" stroke="#161514" stroke-width="14" stroke-linecap="round" />
+    <line x1="256" y1="92" x2="256" y2="30" stroke="#161514" stroke-width="14" stroke-linecap="round" />
+    <line x1="292" y1="96" x2="298" y2="44" stroke="#161514" stroke-width="14" stroke-linecap="round" />
+    
+    <!-- Plume Base Bracket -->
+    <rect x="210" y="94" width="92" height="28" rx="8" fill="#FFB800" stroke="#161514" stroke-width="16" stroke-linejoin="round" />
+  </g>
+
+  <!-- HELMET CHASSIS -->
+  <g id="helmet">
+    <!-- Ear Bolts / Antenna -->
+    <rect x="100" y="210" width="34" height="76" rx="10" fill="#CBD5E1" stroke="#161514" stroke-width="18" stroke-linejoin="round" />
+    <rect x="378" y="210" width="34" height="76" rx="10" fill="#CBD5E1" stroke="#161514" stroke-width="18" stroke-linejoin="round" />
+
+    <!-- Helmet Dome -->
+    <rect x="126" y="112" width="260" height="264" rx="44" fill="#FFFDF8" stroke="#161514" stroke-width="22" stroke-linejoin="round" />
+
+    <!-- Brow Band -->
+    <line x1="126" y1="168" x2="386" y2="168" stroke="#161514" stroke-width="18" stroke-linecap="round" />
+    <circle cx="162" cy="140" r="10" fill="#161514" />
+    <circle cx="350" cy="140" r="10" fill="#161514" />
+    <rect x="236" y="126" width="40" height="26" rx="6" fill="#CEF431" stroke="#161514" stroke-width="12" />
+
+    <!-- DIGITAL VISOR -->
+    <rect x="156" y="186" width="200" height="114" rx="20" fill="#161514" stroke="#161514" stroke-width="14" />
+
+    <!-- Visor Eyes (Cyan LED) -->
+    <rect x="186" y="216" width="42" height="42" rx="12" fill="#38BDF8" />
+    <rect x="284" y="216" width="42" height="42" rx="12" fill="#38BDF8" />
+    <circle cx="202" cy="230" r="7" fill="#FFFFFF" />
+    <circle cx="300" cy="230" r="7" fill="#FFFFFF" />
+
+    <!-- INVICTUS 'V' CHEST / CHIN EMBLEM -->
+    <polygon
+      points="256,420 195,316 230,316 256,368 282,316 317,316"
+      fill="#CEF431"
+      stroke="#161514"
+      stroke-width="16"
       stroke-linejoin="round"
     />
-    <!-- Central Polaris Sparkle Star -->
-    <path
-      d="M246 160 Q246 246 332 246 Q246 246 246 332 Q246 246 160 246 Q246 246 246 160 Z"
-      fill="#F59E0B"
-      stroke="#1E232A"
-      stroke-width="12"
-    />
-    <circle cx="246" cy="246" r="16" fill="#FFFFFF" />
   </g>
 </svg>

@@ -5,11 +5,10 @@ import { useHabits, useStreaks } from "@/lib/queries/goals";
 import { useSubjects, useStudySessions, useTests } from "@/lib/queries/study";
 import { useCategories, useTransactions } from "@/lib/queries/money";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, BookOpen, Wallet, Flame, Trophy, Award, Clock } from "lucide-react";
+import { Calendar, BookOpen, Wallet, Flame, Trophy, Award, Clock, BarChart2 } from "lucide-react";
 import { format, startOfWeek, addDays } from "date-fns";
 import { cn } from "@/lib/utils";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Legend, PieChart, Pie, Cell, LineChart, Line } from "recharts";
-import { SpaceHeroBanner } from "@/components/shared/SpaceHeroBanner";
 import { useUIStore } from "@/store/ui-store";
 import { YearlyActivityMatrix } from "@/components/profile/YearlyActivityMatrix";
 import { useAuth } from "@/components/shared/AuthProvider";
@@ -135,47 +134,78 @@ export default function AnalyticsHubPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] pb-24 p-3 sm:p-6 md:p-8 space-y-6">
+    <div className="min-h-screen bg-cream-bg p-4 md:p-8 space-y-6">
       <div className="max-w-5xl mx-auto space-y-6">
-        {/* Space Hero Banner */}
-        <SpaceHeroBanner
-          space="analytics"
-          badgeText="Performance & Analytics Hub"
-          title="Unified Life Intelligence."
-          subtitle="Cross-module tracking metrics, study trends, and financial health."
-          stats={[
-            { label: "Total Habits", value: `${totalHabits}`, icon: "🌱" },
-            { label: "Study Logged", value: `${totalStudyHours}h`, icon: "📚" },
-            { label: "Net Savings", value: `${currencySymbol}${netBalance.toLocaleString()}`, icon: "💰" },
-          ]}
-        />
+        {/* Clean Neobrutalist Analytics Header Card */}
+        <div className="neo-card p-5 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-heading font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border-2 border-[#161514] bg-[#7DD3FC] text-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center gap-1">
+                <BarChart2 className="size-3 stroke-[2.5]" />
+                <span>Analytics & Insights</span>
+              </span>
+            </div>
+            <h1 className="text-xl sm:text-2xl font-heading font-black text-[#161514] tracking-tight">
+              Life Momentum Hub
+            </h1>
+            <p className="text-xs font-medium text-[#161514]/70 max-w-lg">
+              Cross-module tracking metrics, habit consistency, study volume, and financial performance.
+            </p>
+          </div>
+
+          {/* Quick Metrics */}
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <div className="px-3 py-2 rounded-xl border-2 border-[#161514] bg-[#FAF8F5] shadow-[2px_2px_0px_0px_#161514] text-center min-w-[70px]">
+              <span className="text-[9px] font-heading font-black uppercase text-[#161514]/60 block leading-tight">Habits</span>
+              <span className="text-sm font-heading font-black text-[#161514]">{totalHabits}</span>
+            </div>
+            <div className="px-3 py-2 rounded-xl border-2 border-[#161514] bg-purple-50 shadow-[2px_2px_0px_0px_#161514] text-center min-w-[70px]">
+              <span className="text-[9px] font-heading font-black uppercase text-purple-700 block leading-tight">Studied</span>
+              <span className="text-sm font-heading font-black text-[#161514] flex items-center justify-center gap-1">
+                <Clock className="size-3 text-purple-700" />
+                {totalStudyHours}h
+              </span>
+            </div>
+            <div className="px-3 py-2 rounded-xl border-2 border-[#161514] bg-emerald-50 shadow-[2px_2px_0px_0px_#161514] text-center min-w-[70px]">
+              <span className="text-[9px] font-heading font-black uppercase text-emerald-800 block leading-tight">Savings</span>
+              <span className="text-sm font-heading font-black text-emerald-950 flex items-center justify-center gap-1">
+                <Wallet className="size-3 text-emerald-700" />
+                {currencySymbol}{netBalance.toLocaleString()}
+              </span>
+            </div>
+          </div>
+        </div>
 
         {/* Tab Controls */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="bg-white rounded-2xl sm:rounded-3xl p-2 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] flex w-full max-w-[560px] mb-6 gap-1.5 overflow-x-auto no-scrollbar">
+          <TabsList className="bg-white rounded-2xl sm:rounded-3xl p-1.5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex w-full max-w-[560px] mb-6 gap-1.5 overflow-x-auto no-scrollbar">
             <TabsTrigger
               value="goals"
-              className="flex-1 rounded-xl sm:rounded-2xl text-xs font-black py-2.5 uppercase tracking-wider border-2 border-transparent transition-all cursor-pointer data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:border-[#161514] data-[state=active]:shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+              className="flex-1 rounded-xl sm:rounded-2xl text-xs font-heading font-extrabold py-2 uppercase tracking-wider border-2 border-transparent transition-all cursor-pointer data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:border-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center justify-center gap-1.5"
             >
-              Goals
+              <Flame className="size-3.5" />
+              <span>Goals</span>
             </TabsTrigger>
             <TabsTrigger
               value="study"
-              className="flex-1 rounded-xl sm:rounded-2xl text-xs font-black py-2.5 uppercase tracking-wider border-2 border-transparent transition-all cursor-pointer data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:border-[#161514] data-[state=active]:shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+              className="flex-1 rounded-xl sm:rounded-2xl text-xs font-heading font-extrabold py-2 uppercase tracking-wider border-2 border-transparent transition-all cursor-pointer data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:border-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center justify-center gap-1.5"
             >
-              Study
+              <BookOpen className="size-3.5" />
+              <span>Study</span>
             </TabsTrigger>
             <TabsTrigger
               value="money"
-              className="flex-1 rounded-xl sm:rounded-2xl text-xs font-black py-2.5 uppercase tracking-wider border-2 border-transparent transition-all cursor-pointer data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:border-[#161514] data-[state=active]:shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+              className="flex-1 rounded-xl sm:rounded-2xl text-xs font-heading font-extrabold py-2 uppercase tracking-wider border-2 border-transparent transition-all cursor-pointer data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:border-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center justify-center gap-1.5"
             >
-              Money
+              <Wallet className="size-3.5" />
+              <span>Money</span>
             </TabsTrigger>
             <TabsTrigger
               value="matrix"
-              className="flex-1 rounded-xl sm:rounded-2xl text-xs font-black py-2.5 uppercase tracking-wider border-2 border-transparent transition-all cursor-pointer data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:border-[#161514] data-[state=active]:shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+              className="flex-1 rounded-xl sm:rounded-2xl text-xs font-heading font-extrabold py-2 uppercase tracking-wider border-2 border-transparent transition-all cursor-pointer data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:border-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center justify-center gap-1.5"
             >
-              ⚡ Matrix
+              <Calendar className="size-3.5" />
+              <span>Matrix</span>
             </TabsTrigger>
           </TabsList>
 

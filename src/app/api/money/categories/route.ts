@@ -3,20 +3,12 @@ import mongoose from "mongoose";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Category } from "@/models/Category";
 
-let indexesCleaned = false;
-async function ensureCategoryIndexes() {
-  if (indexesCleaned) return;
-  try {
-    await Category.collection.dropIndex("id_1").catch(() => {});
-    indexesCleaned = true;
-  } catch {}
-}
+export const dynamic = "force-dynamic";
 
 // GET /api/money/categories?userId=xxx
 export async function GET(req: Request) {
   try {
     await connectToDatabase();
-    await ensureCategoryIndexes();
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get("userId");
 
@@ -35,14 +27,17 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     await connectToDatabase();
-    await ensureCategoryIndexes();
     const body = await req.json();
 
-    if (!body.userId || !body.name || !body.type) {
-      return NextResponse.json({ error: "UserId, name, and type required" }, { status: 400 });
+    const name = typeof body.name === "string" ? body.name.trim().slice(0, 60) : "";
+    const type = body.type === "income" ? "income" : body.type === "expense" ? "expense" : null;
+
+    if (!body.userId || !name || !type) {
+      return NextResponse.json({ error: "UserId, valid name (1-60 chars), and type (income|expense) required" }, { status: 400 });
     }
 
     const catId = body.id || `cat_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+    const monthlyBudget = Math.max(0, Math.round(Number(body.monthlyBudget) || 0));
 
     const newCategory = await Category.findOneAndUpdate(
       { id: catId, userId: body.userId },
@@ -50,14 +45,14 @@ export async function POST(req: Request) {
         $set: {
           id: catId,
           userId: body.userId,
-          name: body.name,
-          type: body.type,
-          color: body.color || "amber",
-          icon: body.icon || "💳",
-          monthlyBudget: Number(body.monthlyBudget) || 0,
-          archived: body.archived || false,
-          isTemplate: body.isTemplate || false,
-          templatePackId: body.templatePackId || null,
+          name,
+          type,
+          color: typeof body.color === "string" ? body.color.slice(0, 30) : "amber",
+          icon: typeof body.icon === "string" ? body.icon.slice(0, 50) : "💳",
+          monthlyBudget,
+          archived: Boolean(body.archived),
+          isTemplate: Boolean(body.isTemplate),
+          templatePackId: body.templatePackId ? String(body.templatePackId) : null,
         },
       },
       { upsert: true, returnDocument: "after" }
@@ -73,7 +68,6 @@ export async function POST(req: Request) {
 export async function PUT(req: Request) {
   try {
     await connectToDatabase();
-    await ensureCategoryIndexes();
     const body = await req.json();
     const { id, userId, name, color, icon, type, monthlyBudget, archived, isTemplate, templatePackId } = body;
 
@@ -82,14 +76,25 @@ export async function PUT(req: Request) {
     }
 
     const updateFields: any = {};
-    if (name !== undefined) updateFields.name = name;
-    if (color !== undefined) updateFields.color = color;
-    if (icon !== undefined) updateFields.icon = icon;
-    if (type !== undefined) updateFields.type = type;
-    if (monthlyBudget !== undefined) updateFields.monthlyBudget = Number(monthlyBudget);
-    if (archived !== undefined) updateFields.archived = archived;
-    if (isTemplate !== undefined) updateFields.isTemplate = isTemplate;
-    if (templatePackId !== undefined) updateFields.templatePackId = templatePackId;
+    if (name !== undefined) {
+      const trimmed = typeof name === "string" ? name.trim().slice(0, 60) : "";
+      if (!trimmed) return NextResponse.json({ error: "Category name cannot be empty" }, { status: 400 });
+      updateFields.name = trimmed;
+    }
+    if (color !== undefined) updateFields.color = typeof color === "string" ? color.slice(0, 30) : "amber";
+    if (icon !== undefined) updateFields.icon = typeof icon === "string" ? icon.slice(0, 50) : "💳";
+    if (type !== undefined) {
+      if (type !== "income" && type !== "expense") {
+        return NextResponse.json({ error: "Type must be income or expense" }, { status: 400 });
+      }
+      updateFields.type = type;
+    }
+    if (monthlyBudget !== undefined) {
+      updateFields.monthlyBudget = Math.max(0, Math.round(Number(monthlyBudget) || 0));
+    }
+    if (archived !== undefined) updateFields.archived = Boolean(archived);
+    if (isTemplate !== undefined) updateFields.isTemplate = Boolean(isTemplate);
+    if (templatePackId !== undefined) updateFields.templatePackId = templatePackId ? String(templatePackId) : null;
 
     const queryFilter: any = { userId };
     if (mongoose.Types.ObjectId.isValid(id)) {
@@ -114,7 +119,6 @@ export async function PUT(req: Request) {
 export async function DELETE(req: Request) {
   try {
     await connectToDatabase();
-    await ensureCategoryIndexes();
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
     const userId = searchParams.get("userId");

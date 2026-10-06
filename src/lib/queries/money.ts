@@ -19,12 +19,21 @@ const getActiveUserId = (user: any) => {
 };
 
 const DEFAULT_CATEGORIES: Category[] = [
+  // Income Streams
   { id: "cat-salary", name: "Salary", type: "income", icon: "DollarSign", color: "mint", archived: false },
   { id: "cat-freelance", name: "Freelance", type: "income", icon: "Briefcase", color: "amber", archived: false },
-  { id: "cat-food", name: "Food", type: "expense", icon: "Coffee", color: "coral", monthlyBudget: 5000, archived: false },
-  { id: "cat-rent", name: "Rent", type: "expense", icon: "Home", color: "lavender", monthlyBudget: 15000, archived: false },
-  { id: "cat-transport", name: "Transport", type: "expense", icon: "Compass", color: "orange", monthlyBudget: 2000, archived: false },
-  { id: "cat-leisure", name: "Leisure", type: "expense", icon: "Smile", color: "amber", monthlyBudget: 3000, archived: false },
+  { id: "cat-allowance", name: "Allowance", type: "income", icon: "PiggyBank", color: "lime", archived: false },
+
+  // Everyday Core Expenses
+  { id: "cat-food", name: "Food & Dining", type: "expense", icon: "Coffee", color: "coral", monthlyBudget: 5000, archived: false },
+  { id: "cat-groceries", name: "Groceries", type: "expense", icon: "ShoppingBag", color: "mint", monthlyBudget: 3000, archived: false },
+  { id: "cat-rent", name: "Rent & Housing", type: "expense", icon: "Home", color: "lavender", monthlyBudget: 15000, archived: false },
+  { id: "cat-transport", name: "Transport & Commute", type: "expense", icon: "Compass", color: "orange", monthlyBudget: 2000, archived: false },
+  { id: "cat-shopping", name: "Shopping", type: "expense", icon: "Tag", color: "amber", monthlyBudget: 3000, archived: false },
+  { id: "cat-education", name: "Books & Tuition", type: "expense", icon: "BookOpen", color: "indigo", monthlyBudget: 2500, archived: false },
+  { id: "cat-health", name: "Healthcare & Gym", type: "expense", icon: "HeartPulse", color: "rose", monthlyBudget: 2000, archived: false },
+  { id: "cat-leisure", name: "Leisure & Fun", type: "expense", icon: "Smile", color: "lime", monthlyBudget: 2500, archived: false },
+  { id: "cat-bills", name: "Bills & Utilities", type: "expense", icon: "Zap", color: "sky", monthlyBudget: 1500, archived: false },
 ];
 
 // --- CATEGORIES (MongoDB Atlas Connected) ---
@@ -53,14 +62,16 @@ export function useCategories() {
       if (!res.ok) return [];
       const list = await res.json();
       if (list.length === 0) {
-        // Seed default categories on MongoDB first load
-        for (const cat of DEFAULT_CATEGORIES) {
-          await fetch("/api/money/categories", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId, ...cat }),
-          });
-        }
+        // Seed default categories on MongoDB first load (in parallel)
+        await Promise.allSettled(
+          DEFAULT_CATEGORIES.map((cat) =>
+            fetch("/api/money/categories", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ userId, ...cat }),
+            })
+          )
+        );
         return DEFAULT_CATEGORIES;
       }
       return list.map((c: any, idx: number) => ({
@@ -165,6 +176,7 @@ export function useDeleteCategory() {
 
   return useMutation({
     mutationFn: async (categoryId: string) => {
+      const userId = getActiveUserId(user);
       if (isGuestMode()) {
         const local = localStorage.getItem("invictus_categories");
         const list = local ? JSON.parse(local) : [...DEFAULT_CATEGORIES];
@@ -173,8 +185,8 @@ export function useDeleteCategory() {
         return categoryId;
       }
 
-      if (!user) throw new Error("Unauthenticated");
-      const res = await fetch(`/api/money/categories?id=${categoryId}&userId=${user.uid}`, {
+      if (!userId) throw new Error("Unauthenticated");
+      const res = await fetch(`/api/money/categories?id=${categoryId}&userId=${userId}`, {
         method: "DELETE",
       });
 
@@ -182,7 +194,8 @@ export function useDeleteCategory() {
       return categoryId;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["categories", user?.uid] });
+      const userId = getActiveUserId(user);
+      queryClient.invalidateQueries({ queryKey: ["categories", userId] });
     },
   });
 }
@@ -381,21 +394,22 @@ export function useUpdateTransaction() {
 
 export function useSavingsGoals() {
   const { user } = useAuth();
+  const userId = getActiveUserId(user);
 
   return useQuery({
-    queryKey: ["savingsGoals", user?.uid],
+    queryKey: ["savingsGoals", userId],
     queryFn: async () => {
       if (isGuestMode()) {
         const local = localStorage.getItem("invictus_savings_goals");
         return local ? JSON.parse(local) : [];
       }
-      if (!user) return [];
+      if (!userId) return [];
 
-      const res = await fetch(`/api/money/savings?userId=${user.uid}`);
+      const res = await fetch(`/api/money/savings?userId=${userId}`);
       if (!res.ok) return [];
       return res.json();
     },
-    enabled: !!user || isGuestMode(),
+    enabled: !!userId || isGuestMode(),
   });
 }
 
@@ -405,6 +419,7 @@ export function useAddSavingsGoal() {
 
   return useMutation({
     mutationFn: async (goal: any) => {
+      const userId = getActiveUserId(user);
       if (isGuestMode()) {
         const local = localStorage.getItem("invictus_savings_goals");
         const list = local ? JSON.parse(local) : [];
@@ -414,18 +429,19 @@ export function useAddSavingsGoal() {
         return newGoal;
       }
 
-      if (!user) throw new Error("Unauthenticated");
+      if (!userId) throw new Error("Unauthenticated");
       const res = await fetch("/api/money/savings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user.uid, ...goal }),
+        body: JSON.stringify({ userId, ...goal }),
       });
 
       if (!res.ok) throw new Error("Failed to save savings goal");
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["savingsGoals", user?.uid] });
+      const userId = getActiveUserId(user);
+      queryClient.invalidateQueries({ queryKey: ["savingsGoals", userId] });
     },
   });
 }
@@ -436,6 +452,7 @@ export function useUpdateSavingsGoal() {
 
   return useMutation({
     mutationFn: async (goal: any) => {
+      const userId = getActiveUserId(user);
       if (isGuestMode()) {
         const local = localStorage.getItem("invictus_savings_goals");
         const list = local ? JSON.parse(local) : [];
@@ -447,18 +464,19 @@ export function useUpdateSavingsGoal() {
         return goal;
       }
 
-      if (!user) throw new Error("Unauthenticated");
+      if (!userId) throw new Error("Unauthenticated");
       const res = await fetch("/api/money/savings", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user.uid, ...goal }),
+        body: JSON.stringify({ userId, ...goal }),
       });
 
       if (!res.ok) throw new Error("Failed to update savings goal");
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["savingsGoals", user?.uid] });
+      const userId = getActiveUserId(user);
+      queryClient.invalidateQueries({ queryKey: ["savingsGoals", userId] });
     },
   });
 }
@@ -469,6 +487,7 @@ export function useDeleteSavingsGoal() {
 
   return useMutation({
     mutationFn: async (goalId: string) => {
+      const userId = getActiveUserId(user);
       if (isGuestMode()) {
         const local = localStorage.getItem("invictus_savings_goals");
         const list = local ? JSON.parse(local) : [];
@@ -477,8 +496,8 @@ export function useDeleteSavingsGoal() {
         return goalId;
       }
 
-      if (!user) throw new Error("Unauthenticated");
-      const res = await fetch(`/api/money/savings?id=${goalId}&userId=${user.uid}`, {
+      if (!userId) throw new Error("Unauthenticated");
+      const res = await fetch(`/api/money/savings?id=${goalId}&userId=${userId}`, {
         method: "DELETE",
       });
 
@@ -486,7 +505,8 @@ export function useDeleteSavingsGoal() {
       return goalId;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["savingsGoals", user?.uid] });
+      const userId = getActiveUserId(user);
+      queryClient.invalidateQueries({ queryKey: ["savingsGoals", userId] });
     },
   });
 }
@@ -495,21 +515,22 @@ export function useDeleteSavingsGoal() {
 
 export function useSubscriptions() {
   const { user } = useAuth();
+  const userId = getActiveUserId(user);
 
   return useQuery({
-    queryKey: ["subscriptions", user?.uid],
+    queryKey: ["subscriptions", userId],
     queryFn: async () => {
       if (isGuestMode()) {
         const local = localStorage.getItem("invictus_subscriptions");
         return local ? JSON.parse(local) : [];
       }
-      if (!user) return [];
+      if (!userId) return [];
 
-      const res = await fetch(`/api/money/subscriptions?userId=${user.uid}`);
+      const res = await fetch(`/api/money/subscriptions?userId=${userId}`);
       if (!res.ok) return [];
       return res.json();
     },
-    enabled: !!user || isGuestMode(),
+    enabled: !!userId || isGuestMode(),
   });
 }
 
@@ -519,6 +540,7 @@ export function useAddSubscription() {
 
   return useMutation({
     mutationFn: async (sub: any) => {
+      const userId = getActiveUserId(user);
       if (isGuestMode()) {
         const local = localStorage.getItem("invictus_subscriptions");
         const list = local ? JSON.parse(local) : [];
@@ -528,18 +550,19 @@ export function useAddSubscription() {
         return newSub;
       }
 
-      if (!user) throw new Error("Unauthenticated");
+      if (!userId) throw new Error("Unauthenticated");
       const res = await fetch("/api/money/subscriptions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user.uid, ...sub }),
+        body: JSON.stringify({ userId, ...sub }),
       });
 
       if (!res.ok) throw new Error("Failed to add subscription");
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["subscriptions", user?.uid] });
+      const userId = getActiveUserId(user);
+      queryClient.invalidateQueries({ queryKey: ["subscriptions", userId] });
     },
   });
 }
@@ -550,6 +573,7 @@ export function useDeleteSubscription() {
 
   return useMutation({
     mutationFn: async (subId: string) => {
+      const userId = getActiveUserId(user);
       if (isGuestMode()) {
         const local = localStorage.getItem("invictus_subscriptions");
         const list = local ? JSON.parse(local) : [];
@@ -558,8 +582,8 @@ export function useDeleteSubscription() {
         return subId;
       }
 
-      if (!user) throw new Error("Unauthenticated");
-      const res = await fetch(`/api/money/subscriptions?id=${subId}&userId=${user.uid}`, {
+      if (!userId) throw new Error("Unauthenticated");
+      const res = await fetch(`/api/money/subscriptions?id=${subId}&userId=${userId}`, {
         method: "DELETE",
       });
 
@@ -567,37 +591,12 @@ export function useDeleteSubscription() {
       return subId;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["subscriptions", user?.uid] });
-    },
-  });
-}
-
-export function useUnapplySpendingTemplate() {
-  const { user } = useAuth();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async () => {
       const userId = getActiveUserId(user);
-      if (isGuestMode()) {
-        const local = localStorage.getItem("invictus_categories");
-        const list = local ? JSON.parse(local) : [];
-        const filtered = list.filter((c: any) => c.templatePackId !== "monthly-spending-template");
-        localStorage.setItem("invictus_categories", JSON.stringify(filtered));
-        return;
-      }
-
-      const res = await fetch(`/api/money/spending?userId=${userId}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error("Failed to unapply monthly budget template");
-      return res.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      queryClient.invalidateQueries({ queryKey: ["subscriptions", userId] });
     },
   });
 }
+
 
 // --- LENT & BORROWED DEBT LEDGER ---
 

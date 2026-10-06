@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { Button } from "@/components/ui/button";
-import { LogOut, Settings, User, Sparkles, ShieldCheck, Database, Bell, Sliders, ArrowRight, Trophy, RefreshCw } from "lucide-react";
+import { LogOut, Settings, User, Sparkles, ShieldCheck, Database, Bell, Sliders, ArrowRight, Trophy, RefreshCw, AlarmClock, Layers, BarChart3, Lock } from "lucide-react";
 import Link from "next/link";
 import { UpdateCheckModal } from "@/components/shared/UpdateCheckModal";
 import { YearlyActivityMatrix } from "@/components/profile/YearlyActivityMatrix";
@@ -29,7 +29,8 @@ export default function ProfilePage() {
             onClick={() => setIsUpdateModalOpen(true)}
             className="bg-[#CEF431] hover:bg-[#bce022] text-[#161514] text-xs font-black uppercase px-3.5 py-1.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center gap-1.5 cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
           >
-            <span>⚡ v{APP_VERSION_CONFIG.version}</span>
+            <Sparkles className="h-3.5 w-3.5 stroke-[2.5]" />
+            <span>v{APP_VERSION_CONFIG.version}</span>
           </button>
         </div>
 
@@ -63,13 +64,13 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* 🌟 365-DAY GITHUB-STYLE LIFE MOMENTUM MATRIX */}
+        {/* 365-DAY GITHUB-STYLE LIFE MOMENTUM MATRIX */}
         <div id="activity-matrix-section" className="scroll-mt-24">
           <YearlyActivityMatrix />
         </div>
 
         {/* Prominent Settings Discovery Hero Card */}
-        <div id="settings-discovery-card" className="bg-gradient-to-br from-[#CEF431] via-[#03D26F] to-[#EAF4F4] rounded-3xl p-6 border-[2.5px] border-[#161514] shadow-[5px_5px_0px_0px_#161514] space-y-4 scroll-mt-24">
+        <div id="settings-discovery-card" className="bg-[#CEF431] rounded-3xl p-6 border-[2.5px] border-[#161514] shadow-[5px_5px_0px_0px_#161514] space-y-4 scroll-mt-24">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <span className="bg-white text-[#161514] px-3 py-1 rounded-xl text-xs font-black border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] uppercase tracking-wider flex items-center gap-1.5 whitespace-nowrap shrink-0 self-start sm:self-auto">
               <Sparkles className="h-4 w-4" /> 11 Settings Categories Available
@@ -91,20 +92,20 @@ export default function ProfilePage() {
           {/* Quick Features Badges */}
           <div className="flex flex-wrap gap-1.5 pt-1">
             {[
-              { label: `⚡ v${APP_VERSION_CONFIG.version} Updates`, icon: "⚡" },
-              { label: "⏰ Global Wake-Up", icon: "⏰" },
-              { label: "🏆 Badges & XP", icon: "🏆" },
-              { label: "📂 Habit Groups", icon: "📂" },
-              { label: "📊 CSV Exporter", icon: "📊" },
-              { label: "🔒 Security & Auth", icon: "🔒" },
-              { label: "🔔 OS Status Alerts", icon: "🔔" },
-              { label: "📦 Data Backup", icon: "📦" },
+              { label: `v${APP_VERSION_CONFIG.version} Updates`, Icon: Sparkles },
+              { label: "Global Wake-Up", Icon: AlarmClock },
+              { label: "Badges & XP", Icon: Trophy },
+              { label: "Habit Groups", Icon: Layers },
+              { label: "CSV Exporter", Icon: BarChart3 },
+              { label: "Security & Auth", Icon: Lock },
+              { label: "Alerts & Reminders", Icon: Bell },
+              { label: "Data Backup", Icon: Database },
             ].map((badge, idx) => (
               <span
                 key={idx}
-                className="bg-white text-[#161514] text-[10px] font-black px-2.5 py-1 rounded-xl border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514] flex items-center gap-1"
+                className="bg-white text-[#161514] text-[10px] font-black px-2.5 py-1 rounded-xl border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514] flex items-center gap-1.5"
               >
-                <span>{badge.icon}</span>
+                <badge.Icon className="h-3 w-3 stroke-[2.5]" />
                 <span>{badge.label}</span>
               </span>
             ))}
