@@ -1,15 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
-  <!-- Invictus Monolith ("I" Pillar of Strength) for Apple Touch Icon -->
-  <rect width="512" height="512" fill="#161514" />
+  <!-- Concept 3: The Invictus Monolith ("I" Pillar of Strength) -->
+  <rect x="20" y="20" width="472" height="472" rx="112" fill="#161514" />
   
   <g id="icon" transform="translate(256, 256)">
-    <!-- Top Horizontal Pediment -->
+    <!-- Top Horizontal Crossbar -->
     <path
       d="M -110 -150 L 110 -150 L 80 -95 L -80 -95 Z"
       fill="#FAF8F5"
     />
     
-    <!-- Central Monolithic Stem (Electric Volt) -->
+    <!-- Central Monolithic Pillar / Upward Spear -->
     <path
       d="M -45 -80 L 45 -80 L 45 80 L -45 80 Z"
       fill="#CEF431"

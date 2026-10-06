@@ -65,7 +65,9 @@ public class SafeSpendWidgetProvider extends AppWidgetProvider {
             String dateChip = dateFormatted + " • " + defaultDaysLeft + "d left";
 
             String currency = "₹";
-            String spentTodayFormatted = "₹0";
+            String heroLabel = "DAILY LIMIT LEFT";
+            String heroAmount = "₹0";
+            int heroAmountColor = Color.parseColor("#161514");
             String allowanceBadgeText = "Syncing with Invictus...";
             int allowanceBadgeColor = Color.parseColor("#037A48");
             String upiLeft = "Open App";
@@ -89,6 +91,12 @@ public class SafeSpendWidgetProvider extends AppWidgetProvider {
 
                     double todayExpense = obj.optDouble("todayExpense", 0.0);
                     double dailyBudgetTarget = obj.optDouble("dailyBudgetTarget", safeDaily);
+                    double customDailyBudget = obj.optDouble("customDailyBudget", -1.0);
+                    boolean hasCustomCap = obj.has("customDailyBudget") && !obj.isNull("customDailyBudget") && customDailyBudget > 0;
+                    if (dailyBudgetTarget <= 0 && safeDaily > 0) {
+                        dailyBudgetTarget = safeDaily;
+                    }
+
                     double todayRemaining = obj.has("todayRemaining")
                             ? obj.optDouble("todayRemaining", dailyBudgetTarget - todayExpense)
                             : (dailyBudgetTarget - todayExpense);
@@ -101,22 +109,30 @@ public class SafeSpendWidgetProvider extends AppWidgetProvider {
 
                     NumberFormat formatter = NumberFormat.getNumberInstance(Locale.US);
 
-                    // 1. Hero Stat: Spent Today (e.g. ₹0 or ₹250)
-                    spentTodayFormatted = currency + formatter.format((long) Math.round(todayExpense));
-
-                    // 2. Allowance Status Sub-badge
-                    if (isOverDailyBudget && overDailyAmount > 0) {
-                        allowanceBadgeText = "⚠️ Over by " + currency + formatter.format((long) Math.round(overDailyAmount));
-                        allowanceBadgeColor = Color.parseColor("#B42318");
-                    } else if (dailyBudgetTarget > 0) {
-                        allowanceBadgeText = currency + formatter.format((long) Math.round(Math.max(0, todayRemaining))) + " left (" + currency + formatter.format((long) Math.round(dailyBudgetTarget)) + " cap)";
-                        allowanceBadgeColor = Color.parseColor("#037A48");
+                    // 1. Hero Stat: Amount Left to Spend Today (Daily Limit Left)
+                    if (dailyBudgetTarget > 0) {
+                        if (isOverDailyBudget && overDailyAmount > 0) {
+                            heroLabel = hasCustomCap ? "⚠️ LIMIT EXCEEDED" : "⚠️ PACE EXCEEDED";
+                            heroAmount = "-" + currency + formatter.format((long) Math.round(overDailyAmount));
+                            heroAmountColor = Color.parseColor("#D92D20"); // High-visibility alert red
+                            allowanceBadgeText = "Spent " + currency + formatter.format((long) Math.round(todayExpense)) + " of " + currency + formatter.format((long) Math.round(dailyBudgetTarget)) + (hasCustomCap ? " cap" : " pace");
+                            allowanceBadgeColor = Color.parseColor("#B42318");
+                        } else {
+                            heroLabel = hasCustomCap ? "DAILY LIMIT LEFT" : "SAFE SPEND LEFT";
+                            heroAmount = currency + formatter.format((long) Math.round(Math.max(0, todayRemaining)));
+                            heroAmountColor = Color.parseColor("#161514"); // Crisp Neobrutalist Black
+                            allowanceBadgeText = currency + formatter.format((long) Math.round(todayExpense)) + " spent of " + currency + formatter.format((long) Math.round(dailyBudgetTarget)) + (hasCustomCap ? " limit" : " pace");
+                            allowanceBadgeColor = Color.parseColor("#037A48"); // Emerald Green
+                        }
                     } else {
-                        allowanceBadgeText = "No daily cap set";
+                        heroLabel = "DAILY LIMIT LEFT";
+                        heroAmount = currency + formatter.format((long) Math.round(todayExpense));
+                        heroAmountColor = Color.parseColor("#161514");
+                        allowanceBadgeText = "Open app to set daily limit";
                         allowanceBadgeColor = Color.parseColor("#73716D");
                     }
 
-                    // 3. Liquidity Balances (UPI & Cash)
+                    // 2. Liquidity Balances (UPI & Cash)
                     if (remUpi >= 0) {
                         upiLeft = currency + formatter.format((long) Math.round(remUpi));
                     } else {
@@ -139,7 +155,9 @@ public class SafeSpendWidgetProvider extends AppWidgetProvider {
             // Bind Top Header & Finances
             views.setTextViewText(R.id.widget_title, "⚡ INVICTUS DAILY");
             views.setTextViewText(R.id.widget_date_chip, dateChip);
-            views.setTextViewText(R.id.widget_safe_amount, spentTodayFormatted);
+            views.setTextViewText(R.id.widget_hero_label, heroLabel);
+            views.setTextViewText(R.id.widget_safe_amount, heroAmount);
+            views.setTextColor(R.id.widget_safe_amount, heroAmountColor);
             views.setTextViewText(R.id.widget_today_badge, allowanceBadgeText);
             views.setTextColor(R.id.widget_today_badge, allowanceBadgeColor);
             views.setTextViewText(R.id.widget_upi_left, "📱 UPI: " + upiLeft);
@@ -203,10 +221,10 @@ public class SafeSpendWidgetProvider extends AppWidgetProvider {
                                 : Color.parseColor("#73716D"));
 
                         if (s2 > 0) {
-                            views.setViewVisibility(R.id.widget_habit_row_2, View.VISIBLE);
+                            views.setViewVisibility(R.id.widget_habit_2_streak, View.VISIBLE);
                             views.setTextViewText(R.id.widget_habit_2_streak, "🔥 " + s2 + "d");
                         } else {
-                            views.setViewVisibility(R.id.widget_habit_row_2, View.GONE);
+                            views.setViewVisibility(R.id.widget_habit_2_streak, View.GONE);
                         }
                     } else {
                         views.setViewVisibility(R.id.widget_habit_row_2, View.GONE);
@@ -231,10 +249,10 @@ public class SafeSpendWidgetProvider extends AppWidgetProvider {
                                 : Color.parseColor("#73716D"));
 
                         if (s3 > 0) {
-                            views.setViewVisibility(R.id.widget_habit_row_3, View.VISIBLE);
+                            views.setViewVisibility(R.id.widget_habit_3_streak, View.VISIBLE);
                             views.setTextViewText(R.id.widget_habit_3_streak, "🔥 " + s3 + "d");
                         } else {
-                            views.setViewVisibility(R.id.widget_habit_row_3, View.GONE);
+                            views.setViewVisibility(R.id.widget_habit_3_streak, View.GONE);
                         }
                     } else {
                         views.setViewVisibility(R.id.widget_habit_row_3, View.GONE);

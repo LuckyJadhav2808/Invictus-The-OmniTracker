@@ -29,6 +29,7 @@ export interface WidgetSyncData {
   todayExpense?: number;
   todayRemaining?: number;
   dailyBudgetTarget?: number;
+  customDailyBudget?: number | null;
   isOverDailyBudget?: boolean;
   overDailyAmount?: number;
   // Habits Checklist Additions

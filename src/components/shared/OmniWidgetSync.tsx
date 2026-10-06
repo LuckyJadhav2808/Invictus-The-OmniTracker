@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import { useCategories, useTransactions, useSavingsGoals } from "@/lib/queries/money";
+import { useCategories, useTransactions, useSavingsGoals, useBudgetPreferences } from "@/lib/queries/money";
 import { useHabits, useHabitLogs, useStreaks } from "@/lib/queries/goals";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { useUIStore } from "@/store/ui-store";
@@ -15,7 +15,8 @@ export function OmniWidgetSync() {
   const todayStr = useMemo(() => format(new Date(), "yyyy-MM-dd"), []);
   const currentMonthKey = useMemo(() => format(new Date(), "yyyy-MM"), []);
 
-  // Queries
+  // Database Queries (MongoDB & Offline Cache)
+  const { data: cloudBudgetPrefs } = useBudgetPreferences();
   const { data: categories = [] } = useCategories();
   const { data: transactions = [] } = useTransactions();
   const { data: savingsGoals = [] } = useSavingsGoals();
@@ -23,8 +24,11 @@ export function OmniWidgetSync() {
   const { data: logs = [] } = useHabitLogs(todayStr);
   const { data: streaks = {} } = useStreaks();
 
-  // Read User Preferences
+  // Read User Preferences (Authoritative User Database with LocalStorage Fallback)
   const baseUpiBudget = useMemo(() => {
+    if (cloudBudgetPrefs?.upiBudget !== undefined && cloudBudgetPrefs.upiBudget > 0) {
+      return cloudBudgetPrefs.upiBudget;
+    }
     if (typeof window === "undefined") return 9000;
     try {
       const savedUpi = localStorage.getItem("invictus_monthly_upi_budget");
@@ -37,9 +41,12 @@ export function OmniWidgetSync() {
       }
     } catch {}
     return 9000;
-  }, []);
+  }, [cloudBudgetPrefs]);
 
   const baseCashBudget = useMemo(() => {
+    if (cloudBudgetPrefs?.cashBudget !== undefined && cloudBudgetPrefs.cashBudget >= 0) {
+      return cloudBudgetPrefs.cashBudget;
+    }
     if (typeof window === "undefined") return 0;
     try {
       const savedCash = localStorage.getItem("invictus_monthly_cash_budget");
@@ -48,18 +55,24 @@ export function OmniWidgetSync() {
       }
     } catch {}
     return 0;
-  }, []);
+  }, [cloudBudgetPrefs]);
 
   const enableRollover = useMemo(() => {
+    if (cloudBudgetPrefs?.enableRollover !== undefined) {
+      return cloudBudgetPrefs.enableRollover;
+    }
     if (typeof window === "undefined") return true;
     try {
       const saved = localStorage.getItem("invictus_budget_rollover_enabled");
       if (saved !== null) return saved === "true";
     } catch {}
     return true;
-  }, []);
+  }, [cloudBudgetPrefs]);
 
   const customDailyBudget = useMemo(() => {
+    if (cloudBudgetPrefs?.customDailyBudget !== undefined && cloudBudgetPrefs.customDailyBudget !== null && cloudBudgetPrefs.customDailyBudget > 0) {
+      return cloudBudgetPrefs.customDailyBudget;
+    }
     if (typeof window === "undefined") return null;
     try {
       const saved = localStorage.getItem("invictus_custom_daily_budget");
@@ -68,7 +81,7 @@ export function OmniWidgetSync() {
       }
     } catch {}
     return null;
-  }, []);
+  }, [cloudBudgetPrefs]);
 
   const currencySymbol = useMemo(() => {
     let cur = "INR";
@@ -194,6 +207,7 @@ export function OmniWidgetSync() {
       todayExpense: dailyStats.todayExpense,
       todayRemaining: dailyStats.todayRemaining,
       dailyBudgetTarget: dailyStats.dailyBudgetTarget,
+      customDailyBudget,
       isOverDailyBudget: dailyStats.isOverDailyBudget,
       overDailyAmount: dailyStats.overDailyAmount,
       habitsTotalCount: habits.length,
@@ -201,7 +215,7 @@ export function OmniWidgetSync() {
       habitsList,
       activeGoal,
     });
-  }, [budgetStats, dailyStats, currencySymbol, habits.length, habitsCompletedCount, habitsList, activeGoal, syncToWidget]);
+  }, [budgetStats, dailyStats, customDailyBudget, currencySymbol, habits.length, habitsCompletedCount, habitsList, activeGoal, syncToWidget]);
 
   return null;
 }

@@ -17,10 +17,10 @@ import {
 } from "@/lib/queries/goals";
 import { soundFX } from "@/components/shared/SoundFX";
 import { useStudySessions, useSubjects, useAllTopics, useAddStudySession } from "@/lib/queries/study";
-import { useTransactions, useCategories, useAddTransaction } from "@/lib/queries/money";
+import { useTransactions, useCategories, useAddTransaction, useBudgetPreferences, useUpdateBudgetPreferences } from "@/lib/queries/money";
 import { useTasks, useUpdateTask } from "@/lib/queries/tasks";
 import { computeMonthlyBudgetStats, computeDailyBudgetStats } from "@/lib/utils/budget-rollover";
-import { useWidgetSync } from "@/lib/hooks/useWidgetSync";
+import { AllowanceSettingsModal } from "@/components/money/modals/AllowanceSettingsModal";
 import { toast } from "sonner";
 import {
   format,
@@ -80,9 +80,10 @@ export default function TodayPage() {
     toast.success(`Logged +${amount}ml water! Stay hydrated 🌊`);
   };
 
-  const { syncToWidget } = useWidgetSync();
-
-  // Celebration state
+  // User Cloud Budget Preferences
+  const { data: cloudBudgetPrefs } = useBudgetPreferences();
+  const updateBudgetMutation = useUpdateBudgetPreferences();
+  const [isDailyLimitModalOpen, setIsDailyLimitModalOpen] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const previousConqueredRef = useRef(false);
 
@@ -193,49 +194,62 @@ export default function TodayPage() {
     [todayTransactions]
   );
 
+  const baseUpiBudget = cloudBudgetPrefs?.upiBudget ?? 9000;
+  const baseCashBudget = cloudBudgetPrefs?.cashBudget ?? 0;
+  const enableRollover = cloudBudgetPrefs?.enableRollover ?? true;
+  const customDailyBudget = cloudBudgetPrefs?.customDailyBudget ?? null;
+
   const budgetStats = useMemo(() => {
     const currentMonthKey = format(currentDateObj, "yyyy-MM");
     return computeMonthlyBudgetStats({
       transactions,
       categories,
       targetMonthKey: currentMonthKey,
-      baseUpiBudget: 10000,
-      baseCashBudget: 3000,
-      enableRollover: true,
+      baseUpiBudget,
+      baseCashBudget,
+      enableRollover,
       currencySymbol,
     });
-  }, [transactions, categories, currentDateObj, currencySymbol]);
+  }, [transactions, categories, currentDateObj, baseUpiBudget, baseCashBudget, enableRollover, currencySymbol]);
 
   const dailyBudgetStats = useMemo(() => {
     return computeDailyBudgetStats({
       transactions,
       monthlyStats: budgetStats,
-      customDailyBudget: null,
+      customDailyBudget,
     });
-  }, [transactions, budgetStats]);
+  }, [transactions, budgetStats, customDailyBudget]);
 
-  // Sync to widget
-  useEffect(() => {
-    if (!transactions.length && !categories.length) return;
+  const handleSaveDailyLimit = async (payload: {
+    upiBudget: number;
+    cashBudget: number;
+    customDailyBudget: number | null;
+    enableRollover: boolean;
+  }) => {
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("invictus_monthly_upi_budget", String(payload.upiBudget));
+        localStorage.setItem("invictus_monthly_cash_budget", String(payload.cashBudget));
+        if (payload.customDailyBudget !== null) {
+          localStorage.setItem("invictus_custom_daily_budget", String(payload.customDailyBudget));
+        } else {
+          localStorage.removeItem("invictus_custom_daily_budget");
+        }
+        localStorage.setItem("invictus_budget_rollover_enabled", String(payload.enableRollover));
+      } catch {}
+    }
     try {
-      syncToWidget({
-        safeToSpendDaily: budgetStats.dailySafeToSpend,
-        remainingUpiBudget: budgetStats.remainingUpiBudget,
-        remainingCashBudget: budgetStats.remainingCashBudget,
-        totalAvailableUpiBudget: budgetStats.totalAvailableUpiBudget,
-        totalAvailableCashBudget: budgetStats.totalAvailableCashBudget,
-        currencySymbol,
-        daysRemainingInMonth: budgetStats.daysRemainingInMonth,
-        targetMonthLabel: budgetStats.targetMonthLabel.split(" ")[0],
-        hasCashBudget: budgetStats.baseCashBudget > 0 || budgetStats.totalAvailableCashBudget > 0,
-        todayExpense: dailyBudgetStats.todayExpense,
-        todayRemaining: dailyBudgetStats.todayRemaining,
-        dailyBudgetTarget: dailyBudgetStats.dailyBudgetTarget,
-        isOverDailyBudget: dailyBudgetStats.isOverDailyBudget,
-        overDailyAmount: dailyBudgetStats.overDailyAmount,
+      await updateBudgetMutation.mutateAsync({
+        upiBudget: payload.upiBudget,
+        cashBudget: payload.cashBudget,
+        customDailyBudget: payload.customDailyBudget,
+        enableRollover: payload.enableRollover,
       });
-    } catch {}
-  }, [transactions, categories, budgetStats, dailyBudgetStats, currencySymbol, syncToWidget]);
+      toast.success("Daily spending limit saved & synced to database! 🎯");
+    } catch {
+      toast.success("Daily limit saved locally! 🎯");
+    }
+  };
 
   // Active Stopwatch State
   const [stopwatchSeconds, setStopwatchSeconds] = useState(0);
@@ -418,6 +432,7 @@ export default function TodayPage() {
           <SafeToSpendGauge
             spentToday={spentToday}
             dailySafeToSpend={budgetStats.dailySafeToSpend}
+            customDailyBudget={customDailyBudget}
             currencySymbol={currencySymbol}
             transactions={todayTransactions}
             categories={categories}
@@ -425,6 +440,7 @@ export default function TodayPage() {
             onToggleQuickExpense={() => setIsQuickExpenseOpen(!isQuickExpenseOpen)}
             onAddExpense={handleAddExpense}
             isSavingExpense={isSavingExpense}
+            onOpenSetDailyLimit={() => setIsDailyLimitModalOpen(true)}
           />
         </div>
 
@@ -451,6 +467,19 @@ export default function TodayPage() {
         onChangeNote={setReflectionNote}
         onSaveMood={handleSaveMood}
         isSaving={isSavingMood}
+      />
+
+      {/* 6. Daily Spending Limit & Allowances Modal */}
+      <AllowanceSettingsModal
+        open={isDailyLimitModalOpen}
+        onOpenChange={setIsDailyLimitModalOpen}
+        currencySymbol={currencySymbol}
+        defaultUpiBudget={baseUpiBudget}
+        defaultCashBudget={baseCashBudget}
+        defaultCustomDailyBudget={customDailyBudget}
+        defaultEnableRollover={enableRollover}
+        dailySafeToSpend={budgetStats.dailySafeToSpend}
+        onSave={handleSaveDailyLimit}
       />
     </div>
   );

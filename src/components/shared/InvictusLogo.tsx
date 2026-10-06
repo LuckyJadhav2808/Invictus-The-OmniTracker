@@ -32,48 +32,21 @@ export function InvictusLogo({
       className={cn(
         "relative rounded-xl flex items-center justify-center border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)] overflow-hidden shrink-0 transition-transform duration-200 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5",
         currentSize.icon,
-        "bg-[#CEF431]"
+        "bg-[#161514]"
       )}
     >
-      {/* Vix Gladiator Brand Mark */}
-      <svg viewBox="0 0 100 100" className="w-full h-full p-1" fill="none" xmlns="http://www.w3.org/2000/svg">
-        {/* Plume Crest */}
-        <path
-          d="M36 22C34 8 44 4 50 4C56 4 66 8 64 22H36Z"
-          fill="#E61919"
-          stroke="#161514"
-          strokeWidth="3.5"
-          strokeLinejoin="round"
-        />
-        <line x1="43" y1="19" x2="42" y2="9" stroke="#161514" strokeWidth="2.5" strokeLinecap="round" />
-        <line x1="50" y1="18" x2="50" y2="6" stroke="#161514" strokeWidth="2.5" strokeLinecap="round" />
-        <line x1="57" y1="19" x2="58" y2="9" stroke="#161514" strokeWidth="2.5" strokeLinecap="round" />
-        <rect x="41" y="19" width="18" height="5" rx="1.5" fill="#FFB800" stroke="#161514" strokeWidth="3" />
-
-        {/* Ear Bolts */}
-        <rect x="20" y="42" width="6" height="15" rx="2" fill="#CBD5E1" stroke="#161514" strokeWidth="3" />
-        <rect x="74" y="42" width="6" height="15" rx="2" fill="#CBD5E1" stroke="#161514" strokeWidth="3" />
-
-        {/* Helmet Dome */}
-        <rect x="25" y="23" width="50" height="50" rx="9" fill="#FFFDF8" stroke="#161514" strokeWidth="4" />
-        <line x1="25" y1="34" x2="75" y2="34" stroke="#161514" strokeWidth="3" />
-        <rect x="46" y="26" width="8" height="5" rx="1" fill="#CEF431" stroke="#161514" strokeWidth="2" />
-
-        {/* Digital Visor */}
-        <rect x="31" y="38" width="38" height="22" rx="4" fill="#161514" />
-        <rect x="37" y="44" width="8" height="8" rx="2" fill="#38BDF8" />
-        <rect x="55" y="44" width="8" height="8" rx="2" fill="#38BDF8" />
-        <circle cx="40" cy="47" r="1.5" fill="#FFFFFF" />
-        <circle cx="58" cy="47" r="1.5" fill="#FFFFFF" />
-
-        {/* Invictus 'V' Chin Emblem */}
-        <polygon
-          points="50,84 38,64 44,64 50,74 56,64 62,64"
-          fill="#CEF431"
-          stroke="#161514"
-          strokeWidth="3"
-          strokeLinejoin="round"
-        />
+      {/* Invictus Monolith Brand Mark */}
+      <svg viewBox="0 0 100 100" className="w-full h-full p-1.5" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g transform="translate(50, 50)">
+          {/* Top Horizontal Pediment */}
+          <path d="M -24 -32 L 24 -32 L 18 -20 L -18 -20 Z" fill="#FAF8F5" />
+          {/* Central Monolithic Stem */}
+          <path d="M -10 -17 L 10 -17 L 10 17 L -10 17 Z" fill="#CEF431" />
+          {/* Bottom Horizontal Base Pedestal */}
+          <path d="M -18 20 L 18 20 L 24 32 L -24 32 Z" fill="#FAF8F5" />
+          {/* Inner Upward Chevron Arrow Cutout */}
+          <polygon points="0,-11 6.5,2 0,-2 -6.5,2" fill="#161514" />
+        </g>
       </svg>
     </div>
   );

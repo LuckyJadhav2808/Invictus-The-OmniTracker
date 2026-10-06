@@ -73,7 +73,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="SPENT TODAY"
+                    android:text="DAILY LIMIT LEFT"
                     android:textColor="@color/widget_text_muted"
                     android:textSize="8.5sp"
                     android:textStyle="bold" />
@@ -89,24 +89,24 @@
                     android:visibility="gone" />
             </LinearLayout>
 
-            <!-- Big Bold Hero Stat: Spent Today -->
+            <!-- Big Bold Hero Stat: Daily Limit Left / Safe to Spend -->
             <TextView
                 android:id="@+id/widget_safe_amount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="₹0"
+                android:text="₹1,000"
                 android:textColor="@color/widget_text_primary"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-            <!-- Remaining Allowance Pill Sub-badge -->
+            <!-- Daily Allowance Status Sub-badge -->
             <TextView
                 android:id="@+id/widget_today_badge"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:singleLine="true"
-                android:text="₹168 left (₹500 cap)"
+                android:text="₹0 spent of ₹1,000 limit"
                 android:textColor="@color/widget_accent_emerald"
                 android:textSize="8.5sp"
                 android:textStyle="bold" />

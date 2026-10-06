@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { customUpdateUser, customUpdatePassword, customDeleteUser, customLogout, getGlobalAnnouncement, type GlobalAnnouncement } from "@/lib/custom-auth";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { useUIStore } from "@/store/ui-store";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUserAchievements } from "@/lib/queries/achievements";
+import { useBudgetPreferences, useUpdateBudgetPreferences } from "@/lib/queries/money";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
 import { InvictusLoadingScreen } from "@/components/shared/InvictusLoadingScreen";
@@ -140,6 +141,75 @@ export default function SettingsPage() {
   const [hasExam, setHasExam] = useState(false);
   const [examName, setExamName] = useState("");
   const [examDate, setExamDate] = useState("");
+
+  // Cloud Budget Preferences & Daily Spending Limit State
+  const { data: cloudBudgetPrefs } = useBudgetPreferences();
+  const updateBudgetMutation = useUpdateBudgetPreferences();
+  const [dailyLimitInput, setDailyLimitInput] = useState("");
+  const [savingDailyLimit, setSavingDailyLimit] = useState(false);
+
+  const currencySymbol = useMemo(() => {
+    switch (currency) {
+      case "USD": return "$";
+      case "EUR": return "€";
+      case "GBP": return "£";
+      case "JPY": return "¥";
+      default: return "₹";
+    }
+  }, [currency]);
+
+  useEffect(() => {
+    if (cloudBudgetPrefs?.customDailyBudget !== undefined && cloudBudgetPrefs.customDailyBudget !== null) {
+      setDailyLimitInput(String(cloudBudgetPrefs.customDailyBudget));
+    } else {
+      const local = typeof window !== "undefined" ? localStorage.getItem("invictus_custom_daily_budget") : null;
+      if (local) setDailyLimitInput(local);
+    }
+  }, [cloudBudgetPrefs]);
+
+  const handleSaveDailyLimit = async () => {
+    setSavingDailyLimit(true);
+    const num = dailyLimitInput.trim() ? Number(dailyLimitInput) : null;
+    if (num !== null && (isNaN(num) || num < 0)) {
+      showToast.error("Invalid Amount", "Please enter a valid daily amount");
+      setSavingDailyLimit(false);
+      return;
+    }
+    if (typeof window !== "undefined") {
+      try {
+        if (num !== null) {
+          localStorage.setItem("invictus_custom_daily_budget", String(num));
+        } else {
+          localStorage.removeItem("invictus_custom_daily_budget");
+        }
+      } catch {}
+    }
+    try {
+      await updateBudgetMutation.mutateAsync({
+        customDailyBudget: num,
+      });
+      showToast.success("Daily Limit Saved ⚡", num ? `Daily limit set to ${currencySymbol}${num}/day & synced with widget!` : "Reverted to auto safe-to-spend pace!");
+    } catch {
+      showToast.success("Saved Locally ⚡", "Daily limit cached on device");
+    } finally {
+      setSavingDailyLimit(false);
+    }
+  };
+
+  const handleClearDailyLimit = async () => {
+    setDailyLimitInput("");
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem("invictus_custom_daily_budget");
+      } catch {}
+    }
+    try {
+      await updateBudgetMutation.mutateAsync({ customDailyBudget: null });
+      showToast.success("Daily Limit Cleared 🟢", "Widget reverted to auto safe-to-spend pace");
+    } catch {
+      showToast.info("Cleared Locally", "Daily limit reset on device");
+    }
+  };
 
   // Password Change State
   const [newPassword, setNewPassword] = useState("");
@@ -1494,6 +1564,56 @@ export default function SettingsPage() {
                     }))}
                     placeholder="Select Currency"
                   />
+                </div>
+              </div>
+
+              {/* ⚡ Daily Spending Limit (Widget & Daily Cockpit Target) */}
+              <div className="space-y-1.5 border-t-2 border-[#161514]/10 pt-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label htmlFor="daily-spend-limit-input" className="text-xs font-black uppercase tracking-wider text-[#161514] block font-heading flex items-center gap-1.5">
+                      <Zap className="h-3.5 w-3.5 text-amber-500 fill-amber-400" /> Daily Spending Limit (Android Widget)
+                    </label>
+                    <p className="text-[10px] text-[#161514]/70 font-bold mt-0.5">
+                      Sets the exact daily amount left shown on your Android home screen widget
+                    </p>
+                  </div>
+                  {cloudBudgetPrefs?.customDailyBudget && (
+                    <span className="bg-[#CEF431] text-[#161514] text-[9px] font-black uppercase px-2 py-0.5 rounded-md border border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
+                      {currencySymbol}{cloudBudgetPrefs.customDailyBudget}/day
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex gap-2 pt-1">
+                  <input
+                    id="daily-spend-limit-input"
+                    type="number"
+                    min="0"
+                    step="50"
+                    value={dailyLimitInput}
+                    onChange={(e) => setDailyLimitInput(e.target.value)}
+                    placeholder={`e.g. 500 (or leave empty for auto pace)`}
+                    className="neo-input flex-1 rounded-xl border-2 border-[#161514] bg-[#FAF8F5] py-2 px-3 text-xs font-bold text-[#161514] outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleSaveDailyLimit}
+                    disabled={savingDailyLimit}
+                    className="bg-amber-400 hover:bg-amber-500 text-[#161514] font-black text-xs uppercase px-4 py-2 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
+                  >
+                    {savingDailyLimit ? "Saving…" : "Save Limit"}
+                  </button>
+                  {cloudBudgetPrefs?.customDailyBudget && (
+                    <button
+                      type="button"
+                      onClick={handleClearDailyLimit}
+                      className="bg-rose-100 hover:bg-rose-200 text-rose-700 font-black text-xs uppercase px-3 py-2 rounded-xl border-2 border-[#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
+                      title="Reset to dynamic auto pace"
+                    >
+                      Reset
+                    </button>
+                  )}
                 </div>
               </div>
 

@@ -27,7 +27,6 @@ import {
   computeMonthlyBudgetStats,
   computeDailyBudgetStats,
 } from "@/lib/utils/budget-rollover";
-import { useWidgetSync } from "@/lib/hooks/useWidgetSync";
 import { InvictusLoadingScreen } from "@/components/shared/InvictusLoadingScreen";
 import { type Transaction, type Category } from "@/types";
 import dynamic from "next/dynamic";
@@ -188,26 +187,6 @@ function MoneyPageContent() {
     });
   }, [transactions, monthlyStats, customDailyBudget]);
 
-  // Sync with Global App Widgets
-  const { syncToWidget } = useWidgetSync();
-  useEffect(() => {
-    syncToWidget({
-      safeToSpendDaily: monthlyStats.dailySafeToSpend,
-      remainingUpiBudget: monthlyStats.remainingUpiBudget,
-      remainingCashBudget: monthlyStats.remainingCashBudget,
-      totalAvailableUpiBudget: monthlyStats.totalAvailableUpiBudget,
-      totalAvailableCashBudget: monthlyStats.totalAvailableCashBudget,
-      currencySymbol,
-      daysRemainingInMonth: monthlyStats.daysRemainingInMonth,
-      targetMonthLabel: monthlyStats.targetMonthLabel,
-      hasCashBudget: baseCashBudget > 0,
-      todayExpense: dailyStats.todayExpense,
-      todayRemaining: dailyStats.todayRemaining,
-      dailyBudgetTarget: dailyStats.dailyBudgetTarget,
-      isOverDailyBudget: dailyStats.isOverDailyBudget,
-      overDailyAmount: dailyStats.overDailyAmount,
-    });
-  }, [monthlyStats, dailyStats, currencySymbol, baseCashBudget, syncToWidget]);
 
   // Category map helper
   const categoryMap = useMemo(() => {

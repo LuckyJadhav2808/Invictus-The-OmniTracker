@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <!-- Concept 2: Modernist Gladiator Silhouette (Radical Geometric Reduction) -->
+  <rect x="20" y="20" width="472" height="472" rx="112" fill="#CEF431" stroke="#161514" stroke-width="20" />
+  
+  <g id="icon">
+    <!-- Bold Arch Plume / Crest -->
+    <path
+      d="M 196 112 C 196 68, 226 52, 256 52 C 286 52, 316 68, 316 112 Z"
+      fill="#161514"
+    />
+    
+    <!-- Helmet Dome & Cheeks (Single Bold Monolithic Polygon) -->
+    <path
+      d="M 152 136 
+         H 360 
+         C 376 136, 388 148, 388 164 
+         V 290 
+         C 388 350, 328 410, 256 430 
+         C 184 410, 124 350, 124 290 
+         V 164 
+         C 124 148, 136 136, 152 136 Z"
+      fill="#161514"
+    />
+    
+    <!-- T-Shaped Visor Aperture (Negative Space Spartan / Gladiator Cross) -->
+    <!-- Horizontal Slit -->
+    <rect x="160" y="220" width="192" height="34" rx="10" fill="#CEF431" />
+    <!-- Vertical Nose/Jaw Slit -->
+    <rect x="238" y="240" width="36" height="120" rx="8" fill="#CEF431" />
+  </g>
+</svg>

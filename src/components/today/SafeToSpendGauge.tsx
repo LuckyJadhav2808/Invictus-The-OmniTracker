@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Wallet, Plus, ArrowRight, AlertTriangle } from 'lucide-react';
+import { Wallet, Plus, ArrowRight, AlertTriangle, Sliders } from 'lucide-react';
 import { type Transaction, type Category } from '@/types';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 interface SafeToSpendGaugeProps {
   spentToday: number;
   dailySafeToSpend: number;
+  customDailyBudget?: number | null;
   currencySymbol: string;
   transactions: Transaction[];
   categories: Category[];
@@ -17,11 +18,13 @@ interface SafeToSpendGaugeProps {
   onToggleQuickExpense: () => void;
   onAddExpense: (amount: number, categoryId: string, note: string) => Promise<void>;
   isSavingExpense: boolean;
+  onOpenSetDailyLimit?: () => void;
 }
 
 export function SafeToSpendGauge({
   spentToday,
   dailySafeToSpend,
+  customDailyBudget = null,
   currencySymbol,
   transactions,
   categories,
@@ -29,14 +32,17 @@ export function SafeToSpendGauge({
   onToggleQuickExpense,
   onAddExpense,
   isSavingExpense,
+  onOpenSetDailyLimit,
 }: SafeToSpendGaugeProps) {
   const [amount, setAmount] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [note, setNote] = useState('');
 
-  const remainingSafe = Math.max(0, dailySafeToSpend - spentToday);
-  const isOverBudget = spentToday > dailySafeToSpend && dailySafeToSpend > 0;
-  const percentSpent = dailySafeToSpend > 0 ? Math.min(100, Math.round((spentToday / dailySafeToSpend) * 100)) : 0;
+  const isCustomCap = customDailyBudget !== null && customDailyBudget !== undefined && customDailyBudget > 0;
+  const effectiveDailyLimit = isCustomCap ? customDailyBudget : dailySafeToSpend;
+  const remainingSafe = effectiveDailyLimit - spentToday;
+  const isOverBudget = spentToday > effectiveDailyLimit && effectiveDailyLimit > 0;
+  const percentSpent = effectiveDailyLimit > 0 ? Math.min(100, Math.round((spentToday / effectiveDailyLimit) * 100)) : 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,20 +63,42 @@ export function SafeToSpendGauge({
           <div className="size-7 rounded-lg bg-[#03D26F] border-2 border-[#161514] flex items-center justify-center text-[#161514]">
             <Wallet className="size-3.5 stroke-[2.5]" />
           </div>
-          <h2 className="font-heading font-black text-base text-[#161514] tracking-tight">
-            Safe-to-Spend Gauge
-          </h2>
+          <div>
+            <h2 className="font-heading font-black text-base text-[#161514] tracking-tight leading-none">
+              Safe-to-Spend Gauge
+            </h2>
+            {isCustomCap && (
+              <span className="text-[9px] font-black uppercase text-[#037A48] mt-0.5 inline-block">
+                ⚡ Fixed Limit: {currencySymbol}{customDailyBudget}/day
+              </span>
+            )}
+          </div>
         </div>
 
-        <Button
-          variant="outline"
-          size="xs"
-          onClick={onToggleQuickExpense}
-          className="border-2 border-[#161514] shadow-[1.5px_1.5px_0px_#161514] active:scale-[0.97]"
-        >
-          <Plus className="size-3 stroke-[3]" />
-          <span>Quick Log</span>
-        </Button>
+        <div className="flex items-center gap-2">
+          {onOpenSetDailyLimit && (
+            <Button
+              variant="outline"
+              size="xs"
+              onClick={onOpenSetDailyLimit}
+              className="border-2 border-[#161514] shadow-[1.5px_1.5px_0px_#161514] active:scale-[0.97]"
+              title="Set Daily Spending Amount"
+            >
+              <Sliders className="size-3 stroke-[2.5]" />
+              <span className="hidden sm:inline">{isCustomCap ? `${currencySymbol}${customDailyBudget}/d` : "Set Daily Cap"}</span>
+            </Button>
+          )}
+
+          <Button
+            variant="outline"
+            size="xs"
+            onClick={onToggleQuickExpense}
+            className="border-2 border-[#161514] shadow-[1.5px_1.5px_0px_#161514] active:scale-[0.97]"
+          >
+            <Plus className="size-3 stroke-[3]" />
+            <span>Quick Log</span>
+          </Button>
+        </div>
       </div>
 
       {/* Metric Gauge Banner */}
@@ -87,7 +115,7 @@ export function SafeToSpendGauge({
 
           <div className="text-right">
             <span className="text-[10px] font-mono font-black uppercase text-[#161514]/65 block">
-              SAFE BUDGET LEFT
+              {isCustomCap ? "DAILY LIMIT LEFT" : "SAFE BUDGET LEFT"}
             </span>
             <span
               className={cn(
@@ -111,10 +139,15 @@ export function SafeToSpendGauge({
           />
         </div>
 
-        {isOverBudget && (
+        {isOverBudget ? (
           <div className="flex items-center gap-1.5 text-[11px] font-bold text-rose-700 pt-0.5">
             <AlertTriangle className="size-3.5 stroke-[2.5]" />
-            <span>Exceeded today's calculated safe limit by {currencySymbol}{(spentToday - dailySafeToSpend).toFixed(0)}</span>
+            <span>Exceeded today's {isCustomCap ? "daily limit" : "safe limit"} by {currencySymbol}{(spentToday - effectiveDailyLimit).toFixed(0)}</span>
+          </div>
+        ) : (
+          <div className="flex items-center justify-between text-[10px] font-bold text-[#161514]/60 pt-0.5">
+            <span>{isCustomCap ? `Daily Cap: ${currencySymbol}${customDailyBudget}` : `Safe Pace: ~${currencySymbol}${dailySafeToSpend.toFixed(0)}/day`}</span>
+            <span>{percentSpent}% used today</span>
           </div>
         )}
       </div>
