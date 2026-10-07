@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Neobrutalist Invictus Palette (Night / Obsidian) -->
-    <color name="widget_bg">#161514</color>
-    <color name="widget_card_bg">#22201E</color>
-    <color name="widget_card_inset">#2A2725</color>
-    <color name="widget_border">#3A3734</color>
-    <color name="widget_border_subtle">#55FFFFFF</color>
-    <color name="widget_text_primary">#FAF8F5</color>
-    <color name="widget_text_muted">#A8A29E</color>
+    <!-- Authentic Invictus Neobrutalist Warm Cream Palette (Locked for High-Contrast Widget Legibility) -->
+    <color name="widget_bg">#FAF8F5</color>
+    <color name="widget_card_bg">#FFFFFF</color>
+    <color name="widget_card_inset">#F5F3EF</color>
+    <color name="widget_border">#161514</color>
+    <color name="widget_border_subtle">#33161514</color>
+    <color name="widget_text_primary">#161514</color>
+    <color name="widget_text_muted">#73716D</color>
     <color name="widget_accent_lime">#CEF431</color>
-    <color name="widget_accent_emerald">#03D26F</color>
+    <color name="widget_accent_emerald">#037A48</color>
     <color name="widget_accent_amber">#F59E0B</color>
-    <color name="widget_accent_red">#F87171</color>
+    <color name="widget_accent_red">#B42318</color>
 </resources>

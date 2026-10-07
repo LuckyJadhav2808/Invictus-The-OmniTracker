@@ -74,7 +74,7 @@ export function EveningReflectionCard({
         </div>
 
         {/* 1-Line Win / Reflection Note Box */}
-        <div className="md:col-span-7 flex gap-2">
+        <div className="md:col-span-7 flex items-center gap-2 min-w-0 w-full">
           <input
             type="text"
             placeholder="Today's win or takeaway? (1 line reflection)"
@@ -83,14 +83,14 @@ export function EveningReflectionCard({
             onKeyDown={(e) => {
               if (e.key === 'Enter') onSaveMood();
             }}
-            className="flex-1 neo-input text-base md:text-xs py-1.5"
+            className="flex-1 min-w-0 w-full neo-input text-base md:text-xs py-1.5"
           />
           <Button
             variant="default"
             size="sm"
             onClick={() => onSaveMood()}
             disabled={isSaving}
-            className="border-2 border-[#161514] bg-[#CEF431] text-[#161514] hover:bg-[#D8F74E] shadow-[2px_2px_0px_#161514] active:scale-95 shrink-0"
+            className="border-2 border-[#161514] bg-[#CEF431] text-[#161514] hover:bg-[#D8F74E] shadow-[2px_2px_0px_#161514] active:scale-95 shrink-0 px-3 cursor-pointer"
           >
             <Send className="size-3.5" />
             <span>Save</span>

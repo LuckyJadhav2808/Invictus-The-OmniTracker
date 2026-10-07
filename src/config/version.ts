@@ -10,19 +10,19 @@ export interface AppVersionInfo {
 }
 
 export const APP_VERSION_CONFIG: AppVersionInfo = {
-  version: "1.7.0",
-  buildNumber: 21,
-  releaseDate: "October 6, 2026",
+  version: "1.7.1",
+  buildNumber: 22,
+  releaseDate: "October 7, 2026",
   channel: "stable",
   minSupportedVersion: "1.0.0",
   githubRepoUrl: "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker",
   latestReleaseApiUrl: "https://api.github.com/repos/LuckyJadhav2808/Invictus-The-OmniTracker/releases/latest",
   changelog: [
-    "🏛️ Concept 3 Monolith Brand Redesign: Replaced legacy gladiator helmet with the architectural 'I' pillar of strength, high-contrast favicons, Apple touch icon, and 5-density Android adaptive launcher icons",
-    "⚡ Refined Neobrutalist Android Widget: Clean split-deck daily overview featuring real-time safe-to-spend limit, liquidity breakdown, and interactive habit checklist",
+    "🎨 Widget Contrast Fix: Locked Android widget to high-contrast Neobrutalist Warm Cream palette for day and night modes",
+    "🏛️ Widget Selection Icon & Preview: Configured Monolith icon and @drawable/widget_preview for Android launcher widget drawer",
+    "📱 Responsive Layout Polish: Fixed button overflow in Settings daily spending limit and Today's mindset reflection",
+    "⚡ Refined Neobrutalist Split-Deck Widget: Real-time safe-to-spend limit, liquidity breakdown, and habit checklist",
     "📲 In-App APK Updater: Instant background download with live progress and native Android package installer integration",
-    "🦊 Interactive Vix Vector Mascot: Expressive animated SVG mascot with glance/blink autonomy, audio feedback, and mood states",
-    "🛠️ Neobrutalist UI Upgrades: AdaptiveDrawerDialog, NeobrutalistDateTimePickerModal, and CloudSyncDrawer",
   ],
 };
 

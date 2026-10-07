@@ -45,6 +45,8 @@
         <receiver
             android:name=".SafeSpendWidgetProvider"
             android:label="@string/widget_safe_spend_label"
+            android:icon="@mipmap/ic_launcher"
+            android:roundIcon="@mipmap/ic_launcher_round"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

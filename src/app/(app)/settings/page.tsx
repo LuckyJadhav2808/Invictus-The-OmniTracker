@@ -1585,7 +1585,7 @@ export default function SettingsPage() {
                   )}
                 </div>
 
-                <div className="flex gap-2 pt-1">
+                <div className="flex flex-col sm:flex-row gap-2 pt-1">
                   <input
                     id="daily-spend-limit-input"
                     type="number"
@@ -1593,27 +1593,29 @@ export default function SettingsPage() {
                     step="50"
                     value={dailyLimitInput}
                     onChange={(e) => setDailyLimitInput(e.target.value)}
-                    placeholder={`e.g. 500 (or leave empty for auto pace)`}
-                    className="neo-input flex-1 rounded-xl border-2 border-[#161514] bg-[#FAF8F5] py-2 px-3 text-xs font-bold text-[#161514] outline-none"
+                    placeholder={`e.g. 500 (or empty for auto pace)`}
+                    className="neo-input w-full min-w-0 flex-1 rounded-xl border-2 border-[#161514] bg-[#FAF8F5] py-2 px-3 text-xs font-bold text-[#161514] outline-none"
                   />
-                  <button
-                    type="button"
-                    onClick={handleSaveDailyLimit}
-                    disabled={savingDailyLimit}
-                    className="bg-amber-400 hover:bg-amber-500 text-[#161514] font-black text-xs uppercase px-4 py-2 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
-                  >
-                    {savingDailyLimit ? "Saving…" : "Save Limit"}
-                  </button>
-                  {cloudBudgetPrefs?.customDailyBudget && (
+                  <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
                     <button
                       type="button"
-                      onClick={handleClearDailyLimit}
-                      className="bg-rose-100 hover:bg-rose-200 text-rose-700 font-black text-xs uppercase px-3 py-2 rounded-xl border-2 border-[#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
-                      title="Reset to dynamic auto pace"
+                      onClick={handleSaveDailyLimit}
+                      disabled={savingDailyLimit}
+                      className="flex-1 sm:flex-none bg-amber-400 hover:bg-amber-500 text-[#161514] font-black text-xs uppercase px-3.5 py-2 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer whitespace-nowrap text-center"
                     >
-                      Reset
+                      {savingDailyLimit ? "Saving…" : "Save Limit"}
                     </button>
-                  )}
+                    {cloudBudgetPrefs?.customDailyBudget && (
+                      <button
+                        type="button"
+                        onClick={handleClearDailyLimit}
+                        className="bg-rose-100 hover:bg-rose-200 text-rose-700 font-black text-xs uppercase px-3 py-2 rounded-xl border-2 border-[#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer whitespace-nowrap text-center"
+                        title="Reset to dynamic auto pace"
+                      >
+                        Reset
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
 
