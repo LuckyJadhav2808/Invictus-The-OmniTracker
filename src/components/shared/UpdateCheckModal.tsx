@@ -151,9 +151,11 @@ export function UpdateCheckModal({ open, onOpenChange, autoCheck = false }: Upda
                     {hasUpdate ? `Update: v${latestVer}` : "Up to date"}
                   </span>
                 </div>
-                <p className="text-[10px] text-[#161514]/70 font-semibold pt-0.5">
-                  Build #{APP_VERSION_CONFIG.buildNumber} • {APP_VERSION_CONFIG.channel.toUpperCase()} Channel
-                </p>
+                <div className="flex items-center gap-2 text-[10px] text-[#161514]/70 font-semibold pt-0.5">
+                  <span>Native Shell: v{installedVersion}</span>
+                  <span>•</span>
+                  <span>Web Engine: v{APP_VERSION_CONFIG.version}</span>
+                </div>
               </div>
             </div>
 
@@ -172,12 +174,12 @@ export function UpdateCheckModal({ open, onOpenChange, autoCheck = false }: Upda
           {hasUpdate ? (
             <div className="bg-amber-100 rounded-xl p-2.5 border-2 border-[#161514] flex items-center gap-2 text-xs font-bold text-amber-950">
               <AlertCircle className="h-4 w-4 text-amber-600 shrink-0" />
-              <span>A new version <strong>v{latestVer}</strong> is available for download!</span>
+              <span>Native APK <strong>v{latestVer}</strong> available! Install to update widgets & icons.</span>
             </div>
           ) : (
             <div className="bg-emerald-50 rounded-xl p-2.5 border-2 border-[#161514] flex items-center gap-2 text-xs font-bold text-emerald-950">
               <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-              <span>You have the latest production release with all features active.</span>
+              <span>You have the latest release installed with all native widgets active.</span>
             </div>
           )}
         </div>
@@ -281,14 +283,23 @@ export function UpdateCheckModal({ open, onOpenChange, autoCheck = false }: Upda
             </button>
           )}
 
-          <a
-            href={releaseUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full py-2 text-center block text-[11px] font-bold text-[#161514]/70 hover:text-[#161514] underline underline-offset-2"
-          >
-            View Changelog on GitHub Releases ↗
-          </a>
+          <div className="flex items-center justify-between gap-2 pt-1">
+            <a
+              href="https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v1.7.1/Invictus.apk"
+              download="Invictus.apk"
+              className="text-center text-[10px] font-bold text-[#161514] underline underline-offset-2 hover:text-[#037A48]"
+            >
+              📥 Direct APK Download ↗
+            </a>
+            <a
+              href={releaseUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-center text-[10px] font-bold text-[#161514]/70 hover:text-[#161514] underline underline-offset-2"
+            >
+              GitHub Release Notes ↗
+            </a>
+          </div>
         </div>
       </div>
     </ResponsiveFormContainer>

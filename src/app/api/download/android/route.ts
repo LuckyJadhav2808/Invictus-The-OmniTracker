@@ -10,14 +10,11 @@ export async function GET(request: Request) {
 
   // Resolve real APK asset URL from GitHub releases
   if (!forcePage) {
-    let directDownloadUrl = requestedVersion
-      ? `https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v${requestedVersion}/Invictus.apk`
-      : `https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/latest/download/Invictus.apk`;
+    const targetVer = requestedVersion || APP_VERSION_CONFIG.version;
+    let directDownloadUrl = `https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v${targetVer}/Invictus.apk`;
 
     try {
-      const releaseApiUrl = requestedVersion
-        ? `https://api.github.com/repos/LuckyJadhav2808/Invictus-The-OmniTracker/releases/tags/v${requestedVersion}`
-        : `https://api.github.com/repos/LuckyJadhav2808/Invictus-The-OmniTracker/releases/latest`;
+      const releaseApiUrl = `https://api.github.com/repos/LuckyJadhav2808/Invictus-The-OmniTracker/releases/tags/v${targetVer}`;
 
       const ghRes = await fetch(releaseApiUrl, {
         headers: {

@@ -12,7 +12,9 @@
     "test": "vitest run src",
     "db:verify": "node scripts/verify-data.mjs",
     "version:check": "node scripts/bump-version.mjs --check",
-    "version:bump": "node scripts/bump-version.mjs"
+    "version:bump": "node scripts/bump-version.mjs",
+    "ci:verify": "npm run version:check && npx tsc --noEmit && npm test",
+    "release:publish": "node scripts/publish-release.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.0",
