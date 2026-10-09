@@ -39,7 +39,10 @@ export function ProactiveReminderBanner({ space = "today" }: ProactiveReminderBa
     saveReminderConfig(config);
     setHasEnabledReminders(true);
 
-    if (granted) {
+    const { isNativeApp, scheduleAllNativeAlarms } = await import("@/lib/native/native-notifications");
+    if (isNativeApp()) {
+      await scheduleAllNativeAlarms(config);
+    } else if (granted) {
       sendNativeNotification(
         "🔔 Reminders Enabled!",
         "You're all set! Daily reminders for Money, Habits & Study sessions are now active.",

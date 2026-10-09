@@ -39,9 +39,9 @@ export function ReminderManagerModal({
     if (open) {
       setConfig(getReminderConfig());
       if (isNative) {
-        import("@/lib/native/native-notifications").then(({ checkNativeNotificationPermissions }) => {
-          checkNativeNotificationPermissions().then((granted) => {
-            setPermissionState(granted ? "granted" : "default");
+        import("@/lib/native/native-notifications").then(({ getNativeNotificationPermissionStatus }) => {
+          getNativeNotificationPermissionStatus().then((status) => {
+            setPermissionState(status);
           });
         });
       } else if (typeof window !== "undefined" && "Notification" in window) {
@@ -118,14 +118,18 @@ export function ReminderManagerModal({
               Test Alarm 🔔
             </button>
           </div>
-        ) : permissionState === "denied" && !isNative ? (
+        ) : permissionState === "denied" ? (
           <div className="bg-rose-100 p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] text-xs font-bold text-rose-950 space-y-1">
             <div className="flex items-center gap-1.5 font-black">
               <Bell className="h-4 w-4 text-rose-700 stroke-[2.5]" />
-              ⚠️ Notifications Blocked in Browser Settings
+              {isNative ? "⚠️ Notifications Blocked in Device Settings" : "⚠️ Notifications Blocked in Browser Settings"}
             </div>
             <p className="text-[11px] font-medium text-rose-900 leading-tight">
-              To enable: Click the 🔒 lock icon on your browser address bar next to <code className="bg-white/80 px-1 py-0.5 rounded text-[10px]">localhost:3000</code> → Switch <strong>Notifications</strong> to <strong>Allow</strong>.
+              {isNative ? (
+                <>To enable: Open your phone&apos;s <strong>Settings &gt; Apps &gt; Invictus &gt; Notifications</strong> and toggle <strong>Allow notifications</strong> to On.</>
+              ) : (
+                <>To enable: Click the 🔒 lock icon on your browser address bar next to <code className="bg-white/80 px-1 py-0.5 rounded text-[10px]">localhost:3000</code> &rarr; Switch <strong>Notifications</strong> to <strong>Allow</strong>.</>
+              )}
             </p>
           </div>
         ) : (
@@ -140,7 +144,7 @@ export function ReminderManagerModal({
                 if (isNative) {
                   const { requestNativeNotificationPermissions } = await import("@/lib/native/native-notifications");
                   const granted = await requestNativeNotificationPermissions();
-                  setPermissionState(granted ? "granted" : "default");
+                  setPermissionState(granted ? "granted" : "denied");
                 } else {
                   const granted = await requestNotificationPermission();
                   setPermissionState(granted ? "granted" : "denied");

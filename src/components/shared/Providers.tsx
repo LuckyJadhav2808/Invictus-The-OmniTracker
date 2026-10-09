@@ -9,7 +9,11 @@ import { registerServiceWorker } from "@/lib/utils/notifications";
 import { syncEngine } from "@/lib/offline/sync-manager";
 import { OfflineStatusBanner } from "@/components/shared/OfflineStatusBanner";
 
+import { useRouter } from "next/navigation";
+import { initNativeNotificationBridge, isNativeApp } from "@/lib/native/native-notifications";
+
 export function Providers({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -25,10 +29,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     initReminderScheduler();
     registerServiceWorker().catch(() => {});
+    if (isNativeApp()) {
+      initNativeNotificationBridge(router).catch(() => {});
+    }
     syncEngine.registerQueryInvalidator(() => {
       queryClient.invalidateQueries();
     });
-  }, [queryClient]);
+  }, [queryClient, router]);
 
   return (
     <QueryClientProvider client={queryClient}>

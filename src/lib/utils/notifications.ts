@@ -1,5 +1,7 @@
 "use client";
 
+import { isNativeApp } from "@/lib/native/native-notifications";
+
 export async function registerServiceWorker() {
   if (typeof window === "undefined" || !("serviceWorker" in navigator)) {
     return null;
@@ -14,7 +16,18 @@ export async function registerServiceWorker() {
 }
 
 export async function requestNotificationPermission(): Promise<boolean> {
-  if (typeof window === "undefined" || !("Notification" in window)) {
+  if (typeof window === "undefined") return false;
+
+  if (isNativeApp()) {
+    try {
+      const { requestNativeNotificationPermissions } = await import("@/lib/native/native-notifications");
+      return await requestNativeNotificationPermissions();
+    } catch {
+      return false;
+    }
+  }
+
+  if (!("Notification" in window)) {
     return false;
   }
   if (Notification.permission === "granted") {
@@ -28,14 +41,30 @@ export async function requestNotificationPermission(): Promise<boolean> {
 }
 
 export function isNotificationPermissionGranted(): boolean {
-  if (typeof window === "undefined" || !("Notification" in window)) {
+  if (typeof window === "undefined") return false;
+
+  if (!("Notification" in window)) {
     return false;
   }
   return Notification.permission === "granted";
 }
 
 export async function sendNativeNotification(title: string, body: string, url: string = "/today") {
-  if (typeof window === "undefined" || !("Notification" in window)) {
+  if (typeof window === "undefined") return;
+
+  // 1. If running as Native App (Android APK), dispatch directly via LocalNotifications
+  if (isNativeApp()) {
+    try {
+      const { dispatchInstantNativeNotification } = await import("@/lib/native/native-notifications");
+      await dispatchInstantNativeNotification(title, body, url);
+      return;
+    } catch (e) {
+      console.warn("[Notifications] Native notification dispatch fallback:", e);
+    }
+  }
+
+  // 2. Otherwise Web browser notification path
+  if (!("Notification" in window)) {
     return;
   }
 
@@ -44,7 +73,7 @@ export async function sendNativeNotification(title: string, body: string, url: s
     if (permission !== "granted") return;
   }
 
-  // 1. Fire Direct Browser Notification Constructor IMMEDIATELY (Non-blocking, instant OS status bar toast)
+  // Fire Direct Browser Notification Constructor
   try {
     const n = new Notification(title, {
       body,
@@ -60,7 +89,7 @@ export async function sendNativeNotification(title: string, body: string, url: s
     console.warn("Direct Notification constructor failed:", err);
   }
 
-  // 2. Also trigger via Service Worker if registered (for mobile background lockscreen support)
+  // Also trigger via Service Worker if registered
   try {
     if ("serviceWorker" in navigator) {
       const reg = await navigator.serviceWorker.getRegistration();
@@ -73,7 +102,7 @@ export async function sendNativeNotification(title: string, body: string, url: s
           tag: "invictus-alert-" + Date.now(),
           renotify: true,
           data: { url },
-        } as any);
+        } as NotificationOptions);
       }
     }
   } catch (err) {

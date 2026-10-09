@@ -1,6 +1,6 @@
 "use client";
 
-import { sendNativeNotification, requestNotificationPermission } from "@/lib/utils/notifications";
+import { sendNativeNotification } from "@/lib/utils/notifications";
 import { toast } from "sonner";
 
 export interface ReminderConfig {

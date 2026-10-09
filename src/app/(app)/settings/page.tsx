@@ -63,6 +63,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { SubscriptionsTracker } from "@/components/money/SubscriptionsTracker";
 import { ReminderManagerModal } from "@/components/shared/ReminderManagerModal";
+import { getReminderConfig, type ReminderConfig } from "@/lib/utils/reminder-scheduler";
 import { ReportIssueModal } from "@/components/shared/ReportIssueModal";
 import { UpdateCheckModal } from "@/components/shared/UpdateCheckModal";
 import { APP_VERSION_CONFIG } from "@/config/version";
@@ -102,6 +103,11 @@ export default function SettingsPage() {
   // Active Tab State
   const [activeTab, setActiveTab] = useState<"preferences" | "modules" | "security" | "datavault">("preferences");
   const [isRemindersOpen, setIsRemindersOpen] = useState(false);
+  const [reminderConfig, setReminderConfig] = useState<ReminderConfig | null>(null);
+
+  useEffect(() => {
+    setReminderConfig(getReminderConfig());
+  }, [isRemindersOpen]);
 
   // Global Announcement Banner state
   const [activeAnnouncement, setActiveAnnouncement] = useState<GlobalAnnouncement | null>(null);
@@ -755,13 +761,37 @@ export default function SettingsPage() {
               <div className="h-11 w-11 rounded-xl bg-white border-2 border-[#161514] flex items-center justify-center text-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] shrink-0">
                 <Bell className="h-5 w-5 stroke-[2.5]" />
               </div>
-              <div className="text-left">
+              <div className="text-left space-y-1">
                 <h4 className="font-black text-sm text-[#161514] tracking-tight uppercase font-heading">
                   DAILY LOG REMINDERS & NOTIFICATIONS
                 </h4>
-                <p className="text-[10px] text-[#161514]/80 font-black uppercase tracking-wide">
-                  EXPENSES, HABITS & EXAM STUDY TIMES
-                </p>
+                <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                  {reminderConfig?.habitsEnabled && (
+                    <span className="px-2 py-0.5 bg-white border border-[#161514] rounded-md text-[10px] font-black uppercase text-[#161514]">
+                      Habits: {reminderConfig.habitsTime}
+                    </span>
+                  )}
+                  {reminderConfig?.moneyEnabled && (
+                    <span className="px-2 py-0.5 bg-white border border-[#161514] rounded-md text-[10px] font-black uppercase text-[#161514]">
+                      Money: {reminderConfig.moneyTime}
+                    </span>
+                  )}
+                  {reminderConfig?.studyEnabled && (
+                    <span className="px-2 py-0.5 bg-white border border-[#161514] rounded-md text-[10px] font-black uppercase text-[#161514]">
+                      Study: {reminderConfig.studyTime}
+                    </span>
+                  )}
+                  {reminderConfig?.examEnabled && (
+                    <span className="px-2 py-0.5 bg-white border border-[#161514] rounded-md text-[10px] font-black uppercase text-[#161514]">
+                      Exam: {reminderConfig.examTime}
+                    </span>
+                  )}
+                  {(!reminderConfig || (!reminderConfig.habitsEnabled && !reminderConfig.moneyEnabled && !reminderConfig.studyEnabled && !reminderConfig.examEnabled)) && (
+                    <span className="text-[10px] text-[#161514]/80 font-black uppercase tracking-wide">
+                      NO REMINDERS ACTIVE &bull; TAP TO SET TIMES
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
             <ChevronRight className="h-5 w-5 text-[#161514] stroke-[3]" />
