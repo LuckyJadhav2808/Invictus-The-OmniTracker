@@ -86,6 +86,7 @@ export default function TodayPage() {
   const [isDailyLimitModalOpen, setIsDailyLimitModalOpen] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const previousConqueredRef = useRef(false);
+  const isInitialMountRef = useRef(true);
 
   // Currency resolution
   const [currency, setCurrency] = useState("INR");
@@ -148,14 +149,27 @@ export default function TodayPage() {
   const completedHabitsCount = completedHabitLogs.length;
   const allHabitsConquered = totalHabitsCount > 0 && completedHabitsCount === totalHabitsCount;
 
-  // Trigger confetti when hitting 100% completion
+  // Trigger confetti when hitting 100% completion during active session
   useEffect(() => {
-    if (allHabitsConquered && !previousConqueredRef.current) {
+    // Prevent celebration on initial page mount when habits were already conquered earlier
+    if (isInitialMountRef.current) {
+      isInitialMountRef.current = false;
+      previousConqueredRef.current = allHabitsConquered;
+      return;
+    }
+
+    const celebrationKey = `invictus_celebrated_${selectedDate}`;
+    const alreadyCelebrated = typeof window !== "undefined" && sessionStorage.getItem(celebrationKey) === "true";
+
+    if (allHabitsConquered && !previousConqueredRef.current && !alreadyCelebrated) {
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem(celebrationKey, "true");
+      }
       setShowConfetti(true);
       toast.success("🔥 VICTORY! All daily habits conquered. Vix salutes you!");
     }
     previousConqueredRef.current = allHabitsConquered;
-  }, [allHabitsConquered]);
+  }, [allHabitsConquered, selectedDate]);
 
   // Streak days max
   const streakDays = useMemo(() => {

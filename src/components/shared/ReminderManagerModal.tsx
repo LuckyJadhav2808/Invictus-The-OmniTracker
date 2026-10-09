@@ -105,23 +105,23 @@ export function ReminderManagerModal({
       <form onSubmit={handleSave} className="space-y-4 pt-1">
         {/* Permission Banner */}
         {permissionState === "granted" ? (
-          <div className="bg-emerald-100 p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] text-xs font-bold text-emerald-950 flex items-center justify-between gap-2">
-            <span className="flex items-center gap-1.5 font-black">
-              <CheckCircle2 className="h-4 w-4 text-emerald-700 stroke-[2.5]" />
+          <div className="bg-emerald-100 p-2.5 sm:p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] text-xs font-bold text-emerald-950 flex flex-wrap items-center justify-between gap-2">
+            <span className="flex items-center gap-1.5 font-black text-[11px] sm:text-xs">
+              <CheckCircle2 className="h-4 w-4 text-emerald-700 stroke-[2.5] shrink-0" />
               {isNative ? "🟢 Native Hardware Alarms Granted & Active" : "🟢 Browser Notifications Granted & Active"}
             </span>
             <button
               type="button"
               onClick={handleTestNotification}
-              className="px-3 py-1 rounded-xl bg-white hover:bg-emerald-200 text-[#161514] font-black text-[10px] uppercase border border-[#161514] cursor-pointer shrink-0"
+              className="px-3 py-1 rounded-xl bg-white hover:bg-emerald-200 text-[#161514] font-black text-[10px] uppercase border border-[#161514] cursor-pointer shrink-0 ml-auto"
             >
               Test Alarm 🔔
             </button>
           </div>
         ) : permissionState === "denied" ? (
-          <div className="bg-rose-100 p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] text-xs font-bold text-rose-950 space-y-1">
-            <div className="flex items-center gap-1.5 font-black">
-              <Bell className="h-4 w-4 text-rose-700 stroke-[2.5]" />
+          <div className="bg-rose-100 p-2.5 sm:p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] text-xs font-bold text-rose-950 space-y-1">
+            <div className="flex items-center gap-1.5 font-black text-[11px] sm:text-xs">
+              <Bell className="h-4 w-4 text-rose-700 stroke-[2.5] shrink-0" />
               {isNative ? "⚠️ Notifications Blocked in Device Settings" : "⚠️ Notifications Blocked in Browser Settings"}
             </div>
             <p className="text-[11px] font-medium text-rose-900 leading-tight">
@@ -133,9 +133,9 @@ export function ReminderManagerModal({
             </p>
           </div>
         ) : (
-          <div className="bg-amber-100 p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] text-xs font-bold text-[#161514] flex items-center justify-between gap-2">
-            <span className="flex items-center gap-1.5">
-              <Bell className="h-4 w-4 text-amber-700 stroke-[2.5]" />
+          <div className="bg-amber-100 p-2.5 sm:p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] text-xs font-bold text-[#161514] flex flex-wrap items-center justify-between gap-2">
+            <span className="flex items-center gap-1.5 text-[11px] sm:text-xs">
+              <Bell className="h-4 w-4 text-amber-700 stroke-[2.5] shrink-0" />
               {isNative ? "Enable Native Hardware Alarms for lock screen alerts" : "Allow browser notifications for background alerts"}
             </span>
             <button
@@ -280,26 +280,26 @@ export function ReminderManagerModal({
         </div>
 
         {/* Chime & Test Actions */}
-        <div className="flex items-center justify-between gap-2 pt-1">
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
           <button
             type="button"
             onClick={() => setConfig({ ...config, soundEnabled: !config.soundEnabled })}
             className={cn(
-              "px-3 py-1.5 rounded-xl text-xs font-black border-2 border-[#161514] flex items-center gap-1.5 shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all",
+              "flex-1 min-w-[125px] px-2.5 py-1.5 rounded-xl text-xs font-black border-2 border-[#161514] flex items-center justify-center gap-1.5 shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all",
               config.soundEnabled ? "bg-[#CEF431] text-[#161514]" : "bg-white text-gray-500"
             )}
           >
             {config.soundEnabled ? <Volume2 className="h-3.5 w-3.5 stroke-[2.5]" /> : <VolumeX className="h-3.5 w-3.5 stroke-[2.5]" />}
-            <span>{config.soundEnabled ? "Chime Audio ON" : "Chime Audio Muted"}</span>
+            <span>{config.soundEnabled ? "Chime ON" : "Chime Muted"}</span>
           </button>
 
           <button
             type="button"
             onClick={handleTestNotification}
-            className="px-3 py-1.5 rounded-xl bg-white hover:bg-[#FFF9EA] text-[#161514] text-xs font-black border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center gap-1"
+            className="flex-1 min-w-[125px] px-2.5 py-1.5 rounded-xl bg-white hover:bg-[#FFF9EA] text-[#161514] text-xs font-black border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center justify-center gap-1"
           >
             <Bell className="h-3.5 w-3.5 stroke-[2.5]" />
-            <span>Test Notification</span>
+            <span>Test Alert</span>
           </button>
         </div>
 

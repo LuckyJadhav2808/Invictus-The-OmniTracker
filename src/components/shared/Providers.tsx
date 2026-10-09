@@ -31,6 +31,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
     registerServiceWorker().catch(() => {});
     if (isNativeApp()) {
       initNativeNotificationBridge(router).catch(() => {});
+      import("@capacitor/splash-screen")
+        .then(({ SplashScreen }) => {
+          SplashScreen.hide().catch(() => {});
+        })
+        .catch(() => {});
     }
     syncEngine.registerQueryInvalidator(() => {
       queryClient.invalidateQueries();

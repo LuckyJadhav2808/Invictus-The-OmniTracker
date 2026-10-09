@@ -158,8 +158,12 @@ export async function requestNativeNotificationPermissions(): Promise<boolean> {
       toast.error("Notification permission denied. Please allow in Android App Settings.");
       return false;
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error("[NativeNotifications] Failed to request permissions:", err);
+    const msg = err?.message || "";
+    if (msg.includes("not implemented")) {
+      toast.error("Hardware alarm bridge requires the new app build. Please update your APK! 📲");
+    }
     return false;
   }
 }
@@ -225,7 +229,19 @@ export async function sendTestNativeAlarm(): Promise<boolean> {
     return true;
   } catch (e: any) {
     console.error("Test native alarm failed:", e);
-    toast.error("Failed to fire test alarm: " + e?.message);
+    const msg = e?.message || "";
+    if (msg.includes("not implemented")) {
+      toast.error("Hardware alarm module needs the new app build! Install the latest APK update. 📲");
+      if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
+        try {
+          new Notification("🔔 Test Notification (Web Fallback)", {
+            body: "Test alert triggered! Please install the new APK update to activate native lockscreen alarms.",
+          });
+        } catch {}
+      }
+    } else {
+      toast.error("Failed to fire test alarm: " + msg);
+    }
     return false;
   }
 }
@@ -387,7 +403,14 @@ export async function scheduleAllNativeAlarms(
     return true;
   } catch (err: any) {
     console.error("[NativeNotifications] Error scheduling alarms:", err);
-    toast.error("Failed to schedule native alarms: " + err?.message);
+    const msg = err?.message || "";
+    if (msg.includes("not implemented")) {
+      if (!options.silent) {
+        toast.error("Native alarms will activate as soon as you install the latest app update! 📲");
+      }
+    } else {
+      toast.error("Failed to schedule native alarms: " + msg);
+    }
     return false;
   }
 }

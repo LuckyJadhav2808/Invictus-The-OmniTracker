@@ -36,8 +36,14 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(() => {
+    if (typeof window === "undefined") return null;
+    return getCustomSession();
+  });
+  const [loading, setLoading] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return false;
+  });
 
   const refreshUser = () => {
     const session = getCustomSession();
