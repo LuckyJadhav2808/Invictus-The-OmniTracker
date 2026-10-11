@@ -91,7 +91,7 @@ export function BudgetTabView({
           </div>
 
           <div className="bg-white p-2.5 rounded-xl border border-[#161514]">
-            <span className="text-[9px] font-black uppercase text-[#161514]/60 block">Daily Velocity Pace</span>
+            <span className="text-[9px] font-black uppercase text-[#161514]/60 block">Daily Spend Limit</span>
             <span className="text-sm sm:text-base font-black text-[#03D26F] font-heading mt-0.5 block">
               ~{currencySymbol}{monthlyStats.dailySafeToSpend.toLocaleString()}/day
             </span>

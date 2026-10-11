@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
+import { NeobrutalistDateTimePickerModal } from "@/components/shared/NeobrutalistDateTimePickerModal";
 import { format } from "date-fns";
 
 interface DebtTrackerProps {
@@ -45,6 +46,7 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
 
   // Modal States
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isDueDatePickerOpen, setIsDueDatePickerOpen] = useState(false);
   const [personName, setPersonName] = useState("");
   const [debtType, setDebtType] = useState<"lent" | "borrowed">("lent");
   const [amount, setAmount] = useState("");
@@ -304,10 +306,10 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
                   isSettled ? "bg-[#FAF8F5] opacity-75" : "bg-white"
                 }`}
               >
-                {/* Top Main Row: Avatar + Info (Left) and Amount + Action Buttons (Right) */}
-                <div className="flex items-start justify-between gap-2.5">
+                {/* Responsive Debt Card Layout (No horizontal overlap on mobile) */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   {/* Left: Avatar & Name Details */}
-                  <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                  <div className="flex items-center gap-2.5 min-w-0">
                     <div
                       className={`h-10 w-10 shrink-0 rounded-xl border-2 border-[#161514] flex items-center justify-center font-black text-xs shadow-[2px_2px_0px_0px_#161514] ${
                         isLent ? "bg-emerald-200 text-emerald-950" : "bg-rose-200 text-rose-950"
@@ -341,11 +343,11 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
                     </div>
                   </div>
 
-                  {/* Right: Amount & Actions */}
-                  <div className="flex items-center gap-2 shrink-0">
-                    <div className="text-right">
+                  {/* Right/Bottom: Amount & Actions */}
+                  <div className="flex items-center justify-between sm:justify-end gap-3 pt-1.5 sm:pt-0 border-t border-[#161514]/10 sm:border-t-0">
+                    <div className="text-left sm:text-right">
                       <div
-                        className={`font-black text-sm sm:text-base leading-tight ${
+                        className={`font-black text-base sm:text-lg leading-tight ${
                           isLent ? "text-emerald-600" : "text-rose-600"
                         }`}
                         style={{ fontFamily: "var(--font-heading)" }}
@@ -359,7 +361,7 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1.5 shrink-0">
                       {!isSettled && (
                         <>
                           <button
@@ -371,7 +373,7 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
                               navigator.clipboard.writeText(msg);
                               toast.success(`Reminder text for ${d.personName} copied to clipboard! 📋`);
                             }}
-                            className="h-8 w-8 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-950 font-black border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center cursor-pointer transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+                            className="h-8 w-8 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-950 font-black border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center justify-center cursor-pointer transition-all active:translate-x-0.5 active:translate-y-0.5"
                             title="Copy Reminder Text for WhatsApp/SMS"
                           >
                             <span className="text-xs">💬</span>
@@ -383,11 +385,11 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
                               setSettlingDebt(d);
                               setAutoLogTx(true);
                             }}
-                            className="h-8 px-2.5 rounded-xl bg-[#03D26F] hover:bg-emerald-400 text-white font-black text-xs border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center gap-1 cursor-pointer transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+                            className="h-8 px-2.5 rounded-xl bg-[#03D26F] hover:bg-emerald-400 text-white font-black text-xs border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center gap-1 cursor-pointer transition-all active:translate-x-0.5 active:translate-y-0.5"
                             title="Mark Paid & Settle Up"
                           >
                             <CheckCircle2 className="h-3.5 w-3.5 stroke-[2.5]" />
-                            <span className="hidden sm:inline">Settle</span>
+                            <span>Settle</span>
                           </button>
                         </>
                       )}
@@ -395,7 +397,7 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
                       <button
                         type="button"
                         onClick={() => setDeletingDebtId(d.id)}
-                        className="h-8 w-8 rounded-xl bg-white hover:bg-rose-100 text-rose-600 font-bold border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center cursor-pointer transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+                        className="h-8 w-8 rounded-xl bg-white hover:bg-rose-100 text-rose-600 font-bold border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center justify-center cursor-pointer transition-all active:translate-x-0.5 active:translate-y-0.5"
                         title="Delete record"
                       >
                         <Trash2 className="h-3.5 w-3.5 stroke-[2.5]" />
@@ -455,7 +457,7 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
           {/* Debt Type Selector */}
           <div className="space-y-1">
             <label className="text-xs font-black uppercase text-[#161514]">Record Type</label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => setDebtType("lent")}
@@ -465,8 +467,8 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
                     : "bg-[#FAF8F5] text-[#161514]/70 hover:bg-white"
                 }`}
               >
-                <ArrowUpRight className="h-4 w-4 stroke-[3]" />
-                You Lent (Receivable)
+                <ArrowUpRight className="h-4 w-4 stroke-[3] shrink-0" />
+                <span>You Lent (Receivable)</span>
               </button>
               <button
                 type="button"
@@ -477,8 +479,8 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
                     : "bg-[#FAF8F5] text-[#161514]/70 hover:bg-white"
                 }`}
               >
-                <ArrowDownLeft className="h-4 w-4 stroke-[3]" />
-                You Borrowed (Payable)
+                <ArrowDownLeft className="h-4 w-4 stroke-[3] shrink-0" />
+                <span>You Borrowed (Payable)</span>
               </button>
             </div>
           </div>
@@ -513,12 +515,27 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
           {/* Due Date */}
           <div className="space-y-1">
             <label className="text-xs font-black uppercase text-[#161514]">Due Date (Optional)</label>
-            <input
-              type="date"
-              value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
-              className="w-full h-11 px-3 rounded-xl bg-[#FAF8F5] border-2 border-[#161514] font-bold text-sm text-[#161514] focus:bg-[#FFF9EA] focus:shadow-[2px_2px_0px_0px_#161514] focus:outline-none transition-all"
-            />
+            <button
+              type="button"
+              onClick={() => setIsDueDatePickerOpen(true)}
+              className="w-full h-11 px-3 rounded-xl bg-[#FAF8F5] border-2 border-[#161514] font-bold text-sm text-[#161514] flex items-center justify-between hover:bg-white transition-all cursor-pointer shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none text-left"
+            >
+              <span className={dueDate ? "text-[#161514] font-black" : "text-[#161514]/50"}>
+                {dueDate ? format(new Date(dueDate), "EEE, d MMM yyyy") : "Select Due Date..."}
+              </span>
+              <Calendar className="h-4 w-4 text-[#161514]/60 stroke-[2.5]" />
+            </button>
+            {dueDate && (
+              <div className="flex justify-end pt-1">
+                <button
+                  type="button"
+                  onClick={() => setDueDate("")}
+                  className="text-[11px] font-black text-rose-600 hover:underline cursor-pointer"
+                >
+                  Clear Date
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Note */}
@@ -621,6 +638,17 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
         onConfirm={handleDelete}
         title="Delete Debt Record"
         description="Are you sure you want to delete this debt record? This action cannot be undone."
+      />
+
+      {/* 8. NEOBRUTALIST DATE PICKER MODAL */}
+      <NeobrutalistDateTimePickerModal
+        open={isDueDatePickerOpen}
+        onOpenChange={setIsDueDatePickerOpen}
+        dateValue={dueDate || format(new Date(), "yyyy-MM-dd")}
+        title="Select Due Date"
+        onSave={(newDate) => {
+          setDueDate(newDate);
+        }}
       />
     </div>
   );

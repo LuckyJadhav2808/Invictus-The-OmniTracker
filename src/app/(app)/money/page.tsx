@@ -43,6 +43,7 @@ import { CategoryFormModal } from "@/components/money/modals/CategoryFormModal";
 import { AllowanceSettingsModal } from "@/components/money/modals/AllowanceSettingsModal";
 import { MoveMoneyModal } from "@/components/money/modals/MoveMoneyModal";
 import { SendMoneyModal } from "@/components/money/modals/SendMoneyModal";
+import { NeobrutalistCalculator } from "@/components/shared/NeobrutalistCalculator";
 
 const PDFExportModal = dynamic(
   () => import("@/components/money/PDFExportModal").then((mod) => mod.PDFExportModal),
@@ -122,6 +123,7 @@ function MoneyPageContent() {
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
   const [isMoveMoneyOpen, setIsMoveMoneyOpen] = useState(false);
   const [isSendMoneyOpen, setIsSendMoneyOpen] = useState(false);
+  const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
   const [reopenTxAfterCat, setReopenTxAfterCat] = useState(false);
 
   // Deletion Safeguard
@@ -450,6 +452,7 @@ function MoneyPageContent() {
         onBulkScan={() => setIsBulkModalOpen(true)}
         onAddCategory={() => setIsAddCatOpen(true)}
         onOpenEditAllowances={() => setIsAllowanceModalOpen(true)}
+        onOpenCalculator={() => setIsCalculatorOpen(true)}
       />
 
       {/* 📑 TABS CONTROLS */}
@@ -683,6 +686,12 @@ function MoneyPageContent() {
         onConfirm={() => {
           if (deleteCatId) handleDeleteCategory(deleteCatId);
         }}
+      />
+
+      {/* 9. Floating & Cockpit Quick Neobrutalist Calculator */}
+      <NeobrutalistCalculator
+        open={isCalculatorOpen}
+        onOpenChange={setIsCalculatorOpen}
       />
     </div>
   );

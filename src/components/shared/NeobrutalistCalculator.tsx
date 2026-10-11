@@ -11,8 +11,29 @@ interface HistoryItem {
   timestamp: string;
 }
 
-export function NeobrutalistCalculator() {
-  const [isOpen, setIsOpen] = useState(false);
+export interface NeobrutalistCalculatorProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  hideFloatingTrigger?: boolean;
+}
+
+export function NeobrutalistCalculator({
+  open: controlledOpen,
+  onOpenChange,
+  hideFloatingTrigger = false,
+}: NeobrutalistCalculatorProps = {}) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = typeof controlledOpen === "boolean";
+  const isOpen = isControlled ? controlledOpen : internalOpen;
+
+  const setIsOpen = (next: boolean | ((prev: boolean) => boolean)) => {
+    const val = typeof next === "function" ? next(isOpen) : next;
+    if (!isControlled) {
+      setInternalOpen(val);
+    }
+    onOpenChange?.(val);
+  };
+
   const [showHistory, setShowHistory] = useState(false);
   const [history, setHistory] = useState<HistoryItem[]>([]);
 
@@ -22,6 +43,15 @@ export function NeobrutalistCalculator() {
   const [copied, setCopied] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Listen for global open calculator events
+  useEffect(() => {
+    const handleGlobalOpen = () => {
+      setIsOpen(true);
+    };
+    window.addEventListener("invictus:open-calc", handleGlobalOpen);
+    return () => window.removeEventListener("invictus:open-calc", handleGlobalOpen);
+  }, []);
 
   // Load calculation history from localStorage
   useEffect(() => {
@@ -191,23 +221,25 @@ export function NeobrutalistCalculator() {
   return (
     <>
       {/* 1. Floating Neobrutalist Trigger Button (Placed safely on bottom-left, away from FAB on right) */}
-      <div className="fixed bottom-20 left-3.5 sm:bottom-6 sm:left-6 z-30 select-none">
-        <button
-          type="button"
-          onClick={() => setIsOpen((prev) => !prev)}
-          className={cn(
-            "h-12 w-12 sm:h-14 sm:w-14 rounded-2xl bg-[#CEF431] hover:bg-[#b8db29] text-[#161514] border-2.5 border-[#161514] shadow-[3.5px_3.5px_0px_0px_rgba(22,21,20,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center justify-center cursor-pointer group",
-            isOpen && "bg-[#161514] text-[#CEF431]"
-          )}
-          title="Quick Neobrutalist Calculator (⌘K / 🧮)"
-        >
-          {isOpen ? (
-            <X className="h-6 w-6 stroke-[3] transition-transform duration-200" />
-          ) : (
-            <Calculator className="h-6 w-6 stroke-[2.5] transition-transform duration-200 group-hover:scale-110" />
-          )}
-        </button>
-      </div>
+      {!hideFloatingTrigger && (
+        <div className="fixed bottom-20 left-3.5 sm:bottom-6 sm:left-6 z-30 select-none">
+          <button
+            type="button"
+            onClick={() => setIsOpen((prev) => !prev)}
+            className={cn(
+              "h-12 w-12 sm:h-14 sm:w-14 rounded-2xl bg-[#CEF431] hover:bg-[#b8db29] text-[#161514] border-2.5 border-[#161514] shadow-[3.5px_3.5px_0px_0px_rgba(22,21,20,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center justify-center cursor-pointer group",
+              isOpen && "bg-[#161514] text-[#CEF431]"
+            )}
+            title="Quick Neobrutalist Calculator (⌘K / 🧮)"
+          >
+            {isOpen ? (
+              <X className="h-6 w-6 stroke-[3] transition-transform duration-200" />
+            ) : (
+              <Calculator className="h-6 w-6 stroke-[2.5] transition-transform duration-200 group-hover:scale-110" />
+            )}
+          </button>
+        </div>
+      )}
 
       {/* 2. Calculator Modal / Floating Card Popover */}
       {isOpen && (

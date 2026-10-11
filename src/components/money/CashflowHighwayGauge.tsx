@@ -227,26 +227,23 @@ export function CashflowHighwayGauge({
 
         <div className="space-y-0.5 text-xs">
           <span className="font-black text-[#161514] block">
-            {isOver ? "Overdrive Recovery Advice" : isCaution ? "Approaching Daily Redline" : "Pacing Optimal"}
+            {isOver ? "Over Budget Advice" : isCaution ? "Approaching Daily Limit" : "Safe to Spend"}
           </span>
           <p className="text-[#161514]/80 text-[11px] leading-relaxed">
             {isOver ? (
               <span>
                 You are over by <strong className="text-rose-700">{currencySymbol}{dailyStats.overDailyAmount.toLocaleString()}</strong> today.
-                {" "}No guilt! Trimming just <strong className="underline text-[#161514]">{currencySymbol}{dailyRecoveryShave.toLocaleString()}/day</strong> over the next {recoveryDays} days brings your monthly balance completely back on cruise control! 🛡️
+                {" "}No guilt! Trimming just <strong className="underline text-[#161514]">{currencySymbol}{dailyRecoveryShave.toLocaleString()}/day</strong> over the next {recoveryDays} days brings your monthly balance completely back on track! 🛡️
               </span>
             ) : isCaution ? (
               <span>
-                You have consumed <strong>{percentage}%</strong> of today&apos;s fuel.
-                {" "}You have <strong>{currencySymbol}{dailyStats.todayRemaining.toLocaleString()}</strong> left for tonight&apos;s dinner or commute.
+                You have consumed <strong>{percentage}%</strong> of today&apos;s budget limit.
+                {" "}You have <strong>{currencySymbol}{dailyStats.todayRemaining.toLocaleString()}</strong> left to spend safely today.
               </span>
             ) : (
               <span>
-                Cruising comfortably! At this burn rate, you will bank an estimated{" "}
-                <strong className="text-emerald-800 font-black">
-                  +{currencySymbol}{(dailyStats.todayRemaining * 3).toLocaleString()}
-                </strong>{" "}
-                in surplus savings this week! 🎯
+                You can safely spend <strong className="text-emerald-800 font-black">{currencySymbol}{dailyStats.todayRemaining.toLocaleString()}</strong> more today.
+                {" "}Stick to this pace to save an estimated <strong className="text-emerald-800 font-black">+{currencySymbol}{(dailyStats.todayRemaining * 3).toLocaleString()}</strong> extra this week! 🎯
               </span>
             )}
           </p>

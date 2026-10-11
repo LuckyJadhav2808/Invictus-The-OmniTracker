@@ -161,7 +161,7 @@ export function AllowanceSettingsModal({
             <label htmlFor="daily-allowance-input" className="text-xs font-black uppercase tracking-wider text-[#161514]">
               ⚡ Fixed Daily Cap (Optional) ({currencySymbol})
             </label>
-            <span className="text-[10px] font-bold text-[#161514]/60">Auto-Pace Default</span>
+            <span className="text-[10px] font-bold text-[#161514]/60">Recommended Limit</span>
           </div>
           <input
             id="daily-allowance-input"
@@ -170,7 +170,7 @@ export function AllowanceSettingsModal({
             step="50"
             value={customDailyBudget}
             onChange={(e) => setCustomDailyBudget(e.target.value)}
-            placeholder={`Auto pace ~${currencySymbol}${dailySafeToSpend}/day`}
+            placeholder={`Recommended ~${currencySymbol}${dailySafeToSpend}/day`}
             className="w-full neo-input text-sm font-black bg-white"
           />
           <div className="flex gap-1.5 pt-1 overflow-x-auto no-scrollbar">

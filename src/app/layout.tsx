@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Providers } from "@/components/shared/Providers";
 import "./globals.css";
 
@@ -26,7 +27,9 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-cream-bg text-navy-900">
         <Providers>{children}</Providers>
-        <script
+        <Script
+          id="sw-register"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               if ('serviceWorker' in navigator) {

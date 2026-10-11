@@ -7,6 +7,9 @@ import { soundFX } from "@/components/shared/SoundFX";
 
 export const renderCategoryEmoji = (icon: string | undefined): string => {
   if (!icon) return "💳";
+  // If the icon is already an emoji string, return directly
+  if (/\p{Extended_Pictographic}/u.test(icon)) return icon;
+
   const map: Record<string, string> = {
     Briefcase: "💼",
     Coffee: "☕",
@@ -23,9 +26,35 @@ export const renderCategoryEmoji = (icon: string | undefined): string => {
     Gift: "🎁",
     Film: "🎬",
     Book: "📚",
+    BookOpen: "📖",
     Heart: "❤️",
+    HeartPulse: "🩺",
+    Tag: "🏷️",
+    PiggyBank: "🐷",
+    TrendingUp: "📈",
+    Smartphone: "📱",
+    CreditCard: "💳",
+    Fuel: "⛽",
+    Plane: "✈️",
+    Dumbbell: "🏋️",
+    Gamepad: "🎮",
+    Laptop: "💻",
+    Dog: "🐾",
+    Cat: "🐱",
+    Target: "🎯",
+    Sparkles: "✨",
+    Landmark: "🏛️",
+    GraduationCap: "🎓",
+    Music: "🎵",
+    Camera: "📷",
+    ShoppingCart: "🛒",
+    Shield: "🛡️",
+    Star: "⭐",
+    Activity: "⚡",
+    Check: "✅",
+    Plus: "➕",
   };
-  return map[icon] || icon;
+  return map[icon] || "💳";
 };
 
 export interface CategoryCardItem {
@@ -227,7 +256,7 @@ export function MoneyQuickActionsAndCards({
           )}
         </div>
       ) : (
-        <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-3 pt-1">
+        <div className="flex gap-3.5 overflow-x-auto snap-x snap-mandatory no-scrollbar px-1 py-2">
           {categories.map((cat, idx) => {
             const theme = getCategoryColors(cat, idx);
             const isSelected = selectedCategoryId === cat.id;
@@ -244,20 +273,20 @@ export function MoneyQuickActionsAndCards({
                 }}
                 className={cn(
                   "w-[230px] sm:w-[260px] shrink-0 snap-start relative group cursor-pointer transition-all duration-200 ease-out hover:-translate-y-1",
-                  isSelected && "scale-[1.03]"
+                  isSelected && "-translate-y-1"
                 )}
               >
                 {/* Folder Top Tab */}
                 <div
                   style={{ backgroundColor: theme.bg, color: theme.text }}
                   className={cn(
-                    "w-32 h-6 rounded-t-xl ml-4 text-[9px] font-black uppercase px-2.5 flex items-center justify-between border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]",
-                    isSelected && "border-b-0 ring-2 ring-black"
+                    "w-36 h-6.5 rounded-t-xl ml-3 text-[9px] font-black uppercase px-2.5 flex items-center justify-between border-2 border-b-0 border-[#161514] -mb-[2px] relative z-10",
+                    isSelected && "ring-2 ring-black ring-b-0"
                   )}
                 >
-                  <span className="truncate flex items-center gap-1">
-                    <span>{renderCategoryEmoji(cat.icon)}</span>
-                    <span className="truncate tracking-wider">{cat.name.slice(0, 10)}</span>
+                  <span className="truncate flex items-center gap-1.5">
+                    <span className="text-xs">{renderCategoryEmoji(cat.icon)}</span>
+                    <span className="truncate tracking-wider">{cat.name.slice(0, 12)}</span>
                   </span>
                   <div
                     className="flex items-center gap-1.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
@@ -288,7 +317,7 @@ export function MoneyQuickActionsAndCards({
                 <div
                   style={{ backgroundColor: theme.bg, color: theme.text }}
                   className={cn(
-                    "rounded-2xl rounded-tl-none p-3.5 sm:p-4 border-2 border-[#161514] space-y-2.5 transition-all duration-200 shadow-[3.5px_3.5px_0px_0px_#161514] group-hover:shadow-[5px_5px_0px_0px_#161514]",
+                    "rounded-2xl rounded-tl-none p-3.5 sm:p-4 border-2 border-[#161514] space-y-2.5 transition-all duration-200 shadow-[4px_4px_0px_0px_#161514] group-hover:shadow-[5px_5px_0px_0px_#161514] relative z-0",
                     isSelected && "ring-2 ring-black shadow-[5px_5px_0px_0px_#161514]"
                   )}
                 >

@@ -17,16 +17,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-  const [checking, setChecking] = useState(() => {
-    if (typeof window === "undefined") return true;
+  const [mounted, setMounted] = useState(false);
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    setMounted(true);
     const isGuest = localStorage.getItem("invictus_guest_mode") === "true";
     const onboardedLocal = localStorage.getItem("invictus_onboarded") === "true";
     const session = getCustomSession();
     if (session && (session.onboarded || onboardedLocal || isGuest)) {
-      return false;
+      setChecking(false);
     }
-    return true;
-  });
+  }, []);
 
   useEffect(() => {
     if (loading) return;
@@ -51,7 +53,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     checkOnboarding();
   }, [user, loading, router]);
 
-  if (loading || checking) {
+  if (!mounted || loading || checking) {
     return <InvictusLoadingScreen />;
   }
 

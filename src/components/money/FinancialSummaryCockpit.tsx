@@ -4,7 +4,7 @@ import React from "react";
 import { type MonthlyBudgetStats, type DailyBudgetStats } from "@/lib/utils/budget-rollover";
 import { CashflowHighwayGauge } from "@/components/money/CashflowHighwayGauge";
 import { VixPixelCompanion } from "@/components/mascot/VixPixelCompanion";
-import { Plus, ScanLine, FolderPlus, ArrowUpRight, ArrowDownRight, Wallet } from "lucide-react";
+import { Plus, ScanLine, FolderPlus, ArrowUpRight, ArrowDownRight, Wallet, Calculator } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface FinancialSummaryCockpitProps {
@@ -15,6 +15,7 @@ interface FinancialSummaryCockpitProps {
   onBulkScan: () => void;
   onAddCategory: () => void;
   onOpenEditAllowances: () => void;
+  onOpenCalculator?: () => void;
 }
 
 export function FinancialSummaryCockpit({
@@ -25,126 +26,293 @@ export function FinancialSummaryCockpit({
   onBulkScan,
   onAddCategory,
   onOpenEditAllowances,
+  onOpenCalculator,
 }: FinancialSummaryCockpitProps) {
-  const isSurplus = monthlyStats.netMonthlyCashflow >= 0;
+  const budgetPercentageRemaining = Math.max(
+    0,
+    Math.min(
+      100,
+      monthlyStats.totalAvailableBudget > 0
+        ? Math.round((monthlyStats.remainingBudget / monthlyStats.totalAvailableBudget) * 100)
+        : 0
+    )
+  );
+
+  const budgetUsedPercentage = Math.min(100, monthlyStats.budgetUsedPercentage || 0);
+
+  // Channel percentages
+  const totalChannelMonth = monthlyStats.upiExpense + monthlyStats.cashExpense;
+  const upiMonthPercent = totalChannelMonth > 0 ? Math.round((monthlyStats.upiExpense / totalChannelMonth) * 100) : 0;
+  const cashMonthPercent = totalChannelMonth > 0 ? Math.round((monthlyStats.cashExpense / totalChannelMonth) * 100) : 0;
 
   return (
     <div className="space-y-4">
-      {/* 🚀 Top Summary Banner */}
-      <div className="bg-[#FAF8F5] rounded-3xl border-2 border-[#161514] shadow-[4px_4px_0px_0px_#161514] p-4 sm:p-6 space-y-4">
-        {/* Row 1: Executive Balance & Month In/Out Cashflow */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-          {/* Main Remaining Available Budget Hero */}
-          <div className="md:col-span-5 space-y-1">
+      {/* 👛 Concept 1: Open-Fold Genuine Leather Wallet Hero */}
+      <div className="bg-[#2D2722] rounded-3xl sm:rounded-[32px] border-2 sm:border-[3px] border-[#161514] shadow-[5px_5px_0px_0px_#161514] sm:shadow-[7px_7px_0px_0px_#161514] p-3 sm:p-5 relative overflow-hidden">
+        
+        {/* Leather Perimeter Dashed Stitch Line */}
+        <div className="border-2 border-dashed border-white/20 rounded-2xl sm:rounded-[24px] p-3 sm:p-4.5 space-y-3.5">
+          
+          {/* Top Leather Tag & Status */}
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="p-1.5 rounded-lg bg-[#CEF431] border border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
-                <Wallet className="size-3.5 text-[#161514]" />
-              </span>
-              <span className="text-[10px] font-black uppercase tracking-wider text-[#161514]/70">
-                Remaining Monthly Budget ({monthlyStats.targetMonthLabel})
+              <span className="w-2.5 h-2.5 rounded-full bg-[#CEF431] border border-[#161514]" />
+              <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-[#FAF8F5]" style={{ fontFamily: "var(--font-heading)" }}>
+                Money Wallet
               </span>
             </div>
-
-            <div className="flex items-baseline gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-[#161514] text-[#FAF8F5] border border-white/10 font-mono">
+                {monthlyStats.targetMonthLabel}
+              </span>
               <span
-                className="text-3xl sm:text-4xl font-black text-[#161514] tracking-tight"
-                style={{ fontFamily: "var(--font-heading)" }}
+                className={cn(
+                  "text-[10px] font-black uppercase px-2 py-0.5 rounded-full border border-[#161514]",
+                  budgetPercentageRemaining <= 15
+                    ? "bg-rose-400 text-[#161514]"
+                    : budgetPercentageRemaining <= 30
+                    ? "bg-amber-300 text-[#161514]"
+                    : "bg-[#CEF431] text-[#161514]"
+                )}
               >
-                {currencySymbol}{monthlyStats.remainingBudget.toLocaleString()}
-              </span>
-              <span className="text-xs font-bold text-[#161514]/60">
-                / {currencySymbol}{monthlyStats.totalAvailableBudget.toLocaleString()}
-              </span>
-            </div>
-
-            {monthlyStats.rolloverSurplus > 0 && (
-              <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase bg-[#03D26F]/20 text-emerald-950 px-2 py-0.5 rounded-md border border-[#161514]/20">
-                <span>🔄 Rollover Boost:</span>
-                <span>+{currencySymbol}{monthlyStats.rolloverSurplus.toLocaleString()}</span>
-              </span>
-            )}
-          </div>
-
-          {/* Monthly Inflow & Outflow Gauges */}
-          <div className="md:col-span-7 grid grid-cols-2 gap-3">
-            {/* Monthly Inflow */}
-            <div className="bg-white p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex flex-col justify-between">
-              <div className="flex items-center justify-between">
-                <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-emerald-800 flex items-center gap-1">
-                  <ArrowUpRight className="size-3 text-emerald-600 stroke-[3]" />
-                  <span>Total Inflow</span>
-                </span>
-                <span className="text-[9px] font-bold text-[#161514]/50">Month</span>
-              </div>
-              <span
-                className="text-base sm:text-xl font-black text-emerald-700 mt-1 block"
-                style={{ fontFamily: "var(--font-heading)" }}
-              >
-                +{currencySymbol}{monthlyStats.monthlyIncome.toLocaleString()}
-              </span>
-            </div>
-
-            {/* Monthly Outflow */}
-            <div className="bg-white p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex flex-col justify-between">
-              <div className="flex items-center justify-between">
-                <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-rose-800 flex items-center gap-1">
-                  <ArrowDownRight className="size-3 text-rose-600 stroke-[3]" />
-                  <span>Total Outflow</span>
-                </span>
-                <span className="text-[9px] font-bold text-[#161514]/50">
-                  {monthlyStats.budgetUsedPercentage}% Cap
-                </span>
-              </div>
-              <span
-                className="text-base sm:text-xl font-black text-rose-600 mt-1 block"
-                style={{ fontFamily: "var(--font-heading)" }}
-              >
-                -{currencySymbol}{monthlyStats.monthlyExpense.toLocaleString()}
+                {budgetPercentageRemaining}% Remaining
               </span>
             </div>
           </div>
-        </div>
 
-        {/* Row 2: Action Buttons Dock */}
-        <div className="flex flex-wrap items-center gap-2.5 pt-1 border-t-2 border-[#161514]/10">
-          {/* Primary CTA: Log Transaction */}
-          <button
-            type="button"
-            onClick={onAddTransaction}
-            className="flex-1 sm:flex-none bg-[#CEF431] hover:bg-[#bde422] text-[#161514] font-black text-xs uppercase tracking-wider py-2.5 px-5 rounded-xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center justify-center gap-2 cursor-pointer"
-          >
-            <Plus className="size-4 stroke-[3]" />
-            <span>Log Transaction</span>
-          </button>
+          {/* Responsive Layout Container: 1 column on mobile, 2 columns on laptop/desktop */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
+            
+            {/* LEFT COLUMN (lg:col-span-6): THE CASH BILLFOLD (Remaining Budget & Progress) */}
+            <div className="lg:col-span-6 flex flex-col justify-between bg-[#E8F5E9] border-2 border-[#161514] rounded-2xl p-4 sm:p-5 shadow-[0px_4px_0px_0px_rgba(0,0,0,0.35)] relative overflow-hidden">
+              {/* Currency Watermark - Positioned in the top right corner so it NEVER collides with numbers */}
+              <div className="absolute top-2 right-3 text-4xl sm:text-5xl font-black text-[#1B5E20]/10 select-none pointer-events-none font-mono">
+                {currencySymbol}{monthlyStats.totalAvailableBudget >= 1000 ? `${Math.round(monthlyStats.totalAvailableBudget / 1000)}K` : monthlyStats.totalAvailableBudget}
+              </div>
 
-          {/* Interactive Banker Vix Companion */}
-          <VixPixelCompanion
-            gear="money"
-            state={dailyStats.isOverDailyBudget ? "fire" : "idle"}
-            size={42}
-            onClick={onAddTransaction}
-            title="Vix: Banker Companion (Click to Log Transaction)"
-          />
+              <div>
+                <div className="flex flex-wrap items-center justify-between gap-1 mb-2">
+                  <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider bg-[#161514] text-[#CEF431] px-2 py-0.5 rounded border border-[#161514] font-mono">
+                    Monthly Budget
+                  </span>
+                  {monthlyStats.rolloverSurplus > 0 && (
+                    <span className="text-[10px] font-black font-mono text-[#1B5E20] bg-[#1B5E20]/15 px-2 py-0.5 rounded border border-[#1B5E20]/30">
+                      +{currencySymbol}{monthlyStats.rolloverSurplus.toLocaleString()} Rollover Boost
+                    </span>
+                  )}
+                </div>
 
-          {/* Secondary Action: Bulk / Scan OCR */}
-          <button
-            type="button"
-            onClick={onBulkScan}
-            className="flex-1 sm:flex-none bg-white hover:bg-[#FAF8F5] text-[#161514] font-black text-xs uppercase tracking-wider py-2.5 px-4 rounded-xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-          >
-            <ScanLine className="size-3.5 stroke-[2.5]" />
-            <span>Bulk / Scan</span>
-          </button>
+                <div className="space-y-0.5 relative z-10 pt-1">
+                  <span className="text-[10px] sm:text-[11px] font-black uppercase text-[#1B5E20] tracking-wider block">
+                    Remaining to Spend
+                  </span>
+                  <div className="flex flex-wrap items-baseline gap-2">
+                    <div
+                      className="text-4xl sm:text-5xl font-black tracking-tight text-[#161514]"
+                      style={{ fontFamily: "var(--font-heading)" }}
+                    >
+                      {currencySymbol}{monthlyStats.remainingBudget.toLocaleString()}
+                    </div>
+                    <span className="text-xs sm:text-sm font-bold text-[#161514]/65 font-mono">
+                      / {currencySymbol}{monthlyStats.totalAvailableBudget.toLocaleString()} Budget
+                    </span>
+                  </div>
+                </div>
+              </div>
 
-          {/* Tertiary Action: + Category */}
-          <button
-            type="button"
-            onClick={onAddCategory}
-            className="bg-white hover:bg-[#FAF8F5] text-[#161514] font-black text-xs uppercase tracking-wider py-2.5 px-4 rounded-xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-          >
-            <FolderPlus className="size-3.5 stroke-[2.5]" />
-            <span>+ Category</span>
-          </button>
+              {/* Budget Remaining Security Thread Progress Bar */}
+              <div className="mt-4 pt-2 border-t border-[#1B5E20]/15 space-y-1.5">
+                <div className="h-2.5 w-full bg-[#161514]/15 rounded-full border border-[#161514]/30 overflow-hidden p-0.5">
+                  <div
+                    className={cn(
+                      "h-full rounded-full transition-all duration-500",
+                      budgetPercentageRemaining <= 15
+                        ? "bg-rose-600"
+                        : budgetPercentageRemaining <= 30
+                        ? "bg-amber-500"
+                        : "bg-[#2E7D32]"
+                    )}
+                    style={{ width: `${Math.max(4, budgetPercentageRemaining)}%` }}
+                  />
+                </div>
+                <div className="flex justify-between text-[9px] font-black font-mono text-[#1B5E20]/80 px-0.5 uppercase">
+                  <span>{currencySymbol}0 Spent</span>
+                  <span>{budgetPercentageRemaining}% Remaining</span>
+                  <span>{currencySymbol}{monthlyStats.totalAvailableBudget.toLocaleString()} Budget</span>
+                </div>
+              </div>
+            </div>
+
+            {/* RIGHT COLUMN (lg:col-span-6): TIERED PAYMENT CARDS (UPI & Cash) + LEDGER */}
+            <div className="lg:col-span-6 flex flex-col justify-between space-y-2.5">
+              
+              {/* Slot 1: UPI Channel Card with Crystal-Clear Today vs This Month breakdown */}
+              <div className="bg-white border-2 border-[#161514] rounded-xl sm:rounded-2xl p-3 sm:p-3.5 shadow-[3px_3px_0px_0px_#161514] hover:-translate-y-0.5 transition-transform">
+                <div className="flex items-center justify-between pb-1.5 border-b border-[#161514]/10">
+                  <div className="flex items-center gap-1.5 font-heading text-xs font-black uppercase text-[#161514]">
+                    <span>📱</span>
+                    <span>UPI Payments</span>
+                  </div>
+                  <span className="text-[9px] font-bold text-[#161514]/60 uppercase">
+                    {upiMonthPercent}% of all spending
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 pt-2">
+                  <div className="bg-[#FAF8F5] p-2 rounded-lg border border-[#161514]/20">
+                    <span className="text-[9px] font-bold text-[#161514]/60 uppercase block">Spent Today</span>
+                    <span className="text-sm sm:text-base font-black text-rose-600 font-mono block mt-0.5">
+                      -{currencySymbol}{dailyStats.todayUpiExpense.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="bg-[#FAF8F5] p-2 rounded-lg border border-[#161514]/20">
+                    <span className="text-[9px] font-bold text-[#161514]/60 uppercase block">This Month</span>
+                    <span className="text-sm sm:text-base font-black text-rose-600 font-mono block mt-0.5">
+                      -{currencySymbol}{monthlyStats.upiExpense.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Slot 2: Cash Currency Pocket with Crystal-Clear Today vs This Month breakdown */}
+              <div className="bg-[#FFF9EA] border-2 border-[#161514] rounded-xl sm:rounded-2xl p-3 sm:p-3.5 shadow-[3px_3px_0px_0px_#161514] hover:-translate-y-0.5 transition-transform">
+                <div className="flex items-center justify-between pb-1.5 border-b border-[#161514]/10">
+                  <div className="flex items-center gap-1.5 font-heading text-xs font-black uppercase text-[#161514]">
+                    <span>💵</span>
+                    <span>Cash Payments</span>
+                  </div>
+                  <span className="text-[9px] font-bold text-[#161514]/60 uppercase">
+                    {cashMonthPercent}% of all spending
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 pt-2">
+                  <div className="bg-white p-2 rounded-lg border border-[#161514]/20">
+                    <span className="text-[9px] font-bold text-[#161514]/60 uppercase block">Spent Today</span>
+                    <span className="text-sm sm:text-base font-black text-rose-600 font-mono block mt-0.5">
+                      -{currencySymbol}{dailyStats.todayCashExpense.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="bg-white p-2 rounded-lg border border-[#161514]/20">
+                    <span className="text-[9px] font-bold text-[#161514]/60 uppercase block">This Month</span>
+                    <span className="text-sm sm:text-base font-black text-rose-600 font-mono block mt-0.5">
+                      -{currencySymbol}{monthlyStats.cashExpense.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Slot 3: Inflow & Outflow Monthly Ledger */}
+              <div className="bg-[#1E1A17] border-2 border-[#161514] rounded-xl sm:rounded-2xl p-3 shadow-[3px_3px_0px_0px_rgba(0,0,0,0.4)] grid grid-cols-2 divide-x divide-white/15">
+                <div className="pr-3">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-[#34D399] flex items-center gap-1 font-heading">
+                    <ArrowUpRight className="size-3 text-[#34D399] stroke-[3]" />
+                    <span>Total Income</span>
+                  </span>
+                  <span
+                    className="text-sm sm:text-base font-black text-[#10B981] font-mono block mt-0.5"
+                    style={{ fontFamily: "var(--font-heading)" }}
+                  >
+                    +{currencySymbol}{monthlyStats.monthlyIncome.toLocaleString()}
+                  </span>
+                  <span className="text-[9px] font-bold text-white/50 block">This Month</span>
+                </div>
+
+                <div className="pl-3">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-[#FB7185] flex items-center gap-1 font-heading">
+                    <ArrowDownRight className="size-3 text-[#FB7185] stroke-[3]" />
+                    <span>Total Spent</span>
+                  </span>
+                  <span
+                    className="text-sm sm:text-base font-black text-[#F43F5E] font-mono block mt-0.5"
+                    style={{ fontFamily: "var(--font-heading)" }}
+                  >
+                    -{currencySymbol}{monthlyStats.monthlyExpense.toLocaleString()}
+                  </span>
+                  <span className="text-[9px] font-bold text-white/50 block">
+                    {monthlyStats.budgetUsedPercentage}% of budget used
+                  </span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          {/* 3. WALLET HARDWARE ACTION DOCK */}
+          <div className="space-y-2.5 pt-1">
+            <div className="flex flex-col sm:flex-row gap-2">
+              {/* Primary Action Button */}
+              <button
+                type="button"
+                onClick={onAddTransaction}
+                className="flex-1 py-3 px-4 bg-[#CEF431] hover:bg-[#bde422] text-[#161514] font-black text-xs sm:text-sm uppercase tracking-wider rounded-xl sm:rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_#161514] transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Plus className="size-4 stroke-[3]" />
+                <span>Log Expense</span>
+              </button>
+
+              {/* Utility Buttons */}
+              <div className="grid grid-cols-3 gap-2 sm:w-auto">
+                {onOpenCalculator && (
+                  <button
+                    type="button"
+                    onClick={onOpenCalculator}
+                    className="py-2.5 px-3 bg-[#FAF8F5] hover:bg-white text-[#161514] font-black text-xs uppercase tracking-wider rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center gap-1.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
+                    title="Open Calculator"
+                  >
+                    <Calculator className="size-3.5 stroke-[2.5]" />
+                    <span>Calc</span>
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  onClick={onBulkScan}
+                  className="py-2.5 px-3 bg-[#FAF8F5] hover:bg-white text-[#161514] font-black text-xs uppercase tracking-wider rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center gap-1.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
+                  title="Bulk Expenses or OCR Scan"
+                >
+                  <ScanLine className="size-3.5 stroke-[2.5]" />
+                  <span>Scan</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={onAddCategory}
+                  className="py-2.5 px-3 bg-[#FAF8F5] hover:bg-white text-[#161514] font-black text-xs uppercase tracking-wider rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center gap-1.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
+                  title="Add New Budget Category"
+                >
+                  <FolderPlus className="size-3.5 stroke-[2.5]" />
+                  <span>Category</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Pocket Vix Wallet Companion */}
+            <div
+              onClick={onAddTransaction}
+              className="bg-[#FFF9EA] p-2.5 sm:p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center gap-3 cursor-pointer hover:bg-white active:translate-x-0.5 active:translate-y-0.5 transition-all"
+              title="Click to Log Expense"
+            >
+              <div className="shrink-0">
+                <VixPixelCompanion
+                  gear="money"
+                  state={dailyStats.isOverDailyBudget ? "fire" : "idle"}
+                  size={34}
+                />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-[10px] font-black uppercase text-[#161514] font-heading">
+                  Vix Wallet Companion
+                </div>
+                <div className="text-xs font-bold text-[#161514]/75 truncate mt-0.5">
+                  {dailyStats.isOverDailyBudget
+                    ? `Over daily spend limit by ${currencySymbol}${dailyStats.overDailyAmount.toLocaleString()} today.`
+                    : `${budgetPercentageRemaining}% budget available. Safe to spend ~${currencySymbol}${dailyStats.todayRemaining.toLocaleString()} today.`}
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
 

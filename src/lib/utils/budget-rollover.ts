@@ -291,13 +291,14 @@ export function computeMonthlyBudgetStats({
   if (isCurrentCalendarMonth && monthlyExpense > 0) {
     if (paceDiff > 15 || remainingBudget < 0) {
       burnPaceStatus = "fast";
-      burnPaceMessage = `⚠️ Spending faster than planned (~${currencySymbol}${dailySafeToSpend}/day recommended).`;
+      burnPaceMessage = `⚠️ Spending quickly: try keeping under ~${currencySymbol}${dailySafeToSpend}/day to stay on budget.`;
     } else if (paceDiff < -10) {
       burnPaceStatus = "frugal";
-      burnPaceMessage = `🟢 Under budget! You have room to spend comfortably.`;
+      const potentialSavings = Math.max(0, remainingBudget);
+      burnPaceMessage = `🟢 Under budget! You can save +${currencySymbol}${potentialSavings.toLocaleString()} this month (safe to spend: ~${currencySymbol}${dailySafeToSpend}/day).`;
     } else {
       burnPaceStatus = "on_track";
-      burnPaceMessage = `✨ Spending is on track with your monthly plan.`;
+      burnPaceMessage = `✨ On track: you can safely spend ~${currencySymbol}${dailySafeToSpend}/day.`;
     }
   } else if (!isCurrentCalendarMonth) {
     burnPaceStatus = remainingBudget >= 0 ? "on_track" : "fast";
