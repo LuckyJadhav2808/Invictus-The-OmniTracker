@@ -4,16 +4,17 @@ import React, { useState, useMemo } from "react";
 import { type Transaction, type Category } from "@/types";
 import { cn } from "@/lib/utils";
 import { format, parseISO, isToday, isYesterday } from "date-fns";
-import { Search, Filter, FileDown, Plus, Copy, Edit2, Trash2 } from "lucide-react";
+import { Search, Filter, FileDown, Plus, Copy, Edit2, Trash2, Calendar } from "lucide-react";
 import { soundFX } from "@/components/shared/SoundFX";
 import { renderCategoryEmoji, MoneyQuickActionsAndCards } from "@/components/money/MoneyQuickActionsAndCards";
-import { isCashTransaction, isOnlineTransaction } from "@/lib/utils/budget-rollover";
+import { isCashTransaction, isOnlineTransaction, type MonthlyBudgetStats } from "@/lib/utils/budget-rollover";
 
 interface LedgerTabViewProps {
   transactions: Transaction[];
   categories: Category[];
   currencySymbol: string;
   targetMonthKey?: string;
+  monthlyStats?: MonthlyBudgetStats;
   onInspectTransaction: (tx: Transaction) => void;
   onEditTransaction: (tx: Transaction) => void;
   onDuplicateTransaction: (tx: Transaction) => Promise<void>;
@@ -33,6 +34,7 @@ export function LedgerTabView({
   categories,
   currencySymbol,
   targetMonthKey,
+  monthlyStats,
   onInspectTransaction,
   onEditTransaction,
   onDuplicateTransaction,
@@ -46,10 +48,40 @@ export function LedgerTabView({
   onEditCategory,
   onDeleteCategory,
 }: LedgerTabViewProps) {
+  const activeMonthKey = targetMonthKey || format(new Date(), "yyyy-MM");
+  const [selectedMonth, setSelectedMonth] = useState<string>(activeMonthKey);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedType, setSelectedType] = useState<"all" | "expense" | "income">("all");
   const [selectedMethod, setSelectedMethod] = useState<string>("all");
+
+  // Extract all available months from recorded transactions plus current month
+  const availableMonths = useMemo(() => {
+    const monthsSet = new Set<string>();
+    const currentCalMonth = format(new Date(), "yyyy-MM");
+    monthsSet.add(currentCalMonth);
+    if (targetMonthKey) monthsSet.add(targetMonthKey);
+
+    transactions.forEach((tx) => {
+      if (tx.date && tx.date.length >= 7) {
+        monthsSet.add(tx.date.slice(0, 7));
+      }
+    });
+
+    return Array.from(monthsSet)
+      .sort((a, b) => b.localeCompare(a))
+      .map((m) => {
+        let label = m;
+        try {
+          label = format(parseISO(`${m}-01`), "MMMM yyyy");
+        } catch {}
+        return {
+          key: m,
+          label,
+          isCurrent: m === currentCalMonth,
+        };
+      });
+  }, [transactions, targetMonthKey]);
 
   const categoryMap = useMemo(() => {
     const map = new Map<string, Category>();
@@ -60,6 +92,10 @@ export function LedgerTabView({
   // Filter transactions
   const filteredTransactions = useMemo(() => {
     return transactions.filter((tx) => {
+      if (selectedMonth !== "all" && !tx.date?.startsWith(selectedMonth)) {
+        return false;
+      }
+
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         const noteMatch = tx.note?.toLowerCase().includes(q);
@@ -83,7 +119,7 @@ export function LedgerTabView({
 
       return true;
     });
-  }, [transactions, searchQuery, selectedCategory, selectedType, selectedMethod, categoryMap]);
+  }, [transactions, selectedMonth, searchQuery, selectedCategory, selectedType, selectedMethod, categoryMap]);
 
   // Group transactions by date
   const groupedByDate = useMemo(() => {
@@ -119,11 +155,11 @@ export function LedgerTabView({
     return groups;
   }, [filteredTransactions]);
 
-  const activeMonthKey = targetMonthKey || format(new Date(), "yyyy-MM");
+  const effectiveCategoryMonthKey = selectedMonth === "all" ? activeMonthKey : selectedMonth;
   const categoryCardsData = useMemo(() => {
     const map = new Map<string, number>();
     transactions.forEach((tx) => {
-      if (tx.type === "expense" && tx.date?.startsWith(activeMonthKey)) {
+      if (tx.type === "expense" && tx.date?.startsWith(effectiveCategoryMonthKey)) {
         const curr = map.get(tx.categoryId) || 0;
         map.set(tx.categoryId, curr + Number(tx.amount || 0));
       }
@@ -138,7 +174,18 @@ export function LedgerTabView({
       type: cat.type,
       monthlyBudget: cat.monthlyBudget,
     }));
-  }, [categories, transactions, activeMonthKey]);
+  }, [categories, transactions, effectiveCategoryMonthKey]);
+
+  const selectedMonthSummary = useMemo(() => {
+    let expense = 0;
+    let income = 0;
+    filteredTransactions.forEach((tx) => {
+      const amt = Number(tx.amount || 0);
+      if (tx.type === "expense") expense += amt;
+      else if (tx.type === "income") income += amt;
+    });
+    return { expense, income, count: filteredTransactions.length };
+  }, [filteredTransactions]);
 
   return (
     <div className="space-y-4">
@@ -188,6 +235,23 @@ export function LedgerTabView({
           <div className="flex items-center gap-1 text-[10px] font-black uppercase text-[#161514]/60 mr-1">
             <Filter className="size-3" />
             <span>Filter:</span>
+          </div>
+
+          {/* Dedicated Month Filter Dropdown */}
+          <div className="flex items-center gap-1.5 bg-white px-2.5 py-1 rounded-xl border border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
+            <Calendar className="size-3 text-[#161514]/70 shrink-0" />
+            <select
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              className="bg-transparent text-[10px] font-black uppercase text-[#161514] focus:outline-none cursor-pointer"
+            >
+              <option value="all">📅 All Time (All Months)</option>
+              {availableMonths.map((m) => (
+                <option key={m.key} value={m.key}>
+                  {m.label} {m.isCurrent ? "• Current" : ""}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Type Filter */}
@@ -248,14 +312,86 @@ export function LedgerTabView({
         </div>
       </div>
 
+      {/* 📅 Monthly Remaining Days Runway & Telemetry Banner */}
+      {selectedMonth === activeMonthKey && monthlyStats ? (
+        <div className="bg-[#FAF8F5] border-2 border-[#161514] rounded-2xl p-3 sm:p-3.5 shadow-[2px_2px_0px_0px_#161514] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="size-9 rounded-xl bg-[#CEF431] border-2 border-[#161514] flex items-center justify-center text-base shadow-[1.5px_1.5px_0px_0px_#161514] shrink-0 font-bold">
+              ⚡
+            </div>
+            <div className="space-y-0.5">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[10px] font-black uppercase tracking-wider text-[#161514]/60">
+                  Daily Safe Spend Limit:
+                </span>
+                <span className="text-sm font-black text-[#161514] font-heading">
+                  ~{currencySymbol}{monthlyStats.dailySafeToSpend.toLocaleString()} / day
+                </span>
+                <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-[#161514] text-[#FAF8F5] font-mono">
+                  {monthlyStats.daysRemainingInMonth} {monthlyStats.daysRemainingInMonth === 1 ? "day" : "days"} left
+                </span>
+              </div>
+              <div className="text-[11px] font-bold text-[#161514]/80 flex items-center gap-1.5 flex-wrap">
+                <span>Calculation:</span>
+                <span className="font-mono bg-white px-1.5 py-0.5 rounded border border-[#161514]/30 text-[#161514]">
+                  {currencySymbol}{monthlyStats.remainingBudget.toLocaleString()} left ÷ {monthlyStats.daysRemainingInMonth} days
+                </span>
+                <span className="text-[#161514]/50">•</span>
+                <span>in {monthlyStats.targetMonthLabel}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Dual Channel Split Pills */}
+          <div className="flex items-center gap-1.5 flex-wrap md:shrink-0 text-[10px] font-black uppercase">
+            <div className="bg-white px-2.5 py-1.5 rounded-xl border border-[#161514] shadow-[1px_1px_0px_0px_#161514] text-[#161514] flex items-center gap-1.5">
+              <span>📱</span>
+              <span>UPI: ~{currencySymbol}{monthlyStats.dailySafeToSpendUpi.toLocaleString()}/day</span>
+            </div>
+            <div className="bg-[#FFF9EA] px-2.5 py-1.5 rounded-xl border border-[#161514] shadow-[1px_1px_0px_0px_#161514] text-[#161514] flex items-center gap-1.5">
+              <span>💵</span>
+              <span>Cash: ~{currencySymbol}{monthlyStats.dailySafeToSpendCash.toLocaleString()}/day</span>
+            </div>
+          </div>
+        </div>
+      ) : selectedMonth !== "all" ? (
+        <div className="bg-[#FAF8F5] border-2 border-[#161514] rounded-xl px-3 py-2 shadow-[1.5px_1.5px_0px_0px_#161514] flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs">
+          <div className="flex items-center gap-2">
+            <span className="text-sm">🗓️</span>
+            <span className="font-bold text-[#161514]">
+              Showing statement for <strong className="font-black underline">{availableMonths.find((m) => m.key === selectedMonth)?.label || selectedMonth}</strong>
+            </span>
+          </div>
+          <span className="text-[10px] font-black uppercase text-[#161514]/70 font-mono">
+            {selectedMonthSummary.count} {selectedMonthSummary.count === 1 ? "record" : "records"} • Spent: {currencySymbol}{selectedMonthSummary.expense.toLocaleString()}
+          </span>
+        </div>
+      ) : (
+        <div className="bg-[#FAF8F5] border-2 border-[#161514] rounded-xl px-3 py-2 shadow-[1.5px_1.5px_0px_0px_#161514] flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs">
+          <div className="flex items-center gap-2">
+            <span className="text-sm">🌐</span>
+            <span className="font-bold text-[#161514]">
+              Viewing All-Time History across all months ({selectedMonthSummary.count} records)
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setSelectedMonth(activeMonthKey)}
+            className="text-[10px] font-black uppercase text-[#161514] bg-[#CEF431] px-2 py-0.5 rounded border border-[#161514] hover:underline cursor-pointer sm:self-auto self-start"
+          >
+            Switch to This Month
+          </button>
+        </div>
+      )}
+
       {/* 📜 TRANSACTION FEED LIST */}
       {groupedByDate.length === 0 ? (
         <div className="bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] p-8 text-center space-y-3">
           <div className="text-4xl">🧾</div>
           <span className="text-sm font-black text-[#161514] block">No Transactions Found</span>
           <p className="text-xs text-[#161514]/70 max-w-sm mx-auto">
-            {searchQuery || selectedCategory !== "all" || selectedType !== "all"
-              ? "No records match your active filters. Try clearing the search."
+            {searchQuery || selectedCategory !== "all" || selectedType !== "all" || selectedMonth !== "all"
+              ? "No records match your active filters. Try picking another month or clearing search filters."
               : "Your financial ledger is clear. Log an expense or income to start tracking!"}
           </p>
           <button

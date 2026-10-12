@@ -95,6 +95,9 @@ export function BudgetTabView({
             <span className="text-sm sm:text-base font-black text-[#03D26F] font-heading mt-0.5 block">
               ~{currencySymbol}{monthlyStats.dailySafeToSpend.toLocaleString()}/day
             </span>
+            <span className="text-[9px] text-[#161514]/60 font-bold block mt-0.5 font-mono">
+              {currencySymbol}{monthlyStats.remainingBudget.toLocaleString()} ÷ {monthlyStats.daysRemainingInMonth} days left
+            </span>
           </div>
         </div>
       </div>

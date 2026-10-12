@@ -497,6 +497,7 @@ function MoneyPageContent() {
             categories={categories}
             currencySymbol={currencySymbol}
             targetMonthKey={targetMonthKey}
+            monthlyStats={monthlyStats}
             onInspectTransaction={(tx) => setInspectingTx(tx)}
             onEditTransaction={(tx) => setEditingTx(tx)}
             onDuplicateTransaction={handleDuplicateTransaction}
