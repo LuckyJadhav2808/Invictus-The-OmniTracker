@@ -16,6 +16,7 @@ interface FinancialSummaryCockpitProps {
   onAddCategory: () => void;
   onOpenEditAllowances: () => void;
   onOpenCalculator?: () => void;
+  onSelectPaymentMethod?: (method: "upi" | "cash") => void;
 }
 
 export function FinancialSummaryCockpit({
@@ -27,6 +28,7 @@ export function FinancialSummaryCockpit({
   onAddCategory,
   onOpenEditAllowances,
   onOpenCalculator,
+  onSelectPaymentMethod,
 }: FinancialSummaryCockpitProps) {
   const budgetPercentageRemaining = Math.max(
     0,
@@ -39,6 +41,9 @@ export function FinancialSummaryCockpit({
   );
 
   const budgetUsedPercentage = Math.min(100, monthlyStats.budgetUsedPercentage || 0);
+
+  // Net Cashflow
+  const netCashflow = monthlyStats.monthlyIncome - monthlyStats.monthlyExpense;
 
   // Channel percentages
   const totalChannelMonth = monthlyStats.upiExpense + monthlyStats.cashExpense;
@@ -147,15 +152,29 @@ export function FinancialSummaryCockpit({
             <div className="lg:col-span-6 flex flex-col justify-between space-y-2.5">
               
               {/* Slot 1: UPI Channel Card with Crystal-Clear Today vs This Month breakdown */}
-              <div className="bg-white border-2 border-[#161514] rounded-xl sm:rounded-2xl p-3 sm:p-3.5 shadow-[3px_3px_0px_0px_#161514] hover:-translate-y-0.5 transition-transform">
+              <div
+                onClick={() => onSelectPaymentMethod?.("upi")}
+                className={cn(
+                  "bg-white border-2 border-[#161514] rounded-xl sm:rounded-2xl p-3 sm:p-3.5 shadow-[3px_3px_0px_0px_#161514] transition-all",
+                  onSelectPaymentMethod && "cursor-pointer hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5"
+                )}
+                title={onSelectPaymentMethod ? "Click to view UPI transactions in Ledger" : undefined}
+              >
                 <div className="flex items-center justify-between pb-1.5 border-b border-[#161514]/10">
                   <div className="flex items-center gap-1.5 font-heading text-xs font-black uppercase text-[#161514]">
                     <span>📱</span>
                     <span>UPI Payments</span>
                   </div>
-                  <span className="text-[9px] font-bold text-[#161514]/60 uppercase">
-                    {upiMonthPercent}% of all spending
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[9px] font-bold text-[#161514]/60 uppercase">
+                      {upiMonthPercent}% of spend
+                    </span>
+                    {onSelectPaymentMethod && (
+                      <span className="text-[8px] font-black uppercase px-1 py-0.2 bg-[#CEF431] text-[#161514] rounded border border-[#161514]/30">
+                        View
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 pt-2">
@@ -175,15 +194,29 @@ export function FinancialSummaryCockpit({
               </div>
 
               {/* Slot 2: Cash Currency Pocket with Crystal-Clear Today vs This Month breakdown */}
-              <div className="bg-[#FFF9EA] border-2 border-[#161514] rounded-xl sm:rounded-2xl p-3 sm:p-3.5 shadow-[3px_3px_0px_0px_#161514] hover:-translate-y-0.5 transition-transform">
+              <div
+                onClick={() => onSelectPaymentMethod?.("cash")}
+                className={cn(
+                  "bg-[#FFF9EA] border-2 border-[#161514] rounded-xl sm:rounded-2xl p-3 sm:p-3.5 shadow-[3px_3px_0px_0px_#161514] transition-all",
+                  onSelectPaymentMethod && "cursor-pointer hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5"
+                )}
+                title={onSelectPaymentMethod ? "Click to view Cash transactions in Ledger" : undefined}
+              >
                 <div className="flex items-center justify-between pb-1.5 border-b border-[#161514]/10">
                   <div className="flex items-center gap-1.5 font-heading text-xs font-black uppercase text-[#161514]">
                     <span>💵</span>
                     <span>Cash Payments</span>
                   </div>
-                  <span className="text-[9px] font-bold text-[#161514]/60 uppercase">
-                    {cashMonthPercent}% of all spending
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[9px] font-bold text-[#161514]/60 uppercase">
+                      {cashMonthPercent}% of spend
+                    </span>
+                    {onSelectPaymentMethod && (
+                      <span className="text-[8px] font-black uppercase px-1 py-0.2 bg-[#CEF431] text-[#161514] rounded border border-[#161514]/30">
+                        View
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 pt-2">
@@ -202,35 +235,54 @@ export function FinancialSummaryCockpit({
                 </div>
               </div>
 
-              {/* Slot 3: Inflow & Outflow Monthly Ledger */}
-              <div className="bg-[#1E1A17] border-2 border-[#161514] rounded-xl sm:rounded-2xl p-3 shadow-[3px_3px_0px_0px_rgba(0,0,0,0.4)] grid grid-cols-2 divide-x divide-white/15">
-                <div className="pr-3">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-[#34D399] flex items-center gap-1 font-heading">
-                    <ArrowUpRight className="size-3 text-[#34D399] stroke-[3]" />
-                    <span>Total Income</span>
-                  </span>
-                  <span
-                    className="text-sm sm:text-base font-black text-[#10B981] font-mono block mt-0.5"
-                    style={{ fontFamily: "var(--font-heading)" }}
-                  >
-                    +{currencySymbol}{monthlyStats.monthlyIncome.toLocaleString()}
-                  </span>
-                  <span className="text-[9px] font-bold text-white/50 block">This Month</span>
+              {/* Slot 3: Inflow & Outflow Monthly Ledger + Net Cashflow Strip */}
+              <div className="bg-[#1E1A17] border-2 border-[#161514] rounded-xl sm:rounded-2xl p-3 shadow-[3px_3px_0px_0px_rgba(0,0,0,0.4)] space-y-2">
+                <div className="grid grid-cols-2 divide-x divide-white/15">
+                  <div className="pr-3">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-[#34D399] flex items-center gap-1 font-heading">
+                      <ArrowUpRight className="size-3 text-[#34D399] stroke-[3]" />
+                      <span>Total Income</span>
+                    </span>
+                    <span
+                      className="text-sm sm:text-base font-black text-[#10B981] font-mono block mt-0.5"
+                      style={{ fontFamily: "var(--font-heading)" }}
+                    >
+                      +{currencySymbol}{monthlyStats.monthlyIncome.toLocaleString()}
+                    </span>
+                    <span className="text-[9px] font-bold text-white/50 block">This Month</span>
+                  </div>
+
+                  <div className="pl-3">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-[#FB7185] flex items-center gap-1 font-heading">
+                      <ArrowDownRight className="size-3 text-[#FB7185] stroke-[3]" />
+                      <span>Total Spent</span>
+                    </span>
+                    <span
+                      className="text-sm sm:text-base font-black text-[#F43F5E] font-mono block mt-0.5"
+                      style={{ fontFamily: "var(--font-heading)" }}
+                    >
+                      -{currencySymbol}{monthlyStats.monthlyExpense.toLocaleString()}
+                    </span>
+                    <span className="text-[9px] font-bold text-white/50 block">
+                      {monthlyStats.budgetUsedPercentage}% of budget used
+                    </span>
+                  </div>
                 </div>
 
-                <div className="pl-3">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-[#FB7185] flex items-center gap-1 font-heading">
-                    <ArrowDownRight className="size-3 text-[#FB7185] stroke-[3]" />
-                    <span>Total Spent</span>
-                  </span>
+                {/* Net Cashflow indicator */}
+                <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[10px] font-black uppercase tracking-wider">
+                  <span className="text-white/60">Net Cashflow:</span>
                   <span
-                    className="text-sm sm:text-base font-black text-[#F43F5E] font-mono block mt-0.5"
-                    style={{ fontFamily: "var(--font-heading)" }}
+                    className={cn(
+                      "px-2 py-0.5 rounded-md font-mono border text-[9px] font-black tracking-normal",
+                      netCashflow >= 0
+                        ? "bg-[#10B981]/20 text-[#34D399] border-[#10B981]/40"
+                        : "bg-[#F43F5E]/20 text-[#FB7185] border-[#F43F5E]/40"
+                    )}
                   >
-                    -{currencySymbol}{monthlyStats.monthlyExpense.toLocaleString()}
-                  </span>
-                  <span className="text-[9px] font-bold text-white/50 block">
-                    {monthlyStats.budgetUsedPercentage}% of budget used
+                    {netCashflow >= 0
+                      ? `+${currencySymbol}${netCashflow.toLocaleString()} Net Savings`
+                      : `-${currencySymbol}${Math.abs(netCashflow).toLocaleString()} Deficit`}
                   </span>
                 </div>
               </div>

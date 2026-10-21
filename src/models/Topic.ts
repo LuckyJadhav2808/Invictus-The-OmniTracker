@@ -12,6 +12,10 @@ export interface ITopic extends Document {
   revisionsCount?: number;
   satisfactionRate?: number;
   notes?: string;
+  nextRevisionDate?: string;
+  easinessFactor?: number;
+  intervalDays?: number;
+  lastRevisedAt?: string;
   createdAt: Date;
 }
 
@@ -32,6 +36,10 @@ const TopicSchema = new Schema<ITopic>(
     revisionsCount: { type: Number, default: 0 },
     satisfactionRate: { type: Number, default: 5 },
     notes: { type: String, default: "" },
+    nextRevisionDate: { type: String },
+    easinessFactor: { type: Number, default: 2.5 },
+    intervalDays: { type: Number, default: 1 },
+    lastRevisedAt: { type: String },
     createdAt: { type: Date, default: Date.now },
   },
   { timestamps: true }

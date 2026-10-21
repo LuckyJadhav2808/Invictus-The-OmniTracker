@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CreditCard, Plus, Trash2, Clock } from "lucide-react";
+import { CreditCard, Plus, Trash2, Clock, Zap, Check } from "lucide-react";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
 import { TemplateSelectionModal, TemplatePack } from "@/components/shared/TemplateSelectionModal";
@@ -9,7 +9,8 @@ import { SUBSCRIPTION_TEMPLATE_PACKS } from "@/lib/templates-data";
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { useSubscriptions, useAddSubscription, useDeleteSubscription } from "@/lib/queries/money";
+import { format } from "date-fns";
+import { useSubscriptions, useAddSubscription, useDeleteSubscription, useAddTransaction, useCategories } from "@/lib/queries/money";
 
 export interface SubscriptionItem {
   id: string;
@@ -43,6 +44,43 @@ export function SubscriptionsTracker() {
     toast.success(`Applied ${pack.name} subscription pack!`);
   };
   const [deleteSubId, setDeleteSubId] = useState<string | null>(null);
+  const [loggingSubId, setLoggingSubId] = useState<string | null>(null);
+
+  const addTxMutation = useAddTransaction();
+  const { data: categories = [] } = useCategories();
+
+  const handleLogPayment = async (sub: any) => {
+    const cost = sub.amount || sub.cost || 0;
+    if (cost <= 0) return;
+
+    try {
+      setLoggingSubId(sub.id);
+      const targetCat = categories.find((c) =>
+        c.type === "expense" && (
+          c.name.toLowerCase().includes(sub.category?.toLowerCase() || "") ||
+          c.name.toLowerCase().includes("utilit") ||
+          c.name.toLowerCase().includes("subscript") ||
+          c.name.toLowerCase().includes("entertain")
+        )
+      ) || categories.find((c) => c.type === "expense") || categories[0];
+
+      await addTxMutation.mutateAsync({
+        amount: cost,
+        type: "expense",
+        categoryId: targetCat?.id || "subscriptions",
+        date: format(new Date(), "yyyy-MM-dd"),
+        note: `Subscription: ${sub.name} (${sub.billingCycle})`,
+        paymentMethod: "UPI",
+        isRecurring: true,
+      } as any);
+
+      toast.success(`Logged ₹${cost.toLocaleString()} for ${sub.name} in Ledger! ⚡`);
+    } catch {
+      toast.error("Failed to log subscription payment");
+    } finally {
+      setTimeout(() => setLoggingSubId(null), 800);
+    }
+  };
 
   // Form State
   const [subName, setSubName] = useState("");
@@ -132,11 +170,22 @@ export function SubscriptionsTracker() {
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2.5 shrink-0">
+                <div className="flex items-center gap-2 shrink-0">
                   <span className="text-sm font-black text-[#161514] font-heading">
                     ₹{cost.toLocaleString()} <span className="text-[9px] text-[#161514]/70 font-bold">/mo</span>
                   </span>
                   <button
+                    type="button"
+                    onClick={() => handleLogPayment(sub)}
+                    disabled={loggingSubId === sub.id}
+                    className="bg-[#CEF431] hover:bg-[#bde422] text-[#161514] font-black text-[10px] uppercase tracking-wider px-2.5 py-1.5 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                    title="Log this subscription payment into Ledger"
+                  >
+                    <Zap className="h-3 w-3 fill-[#161514] stroke-[2.5]" />
+                    <span>Log</span>
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => setDeleteSubId(sub.id)}
                     className="bg-[#FEE2E2] hover:bg-[#FCA5A5] text-[#991B1B] p-1.5 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
                     title="Cancel subscription"

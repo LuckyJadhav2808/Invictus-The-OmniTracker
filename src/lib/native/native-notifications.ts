@@ -75,6 +75,8 @@ export async function setupNotificationChannels(): Promise<void> {
   }
 }
 
+const NATIVE_PERMISSION_TOAST_KEY = "invictus_native_permission_toast_shown";
+
 /**
  * Initializes native notification bridge and sets up action/tap listeners
  */
@@ -105,6 +107,9 @@ export async function initNativeNotificationBridge(router?: any): Promise<void> 
     // Auto-sync hardware alarms with saved user config on startup if permission is already granted
     const isGranted = await checkNativeNotificationPermissions();
     if (isGranted) {
+      if (typeof window !== "undefined") {
+        localStorage.setItem(NATIVE_PERMISSION_TOAST_KEY, "true");
+      }
       try {
         const { getReminderConfig } = await import("@/lib/utils/reminder-scheduler");
         const config = getReminderConfig();
@@ -146,23 +151,38 @@ export async function checkNativeNotificationPermissions(): Promise<boolean> {
 /**
  * Request exact alarm & notification permissions on native Android/iOS
  */
-export async function requestNativeNotificationPermissions(): Promise<boolean> {
+export async function requestNativeNotificationPermissions(
+  options: { silent?: boolean } = {}
+): Promise<boolean> {
   if (!isNativeApp()) return false;
 
   try {
     const status = await LocalNotifications.requestPermissions();
     if (status.display === "granted") {
-      toast.success("Native Alarm Permissions Granted! 🔔");
+      const alreadyShown =
+        typeof window !== "undefined" &&
+        localStorage.getItem(NATIVE_PERMISSION_TOAST_KEY) === "true";
+
+      if (!options.silent && !alreadyShown) {
+        if (typeof window !== "undefined") {
+          localStorage.setItem(NATIVE_PERMISSION_TOAST_KEY, "true");
+        }
+        toast.success("Native Alarm Permissions Granted! 🔔");
+      }
       return true;
     } else {
-      toast.error("Notification permission denied. Please allow in Android App Settings.");
+      if (!options.silent) {
+        toast.error("Notification permission denied. Please allow in Android App Settings.");
+      }
       return false;
     }
   } catch (err: any) {
     console.error("[NativeNotifications] Failed to request permissions:", err);
     const msg = err?.message || "";
     if (msg.includes("not implemented")) {
-      toast.error("Hardware alarm bridge requires the new app build. Please update your APK! 📲");
+      if (!options.silent) {
+        toast.error("Hardware alarm bridge requires the new app build. Please update your APK! 📲");
+      }
     }
     return false;
   }
@@ -209,7 +229,7 @@ export async function dispatchInstantNativeNotification(
 export async function sendTestNativeAlarm(): Promise<boolean> {
   if (!isNativeApp()) return false;
   try {
-    await requestNativeNotificationPermissions();
+    await requestNativeNotificationPermissions({ silent: true });
     await setupNotificationChannels();
     await LocalNotifications.schedule({
       notifications: [
@@ -281,7 +301,15 @@ export async function scheduleAllNativeAlarms(
   if (!isNativeApp()) return false;
 
   try {
-    await requestNativeNotificationPermissions();
+    const isGranted = await checkNativeNotificationPermissions();
+    if (!isGranted) {
+      if (options.silent) {
+        // In silent mode (e.g. app startup boot sync), do not prompt or show toasts
+        return false;
+      }
+      const grantedNow = await requestNativeNotificationPermissions(options);
+      if (!grantedNow) return false;
+    }
     await setupNotificationChannels();
 
     // 1. Explicitly cancel all established Invictus alarm IDs plus any pending
@@ -409,7 +437,9 @@ export async function scheduleAllNativeAlarms(
         toast.error("Native alarms will activate as soon as you install the latest app update! 📲");
       }
     } else {
-      toast.error("Failed to schedule native alarms: " + msg);
+      if (!options.silent) {
+        toast.error("Failed to schedule native alarms: " + msg);
+      }
     }
     return false;
   }

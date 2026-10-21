@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { useGymRoutines, useAddGymRoutine, useUpdateGymRoutine, useDeleteGymRoutine } from "@/lib/queries/gym";
 import { useExerciseLibrary } from "@/lib/queries/exercises";
 import { getFriendlyWeekLabel } from "@/lib/utils/gym-rollover";
+import { useWakeLock } from "@/lib/hooks/useWakeLock";
 
 const DAYS_OF_WEEK = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] as const;
 
@@ -27,39 +28,60 @@ export function GymRoutineTracker() {
 
   const [selectedDay, setSelectedDay] = useState<typeof DAYS_OF_WEEK[number]>(currentDayName);
 
-  // Automatic Gladiator Rest Timer State
+  // Automatic Gladiator Rest Timer State (Benchmark: Hevy / Strong)
   const [restSecondsLeft, setRestSecondsLeft] = useState<number | null>(null);
   const [restDuration, setRestDuration] = useState<number>(60);
   const [isTimerPaused, setIsTimerPaused] = useState<boolean>(false);
+  const targetEndTimeRef = useRef<number | null>(null);
+
+  const isTimerRunning = restSecondsLeft !== null && !isTimerPaused;
+  useWakeLock(isTimerRunning);
 
   useEffect(() => {
-    if (restSecondsLeft === null || isTimerPaused) return;
-    if (restSecondsLeft <= 0) {
-      soundFX.playRestDoneBeep();
-      soundFX.vibrate([40, 80, 40]);
-      toast.success("REST OVER — GET ON THE BAR! 💥");
-      setRestSecondsLeft(null);
-      return;
-    }
+    if (!isTimerRunning || !targetEndTimeRef.current) return;
 
-    const timer = setInterval(() => {
-      setRestSecondsLeft((prev) => {
-        if (prev === null) return null;
-        if (prev <= 4 && prev > 1) {
-          soundFX.vibrate(15);
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    const tick = () => {
+      if (!targetEndTimeRef.current) return;
+      const now = Date.now();
+      const remaining = Math.max(0, Math.ceil((targetEndTimeRef.current - now) / 1000));
 
+      if (remaining <= 0) {
+        soundFX.playRestDoneBeep();
+        soundFX.vibrate([40, 80, 40]);
+        toast.success("REST OVER — GET ON THE BAR! 💥");
+        setRestSecondsLeft(null);
+        targetEndTimeRef.current = null;
+        return;
+      }
+
+      if (remaining <= 4 && remaining > 1) {
+        soundFX.vibrate(15);
+      }
+      setRestSecondsLeft(remaining);
+    };
+
+    tick();
+    const timer = setInterval(tick, 500);
     return () => clearInterval(timer);
-  }, [restSecondsLeft, isTimerPaused]);
+  }, [isTimerRunning]);
 
   const startRestTimer = (seconds: number = restDuration) => {
     setRestDuration(seconds);
+    targetEndTimeRef.current = Date.now() + seconds * 1000;
     setRestSecondsLeft(seconds);
     setIsTimerPaused(false);
     soundFX.playPop();
+  };
+
+  const togglePauseTimer = () => {
+    if (isTimerPaused) {
+      if (restSecondsLeft !== null) {
+        targetEndTimeRef.current = Date.now() + restSecondsLeft * 1000;
+      }
+      setIsTimerPaused(false);
+    } else {
+      setIsTimerPaused(true);
+    }
   };
 
   const { data: routines = [], isLoading } = useGymRoutines();
@@ -592,7 +614,7 @@ export function GymRoutineTracker() {
             <div className="flex items-center gap-1.5">
               <button
                 type="button"
-                onClick={() => setIsTimerPaused(!isTimerPaused)}
+                onClick={togglePauseTimer}
                 className="size-8 rounded-xl border-2 border-[#161514] bg-white hover:bg-[#FFF9EA] text-[#161514] flex items-center justify-center shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-y-0.5"
                 title={isTimerPaused ? "Resume" : "Pause"}
               >

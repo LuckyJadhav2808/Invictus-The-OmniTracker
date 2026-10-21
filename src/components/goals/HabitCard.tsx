@@ -11,6 +11,7 @@ interface HabitCardProps {
   habit: Habit;
   streak?: Streak;
   isCompletedToday: boolean;
+  isRestDay?: boolean;
   onToggle: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
@@ -21,6 +22,7 @@ export function HabitCard({
   habit,
   streak,
   isCompletedToday,
+  isRestDay = false,
   onToggle,
   onEdit,
   onDelete,
@@ -158,6 +160,20 @@ export function HabitCard({
                 ? "Weekly"
                 : "Custom"}
             </span>
+
+            {/* Rest Day Badge */}
+            {isRestDay && !isCompletedToday && (
+              <span className="text-[9px] font-heading font-black text-amber-900 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-500 shadow-[1px_1px_0px_0px_#161514]">
+                💤 Rest Day
+              </span>
+            )}
+
+            {/* Reminder Time Badge */}
+            {habit.reminderTime && (
+              <span className="text-[9px] font-heading font-bold text-[#161514]/70 bg-white px-2 py-0.5 rounded-full border border-[#161514]/30">
+                ⏰ {habit.reminderTime}
+              </span>
+            )}
 
             {/* Evolving Streak Flame Badge */}
             {currentStreak > 0 && (

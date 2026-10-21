@@ -168,6 +168,7 @@ class OfflineSyncEngine {
           method: job.method,
           headers: {
             "Content-Type": "application/json",
+            "x-idempotency-key": job.idempotencyKey || job.id,
           },
           body: job.body ? JSON.stringify(job.body) : undefined,
         });

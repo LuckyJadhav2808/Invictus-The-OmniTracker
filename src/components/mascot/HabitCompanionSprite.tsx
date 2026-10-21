@@ -72,7 +72,7 @@ export function detectHabitArchetype(iconName: string = "", title: string = ""):
   return "general";
 }
 
-const ARCHETYPE_CONFIG: Record<
+export const ARCHETYPE_CONFIG: Record<
   HabitArchetype,
   {
     label: string;

@@ -15,13 +15,15 @@ export async function registerServiceWorker() {
   }
 }
 
-export async function requestNotificationPermission(): Promise<boolean> {
+export async function requestNotificationPermission(
+  options: { silent?: boolean } = {}
+): Promise<boolean> {
   if (typeof window === "undefined") return false;
 
   if (isNativeApp()) {
     try {
       const { requestNativeNotificationPermissions } = await import("@/lib/native/native-notifications");
-      return await requestNativeNotificationPermissions();
+      return await requestNativeNotificationPermissions(options);
     } catch {
       return false;
     }

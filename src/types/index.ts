@@ -22,6 +22,7 @@ export interface TaskItem {
   estimatedMinutes?: number;
   loggedMinutes?: number;
   projectTag: string; // e.g. "Work", "Personal", "Code", "Health"
+  orderKey?: string;
   subtasks: Subtask[];
   completedAt?: string;
   createdAt: string;

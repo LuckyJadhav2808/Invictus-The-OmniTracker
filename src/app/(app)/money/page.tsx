@@ -60,6 +60,12 @@ function MoneyPageContent() {
   const tabParam = searchParams.get("tab");
   const actionParam = searchParams.get("action");
   const [activeTab, setActiveTab] = useState(tabParam || "ledger");
+  const [ledgerMethodFilter, setLedgerMethodFilter] = useState<string>("all");
+
+  const handleSelectPaymentMethodFromHero = (method: "upi" | "cash") => {
+    setLedgerMethodFilter(method);
+    setActiveTab("ledger");
+  };
 
   // Sync tab with URL search parameter
   useEffect(() => {
@@ -453,6 +459,7 @@ function MoneyPageContent() {
         onAddCategory={() => setIsAddCatOpen(true)}
         onOpenEditAllowances={() => setIsAllowanceModalOpen(true)}
         onOpenCalculator={() => setIsCalculatorOpen(true)}
+        onSelectPaymentMethod={handleSelectPaymentMethodFromHero}
       />
 
       {/* 📑 TABS CONTROLS */}
@@ -498,6 +505,7 @@ function MoneyPageContent() {
             currencySymbol={currencySymbol}
             targetMonthKey={targetMonthKey}
             monthlyStats={monthlyStats}
+            initialMethodFilter={ledgerMethodFilter}
             onInspectTransaction={(tx) => setInspectingTx(tx)}
             onEditTransaction={(tx) => setEditingTx(tx)}
             onDuplicateTransaction={handleDuplicateTransaction}
@@ -538,6 +546,7 @@ function MoneyPageContent() {
             transactions={transactions}
             categories={categories}
             currencySymbol={currencySymbol}
+            targetMonthKey={targetMonthKey}
             onOpenAddTransaction={() => setIsAddTxOpen(true)}
           />
         </TabsContent>

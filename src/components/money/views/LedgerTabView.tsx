@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { type Transaction, type Category } from "@/types";
 import { cn } from "@/lib/utils";
 import { format, parseISO, isToday, isYesterday } from "date-fns";
@@ -15,6 +15,7 @@ interface LedgerTabViewProps {
   currencySymbol: string;
   targetMonthKey?: string;
   monthlyStats?: MonthlyBudgetStats;
+  initialMethodFilter?: string;
   onInspectTransaction: (tx: Transaction) => void;
   onEditTransaction: (tx: Transaction) => void;
   onDuplicateTransaction: (tx: Transaction) => Promise<void>;
@@ -35,6 +36,7 @@ export function LedgerTabView({
   currencySymbol,
   targetMonthKey,
   monthlyStats,
+  initialMethodFilter,
   onInspectTransaction,
   onEditTransaction,
   onDuplicateTransaction,
@@ -53,7 +55,13 @@ export function LedgerTabView({
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedType, setSelectedType] = useState<"all" | "expense" | "income">("all");
-  const [selectedMethod, setSelectedMethod] = useState<string>("all");
+  const [selectedMethod, setSelectedMethod] = useState<string>(initialMethodFilter || "all");
+
+  useEffect(() => {
+    if (initialMethodFilter) {
+      setSelectedMethod(initialMethodFilter);
+    }
+  }, [initialMethodFilter]);
 
   // Extract all available months from recorded transactions plus current month
   const availableMonths = useMemo(() => {

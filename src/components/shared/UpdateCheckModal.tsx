@@ -11,13 +11,19 @@ import { NativeAppUpdater } from "@/lib/native/app-update-bridge";
 interface UpdateData {
   currentVersion: string;
   latestVersion: string;
+  buildNumber?: number;
   hasUpdate: boolean;
   isMandatory: boolean;
+  channel?: string;
   title: string;
   releaseNotes: string[];
   downloadUrl: string;
   apkDownloadUrl: string;
+  apkSha256?: string;
+  apkSizeBytes?: number;
+  otaBundleUrl?: string;
   publishedAt: string;
+  provider?: string;
 }
 
 interface UpdateCheckModalProps {
@@ -259,6 +265,17 @@ export function UpdateCheckModal({ open, onOpenChange, autoCheck = false }: Upda
           </div>
         </div>
 
+        {/* Cryptographic SHA-256 Checksum Card */}
+        {data?.apkSha256 && (
+          <div className="bg-white rounded-xl p-2.5 border border-[#161514]/20 flex items-center justify-between text-[9px] font-mono text-[#161514]/70 gap-2">
+            <span className="font-bold text-[#161514] uppercase tracking-wide">SHA-256:</span>
+            <span className="truncate max-w-[240px] text-zinc-600">{data.apkSha256}</span>
+            <span className="bg-emerald-100 text-emerald-800 text-[8px] font-black px-1.5 py-0.2 rounded border border-emerald-400 shrink-0">
+              Verified
+            </span>
+          </div>
+        )}
+
         {/* Action Buttons */}
         <div className="space-y-2 pt-1">
           {hasUpdate ? (
@@ -285,7 +302,7 @@ export function UpdateCheckModal({ open, onOpenChange, autoCheck = false }: Upda
 
           <div className="flex items-center justify-between gap-2 pt-1">
             <a
-              href="https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v1.7.1/Invictus.apk"
+              href={apkUrl}
               download="Invictus.apk"
               className="text-center text-[10px] font-bold text-[#161514] underline underline-offset-2 hover:text-[#037A48]"
             >

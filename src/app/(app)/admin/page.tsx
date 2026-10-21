@@ -43,7 +43,10 @@ import {
   UserPlus,
   Shield,
   Edit3,
+  Zap,
+  Rocket,
 } from "lucide-react";
+import { InAppCicdPanel } from "@/components/admin/InAppCicdPanel";
 import { Button } from "@/components/ui/button";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
@@ -63,7 +66,7 @@ export default function AdminDashboardPage() {
   const [announcement, setAnnouncement] = useState<GlobalAnnouncement | null>(null);
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState<"users" | "issues" | "audit_announcements">("users");
+  const [activeTab, setActiveTab] = useState<"users" | "issues" | "audit_announcements" | "cicd">("users");
 
   // Announcement Form State
   const [announcementMsg, setAnnouncementMsg] = useState("");
@@ -527,6 +530,17 @@ export default function AdminDashboardPage() {
             >
               <Megaphone className="h-3.5 w-3.5 stroke-[2.5]" /> Announcements & Logs
             </button>
+            <button
+              onClick={() => setActiveTab("cicd")}
+              className={cn(
+                "px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 border-2 font-heading",
+                activeTab === "cicd"
+                  ? "bg-[#161514] text-white border-[#161514] shadow-[2px_2px_0px_0px_#161514]"
+                  : "bg-white text-[#161514] border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:bg-[#FAF8F5]"
+              )}
+            >
+              <Zap className="h-3.5 w-3.5 stroke-[2.5]" /> In-App CI/CD & Flags
+            </button>
           </div>
 
           {activeTab === "users" && (
@@ -878,6 +892,9 @@ export default function AdminDashboardPage() {
             </div>
           </div>
         )}
+
+        {/* Tab 4: In-App CI/CD & Runtime Flags */}
+        {activeTab === "cicd" && <InAppCicdPanel />}
       </div>
 
       {/* Add User Modal */}

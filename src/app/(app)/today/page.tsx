@@ -48,7 +48,7 @@ export default function TodayPage() {
   const { data: habits = [] } = useHabits();
   const { data: logs = [] } = useHabitLogs(selectedDate);
   const { data: streaks = {} } = useStreaks();
-  const { data: streakFreeze = { tokensAvailable: 1, frozenDates: [] } } = useStreakFreeze();
+  const { data: streakFreeze = { userId: "", tokensAvailable: 1, lastMonthlyCredit: "", frozenDates: [], autoShieldEvent: null } } = useStreakFreeze();
   const toggleHabitMutation = useToggleHabitLog();
 
   const { data: studySessions = [] } = useStudySessions();
@@ -112,6 +112,45 @@ export default function TodayPage() {
       default: return "₹";
     }
   }, [currency]);
+
+  // 🛡️ Autonomous Streak Freeze Shield Notification
+  useEffect(() => {
+    if (streakFreeze?.autoShieldEvent?.shielded && streakFreeze.autoShieldEvent.newlyFrozenDates?.length) {
+      const datesList = streakFreeze.autoShieldEvent.newlyFrozenDates.join(", ");
+      const toastKey = `invictus_streak_shield_alert_${datesList}`;
+      if (typeof window !== "undefined" && sessionStorage.getItem(toastKey)) return;
+      if (typeof window !== "undefined") sessionStorage.setItem(toastKey, "true");
+
+      try {
+        soundFX.playCompleteChime();
+        soundFX.playBotChirp("salute");
+      } catch {}
+
+      toast.custom(
+        () => (
+          <div className="bg-[#FAF8F5] border-2 border-[#161514] p-3.5 rounded-xl shadow-[3px_3px_0px_0px_#161514] flex items-center gap-3 w-full max-w-sm">
+            <div className="size-9 rounded-lg bg-[#03D26F] border-2 border-[#161514] flex items-center justify-center shrink-0 shadow-[1px_1px_0px_#161514]">
+              <span className="text-lg">🛡️</span>
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5">
+                <span className="font-heading font-black text-xs text-[#161514] uppercase tracking-wide">
+                  Streak Shield Deployed!
+                </span>
+                <span className="bg-[#CEF431] text-[#161514] font-black text-[9px] px-1.5 py-0.5 rounded border border-[#161514]">
+                  SAVED
+                </span>
+              </div>
+              <p className="text-[11px] text-[#161514]/80 font-medium leading-tight mt-0.5">
+                Protected {datesList} while you were away. Flame preserved! ({streakFreeze.tokensAvailable}/2 tokens left)
+              </p>
+            </div>
+          </div>
+        ),
+        { duration: 6000 }
+      );
+    }
+  }, [streakFreeze]);
 
   // Date Navigation
   const currentDateObj = useMemo(() => {

@@ -18,6 +18,7 @@ export interface ITask extends Document {
   estimatedMinutes?: number;
   loggedMinutes?: number;
   projectTag: string;
+  orderKey?: string;
   subtasks: ISubtask[];
   completedAt?: string;
   createdAt: Date;
@@ -55,6 +56,7 @@ const TaskSchema = new Schema<ITask>(
     estimatedMinutes: { type: Number, default: 0 },
     loggedMinutes: { type: Number, default: 0 },
     projectTag: { type: String, default: "General" },
+    orderKey: { type: String, default: "a0", index: true },
     subtasks: [SubtaskSchema],
     completedAt: { type: String },
   },

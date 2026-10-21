@@ -5,6 +5,7 @@ import { TaskItem, Subtask } from "@/types";
 import { toast } from "sonner";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { getCustomSession } from "@/lib/custom-auth";
+import { generateKeyBetween, generateInitialKey } from "@/lib/utils/lexorank";
 
 const TASKS_STORAGE_KEY = "invictus_tasks_db";
 const DEFAULT_SEED_TASKS: TaskItem[] = [];
@@ -252,4 +253,26 @@ export function useToggleSubtask() {
       );
     },
   });
+}
+
+/**
+ * 6. Lexicographical Fractional Reorder Mutation (Benchmark: Linear)
+ * Reorders a task in O(1) time by computing a fractional midpoint orderKey.
+ */
+export function useReorderTask() {
+  const updateTask = useUpdateTask();
+
+  const reorder = async (
+    taskId: string,
+    prevKey?: string,
+    nextKey?: string
+  ) => {
+    const newKey = generateKeyBetween(prevKey, nextKey);
+    return updateTask.mutateAsync({
+      id: taskId,
+      updates: { orderKey: newKey },
+    });
+  };
+
+  return { reorder };
 }

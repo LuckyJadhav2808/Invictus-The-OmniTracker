@@ -19,6 +19,7 @@ import {
 } from "@/lib/queries/study";
 import { ExamSyllabusTracker } from "@/components/study/ExamSyllabusTracker";
 import { StudySessionLogger } from "@/components/study/StudySessionLogger";
+import { calculateSM2Review } from "@/lib/utils/spaced-repetition";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
 import { InvictusLoadingScreen } from "@/components/shared/InvictusLoadingScreen";
@@ -530,10 +531,18 @@ function StudyPageContent() {
                   toast.success("Topic added to syllabus!");
                 }}
                 onUpdateTopicStatus={(topicId, status, revisionsCount) => {
+                  const existingTopic = (allTopics || []).find((t: any) => t.id === topicId);
+                  const isAdvancing = revisionsCount !== undefined && revisionsCount > (existingTopic?.revisionsCount || 0);
+                  const sm2 = calculateSM2Review(existingTopic, isAdvancing ? 5 : 3);
+
                   updateTopicMutation.mutate({
                     id: topicId,
                     status: status as any,
                     revisionsCount,
+                    easinessFactor: sm2.easinessFactor,
+                    intervalDays: sm2.intervalDays,
+                    nextRevisionDate: sm2.nextRevisionDate,
+                    lastRevisedAt: new Date().toISOString(),
                   } as any);
                 }}
                 onEditTopic={(topicId, title) => {

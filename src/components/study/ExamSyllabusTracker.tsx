@@ -7,6 +7,7 @@ import { useAuth } from "@/components/shared/AuthProvider";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
+import { isTopicDueForRevision } from "@/lib/utils/spaced-repetition";
 
 interface ExamSyllabusTrackerProps {
   subjects: any[];
@@ -200,10 +201,17 @@ export function ExamSyllabusTracker({
                       </button>
 
                       <div>
-                        <h5 className={cn("text-xs font-black text-[#161514]", isCompleted && "line-through text-[#161514]/40")}>
-                          {top.title}
-                        </h5>
-                        <span className="text-[9px] font-bold text-[#161514]/60 block">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h5 className={cn("text-xs font-black text-[#161514]", isCompleted && "line-through text-[#161514]/40")}>
+                            {top.title}
+                          </h5>
+                          {isTopicDueForRevision(top).isDue && (
+                            <span className="bg-[#CEF431] text-[#161514] text-[8px] font-black uppercase px-2 py-0.5 rounded-md border border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
+                              🧠 Due for Review
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[9px] font-bold text-[#161514]/60 block mt-0.5">
                           Estimated: {top.estimatedHours || 2} hours study
                         </span>
                       </div>

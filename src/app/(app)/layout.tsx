@@ -12,6 +12,9 @@ import { AutoUpdateBanner } from "@/components/shared/AutoUpdateBanner";
 import { APP_VERSION_CONFIG } from "@/config/version";
 import { InvictusLoadingScreen } from "@/components/shared/InvictusLoadingScreen";
 import { getCustomSession } from "@/lib/custom-auth";
+import { safeModeWatchdog } from "@/lib/runtime/safe-mode-watchdog";
+import { SafeModeScreen } from "@/components/shared/SafeModeScreen";
+import { migrationEngine } from "@/lib/offline/migration-engine";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -19,15 +22,27 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
   const [checking, setChecking] = useState(true);
+  const [safeModeActive, setSafeModeActive] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    const unsub = safeModeWatchdog.subscribe((status) => {
+      setSafeModeActive(status.isSafeMode);
+    });
+
+    // Run safe client storage migration in background
+    migrationEngine.runMigrations().catch(() => {});
+
     const isGuest = localStorage.getItem("invictus_guest_mode") === "true";
     const onboardedLocal = localStorage.getItem("invictus_onboarded") === "true";
     const session = getCustomSession();
     if (session && (session.onboarded || onboardedLocal || isGuest)) {
       setChecking(false);
     }
+
+    return () => {
+      unsub();
+    };
   }, []);
 
   useEffect(() => {
@@ -111,6 +126,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* Mobile 5-Tab Persistent Navigation */}
       <BottomNav />
+
+      {/* Bootloader Safe-Mode Circuit Breaker Recovery Dialog */}
+      {safeModeActive && (
+        <SafeModeScreen onDismiss={() => setSafeModeActive(false)} />
+      )}
     </div>
   );
 }

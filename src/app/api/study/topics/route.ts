@@ -78,6 +78,10 @@ export async function PUT(req: Request) {
     if (revisionsCount !== undefined) updateFields.revisionsCount = Number(revisionsCount);
     if (satisfactionRate !== undefined) updateFields.satisfactionRate = Number(satisfactionRate);
     if (notes !== undefined) updateFields.notes = notes;
+    if (body.easinessFactor !== undefined) updateFields.easinessFactor = Number(body.easinessFactor);
+    if (body.intervalDays !== undefined) updateFields.intervalDays = Number(body.intervalDays);
+    if (body.nextRevisionDate !== undefined) updateFields.nextRevisionDate = body.nextRevisionDate;
+    if (body.lastRevisedAt !== undefined) updateFields.lastRevisedAt = body.lastRevisedAt;
 
     const updated = await Topic.findOneAndUpdate(
       { id, userId },

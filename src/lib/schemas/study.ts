@@ -18,6 +18,11 @@ export const TopicSchema = z.object({
   estimatedHours: z.number().min(0).default(0),
   loggedHours: z.number().min(0).default(0), // denormalized sum of session durations
   confidence: z.number().min(1).max(5).default(1),
+  revisionsCount: z.number().default(0),
+  easinessFactor: z.number().default(2.5),
+  intervalDays: z.number().default(1),
+  nextRevisionDate: z.string().optional(),
+  lastRevisedAt: z.any().optional(),
   notes: z.string().optional(),
   resourceLinks: z.array(z.string()).default([]),
   lastStudiedAt: z.any().optional(),

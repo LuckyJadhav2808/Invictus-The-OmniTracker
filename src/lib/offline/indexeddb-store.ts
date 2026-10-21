@@ -6,6 +6,7 @@
 
 export interface PendingMutationJob {
   id: string;
+  idempotencyKey?: string;
   endpoint: string;
   method: "POST" | "PUT" | "DELETE" | "PATCH";
   body?: any;
@@ -57,6 +58,7 @@ export async function enqueueOfflineMutation(
   const fullJob: PendingMutationJob = {
     ...job,
     id: `mut_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+    idempotencyKey: (job as any).idempotencyKey || `idem_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`,
     createdAt: Date.now(),
     retryCount: 0,
   };
@@ -74,6 +76,26 @@ export async function enqueueOfflineMutation(
   } catch (err) {
     console.error("[OfflineDB] Failed to enqueue mutation:", err);
     return fullJob;
+  }
+}
+
+/**
+ * Upsert or update an existing mutation job in the offline queue.
+ */
+export async function saveOfflineMutation(job: PendingMutationJob): Promise<PendingMutationJob> {
+  try {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_MUTATIONS, "readwrite");
+      const store = tx.objectStore(STORE_MUTATIONS);
+      const req = store.put(job);
+
+      req.onsuccess = () => resolve(job);
+      req.onerror = () => reject(req.error);
+    });
+  } catch (err) {
+    console.error("[OfflineDB] Failed to save mutation:", err);
+    return job;
   }
 }
 

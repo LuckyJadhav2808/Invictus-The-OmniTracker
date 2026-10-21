@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { APP_VERSION_CONFIG } from "@/config/version";
+import { connectToDatabase } from "@/lib/mongodb";
+import { AppRelease } from "@/models/AppRelease";
 
 export const dynamic = "force-dynamic";
 
@@ -8,10 +10,27 @@ export async function GET(request: Request) {
   const requestedVersion = searchParams.get("v");
   const forcePage = searchParams.get("page") === "true";
 
-  // Resolve real APK asset URL from GitHub releases
+  // Resolve real APK asset URL
   if (!forcePage) {
     const targetVer = requestedVersion || APP_VERSION_CONFIG.version;
     let directDownloadUrl = `https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v${targetVer}/Invictus.apk`;
+    let sha256 = "";
+
+    // 1. Check self-hosted AppRelease in MongoDB first
+    try {
+      await connectToDatabase();
+      const releaseDoc = await AppRelease.findOne({
+        version: targetVer,
+        isActive: true,
+      });
+
+      if (releaseDoc && releaseDoc.apkDownloadUrl && !releaseDoc.apkDownloadUrl.startsWith("/api/download")) {
+        directDownloadUrl = releaseDoc.apkDownloadUrl;
+        sha256 = releaseDoc.apkSha256 || "";
+      }
+    } catch {
+      // Fallback cleanly
+    }
 
     try {
       const releaseApiUrl = `https://api.github.com/repos/LuckyJadhav2808/Invictus-The-OmniTracker/releases/tags/v${targetVer}`;

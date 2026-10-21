@@ -26,7 +26,7 @@ export async function GET(req: Request) {
     }
 
     const targetUserIds = getTargetUserIds(userId);
-    const tasks = await Task.find({ userId: { $in: targetUserIds } }).sort({ createdAt: -1 });
+    const tasks = await Task.find({ userId: { $in: targetUserIds } }).sort({ orderKey: 1, createdAt: -1 });
 
     return NextResponse.json(tasks);
   } catch (error: any) {
@@ -62,6 +62,7 @@ export async function POST(req: Request) {
           estimatedMinutes: Number(body.estimatedMinutes) || 0,
           loggedMinutes: Number(body.loggedMinutes) || 0,
           projectTag: body.projectTag || "General",
+          orderKey: body.orderKey || "a0",
           subtasks: body.subtasks || [],
           completedAt: body.completedAt || null,
         },

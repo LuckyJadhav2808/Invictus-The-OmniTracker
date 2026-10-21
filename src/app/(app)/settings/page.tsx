@@ -66,6 +66,7 @@ import { ReminderManagerModal } from "@/components/shared/ReminderManagerModal";
 import { getReminderConfig, type ReminderConfig } from "@/lib/utils/reminder-scheduler";
 import { ReportIssueModal } from "@/components/shared/ReportIssueModal";
 import { UpdateCheckModal } from "@/components/shared/UpdateCheckModal";
+import { InAppDiagnosticsModal } from "@/components/shared/InAppDiagnosticsModal";
 import { APP_VERSION_CONFIG } from "@/config/version";
 import { Capacitor } from "@capacitor/core";
 
@@ -228,6 +229,7 @@ export default function SettingsPage() {
   const [isCSVModalOpen, setIsCSVModalOpen] = useState(false);
   const [isReportIssueOpen, setIsReportIssueOpen] = useState(false);
   const [isUpdateCheckOpen, setIsUpdateCheckOpen] = useState(false);
+  const [isDiagnosticsOpen, setIsDiagnosticsOpen] = useState(false);
   const [isInstallGuideOpen, setIsInstallGuideOpen] = useState(false);
 
   // Reminders & Audio feedback states
@@ -1283,7 +1285,7 @@ export default function SettingsPage() {
             </div>
 
             {/* Action Buttons */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 pt-1">
               <button
                 type="button"
                 onClick={handleInstallPWA}
@@ -1311,6 +1313,15 @@ export default function SettingsPage() {
               >
                 <Sparkles className="h-4 w-4 stroke-[2.5]" />
                 <span>Check Updates</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsDiagnosticsOpen(true)}
+                className="w-full bg-[#FAF8F5] hover:bg-white text-[#161514] font-black text-xs uppercase tracking-wider py-3.5 px-3 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center justify-center gap-2"
+              >
+                <Zap className="h-4 w-4 stroke-[2.5]" />
+                <span>Diagnostics</span>
               </button>
             </div>
 
@@ -1363,6 +1374,12 @@ export default function SettingsPage() {
         <UpdateCheckModal
           open={isUpdateCheckOpen}
           onOpenChange={setIsUpdateCheckOpen}
+        />
+
+        {/* In-App Diagnostics & Telemetry Modal */}
+        <InAppDiagnosticsModal
+          open={isDiagnosticsOpen}
+          onOpenChange={setIsDiagnosticsOpen}
         />
 
         {/* ACCOUNT SECTION */}
