@@ -13,6 +13,8 @@
     "db:verify": "node scripts/verify-data.mjs",
     "version:check": "node scripts/bump-version.mjs --check",
     "version:bump": "node scripts/bump-version.mjs",
+    "apk:stage": "node scripts/stage-apk.mjs",
+    "apk:build": "node scripts/build-and-stage-apk.mjs",
     "ci:verify": "npm run version:check && npx tsc --noEmit && npm test",
     "release:publish": "node scripts/publish-release.mjs"
   },

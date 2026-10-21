@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { APP_VERSION_CONFIG } from "@/config/version";
 import { connectToDatabase } from "@/lib/mongodb";
 import { AppRelease } from "@/models/AppRelease";
+import fs from "node:fs";
+import path from "node:path";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +18,13 @@ export async function GET(request: Request) {
     let directDownloadUrl = `https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v${targetVer}/Invictus.apk`;
     let sha256 = "";
 
-    // 1. Check self-hosted AppRelease in MongoDB first
+    // 1. Check local self-hosted public/downloads/Invictus.apk first (100% GitHub-free)
+    const localApkPath = path.join(process.cwd(), "public", "downloads", "Invictus.apk");
+    if (fs.existsSync(localApkPath)) {
+      directDownloadUrl = "/downloads/Invictus.apk";
+    }
+
+    // 2. Check self-hosted AppRelease in MongoDB
     try {
       await connectToDatabase();
       const releaseDoc = await AppRelease.findOne({
@@ -32,28 +40,31 @@ export async function GET(request: Request) {
       // Fallback cleanly
     }
 
-    try {
-      const releaseApiUrl = `https://api.github.com/repos/LuckyJadhav2808/Invictus-The-OmniTracker/releases/tags/v${targetVer}`;
+    // 3. Fallback to GitHub releases only if neither local file nor MongoDB release is available
+    if (directDownloadUrl.includes("github.com")) {
+      try {
+        const releaseApiUrl = `https://api.github.com/repos/LuckyJadhav2808/Invictus-The-OmniTracker/releases/tags/v${targetVer}`;
 
-      const ghRes = await fetch(releaseApiUrl, {
-        headers: {
-          Accept: "application/vnd.github.v3+json",
-          "User-Agent": "Invictus-Downloader",
-        },
-        cache: "no-store",
-      });
+        const ghRes = await fetch(releaseApiUrl, {
+          headers: {
+            Accept: "application/vnd.github.v3+json",
+            "User-Agent": "Invictus-Downloader",
+          },
+          cache: "no-store",
+        });
 
-      if (ghRes.ok) {
-        const data = await ghRes.json();
-        if (Array.isArray(data.assets)) {
-          const apk = data.assets.find((a: any) => a.name?.endsWith(".apk"));
-          if (apk && apk.browser_download_url) {
-            directDownloadUrl = apk.browser_download_url;
+        if (ghRes.ok) {
+          const data = await ghRes.json();
+          if (Array.isArray(data.assets)) {
+            const apk = data.assets.find((a: any) => a.name?.endsWith(".apk"));
+            if (apk && apk.browser_download_url) {
+              directDownloadUrl = apk.browser_download_url;
+            }
           }
         }
+      } catch {
+        // Fallback cleanly
       }
-    } catch {
-      // Fallback cleanly
     }
 
     return NextResponse.redirect(directDownloadUrl, {
@@ -66,8 +77,7 @@ export async function GET(request: Request) {
     });
   }
 
-  // 3. Resilient Fallback HTML Page
-  // Never crash or leave the user on a raw 404 or blocked frame.
+  // Resilient Fallback HTML Page
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -92,24 +102,23 @@ export async function GET(request: Request) {
 </head>
 <body>
   <div class="card">
-    <div class="badge">🤖 Android Distribution Gateway</div>
-    <h1>Invictus v${requestedVersion} APK</h1>
-    <p>The standalone APK is queued on GitHub CI/CD Actions or pending publication. You can install it right now using one of the methods below:</p>
+    <div class="badge">🤖 Self-Hosted Android Gateway</div>
+    <h1>Invictus v${requestedVersion || APP_VERSION_CONFIG.version} APK</h1>
+    <p>Download the standalone APK directly without third-party app stores or GitHub limits:</p>
 
     <div class="steps">
       <div style="font-weight: 900; margin-bottom: 6px; text-transform: uppercase; font-size: 11px; color: #161514;">⚡ Quick Install Options:</div>
       <ol>
-        <li><strong>Option 1 (Instant):</strong> Tap "Add to Home Screen" in your Chrome/Brave menu to install as a full native PWA.</li>
-        <li><strong>Option 2 (Raw APK):</strong> Download the latest compiled debug build directly from GitHub Actions runs below.</li>
+        <li>Tap <b>Direct Download</b> below.</li>
+        <li>Open the downloaded APK and tap <b>Install / Update</b>.</li>
       </ol>
     </div>
 
-    <a href="${APP_VERSION_CONFIG.githubRepoUrl}/actions" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
-      <span>📦 View CI/CD Artifacts & Builds ↗</span>
+    <a href="/downloads/Invictus.apk" class="btn btn-primary">
+      ⚡ Direct In-App APK Download
     </a>
-
-    <a href="/settings" class="btn btn-secondary">
-      <span>⬅ Return to Settings</span>
+    <a href="/" class="btn btn-secondary">
+      Return to Invictus Web
     </a>
   </div>
 </body>
@@ -119,7 +128,6 @@ export async function GET(request: Request) {
     status: 200,
     headers: {
       "Content-Type": "text/html; charset=utf-8",
-      "Cache-Control": "no-cache, no-store",
     },
   });
 }

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { APP_VERSION_CONFIG, compareSemver } from "@/config/version";
 import { connectToDatabase } from "@/lib/mongodb";
 import { AppRelease } from "@/models/AppRelease";
+import fs from "node:fs";
+import path from "node:path";
 
 export const dynamic = "force-dynamic";
 
@@ -48,6 +50,19 @@ export async function GET(request: Request) {
       // Clean fallback if MongoDB is unreachable
       console.warn("Self-hosted manifest lookup skipped DB, using static version config:", dbErr);
     }
+
+    // 2. Check local self-hosted public/downloads/Invictus.apk
+    try {
+      const localApkPath = path.join(process.cwd(), "public", "downloads", "Invictus.apk");
+      if (fs.existsSync(localApkPath)) {
+        if (!apkDownloadUrl || apkDownloadUrl.includes("github.com") || apkDownloadUrl === "/api/download/android") {
+          apkDownloadUrl = "/downloads/Invictus.apk";
+        }
+        if (!apkSizeBytes) {
+          apkSizeBytes = fs.statSync(localApkPath).size;
+        }
+      }
+    } catch {}
 
     const effectiveTargetVersion =
       compareSemver(latestVersion, APP_VERSION_CONFIG.version) >= 0
