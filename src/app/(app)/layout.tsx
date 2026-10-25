@@ -87,8 +87,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       {/* Native Android & Mobile Backstack Manager */}
       <NativeBackHandler />
 
-      {/* Floating Dynamic Island Live Activity Dock */}
-      <DynamicIslandDock />
+      {/* Mobile Floating Dynamic Island Dock (Thumb-Zone above Bottom Nav) */}
+      <DynamicIslandDock variant="mobile" />
 
       {/* Desktop Persistent Sidebar */}
       <Sidebar />

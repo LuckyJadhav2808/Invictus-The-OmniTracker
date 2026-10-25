@@ -35,6 +35,7 @@ import { soundFX } from "@/components/shared/SoundFX";
 import { format } from "date-fns";
 import Link from "next/link";
 import { getSubrouteInfo } from "@/lib/page-flow/page-flow-resolver";
+import { DynamicIslandDock } from "@/components/shared/DynamicIslandDock";
 export { getSubrouteInfo };
 
 export function SpaceHeader() {
@@ -221,6 +222,11 @@ export function SpaceHeader() {
               </p>
             </div>
           </div>
+        </div>
+
+        {/* Center: Desktop Dynamic Island Live Activity Dock (Zero Collision) */}
+        <div className="hidden lg:flex flex-1 justify-center items-center px-4 min-w-0">
+          <DynamicIslandDock variant="header" />
         </div>
 
         {/* Right: Actions, Date, Sync & User Profile */}

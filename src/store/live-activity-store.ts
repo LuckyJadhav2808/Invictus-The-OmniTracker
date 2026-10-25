@@ -31,6 +31,7 @@ export interface AmbientData {
 interface LiveActivityStoreState {
   activeActivity: LiveActivityMode;
   isExpanded: boolean;
+  isAmbientDismissed: boolean;
   gymRest: GymRestData;
   pomodoro: PomodoroData;
   ambient: AmbientData;
@@ -38,6 +39,8 @@ interface LiveActivityStoreState {
   // UI Actions
   setIsExpanded: (expanded: boolean) => void;
   toggleExpanded: () => void;
+  dismissAmbient: () => void;
+  restoreAmbient: () => void;
 
   // Gym Rest Actions
   startGymRest: (seconds: number, exerciseName?: string) => void;
@@ -88,12 +91,15 @@ export const useLiveActivityStore = create<LiveActivityStoreState>()(
     (set, get) => ({
       activeActivity: "none",
       isExpanded: false,
+      isAmbientDismissed: false,
       gymRest: initialGymRest,
       pomodoro: initialPomodoro,
       ambient: initialAmbient,
 
       setIsExpanded: (expanded) => set({ isExpanded: expanded }),
       toggleExpanded: () => set((state) => ({ isExpanded: !state.isExpanded })),
+      dismissAmbient: () => set({ isAmbientDismissed: true, isExpanded: false }),
+      restoreAmbient: () => set({ isAmbientDismissed: false }),
 
       // ================= GYM REST =================
       startGymRest: (seconds, exerciseName) => {

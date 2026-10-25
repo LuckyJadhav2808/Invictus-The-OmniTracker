@@ -1,16 +1,11 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import React, { useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import {
   Timer,
   Play,
   Pause,
-  Plus,
-  Minus,
-  CheckCircle2,
-  BookOpen,
-  Wallet,
   ChevronUp,
   X,
   Flame,
@@ -18,24 +13,31 @@ import {
   Sparkles,
   Dumbbell,
   Clock,
+  BookOpen,
+  Wallet,
 } from "lucide-react";
 import { useLiveActivityStore } from "@/store/live-activity-store";
 import { soundFX } from "@/components/shared/SoundFX";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
-export function DynamicIslandDock() {
+interface DynamicIslandDockProps {
+  variant?: "header" | "mobile";
+}
+
+export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps) {
   const router = useRouter();
-  const pathname = usePathname();
 
   const {
     activeActivity,
     isExpanded,
+    isAmbientDismissed,
     gymRest,
     pomodoro,
     ambient,
     setIsExpanded,
     toggleExpanded,
+    dismissAmbient,
     togglePauseGymRest,
     addGymRestSeconds,
     stopGymRest,
@@ -47,13 +49,15 @@ export function DynamicIslandDock() {
     startPomodoro,
   } = useLiveActivityStore();
 
-  const [hasInteracted, setHasInteracted] = useState(false);
   const islandRef = useRef<HTMLDivElement>(null);
   const prevGymSecondsRef = useRef<number | null>(null);
   const prevPomoSecondsRef = useRef<number | null>(null);
 
   // 1. Unified Background Ticker Loop for Live Activities
   useEffect(() => {
+    // Only run the ticker loop in the header variant to avoid duplicate intervals
+    if (variant !== "header") return;
+
     const isGymRunning = activeActivity === "gym_rest" && !gymRest.isPaused && Boolean(gymRest.targetEndTime);
     const isPomoRunning = activeActivity === "pomodoro" && !pomodoro.isPaused && Boolean(pomodoro.targetEndTime);
 
@@ -69,10 +73,12 @@ export function DynamicIslandDock() {
     }, 500);
 
     return () => clearInterval(interval);
-  }, [activeActivity, gymRest.isPaused, gymRest.targetEndTime, pomodoro.isPaused, pomodoro.targetEndTime, tickGymRest, tickPomodoro]);
+  }, [variant, activeActivity, gymRest.isPaused, gymRest.targetEndTime, pomodoro.isPaused, pomodoro.targetEndTime, tickGymRest, tickPomodoro]);
 
-  // 2. Audio & Haptic Alarm on Timer Finish
+  // 2. Audio & Haptic Alarm on Timer Finish (only in primary variant)
   useEffect(() => {
+    if (variant !== "header") return;
+
     // Gym rest finished
     if (
       prevGymSecondsRef.current !== null &&
@@ -87,9 +93,11 @@ export function DynamicIslandDock() {
       });
     }
     prevGymSecondsRef.current = gymRest.secondsLeft;
-  }, [gymRest.secondsLeft, gymRest.exerciseName, activeActivity]);
+  }, [variant, gymRest.secondsLeft, gymRest.exerciseName, activeActivity]);
 
   useEffect(() => {
+    if (variant !== "header") return;
+
     // Pomodoro finished
     if (
       prevPomoSecondsRef.current !== null &&
@@ -101,12 +109,12 @@ export function DynamicIslandDock() {
       soundFX.vibrate([80, 50, 80]);
       toast.success(
         pomodoro.phase === "focus"
-          ? "FOCUS SESSION COMPLETE! 🎯 Awesome discipline!"
+          ? "POMODORO SESSION COMPLETE! 🎯 Awesome discipline!"
           : "BREAK TIME OVER — Back to deep work! 📚"
       );
     }
     prevPomoSecondsRef.current = pomodoro.secondsLeft;
-  }, [pomodoro.secondsLeft, pomodoro.phase, activeActivity]);
+  }, [variant, pomodoro.secondsLeft, pomodoro.phase, activeActivity]);
 
   // 3. Click-outside to collapse expanded HUD
   useEffect(() => {
@@ -150,6 +158,11 @@ export function DynamicIslandDock() {
       ? "pomodoro"
       : "ambient";
 
+  // Hide ambient pill if dismissed by user
+  if (currentMode === "ambient" && isAmbientDismissed) {
+    return null;
+  }
+
   const handlePillClick = () => {
     soundFX.playPop();
     soundFX.vibrate(15);
@@ -160,22 +173,30 @@ export function DynamicIslandDock() {
     <div
       ref={islandRef}
       className={cn(
-        "fixed left-1/2 -translate-x-1/2 z-50 transition-all duration-300 ease-out select-none",
-        "top-2.5 sm:top-3",
-        isExpanded ? "w-[calc(100vw-28px)] max-w-md" : "w-auto max-w-[calc(100vw-32px)]"
+        "select-none transition-all duration-300 ease-out",
+        variant === "header"
+          ? "relative flex items-center justify-center"
+          : "lg:hidden fixed bottom-20 left-1/2 -translate-x-1/2 z-40"
       )}
       role="region"
       aria-label="Live Activity Dynamic Island"
     >
       {/* ================= COMPACT PILL MODE ================= */}
       {!isExpanded && (
-        <button
-          type="button"
+        <div
+          role="button"
+          tabIndex={0}
           onClick={handlePillClick}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              handlePillClick();
+            }
+          }}
           className={cn(
-            "group h-10 px-3.5 py-1.5 rounded-full border-2 border-[#161514] flex items-center gap-2.5 cursor-pointer",
-            "shadow-[3px_3px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_#161514]",
-            "hover:-translate-y-0.5 transition-all duration-200",
+            "group h-9 px-3 py-1 rounded-full border-2 border-[#161514] flex items-center gap-2 cursor-pointer",
+            "shadow-[2px_2px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_#161514]",
+            "hover:-translate-y-0.5 transition-all duration-200 shrink-0",
             currentMode === "gym_rest"
               ? "bg-[#CEF431] text-[#161514]"
               : currentMode === "pomodoro"
@@ -187,15 +208,15 @@ export function DynamicIslandDock() {
           {currentMode === "gym_rest" && (
             <>
               <div className="flex items-center gap-1.5">
-                <span className="relative flex h-2.5 w-2.5">
+                <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-500 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-600" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-600" />
                 </span>
                 <Dumbbell className="size-3.5 stroke-[2.5]" />
               </div>
 
               <div className="flex items-center gap-1.5">
-                <span className="text-[11px] font-black uppercase tracking-wider">
+                <span className="text-[10px] font-black uppercase tracking-wider">
                   Rest:
                 </span>
                 <span className="font-mono text-xs font-black tracking-tight">
@@ -204,7 +225,7 @@ export function DynamicIslandDock() {
               </div>
 
               {/* Mini progress bar inside pill */}
-              <div className="w-10 h-1.5 bg-[#161514]/20 rounded-full overflow-hidden hidden xs:block">
+              <div className="w-8 h-1.5 bg-[#161514]/20 rounded-full overflow-hidden hidden xs:block">
                 <div
                   className="h-full bg-[#161514] transition-all duration-500"
                   style={{
@@ -222,15 +243,15 @@ export function DynamicIslandDock() {
           {currentMode === "pomodoro" && (
             <>
               <div className="flex items-center gap-1.5">
-                <span className="relative flex h-2.5 w-2.5">
+                <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-600" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600" />
                 </span>
                 <BookOpen className="size-3.5 stroke-[2.5]" />
               </div>
 
               <div className="flex items-center gap-1.5">
-                <span className="text-[11px] font-black uppercase tracking-wider truncate max-w-[90px] sm:max-w-[130px]">
+                <span className="text-[10px] font-black uppercase tracking-wider truncate max-w-[80px] sm:max-w-[120px]">
                   {pomodoro.subjectName}:
                 </span>
                 <span className="font-mono text-xs font-black tracking-tight">
@@ -244,8 +265,8 @@ export function DynamicIslandDock() {
           {currentMode === "ambient" && (
             <>
               <div className="flex items-center gap-1.5">
-                <span className="size-2 rounded-full bg-[#03D26F] animate-pulse" />
-                <Wallet className="size-3.5 stroke-[2.5] text-[#161514]" />
+                <span className="size-1.5 rounded-full bg-[#03D26F] animate-pulse" />
+                <Wallet className="size-3 stroke-[2.5] text-[#161514]" />
               </div>
 
               <span className="text-[11px] font-black tracking-tight flex items-center gap-1">
@@ -253,7 +274,7 @@ export function DynamicIslandDock() {
                   {ambient.currencySymbol}
                   {Math.round(ambient.dailyCashLeft || 0).toLocaleString()}
                 </span>
-                <span className="text-[#161514]/60 font-semibold text-[10px]">left today</span>
+                <span className="text-[#161514]/60 font-semibold text-[9px]">left today</span>
               </span>
 
               {ambient.totalHabits > 0 && (
@@ -267,16 +288,38 @@ export function DynamicIslandDock() {
                   </div>
                 </>
               )}
+
+              {/* 1-Tap Dismiss Ambient Pill */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  soundFX.playPop();
+                  dismissAmbient();
+                  toast.info("Ambient dock minimized until your next workout or study session.");
+                }}
+                className="size-4 rounded-full hover:bg-[#161514]/15 flex items-center justify-center text-[#161514]/40 hover:text-[#161514] transition-colors ml-0.5 cursor-pointer"
+                title="Dismiss ambient pill"
+              >
+                <X className="size-2.5 stroke-[3]" />
+              </button>
             </>
           )}
 
           <ChevronUp className="size-3 stroke-[3] rotate-180 opacity-60 group-hover:opacity-100 transition-opacity ml-0.5" />
-        </button>
+        </div>
       )}
 
       {/* ================= EXPANDED HUD MODE ================= */}
       {isExpanded && (
-        <div className="bg-[#FAF8F5] rounded-3xl border-[2.5px] border-[#161514] shadow-[5px_5px_0px_0px_#161514] p-4 sm:p-5 space-y-3.5 animate-in fade-in-0 zoom-in-95 duration-200">
+        <div
+          className={cn(
+            "bg-[#FAF8F5] rounded-3xl border-[2.5px] border-[#161514] shadow-[5px_5px_0px_0px_#161514] p-4 sm:p-5 space-y-3.5 animate-in fade-in-0 zoom-in-95 duration-200 z-50",
+            variant === "header"
+              ? "absolute top-full mt-2 left-1/2 -translate-x-1/2 w-[390px] max-w-[92vw]"
+              : "fixed bottom-20 left-1/2 -translate-x-1/2 w-[calc(100vw-28px)] max-w-md"
+          )}
+        >
           {/* Header Bar */}
           <div className="flex items-center justify-between border-b-2 border-[#161514]/15 pb-2.5">
             <div className="flex items-center gap-2">
@@ -443,7 +486,10 @@ export function DynamicIslandDock() {
 
                 <div className="w-full h-2.5 bg-[#F1EFEA] border border-[#161514] rounded-full overflow-hidden mt-2.5">
                   <div
-                    className="h-full bg-[#C084FC] transition-all duration-500"
+                    className={cn(
+                      "h-full bg-[#C084FC] transition-all duration-500",
+                      pomodoro.phase === "focus" ? "bg-[#C084FC]" : "bg-[#03D26F]"
+                    )}
                     style={{
                       width: `${Math.min(
                         100,
