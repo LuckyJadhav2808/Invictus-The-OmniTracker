@@ -62,6 +62,97 @@ export function getEffectiveDaypartFromHour(hour: number): EffectiveDaypart {
   return "night";
 }
 
+export interface DailyConquestMetrics {
+  overallScore: number; // 0 to 100
+  habitPercent: number; // 0 to 100
+  completedHabitsCount: number;
+  totalHabitsCount: number;
+  studyPercent: number; // 0 to 100
+  studyHoursFormatted: string; // e.g. "2.5h"
+  studyTargetHoursFormatted: string; // e.g. "4.0h"
+  budgetPercent: number; // 0 to 100
+  spentToday: number;
+  dailySafeToSpend: number;
+  remainingSafeToSpend: number;
+  currencySymbol: string;
+}
+
+const SNAPSHOT_STORAGE_KEY = "invictus_today_conquest_snapshot";
+
+/**
+ * Computes composite daily momentum metrics across Habits, Study Focus, and Financial Defense.
+ * Weighted: Habits (35%), Study (35%), Budget (30%).
+ */
+export function computeDailyConquestScore({
+  completedHabitsCount,
+  totalHabitsCount,
+  studyMinutesToday,
+  studyTargetHours = 4.0,
+  spentToday,
+  dailySafeToSpend,
+  currencySymbol = "₹",
+}: {
+  completedHabitsCount: number;
+  totalHabitsCount: number;
+  studyMinutesToday: number;
+  studyTargetHours?: number;
+  spentToday: number;
+  dailySafeToSpend: number;
+  currencySymbol?: string;
+}): DailyConquestMetrics {
+  // 1. Habit Percent (Weight: 35%)
+  const habitPercent =
+    totalHabitsCount > 0
+      ? Math.min(100, Math.round((completedHabitsCount / totalHabitsCount) * 100))
+      : 100;
+
+  // 2. Study Percent (Weight: 35%)
+  const studyTargetMinutes = studyTargetHours * 60;
+  const studyPercent =
+    studyTargetMinutes > 0
+      ? Math.min(100, Math.round((studyMinutesToday / studyTargetMinutes) * 100))
+      : 0;
+  const studyHoursFormatted = (studyMinutesToday / 60).toFixed(1) + "h";
+  const studyTargetHoursFormatted = studyTargetHours.toFixed(1) + "h";
+
+  // 3. Budget Percent (Weight: 30%)
+  let budgetPercent = 100;
+  const remainingSafeToSpend = Math.max(0, dailySafeToSpend - spentToday);
+
+  if (dailySafeToSpend > 0) {
+    if (spentToday <= dailySafeToSpend) {
+      budgetPercent = Math.round(((dailySafeToSpend - spentToday) / dailySafeToSpend) * 100);
+    } else {
+      budgetPercent = 0; // Over budget
+    }
+  }
+
+  // 4. Composite Weighted Score
+  const weightedHabit = totalHabitsCount > 0 ? (habitPercent / 100) * 35 : 35;
+  const weightedStudy = (studyPercent / 100) * 35;
+  const weightedBudget = (budgetPercent / 100) * 30;
+
+  const overallScore = Math.min(
+    100,
+    Math.max(0, Math.round(weightedHabit + weightedStudy + weightedBudget))
+  );
+
+  return {
+    overallScore,
+    habitPercent,
+    completedHabitsCount,
+    totalHabitsCount,
+    studyPercent,
+    studyHoursFormatted,
+    studyTargetHoursFormatted,
+    budgetPercent,
+    spentToday,
+    dailySafeToSpend,
+    remainingSafeToSpend,
+    currencySymbol,
+  };
+}
+
 export function useTodayCockpitViewModel() {
   const [daypartMode, setDaypartMode] = useState<DaypartMode>("auto");
   const [currentHour, setCurrentHour] = useState<number>(() => new Date().getHours());

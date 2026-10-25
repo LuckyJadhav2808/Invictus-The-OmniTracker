@@ -39,7 +39,8 @@ import { SafeToSpendGauge } from "@/components/today/SafeToSpendGauge";
 import { TaskBattleQueue } from "@/components/today/TaskBattleQueue";
 import { EveningReflectionCard } from "@/components/today/EveningReflectionCard";
 import { ConfettiCelebration } from "@/components/common/ConfettiCelebration";
-import { useTodayCockpitViewModel } from "@/components/today/useTodayCockpitViewModel";
+import { useTodayCockpitViewModel, computeDailyConquestScore } from "@/components/today/useTodayCockpitViewModel";
+import { GladiatorConquestHUD } from "@/components/today/GladiatorConquestHUD";
 import { RetroStickyScratchpad } from "@/components/today/RetroStickyScratchpad";
 
 export default function TodayPage() {
@@ -277,6 +278,26 @@ export default function TodayPage() {
     });
   }, [transactions, budgetStats, customDailyBudget]);
 
+  // Derived Daily Conquest Telemetry (Isolates stopwatch ticker from re-rendering the HUD)
+  const conquestMetrics = useMemo(() => {
+    return computeDailyConquestScore({
+      completedHabitsCount,
+      totalHabitsCount,
+      studyMinutesToday: todayStudyMinutes,
+      studyTargetHours: 4.0,
+      spentToday,
+      dailySafeToSpend: budgetStats.dailySafeToSpend,
+      currencySymbol,
+    });
+  }, [
+    completedHabitsCount,
+    totalHabitsCount,
+    todayStudyMinutes,
+    spentToday,
+    budgetStats.dailySafeToSpend,
+    currencySymbol,
+  ]);
+
   const handleSaveDailyLimit = async (payload: {
     upiBudget: number;
     cashBudget: number;
@@ -402,9 +423,17 @@ export default function TodayPage() {
     }
   };
 
-  // Smooth scroll helper for quick dock
+  // Smooth scroll helpers for quick dock and telemetry HUD
   const scrollToHabits = () => {
     const el = document.getElementById("habits-section");
+    if (el) el.scrollIntoView({ behavior: "smooth" });
+  };
+  const scrollToStudy = () => {
+    const el = document.getElementById("study-section");
+    if (el) el.scrollIntoView({ behavior: "smooth" });
+  };
+  const scrollToMoney = () => {
+    const el = document.getElementById("money-section") || document.getElementById("expense-section");
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
 
@@ -432,7 +461,15 @@ export default function TodayPage() {
         onSelectDaypartMode={setDaypartMode}
       />
 
-      {/* 2. Ergonomic Quick Action Dock (44px Touch Targets) */}
+      {/* 2. Gladiator Conquest Tri-Ring HUD (Apple Fitness Activity Benchmark) */}
+      <GladiatorConquestHUD
+        metrics={conquestMetrics}
+        onScrollToHabits={scrollToHabits}
+        onScrollToStudy={scrollToStudy}
+        onScrollToMoney={scrollToMoney}
+      />
+
+      {/* 3. Ergonomic Quick Action Dock (44px Touch Targets) */}
       <QuickActionDock
         isTimerRunning={isTimerRunning}
         onToggleTimer={() => setIsTimerRunning(!isTimerRunning)}
@@ -440,7 +477,7 @@ export default function TodayPage() {
         onScrollToHabits={scrollToHabits}
       />
 
-      {/* 3. Bento Row 1: Habit Momentum Ring & Study Focus Hub */}
+      {/* 4. Bento Row 1: Habit Momentum Ring & Study Focus Hub */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Habit Momentum Card (7 Cols) */}
         <div className="lg:col-span-7">
@@ -485,10 +522,10 @@ export default function TodayPage() {
         </div>
       </div>
 
-      {/* 4. Bento Row 2: Financial Safe-to-Spend Gauge & Priority Battle Queue */}
+      {/* 5. Bento Row 2: Financial Safe-to-Spend Gauge & Priority Battle Queue */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Safe-to-Spend Financial Gauge (6 Cols) */}
-        <div className="lg:col-span-6">
+        <div id="money-section" className="lg:col-span-6">
           <SafeToSpendGauge
             spentToday={spentToday}
             dailySafeToSpend={budgetStats.dailySafeToSpend}
