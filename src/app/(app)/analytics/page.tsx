@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import Link from "next/link";
 import { useHabits, useStreaks } from "@/lib/queries/goals";
 import { useSubjects, useStudySessions, useTests } from "@/lib/queries/study";
 import { useCategories, useTransactions } from "@/lib/queries/money";
@@ -12,6 +13,37 @@ import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Legend, PieC
 import { useUIStore } from "@/store/ui-store";
 import { YearlyActivityMatrix } from "@/components/profile/YearlyActivityMatrix";
 import { useAuth } from "@/components/shared/AuthProvider";
+
+// Custom Tactile Neobrutalist Chart Tooltip
+function NeobrutalistTooltip({ active, payload, label, unit = "" }: any) {
+  if (!active || !payload || !payload.length) return null;
+  return (
+    <div className="bg-[#FAF8F5] border-2 border-[#161514] rounded-xl p-2.5 shadow-[3px_3px_0px_#161514] text-xs font-heading space-y-1.5 z-40 select-none min-w-[120px]">
+      {label && (
+        <p className="font-heading font-black text-[#161514] text-[11px] uppercase tracking-wider border-b-2 border-[#161514]/15 pb-1">
+          {label}
+        </p>
+      )}
+      <div className="space-y-1">
+        {payload.map((item: any, idx: number) => {
+          const color = item.color || item.fill || item.stroke || "#161514";
+          return (
+            <div key={idx} className="flex items-center justify-between gap-3 text-[11px] font-bold">
+              <span className="flex items-center gap-1.5 text-[#161514]">
+                <span className="size-2 rounded-full border border-[#161514] shrink-0" style={{ backgroundColor: color }} />
+                <span>{item.name}:</span>
+              </span>
+              <span className="font-mono font-black text-[#161514]">
+                {item.value}
+                {unit}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 export default function AnalyticsHubPage() {
   const { user } = useAuth();
@@ -243,7 +275,7 @@ export default function AnalyticsHubPage() {
               </div>
             </div>
 
-            {habitsChartData.length > 0 && (
+            {habitsChartData.length > 0 ? (
               <div className="bg-white rounded-3xl p-5 sm:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
                 <h3 className="font-black text-xs sm:text-sm text-[#161514] uppercase tracking-wider font-heading">
                   Streaks comparison per habit
@@ -253,13 +285,34 @@ export default function AnalyticsHubPage() {
                     <BarChart data={habitsChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                       <XAxis dataKey="name" stroke="#161514" fontSize={11} fontWeight={700} tickLine={false} axisLine={{ stroke: "#161514", strokeWidth: 2 }} />
                       <YAxis stroke="#161514" fontSize={11} fontWeight={700} tickLine={false} axisLine={{ stroke: "#161514", strokeWidth: 2 }} />
-                      <Tooltip contentStyle={{ borderRadius: "12px", border: "2px solid #161514", boxShadow: "3px 3px 0px 0px #161514", fontWeight: "bold" }} />
+                      <Tooltip content={<NeobrutalistTooltip unit=" days" />} />
                       <Legend />
                       <Bar dataKey="Streak" fill="#F59E0B" stroke="#161514" strokeWidth={1.5} radius={[6, 6, 0, 0]} />
                       <Bar dataKey="Record" fill="#C084FC" stroke="#161514" strokeWidth={1.5} radius={[6, 6, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
+              </div>
+            ) : (
+              <div className="bg-white rounded-3xl p-8 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] text-center space-y-3">
+                <div className="size-12 rounded-2xl bg-amber-100 border-2 border-[#161514] shadow-[2px_2px_0px_#161514] flex items-center justify-center mx-auto text-xl">
+                  🔥
+                </div>
+                <div className="space-y-1 max-w-sm mx-auto">
+                  <h4 className="font-heading font-black text-sm text-[#161514] uppercase tracking-wide">
+                    No Habit Streaks Recorded Yet
+                  </h4>
+                  <p className="text-xs text-[#161514]/70 font-medium">
+                    Check off your daily habits in the Today Cockpit or Goals Space to illuminate your streak consistency matrix.
+                  </p>
+                </div>
+                <Link
+                  href="/goals"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#03D26F] hover:bg-[#02b861] text-[#161514] font-heading font-black text-xs border-2 border-[#161514] shadow-[2px_2px_0px_#161514] active:translate-y-0.5 transition-all"
+                >
+                  <span>Open Habits Hub</span>
+                  <span>→</span>
+                </Link>
               </div>
             )}
           </TabsContent>
@@ -297,14 +350,14 @@ export default function AnalyticsHubPage() {
                   <BarChart data={studyBarData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <XAxis dataKey="name" stroke="#161514" fontSize={11} fontWeight={700} tickLine={false} axisLine={{ stroke: "#161514", strokeWidth: 2 }} />
                     <YAxis stroke="#161514" fontSize={11} fontWeight={700} tickLine={false} axisLine={{ stroke: "#161514", strokeWidth: 2 }} tickFormatter={(v) => `${v}h`} />
-                    <Tooltip formatter={(v) => [`${v}h`]} contentStyle={{ borderRadius: "12px", border: "2px solid #161514", boxShadow: "3px 3px 0px 0px #161514", fontWeight: "bold" }} />
+                    <Tooltip content={<NeobrutalistTooltip unit="h" />} />
                     <Bar dataKey="hours" fill="#FB923C" stroke="#161514" strokeWidth={1.5} radius={[6, 6, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
             </div>
 
-            {testTrendData.length > 0 && (
+            {testTrendData.length > 0 ? (
               <div className="bg-white rounded-3xl p-5 sm:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
                 <h3 className="font-black text-xs sm:text-sm text-[#161514] uppercase tracking-wider font-heading">
                   Mock Score Trends (%)
@@ -314,11 +367,32 @@ export default function AnalyticsHubPage() {
                     <LineChart data={testTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                       <XAxis dataKey="name" stroke="#161514" fontSize={11} fontWeight={700} tickLine={false} axisLine={{ stroke: "#161514", strokeWidth: 2 }} />
                       <YAxis stroke="#161514" fontSize={11} fontWeight={700} tickLine={false} axisLine={{ stroke: "#161514", strokeWidth: 2 }} domain={[0, 100]} />
-                      <Tooltip formatter={(v) => [`${v}%`]} contentStyle={{ borderRadius: "12px", border: "2px solid #161514", boxShadow: "3px 3px 0px 0px #161514", fontWeight: "bold" }} />
+                      <Tooltip content={<NeobrutalistTooltip unit="%" />} />
                       <Line type="monotone" dataKey="score" stroke="#F59E0B" strokeWidth={3.5} dot={{ r: 5, fill: "#F59E0B", stroke: "#161514", strokeWidth: 2 }} />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
+              </div>
+            ) : (
+              <div className="bg-white rounded-3xl p-8 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] text-center space-y-3">
+                <div className="size-12 rounded-2xl bg-purple-100 border-2 border-[#161514] shadow-[2px_2px_0px_#161514] flex items-center justify-center mx-auto text-xl">
+                  📊
+                </div>
+                <div className="space-y-1 max-w-sm mx-auto">
+                  <h4 className="font-heading font-black text-sm text-[#161514] uppercase tracking-wide">
+                    No Mock Test Scores Yet
+                  </h4>
+                  <p className="text-xs text-[#161514]/70 font-medium">
+                    Log your mock exams and revision test percentages to unlock your score trajectory line chart.
+                  </p>
+                </div>
+                <Link
+                  href="/study?tab=tests"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#C084FC] hover:bg-[#ad6ef7] text-[#161514] font-heading font-black text-xs border-2 border-[#161514] shadow-[2px_2px_0px_#161514] active:translate-y-0.5 transition-all"
+                >
+                  <span>Log First Mock Test</span>
+                  <span>→</span>
+                </Link>
               </div>
             )}
           </TabsContent>
@@ -347,7 +421,7 @@ export default function AnalyticsHubPage() {
               </div>
             </div>
 
-            {expensePieData.length > 0 && (
+            {expensePieData.length > 0 ? (
               <div className="bg-white rounded-3xl p-5 sm:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
                 <h3 className="font-black text-xs sm:text-sm text-[#161514] uppercase tracking-wider font-heading">
                   Expense Share per Category
@@ -370,11 +444,32 @@ export default function AnalyticsHubPage() {
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
-                      <Tooltip contentStyle={{ borderRadius: "12px", border: "2px solid #161514", boxShadow: "3px 3px 0px 0px #161514", fontWeight: "bold" }} />
+                      <Tooltip content={<NeobrutalistTooltip unit="" />} />
                       <Legend verticalAlign="bottom" height={36} />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
+              </div>
+            ) : (
+              <div className="bg-white rounded-3xl p-8 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] text-center space-y-3">
+                <div className="size-12 rounded-2xl bg-emerald-100 border-2 border-[#161514] shadow-[2px_2px_0px_#161514] flex items-center justify-center mx-auto text-xl">
+                  💰
+                </div>
+                <div className="space-y-1 max-w-sm mx-auto">
+                  <h4 className="font-heading font-black text-sm text-[#161514] uppercase tracking-wide">
+                    No Expenses Recorded This Month
+                  </h4>
+                  <p className="text-xs text-[#161514]/70 font-medium">
+                    Log expenses into category envelopes to see your spend distribution pie chart and cashflow comparison.
+                  </p>
+                </div>
+                <Link
+                  href="/money?action=add_tx"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#CEF431] hover:bg-[#b8dc22] text-[#161514] font-heading font-black text-xs border-2 border-[#161514] shadow-[2px_2px_0px_#161514] active:translate-y-0.5 transition-all"
+                >
+                  <span>Log First Expense</span>
+                  <span>→</span>
+                </Link>
               </div>
             )}
 
@@ -387,7 +482,7 @@ export default function AnalyticsHubPage() {
                   <BarChart data={moneyBarData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <XAxis dataKey="name" stroke="#161514" fontSize={11} fontWeight={700} tickLine={false} axisLine={{ stroke: "#161514", strokeWidth: 2 }} />
                     <YAxis stroke="#161514" fontSize={11} fontWeight={700} tickLine={false} axisLine={{ stroke: "#161514", strokeWidth: 2 }} />
-                    <Tooltip contentStyle={{ borderRadius: "12px", border: "2px solid #161514", boxShadow: "3px 3px 0px 0px #161514", fontWeight: "bold" }} />
+                    <Tooltip content={<NeobrutalistTooltip unit="" />} />
                     <Legend />
                     <Bar dataKey="Income" fill="#03D26F" stroke="#161514" strokeWidth={1.5} radius={[6, 6, 0, 0]} />
                     <Bar dataKey="Expense" fill="#FB7185" stroke="#161514" strokeWidth={1.5} radius={[6, 6, 0, 0]} />

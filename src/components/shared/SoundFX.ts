@@ -49,6 +49,27 @@ class SoundManager {
     return this.muted;
   }
 
+  // Zero-lag Web Audio API hardware pre-buffering & context unfreezing
+  public prewarm() {
+    if (typeof window === "undefined") return;
+    const ctx = this.getContext();
+    if (!ctx) return;
+    try {
+      if (ctx.state === "suspended") {
+        ctx.resume().catch(() => {});
+      }
+      // Play a near-silent 1ms oscillator buffer to pre-allocate audio hardware pipelines
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.002);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.003);
+    } catch {}
+  }
+
   // Crisp tactile check pop (frequency sweep down 850Hz -> 320Hz in 35ms)
   public playPop() {
     if (this.muted) return;
@@ -134,25 +155,44 @@ class SoundManager {
     } catch {}
   }
 
-  // Alert tone for rest timer expiration (880Hz crisp alert pulses)
-  public playRestDoneBeep() {
+  // Hevy-style tactile dual-pulse rest timer alarm (880Hz A5 -> 1174Hz D6 alert)
+  public playRestDoneDoubleBeep() {
     if (this.muted) return;
     const ctx = this.getContext();
     if (!ctx) return;
     try {
-      [0, 0.12, 0.24].forEach((delay) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = "square";
-        osc.frequency.setValueAtTime(880, ctx.currentTime + delay);
-        gain.gain.setValueAtTime(0.08, ctx.currentTime + delay);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.06);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(ctx.currentTime + delay);
-        osc.stop(ctx.currentTime + delay + 0.07);
-      });
+      const now = ctx.currentTime;
+      // First Beep: 880Hz (A5)
+      const osc1 = ctx.createOscillator();
+      const gain1 = ctx.createGain();
+      osc1.type = "sine";
+      osc1.frequency.setValueAtTime(880, now);
+      gain1.gain.setValueAtTime(0.18, now);
+      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+      osc1.connect(gain1);
+      gain1.connect(ctx.destination);
+      osc1.start(now);
+      osc1.stop(now + 0.1);
+
+      // Second Beep: 1174.66Hz (D6) with higher resonance for distinct clarity
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.type = "triangle";
+      osc2.frequency.setValueAtTime(1174.66, now + 0.13);
+      gain2.gain.setValueAtTime(0.22, now + 0.13);
+      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.start(now + 0.13);
+      osc2.stop(now + 0.3);
+
+      this.vibrate([60, 60, 100]);
     } catch {}
+  }
+
+  // Alert tone for rest timer expiration (delegates to crisp double-beep)
+  public playRestDoneBeep() {
+    this.playRestDoneDoubleBeep();
   }
 
   // Satisfying cash register / coin bell for transaction saves (C6 -> E6 metallic ding)
@@ -256,3 +296,17 @@ class SoundManager {
 }
 
 export const soundFX = new SoundManager();
+
+// Automatically pre-warm audio hardware on the first user interaction for zero-lag sound execution
+if (typeof window !== "undefined") {
+  const warmUp = () => {
+    soundFX.prewarm();
+    window.removeEventListener("pointerdown", warmUp);
+    window.removeEventListener("touchstart", warmUp);
+    window.removeEventListener("keydown", warmUp);
+  };
+  window.addEventListener("pointerdown", warmUp, { passive: true, once: true });
+  window.addEventListener("touchstart", warmUp, { passive: true, once: true });
+  window.addEventListener("keydown", warmUp, { passive: true, once: true });
+}
+

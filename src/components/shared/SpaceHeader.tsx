@@ -23,6 +23,7 @@ import {
   X,
   Calendar,
   RefreshCw,
+  ArrowLeft,
 } from "lucide-react";
 import { InvictusLogo } from "@/components/shared/InvictusLogo";
 import { useAuth } from "@/components/shared/AuthProvider";
@@ -30,8 +31,11 @@ import { getGlobalAnnouncement, type GlobalAnnouncement } from "@/lib/custom-aut
 import { ReminderManagerModal } from "@/components/shared/ReminderManagerModal";
 import { CloudSyncDrawer } from "@/components/shared/CloudSyncDrawer";
 import { useOfflineSync } from "@/lib/offline/sync-manager";
+import { soundFX } from "@/components/shared/SoundFX";
 import { format } from "date-fns";
 import Link from "next/link";
+import { getSubrouteInfo } from "@/lib/page-flow/page-flow-resolver";
+export { getSubrouteInfo };
 
 export function SpaceHeader() {
   const pathname = usePathname();
@@ -149,6 +153,8 @@ export function SpaceHeader() {
   const Icon = space.icon;
   const todayFormatted = format(new Date(), "EEE, d MMM");
 
+  const subrouteInfo = getSubrouteInfo(pathname);
+
   return (
     <header className="sticky top-0 z-30 w-full bg-[#FBF9F5]/90 backdrop-blur-md border-b-2 border-[#161514] select-none">
       {/* Optional Announcement Banner */}
@@ -170,13 +176,34 @@ export function SpaceHeader() {
 
       {/* Main Header Container */}
       <div className="max-w-6xl mx-auto px-4 py-2.5 flex items-center justify-between gap-4">
-        {/* Left: Mobile Brand or Desktop Breadcrumb */}
-        <div className="flex items-center gap-3">
-          <div className="lg:hidden">
-            <InvictusLogo size="sm" variant="icon-only" href="/today" />
-          </div>
+        {/* Left: Mobile Brand / Contextual Back Button & Space Breadcrumb */}
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+          {subrouteInfo ? (
+            <button
+              type="button"
+              onClick={() => {
+                soundFX.playPop();
+                if (typeof window !== "undefined" && window.history.length > 1) {
+                  router.back();
+                } else {
+                  router.push(subrouteInfo.parentHref);
+                }
+              }}
+              className="h-8 sm:h-9 px-2 sm:px-2.5 rounded-lg border-2 border-[#161514] bg-white hover:bg-[#FAF8F5] active:translate-y-0.5 shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center gap-1.5 text-xs font-heading font-black text-[#161514] cursor-pointer transition-all shrink-0"
+              aria-label={`Back to ${subrouteInfo.parentLabel}`}
+              title={`Back to ${subrouteInfo.parentLabel}`}
+            >
+              <ArrowLeft className="size-4 stroke-[3]" />
+              <span className="hidden sm:inline">{subrouteInfo.parentLabel}</span>
+              <span className="sm:hidden text-[11px]">Back</span>
+            </button>
+          ) : (
+            <div className="lg:hidden shrink-0">
+              <InvictusLogo size="sm" variant="icon-only" href="/today" />
+            </div>
+          )}
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
             <div
               className={cn(
                 "size-8 rounded-lg border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center justify-center shrink-0",
@@ -185,11 +212,11 @@ export function SpaceHeader() {
             >
               <Icon className="size-4 stroke-[2.5]" />
             </div>
-            <div>
-              <h1 className="font-heading font-black text-sm lg:text-base leading-none text-[#161514] tracking-tight">
+            <div className="min-w-0">
+              <h1 className="font-heading font-black text-sm lg:text-base leading-none text-[#161514] tracking-tight truncate">
                 {space.title}
               </h1>
-              <p className="hidden sm:block text-[11px] font-semibold text-[#161514]/65 leading-tight mt-0.5">
+              <p className="hidden sm:block text-[11px] font-semibold text-[#161514]/65 leading-tight mt-0.5 truncate">
                 {space.subtitle}
               </p>
             </div>

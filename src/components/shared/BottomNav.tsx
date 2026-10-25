@@ -12,6 +12,7 @@ import {
 import { useState, useEffect, useRef, Suspense } from "react";
 import { useUIStore } from "@/store/ui-store";
 import { cn } from "@/lib/utils";
+import { soundFX } from "@/components/shared/SoundFX";
 
 function BottomNavContent() {
   const pathname = usePathname();
@@ -122,11 +123,23 @@ function BottomNavContent() {
             href={item.href}
             onClick={(e) => {
               const now = Date.now();
-              if (now - lastNavClickRef.current < 250 && isActive) {
-                e.preventDefault();
-                return;
+              if (isActive) {
+                // If re-tapping active tab: smooth scroll main container to top
+                const scrollContainer = document.getElementById("main-scroll-container");
+                if (scrollContainer && scrollContainer.scrollTop > 10) {
+                  e.preventDefault();
+                  scrollContainer.scrollTo({ top: 0, behavior: "smooth" });
+                  soundFX.playPop();
+                  triggerHaptic();
+                  return;
+                }
+                if (now - lastNavClickRef.current < 250) {
+                  e.preventDefault();
+                  return;
+                }
               }
               lastNavClickRef.current = now;
+              soundFX.playPop();
               triggerHaptic();
               if (item.value && item.value !== "today") {
                 setActiveTracker(item.value as any);

@@ -97,6 +97,19 @@ function GoalsPageContent() {
     }
   }, [tabParam]);
 
+  const handleTabChange = (val: string) => {
+    setActiveTab(val);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      if (val === "list") {
+        url.searchParams.delete("tab");
+      } else {
+        url.searchParams.set("tab", val);
+      }
+      window.history.replaceState(null, "", url.pathname + url.search);
+    }
+  };
+
   // States for Health Profile Modal
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [profileForm, setProfileForm] = useState({ gender: "", age: "", weight: "" });
@@ -486,7 +499,7 @@ function GoalsPageContent() {
         </div>
 
         {/* Tab Controls (Horizontally scrollable on mobile, inline on desktop) */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           <div className="w-full overflow-x-auto no-scrollbar pb-1 mb-5">
             <TabsList className="bg-[#FAF8F5] rounded-2xl p-1.5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] flex items-center gap-1.5 w-max min-w-full sm:min-w-0 sm:w-auto">
               <TabsTrigger

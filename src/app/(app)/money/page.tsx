@@ -64,6 +64,9 @@ function MoneyPageContent() {
 
   const handleSelectPaymentMethodFromHero = (method: "upi" | "cash") => {
     setLedgerMethodFilter(method);
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("invictus_ledger_method", method);
+    }
     setActiveTab("ledger");
   };
 
@@ -73,6 +76,19 @@ function MoneyPageContent() {
       setActiveTab(tabParam);
     }
   }, [tabParam]);
+
+  const handleTabChange = (val: string) => {
+    setActiveTab(val);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      if (val === "ledger") {
+        url.searchParams.delete("tab");
+      } else {
+        url.searchParams.set("tab", val);
+      }
+      window.history.replaceState(null, "", url.pathname + url.search);
+    }
+  };
 
   // Handle deep-link action triggers (e.g., from quick-action menu or widgets)
   useEffect(() => {
@@ -463,7 +479,7 @@ function MoneyPageContent() {
       />
 
       {/* 📑 TABS CONTROLS */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         <div className="w-full overflow-x-auto no-scrollbar pb-1 mb-4">
           <TabsList className="bg-[#FAF8F5] rounded-2xl p-1.5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex items-center gap-1.5 w-max min-w-full sm:min-w-0 sm:w-auto">
             <TabsTrigger

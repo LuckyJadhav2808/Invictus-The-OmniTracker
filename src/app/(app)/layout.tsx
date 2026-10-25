@@ -15,6 +15,7 @@ import { getCustomSession } from "@/lib/custom-auth";
 import { safeModeWatchdog } from "@/lib/runtime/safe-mode-watchdog";
 import { SafeModeScreen } from "@/components/shared/SafeModeScreen";
 import { migrationEngine } from "@/lib/offline/migration-engine";
+import { NativeBackHandler } from "@/components/shared/NativeBackHandler";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -68,12 +69,23 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     checkOnboarding();
   }, [user, loading, router]);
 
+  // Scroll Restoration: Reset custom viewport scroll to top on route change
+  useEffect(() => {
+    const scrollContainer = document.getElementById("main-scroll-container");
+    if (scrollContainer) {
+      scrollContainer.scrollTop = 0;
+    }
+  }, [pathname]);
+
   if (!mounted || loading || checking) {
     return <InvictusLoadingScreen />;
   }
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-[#FBF9F5] text-[#161514]">
+      {/* Native Android & Mobile Backstack Manager */}
+      <NativeBackHandler />
+
       {/* Desktop Persistent Sidebar */}
       <Sidebar />
 

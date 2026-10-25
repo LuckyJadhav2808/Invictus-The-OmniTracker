@@ -46,8 +46,8 @@ export function GymRoutineTracker() {
       const remaining = Math.max(0, Math.ceil((targetEndTimeRef.current - now) / 1000));
 
       if (remaining <= 0) {
-        soundFX.playRestDoneBeep();
-        soundFX.vibrate([40, 80, 40]);
+        soundFX.playRestDoneDoubleBeep();
+        soundFX.vibrate([60, 60, 100]);
         toast.success("REST OVER — GET ON THE BAR! 💥");
         setRestSecondsLeft(null);
         targetEndTimeRef.current = null;
@@ -366,6 +366,42 @@ export function GymRoutineTracker() {
     }
   };
 
+  // Hevy-style progressive overload memory: retrieves previous session performance or set baseline
+  const getPreviousSetGhost = (ex: any, setIdx: number) => {
+    if (!ex) return { weight: 20, reps: 10, isFromPreviousSession: false };
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem(`invictus_gym_last_${ex.name?.toLowerCase().trim()}`);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed?.sets?.[setIdx] && parsed.sets[setIdx].weight) {
+            return {
+              weight: parsed.sets[setIdx].weight,
+              reps: parsed.sets[setIdx].reps || 10,
+              isFromPreviousSession: true,
+            };
+          }
+          if (parsed?.weight) {
+            return {
+              weight: parsed.weight,
+              reps: parsed.reps || 10,
+              isFromPreviousSession: true,
+            };
+          }
+        }
+      } catch {}
+    }
+    // Fallback: previous set within current routine
+    if (setIdx > 0 && ex.sets?.[setIdx - 1]) {
+      return {
+        weight: ex.sets[setIdx - 1].weight || 20,
+        reps: ex.sets[setIdx - 1].reps || 10,
+        isFromPreviousSession: false,
+      };
+    }
+    return { weight: 20, reps: 10, isFromPreviousSession: false };
+  };
+
   // Add a new set to an exercise
   const handleAddSet = async (exId: string) => {
     if (!currentRoutine) return;
@@ -373,12 +409,13 @@ export function GymRoutineTracker() {
     const updatedExercises = (currentRoutine.exercises || []).map((ex: any) => {
       if (ex.id === exId) {
         const nextSetNum = (ex.sets?.length || 0) + 1;
+        const ghost = getPreviousSetGhost(ex, nextSetNum - 1);
         const lastSet = ex.sets?.[ex.sets.length - 1];
         const newSet = {
           id: `set_${nextSetNum}_${Date.now()}`,
           setNumber: nextSetNum,
-          weight: lastSet ? lastSet.weight : 20,
-          reps: lastSet ? lastSet.reps : 10,
+          weight: lastSet?.weight ? lastSet.weight : ghost.weight,
+          reps: lastSet?.reps ? lastSet.reps : ghost.reps,
           completed: false,
         };
         return { ...ex, sets: [...(ex.sets || []), newSet] };
@@ -447,6 +484,19 @@ export function GymRoutineTracker() {
           soundFX.vibrate(25);
           startRestTimer(restDuration);
           const thisEx = updatedExercises.find((e: any) => e.id === exId);
+          // Auto-persist previous session memory for Hevy progressive overload
+          if (typeof window !== "undefined" && thisEx?.name) {
+            try {
+              const memory = {
+                name: thisEx.name,
+                updatedAt: new Date().toISOString(),
+                sets: (thisEx.sets || []).map((s: any) => ({ weight: s.weight, reps: s.reps })),
+                weight: (thisEx.sets || [])[setIndex]?.weight || 20,
+                reps: (thisEx.sets || [])[setIndex]?.reps || 10,
+              };
+              localStorage.setItem(`invictus_gym_last_${thisEx.name.toLowerCase().trim()}`, JSON.stringify(memory));
+            } catch {}
+          }
           const thisExCompleted = thisEx && (thisEx.sets || []).length > 0 && (thisEx.sets || []).every((s: any) => s.completed);
           if (thisExCompleted) {
             soundFX.playCompleteChime();
@@ -593,100 +643,36 @@ export function GymRoutineTracker() {
         })}
       </div>
 
-      {/* Gladiator Automatic Rest Timer HUD */}
-      {restSecondsLeft !== null && (
-        <div className="bg-[#FAF8F5] border-[2.5px] border-[#161514] rounded-2xl p-4 shadow-[4px_4px_0px_0px_#161514] space-y-3 animate-in fade-in duration-200">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="size-9 rounded-xl bg-amber-300 border-2 border-[#161514] flex items-center justify-center shadow-[1.5px_1.5px_0px_0px_#161514]">
-                <Timer className="size-5 text-[#161514] stroke-[2.5]" />
-              </div>
-              <div>
-                <h4 className="text-xs font-heading font-black text-[#161514] uppercase tracking-wider">
-                  Gladiator Rest Clock
-                </h4>
-                <p className="text-[10px] font-bold text-[#161514]/70">
-                  {restSecondsLeft > 0 ? "Breathe, hydrate, prepare for next set" : "Rest complete — attack next set!"}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-1.5">
-              <button
-                type="button"
-                onClick={togglePauseTimer}
-                className="size-8 rounded-xl border-2 border-[#161514] bg-white hover:bg-[#FFF9EA] text-[#161514] flex items-center justify-center shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-y-0.5"
-                title={isTimerPaused ? "Resume" : "Pause"}
-              >
-                {isTimerPaused ? <Play className="size-3.5 fill-current" /> : <Pause className="size-3.5 fill-current" />}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  soundFX.playPop();
-                  setRestSecondsLeft((prev) => (prev !== null ? prev + 15 : 15));
-                }}
-                className="px-2.5 py-1 rounded-xl border-2 border-[#161514] bg-white hover:bg-[#FFF9EA] text-[#161514] font-heading font-black text-[10px] shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-y-0.5"
-                title="Add 15s"
-              >
-                +15s
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  soundFX.playPop();
-                  setRestSecondsLeft(null);
-                }}
-                className="size-8 rounded-xl border-2 border-[#161514] bg-rose-100 hover:bg-rose-200 text-[#161514] flex items-center justify-center shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-y-0.5"
-                title="Dismiss timer"
-              >
-                <X className="size-4 stroke-[2.5]" />
-              </button>
-            </div>
-          </div>
-
-          {/* Big Digital Countdown & Progress Bar */}
-          <div className="space-y-1.5">
-            <div className="flex items-baseline justify-between">
-              <span className={cn(
-                "text-2xl sm:text-3xl font-heading font-black tracking-tight",
-                restSecondsLeft <= 5 ? "text-rose-600 animate-pulse" : "text-[#161514]"
-              )}>
-                {Math.floor(restSecondsLeft / 60)}:{(restSecondsLeft % 60).toString().padStart(2, "0")}
-              </span>
-              <div className="flex gap-1.5">
-                {[30, 45, 60, 90, 120].map((sec) => (
-                  <button
-                    key={sec}
-                    type="button"
-                    onClick={() => startRestTimer(sec)}
-                    className={cn(
-                      "text-[10px] font-heading font-black px-2 py-0.5 rounded-lg border-2 border-[#161514] transition-all",
-                      restDuration === sec
-                        ? "bg-[#CEF431] text-[#161514] shadow-[1px_1px_0px_0px_#161514]"
-                        : "bg-white text-[#161514]/70 hover:bg-slate-50"
-                    )}
-                  >
-                    {sec}s
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="w-full h-3 bg-white rounded-full border-2 border-[#161514] overflow-hidden p-0.5">
-              <div
-                className={cn(
-                  "h-full rounded-full transition-all duration-1000 ease-linear",
-                  restSecondsLeft <= 5 ? "bg-rose-500" : "bg-[#03D26F]"
-                )}
-                style={{
-                  width: `${Math.min(100, Math.max(0, (restSecondsLeft / Math.max(restDuration, 1)) * 100))}%`,
-                }}
-              />
-            </div>
-          </div>
+      {/* Rest Duration Presets Bar */}
+      <div className="bg-[#FAF8F5] border-2 border-[#161514] rounded-2xl p-3 shadow-[2.5px_2.5px_0px_0px_#161514] flex items-center justify-between gap-2 flex-wrap">
+        <div className="flex items-center gap-2">
+          <Timer className="size-4 text-[#161514] stroke-[2.5]" />
+          <span className="text-xs font-heading font-black text-[#161514] uppercase tracking-wider">
+            Auto Rest Duration:
+          </span>
         </div>
-      )}
+        <div className="flex items-center gap-1.5 flex-wrap">
+          {[30, 45, 60, 90, 120].map((sec) => (
+            <button
+              key={sec}
+              type="button"
+              onClick={() => {
+                setRestDuration(sec);
+                soundFX.playPop();
+                toast.success(`Default rest timer set to ${sec}s`);
+              }}
+              className={cn(
+                "text-[10px] font-heading font-black px-2.5 py-1 rounded-lg border-2 border-[#161514] transition-all cursor-pointer",
+                restDuration === sec
+                  ? "bg-[#CEF431] text-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]"
+                  : "bg-white text-[#161514]/70 hover:bg-[#FFF9EA]"
+              )}
+            >
+              {sec}s
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* Routine Title Banner */}
       <div className="bg-cream-bg/50 rounded-2xl p-3.5 sm:p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -887,7 +873,7 @@ export function GymRoutineTracker() {
                     </div>
                   </div>
 
-                  {/* Sub-line: Muscle Tag + Machine + Form Guide Button */}
+                  {/* Sub-line: Muscle Tag + Machine + Form Guide Button + Progressive Overload Ghost Target */}
                   <div className="flex items-center justify-between gap-2 flex-wrap pt-0.5">
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-md bg-rose-100 text-rose-800 border-2 border-[#161514]">
@@ -898,6 +884,18 @@ export function GymRoutineTracker() {
                           <Layers className="h-3 w-3 text-rose-500" /> {ex.machineName}
                         </span>
                       )}
+                      {(() => {
+                        const ghost = getPreviousSetGhost(ex, 0);
+                        return (
+                          <span
+                            title="Hevy Progressive Overload Target"
+                            className="text-[9px] font-mono font-bold text-[#161514] bg-amber-50 px-2 py-0.5 rounded-md border border-[#161514] shadow-[1px_1px_0px_0px_#161514] flex items-center gap-1"
+                          >
+                            <Flame className="size-2.5 text-orange-500 fill-orange-400" />
+                            <span>{ghost.isFromPreviousSession ? `Prev: ${ghost.weight}kg × ${ghost.reps}` : `Target: ${ghost.weight}kg × ${ghost.reps}`}</span>
+                          </span>
+                        );
+                      })()}
                     </div>
 
                     <button
@@ -922,27 +920,31 @@ export function GymRoutineTracker() {
                   </div>
 
                   <div className="divide-y divide-[#161514]/10">
-                    {(ex.sets || []).map((st: any, idx: number) => (
-                      <div key={st.id || idx} className="grid grid-cols-4 gap-2 px-3 py-2.5 items-center text-center">
-                        <span className="font-heading font-black text-[#161514] text-xs">Set {st.setNumber}</span>
-                        <div className="flex justify-center">
-                          <input
-                            type="number"
-                            value={st.weight}
-                            onChange={(e) => handleSetChange(ex.id, idx, "weight", Number(e.target.value))}
-                            className="w-full max-w-[64px] bg-[#FAF8F5] border-2 border-[#161514] rounded-xl py-1.5 px-1 text-center font-heading font-black text-[#161514] text-base sm:text-xs outline-none focus:bg-[#FFF9EA] shadow-[1.5px_1.5px_0px_0px_#161514] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-all"
-                            min={0}
-                          />
-                        </div>
-                        <div className="flex justify-center">
-                          <input
-                            type="number"
-                            value={st.reps}
-                            onChange={(e) => handleSetChange(ex.id, idx, "reps", Number(e.target.value))}
-                            className="w-full max-w-[64px] bg-[#FAF8F5] border-2 border-[#161514] rounded-xl py-1.5 px-1 text-center font-heading font-black text-[#161514] text-base sm:text-xs outline-none focus:bg-[#FFF9EA] shadow-[1.5px_1.5px_0px_0px_#161514] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-all"
-                            min={1}
-                          />
-                        </div>
+                    {(ex.sets || []).map((st: any, idx: number) => {
+                      const ghost = getPreviousSetGhost(ex, idx);
+                      return (
+                        <div key={st.id || idx} className="grid grid-cols-4 gap-2 px-3 py-2.5 items-center text-center">
+                          <span className="font-heading font-black text-[#161514] text-xs">Set {st.setNumber}</span>
+                          <div className="flex justify-center">
+                            <input
+                              type="number"
+                              value={st.weight === 0 ? "" : st.weight}
+                              placeholder={String(ghost.weight)}
+                              onChange={(e) => handleSetChange(ex.id, idx, "weight", e.target.value === "" ? 0 : Number(e.target.value))}
+                              className="w-full max-w-[64px] bg-[#FAF8F5] border-2 border-[#161514] rounded-xl py-1.5 px-1 text-center font-heading font-black text-[#161514] placeholder:text-[#161514]/35 placeholder:font-normal text-base sm:text-xs outline-none focus:bg-[#FFF9EA] shadow-[1.5px_1.5px_0px_0px_#161514] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-all"
+                              min={0}
+                            />
+                          </div>
+                          <div className="flex justify-center">
+                            <input
+                              type="number"
+                              value={st.reps === 0 ? "" : st.reps}
+                              placeholder={String(ghost.reps)}
+                              onChange={(e) => handleSetChange(ex.id, idx, "reps", e.target.value === "" ? 0 : Number(e.target.value))}
+                              className="w-full max-w-[64px] bg-[#FAF8F5] border-2 border-[#161514] rounded-xl py-1.5 px-1 text-center font-heading font-black text-[#161514] placeholder:text-[#161514]/35 placeholder:font-normal text-base sm:text-xs outline-none focus:bg-[#FFF9EA] shadow-[1.5px_1.5px_0px_0px_#161514] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-all"
+                              min={1}
+                            />
+                          </div>
                         <div className="flex justify-center">
                           <button
                             type="button"
@@ -964,7 +966,8 @@ export function GymRoutineTracker() {
                           </button>
                         </div>
                       </div>
-                    ))}
+                    );
+                  })}
                   </div>
                 </div>
 
@@ -1416,6 +1419,113 @@ export function GymRoutineTracker() {
         }}
         exercise={selectedGuideExercise}
       />
+
+      {/* Hevy-Style Persistent Floating Rest Countdown Timer Dock */}
+      {restSecondsLeft !== null && (
+        <div
+          role="region"
+          aria-label="Floating Rest Timer"
+          className="fixed bottom-24 lg:bottom-8 right-3 sm:right-6 z-50 max-w-[360px] w-[calc(100%-1.5rem)] sm:w-auto bg-[#FAF8F5] border-2 border-[#161514] rounded-2xl p-3 sm:p-3.5 shadow-[4px_4px_0px_0px_#161514] animate-in slide-in-from-bottom-4 duration-200 select-none"
+        >
+          <div className="flex items-center justify-between gap-3">
+            {/* Timer Icon & Title */}
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div
+                className={cn(
+                  "size-9 rounded-xl border-2 border-[#161514] flex items-center justify-center shadow-[1.5px_1.5px_0px_0px_#161514] shrink-0 transition-colors",
+                  restSecondsLeft <= 5 ? "bg-rose-400 text-white animate-bounce" : "bg-[#CEF431] text-[#161514]"
+                )}
+              >
+                <Timer className="size-5 stroke-[2.5]" />
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514]">
+                    Rest Clock
+                  </span>
+                  {isTimerPaused && (
+                    <span className="text-[8px] font-black uppercase px-1 rounded bg-amber-200 border border-[#161514]">
+                      Paused
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-baseline gap-1">
+                  <span
+                    className={cn(
+                      "text-xl sm:text-2xl font-mono font-black tracking-tight",
+                      restSecondsLeft <= 5 ? "text-rose-600 animate-pulse" : "text-[#161514]"
+                    )}
+                  >
+                    {Math.floor(restSecondsLeft / 60)}:{(restSecondsLeft % 60).toString().padStart(2, "0")}
+                  </span>
+                  <span className="text-[9px] font-bold text-[#161514]/60">left</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Control Buttons */}
+            <div className="flex items-center gap-1.5 shrink-0">
+              <button
+                type="button"
+                onClick={() => {
+                  soundFX.playPop();
+                  setRestSecondsLeft((prev) => (prev !== null ? Math.max(0, prev - 15) : 0));
+                  if (targetEndTimeRef.current) targetEndTimeRef.current -= 15000;
+                }}
+                className="px-2 py-1.5 rounded-lg border-2 border-[#161514] bg-white hover:bg-[#FFF9EA] text-[#161514] font-heading font-black text-[10px] shadow-[1px_1px_0px_0px_#161514] active:translate-y-0.5 cursor-pointer"
+                title="Subtract 15s"
+              >
+                -15s
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  soundFX.playPop();
+                  setRestSecondsLeft((prev) => (prev !== null ? prev + 30 : 30));
+                  if (targetEndTimeRef.current) targetEndTimeRef.current += 30000;
+                }}
+                className="px-2 py-1.5 rounded-lg border-2 border-[#161514] bg-[#CEF431] hover:bg-[#D8F74E] text-[#161514] font-heading font-black text-[10px] shadow-[1px_1px_0px_0px_#161514] active:translate-y-0.5 cursor-pointer"
+                title="Add 30s"
+              >
+                +30s
+              </button>
+              <button
+                type="button"
+                onClick={togglePauseTimer}
+                className="size-8 rounded-lg border-2 border-[#161514] bg-white hover:bg-[#FFF9EA] text-[#161514] flex items-center justify-center shadow-[1px_1px_0px_0px_#161514] active:translate-y-0.5 cursor-pointer"
+                title={isTimerPaused ? "Resume" : "Pause"}
+              >
+                {isTimerPaused ? <Play className="size-3.5 fill-current" /> : <Pause className="size-3.5 fill-current" />}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  soundFX.playPop();
+                  setRestSecondsLeft(null);
+                  targetEndTimeRef.current = null;
+                }}
+                className="size-8 rounded-lg border-2 border-[#161514] bg-rose-100 hover:bg-rose-200 text-[#161514] flex items-center justify-center shadow-[1px_1px_0px_0px_#161514] active:translate-y-0.5 cursor-pointer"
+                title="Dismiss rest timer"
+              >
+                <X className="size-4 stroke-[2.5]" />
+              </button>
+            </div>
+          </div>
+
+          {/* Micro progress bar along bottom */}
+          <div className="w-full h-1.5 bg-[#161514]/10 rounded-full border border-[#161514]/20 overflow-hidden mt-2">
+            <div
+              className={cn(
+                "h-full transition-all duration-500",
+                restSecondsLeft <= 5 ? "bg-rose-500" : "bg-[#03D26F]"
+              )}
+              style={{
+                width: `${Math.min(100, Math.max(0, ((restSecondsLeft || 0) / restDuration) * 100))}%`,
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -69,6 +69,8 @@ import { UpdateCheckModal } from "@/components/shared/UpdateCheckModal";
 import { InAppDiagnosticsModal } from "@/components/shared/InAppDiagnosticsModal";
 import { APP_VERSION_CONFIG } from "@/config/version";
 import { Capacitor } from "@capacitor/core";
+import { encryptVaultPayload, decryptVaultPayload } from "@/lib/vault/vault-crypto";
+import { soundFX } from "@/components/shared/SoundFX";
 
 const TIMEZONES = [
   "Asia/Kolkata",
@@ -505,6 +507,7 @@ export default function SettingsPage() {
     if (!user && !isGuestMode) return;
     setIsExporting(true);
     try {
+      soundFX.playPop();
       const keys = getAllInvictusKeys();
       const localData: Record<string, unknown> = {};
       keys.forEach((key) => {
@@ -517,7 +520,18 @@ export default function SettingsPage() {
       let cloudData: Record<string, unknown> | null = null;
       if (user?.uid && !isGuestMode) {
         const uid = user.uid;
-        const [habitsRes, logsRes, subjectsRes, sessionsRes, testsRes, txRes, catRes, debtsRes] = await Promise.allSettled([
+        const [
+          habitsRes,
+          logsRes,
+          subjectsRes,
+          sessionsRes,
+          testsRes,
+          txRes,
+          catRes,
+          debtsRes,
+          tasksRes,
+          gymRes,
+        ] = await Promise.allSettled([
           fetch(`/api/goals/habits?userId=${uid}`).then((r) => (r.ok ? r.json() : null)),
           fetch(`/api/goals/logs?userId=${uid}`).then((r) => (r.ok ? r.json() : null)),
           fetch(`/api/study/subjects?userId=${uid}`).then((r) => (r.ok ? r.json() : null)),
@@ -526,6 +540,8 @@ export default function SettingsPage() {
           fetch(`/api/money/transactions?userId=${uid}`).then((r) => (r.ok ? r.json() : null)),
           fetch(`/api/money/categories?userId=${uid}`).then((r) => (r.ok ? r.json() : null)),
           fetch(`/api/money/debts?userId=${uid}`).then((r) => (r.ok ? r.json() : null)),
+          fetch(`/api/tasks`).then((r) => (r.ok ? r.json() : null)),
+          fetch(`/api/gym/routines`).then((r) => (r.ok ? r.json() : null)),
         ]);
 
         cloudData = {
@@ -537,13 +553,15 @@ export default function SettingsPage() {
           transactions: txRes.status === "fulfilled" ? txRes.value : null,
           categories: catRes.status === "fulfilled" ? catRes.value : null,
           debts: debtsRes.status === "fulfilled" ? debtsRes.value : null,
+          tasks: tasksRes.status === "fulfilled" ? tasksRes.value : null,
+          gymRoutines: gymRes.status === "fulfilled" ? gymRes.value : null,
         };
       }
 
       const backup: Record<string, unknown> = {
         exportedAt: new Date().toISOString(),
         mode: isGuestMode ? "guest" : "cloud",
-        version: 1,
+        version: 2,
         user: user
           ? { uid: user.uid, email: user.email, displayName: user.displayName }
           : { uid: "guest", email: "guest@invictus.local", displayName: "Guest" },
@@ -551,17 +569,20 @@ export default function SettingsPage() {
         ...(cloudData ? { cloudData } : {}),
       };
 
-      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+      // Encrypt snapshot with AES-GCM 256-bit Web Crypto API
+      const encryptedJson = await encryptVaultPayload(backup);
+      const blob = new Blob([encryptedJson], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `invictus-backup-${new Date().toISOString().split("T")[0]}.json`;
+      a.download = `invictus-vault-${new Date().toISOString().split("T")[0]}.invictus.json`;
       a.click();
       URL.revokeObjectURL(url);
-      showToast.success("Backup exported!", "Your data backup has been downloaded 📦");
+      soundFX.playCompleteChime();
+      showToast.success("Encrypted Vault Exported!", "Your data snapshot is secured with AES-GCM-256 🛡️");
     } catch (err) {
       console.error("Export error:", err);
-      showToast.error("Export failed", "Something went wrong during export ❌");
+      showToast.error("Export failed", "Something went wrong during encrypted export ❌");
     } finally {
       setIsExporting(false);
     }
@@ -573,14 +594,17 @@ export default function SettingsPage() {
     if (!file || (!user && !isGuestMode)) return;
     setIsImporting(true);
     try {
+      soundFX.playPop();
       const text = await file.text();
-      const backup = JSON.parse(text);
+      // Decrypt AES-GCM payload or parse plain JSON backup seamlessly
+      const backup = await decryptVaultPayload(text);
 
       if (!backup.version || !backup.exportedAt) {
-        showToast.error("Invalid backup", "This file doesn't look like a valid Invictus backup ❌");
+        showToast.error("Invalid vault backup", "This file does not contain a recognized Invictus backup signature ❌");
         return;
       }
 
+      // 1. Restore local workspace items
       if (backup.data && typeof backup.data === "object") {
         Object.entries(backup.data).forEach(([key, value]) => {
           if (key.startsWith("invictus_")) {
@@ -589,11 +613,13 @@ export default function SettingsPage() {
         });
       }
 
-      queryClient.invalidateQueries();
-      showToast.success("Backup restored!", "Your data has been restored successfully 🎉");
+      // 2. Refresh queries across all spaces
+      await queryClient.invalidateQueries();
+      soundFX.playCompleteChime();
+      showToast.success("Vault Restored!", "All data decrypted & restored successfully 🎉");
     } catch (err) {
       console.error("Import error:", err);
-      showToast.error("Import failed", "Failed to parse or restore the backup file ❌");
+      showToast.error("Import failed", "Failed to decrypt or parse the vault file. Ensure the file is not corrupted ❌");
     } finally {
       setIsImporting(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -2017,8 +2043,8 @@ export default function SettingsPage() {
             <div className="space-y-2 pt-2">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-black uppercase tracking-wider text-[#161514] font-heading">Export Backup JSON</p>
-                  <p className="text-[10px] text-[#161514]/70 font-bold">Download complete workspace snapshot</p>
+                  <p className="text-xs font-black uppercase tracking-wider text-[#161514] font-heading">Export Encrypted Vault</p>
+                  <p className="text-[10px] text-[#161514]/70 font-bold">Single-click AES-GCM-256 encrypted snapshot of all spaces</p>
                 </div>
                 <Button
                   variant="outline"
@@ -2028,7 +2054,7 @@ export default function SettingsPage() {
                   className="rounded-xl border-2 border-[#161514] text-[#161514] bg-white hover:bg-[#FAF8F5] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer gap-1.5 text-xs font-black uppercase tracking-wider transition-all"
                 >
                   <Download className="h-3.5 w-3.5 stroke-[2.5]" />
-                  {isExporting ? "Exporting…" : "Export"}
+                  {isExporting ? "Securing Vault…" : "Export Vault"}
                 </Button>
               </div>
             </div>
@@ -2039,8 +2065,8 @@ export default function SettingsPage() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-black uppercase tracking-wider text-[#161514] font-heading">Import & Restore</p>
-                  <p className="text-[10px] text-[#161514]/70 font-bold">Restore from previously exported JSON backup</p>
+                  <p className="text-xs font-black uppercase tracking-wider text-[#161514] font-heading">Import & Restore Vault</p>
+                  <p className="text-[10px] text-[#161514]/70 font-bold">Restore from encrypted vault or legacy JSON backup</p>
                 </div>
                 <Button
                   variant="outline"
@@ -2050,12 +2076,12 @@ export default function SettingsPage() {
                   className="rounded-xl border-2 border-[#161514] text-[#161514] bg-white hover:bg-[#FAF8F5] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer gap-1.5 text-xs font-black uppercase tracking-wider transition-all"
                 >
                   <Upload className="h-3.5 w-3.5 stroke-[2.5]" />
-                  {isImporting ? "Importing…" : "Import"}
+                  {isImporting ? "Restoring…" : "Restore Vault"}
                 </Button>
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept=".json"
+                  accept=".json,.invictus.json"
                   className="hidden"
                   onChange={handleImportRestore}
                 />

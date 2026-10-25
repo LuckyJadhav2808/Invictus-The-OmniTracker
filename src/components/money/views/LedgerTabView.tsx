@@ -51,17 +51,102 @@ export function LedgerTabView({
   onDeleteCategory,
 }: LedgerTabViewProps) {
   const activeMonthKey = targetMonthKey || format(new Date(), "yyyy-MM");
-  const [selectedMonth, setSelectedMonth] = useState<string>(activeMonthKey);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [selectedType, setSelectedType] = useState<"all" | "expense" | "income">("all");
-  const [selectedMethod, setSelectedMethod] = useState<string>(initialMethodFilter || "all");
+  // Retain filter and search state across tab navigations via sessionStorage
+  const [selectedMonth, setSelectedMonth] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      const cached = sessionStorage.getItem("invictus_ledger_month");
+      if (cached) return cached;
+    }
+    return activeMonthKey;
+  });
+  const [searchQuery, setSearchQuery] = useState(() => {
+    if (typeof window !== "undefined") {
+      return sessionStorage.getItem("invictus_ledger_search") || "";
+    }
+    return "";
+  });
+  const [selectedCategory, setSelectedCategory] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      return sessionStorage.getItem("invictus_ledger_category") || "all";
+    }
+    return "all";
+  });
+  const [selectedType, setSelectedType] = useState<"all" | "expense" | "income">(() => {
+    if (typeof window !== "undefined") {
+      return (sessionStorage.getItem("invictus_ledger_type") as any) || "all";
+    }
+    return "all";
+  });
+  const [selectedMethod, setSelectedMethod] = useState<string>(() => {
+    if (initialMethodFilter) return initialMethodFilter;
+    if (typeof window !== "undefined") {
+      return sessionStorage.getItem("invictus_ledger_method") || "all";
+    }
+    return "all";
+  });
+
+  // Persist filter values to sessionStorage whenever updated
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("invictus_ledger_month", selectedMonth);
+    }
+  }, [selectedMonth]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("invictus_ledger_search", searchQuery);
+    }
+  }, [searchQuery]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("invictus_ledger_category", selectedCategory);
+    }
+  }, [selectedCategory]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("invictus_ledger_type", selectedType);
+    }
+  }, [selectedType]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("invictus_ledger_method", selectedMethod);
+    }
+  }, [selectedMethod]);
 
   useEffect(() => {
     if (initialMethodFilter) {
       setSelectedMethod(initialMethodFilter);
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("invictus_ledger_method", initialMethodFilter);
+      }
     }
   }, [initialMethodFilter]);
+
+  const handleResetFilters = () => {
+    soundFX.playPop();
+    setSearchQuery("");
+    setSelectedCategory("all");
+    setSelectedType("all");
+    setSelectedMethod("all");
+    setSelectedMonth(activeMonthKey);
+    if (typeof window !== "undefined") {
+      sessionStorage.removeItem("invictus_ledger_search");
+      sessionStorage.removeItem("invictus_ledger_category");
+      sessionStorage.removeItem("invictus_ledger_type");
+      sessionStorage.removeItem("invictus_ledger_method");
+      sessionStorage.removeItem("invictus_ledger_month");
+    }
+  };
+
+  const isFilterActive =
+    searchQuery.trim() !== "" ||
+    selectedCategory !== "all" ||
+    selectedType !== "all" ||
+    selectedMethod !== "all" ||
+    selectedMonth !== activeMonthKey;
 
   // Extract all available months from recorded transactions plus current month
   const availableMonths = useMemo(() => {
@@ -317,6 +402,18 @@ export function LedgerTabView({
               </option>
             ))}
           </select>
+
+          {isFilterActive && (
+            <button
+              type="button"
+              onClick={handleResetFilters}
+              className="bg-rose-100 hover:bg-rose-200 text-[#161514] border border-[#161514] px-2 py-1 text-[9.5px] font-black rounded-xl shadow-[1px_1px_0px_#161514] transition-all cursor-pointer flex items-center gap-1 shrink-0"
+              title="Reset all search queries and filters to defaults"
+            >
+              <span>✕</span>
+              <span>Reset</span>
+            </button>
+          )}
         </div>
       </div>
 
