@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { Sunrise, Zap, Moon } from "lucide-react";
+import { format, addDays } from "date-fns";
 
 export type DaypartMode = "auto" | "dawn" | "forge" | "night";
 export type EffectiveDaypart = "dawn" | "forge" | "night";
@@ -178,4 +179,88 @@ export function useTodayCockpitViewModel() {
     effectiveDaypart,
     activeConfig,
   };
+}
+
+export interface HorizonDayItem {
+  dateObj: Date;
+  dateStr: string; // "yyyy-MM-dd"
+  dayName: string; // "Mon", "Tue", etc.
+  dayNumber: string; // "24", "25", etc.
+  isToday: boolean;
+  isSelected: boolean;
+  isCompleted?: boolean;
+}
+
+/**
+ * Generates a 7-day horizon centered on the anchor date (-3 days, anchor day, +3 days).
+ */
+export function computeHorizonDays(
+  anchorDate: Date,
+  selectedDateStr: string,
+  completedDatesSet?: Set<string>
+): HorizonDayItem[] {
+  const days: HorizonDayItem[] = [];
+  const todayStr = format(new Date(), "yyyy-MM-dd");
+
+  for (let offset = -3; offset <= 3; offset++) {
+    const d = addDays(anchorDate, offset);
+    const dateStr = format(d, "yyyy-MM-dd");
+    days.push({
+      dateObj: d,
+      dateStr,
+      dayName: format(d, "EEE"),
+      dayNumber: format(d, "d"),
+      isToday: dateStr === todayStr,
+      isSelected: dateStr === selectedDateStr,
+      isCompleted: completedDatesSet ? completedDatesSet.has(dateStr) : false,
+    });
+  }
+
+  return days;
+}
+
+export interface DaySealRecord {
+  isSealed: boolean;
+  sealedAt?: string;
+  score?: number;
+}
+
+// In-memory fallback for SSR & Node test runners
+const memorySealStore = new Map<string, string>();
+
+export function getDaySealStatus(dateStr: string): DaySealRecord {
+  try {
+    let stored: string | null = null;
+    if (typeof window !== "undefined" && window.localStorage) {
+      stored = localStorage.getItem(`invictus_day_seal_${dateStr}`);
+    } else {
+      stored = memorySealStore.get(`invictus_day_seal_${dateStr}`) || null;
+    }
+    if (!stored) return { isSealed: false };
+    const parsed = JSON.parse(stored);
+    return {
+      isSealed: true,
+      sealedAt: parsed.sealedAt,
+      score: parsed.score,
+    };
+  } catch {
+    return { isSealed: false };
+  }
+}
+
+export function sealDayLedger(dateStr: string, score: number): DaySealRecord {
+  const record: DaySealRecord = {
+    isSealed: true,
+    sealedAt: format(new Date(), "HH:mm"),
+    score,
+  };
+  try {
+    const serialized = JSON.stringify(record);
+    if (typeof window !== "undefined" && window.localStorage) {
+      localStorage.setItem(`invictus_day_seal_${dateStr}`, serialized);
+    } else {
+      memorySealStore.set(`invictus_day_seal_${dateStr}`, serialized);
+    }
+  } catch {}
+  return record;
 }

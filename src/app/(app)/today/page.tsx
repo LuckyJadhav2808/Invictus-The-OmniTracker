@@ -42,6 +42,9 @@ import { ConfettiCelebration } from "@/components/common/ConfettiCelebration";
 import { useTodayCockpitViewModel, computeDailyConquestScore } from "@/components/today/useTodayCockpitViewModel";
 import { GladiatorConquestHUD } from "@/components/today/GladiatorConquestHUD";
 import { RetroStickyScratchpad } from "@/components/today/RetroStickyScratchpad";
+import { StickyIslandMiniCockpit } from "@/components/today/StickyIslandMiniCockpit";
+import { GladiatorCloseoutCard } from "@/components/today/GladiatorCloseoutCard";
+import { TodayCockpitFooter } from "@/components/today/TodayCockpitFooter";
 
 export default function TodayPage() {
   const { user } = useAuth();
@@ -423,6 +426,12 @@ export default function TodayPage() {
     }
   };
 
+  // Tomorrow pending tasks preview for night closeout
+  const tomorrowDateStr = useMemo(() => format(addDays(currentDateObj, 1), "yyyy-MM-dd"), [currentDateObj]);
+  const tomorrowPendingTasksCount = useMemo(() => {
+    return tasks.filter((t) => (t.dueDate === tomorrowDateStr || (t as any).date === tomorrowDateStr) && t.status !== "completed").length;
+  }, [tasks, tomorrowDateStr]);
+
   // Smooth scroll helpers for quick dock and telemetry HUD
   const scrollToHabits = () => {
     const el = document.getElementById("habits-section");
@@ -436,19 +445,66 @@ export default function TodayPage() {
     const el = document.getElementById("money-section") || document.getElementById("expense-section");
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
+  const scrollToTop = () => {
+    const mainContainer = document.getElementById("main-scroll-container");
+    if (mainContainer) {
+      mainContainer.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  // Sticky Mini Island Sentinel & Visibility (IntersectionObserver)
+  const heroSentinelRef = useRef<HTMLDivElement>(null);
+  const [isStickyIslandVisible, setIsStickyIslandVisible] = useState(false);
+
+  useEffect(() => {
+    const sentinel = heroSentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsStickyIslandVisible(!entry.isIntersecting);
+      },
+      {
+        threshold: 0,
+        rootMargin: "-20px 0px 0px 0px",
+      }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <div className="space-y-6 py-4 px-3 sm:px-6 max-w-5xl mx-auto">
+    <div className="space-y-6 py-4 px-3 sm:px-6 max-w-5xl mx-auto relative">
+      {/* 0. Sticky Island Mini-Cockpit on Scroll (Apple Dynamic Island & Spotify Benchmark) */}
+      <StickyIslandMiniCockpit
+        metrics={conquestMetrics}
+        currentDateObj={currentDateObj}
+        isTimerRunning={isTimerRunning}
+        stopwatchSeconds={stopwatchSeconds}
+        onToggleTimer={() => setIsTimerRunning(!isTimerRunning)}
+        onOpenExpenseModal={() => setIsQuickExpenseOpen(true)}
+        onScrollToTop={scrollToTop}
+        visible={isStickyIslandVisible}
+      />
+
+      {/* Top Sentinel for Sticky Island trigger */}
+      <div ref={heroSentinelRef} className="h-0 w-full" aria-hidden="true" />
+
       {/* Milestone Confetti Explosion */}
       <ConfettiCelebration active={showConfetti} onComplete={() => setShowConfetti(false)} />
 
       {/* 1. Dynamic Greeting Hero & Vix the Gladiator Bot Cockpit */}
       <TodayGreetingHero
         currentDateObj={currentDateObj}
+        selectedDate={selectedDate}
         isToday={isCurrentDayToday}
         onPrevDay={handlePrevDay}
         onNextDay={handleNextDay}
         onJumpToToday={handleJumpToToday}
+        onSelectDate={setSelectedDate}
         streakDays={streakDays}
         streakFreezeTokens={streakFreeze.tokensAvailable || 0}
         completedHabitsCount={completedHabitsCount}
@@ -602,7 +658,21 @@ export default function TodayPage() {
         isSaving={isSavingMood}
       />
 
-      {/* 6. Daily Spending Limit & Allowances Modal */}
+      {/* 6. Gladiator Night Closeout Ritual Slip (Things 3 & Apple Fitness Benchmark) */}
+      <GladiatorCloseoutCard
+        metrics={conquestMetrics}
+        selectedDate={selectedDate}
+        isToday={isCurrentDayToday}
+        onSealComplete={() => setShowConfetti(true)}
+        tomorrowPendingTasksCount={tomorrowPendingTasksCount}
+        tomorrowSafeToSpend={budgetStats.dailySafeToSpend}
+        currencySymbol={currencySymbol}
+      />
+
+      {/* 7. Production Cockpit Footer & Safe Area Cushion (Linear & Apple Insets Benchmark) */}
+      <TodayCockpitFooter onScrollToTop={scrollToTop} />
+
+      {/* 8. Daily Spending Limit & Allowances Modal */}
       <AllowanceSettingsModal
         open={isDailyLimitModalOpen}
         onOpenChange={setIsDailyLimitModalOpen}

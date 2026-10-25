@@ -20,15 +20,19 @@ import {
   EffectiveDaypart,
   DAYPART_CONFIGS,
 } from '@/components/today/useTodayCockpitViewModel';
+import { HorizonWeekStrip } from '@/components/today/HorizonWeekStrip';
 import { soundFX } from '@/components/shared/SoundFX';
 import { cn } from '@/lib/utils';
 
 interface TodayGreetingHeroProps {
   currentDateObj: Date;
+  selectedDate?: string;
   isToday: boolean;
   onPrevDay: () => void;
   onNextDay: () => void;
   onJumpToToday: () => void;
+  onSelectDate?: (dateStr: string) => void;
+  completedDatesSet?: Set<string>;
   streakDays: number;
   streakFreezeTokens: number;
   completedHabitsCount: number;
@@ -43,10 +47,13 @@ interface TodayGreetingHeroProps {
 
 export function TodayGreetingHero({
   currentDateObj,
+  selectedDate,
   isToday,
   onPrevDay,
   onNextDay,
   onJumpToToday,
+  onSelectDate,
+  completedDatesSet,
   streakDays,
   streakFreezeTokens,
   completedHabitsCount,
@@ -83,44 +90,18 @@ export function TodayGreetingHero({
   return (
     <header className="space-y-3">
       {/* 1. Date Navigation & Telemetry Bar */}
-      <div className="bg-white border-2 border-[#161514] p-2 sm:p-3.5 rounded-2xl shadow-[3px_3px_0px_#161514] flex flex-wrap items-center justify-between gap-1.5 sm:gap-3">
-        {/* Date Navigation Block */}
-        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-          <button
-            type="button"
-            onClick={onPrevDay}
-            className="size-7 sm:size-9 rounded-lg border-2 border-[#161514] bg-white hover:bg-[#F1EFEA] active:scale-95 flex items-center justify-center shadow-[1.5px_1.5px_0px_#161514] transition-all cursor-pointer shrink-0"
-            aria-label="Previous Day"
-          >
-            <ChevronLeft className="size-3.5 sm:size-4 stroke-[2.5]" />
-          </button>
-
-          <div className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border-2 border-[#161514] bg-[#F1EFEA] flex items-center gap-1.5 sm:gap-2 shadow-[1px_1px_0px_#161514] shrink-0">
-            <Calendar className="size-3.5 sm:size-4 stroke-[2.2] text-[#161514] shrink-0" />
-            <span className="font-heading font-black text-xs sm:text-sm text-[#161514] whitespace-nowrap">
-              {format(currentDateObj, 'EEE, MMM d')}
-            </span>
-          </div>
-
-          <button
-            type="button"
-            onClick={onNextDay}
-            className="size-7 sm:size-9 rounded-lg border-2 border-[#161514] bg-white hover:bg-[#F1EFEA] active:scale-95 flex items-center justify-center shadow-[1.5px_1.5px_0px_#161514] transition-all cursor-pointer shrink-0"
-            aria-label="Next Day"
-          >
-            <ChevronRight className="size-3.5 sm:size-4 stroke-[2.5]" />
-          </button>
-
-          {!isToday && (
-            <button
-              type="button"
-              onClick={onJumpToToday}
-              className="px-2 sm:px-2.5 py-1 rounded-lg border-2 border-[#161514] bg-[#CEF431] hover:bg-[#D8F74E] text-[10px] sm:text-xs font-heading font-black text-[#161514] shadow-[1.5px_1.5px_0px_#161514] active:scale-95 transition-all cursor-pointer shrink-0 whitespace-nowrap"
-            >
-              Today
-            </button>
-          )}
-        </div>
+      <div className="bg-white border-2 border-[#161514] p-2 sm:p-3 rounded-2xl shadow-[3px_3px_0px_#161514] flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+        {/* 7-Day Horizon Strip (Things 3 & Apple Calendar Benchmark) */}
+        <HorizonWeekStrip
+          currentDateObj={currentDateObj}
+          selectedDate={selectedDate || format(currentDateObj, "yyyy-MM-dd")}
+          isToday={isToday}
+          onSelectDate={onSelectDate || (() => {})}
+          onPrevDay={onPrevDay}
+          onNextDay={onNextDay}
+          onJumpToToday={onJumpToToday}
+          completedDatesSet={completedDatesSet}
+        />
 
         {/* Telemetry Chips & Compact Pixel HUD Companion */}
         <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0 ml-auto">
