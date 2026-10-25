@@ -88,7 +88,6 @@ ${transaction.note ? `📝 *Note:* "${transaction.note}"\n` : ""}━━━━━
       soundFX.playPop();
       soundFX.vibrate(25);
       await onDuplicate(transaction);
-      toast.success("Transaction duplicated!");
       if (onClose) onClose();
     } finally {
       setIsDuplicating(false);
@@ -100,7 +99,6 @@ ${transaction.note ? `📝 *Note:* "${transaction.note}"\n` : ""}━━━━━
     try {
       soundFX.playPop();
       await onDelete(transaction.id);
-      toast.success("Transaction deleted");
       if (onClose) onClose();
     } finally {
       setIsDeleting(false);
