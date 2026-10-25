@@ -9,12 +9,10 @@ import {
   Edit2,
   Trash2,
   Check,
-  ExternalLink,
-  Sparkles,
-  Receipt,
-  Tag,
-  CreditCard,
-  Calendar,
+  Users,
+  MessageCircle,
+  Plus,
+  Minus,
 } from "lucide-react";
 import { soundFX } from "@/components/shared/SoundFX";
 import { toast } from "sonner";
@@ -31,6 +29,50 @@ interface ThermalReceiptSlipProps {
   onClose?: () => void;
 }
 
+/**
+ * Formats a clean, high-utility WhatsApp / SMS message for splitting expenses with roommates/friends.
+ */
+export function formatReceiptShareText(
+  transaction: Transaction,
+  categoryName: string,
+  categoryIcon: string,
+  currencySymbol: string,
+  splitCount: number = 1
+): string {
+  let formattedDate = transaction.date;
+  try {
+    const d = parseISO(transaction.date);
+    formattedDate = format(d, "dd-MMM-yyyy").toUpperCase();
+  } catch {}
+
+  const totalAmount = Number(transaction.amount);
+  const perPerson = splitCount > 1 ? Math.ceil(totalAmount / splitCount) : totalAmount;
+
+  let text = `🧾 *INVICTUS ${splitCount > 1 ? "SPLIT BILL" : "EXPENSE"} RECEIPT*
+━━━━━━━━━━━━━━━━━━━━
+📍 *Category:* ${categoryName} ${categoryIcon}
+📅 *Date:* ${formattedDate}
+💳 *Paid Via:* ${transaction.paymentMethod === "cash" ? "Cash" : transaction.paymentMethod?.toUpperCase() || "UPI"}
+💰 *Total Amount:* ${currencySymbol}${totalAmount.toLocaleString()}`;
+
+  if (splitCount > 1) {
+    text += `\n👥 *Split:* ${splitCount} ways (${currencySymbol}${perPerson.toLocaleString()} / person)`;
+  }
+
+  if (transaction.note) {
+    text += `\n📝 *Note:* "${transaction.note}"`;
+  }
+
+  text += `\n━━━━━━━━━━━━━━━━━━━━`;
+
+  if (splitCount > 1) {
+    text += `\n💸 *Please send your share (${currencySymbol}${perPerson.toLocaleString()}):*\n👉 Pay via UPI / Cash to settle up ✨`;
+  }
+
+  text += `\n✨ _Shared via Invictus Life OS_`;
+  return text;
+}
+
 export function ThermalReceiptSlip({
   transaction,
   category,
@@ -40,6 +82,7 @@ export function ThermalReceiptSlip({
   onDelete,
   onClose,
 }: ThermalReceiptSlipProps) {
+  const [splitCount, setSplitCount] = useState<number>(1);
   const [copiedShare, setCopiedShare] = useState(false);
   const [isDuplicating, setIsDuplicating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -54,26 +97,48 @@ export function ThermalReceiptSlip({
     formattedTime = format(new Date(), "hh:mm a").toUpperCase();
   } catch {}
 
-  // Generate WhatsApp / Friends Split-Bill Formatted String
-  const handleShareReceipt = async () => {
+  const totalAmount = Number(transaction.amount);
+  const perPersonShare = splitCount > 1 ? Math.ceil(totalAmount / splitCount) : totalAmount;
+
+  const categoryName = category?.name || "General Expense";
+  const categoryIcon = renderCategoryEmoji(category?.icon);
+
+  const billBreakdown = formatReceiptShareText(
+    transaction,
+    categoryName,
+    categoryIcon,
+    currencySymbol,
+    splitCount
+  );
+
+  // 1. Native Web Share API with Clipboard Fallback
+  const handleNativeShare = async () => {
     soundFX.playCashRegister();
     soundFX.vibrate([20, 40, 60]);
 
-    const billBreakdown = `🧾 *INVICTUS EXPENSE RECEIPT*
-━━━━━━━━━━━━━━━━━━━━
-📍 *Category:* ${category?.name || "General Expense"} ${renderCategoryEmoji(category?.icon)}
-📅 *Date:* ${formattedDate}
-💳 *Paid Via:* ${transaction.paymentMethod === "cash" ? "Cash" : transaction.paymentMethod?.toUpperCase() || "UPI"}
-💰 *Total Amount:* ${currencySymbol}${Number(transaction.amount).toLocaleString()}
-${transaction.note ? `📝 *Note:* "${transaction.note}"\n` : ""}━━━━━━━━━━━━━━━━━━━━
-✨ _Shared via Invictus Life OS_`;
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({
+          title: `Invictus Receipt: ${categoryName}`,
+          text: billBreakdown,
+        });
+        toast.success("Receipt shared! 🧾");
+        return;
+      } catch (err: any) {
+        // User cancelled share sheet or share failed - fall through to clipboard
+        if (err?.name === "AbortError") return;
+      }
+    }
 
+    // Fallback to Clipboard
     try {
       if (typeof navigator !== "undefined" && navigator.clipboard) {
         await navigator.clipboard.writeText(billBreakdown);
         setCopiedShare(true);
         toast.success("Receipt Copied to Clipboard! 🧾", {
-          description: "Ready to paste in WhatsApp / Split with roommates.",
+          description: splitCount > 1
+            ? `Split ${splitCount} ways (₹${perPersonShare}/each) ready to paste in WhatsApp.`
+            : "Ready to paste in WhatsApp / Split with roommates.",
         });
         setTimeout(() => setCopiedShare(false), 3000);
       }
@@ -82,6 +147,17 @@ ${transaction.note ? `📝 *Note:* "${transaction.note}"\n` : ""}━━━━━
     }
   };
 
+  // 2. Direct 1-Tap WhatsApp Share Deep Link
+  const handleWhatsAppDirect = () => {
+    soundFX.playCashRegister();
+    soundFX.vibrate(25);
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(billBreakdown)}`;
+    if (typeof window !== "undefined") {
+      window.open(url, "_blank");
+    }
+  };
+
+  // 3. Duplicate Transaction
   const handleDuplicate = async () => {
     setIsDuplicating(true);
     try {
@@ -94,6 +170,7 @@ ${transaction.note ? `📝 *Note:* "${transaction.note}"\n` : ""}━━━━━
     }
   };
 
+  // 4. Delete Transaction
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
@@ -158,8 +235,8 @@ ${transaction.note ? `📝 *Note:* "${transaction.note}"\n` : ""}━━━━━
           {/* Category Stamp & Payment Badge */}
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-1.5 bg-[#FAF8F5] border border-[#161514] px-2 py-1 rounded text-xs font-black">
-              <span>{renderCategoryEmoji(category?.icon)}</span>
-              <span className="truncate max-w-[120px]">{category?.name || "General"}</span>
+              <span>{categoryIcon}</span>
+              <span className="truncate max-w-[120px]">{categoryName}</span>
             </div>
 
             {/* Inked Stamp Style Badge */}
@@ -171,7 +248,9 @@ ${transaction.note ? `📝 *Note:* "${transaction.note}"\n` : ""}━━━━━
                   : "border-indigo-700 text-indigo-800 bg-indigo-50"
               )}
             >
-              {transaction.paymentMethod === "cash" ? "💵 CASH IN HAND" : "⚡ " + (transaction.paymentMethod?.toUpperCase() || "UPI")}
+              {transaction.paymentMethod === "cash"
+                ? "💵 CASH IN HAND"
+                : "⚡ " + (transaction.paymentMethod?.toUpperCase() || "UPI")}
             </div>
           </div>
 
@@ -193,12 +272,94 @@ ${transaction.note ? `📝 *Note:* "${transaction.note}"\n` : ""}━━━━━
                 isIncome ? "text-emerald-700" : "text-[#161514]"
               )}
             >
-              {isIncome ? "+" : "-"}{currencySymbol}{Number(transaction.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              {isIncome ? "+" : "-"}{currencySymbol}{totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
             <span className="text-[9px] font-black uppercase text-[#161514]/50 block">
               STATUS: AUDITED &amp; CONFIRMED
             </span>
           </div>
+
+          {/* 👥 Roommate Split Bill Calculation Perforated Card */}
+          {!isIncome && (
+            <div className="bg-[#FAF8F5] p-3 rounded-xl border border-[#161514]/30 space-y-2">
+              <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-[#161514]">
+                <span className="flex items-center gap-1">
+                  <Users className="size-3.5" />
+                  <span>Split with Friends:</span>
+                </span>
+                <span className="font-mono text-xs">
+                  {splitCount === 1 ? "Solo Bill" : `${splitCount} People`}
+                </span>
+              </div>
+
+              {/* Stepper & Preset Chips */}
+              <div className="flex items-center justify-between gap-1.5">
+                <div className="flex items-center gap-1 bg-white px-2 py-1 rounded-lg border border-[#161514]">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      soundFX.playPop();
+                      setSplitCount((prev) => Math.max(1, prev - 1));
+                    }}
+                    disabled={splitCount <= 1}
+                    className="size-5 rounded flex items-center justify-center hover:bg-[#161514]/10 disabled:opacity-30 cursor-pointer"
+                    aria-label="Decrease split count"
+                  >
+                    <Minus className="size-3" />
+                  </button>
+                  <span className="font-mono font-black text-xs px-2 min-w-6 text-center">
+                    {splitCount}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      soundFX.playPop();
+                      setSplitCount((prev) => Math.min(10, prev + 1));
+                    }}
+                    disabled={splitCount >= 10}
+                    className="size-5 rounded flex items-center justify-center hover:bg-[#161514]/10 disabled:opacity-30 cursor-pointer"
+                    aria-label="Increase split count"
+                  >
+                    <Plus className="size-3" />
+                  </button>
+                </div>
+
+                {/* Quick Presets */}
+                <div className="flex items-center gap-1">
+                  {[2, 3, 4, 5].map((count) => (
+                    <button
+                      key={count}
+                      type="button"
+                      onClick={() => {
+                        soundFX.playPop();
+                        setSplitCount(count);
+                      }}
+                      className={cn(
+                        "size-6 rounded-md text-[10px] font-black font-mono border transition-all cursor-pointer",
+                        splitCount === count
+                          ? "bg-[#161514] text-white border-[#161514]"
+                          : "bg-white text-[#161514] border-[#161514]/30 hover:border-[#161514]"
+                      )}
+                    >
+                      {count}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Per-Person Result Display */}
+              {splitCount > 1 && (
+                <div className="pt-2 border-t border-dashed border-[#161514]/20 flex items-center justify-between font-mono">
+                  <span className="text-[10px] text-[#161514]/70 font-bold uppercase">
+                    Per Person Share:
+                  </span>
+                  <span className="text-sm font-black text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded border border-emerald-800/30">
+                    {currencySymbol}{perPersonShare.toLocaleString()}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Procedural Vector Barcode */}
           <div className="flex flex-col items-center justify-center pt-1 pb-2">
@@ -256,24 +417,40 @@ ${transaction.note ? `📝 *Note:* "${transaction.note}"\n` : ""}━━━━━
 
       {/* ================= ACTION DOCK ================= */}
       <div className="max-w-sm mx-auto space-y-2 pt-2">
-        {/* 1-Click WhatsApp / Roommates Share Button */}
-        <button
-          type="button"
-          onClick={handleShareReceipt}
-          className="w-full bg-[#CEF431] hover:bg-[#bde422] text-[#161514] font-black text-xs uppercase tracking-wider py-3 px-4 rounded-xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_#161514] transition-all flex items-center justify-center gap-2 cursor-pointer font-heading"
-        >
-          {copiedShare ? (
-            <>
-              <Check className="size-4 stroke-[3] text-emerald-800" />
-              <span>Copied Breakdown to Clipboard!</span>
-            </>
-          ) : (
-            <>
-              <Share2 className="size-4 stroke-[2.5]" />
-              <span>Share Receipt / Split Bill</span>
-            </>
-          )}
-        </button>
+        {/* Dual Primary Sharing Actions */}
+        <div className="grid grid-cols-2 gap-2">
+          {/* Button 1: Native Share Sheet / Clipboard */}
+          <button
+            type="button"
+            onClick={handleNativeShare}
+            className="bg-[#CEF431] hover:bg-[#bde422] text-[#161514] font-black text-xs uppercase tracking-wider py-3 px-3 rounded-xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_#161514] transition-all flex items-center justify-center gap-1.5 cursor-pointer font-heading"
+          >
+            {copiedShare ? (
+              <>
+                <Check className="size-4 stroke-[3] text-emerald-800" />
+                <span className="truncate">Copied!</span>
+              </>
+            ) : (
+              <>
+                <Share2 className="size-4 stroke-[2.5]" />
+                <span className="truncate">
+                  {splitCount > 1 ? `Share Split (${splitCount})` : "Share Slip"}
+                </span>
+              </>
+            )}
+          </button>
+
+          {/* Button 2: Direct WhatsApp Action */}
+          <button
+            type="button"
+            onClick={handleWhatsAppDirect}
+            className="bg-[#25D366] hover:bg-[#20ba59] text-white font-black text-xs uppercase tracking-wider py-3 px-3 rounded-xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_#161514] transition-all flex items-center justify-center gap-1.5 cursor-pointer font-heading"
+            title="Open WhatsApp directly with receipt text"
+          >
+            <MessageCircle className="size-4 stroke-[2.5]" />
+            <span className="truncate">WhatsApp</span>
+          </button>
+        </div>
 
         {/* Secondary Actions Row: Duplicate, Edit, Delete */}
         <div className="grid grid-cols-3 gap-2">

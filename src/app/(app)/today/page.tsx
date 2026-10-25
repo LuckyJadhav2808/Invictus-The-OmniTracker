@@ -519,18 +519,38 @@ export default function TodayPage() {
           />
 
           <RetroStickyScratchpad
-            onConvertToTask={(text) => {
+            categories={categories}
+            onConvertToTask={(task) => {
               createTaskMutation.mutate({
-                title: text,
-                priority: "p2",
+                title: task.title,
+                priority: task.priority || "p2",
                 status: "todo",
-                date: selectedDate,
-                category: "Quick Thought",
+                date: task.date || selectedDate,
+                category: task.category || "Quick Thought",
                 subtasks: [],
               } as any);
             }}
-            onConvertToExpense={(amount, note) => {
-              handleAddExpense(amount, "", note);
+            onConvertToExpense={(expense) => {
+              handleAddExpense(
+                expense.amount,
+                expense.categoryId || "",
+                expense.note
+              );
+            }}
+            onBatchConvert={(batchTasks, batchExpenses) => {
+              batchTasks.forEach((t) => {
+                createTaskMutation.mutate({
+                  title: t.title,
+                  priority: t.priority || "p2",
+                  status: "todo",
+                  date: t.date || selectedDate,
+                  category: t.category || "Quick Thought",
+                  subtasks: [],
+                } as any);
+              });
+              batchExpenses.forEach((e) => {
+                handleAddExpense(e.amount, e.categoryId || "", e.note);
+              });
             }}
           />
         </div>

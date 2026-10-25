@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { format, parseISO } from "date-fns";
+import { formatReceiptShareText } from "./ThermalReceiptSlip";
 
 describe("Thermal Receipt Formatter", () => {
   const sampleTransaction = {
@@ -20,23 +21,36 @@ describe("Thermal Receipt Formatter", () => {
     expect(formattedDate).toBe("25-OCT-2026");
   });
 
-  it("should format split-bill text ready for WhatsApp", () => {
-    const formattedDate = "25-OCT-2026";
-    const currencySymbol = "₹";
-    const billBreakdown = `🧾 *INVICTUS EXPENSE RECEIPT*
-━━━━━━━━━━━━━━━━━━━━
-📍 *Category:* Food & Dining 🍔
-📅 *Date:* ${formattedDate}
-💳 *Paid Via:* UPI
-💰 *Total Amount:* ${currencySymbol}${Number(sampleTransaction.amount).toLocaleString()}
-${sampleTransaction.note ? `📝 *Note:* "${sampleTransaction.note}"\n` : ""}━━━━━━━━━━━━━━━━━━━━
-✨ _Shared via Invictus Life OS_`;
+  it("should format single-person receipt text using formatReceiptShareText", () => {
+    const text = formatReceiptShareText(
+      sampleTransaction as any,
+      "Food & Dining",
+      "🍔",
+      "₹",
+      1
+    );
 
-    expect(billBreakdown).toContain("INVICTUS EXPENSE RECEIPT");
-    expect(billBreakdown).toContain("Food & Dining 🍔");
-    expect(billBreakdown).toContain("₹450");
-    expect(billBreakdown).toContain('"Coffee with college friends"');
-    expect(billBreakdown).toContain("Shared via Invictus Life OS");
+    expect(text).toContain("INVICTUS EXPENSE RECEIPT");
+    expect(text).toContain("Food & Dining 🍔");
+    expect(text).toContain("₹450");
+    expect(text).toContain('"Coffee with college friends"');
+    expect(text).toContain("Shared via Invictus Life OS");
+  });
+
+  it("should format multi-person roommate split bill with per-person calculations", () => {
+    // ₹450 split 3 ways = ₹150 each
+    const text = formatReceiptShareText(
+      sampleTransaction as any,
+      "Food & Dining",
+      "🍔",
+      "₹",
+      3
+    );
+
+    expect(text).toContain("INVICTUS SPLIT BILL RECEIPT");
+    expect(text).toContain("*Split:* 3 ways (₹150 / person)");
+    expect(text).toContain("Please send your share (₹150)");
+    expect(text).toContain("Pay via UPI / Cash");
   });
 
   it("should generate valid audit reference string", () => {
