@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useLiveActivityStore } from "@/store/live-activity-store";
 import { useGymRoutines, useAddGymRoutine, useUpdateGymRoutine, useDeleteGymRoutine } from "@/lib/queries/gym";
 import { useExerciseLibrary } from "@/lib/queries/exercises";
 import { getFriendlyWeekLabel } from "@/lib/utils/gym-rollover";
@@ -35,60 +36,33 @@ export function GymRoutineTracker() {
 
   const [selectedDay, setSelectedDay] = useState<typeof DAYS_OF_WEEK[number]>(currentDayName);
 
-  // Automatic Gladiator Rest Timer State (Benchmark: Hevy / Strong)
-  const [restSecondsLeft, setRestSecondsLeft] = useState<number | null>(null);
-  const [restDuration, setRestDuration] = useState<number>(60);
-  const [isTimerPaused, setIsTimerPaused] = useState<boolean>(false);
-  const targetEndTimeRef = useRef<number | null>(null);
+  // Automatic Gladiator Rest Timer State (Synchronized via Live Activity Store)
+  const {
+    activeActivity,
+    gymRest,
+    startGymRest,
+    togglePauseGymRest,
+    addGymRestSeconds,
+    stopGymRest,
+  } = useLiveActivityStore();
+
+  const [defaultRestDuration, setDefaultRestDuration] = useState<number>(60);
+  const restSecondsLeft =
+    activeActivity === "gym_rest" && gymRest.secondsLeft > 0 ? gymRest.secondsLeft : null;
+  const restDuration = activeActivity === "gym_rest" ? (gymRest.totalSeconds || defaultRestDuration) : defaultRestDuration;
+  const isTimerPaused = gymRest.isPaused;
 
   const isTimerRunning = restSecondsLeft !== null && !isTimerPaused;
   useWakeLock(isTimerRunning);
 
-  useEffect(() => {
-    if (!isTimerRunning || !targetEndTimeRef.current) return;
-
-    const tick = () => {
-      if (!targetEndTimeRef.current) return;
-      const now = Date.now();
-      const remaining = Math.max(0, Math.ceil((targetEndTimeRef.current - now) / 1000));
-
-      if (remaining <= 0) {
-        soundFX.playRestDoneDoubleBeep();
-        soundFX.vibrate([60, 60, 100]);
-        toast.success("REST OVER — GET ON THE BAR! 💥");
-        setRestSecondsLeft(null);
-        targetEndTimeRef.current = null;
-        return;
-      }
-
-      if (remaining <= 4 && remaining > 1) {
-        soundFX.vibrate(15);
-      }
-      setRestSecondsLeft(remaining);
-    };
-
-    tick();
-    const timer = setInterval(tick, 500);
-    return () => clearInterval(timer);
-  }, [isTimerRunning]);
-
-  const startRestTimer = (seconds: number = restDuration) => {
-    setRestDuration(seconds);
-    targetEndTimeRef.current = Date.now() + seconds * 1000;
-    setRestSecondsLeft(seconds);
-    setIsTimerPaused(false);
+  const startRestTimer = (seconds: number = restDuration, exName?: string) => {
+    startGymRest(seconds, exName || "Workout Recovery");
     soundFX.playPop();
   };
 
   const togglePauseTimer = () => {
-    if (isTimerPaused) {
-      if (restSecondsLeft !== null) {
-        targetEndTimeRef.current = Date.now() + restSecondsLeft * 1000;
-      }
-      setIsTimerPaused(false);
-    } else {
-      setIsTimerPaused(true);
-    }
+    togglePauseGymRest();
+    soundFX.playPop();
   };
 
   const { data: routines = [], isLoading } = useGymRoutines();
@@ -691,7 +665,7 @@ export function GymRoutineTracker() {
               key={sec}
               type="button"
               onClick={() => {
-                setRestDuration(sec);
+                setDefaultRestDuration(sec);
                 soundFX.playPop();
                 toast.success(`Default rest timer set to ${sec}s`);
               }}
@@ -1618,8 +1592,7 @@ export function GymRoutineTracker() {
                 type="button"
                 onClick={() => {
                   soundFX.playPop();
-                  setRestSecondsLeft((prev) => (prev !== null ? Math.max(0, prev - 15) : 0));
-                  if (targetEndTimeRef.current) targetEndTimeRef.current -= 15000;
+                  addGymRestSeconds(-15);
                 }}
                 className="px-2 py-1.5 rounded-lg border-2 border-[#161514] bg-white hover:bg-[#FFF9EA] text-[#161514] font-heading font-black text-[10px] shadow-[1px_1px_0px_0px_#161514] active:translate-y-0.5 cursor-pointer"
                 title="Subtract 15s"
@@ -1630,8 +1603,7 @@ export function GymRoutineTracker() {
                 type="button"
                 onClick={() => {
                   soundFX.playPop();
-                  setRestSecondsLeft((prev) => (prev !== null ? prev + 30 : 30));
-                  if (targetEndTimeRef.current) targetEndTimeRef.current += 30000;
+                  addGymRestSeconds(30);
                 }}
                 className="px-2 py-1.5 rounded-lg border-2 border-[#161514] bg-[#CEF431] hover:bg-[#D8F74E] text-[#161514] font-heading font-black text-[10px] shadow-[1px_1px_0px_0px_#161514] active:translate-y-0.5 cursor-pointer"
                 title="Add 30s"
@@ -1650,8 +1622,7 @@ export function GymRoutineTracker() {
                 type="button"
                 onClick={() => {
                   soundFX.playPop();
-                  setRestSecondsLeft(null);
-                  targetEndTimeRef.current = null;
+                  stopGymRest();
                 }}
                 className="size-8 rounded-lg border-2 border-[#161514] bg-rose-100 hover:bg-rose-200 text-[#161514] flex items-center justify-center shadow-[1px_1px_0px_0px_#161514] active:translate-y-0.5 cursor-pointer"
                 title="Dismiss rest timer"

@@ -19,6 +19,7 @@ import {
 } from "@/lib/queries/study";
 import { ExamSyllabusTracker } from "@/components/study/ExamSyllabusTracker";
 import { StudySessionLogger } from "@/components/study/StudySessionLogger";
+import { PomodoroTimerWidget } from "@/components/study/PomodoroTimerWidget";
 import { calculateSM2Review } from "@/lib/utils/spaced-repetition";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
@@ -575,6 +576,9 @@ function StudyPageContent() {
 
           {/* Tab 2: Study Sessions */}
           <TabsContent value="sessions" className="space-y-6 outline-none">
+            {/* Live Dynamic Island-Synced Pomodoro Focus Widget */}
+            <PomodoroTimerWidget subjects={subjects} />
+
             <StudySessionLogger
               topics={allTopics}
               onLogSession={(data) => {

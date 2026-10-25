@@ -6,6 +6,7 @@ import { useHabits, useHabitLogs, useStreaks } from "@/lib/queries/goals";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { useUIStore } from "@/store/ui-store";
 import { useWidgetSync } from "@/lib/hooks/useWidgetSync";
+import { useLiveActivityStore } from "@/store/live-activity-store";
 import { computeMonthlyBudgetStats, computeDailyBudgetStats } from "@/lib/utils/budget-rollover";
 import { format } from "date-fns";
 
@@ -215,7 +216,15 @@ export function OmniWidgetSync() {
       habitsList,
       activeGoal,
     });
-  }, [budgetStats, dailyStats, customDailyBudget, currencySymbol, habits.length, habitsCompletedCount, habitsList, activeGoal, syncToWidget]);
+    // Sync Ambient Telemetry to Dynamic Island Live Activity Dock
+    useLiveActivityStore.getState().updateAmbient({
+      dailyCashLeft: dailyStats.todayRemaining,
+      currencySymbol,
+      habitsCompleted: habitsCompletedCount,
+      totalHabits: habits.length,
+      activeStreak: (user as any)?.streakCount || (user as any)?.streak || 1,
+    });
+  }, [budgetStats, dailyStats, customDailyBudget, currencySymbol, habits.length, habitsCompletedCount, habitsList, activeGoal, syncToWidget, user]);
 
   return null;
 }

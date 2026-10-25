@@ -16,6 +16,7 @@ import { safeModeWatchdog } from "@/lib/runtime/safe-mode-watchdog";
 import { SafeModeScreen } from "@/components/shared/SafeModeScreen";
 import { migrationEngine } from "@/lib/offline/migration-engine";
 import { NativeBackHandler } from "@/components/shared/NativeBackHandler";
+import { DynamicIslandDock } from "@/components/shared/DynamicIslandDock";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -85,6 +86,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen flex flex-col lg:flex-row bg-[#FBF9F5] text-[#161514]">
       {/* Native Android & Mobile Backstack Manager */}
       <NativeBackHandler />
+
+      {/* Floating Dynamic Island Live Activity Dock */}
+      <DynamicIslandDock />
 
       {/* Desktop Persistent Sidebar */}
       <Sidebar />
