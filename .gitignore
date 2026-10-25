@@ -50,3 +50,4 @@ scratch/
 .agents/
 .claude/
 mcp_config.json
+AGENTS.md
