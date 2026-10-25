@@ -8,8 +8,13 @@ import {
   CheckCircle2,
   GraduationCap,
   Wallet,
-  ArrowRight,
   Award,
+  Zap,
+  Smile,
+  Meh,
+  Frown,
+  Moon,
+  Send,
 } from "lucide-react";
 import {
   type DailyConquestMetrics,
@@ -29,8 +34,21 @@ interface GladiatorCloseoutCardProps {
   tomorrowPendingTasksCount?: number;
   tomorrowSafeToSpend?: number;
   currencySymbol?: string;
+  currentMood?: string;
+  reflectionNote?: string;
+  onChangeNote?: (note: string) => void;
+  onSaveMood?: (newMood?: string) => Promise<void>;
+  isSavingMood?: boolean;
   className?: string;
 }
+
+const MOOD_OPTIONS = [
+  { id: "awesome", label: "Great", Icon: Zap, bg: "bg-emerald-300" },
+  { id: "good", label: "Good", Icon: Smile, bg: "bg-[#CEF431]" },
+  { id: "okay", label: "Okay", Icon: Meh, bg: "bg-cyan-200" },
+  { id: "low", label: "Low", Icon: Frown, bg: "bg-amber-200" },
+  { id: "tired", label: "Tired", Icon: Moon, bg: "bg-rose-200" },
+];
 
 export function GladiatorCloseoutCard({
   metrics,
@@ -40,6 +58,11 @@ export function GladiatorCloseoutCard({
   tomorrowPendingTasksCount = 0,
   tomorrowSafeToSpend,
   currencySymbol = "₹",
+  currentMood = "good",
+  reflectionNote = "",
+  onChangeNote,
+  onSaveMood,
+  isSavingMood = false,
   className,
 }: GladiatorCloseoutCardProps) {
   const [sealStatus, setSealStatus] = useState<DaySealRecord>({ isSealed: false });
@@ -49,7 +72,14 @@ export function GladiatorCloseoutCard({
     setSealStatus(getDaySealStatus(selectedDate));
   }, [selectedDate]);
 
-  const handleSealDay = () => {
+  const handleSealDay = async () => {
+    // If user typed a reflection note that hasn't been saved yet, save it now
+    if (onSaveMood && reflectionNote.trim()) {
+      try {
+        await onSaveMood();
+      } catch {}
+    }
+
     const updated = sealDayLedger(selectedDate, metrics.overallScore);
     setSealStatus(updated);
 
@@ -63,6 +93,14 @@ export function GladiatorCloseoutCard({
 
     if (onSealComplete) {
       onSealComplete();
+    }
+  };
+
+  const handleMoodSelect = (moodId: string) => {
+    soundFX.playPop();
+    soundFX.vibrate(15);
+    if (onSaveMood) {
+      onSaveMood(moodId);
     }
   };
 
@@ -138,12 +176,76 @@ export function GladiatorCloseoutCard({
             <span className="text-emerald-600 font-black">{metrics.budgetPercent}%</span>
           </div>
           <p className="text-xs font-heading font-black text-[#161514]">
-            {currencySymbol}{metrics.remainingSafeToSpend} Safe Left
+            {currencySymbol}{metrics.remainingSafeToSpend.toLocaleString()} Safe Left
           </p>
         </div>
       </div>
 
-      {/* 3. 1-Tap Seal & Archival Ritual Button / Wax Stamp Badge */}
+      {/* 3. Integrated Daily Mindset & Evening Pulse (Things 3 Benchmark) */}
+      <div className="bg-white border-2 border-[#161514] rounded-xl p-3.5 shadow-[2px_2px_0px_#161514] space-y-3">
+        <div className="flex items-center justify-between border-b border-[#161514]/10 pb-2">
+          <div className="flex items-center gap-1.5 font-heading font-black text-xs text-[#161514] uppercase tracking-wide">
+            <span>💭</span>
+            <span>Daily Mindset & Evening Pulse</span>
+          </div>
+          <span className="text-[10px] font-mono font-bold text-[#161514]/60">1-Tap Reflection</span>
+        </div>
+
+        {/* 5-scale sentiment buttons */}
+        <div className="grid grid-cols-5 gap-1.5 sm:gap-2">
+          {MOOD_OPTIONS.map((m) => {
+            const Icon = m.Icon;
+            const isSelected = currentMood === m.id;
+
+            return (
+              <button
+                key={m.id}
+                type="button"
+                onClick={() => handleMoodSelect(m.id)}
+                className={cn(
+                  "p-2 rounded-lg border-2 border-[#161514] flex flex-col items-center justify-center gap-1 transition-all cursor-pointer active:scale-95",
+                  isSelected
+                    ? `${m.bg} shadow-[2px_2px_0px_#161514] scale-[1.02]`
+                    : "bg-[#FAF8F5] opacity-65 hover:opacity-100"
+                )}
+                title={`Mark mood: ${m.label}`}
+              >
+                <Icon className="size-4 text-[#161514]" />
+                <span className="text-[10px] font-heading font-black text-[#161514]">
+                  {m.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Optional 1-line note */}
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={reflectionNote}
+            onChange={(e) => onChangeNote?.(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !isSavingMood && onSaveMood) {
+                onSaveMood();
+              }
+            }}
+            placeholder="One-line victory note or closing reflection..."
+            className="flex-1 bg-[#FAF8F5] border border-[#161514]/30 rounded-lg px-2.5 py-1.5 text-xs text-[#161514] font-medium placeholder:text-[#161514]/40 focus:outline-none focus:border-[#161514]"
+          />
+          <button
+            type="button"
+            onClick={() => onSaveMood?.()}
+            disabled={isSavingMood}
+            className="px-3 py-1.5 bg-[#161514] text-white rounded-lg text-xs font-heading font-black hover:bg-[#2a2826] active:scale-95 transition-all disabled:opacity-50 cursor-pointer shrink-0 flex items-center gap-1"
+          >
+            <Send className="size-3" />
+            <span>{isSavingMood ? "Saving..." : "Save"}</span>
+          </button>
+        </div>
+      </div>
+
+      {/* 4. 1-Tap Seal & Archival Ritual Button / Wax Stamp Badge */}
       <div className="pt-1">
         {sealStatus.isSealed ? (
           <div className="bg-[#161514] text-white border-2 border-[#161514] rounded-xl p-3.5 shadow-[3px_3px_0px_#161514] flex items-center justify-between gap-3">
@@ -178,17 +280,17 @@ export function GladiatorCloseoutCard({
           >
             <Lock className="size-4 stroke-[2.5] group-hover:scale-110 transition-transform" />
             <span className="font-heading font-black text-xs sm:text-sm uppercase tracking-wider">
-              Seal & Archive Today's Ledger
+              Seal & Archive Today&apos;s Ledger
             </span>
             <Sparkles className="size-4 fill-[#161514]" />
           </button>
         )}
       </div>
 
-      {/* 4. Tomorrow Battle Preview (Things 3 Benchmark) */}
+      {/* 5. Tomorrow Battle Preview (Things 3 Benchmark) */}
       <div className="bg-white/80 border border-[#161514]/20 rounded-xl p-3 flex flex-wrap items-center justify-between gap-2 text-xs">
         <div className="flex items-center gap-2 font-mono text-[#161514]/80">
-          <span className="font-bold text-[#161514]">⚔️ Tomorrow's Horizon:</span>
+          <span className="font-bold text-[#161514]">⚔️ Tomorrow&apos;s Horizon:</span>
           <span>{tomorrowPendingTasksCount} tasks queued</span>
           <span>•</span>
           <span>

@@ -30,21 +30,17 @@ import {
   isToday as checkIsToday,
 } from "date-fns";
 
-// Modular Today Cockpit & Mascot Components
-import { TodayGreetingHero } from "@/components/today/TodayGreetingHero";
-import { QuickActionDock } from "@/components/today/QuickActionDock";
+// Modular Today Cockpit Architecture (4-Zone Clean Cockpit)
+import { MasterTodayHero } from "@/components/today/MasterTodayHero";
 import { HabitMomentumCard } from "@/components/today/HabitMomentumCard";
 import { StudySprintWidget } from "@/components/today/StudySprintWidget";
 import { SafeToSpendGauge } from "@/components/today/SafeToSpendGauge";
-import { TaskBattleQueue } from "@/components/today/TaskBattleQueue";
-import { EveningReflectionCard } from "@/components/today/EveningReflectionCard";
+import { ExecutionCaptureCard } from "@/components/today/ExecutionCaptureCard";
+import { GladiatorCloseoutCard } from "@/components/today/GladiatorCloseoutCard";
+import { StickyIslandMiniCockpit } from "@/components/today/StickyIslandMiniCockpit";
+import { TodayCockpitFooter } from "@/components/today/TodayCockpitFooter";
 import { ConfettiCelebration } from "@/components/common/ConfettiCelebration";
 import { useTodayCockpitViewModel, computeDailyConquestScore } from "@/components/today/useTodayCockpitViewModel";
-import { GladiatorConquestHUD } from "@/components/today/GladiatorConquestHUD";
-import { RetroStickyScratchpad } from "@/components/today/RetroStickyScratchpad";
-import { StickyIslandMiniCockpit } from "@/components/today/StickyIslandMiniCockpit";
-import { GladiatorCloseoutCard } from "@/components/today/GladiatorCloseoutCard";
-import { TodayCockpitFooter } from "@/components/today/TodayCockpitFooter";
 
 export default function TodayPage() {
   const { user } = useAuth();
@@ -198,7 +194,6 @@ export default function TodayPage() {
 
   // Trigger confetti when hitting 100% completion during active session
   useEffect(() => {
-    // Prevent celebration on initial page mount when habits were already conquered earlier
     if (isInitialMountRef.current) {
       isInitialMountRef.current = false;
       previousConqueredRef.current = allHabitsConquered;
@@ -273,15 +268,7 @@ export default function TodayPage() {
     });
   }, [transactions, categories, currentDateObj, baseUpiBudget, baseCashBudget, enableRollover, currencySymbol]);
 
-  const dailyBudgetStats = useMemo(() => {
-    return computeDailyBudgetStats({
-      transactions,
-      monthlyStats: budgetStats,
-      customDailyBudget,
-    });
-  }, [transactions, budgetStats, customDailyBudget]);
-
-  // Derived Daily Conquest Telemetry (Isolates stopwatch ticker from re-rendering the HUD)
+  // Derived Daily Conquest Telemetry
   const conquestMetrics = useMemo(() => {
     return computeDailyConquestScore({
       completedHabitsCount,
@@ -432,7 +419,7 @@ export default function TodayPage() {
     return tasks.filter((t) => (t.dueDate === tomorrowDateStr || (t as any).date === tomorrowDateStr) && t.status !== "completed").length;
   }, [tasks, tomorrowDateStr]);
 
-  // Smooth scroll helpers for quick dock and telemetry HUD
+  // Smooth scroll helpers
   const scrollToHabits = () => {
     const el = document.getElementById("habits-section");
     if (el) el.scrollIntoView({ behavior: "smooth" });
@@ -442,7 +429,7 @@ export default function TodayPage() {
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
   const scrollToMoney = () => {
-    const el = document.getElementById("money-section") || document.getElementById("expense-section");
+    const el = document.getElementById("money-section");
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
   const scrollToTop = () => {
@@ -493,11 +480,11 @@ export default function TodayPage() {
       {/* Top Sentinel for Sticky Island trigger */}
       <div ref={heroSentinelRef} className="h-0 w-full" aria-hidden="true" />
 
-      {/* Milestone Confetti Explosion */}
+      {/* Milestone Confetti Celebration */}
       <ConfettiCelebration active={showConfetti} onComplete={() => setShowConfetti(false)} />
 
-      {/* 1. Dynamic Greeting Hero & Vix the Gladiator Bot Cockpit */}
-      <TodayGreetingHero
+      {/* ZONE 1: Gladiator Command Deck (Unified Master Hero) */}
+      <MasterTodayHero
         currentDateObj={currentDateObj}
         selectedDate={selectedDate}
         isToday={isCurrentDayToday}
@@ -515,28 +502,18 @@ export default function TodayPage() {
         daypartMode={daypartMode}
         effectiveDaypart={effectiveDaypart}
         onSelectDaypartMode={setDaypartMode}
-      />
-
-      {/* 2. Gladiator Conquest Tri-Ring HUD (Apple Fitness Activity Benchmark) */}
-      <GladiatorConquestHUD
         metrics={conquestMetrics}
         onScrollToHabits={scrollToHabits}
         onScrollToStudy={scrollToStudy}
         onScrollToMoney={scrollToMoney}
-      />
-
-      {/* 3. Ergonomic Quick Action Dock (44px Touch Targets) */}
-      <QuickActionDock
-        isTimerRunning={isTimerRunning}
         onToggleTimer={() => setIsTimerRunning(!isTimerRunning)}
         onOpenExpenseModal={() => setIsQuickExpenseOpen(true)}
-        onScrollToHabits={scrollToHabits}
       />
 
-      {/* 4. Bento Row 1: Habit Momentum Ring & Study Focus Hub */}
+      {/* ZONE 2: Daily Core Hub (Bento Row 1 - Habits & Study Focus) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Habit Momentum Card (7 Cols) */}
-        <div className="lg:col-span-7">
+        <div id="habits-section" className="lg:col-span-7">
           <HabitMomentumCard
             habits={habits}
             logs={logs}
@@ -556,7 +533,7 @@ export default function TodayPage() {
         </div>
 
         {/* Study Sprint Stopwatch Widget (5 Cols) */}
-        <div className="lg:col-span-5">
+        <div id="study-section" className="lg:col-span-5">
           <StudySprintWidget
             stopwatchSeconds={stopwatchSeconds}
             isTimerRunning={isTimerRunning}
@@ -578,7 +555,7 @@ export default function TodayPage() {
         </div>
       </div>
 
-      {/* 5. Bento Row 2: Financial Safe-to-Spend Gauge & Priority Battle Queue */}
+      {/* ZONE 3: Operations & Execution Hub (Bento Row 2 - Balanced 6:6 Ratio) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Safe-to-Spend Financial Gauge (6 Cols) */}
         <div id="money-section" className="lg:col-span-6">
@@ -597,9 +574,9 @@ export default function TodayPage() {
           />
         </div>
 
-        {/* Priority Battle Queue & Retro Sticky Scratchpad (6 Cols) */}
-        <div className="lg:col-span-6 space-y-6">
-          <TaskBattleQueue
+        {/* Unified Execution & Quick Capture Hub (6 Cols) */}
+        <div id="tasks-section" className="lg:col-span-6">
+          <ExecutionCaptureCard
             tasks={tasks}
             selectedDate={selectedDate}
             onCompleteTask={(taskId, title) => {
@@ -609,9 +586,6 @@ export default function TodayPage() {
               });
               toast.success(`Conquered: ${title}`);
             }}
-          />
-
-          <RetroStickyScratchpad
             categories={categories}
             onConvertToTask={(task) => {
               createTaskMutation.mutate({
@@ -649,16 +623,7 @@ export default function TodayPage() {
         </div>
       </div>
 
-      {/* 5. Bento Row 3: Daily Reflection & Mindset */}
-      <EveningReflectionCard
-        currentMood={currentMood}
-        reflectionNote={reflectionNote}
-        onChangeNote={setReflectionNote}
-        onSaveMood={handleSaveMood}
-        isSaving={isSavingMood}
-      />
-
-      {/* 6. Gladiator Night Closeout Ritual Slip (Things 3 & Apple Fitness Benchmark) */}
+      {/* ZONE 4: The Evening Closeout Ritual (Thermal Receipt + Integrated Mindset Pulse) */}
       <GladiatorCloseoutCard
         metrics={conquestMetrics}
         selectedDate={selectedDate}
@@ -667,12 +632,17 @@ export default function TodayPage() {
         tomorrowPendingTasksCount={tomorrowPendingTasksCount}
         tomorrowSafeToSpend={budgetStats.dailySafeToSpend}
         currencySymbol={currencySymbol}
+        currentMood={currentMood}
+        reflectionNote={reflectionNote}
+        onChangeNote={setReflectionNote}
+        onSaveMood={handleSaveMood}
+        isSavingMood={isSavingMood}
       />
 
-      {/* 7. Production Cockpit Footer & Safe Area Cushion (Linear & Apple Insets Benchmark) */}
+      {/* ZONE 5: Ambient Utility & Production Cockpit Footer */}
       <TodayCockpitFooter onScrollToTop={scrollToTop} />
 
-      {/* 8. Daily Spending Limit & Allowances Modal */}
+      {/* Daily Spending Limit & Allowances Modal */}
       <AllowanceSettingsModal
         open={isDailyLimitModalOpen}
         onOpenChange={setIsDailyLimitModalOpen}
