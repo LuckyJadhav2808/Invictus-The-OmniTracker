@@ -18,7 +18,7 @@ import {
 import { soundFX } from "@/components/shared/SoundFX";
 import { useStudySessions, useSubjects, useAllTopics, useAddStudySession } from "@/lib/queries/study";
 import { useTransactions, useCategories, useAddTransaction, useBudgetPreferences, useUpdateBudgetPreferences } from "@/lib/queries/money";
-import { useTasks, useUpdateTask } from "@/lib/queries/tasks";
+import { useTasks, useUpdateTask, useCreateTask } from "@/lib/queries/tasks";
 import { computeMonthlyBudgetStats, computeDailyBudgetStats } from "@/lib/utils/budget-rollover";
 import { AllowanceSettingsModal } from "@/components/money/modals/AllowanceSettingsModal";
 import { toast } from "sonner";
@@ -39,6 +39,8 @@ import { SafeToSpendGauge } from "@/components/today/SafeToSpendGauge";
 import { TaskBattleQueue } from "@/components/today/TaskBattleQueue";
 import { EveningReflectionCard } from "@/components/today/EveningReflectionCard";
 import { ConfettiCelebration } from "@/components/common/ConfettiCelebration";
+import { useTodayCockpitViewModel } from "@/components/today/useTodayCockpitViewModel";
+import { RetroStickyScratchpad } from "@/components/today/RetroStickyScratchpad";
 
 export default function TodayPage() {
   const { user } = useAuth();
@@ -62,6 +64,8 @@ export default function TodayPage() {
 
   const { data: tasks = [] } = useTasks();
   const updateTaskMutation = useUpdateTask();
+  const createTaskMutation = useCreateTask();
+  const { daypartMode, setDaypartMode, effectiveDaypart } = useTodayCockpitViewModel();
 
   const { data: moodLog } = useMoodLog(selectedDate);
   const saveMoodMutation = useSaveMoodLog();
@@ -423,6 +427,9 @@ export default function TodayPage() {
         studyMinutesToday={todayStudyMinutes}
         isStudyingActive={isTimerRunning}
         allHabitsConquered={allHabitsConquered}
+        daypartMode={daypartMode}
+        effectiveDaypart={effectiveDaypart}
+        onSelectDaypartMode={setDaypartMode}
       />
 
       {/* 2. Ergonomic Quick Action Dock (44px Touch Targets) */}
@@ -497,8 +504,8 @@ export default function TodayPage() {
           />
         </div>
 
-        {/* Priority Battle Queue (6 Cols) */}
-        <div className="lg:col-span-6">
+        {/* Priority Battle Queue & Retro Sticky Scratchpad (6 Cols) */}
+        <div className="lg:col-span-6 space-y-6">
           <TaskBattleQueue
             tasks={tasks}
             selectedDate={selectedDate}
@@ -508,6 +515,22 @@ export default function TodayPage() {
                 updates: { status: "completed" },
               });
               toast.success(`Conquered: ${title}`);
+            }}
+          />
+
+          <RetroStickyScratchpad
+            onConvertToTask={(text) => {
+              createTaskMutation.mutate({
+                title: text,
+                priority: "p2",
+                status: "todo",
+                date: selectedDate,
+                category: "Quick Thought",
+                subtasks: [],
+              } as any);
+            }}
+            onConvertToExpense={(amount, note) => {
+              handleAddExpense(amount, "", note);
             }}
           />
         </div>
