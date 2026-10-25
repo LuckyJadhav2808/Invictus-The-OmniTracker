@@ -466,7 +466,7 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
                 onClick={() => {
                   soundFX.playPop();
                   setIsExpanded(false);
-                  router.push("/goals?tab=gym");
+                  router.push("/goals/gym");
                 }}
                 className="w-full bg-[#161514] hover:bg-black text-white font-black text-[11px] uppercase tracking-wider py-2.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center gap-1.5 cursor-pointer"
               >

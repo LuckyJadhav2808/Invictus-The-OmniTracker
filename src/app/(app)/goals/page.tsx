@@ -8,7 +8,6 @@ import {
   useDeleteHabit,
   useToggleHabitLog,
   useHabitLogs,
-  useMonthHabitLogs,
   useStreaks,
   useStreakFreeze,
   useHealthProfile,
@@ -23,8 +22,6 @@ import { NewHabitForm } from "@/components/goals/NewHabitForm";
 import { WaterTracker } from "@/components/goals/WaterTracker";
 import { MoodJournalWidget } from "@/components/goals/MoodJournalWidget";
 import { SleepAndActiveWidgets } from "@/components/goals/SleepAndActiveWidgets";
-import { GymRoutineTracker } from "@/components/goals/GymRoutineTracker";
-import { MealTracker } from "@/components/goals/MealTracker";
 import { WeeklyOverviewWidget } from "@/components/goals/WeeklyOverviewWidget";
 import { WeeklyVelocityAndHabitMatrix } from "@/components/goals/WeeklyVelocityAndHabitMatrix";
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
@@ -37,33 +34,24 @@ import { HABIT_TEMPLATE_PACKS } from "@/lib/templates-data";
 import { HabitCompanionSprite } from "@/components/mascot/HabitCompanionSprite";
 import { VixPixelCompanion } from "@/components/mascot/VixPixelCompanion";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Target,
   Plus,
   Flame,
-  Award,
-  BarChart2,
-  CheckSquare,
   Sparkles,
-  Droplets,
-  Dumbbell,
-  Calendar as CalendarIcon,
   Activity,
   Edit3,
   Moon,
-  Shield,
   ShieldCheck,
   ShieldAlert,
   Info,
   Volume2,
   VolumeX,
 } from "lucide-react";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isSameDay, subWeeks } from "date-fns";
+import { format, getDay } from "date-fns";
 import { toast } from "sonner";
 import { useUIStore } from "@/store/ui-store";
 import { cn } from "@/lib/utils";
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from "recharts";
 import { ProactiveReminderBanner } from "@/components/shared/ProactiveReminderBanner";
 import { useSearchParams, useRouter } from "next/navigation";
 
@@ -72,47 +60,21 @@ function GoalsPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const tabParam = searchParams.get("tab");
-  const [activeTab, setActiveTab] = useState(tabParam || "list");
+
+  // Graceful backward compatibility redirect for legacy ?tab= queries
+  useEffect(() => {
+    if (tabParam === "gym") {
+      router.replace("/goals/gym");
+    } else if (tabParam === "nutrition") {
+      router.replace("/goals/nutrition");
+    } else if (tabParam === "calendar" || tabParam === "analytics") {
+      router.replace("/goals/analytics");
+    }
+  }, [tabParam, router]);
+
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isChoiceOpen, setIsChoiceOpen] = useState(false);
   const [soundMuted, setSoundMuted] = useState(soundFX.isMuted());
-
-  const handleApplyHabitPack = (pack: TemplatePack) => {
-    pack.items.forEach((item) => {
-      addHabitMutation.mutate({
-        title: item.title,
-        icon: "🌱",
-        color: "amber",
-        frequency: { type: "daily", targetPerDay: 1 },
-        allowGraceSkip: false,
-        isGoalStyle: false,
-        reminderTime: item.desc || "",
-      });
-    });
-  };
-
-  useEffect(() => {
-    if (tabParam) {
-      setActiveTab(tabParam);
-    }
-  }, [tabParam]);
-
-  const handleTabChange = (val: string) => {
-    setActiveTab(val);
-    if (typeof window !== "undefined") {
-      const url = new URL(window.location.href);
-      if (val === "list") {
-        url.searchParams.delete("tab");
-      } else {
-        url.searchParams.set("tab", val);
-      }
-      window.history.replaceState(null, "", url.pathname + url.search);
-    }
-  };
-
-  // States for Health Profile Modal
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [profileForm, setProfileForm] = useState({ gender: "", age: "", weight: "" });
 
   // Health Profile & Habits Database Query hooks
   const { data: userProfile = { gender: "Female", age: "24 Years", weight: "68 kg" } } = useHealthProfile();
@@ -129,18 +91,15 @@ function GoalsPageContent() {
   const achievements = useUserAchievements();
   const { habitLayoutStyle } = useUIStore();
 
-  // Fetch habit logs for the entire month (heatmap) and past 4 weeks (analytics)
-  const heatmapMonthStart = format(startOfMonth(new Date()), "yyyy-MM-dd");
-  const heatmapMonthEnd = format(endOfMonth(new Date()), "yyyy-MM-dd");
-  const analyticsStart = format(subWeeks(new Date(), 4), "yyyy-MM-dd");
-  const { data: monthLogs = [] } = useMonthHabitLogs(heatmapMonthStart, heatmapMonthEnd);
-  const { data: fourWeekLogs = [] } = useMonthHabitLogs(analyticsStart, heatmapMonthEnd);
-
   const addHabitMutation = useAddHabit();
   const updateHabitMutation = useUpdateHabit();
   const deleteHabitMutation = useDeleteHabit();
   const toggleLogMutation = useToggleHabitLog();
   const setWaterMutation = useSetWater();
+
+  // States for Health Profile Modal
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [profileForm, setProfileForm] = useState({ gender: "", age: "", weight: "" });
 
   // 🛡️ Autonomous Streak Freeze Shield State & Notification
   const [isShieldInfoOpen, setIsShieldInfoOpen] = useState(false);
@@ -199,33 +158,58 @@ function GoalsPageContent() {
     const unit = unitMatch ? unitMatch[0].toLowerCase() : "kg";
     const num = rawWeight.replace(/[^0-9.]/g, "") || "68";
 
-    const rawAge = userProfile.age && userProfile.age !== "Not Set" ? userProfile.age : "";
-    const ageNum = rawAge.replace(/[^0-9]/g, "");
-
     setWeightVal(num);
     setWeightUnit(unit);
-    setAgeVal(ageNum);
+    const rawAge = userProfile.age && userProfile.age !== "Not Set" ? userProfile.age.replace(/[^0-9]/g, "") : "24";
+    setAgeVal(rawAge);
     setProfileForm({
-      gender: userProfile.gender && userProfile.gender !== "Not Set" ? userProfile.gender : "Female",
-      age: ageNum ? `${ageNum} Years` : "",
-      weight: `${num} ${unit}`,
+      gender: userProfile.gender || "Female",
+      age: userProfile.age || "24 Years",
+      weight: userProfile.weight || "68 kg",
     });
     setIsProfileOpen(true);
   };
 
-  const handleProfileSubmit = (e: React.FormEvent) => {
+  const handleProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const finalForm = {
-      ...profileForm,
-      age: ageVal ? `${ageVal} Years` : "Not Set",
-    };
-    updateProfileMutation.mutate(finalForm);
-    toast.success("Health stats updated! 🌟");
-    setIsProfileOpen(false);
+    soundFX.playPop();
+    const formattedAge = ageVal ? `${ageVal} Years` : profileForm.age;
+    const formattedWeight = weightVal ? `${weightVal} ${weightUnit}` : profileForm.weight;
+
+    try {
+      await updateProfileMutation.mutateAsync({
+        ...profileForm,
+        age: formattedAge,
+        weight: formattedWeight,
+      });
+      toast.success("Health stats updated! 🎯");
+      setIsProfileOpen(false);
+    } catch {
+      toast.error("Failed to update profile stats");
+    }
   };
 
-  const logWater = (amount: number) => {
-    logWaterMutation.mutate({ date: selectedDate, amount });
+  const logWater = async (amount: number) => {
+    try {
+      soundFX.playSplash();
+      await logWaterMutation.mutateAsync({ date: selectedDate, amount });
+    } catch {
+      toast.error("Failed to log water");
+    }
+  };
+
+  const handleApplyHabitPack = (pack: TemplatePack) => {
+    pack.items.forEach((item) => {
+      addHabitMutation.mutate({
+        title: item.title,
+        icon: "🌱",
+        color: "amber",
+        frequency: { type: "daily", targetPerDay: 1 },
+        allowGraceSkip: false,
+        isGoalStyle: false,
+        reminderTime: item.desc || "",
+      });
+    });
   };
 
   const SUGGESTED_HABITS = [
@@ -320,684 +304,461 @@ function GoalsPageContent() {
     return true;
   });
 
-  // Calendar Heatmap Logic
-  const today = new Date();
-  const monthStart = startOfMonth(today);
-  const monthEnd = endOfMonth(today);
-  const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
-  const startDayOfWeek = getDay(monthStart); // 0 = Sunday, 1 = Monday etc.
-
-  // Real Calendar/Heatmap completion percentages
-  const getCompletionPercentage = (dateStr: string) => {
-    if (totalHabits === 0) return 0;
-    const completedOnDay = monthLogs.filter((l) => l.date === dateStr).length;
-    return Math.round((completedOnDay / totalHabits) * 100);
-  };
-
-  // Analytics Calculations
   const totalHabits = habits.length;
-  const activeStreaksList = Object.values(streaks).filter((s) => s.currentStreak > 0);
   const longestStreakValue = Object.values(streaks).reduce((max, s) => Math.max(max, s.longestStreak), 0);
 
-  // Real completion rate: total completed logs vs total possible over tracked days
-  const trackedDays = new Set(fourWeekLogs.map((l) => l.date)).size || 1;
-  const overallCompletionRate = totalHabits > 0
-    ? Math.round((fourWeekLogs.length / (totalHabits * trackedDays)) * 100)
-    : 0;
-
-  // Real bar chart: completion rate by day of week from past 4 weeks
-  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  const barChartData = (() => {
-    if (totalHabits === 0) return dayNames.map((name) => ({ name, rate: 0 }));
-    const dayCounts: Record<number, { completed: number; totalDays: number }> = {};
-    for (let i = 0; i < 7; i++) dayCounts[i] = { completed: 0, totalDays: 0 };
-    const fourWeekStart = subWeeks(new Date(), 4);
-    const windowDays = eachDayOfInterval({ start: fourWeekStart, end: new Date() });
-    for (const day of windowDays) {
-      dayCounts[getDay(day)].totalDays++;
-    }
-    for (const log of fourWeekLogs) {
-      const dow = getDay(new Date(log.date));
-      dayCounts[dow].completed++;
-    }
-    return dayNames.map((name, i) => {
-      const { completed, totalDays } = dayCounts[i];
-      const possibleCompletions = totalDays * totalHabits;
-      const rate = possibleCompletions > 0 ? Math.round((completed / possibleCompletions) * 100) : 0;
-      return { name, rate };
-    });
-  })();
-
   return (
-    <div className="min-h-screen bg-cream-bg p-4 md:p-8 space-y-6">
-      <div className="max-w-4xl mx-auto space-y-6">
-        {/* Clean Neobrutalist Goals Header Card */}
-        <div className="neo-card p-5 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-heading font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border-2 border-[#161514] bg-[#03D26F] text-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]">
-                Habits & Wellness
-              </span>
-              <span className="text-[10px] font-heading font-black text-[#161514]/70">
-                Lvl {achievements.userLevel} • {achievements.totalXP} XP
-              </span>
-            </div>
-            <h1 className="text-xl sm:text-2xl font-heading font-black text-[#161514] tracking-tight">
-              Habits & Routines
-            </h1>
-            <p className="text-xs font-medium text-[#161514]/70 max-w-lg">
-              Build daily consistency, workout routines, and track streaks.
-            </p>
-          </div>
-
-          {/* Quick Metrics & Actions */}
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            <div className="px-3 py-2 rounded-xl border-2 border-[#161514] bg-[#FAF8F5] shadow-[2px_2px_0px_0px_#161514] text-center min-w-[70px]">
-              <span className="text-[9px] font-heading font-black uppercase text-[#161514]/60 block leading-tight">Habits</span>
-              <span className="text-sm font-heading font-black text-[#161514]">{totalHabits}</span>
-            </div>
-            <div className="px-3 py-2 rounded-xl border-2 border-[#161514] bg-amber-50 shadow-[2px_2px_0px_0px_#161514] text-center min-w-[70px]">
-              <span className="text-[9px] font-heading font-black uppercase text-amber-700 block leading-tight">Best Streak</span>
-              <span className="text-sm font-heading font-black text-[#161514] flex items-center justify-center gap-1">
-                <Flame className="size-3.5 fill-rose-500 text-rose-500" />
-                {longestStreakValue}d
-              </span>
-            </div>
-            {/* Tactile Audio Mute Toggle */}
-            <button
-              type="button"
-              onClick={() => {
-                const nextMuted = soundFX.toggleMute();
-                setSoundMuted(nextMuted);
-                toast.info(nextMuted ? "Tactile audio muted" : "Tactile audio active 🔊");
-              }}
-              className="size-10 rounded-xl border-2 border-[#161514] bg-white hover:bg-[#FFF9EA] text-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all flex items-center justify-center cursor-pointer shrink-0"
-              title={soundMuted ? "Unmute tactile sounds" : "Mute tactile sounds"}
-              aria-label="Toggle sound"
-            >
-              {soundMuted ? <VolumeX className="size-4 stroke-[2.5]" /> : <Volume2 className="size-4 stroke-[2.5]" />}
-            </button>
-
-            <Button
-              onClick={() => {
-                soundFX.playPop();
-                setIsAddOpen(true);
-              }}
-              className="bg-[#CEF431] hover:bg-[#D8F74E] text-[#161514] font-heading font-black text-xs px-3.5 py-2.5 h-auto rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center gap-1.5 cursor-pointer"
-            >
-              <Plus className="size-4 stroke-[3]" />
-              <span>New Habit</span>
-            </Button>
-
-            {/* Interactive Fitness Vix Companion */}
-            <VixPixelCompanion
-              gear="fitness"
-              state={isAllDueCompleted || longestStreakValue >= 3 ? "fire" : "idle"}
-              size={42}
-              onClick={() => setIsAddOpen(true)}
-              title={isAllDueCompleted ? "Vix: All daily habits conquered today! 🏆" : "Vix: Fitness Companion (Click for New Habit)"}
-            />
-          </div>
-        </div>
-
-        {/* Proactive Reminder Banner */}
-        <ProactiveReminderBanner space="goals" />
-
-        {/* Autonomous Streak Freeze Shield Card */}
-        <div
-          onClick={() => setIsShieldInfoOpen(true)}
-          className="bg-white rounded-xl p-3 border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] flex items-center justify-between gap-2.5 cursor-pointer hover:bg-[#FAF8F5] transition-colors group"
-        >
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div
-              className={cn(
-                "size-8 shrink-0 rounded-lg border-2 border-[#161514] flex items-center justify-center text-[#161514] shadow-[1px_1px_0px_0px_#161514] transition-transform group-hover:scale-105",
-                streakFreeze.tokensAvailable > 0 ? "bg-[#03D26F]" : "bg-amber-100"
-              )}
-            >
-              {streakFreeze.tokensAvailable > 0 ? (
-                <ShieldCheck className="size-4 stroke-[2.5]" />
-              ) : (
-                <ShieldAlert className="size-4 stroke-[2.5]" />
-              )}
-            </div>
-            <div className="min-w-0">
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <h4 className="font-heading font-black text-xs text-[#161514] uppercase tracking-tight truncate">
-                  Autonomous Streak Shield
-                </h4>
-                <span
-                  className={cn(
-                    "text-[#161514] font-heading font-black text-[9px] px-1.5 py-0.5 rounded-md border border-[#161514] shrink-0",
-                    streakFreeze.tokensAvailable > 0 ? "bg-[#CEF431]" : "bg-amber-200"
-                  )}
-                >
-                  {streakFreeze.tokensAvailable > 0
-                    ? `${streakFreeze.tokensAvailable}/2 Armed`
-                    : "0/2 Depleted"}
-                </span>
-                {streakFreeze.frozenDates && streakFreeze.frozenDates.length > 0 && (
-                  <span className="bg-cyan-100 text-[#161514] font-heading font-bold text-[8.5px] px-1.5 py-0.5 rounded-md border border-[#161514] shrink-0 hidden sm:inline-block">
-                    {streakFreeze.frozenDates.length} Shielded
-                  </span>
-                )}
-              </div>
-              <p className="text-[10px] text-[#161514]/70 font-medium truncate pt-0.5">
-                {streakFreeze.tokensAvailable > 0
-                  ? "Auto-deploys if you miss a scheduled day. Flame preserved."
-                  : "0 shields remaining. Refills automatically on the 1st."}
-              </p>
-            </div>
-          </div>
-
-          <div className="shrink-0 flex items-center gap-1.5">
-            <span className="text-[10px] font-heading font-black text-[#161514] bg-[#FAF8F5] group-hover:bg-[#CEF431] px-2 py-1 rounded-lg border border-[#161514] flex items-center gap-1 shadow-[1px_1px_0px_0px_#161514] transition-colors">
-              <Info className="size-3 stroke-[2.5]" />
-              <span className="hidden sm:inline">Details</span>
+    <div className="space-y-6 animate-in fade-in duration-300">
+      {/* 1. Habits & Wellness Cockpit Header Card */}
+      <div className="bg-white border-2 border-[#161514] rounded-2xl p-5 shadow-[4px_4px_0px_0px_#161514] flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-heading font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border-2 border-[#161514] bg-[#03D26F] text-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]">
+              Habits & Wellness
+            </span>
+            <span className="text-[10px] font-heading font-black text-[#161514]/70">
+              Lvl {achievements.userLevel} • {achievements.totalXP} XP
             </span>
           </div>
+          <h1 className="text-xl sm:text-2xl font-heading font-black text-[#161514] tracking-tight">
+            Habits & Routines
+          </h1>
+          <p className="text-xs font-medium text-[#161514]/70 max-w-lg">
+            Build daily consistency, conquer streaks, and maintain holistic vitality.
+          </p>
         </div>
 
-        {/* Tab Controls (Horizontally scrollable on mobile, inline on desktop) */}
-        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-          <div className="w-full overflow-x-auto no-scrollbar pb-1 mb-5">
-            <TabsList className="bg-[#FAF8F5] rounded-2xl p-1.5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] flex items-center gap-1.5 w-max min-w-full sm:min-w-0 sm:w-auto">
-              <TabsTrigger
-                value="list"
-                className="rounded-xl text-xs font-heading font-extrabold py-2 px-3.5 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#03D26F] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#161514] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
-              >
-                <CheckSquare className="size-3.5 stroke-[2.2]" />
-                <span>Habits</span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="gym"
-                className="rounded-xl text-xs font-heading font-extrabold py-2 px-3.5 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#03D26F] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#161514] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
-              >
-                <Dumbbell className="size-3.5 stroke-[2.2]" />
-                <span>Gym & Meals</span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="calendar"
-                className="rounded-xl text-xs font-heading font-extrabold py-2 px-3.5 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#03D26F] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#161514] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
-              >
-                <CalendarIcon className="size-3.5 stroke-[2.2]" />
-                <span>Heatmap</span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="analytics"
-                className="rounded-xl text-xs font-heading font-extrabold py-2 px-3.5 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#03D26F] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#161514] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0"
-              >
-                <BarChart2 className="size-3.5 stroke-[2.2]" />
-                <span>Analytics</span>
-              </TabsTrigger>
-            </TabsList>
+        {/* Quick Metrics & Actions */}
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <div className="px-3 py-2 rounded-xl border-2 border-[#161514] bg-[#FAF8F5] shadow-[2px_2px_0px_0px_#161514] text-center min-w-[70px]">
+            <span className="text-[9px] font-heading font-black uppercase text-[#161514]/60 block leading-tight">Habits</span>
+            <span className="text-sm font-heading font-black text-[#161514]">{totalHabits}</span>
+          </div>
+          <div className="px-3 py-2 rounded-xl border-2 border-[#161514] bg-amber-50 shadow-[2px_2px_0px_0px_#161514] text-center min-w-[70px]">
+            <span className="text-[9px] font-heading font-black uppercase text-amber-700 block leading-tight">Best Streak</span>
+            <span className="text-sm font-heading font-black text-[#161514] flex items-center justify-center gap-1">
+              <Flame className="size-3.5 fill-rose-500 text-rose-500" />
+              {longestStreakValue}d
+            </span>
           </div>
 
-          {/* Tab 2: Gym & Meals Workspace (Dedicated full-width view) */}
-          <TabsContent value="gym" className="space-y-4 pb-28 lg:pb-8 outline-none">
-            <div id="gym-section">
-              <GymRoutineTracker />
+          {/* Tactile Audio Mute Toggle */}
+          <button
+            type="button"
+            onClick={() => {
+              const nextMuted = soundFX.toggleMute();
+              setSoundMuted(nextMuted);
+              toast.info(nextMuted ? "Tactile audio muted" : "Tactile audio active 🔊");
+            }}
+            className="size-10 rounded-xl border-2 border-[#161514] bg-white hover:bg-[#FFF9EA] text-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all flex items-center justify-center cursor-pointer shrink-0"
+            title={soundMuted ? "Unmute tactile sounds" : "Mute tactile sounds"}
+            aria-label="Toggle sound"
+          >
+            {soundMuted ? <VolumeX className="size-4 stroke-[2.5]" /> : <Volume2 className="size-4 stroke-[2.5]" />}
+          </button>
+
+          <Button
+            onClick={() => {
+              soundFX.playPop();
+              setIsAddOpen(true);
+            }}
+            className="bg-[#CEF431] hover:bg-[#D8F74E] text-[#161514] font-heading font-black text-xs px-3.5 py-2.5 h-auto rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center gap-1.5 cursor-pointer"
+          >
+            <Plus className="size-4 stroke-[3]" />
+            <span>New Habit</span>
+          </Button>
+
+          {/* Interactive Fitness Vix Companion */}
+          <VixPixelCompanion
+            gear="fitness"
+            state={isAllDueCompleted || longestStreakValue >= 3 ? "fire" : "idle"}
+            size={42}
+            onClick={() => setIsAddOpen(true)}
+            title={isAllDueCompleted ? "Vix: All daily habits conquered today! 🏆" : "Vix: Fitness Companion (Click for New Habit)"}
+          />
+        </div>
+      </div>
+
+      {/* 2. Proactive Reminder Banner */}
+      <ProactiveReminderBanner space="goals" />
+
+      {/* 3. Autonomous Streak Freeze Shield Card */}
+      <div
+        onClick={() => setIsShieldInfoOpen(true)}
+        className="bg-white rounded-xl p-3 border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] flex items-center justify-between gap-2.5 cursor-pointer hover:bg-[#FAF8F5] transition-colors group"
+      >
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div
+            className={cn(
+              "size-8 shrink-0 rounded-lg border-2 border-[#161514] flex items-center justify-center text-[#161514] shadow-[1px_1px_0px_0px_#161514] transition-transform group-hover:scale-105",
+              streakFreeze.tokensAvailable > 0 ? "bg-[#03D26F]" : "bg-amber-100"
+            )}
+          >
+            {streakFreeze.tokensAvailable > 0 ? (
+              <ShieldCheck className="size-4 stroke-[2.5]" />
+            ) : (
+              <ShieldAlert className="size-4 stroke-[2.5]" />
+            )}
+          </div>
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <h4 className="font-heading font-black text-xs text-[#161514] uppercase tracking-tight truncate">
+                Autonomous Streak Shield
+              </h4>
+              <span
+                className={cn(
+                  "text-[#161514] font-heading font-black text-[9px] px-1.5 py-0.5 rounded-md border border-[#161514] shrink-0",
+                  streakFreeze.tokensAvailable > 0 ? "bg-[#CEF431]" : "bg-amber-200"
+                )}
+              >
+                {streakFreeze.tokensAvailable > 0
+                  ? `${streakFreeze.tokensAvailable}/2 Armed`
+                  : "0/2 Depleted"}
+              </span>
+              {streakFreeze.frozenDates && streakFreeze.frozenDates.length > 0 && (
+                <span className="bg-cyan-100 text-[#161514] font-heading font-bold text-[8.5px] px-1.5 py-0.5 rounded-md border border-[#161514] shrink-0 hidden sm:inline-block">
+                  {streakFreeze.frozenDates.length} Shielded
+                </span>
+              )}
             </div>
-            <div id="nutrition-section">
-              <MealTracker />
-            </div>
-          </TabsContent>
+            <p className="text-[10px] text-[#161514]/70 font-medium truncate pt-0.5">
+              {streakFreeze.tokensAvailable > 0
+                ? "Auto-deploys if you miss a scheduled day. Flame preserved."
+                : "0 shields remaining. Refills automatically on the 1st."}
+            </p>
+          </div>
+        </div>
 
-          {/* Tab 1: Habits & Wellness Workspace */}
-          <TabsContent value="list" className="space-y-6 outline-none">
-            {/* Neobrutalism Weekly Overview Widget (Top) */}
-            <WeeklyOverviewWidget />
+        <div className="shrink-0 flex items-center gap-1.5">
+          <span className="text-[10px] font-heading font-black text-[#161514] bg-[#FAF8F5] group-hover:bg-[#CEF431] px-2 py-1 rounded-lg border border-[#161514] flex items-center gap-1 shadow-[1px_1px_0px_0px_#161514] transition-colors">
+            <Info className="size-3 stroke-[2.5]" />
+            <span className="hidden sm:inline">Details</span>
+          </span>
+        </div>
+      </div>
 
-            {/* Weekly Velocity & 4-Week Activity Heatmap Matrix */}
-            <WeeklyVelocityAndHabitMatrix />
+      {/* 4. Weekly Overview Widget */}
+      <WeeklyOverviewWidget />
 
-            {/* 2-Column Responsive Layout: Habits Checklist + Hydration & Health Stats */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 my-4">
-              {/* Left Column (2 cols on lg): Habits Checklist */}
-              <div id="habits-section" className="lg:col-span-2 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5" style={{ fontFamily: "var(--font-heading)" }}>
-                    <Sparkles className="size-3.5 text-[#03D26F]" />
-                    <span>Active Habit Streaks</span>
-                    <span className="bg-[#CEF431] text-[#161514] text-[10px] px-2 py-0.5 rounded-full border-2 border-[#161514] font-black shadow-[1px_1px_0px_0px_#161514]">
-                      {habits.length}
+      {/* 5. Weekly Velocity & Activity Matrix */}
+      <WeeklyVelocityAndHabitMatrix />
+
+      {/* 6. Responsive 2-Column Grid: Habits Checklist + Hydration & Health Stats */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 my-4">
+        {/* Left Column (2 cols on lg): Habits Checklist */}
+        <div id="habits-section" className="lg:col-span-2 space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5" style={{ fontFamily: "var(--font-heading)" }}>
+              <Sparkles className="size-3.5 text-[#03D26F]" />
+              <span>Active Habit Streaks</span>
+              <span className="bg-[#CEF431] text-[#161514] text-[10px] px-2 py-0.5 rounded-full border-2 border-[#161514] font-black shadow-[1px_1px_0px_0px_#161514]">
+                {habits.length}
+              </span>
+            </h3>
+            <button
+              type="button"
+              onClick={() => setIsChoiceOpen(true)}
+              className="text-[10px] font-black uppercase tracking-wider text-[#161514] bg-[#CEF431] border-2 border-[#161514] px-2.5 py-1 rounded-xl shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
+            >
+              + New Habit
+            </button>
+          </div>
+
+          {/* Daily Victory Celebration HUD */}
+          {isAllDueCompleted && habits.length > 0 && (
+            <div className="bg-[#CEF431] border-2 border-[#161514] rounded-2xl p-4 shadow-[4px_4px_0px_0px_#161514] flex items-center justify-between gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+              <div className="flex items-center gap-3">
+                <div className="size-10 rounded-xl bg-white border-2 border-[#161514] flex items-center justify-center text-xl shadow-[2px_2px_0px_0px_#161514] shrink-0">
+                  👑
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-black uppercase tracking-wider text-[#161514]" style={{ fontFamily: "var(--font-heading)" }}>
+                      Daily Conquered! 100% Complete
                     </span>
-                  </h3>
-                  <button
-                    type="button"
-                    onClick={() => setIsChoiceOpen(true)}
-                    className="text-[10px] font-black uppercase tracking-wider text-[#161514] bg-[#CEF431] border-2 border-[#161514] px-2.5 py-1 rounded-xl shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
-                  >
-                    + New Habit
-                  </button>
+                    <span className="bg-[#161514] text-[#CEF431] text-[9px] font-black px-2 py-0.5 rounded-full uppercase">
+                      All Due Done
+                    </span>
+                  </div>
+                  <p className="text-[11px] font-bold text-[#161514]/80 mt-0.5">
+                    Vix is ecstatic! Every single habit scheduled for today has been checked off. Take a bow.
+                  </p>
                 </div>
+              </div>
+              <div className="hidden sm:flex shrink-0">
+                <VixPixelCompanion gear="fitness" state="celebrate" size={48} title="Daily Conquered!" />
+              </div>
+            </div>
+          )}
 
-                {/* Daily Victory HUD */}
-                {isAllDueCompleted && habits.length > 0 && (
-                  <div className="bg-[#CEF431] border-2 border-[#161514] rounded-2xl p-4 shadow-[4px_4px_0px_0px_#161514] flex items-center justify-between gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                    <div className="flex items-center gap-3">
-                      <div className="size-10 rounded-xl bg-white border-2 border-[#161514] flex items-center justify-center text-xl shadow-[2px_2px_0px_0px_#161514] shrink-0">
-                        👑
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-black uppercase tracking-wider text-[#161514]" style={{ fontFamily: "var(--font-heading)" }}>
-                            Daily Conquered! 100% Complete
-                          </span>
-                          <span className="bg-[#161514] text-[#CEF431] text-[9px] font-black px-2 py-0.5 rounded-full uppercase">
-                            All Due Done
-                          </span>
-                        </div>
-                        <p className="text-[11px] font-bold text-[#161514]/80 mt-0.5">
-                          Vix is ecstatic! Every single habit scheduled for today has been checked off. Take a bow.
-                        </p>
-                      </div>
-                    </div>
-                    <div className="hidden sm:flex shrink-0">
-                      <VixPixelCompanion gear="fitness" state="celebrate" size={48} title="Daily Conquered!" />
-                    </div>
-                  </div>
-                )}
+          {/* Quick Filter Bar */}
+          {habits.length > 0 && (
+            <div className="flex flex-wrap items-center justify-between gap-2 bg-white border-2 border-[#161514] rounded-2xl p-2.5 shadow-[3px_3px_0px_0px_#161514]">
+              <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-0.5">
+                <button
+                  type="button"
+                  onClick={() => setHabitStatusFilter("all")}
+                  className={cn(
+                    "px-2.5 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider border-2 border-[#161514] transition-all cursor-pointer",
+                    habitStatusFilter === "all"
+                      ? "bg-[#161514] text-white shadow-[2px_2px_0px_0px_#CEF431]"
+                      : "bg-[#FAF8F5] text-[#161514] hover:bg-amber-100 shadow-[1px_1px_0px_0px_#161514]"
+                  )}
+                >
+                  All ({habits.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setHabitStatusFilter("pending")}
+                  className={cn(
+                    "px-2.5 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider border-2 border-[#161514] transition-all cursor-pointer flex items-center gap-1",
+                    habitStatusFilter === "pending"
+                      ? "bg-[#161514] text-white shadow-[2px_2px_0px_0px_#CEF431]"
+                      : "bg-[#FAF8F5] text-[#161514] hover:bg-amber-100 shadow-[1px_1px_0px_0px_#161514]"
+                  )}
+                >
+                  <span>Due Today</span>
+                  <span className={cn(
+                    "px-1.5 py-0.2 rounded-full text-[9px] font-black border",
+                    pendingTodayHabits.length > 0 ? "bg-amber-300 text-[#161514] border-[#161514]" : "bg-zinc-200 text-zinc-600 border-zinc-400"
+                  )}>
+                    {pendingTodayHabits.length}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setHabitStatusFilter("completed")}
+                  className={cn(
+                    "px-2.5 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider border-2 border-[#161514] transition-all cursor-pointer flex items-center gap-1",
+                    habitStatusFilter === "completed"
+                      ? "bg-[#161514] text-white shadow-[2px_2px_0px_0px_#03D26F]"
+                      : "bg-[#FAF8F5] text-[#161514] hover:bg-emerald-50 shadow-[1px_1px_0px_0px_#161514]"
+                  )}
+                >
+                  <span>Completed</span>
+                  <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black border bg-[#03D26F] text-[#161514] border-[#161514]">
+                    {completedTodayHabits.length}
+                  </span>
+                </button>
+              </div>
 
-                {/* Quick Filter Bar */}
-                {habits.length > 0 && (
-                  <div className="flex flex-wrap items-center justify-between gap-2 bg-white border-2 border-[#161514] rounded-2xl p-2.5 shadow-[3px_3px_0px_0px_#161514]">
-                    <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-0.5">
-                      <button
-                        type="button"
-                        onClick={() => setHabitStatusFilter("all")}
-                        className={cn(
-                          "px-2.5 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider border-2 border-[#161514] transition-all cursor-pointer",
-                          habitStatusFilter === "all"
-                            ? "bg-[#161514] text-white shadow-[2px_2px_0px_0px_#CEF431]"
-                            : "bg-[#FAF8F5] text-[#161514] hover:bg-amber-100 shadow-[1px_1px_0px_0px_#161514]"
-                        )}
-                      >
-                        All ({habits.length})
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setHabitStatusFilter("pending")}
-                        className={cn(
-                          "px-2.5 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider border-2 border-[#161514] transition-all cursor-pointer flex items-center gap-1",
-                          habitStatusFilter === "pending"
-                            ? "bg-[#161514] text-white shadow-[2px_2px_0px_0px_#CEF431]"
-                            : "bg-[#FAF8F5] text-[#161514] hover:bg-amber-100 shadow-[1px_1px_0px_0px_#161514]"
-                        )}
-                      >
-                        <span>Due Today</span>
-                        <span className={cn(
-                          "px-1.5 py-0.2 rounded-full text-[9px] font-black border",
-                          pendingTodayHabits.length > 0 ? "bg-amber-300 text-[#161514] border-[#161514]" : "bg-zinc-200 text-zinc-600 border-zinc-400"
-                        )}>
-                          {pendingTodayHabits.length}
-                        </span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setHabitStatusFilter("completed")}
-                        className={cn(
-                          "px-2.5 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider border-2 border-[#161514] transition-all cursor-pointer flex items-center gap-1",
-                          habitStatusFilter === "completed"
-                            ? "bg-[#161514] text-white shadow-[2px_2px_0px_0px_#03D26F]"
-                            : "bg-[#FAF8F5] text-[#161514] hover:bg-emerald-50 shadow-[1px_1px_0px_0px_#161514]"
-                        )}
-                      >
-                        <span>Completed</span>
-                        <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black border bg-[#03D26F] text-[#161514] border-[#161514]">
-                          {completedTodayHabits.length}
-                        </span>
-                      </button>
-                    </div>
-
-                    {/* Daily Momentum Progress Pill */}
-                    <div className="flex items-center gap-2 px-2.5 py-1 bg-[#FAF8F5] border-2 border-[#161514] rounded-xl text-[10px] font-black text-[#161514]">
-                      <span className="text-[9px] uppercase tracking-wider text-[#161514]/70">Today</span>
-                      <div className="w-16 h-2 bg-zinc-200 rounded-full border border-[#161514] overflow-hidden">
-                        <div
-                          className="h-full bg-[#03D26F] transition-all duration-300"
-                          style={{ width: `${dailyCompletionPercent}%` }}
-                        />
-                      </div>
-                      <span className="text-[10px] font-black text-[#161514]">{dailyCompletionPercent}%</span>
-                    </div>
-                  </div>
-                )}
-
-                {habitsLoading ? (
-                  <div className="space-y-3">
-                    {[1, 2, 3].map((i) => (
-                      <div key={i} className="bg-white rounded-2xl border-2 border-[#161514] p-4 h-16 animate-pulse shadow-[3px_3px_0px_0px_#161514]" />
-                    ))}
-                  </div>
-                ) : habits.length === 0 ? (
-                  <EmptyState
-                    title="Ready to build a new habit?"
-                    description="Habits help you build daily routines and streaks. Pick a suggestion below or click 'Create a Habit'!"
-                    Icon={Target}
-                    ctaText="Create a Habit"
-                    onCtaClick={() => setIsChoiceOpen(true)}
+              {/* Daily Momentum Progress Pill */}
+              <div className="flex items-center gap-2 px-2.5 py-1 bg-[#FAF8F5] border-2 border-[#161514] rounded-xl text-[10px] font-black text-[#161514]">
+                <span className="text-[9px] uppercase tracking-wider text-[#161514]/70">Today</span>
+                <div className="w-16 h-2 bg-zinc-200 rounded-full border border-[#161514] overflow-hidden">
+                  <div
+                    className="h-full bg-[#03D26F] transition-all duration-300"
+                    style={{ width: `${dailyCompletionPercent}%` }}
                   />
-                ) : displayedHabits.length === 0 ? (
-                  <div className="bg-white rounded-2xl border-2 border-[#161514] p-8 text-center space-y-2 shadow-[3px_3px_0px_0px_#161514]">
-                    <div className="text-2xl">🎯</div>
-                    <h4 className="text-sm font-black text-[#161514]">
-                      {habitStatusFilter === "pending"
-                        ? "No habits left due today! You're all caught up."
-                        : habitStatusFilter === "completed"
-                        ? "No habits completed yet today. Let's tackle one!"
-                        : "No habits found."}
-                    </h4>
-                    {habitStatusFilter !== "all" && (
-                      <button
-                        type="button"
-                        onClick={() => setHabitStatusFilter("all")}
-                        className="text-[11px] font-black uppercase text-[#161514] underline cursor-pointer"
-                      >
-                        Show all habits
-                      </button>
-                    )}
-                  </div>
-                ) : (
-                  <div className={cn("space-y-3", habitLayoutStyle === "compact" && "space-y-2")}>
-                    {displayedHabits.map((habit) => {
-                      const isDone = isCompletedToday(habit.id);
-                      const isRest = isHabitRestDay(habit);
-                      const habitStreak = streaks[habit.id];
-
-                      if (habitLayoutStyle === "compact") {
-                        return (
-                          <div
-                            key={habit.id}
-                            className={cn(
-                              "bg-white rounded-2xl p-3 border-2 border-[#161514] flex items-center justify-between transition-all cursor-pointer shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5",
-                              isDone && "bg-emerald-50/70 opacity-90",
-                              isRest && "bg-zinc-50 border-dashed opacity-80"
-                            )}
-                            onClick={() => router.push(`/goals/${habit.id}`)}
-                          >
-                            <div className="flex items-center gap-3">
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleToggleLog(habit.id, !isDone);
-                                }}
-                                className={cn(
-                                  "h-8 w-8 rounded-xl border-2 border-[#161514] flex items-center justify-center font-black text-sm transition-all cursor-pointer shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
-                                  isDone ? "bg-[#03D26F] text-[#161514]" : "bg-white hover:bg-amber-100"
-                                )}
-                              >
-                                {isDone ? "✓" : ""}
-                              </button>
-                              <div>
-                                <div className="flex items-center gap-1.5">
-                                  <h4 className={cn("font-black text-xs text-[#161514]", isDone && "line-through text-[#161514]/50")}>
-                                    {habit.title}
-                                  </h4>
-                                  {isRest && (
-                                    <span className="text-[8px] font-black uppercase px-1.5 py-0.2 rounded border border-[#161514] bg-zinc-200 text-zinc-700">
-                                      💤 Rest
-                                    </span>
-                                  )}
-                                </div>
-                                {habitStreak?.currentStreak ? (
-                                  <span className="text-[9px] font-black text-amber-700 flex items-center gap-0.5 mt-0.5">
-                                    🔥 {habitStreak.currentStreak} day streak
-                                  </span>
-                                ) : null}
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                              {habit.reminderTime && (
-                                <span className="text-[9px] font-black px-1.5 py-0.5 rounded-lg border border-[#161514] bg-white text-[#161514]">
-                                  ⏰ {habit.reminderTime}
-                                </span>
-                              )}
-                              <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-lg border-2 border-[#161514] bg-amber-300 text-[#161514] shadow-[1px_1px_0px_0px_#161514]">
-                                {habit.frequency?.type || "DAILY"}
-                              </span>
-                            </div>
-                          </div>
-                        );
-                      }
-
-                      return (
-                        <HabitCard
-                          key={habit.id}
-                          habit={habit}
-                          streak={habitStreak}
-                          isCompletedToday={isDone}
-                          isRestDay={isRest}
-                          onToggle={() => handleToggleLog(habit.id, !isDone)}
-                          onEdit={() => {
-                            setEditingHabit(habit);
-                            setEditHabitTitle(habit.title);
-                            setEditHabitDesc(habit.reminderTime || "");
-                          }}
-                          onDelete={() => setDeleteHabitId(habit.id)}
-                          onClick={() => router.push(`/goals/${habit.id}`)}
-                        />
-                      );
-                    })}
-                  </div>
-                )}
-
-                {/* Suggestions Carousel */}
-                <div className="space-y-2 pt-2">
-                  <h4 className="text-[10px] font-black uppercase tracking-widest text-[#161514]/70" style={{ fontFamily: "var(--font-heading)" }}>Suggested Routines</h4>
-                  <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none select-none -mx-4 px-4 md:-mx-0 md:px-0">
-                    {SUGGESTED_HABITS.map((suggested) => (
-                      <div
-                        key={suggested.title}
-                        className="flex-shrink-0 w-[200px] bg-white rounded-2xl p-3 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex items-center justify-between gap-2 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all"
-                      >
-                        <div className="min-w-0">
-                          <span className="text-[10px] font-black text-[#161514] block truncate">{suggested.title}</span>
-                          <span className="text-[8px] text-[#161514]/70 font-bold block truncate">{suggested.desc}</span>
-                        </div>
-                        <button
-                          onClick={() => handleAddSuggested(suggested)}
-                          className="bg-amber-400 hover:bg-amber-500 text-[#161514] p-1.5 rounded-xl border-2 border-[#161514] cursor-pointer transition-all shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none outline-none flex-shrink-0"
-                        >
-                          <Plus className="h-3 w-3 stroke-[3]" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
                 </div>
-              </div>
-
-              {/* Right Column (1 col on lg): Hydration & Health Stats */}
-              <div className="space-y-4">
-                {/* Neobrutalist Living Hydro-Tumbler */}
-                <WaterTracker
-                  amount={waterLogged}
-                  targetAmount={(waterLog as any)?.waterGoal || 2000}
-                  onLogWater={logWater}
-                  onSetWater={async (amt, target) => {
-                    await setWaterMutation.mutateAsync({
-                      date: selectedDate,
-                      amount: amt,
-                      ...(target ? { waterGoal: target } : {}),
-                    });
-                  }}
-                />
-
-                {/* Health & Weight Profile Card */}
-                <div className="bg-white rounded-2xl p-5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-3">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-[#161514] flex items-center gap-1.5" style={{ fontFamily: "var(--font-heading)" }}>
-                      <Activity className="size-3.5 text-emerald-600" />
-                      <span>Body & Health Stats</span>
-                    </h4>
-                    <button
-                      type="button"
-                      onClick={updateProfileStat}
-                      className="px-2.5 py-1 rounded-xl bg-[#CEF431] hover:bg-[#bce023] text-[#161514] border-2 border-[#161514] font-black text-[10px] transition-all cursor-pointer shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none flex items-center gap-1"
-                    >
-                      <Edit3 className="size-3" />
-                      <span>Edit Stats</span>
-                    </button>
-                  </div>
-                  
-                  <div className="grid grid-cols-3 gap-2 pt-1">
-                    <div className="bg-[#FAF8F5] p-2 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-center">
-                      <span className="text-[8px] font-black uppercase text-[#161514]/60 block">Weight</span>
-                      <span className="text-xs font-black text-[#161514] block mt-0.5">{userProfile.weight || "68 kg"}</span>
-                    </div>
-                    <div className="bg-[#FAF8F5] p-2 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-center">
-                      <span className="text-[8px] font-black uppercase text-[#161514]/60 block">Age</span>
-                      <span className="text-xs font-black text-[#161514] block mt-0.5">{userProfile.age || "24 Yrs"}</span>
-                    </div>
-                    <div className="bg-[#FAF8F5] p-2 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-center">
-                      <span className="text-[8px] font-black uppercase text-[#161514]/60 block">Gender</span>
-                      <span className="text-xs font-black text-[#161514] block mt-0.5">{userProfile.gender || "Female"}</span>
-                    </div>
-                  </div>
-                </div>
+                <span className="text-[10px] font-black text-[#161514]">{dailyCompletionPercent}%</span>
               </div>
             </div>
+          )}
 
-            {/* Sleep, Energy & Mood Journal Section */}
-            <div id="mood-section" className="space-y-4 pt-2">
-              <h3 className="text-xs font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5" style={{ fontFamily: "var(--font-heading)" }}>
-                <Moon className="size-3.5 text-indigo-600" />
-                <span>Sleep, Energy & Mood Journal</span>
-              </h3>
-              <SleepAndActiveWidgets />
-              <MoodJournalWidget dateStr={selectedDate} />
+          {habitsLoading ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white rounded-2xl border-2 border-[#161514] p-4 h-16 animate-pulse shadow-[3px_3px_0px_0px_#161514]" />
+              ))}
             </div>
-          </TabsContent>
+          ) : habits.length === 0 ? (
+            <EmptyState
+              title="Ready to build a new habit?"
+              description="Habits help you build daily routines and streaks. Pick a suggestion below or click 'Create a Habit'!"
+              Icon={Target}
+              ctaText="Create a Habit"
+              onCtaClick={() => setIsChoiceOpen(true)}
+            />
+          ) : displayedHabits.length === 0 ? (
+            <div className="bg-white rounded-2xl border-2 border-[#161514] p-8 text-center space-y-2 shadow-[3px_3px_0px_0px_#161514]">
+              <div className="text-2xl">🎯</div>
+              <h4 className="text-sm font-black text-[#161514]">
+                {habitStatusFilter === "pending"
+                  ? "No habits left due today! You're all caught up."
+                  : habitStatusFilter === "completed"
+                  ? "No habits completed yet today. Let's tackle one!"
+                  : "No habits found."}
+              </h4>
+              {habitStatusFilter !== "all" && (
+                <button
+                  type="button"
+                  onClick={() => setHabitStatusFilter("all")}
+                  className="text-[11px] font-black uppercase text-[#161514] underline cursor-pointer"
+                >
+                  Show all habits
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className={cn("space-y-3", habitLayoutStyle === "compact" && "space-y-2")}>
+              {displayedHabits.map((habit) => {
+                const isDone = isCompletedToday(habit.id);
+                const isRest = isHabitRestDay(habit);
+                const habitStreak = streaks[habit.id];
 
-          {/* Tab 3: Calendar Heatmap */}
-          <TabsContent value="calendar">
-            <div className="bg-white rounded-2xl p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="font-black text-sm text-[#161514] uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
-                  {format(today, "MMMM yyyy")} Heatmap
-                </h3>
-              </div>
-
-              {/* Day headers */}
-              <div className="grid grid-cols-7 gap-2 text-center text-[10px] font-black text-[#161514]/70 uppercase tracking-wider">
-                <span>Sun</span>
-                <span>Mon</span>
-                <span>Tue</span>
-                <span>Wed</span>
-                <span>Thu</span>
-                <span>Fri</span>
-                <span>Sat</span>
-              </div>
-
-              {/* Grid items */}
-              <div className="grid grid-cols-7 gap-2">
-                {Array.from({ length: startDayOfWeek }).map((_, i) => (
-                  <div key={`empty-${i}`} className="aspect-square" />
-                ))}
-
-                {daysInMonth.map((day) => {
-                  const dayStr = format(day, "yyyy-MM-dd");
-                  const completion = getCompletionPercentage(dayStr);
-                  const isCurrent = isSameDay(day, today);
-
-                  let bgClass = "bg-[#FAF8F5] text-[#161514]/40";
-                  if (completion === 100) bgClass = "bg-[#03D26F] text-[#161514] font-black shadow-[2px_2px_0px_0px_#161514]";
-                  else if (completion >= 50) bgClass = "bg-[#CEF431] text-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_#161514]";
-                  else if (completion >= 20) bgClass = "bg-[#CEF431]/40 text-[#161514] shadow-[1px_1px_0px_0px_#161514]";
-
+                if (habitLayoutStyle === "compact") {
                   return (
                     <div
-                      key={dayStr}
+                      key={habit.id}
                       className={cn(
-                        "aspect-square rounded-xl border-2 border-[#161514] flex items-center justify-center text-xs font-black transition-all relative select-none hover:-translate-x-0.5 hover:-translate-y-0.5 cursor-pointer",
-                        bgClass,
-                        isCurrent && "ring-2 ring-[#161514] ring-offset-2"
+                        "bg-white rounded-2xl p-3 border-2 border-[#161514] flex items-center justify-between transition-all cursor-pointer shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5",
+                        isDone && "bg-emerald-50/70 opacity-90",
+                        isRest && "bg-zinc-50 border-dashed opacity-80"
                       )}
-                      title={`${format(day, "MMM d")}: ${completion}% complete`}
+                      onClick={() => router.push(`/goals/${habit.id}`)}
                     >
-                      {format(day, "d")}
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleToggleLog(habit.id, !isDone);
+                          }}
+                          className={cn(
+                            "h-8 w-8 rounded-xl border-2 border-[#161514] flex items-center justify-center font-black text-sm transition-all cursor-pointer shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
+                            isDone ? "bg-[#03D26F] text-[#161514]" : "bg-white hover:bg-amber-100"
+                          )}
+                        >
+                          {isDone ? "✓" : ""}
+                        </button>
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <h4 className={cn("font-black text-xs text-[#161514]", isDone && "line-through text-[#161514]/50")}>
+                              {habit.title}
+                            </h4>
+                            {isRest && (
+                              <span className="text-[8px] font-black uppercase px-1.5 py-0.2 rounded border border-[#161514] bg-zinc-200 text-zinc-700">
+                                💤 Rest
+                              </span>
+                            )}
+                          </div>
+                          {habitStreak?.currentStreak ? (
+                            <span className="text-[9px] font-black text-amber-700 flex items-center gap-0.5 mt-0.5">
+                              🔥 {habitStreak.currentStreak} day streak
+                            </span>
+                          ) : null}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        {habit.reminderTime && (
+                          <span className="text-[9px] font-black px-1.5 py-0.5 rounded-lg border border-[#161514] bg-white text-[#161514]">
+                            ⏰ {habit.reminderTime}
+                          </span>
+                        )}
+                        <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-lg border-2 border-[#161514] bg-amber-300 text-[#161514] shadow-[1px_1px_0px_0px_#161514]">
+                          {habit.frequency?.type || "DAILY"}
+                        </span>
+                      </div>
                     </div>
                   );
-                })}
-              </div>
+                }
 
-              <div className="flex items-center gap-4 pt-4 border-t-2 border-[#161514]/10 text-[10px] font-black text-[#161514]/80 flex-wrap">
-                <span className="flex items-center gap-1.5">
-                  <span className="h-3.5 w-3.5 rounded-md bg-[#FAF8F5] border-2 border-[#161514]" /> Not Completed
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="h-3.5 w-3.5 rounded-md bg-[#CEF431]/40 border-2 border-[#161514]" /> Some Habits Done
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="h-3.5 w-3.5 rounded-md bg-[#CEF431] border-2 border-[#161514]" /> Most Habits Done
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="h-3.5 w-3.5 rounded-md bg-[#03D26F] border-2 border-[#161514]" /> Fully Completed
-                </span>
+                return (
+                  <HabitCard
+                    key={habit.id}
+                    habit={habit}
+                    streak={habitStreak}
+                    isCompletedToday={isDone}
+                    isRestDay={isRest}
+                    onToggle={() => handleToggleLog(habit.id, !isDone)}
+                    onEdit={() => {
+                      setEditingHabit(habit);
+                      setEditHabitTitle(habit.title);
+                      setEditHabitDesc(habit.reminderTime || "");
+                    }}
+                    onDelete={() => setDeleteHabitId(habit.id)}
+                    onClick={() => router.push(`/goals/${habit.id}`)}
+                  />
+                );
+              })}
+            </div>
+          )}
+
+          {/* Suggestions Carousel */}
+          <div className="space-y-2 pt-2">
+            <h4 className="text-[10px] font-black uppercase tracking-widest text-[#161514]/70" style={{ fontFamily: "var(--font-heading)" }}>Suggested Routines</h4>
+            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none select-none -mx-4 px-4 md:-mx-0 md:px-0">
+              {SUGGESTED_HABITS.map((suggested) => (
+                <div
+                  key={suggested.title}
+                  className="flex-shrink-0 w-[200px] bg-white rounded-2xl p-3 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex items-center justify-between gap-2 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all"
+                >
+                  <div className="min-w-0">
+                    <span className="text-[10px] font-black text-[#161514] block truncate">{suggested.title}</span>
+                    <span className="text-[8px] text-[#161514]/70 font-bold block truncate">{suggested.desc}</span>
+                  </div>
+                  <button
+                    onClick={() => handleAddSuggested(suggested)}
+                    className="bg-amber-400 hover:bg-amber-500 text-[#161514] p-1.5 rounded-xl border-2 border-[#161514] cursor-pointer transition-all shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none outline-none flex-shrink-0"
+                  >
+                    <Plus className="h-3 w-3 stroke-[3]" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column (1 col on lg): Hydration & Health Stats */}
+        <div className="space-y-4">
+          {/* Neobrutalist Living Hydro-Tumbler */}
+          <WaterTracker
+            amount={waterLogged}
+            targetAmount={(waterLog as any)?.waterGoal || 2000}
+            onLogWater={logWater}
+            onSetWater={async (amt, target) => {
+              await setWaterMutation.mutateAsync({
+                date: selectedDate,
+                amount: amt,
+                ...(target ? { waterGoal: target } : {}),
+              });
+            }}
+          />
+
+          {/* Health & Weight Profile Card */}
+          <div className="bg-white rounded-2xl p-5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-3">
+            <div className="flex items-center justify-between">
+              <h4 className="text-[10px] font-black uppercase tracking-widest text-[#161514] flex items-center gap-1.5" style={{ fontFamily: "var(--font-heading)" }}>
+                <Activity className="size-3.5 text-emerald-600" />
+                <span>Body & Health Stats</span>
+              </h4>
+              <button
+                type="button"
+                onClick={updateProfileStat}
+                className="px-2.5 py-1 rounded-xl bg-[#CEF431] hover:bg-[#bce023] text-[#161514] border-2 border-[#161514] font-black text-[10px] transition-all cursor-pointer shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none flex items-center gap-1"
+              >
+                <Edit3 className="size-3" />
+                <span>Edit Stats</span>
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-3 gap-2 pt-1">
+              <div className="bg-[#FAF8F5] p-2 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-center">
+                <span className="text-[8px] font-black uppercase text-[#161514]/60 block">Weight</span>
+                <span className="text-xs font-black text-[#161514] block mt-0.5">{userProfile.weight || "68 kg"}</span>
+              </div>
+              <div className="bg-[#FAF8F5] p-2 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-center">
+                <span className="text-[8px] font-black uppercase text-[#161514]/60 block">Age</span>
+                <span className="text-xs font-black text-[#161514] block mt-0.5">{userProfile.age || "24 Yrs"}</span>
+              </div>
+              <div className="bg-[#FAF8F5] p-2 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-center">
+                <span className="text-[8px] font-black uppercase text-[#161514]/60 block">Gender</span>
+                <span className="text-xs font-black text-[#161514] block mt-0.5">{userProfile.gender || "Female"}</span>
               </div>
             </div>
-          </TabsContent>
+          </div>
+        </div>
+      </div>
 
-          {/* Tab 4: Analytics */}
-          <TabsContent value="analytics">
-            <div className="space-y-6">
-              {/* Leaderboard Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-white rounded-2xl p-5 border-[2.5px] border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex items-center gap-4">
-                  <div className="h-11 w-11 rounded-xl bg-amber-300 border-2 border-[#161514] flex items-center justify-center text-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] shrink-0">
-                    <Flame className="h-5 w-5 fill-rose-600 text-rose-600" />
-                  </div>
-                  <div>
-                    <h5 className="text-[10px] font-black text-[#161514]/70 uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>Active Streaks</h5>
-                    <p className="text-2xl font-black text-[#161514] mt-0.5" style={{ fontFamily: "var(--font-heading)" }}>{activeStreaksList.length}</p>
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-2xl p-5 border-[2.5px] border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex items-center gap-4">
-                  <div className="h-11 w-11 rounded-xl bg-[#CEF431] border-2 border-[#161514] flex items-center justify-center text-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] shrink-0">
-                    <Award className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h5 className="text-[10px] font-black text-[#161514]/70 uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>Best Streak</h5>
-                    <p className="text-2xl font-black text-[#161514] mt-0.5" style={{ fontFamily: "var(--font-heading)" }}>{longestStreakValue} days</p>
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-2xl p-5 border-[2.5px] border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex items-center gap-4">
-                  <div className="h-11 w-11 rounded-xl bg-[#03D26F] border-2 border-[#161514] flex items-center justify-center text-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] shrink-0">
-                    <BarChart2 className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h5 className="text-[10px] font-black text-[#161514]/70 uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>Completion Rate</h5>
-                    <p className="text-2xl font-black text-[#161514] mt-0.5" style={{ fontFamily: "var(--font-heading)" }}>{overallCompletionRate}%</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Completion Rate Chart */}
-              <div className="bg-white rounded-2xl p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
-                <h3 className="font-black text-sm text-[#161514] uppercase tracking-wider" style={{ fontFamily: "var(--font-heading)" }}>
-                  Completion Rate by Day of Week
-                </h3>
-                <div className="h-64 w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={barChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                      <XAxis dataKey="name" stroke="#161514" fontSize={11} fontWeight={800} tickLine={false} axisLine={false} />
-                      <YAxis stroke="#161514" fontSize={11} fontWeight={800} tickLine={false} axisLine={false} tickFormatter={(v) => `${v}%`} domain={[0, 100]} />
-                      <Tooltip formatter={(v) => [`${v}%`, "Completion Rate"]} contentStyle={{ borderRadius: "12px", border: "2px solid #161514", boxShadow: "3px 3px 0px 0px #161514", fontFamily: "var(--font-heading)", fontSize: "12px", fontWeight: 800 }} />
-                      <Bar dataKey="rate" radius={[6, 6, 0, 0]}>
-                        {barChartData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.rate >= 75 ? "#03D26F" : entry.rate >= 50 ? "#CEF431" : "#FBCFE8"} stroke="#161514" strokeWidth={1.5} />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
+      {/* 7. Sleep, Energy & Mood Journal Section */}
+      <div id="mood-section" className="space-y-4 pt-2">
+        <h3 className="text-xs font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5" style={{ fontFamily: "var(--font-heading)" }}>
+          <Moon className="size-3.5 text-indigo-600" />
+          <span>Sleep, Energy & Mood Journal</span>
+        </h3>
+        <SleepAndActiveWidgets />
+        <MoodJournalWidget dateStr={selectedDate} />
       </div>
 
       {/* Add Habit Template Choice Modal */}
