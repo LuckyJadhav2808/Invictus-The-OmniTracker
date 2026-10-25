@@ -8,6 +8,13 @@ import { TemplateSelectionModal, TemplatePack } from "@/components/shared/Templa
 import { GYM_TEMPLATE_PACKS } from "@/lib/templates-data";
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
 import { ExerciseGuideModal } from "@/components/goals/ExerciseGuideModal";
+import { HumanMuscleAnatomy } from "@/components/goals/anatomy/HumanMuscleAnatomy";
+import {
+  MuscleGroup,
+  resolveExerciseAnatomy,
+  mapMuscleGroupToBodyPart,
+  mapBodyPartToMuscleGroup,
+} from "@/components/goals/anatomy/muscle-mapping";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -103,6 +110,8 @@ export function GymRoutineTracker() {
   const [isChoiceOpen, setIsChoiceOpen] = useState(false);
   const [selectedGuideExercise, setSelectedGuideExercise] = useState<any | null>(null);
   const [collapsedExercises, setCollapsedExercises] = useState<Record<string, boolean>>({});
+  const [showBodyMapFilter, setShowBodyMapFilter] = useState(false);
+  const [isSplitAnatomyOpen, setIsSplitAnatomyOpen] = useState(false);
 
   const toggleCollapse = (exId: string) => {
     setCollapsedExercises((prev) => ({
@@ -541,6 +550,31 @@ export function GymRoutineTracker() {
   };
 
   const currentExercises = currentRoutine?.exercises || [];
+
+  const splitAnatomy = useMemo(() => {
+    const primaryMuscles: MuscleGroup[] = [];
+    const secondaryMuscles: MuscleGroup[] = [];
+
+    (currentExercises || []).forEach((ex: any) => {
+      const res = resolveExerciseAnatomy({
+        title: ex.name,
+        targetMuscle: ex.targetMuscle,
+        primaryMuscles: ex.primaryMuscles,
+        secondaryMuscles: ex.secondaryMuscles,
+      });
+      res.primary.forEach((m) => {
+        if (!primaryMuscles.includes(m)) primaryMuscles.push(m);
+      });
+      res.secondary.forEach((m) => {
+        if (!secondaryMuscles.includes(m) && !primaryMuscles.includes(m)) {
+          secondaryMuscles.push(m);
+        }
+      });
+    });
+
+    return { primary: primaryMuscles, secondary: secondaryMuscles };
+  }, [currentExercises]);
+
   const totalCompletedSets = currentExercises.reduce(
     (sum: number, ex: any) => sum + (ex.sets?.filter((s: any) => s.completed).length || 0),
     0
@@ -686,6 +720,21 @@ export function GymRoutineTracker() {
         </div>
 
         <div className="flex items-center gap-2 shrink-0 self-start sm:self-center">
+          {currentExercises.length > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                setIsSplitAnatomyOpen(true);
+                soundFX.playPop();
+              }}
+              className="bg-rose-100 hover:bg-rose-200 text-[#161514] font-heading font-black rounded-xl py-1.5 px-2.5 sm:px-3 text-xs border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] cursor-pointer transition-all flex items-center gap-1 active:translate-y-0.5"
+              title="Inspect anatomical muscle activation for today's routine"
+            >
+              <Flame className="size-3.5 fill-rose-500 text-rose-600" />
+              <span>Muscle Map</span>
+            </button>
+          )}
+
           {currentExercises.length > 1 && (
             <button
               type="button"
@@ -1125,6 +1174,62 @@ export function GymRoutineTracker() {
                 )}
               </div>
 
+              {/* Muscle Group Quick Filters + Interactive Body Map Toggle */}
+              <div className="flex items-center justify-between gap-2 pt-0.5">
+                <span className="text-[10px] font-heading font-black uppercase text-[#161514]/70">
+                  Filter By Muscle Group
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowBodyMapFilter(!showBodyMapFilter);
+                    soundFX.playPop();
+                  }}
+                  className={cn(
+                    "text-[10px] font-heading font-black px-2.5 py-1 rounded-xl border-2 border-[#161514] transition-all cursor-pointer flex items-center gap-1 active:translate-y-0.5",
+                    showBodyMapFilter
+                      ? "bg-[#161514] text-[#CEF431] shadow-[1px_1px_0px_0px_#161514]"
+                      : "bg-amber-100 hover:bg-amber-200 text-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]"
+                  )}
+                >
+                  <span>{showBodyMapFilter ? "Hide Visual Map" : "Visual Muscle Map 🗺️"}</span>
+                </button>
+              </div>
+
+              {/* Interactive Visual Anatomy Body Map Filter */}
+              {showBodyMapFilter && (
+                <div className="bg-[#FAF8F5] p-3 rounded-2xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] animate-in fade-in zoom-in-95 duration-150">
+                  <div className="text-center mb-2 min-h-[38px] flex flex-col items-center justify-center">
+                    <p className="text-[10px] font-heading font-black uppercase text-[#161514]/70">
+                      Tap any muscle on the model to filter 4,300+ exercises
+                    </p>
+                    {libBodyPart !== "all" ? (
+                      <span className="inline-block mt-0.5 text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-[#CEF431] text-[#161514] border border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
+                        Filtered by: {libBodyPart}
+                      </span>
+                    ) : (
+                      <span className="inline-block mt-0.5 text-[9.5px] font-bold text-[#161514]/40">
+                        Viewing all muscle groups
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex justify-center">
+                    <HumanMuscleAnatomy
+                      size="sm"
+                      interactive={true}
+                      selectedMuscle={mapBodyPartToMuscleGroup(libBodyPart)}
+                      onMuscleClick={(muscle) => {
+                        const mappedPart = mapMuscleGroupToBodyPart(muscle);
+                        setLibBodyPart(mappedPart);
+                        toast.info(`Filtered exercises for ${mappedPart}`);
+                      }}
+                      showViewToggle={true}
+                      showLegend={false}
+                    />
+                  </div>
+                </div>
+              )}
+
               {/* Muscle Group Quick Filters */}
               <div className="flex flex-wrap gap-1.5 pt-0.5">
                 {["all", "Chest", "Back", "Shoulders", "Biceps", "Triceps", "Quadriceps", "Hamstrings", "Glutes", "Calves", "Abdominals", "Cardio"].map((m) => (
@@ -1419,6 +1524,50 @@ export function GymRoutineTracker() {
         }}
         exercise={selectedGuideExercise}
       />
+
+      {/* Daily Workout Split Cumulative Muscle Heatmap Modal */}
+      <AdaptiveDrawerDialog
+        open={isSplitAnatomyOpen}
+        onOpenChange={setIsSplitAnatomyOpen}
+        title={`${selectedDay} Split Anatomy`}
+        description="Muscular activation and volume distribution across today's workout"
+      >
+        <div className="space-y-4 pt-1 pb-3 text-center">
+          <div className="flex justify-center">
+            <HumanMuscleAnatomy
+              highlightedMuscles={splitAnatomy}
+              size="md"
+              interactive={true}
+              showViewToggle={true}
+              showLegend={true}
+            />
+          </div>
+
+          <div className="bg-[#FAF8F5] p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-left text-xs space-y-1.5">
+            <span className="font-heading font-black uppercase text-[#161514] block">
+              Active Focus Areas ({splitAnatomy.primary.length} Muscle Groups)
+            </span>
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {splitAnatomy.primary.map((m) => (
+                <span
+                  key={m}
+                  className="px-2 py-0.5 rounded-md bg-rose-100 text-rose-900 border border-[#161514] text-[10px] font-black uppercase shadow-[1px_1px_0px_0px_#161514]"
+                >
+                  🔥 {m}
+                </span>
+              ))}
+              {splitAnatomy.secondary.map((m) => (
+                <span
+                  key={m}
+                  className="px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 border border-[#161514] text-[10px] font-black uppercase shadow-[1px_1px_0px_0px_#161514]"
+                >
+                  ⚡ {m}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </AdaptiveDrawerDialog>
 
       {/* Hevy-Style Persistent Floating Rest Countdown Timer Dock */}
       {restSecondsLeft !== null && (

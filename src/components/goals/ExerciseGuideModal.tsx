@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
-import { Dumbbell, Target, Layers, Sparkles, CheckCircle2, Play, Pause, Info, Loader2 } from "lucide-react";
+import { Dumbbell, Target, Layers, Sparkles, CheckCircle2, Play, Pause, Info, Loader2, Flame } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { HumanMuscleAnatomy } from "@/components/goals/anatomy/HumanMuscleAnatomy";
+import { resolveExerciseAnatomy } from "@/components/goals/anatomy/muscle-mapping";
 
 interface ExerciseGuideModalProps {
   open: boolean;
@@ -17,6 +19,7 @@ interface ExerciseGuideModalProps {
     equipment?: string;
     machineName?: string;
     instructions?: string[];
+    primaryMuscles?: string[];
     secondaryMuscles?: string[];
     images?: string[];
     gifUrl?: string;
@@ -130,6 +133,14 @@ export function ExerciseGuideModal({
     `Drive through the concentric phase with explosive, controlled power while exhaling.`,
   ];
   const secondaryMuscles = details?.secondaryMuscles?.length ? details.secondaryMuscles : exercise.secondaryMuscles || [];
+
+  const anatomy = resolveExerciseAnatomy({
+    title,
+    bodyPart: details?.bodyPart || exercise?.bodyPart || targetMuscle,
+    targetMuscle,
+    primaryMuscles: details?.primaryMuscles || exercise?.primaryMuscles,
+    secondaryMuscles,
+  });
 
   return (
     <ResponsiveFormContainer
@@ -249,20 +260,42 @@ export function ExerciseGuideModal({
           </div>
         )}
 
-        {/* Target & Secondary Muscles Breakdown */}
-        <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)] space-y-2">
-          <div className="flex items-center gap-2 text-xs font-black uppercase text-[#161514]">
-            <Target className="h-4 w-4 text-rose-600 stroke-[2.5]" />
-            <span>Muscle Activation Map</span>
+        {/* Visual Human Muscle Anatomy & Target Activation Map */}
+        <div className="bg-[#FAF8F5] p-3.5 sm:p-4 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] space-y-3">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <div className="flex items-center gap-2 text-xs font-black uppercase text-[#161514]">
+              <Target className="h-4 w-4 text-rose-600 stroke-[2.5]" />
+              <span>Anatomical Muscle Activation</span>
+            </div>
+            <span className="text-[10px] font-heading font-black px-2 py-0.5 rounded-md bg-[#CEF431] text-[#161514] border border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
+              {anatomy.dominantName} Focus
+            </span>
           </div>
 
+          {/* Interactive Human Muscle Anatomy Figure */}
+          <div className="py-2 flex justify-center">
+            <HumanMuscleAnatomy
+              highlightedMuscles={{
+                primary: anatomy.primary,
+                secondary: anatomy.secondary,
+              }}
+              initialView={anatomy.defaultOrientation}
+              size="md"
+              interactive={true}
+              showViewToggle={true}
+              showLegend={true}
+            />
+          </div>
+
+          {/* Primary & Secondary Breakdown Cards */}
           <div className="grid grid-cols-2 gap-2 pt-1 text-xs">
             <div className="bg-white p-2.5 rounded-xl border border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)]">
               <span className="text-[10px] font-black uppercase text-gray-500 block mb-0.5">
-                Primary Target
+                Primary Driver
               </span>
-              <span className="font-black text-rose-600 capitalize">
-                🔥 {targetMuscle}
+              <span className="font-black text-rose-600 capitalize flex items-center gap-1">
+                <Flame className="size-3.5 fill-rose-500 text-rose-600 shrink-0" />
+                <span>{anatomy.dominantName}</span>
               </span>
             </div>
 
@@ -270,8 +303,12 @@ export function ExerciseGuideModal({
               <span className="text-[10px] font-black uppercase text-gray-500 block mb-0.5">
                 Secondary Assists
               </span>
-              <span className="font-bold text-[#161514] capitalize">
-                {secondaryMuscles.length > 0 ? secondaryMuscles.join(", ") : "Core Stabilizers"}
+              <span className="font-bold text-[#161514] capitalize truncate block">
+                {secondaryMuscles.length > 0
+                  ? secondaryMuscles.join(", ")
+                  : anatomy.secondary.length > 0
+                  ? anatomy.secondary.join(", ")
+                  : "Core Stabilizers"}
               </span>
             </div>
           </div>
