@@ -92,7 +92,7 @@ export function GymRoutineTracker() {
   const toggleCollapse = (exId: string) => {
     setCollapsedExercises((prev) => ({
       ...prev,
-      [exId]: !prev[exId],
+      [exId]: !(prev[exId] ?? true),
     }));
   };
 
@@ -137,6 +137,7 @@ export function GymRoutineTracker() {
         });
       }
       toast.success(`Exercise '${custom.name}' added to ${selectedDay}! 💪`);
+      setCollapsedExercises((prev) => ({ ...prev, [newExercise.id]: false }));
       setIsChoiceOpen(false);
     } catch {
       toast.error("Failed to add exercise");
@@ -296,7 +297,8 @@ export function GymRoutineTracker() {
         });
       }
       toast.success(`Added '${item.title}' to ${selectedDay}! 💪`);
-      setIsAddExerciseOpen(false);
+      setCollapsedExercises((prev) => ({ ...prev, [newExercise.id]: false }));
+      setIsChoiceOpen(false);
       setLibQuery("");
     } catch {
       toast.error("Failed to add exercise to routine");
@@ -605,14 +607,20 @@ export function GymRoutineTracker() {
   const totalSets = currentExercises.reduce((sum: number, ex: any) => sum + (ex.sets?.length || 0), 0);
 
   const isAllCollapsed = useMemo(() => {
-    if (currentExercises.length === 0) return false;
-    return currentExercises.every((ex: any) => collapsedExercises[ex.id]);
+    if (currentExercises.length === 0) return true;
+    return currentExercises.every((ex: any) => (collapsedExercises[ex.id] ?? true));
   }, [currentExercises, collapsedExercises]);
 
   const toggleAllCollapse = () => {
     if (isAllCollapsed) {
-      setCollapsedExercises({});
+      // User tapped "Expand All": set each exercise to expanded (false)
+      const all: Record<string, boolean> = {};
+      currentExercises.forEach((ex: any) => {
+        all[ex.id] = false;
+      });
+      setCollapsedExercises(all);
     } else {
+      // User tapped "Collapse": set each exercise to collapsed (true)
       const all: Record<string, boolean> = {};
       currentExercises.forEach((ex: any) => {
         all[ex.id] = true;
@@ -935,7 +943,7 @@ export function GymRoutineTracker() {
             const isCompleted = (ex.sets || []).length > 0 && (ex.sets || []).every((s: any) => s.completed);
             const completedCount = (ex.sets || []).filter((s: any) => s.completed).length;
             const totalCount = ex.sets?.length || 0;
-            const isCollapsed = collapsedExercises[ex.id] ?? false;
+            const isCollapsed = collapsedExercises[ex.id] ?? true;
 
             if (isCollapsed) {
               return (
