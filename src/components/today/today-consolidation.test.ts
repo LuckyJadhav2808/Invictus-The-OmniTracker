@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { computeDailyConquestScore } from "./useTodayCockpitViewModel";
 import { parseScratchpad, parseThoughtLine } from "@/lib/utils/scratchpad-nlp";
 
-describe("Today Dashboard 4-Zone Consolidation & Execution Architecture", () => {
+describe("The Gladiator Coliseum: Today Dashboard Architecture", () => {
   it("computes unified gladiator telemetry accurately for MasterTodayHero", () => {
     const metrics = computeDailyConquestScore({
       completedHabitsCount: 4,

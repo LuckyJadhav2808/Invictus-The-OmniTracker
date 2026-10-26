@@ -30,15 +30,15 @@ import {
   isToday as checkIsToday,
 } from "date-fns";
 
-// Modular Today Cockpit Architecture (4-Zone Clean Cockpit)
+// Modular Today Cockpit Architecture (Candidate Coliseum)
 import { MasterTodayHero } from "@/components/today/MasterTodayHero";
 import { HabitMomentumCard } from "@/components/today/HabitMomentumCard";
 import { StudySprintWidget } from "@/components/today/StudySprintWidget";
 import { SafeToSpendGauge } from "@/components/today/SafeToSpendGauge";
-import { ExecutionCaptureCard } from "@/components/today/ExecutionCaptureCard";
+import { TaskBattleQueue } from "@/components/today/TaskBattleQueue";
+import { RetroStickyScratchpad } from "@/components/today/RetroStickyScratchpad";
 import { GladiatorCloseoutCard } from "@/components/today/GladiatorCloseoutCard";
 import { StickyIslandMiniCockpit } from "@/components/today/StickyIslandMiniCockpit";
-import { TodayCockpitFooter } from "@/components/today/TodayCockpitFooter";
 import { ConfettiCelebration } from "@/components/common/ConfettiCelebration";
 import { useTodayCockpitViewModel, computeDailyConquestScore } from "@/components/today/useTodayCockpitViewModel";
 
@@ -464,7 +464,7 @@ export default function TodayPage() {
   }, []);
 
   return (
-    <div className="space-y-6 py-4 px-3 sm:px-6 max-w-5xl mx-auto relative">
+    <div className="space-y-6 py-4 px-3 sm:px-6 max-w-5xl mx-auto relative pb-12">
       {/* 0. Sticky Island Mini-Cockpit on Scroll (Apple Dynamic Island & Spotify Benchmark) */}
       <StickyIslandMiniCockpit
         metrics={conquestMetrics}
@@ -483,8 +483,9 @@ export default function TodayPage() {
       {/* Milestone Confetti Celebration */}
       <ConfettiCelebration active={showConfetti} onComplete={() => setShowConfetti(false)} />
 
-      {/* ZONE 1: Gladiator Command Deck (Unified Master Hero) */}
+      {/* ZONE 1: TRUE GLADIATOR HERO SECTION (MasterTodayHero) */}
       <MasterTodayHero
+        userName={user?.displayName}
         currentDateObj={currentDateObj}
         selectedDate={selectedDate}
         isToday={isCurrentDayToday}
@@ -510,7 +511,7 @@ export default function TodayPage() {
         onOpenExpenseModal={() => setIsQuickExpenseOpen(true)}
       />
 
-      {/* ZONE 2: Daily Core Hub (Bento Row 1 - Habits & Study Focus) */}
+      {/* ZONE 2: DAILY CORE HUB (Bento Row 1 - Habits & Study Focus) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Habit Momentum Card (7 Cols) */}
         <div id="habits-section" className="lg:col-span-7">
@@ -555,7 +556,7 @@ export default function TodayPage() {
         </div>
       </div>
 
-      {/* ZONE 3: Operations & Execution Hub (Bento Row 2 - Balanced 6:6 Ratio) */}
+      {/* ZONE 3: OPERATIONS HUB (Bento Row 2 - Balanced 6:6 Ratio) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Safe-to-Spend Financial Gauge (6 Cols) */}
         <div id="money-section" className="lg:col-span-6">
@@ -574,9 +575,9 @@ export default function TodayPage() {
           />
         </div>
 
-        {/* Unified Execution & Quick Capture Hub (6 Cols) */}
+        {/* Priority Battle Queue (6 Cols) */}
         <div id="tasks-section" className="lg:col-span-6">
-          <ExecutionCaptureCard
+          <TaskBattleQueue
             tasks={tasks}
             selectedDate={selectedDate}
             onCompleteTask={(taskId, title) => {
@@ -586,44 +587,48 @@ export default function TodayPage() {
               });
               toast.success(`Conquered: ${title}`);
             }}
-            categories={categories}
-            onConvertToTask={(task) => {
-              createTaskMutation.mutate({
-                title: task.title,
-                priority: task.priority || "p2",
-                status: "todo",
-                date: task.date || selectedDate,
-                category: task.category || "Quick Thought",
-                subtasks: [],
-              } as any);
-            }}
-            onConvertToExpense={(expense) => {
-              handleAddExpense(
-                expense.amount,
-                expense.categoryId || "",
-                expense.note
-              );
-            }}
-            onBatchConvert={(batchTasks, batchExpenses) => {
-              batchTasks.forEach((t) => {
-                createTaskMutation.mutate({
-                  title: t.title,
-                  priority: t.priority || "p2",
-                  status: "todo",
-                  date: t.date || selectedDate,
-                  category: t.category || "Quick Thought",
-                  subtasks: [],
-                } as any);
-              });
-              batchExpenses.forEach((e) => {
-                handleAddExpense(e.amount, e.categoryId || "", e.note);
-              });
-            }}
           />
         </div>
       </div>
 
-      {/* ZONE 4: The Evening Closeout Ritual (Thermal Receipt + Integrated Mindset Pulse) */}
+      {/* ZONE 4: THE INDIVIDUAL DESK POST-IT NOTE (Student Analog Desk Pad) */}
+      <RetroStickyScratchpad
+        categories={categories}
+        onConvertToTask={(task) => {
+          createTaskMutation.mutate({
+            title: task.title,
+            priority: task.priority || "p2",
+            status: "todo",
+            date: task.date || selectedDate,
+            category: task.category || "Quick Thought",
+            subtasks: [],
+          } as any);
+        }}
+        onConvertToExpense={(expense) => {
+          handleAddExpense(
+            expense.amount,
+            expense.categoryId || "",
+            expense.note
+          );
+        }}
+        onBatchConvert={(batchTasks, batchExpenses) => {
+          batchTasks.forEach((t) => {
+            createTaskMutation.mutate({
+              title: t.title,
+              priority: t.priority || "p2",
+              status: "todo",
+              date: t.date || selectedDate,
+              category: t.category || "Quick Thought",
+              subtasks: [],
+            } as any);
+          });
+          batchExpenses.forEach((e) => {
+            handleAddExpense(e.amount, e.categoryId || "", e.note);
+          });
+        }}
+      />
+
+      {/* ZONE 5: NIGHT CLOSEOUT THERMAL RECEIPT SLIP */}
       <GladiatorCloseoutCard
         metrics={conquestMetrics}
         selectedDate={selectedDate}
@@ -639,8 +644,7 @@ export default function TodayPage() {
         isSavingMood={isSavingMood}
       />
 
-      {/* ZONE 5: Ambient Utility & Production Cockpit Footer */}
-      <TodayCockpitFooter onScrollToTop={scrollToTop} />
+      {/* Note: The global footer is rendered once at the application root layout level (layout.tsx) */}
 
       {/* Daily Spending Limit & Allowances Modal */}
       <AllowanceSettingsModal
