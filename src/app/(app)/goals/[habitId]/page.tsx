@@ -126,7 +126,7 @@ export default function HabitDetailPage({
 
   if (habitsLoading) {
     return (
-      <div className="min-h-screen bg-cream-bg flex items-center justify-center p-4">
+      <div className="py-20 flex items-center justify-center p-4">
         <div className="text-center space-y-3 animate-pulse">
           <div className="w-12 h-12 bg-amber-300 rounded-2xl mx-auto border-2 border-[#161514]" />
           <p className="text-xs font-black text-[#161514] uppercase tracking-wider">
@@ -139,7 +139,7 @@ export default function HabitDetailPage({
 
   if (!habit) {
     return (
-      <div className="min-h-screen bg-cream-bg flex items-center justify-center p-4">
+      <div className="py-20 flex items-center justify-center p-4">
         <div className="text-center space-y-4">
           <p className="text-[#161514] font-black text-sm">Habit not found</p>
           <Link href="/goals">
@@ -200,8 +200,8 @@ export default function HabitDetailPage({
   };
 
   return (
-    <div className="min-h-screen bg-cream-bg p-4 md:p-8 space-y-6 pb-24">
-      <div className="max-w-xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-300">
+      <div className="space-y-6">
         {/* Header navigation & actions */}
         <div className="flex items-center justify-between">
           <Link

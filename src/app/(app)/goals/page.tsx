@@ -29,7 +29,8 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { InvictusLoadingScreen } from "@/components/shared/InvictusLoadingScreen";
 import { AdaptiveDrawerDialog } from "@/components/shared/AdaptiveDrawerDialog";
 import { soundFX } from "@/components/shared/SoundFX";
-import { TemplateSelectionModal, TemplatePack } from "@/components/shared/TemplateSelectionModal";
+import { TemplatePack } from "@/components/shared/TemplateSelectionModal";
+import { HabitChoiceModal, AtomicHabitPreset } from "@/components/goals/HabitChoiceModal";
 import { HABIT_TEMPLATE_PACKS } from "@/lib/templates-data";
 import { HabitCompanionSprite } from "@/components/mascot/HabitCompanionSprite";
 import { VixPixelCompanion } from "@/components/mascot/VixPixelCompanion";
@@ -202,7 +203,7 @@ function GoalsPageContent() {
     pack.items.forEach((item) => {
       addHabitMutation.mutate({
         title: item.title,
-        icon: "🌱",
+        icon: "Target",
         color: "amber",
         frequency: { type: "daily", targetPerDay: 1 },
         allowGraceSkip: false,
@@ -210,6 +211,46 @@ function GoalsPageContent() {
         reminderTime: item.desc || "",
       });
     });
+    toast.success(`Applied '${pack.name}' protocol! 🚀`);
+    setIsChoiceOpen(false);
+  };
+
+  const handleSelectPreset = async (preset: AtomicHabitPreset) => {
+    try {
+      await addHabitMutation.mutateAsync({
+        title: preset.title,
+        icon: preset.icon,
+        color: preset.color,
+        frequency: { type: preset.frequencyType, targetPerDay: 1 },
+        reminderTime: preset.reminderTime || "",
+        allowGraceSkip: false,
+        isGoalStyle: !!preset.goalTarget,
+        goalTarget: preset.goalTarget,
+        goalUnit: preset.goalUnit,
+      });
+      toast.success(`Added '${preset.title}' to routines! ✨`);
+    } catch {
+      toast.error("Failed to add preset habit");
+    }
+  };
+
+  const handleAddCustomHabit = async (custom: any) => {
+    try {
+      await addHabitMutation.mutateAsync({
+        title: custom.title,
+        icon: custom.icon,
+        color: custom.color,
+        frequency: custom.frequency,
+        reminderTime: custom.reminderTime || "",
+        allowGraceSkip: custom.allowGraceSkip,
+        isGoalStyle: !!custom.goalTarget,
+        goalTarget: custom.goalTarget,
+        goalUnit: custom.goalUnit,
+      });
+      toast.success(`Created habit '${custom.title}'! 🎯`);
+    } catch {
+      toast.error("Failed to create habit");
+    }
   };
 
   const SUGGESTED_HABITS = [
@@ -360,9 +401,9 @@ function GoalsPageContent() {
           <Button
             onClick={() => {
               soundFX.playPop();
-              setIsAddOpen(true);
+              setIsChoiceOpen(true);
             }}
-            className="bg-[#CEF431] hover:bg-[#D8F74E] text-[#161514] font-heading font-black text-xs px-3.5 py-2.5 h-auto rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center gap-1.5 cursor-pointer"
+            className="bg-[#CEF431] hover:bg-[#D8F74E] text-[#161514] font-heading font-black text-xs px-3.5 py-2.5 h-auto rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center gap-1.5 cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
           >
             <Plus className="size-4 stroke-[3]" />
             <span>New Habit</span>
@@ -373,8 +414,11 @@ function GoalsPageContent() {
             gear="fitness"
             state={isAllDueCompleted || longestStreakValue >= 3 ? "fire" : "idle"}
             size={42}
-            onClick={() => setIsAddOpen(true)}
-            title={isAllDueCompleted ? "Vix: All daily habits conquered today! 🏆" : "Vix: Fitness Companion (Click for New Habit)"}
+            onClick={() => {
+              soundFX.playPop();
+              setIsChoiceOpen(true);
+            }}
+            title={isAllDueCompleted ? "Vix: All daily habits conquered today! 🏆" : "Vix: Fitness Companion (Click for Habit Vault)"}
           />
         </div>
       </div>
@@ -761,19 +805,14 @@ function GoalsPageContent() {
         <MoodJournalWidget dateStr={selectedDate} />
       </div>
 
-      {/* Add Habit Template Choice Modal */}
-      <TemplateSelectionModal
+      {/* Immersive Habit Choice Modal (Atomic Presets, Custom Architect, Protocol Packs) */}
+      <HabitChoiceModal
         open={isChoiceOpen}
         onOpenChange={setIsChoiceOpen}
-        title="ADD HABIT"
-        subtitle="START FROM SCRATCH OR APPLY A READY-MADE ROUTINE PACK."
-        blankLabel="BLANK HABIT"
-        blankDesc="CUSTOM NAME, COLOR, CATEGORY"
-        templatesLabel="TEMPLATE PACKS"
-        templatesDesc="MONK MODE, REDDIT ESSENTIALS, ATHLETIC..."
-        templatePacks={HABIT_TEMPLATE_PACKS}
-        onSelectBlank={() => setIsAddOpen(true)}
-        onApplyTemplatePack={handleApplyHabitPack}
+        onSelectPreset={handleSelectPreset}
+        onAddCustomHabit={handleAddCustomHabit}
+        onApplyPresetPack={handleApplyHabitPack}
+        isPending={addHabitMutation.isPending}
       />
 
       {/* Add Habit Adaptive Drawer Dialog */}
