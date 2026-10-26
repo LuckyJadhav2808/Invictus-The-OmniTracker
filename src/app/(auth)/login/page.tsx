@@ -84,13 +84,8 @@ function LoginForm() {
 
   const handleGuestLogin = () => {
     enterGuestMode("Guest Explorer");
-    toast.success("Entered offline sandbox mode.");
-    const onboarded = localStorage.getItem("invictus_onboarded") === "true";
-    if (onboarded) {
-      router.push("/today");
-    } else {
-      router.push("/onboarding");
-    }
+    toast.success("Entered Evaluator Sandbox Mode! 🧪✨");
+    router.push("/today");
   };
 
   return (

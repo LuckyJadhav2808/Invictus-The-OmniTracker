@@ -41,6 +41,7 @@
   ],
   "exclude": [
     "node_modules",
-    "src/components/lightswind"
+    "src/components/lightswind",
+    "Shared-Skills-Pack"
   ]
 }

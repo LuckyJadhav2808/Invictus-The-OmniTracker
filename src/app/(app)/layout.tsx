@@ -17,6 +17,7 @@ import { SafeModeScreen } from "@/components/shared/SafeModeScreen";
 import { migrationEngine } from "@/lib/offline/migration-engine";
 import { NativeBackHandler } from "@/components/shared/NativeBackHandler";
 import { DynamicIslandDock } from "@/components/shared/DynamicIslandDock";
+import { EvaluatorSandboxBanner } from "@/components/shared/EvaluatorSandboxBanner";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -98,6 +99,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         id="main-scroll-container"
         className="flex-1 pb-24 lg:pb-0 min-h-screen relative overflow-y-auto flex flex-col"
       >
+        {/* Evaluator Sandbox Banner (Active for Guests) */}
+        <EvaluatorSandboxBanner />
+
         {/* Proactive Auto-Update Notification Banner */}
         <AutoUpdateBanner />
 

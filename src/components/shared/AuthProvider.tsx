@@ -10,6 +10,7 @@ import {
   setCustomSession,
 } from "@/lib/custom-auth";
 import { registerServiceWorker } from "@/lib/utils/notifications";
+import { loadEvaluatorDemoData } from "@/lib/demo/demo-data-seed";
 
 interface AuthContextType {
   user: User | null;
@@ -74,6 +75,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const enterGuestMode = (name = "Guest Explorer") => {
     localStorage.setItem("invictus_guest_mode", "true");
     localStorage.setItem("invictus_guest_name", name);
+    localStorage.setItem("invictus_onboarded", "true");
+
+    // Auto-seed evaluator showcase if empty
+    const hasExistingData = localStorage.getItem("invictus_tasks_db") || localStorage.getItem("invictus_habits");
+    if (!hasExistingData) {
+      loadEvaluatorDemoData();
+    }
+
     const guestUser: User = {
       uid: "guest-user",
       email: "guest@invictus.local",

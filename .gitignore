@@ -24,6 +24,8 @@
 .DS_Store
 *.pem
 *.apk
+*.zip
+Shared-Skills-Pack/
 
 # debug
 npm-debug.log*

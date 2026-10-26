@@ -71,6 +71,7 @@ import { APP_VERSION_CONFIG } from "@/config/version";
 import { Capacitor } from "@capacitor/core";
 import { encryptVaultPayload, decryptVaultPayload } from "@/lib/vault/vault-crypto";
 import { soundFX } from "@/components/shared/SoundFX";
+import { loadEvaluatorDemoData, clearEvaluatorDemoData, isDemoDataActive } from "@/lib/demo/demo-data-seed";
 
 const TIMEZONES = [
   "Asia/Kolkata",
@@ -88,7 +89,7 @@ const TIMEZONES = [
 const CURRENCIES = ["INR", "USD", "EUR", "GBP", "JPY", "AUD", "CAD"];
 
 export default function SettingsPage() {
-  const { user, signOut, refreshUser } = useAuth();
+  const { user, signOut, refreshUser, isGuest } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -102,6 +103,14 @@ export default function SettingsPage() {
   } = useUIStore();
   const queryClient = useQueryClient();
   const achievements = useUserAchievements();
+
+  // Evaluator Demo Data State
+  const isGuestActive = isGuest || (typeof window !== "undefined" && localStorage.getItem("invictus_guest_mode") === "true");
+  const [isDemoActive, setIsDemoActive] = useState(false);
+
+  useEffect(() => {
+    setIsDemoActive(isDemoDataActive());
+  }, []);
 
   // Active Tab State
   const [activeTab, setActiveTab] = useState<"preferences" | "modules" | "security" | "datavault">("preferences");
@@ -117,6 +126,51 @@ export default function SettingsPage() {
 
   // Storage usage meter
   const [storageMetrics, setStorageMetrics] = useState({ kb: 0, percent: 0 });
+
+  const refreshStorageMetrics = () => {
+    let totalBytes = 0;
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key) {
+        totalBytes += (key.length + (localStorage.getItem(key)?.length || 0)) * 2;
+      }
+    }
+    const kb = Math.round(totalBytes / 1024);
+    const pct = Math.min(100, Math.round((kb / 5120) * 100));
+    setStorageMetrics({ kb, percent: pct });
+  };
+
+  const handleLoadDemoData = () => {
+    soundFX.playCompleteChime();
+    const success = loadEvaluatorDemoData();
+    if (success) {
+      setIsDemoActive(true);
+      refreshStorageMetrics();
+      queryClient.invalidateQueries();
+      showToast.success(
+        "Evaluator Showcase Loaded ✨",
+        "Populated tasks, habits, gym routines, meal plans, flashcards & finances!"
+      );
+    } else {
+      showToast.error("Failed to load demo data", "Storage update encountered an error.");
+    }
+  };
+
+  const handleClearDemoData = () => {
+    soundFX.playClick();
+    const success = clearEvaluatorDemoData();
+    if (success) {
+      setIsDemoActive(false);
+      refreshStorageMetrics();
+      queryClient.invalidateQueries();
+      showToast.success(
+        "Demo Data Purged 🧹",
+        "All showcase records wiped. Clean canvas ready for fresh testing!"
+      );
+    } else {
+      showToast.error("Failed to clear demo data", "Storage clearance encountered an error.");
+    }
+  };
 
   // Data management states
   const [showClearConfirm, setShowClearConfirm] = useState(false);
@@ -1536,6 +1590,57 @@ export default function SettingsPage() {
           </div>
         )}
 
+        {/* GUEST EVALUATOR SHOWCASE HIGHLIGHT CARD */}
+        {isGuestActive && (
+          <div className="bg-white rounded-3xl p-5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-2xl bg-[#CEF431] border-2 border-[#161514] flex items-center justify-center shadow-[2px_2px_0px_0px_#161514] shrink-0">
+                  <Sparkles className="h-5 w-5 text-[#161514] stroke-[2.5]" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="font-black text-xs uppercase tracking-wider text-[#161514] font-heading">
+                      Evaluator Sandbox Controls
+                    </h3>
+                    <span
+                      className={cn(
+                        "text-[9px] font-black uppercase px-2 py-0.5 rounded-full border border-[#161514] flex items-center gap-1",
+                        isDemoActive ? "bg-[#03D26F] text-[#161514]" : "bg-neutral-100 text-[#161514]/70"
+                      )}
+                    >
+                      <span className={cn("h-1.5 w-1.5 rounded-full", isDemoActive ? "bg-[#161514]" : "bg-neutral-400")} />
+                      {isDemoActive ? "Showcase Active" : "Blank Canvas"}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-[#161514]/80 font-bold mt-0.5">
+                    Browsing as a guest evaluator. Seed full mock data or wipe clean to test raw inputs.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 self-stretch sm:self-auto shrink-0 flex-wrap sm:flex-nowrap">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleClearDemoData}
+                  className="flex-1 sm:flex-initial rounded-xl border-2 border-red-600 text-red-600 bg-white hover:bg-red-50 shadow-[2px_2px_0px_0px_#dc2626] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer gap-1.5 text-xs font-black uppercase tracking-wider transition-all"
+                >
+                  <Trash2 className="h-3.5 w-3.5 stroke-[2.5]" />
+                  Delete Demo Data
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={handleLoadDemoData}
+                  className="flex-1 sm:flex-initial rounded-xl bg-[#CEF431] hover:bg-[#bce028] text-[#161514] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer gap-1.5 text-xs font-black uppercase tracking-wider transition-all"
+                >
+                  <Sparkles className="h-3.5 w-3.5 stroke-[2.5]" />
+                  {isDemoActive ? "Reload Showcase" : "Load Showcase"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Section Segmented Navigation Pills */}
         <div className="bg-white rounded-2xl sm:rounded-3xl p-1.5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] flex justify-between gap-1.5 overflow-x-auto">
           <button
@@ -2038,6 +2143,51 @@ export default function SettingsPage() {
               </div>
               <p className="text-[9px] font-black text-[#161514]/70 text-right uppercase">Local Storage Usage Metric</p>
             </div>
+
+            {/* Evaluator Demo Data Card in Data & Backup */}
+            <div className="bg-[#FAF8F5] rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-amber-500 stroke-[2.5]" />
+                  <p className="text-xs font-black uppercase tracking-wider text-[#161514] font-heading">
+                    Evaluator Showcase & Demo Data
+                  </p>
+                </div>
+                <span
+                  className={cn(
+                    "text-[9px] font-black uppercase px-2 py-0.5 rounded-full border border-[#161514] flex items-center gap-1",
+                    isDemoActive ? "bg-[#03D26F] text-[#161514]" : "bg-white text-[#161514]/70"
+                  )}
+                >
+                  <span className={cn("h-1.5 w-1.5 rounded-full", isDemoActive ? "bg-[#161514]" : "bg-neutral-400")} />
+                  {isDemoActive ? "Showcase Loaded" : "Blank Canvas"}
+                </span>
+              </div>
+              <p className="text-[10px] text-[#161514]/70 font-bold">
+                Seed realistic, relative demo data across all modules (Tasks, Habits, Gym Hypertrophy, Meal Tracker, Study Spaces, and Money Tracker) or delete all demo data for a blank testing slate.
+              </p>
+              <div className="flex items-center gap-2 pt-1 flex-wrap">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleClearDemoData}
+                  className="rounded-xl border-2 border-red-600 text-red-600 bg-white hover:bg-red-50 shadow-[2px_2px_0px_0px_#dc2626] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer gap-1.5 text-xs font-black uppercase tracking-wider transition-all"
+                >
+                  <Trash2 className="h-3.5 w-3.5 stroke-[2.5]" />
+                  Delete Demo Data
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={handleLoadDemoData}
+                  className="rounded-xl bg-[#CEF431] hover:bg-[#bce028] text-[#161514] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer gap-1.5 text-xs font-black uppercase tracking-wider transition-all"
+                >
+                  <Sparkles className="h-3.5 w-3.5 stroke-[2.5]" />
+                  {isDemoActive ? "Reset / Reload Showcase" : "Load Evaluator Showcase"}
+                </Button>
+              </div>
+            </div>
+
+            <hr className="border-t-2 border-[#161514]/10" />
 
             {/* Export Backup */}
             <div className="space-y-2 pt-2">

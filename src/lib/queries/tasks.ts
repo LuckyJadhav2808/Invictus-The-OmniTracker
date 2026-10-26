@@ -10,6 +10,11 @@ import { generateKeyBetween, generateInitialKey } from "@/lib/utils/lexorank";
 const TASKS_STORAGE_KEY = "invictus_tasks_db";
 const DEFAULT_SEED_TASKS: TaskItem[] = [];
 
+const isGuestMode = () => {
+  if (typeof window === "undefined") return false;
+  return localStorage.getItem("invictus_guest_mode") === "true";
+};
+
 const getActiveUserId = (user: any) => {
   if (user?.uid) return user.uid;
   if (typeof window !== "undefined") {
@@ -54,6 +59,10 @@ export function useTasks() {
   return useQuery<TaskItem[]>({
     queryKey: ["tasks", userId],
     queryFn: async () => {
+      if (isGuestMode()) {
+        return getLocalTasks();
+      }
+
       try {
         const res = await fetch(`/api/tasks?userId=${userId}`);
         if (res.ok) {
@@ -94,14 +103,16 @@ export function useCreateTask() {
       const updated = [task, ...existing];
       saveLocalTasks(updated);
 
-      try {
-        await fetch("/api/tasks", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(task),
-        });
-      } catch (err) {
-        console.warn("MongoDB /api/tasks sync warning:", err);
+      if (!isGuestMode()) {
+        try {
+          await fetch("/api/tasks", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(task),
+          });
+        } catch (err) {
+          console.warn("MongoDB /api/tasks sync warning:", err);
+        }
       }
 
       return task;
@@ -141,14 +152,16 @@ export function useUpdateTask() {
       existing[idx] = updatedTask;
       saveLocalTasks(existing);
 
-      try {
-        await fetch("/api/tasks", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...updatedTask, userId }),
-        });
-      } catch (err) {
-        console.warn("MongoDB /api/tasks update warning:", err);
+      if (!isGuestMode()) {
+        try {
+          await fetch("/api/tasks", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ...updatedTask, userId }),
+          });
+        } catch (err) {
+          console.warn("MongoDB /api/tasks update warning:", err);
+        }
       }
 
       return updatedTask;
@@ -178,12 +191,14 @@ export function useDeleteTask() {
       const filtered = existing.filter((t) => t.id !== taskId);
       saveLocalTasks(filtered);
 
-      try {
-        await fetch(`/api/tasks?id=${encodeURIComponent(taskId)}&userId=${encodeURIComponent(userId)}`, {
-          method: "DELETE",
-        });
-      } catch (err) {
-        console.warn("MongoDB /api/tasks delete warning:", err);
+      if (!isGuestMode()) {
+        try {
+          await fetch(`/api/tasks?id=${encodeURIComponent(taskId)}&userId=${encodeURIComponent(userId)}`, {
+            method: "DELETE",
+          });
+        } catch (err) {
+          console.warn("MongoDB /api/tasks delete warning:", err);
+        }
       }
 
       return taskId;
@@ -231,14 +246,16 @@ export function useToggleSubtask() {
       existing[taskIdx] = updatedTask;
       saveLocalTasks(existing);
 
-      try {
-        await fetch("/api/tasks", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...updatedTask, userId }),
-        });
-      } catch (err) {
-        console.warn("MongoDB /api/tasks toggle subtask warning:", err);
+      if (!isGuestMode()) {
+        try {
+          await fetch("/api/tasks", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ...updatedTask, userId }),
+          });
+        } catch (err) {
+          console.warn("MongoDB /api/tasks toggle subtask warning:", err);
+        }
       }
 
       return updatedTask;
