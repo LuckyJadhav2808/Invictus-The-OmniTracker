@@ -895,6 +895,21 @@ export function generateEvaluatorDemoDataset() {
 export function loadEvaluatorDemoData(): boolean {
   if (typeof window === "undefined" && typeof localStorage === "undefined") return false;
 
+  // SAFETY AIR-GAP: Strictly block demo data loading if an active authenticated main account is detected!
+  if (typeof window !== "undefined") {
+    try {
+      const activeUserStr = localStorage.getItem("invictus_active_user");
+      const sessionToken = localStorage.getItem("invictus_custom_session_token");
+      if (activeUserStr && sessionToken) {
+        const parsed = JSON.parse(activeUserStr);
+        if (parsed.uid && parsed.uid !== "guest-user") {
+          console.warn("[DEMO SEED BLOCKED]: Active main user account detected. Demo seed rejected to protect user data.");
+          return false;
+        }
+      }
+    } catch {}
+  }
+
   try {
     const data = generateEvaluatorDemoDataset();
 
@@ -953,24 +968,30 @@ export function loadEvaluatorDemoData(): boolean {
     // 6. Scratchpad
     localStorage.setItem("invictus_sticky_scratchpad", data.scratchpadContent);
 
-    // 7. Profile & Session
-    localStorage.setItem("invictus_guest_mode", "true");
-    localStorage.setItem("invictus_guest_name", "Alex Vance (Guest Evaluator)");
-    localStorage.setItem("invictus_onboarded", "true");
-    localStorage.setItem(
-      "invictus_user_profile",
-      JSON.stringify({
-        displayName: "Alex Vance",
-        age: "22 Years",
-        weight: "72 kg",
-        gender: "Male",
-        waterGoal: 3000,
-        currency: "INR",
-        timezone: "Asia/Kolkata",
-        weekStartsOn: 1,
-        modulesEnabled: { goals: true, study: true, money: true },
-      })
-    );
+    // 7. Profile & Session (Only set if not a real authenticated user)
+    const activeUserStr = typeof window !== "undefined" ? localStorage.getItem("invictus_active_user") : null;
+    const sessionToken = typeof window !== "undefined" ? localStorage.getItem("invictus_custom_session_token") : null;
+    const isMainUser = activeUserStr && sessionToken;
+
+    if (!isMainUser) {
+      localStorage.setItem("invictus_guest_mode", "true");
+      localStorage.setItem("invictus_guest_name", "Alex Vance (Guest Evaluator)");
+      localStorage.setItem("invictus_onboarded", "true");
+      localStorage.setItem(
+        "invictus_user_profile",
+        JSON.stringify({
+          displayName: "Alex Vance",
+          age: "22 Years",
+          weight: "72 kg",
+          gender: "Male",
+          waterGoal: 3000,
+          currency: "INR",
+          timezone: "Asia/Kolkata",
+          weekStartsOn: 1,
+          modulesEnabled: { goals: true, study: true, money: true },
+        })
+      );
+    }
 
     // Mark demo data active
     localStorage.setItem(DEMO_DATA_FLAG_KEY, "true");
@@ -986,6 +1007,22 @@ export function loadEvaluatorDemoData(): boolean {
  */
 export function clearEvaluatorDemoData(): boolean {
   if (typeof window === "undefined" && typeof localStorage === "undefined") return false;
+
+  // SAFETY AIR-GAP: Protect main accounts from accidental demo purging
+  if (typeof window !== "undefined") {
+    try {
+      const isGuest = localStorage.getItem("invictus_guest_mode") === "true";
+      const isDemoActive = localStorage.getItem(DEMO_DATA_FLAG_KEY) === "true";
+      const activeUserStr = localStorage.getItem("invictus_active_user");
+      if (activeUserStr && !isGuest && !isDemoActive) {
+        const parsed = JSON.parse(activeUserStr);
+        if (parsed.uid && parsed.uid !== "guest-user") {
+          console.warn("[DEMO PURGE BLOCKED]: Active main account without demo flag. Clearance rejected to protect user data.");
+          return false;
+        }
+      }
+    } catch {}
+  }
 
   try {
     const keysToPurge = [

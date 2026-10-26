@@ -10,7 +10,7 @@ import { Sparkles, Trash2, ShieldAlert, ChevronUp, ChevronDown } from "lucide-re
 import { cn } from "@/lib/utils";
 
 export function EvaluatorSandboxBanner() {
-  const { isGuest } = useAuth();
+  const { isGuest, user } = useAuth();
   const queryClient = useQueryClient();
   const [demoActive, setDemoActive] = useState(false);
   const [minimized, setMinimized] = useState(false);
@@ -21,7 +21,8 @@ export function EvaluatorSandboxBanner() {
     }
   }, []);
 
-  if (!isGuest) return null;
+  // Strict Safety Guard: Never render for authenticated main accounts!
+  if (!isGuest || (user && user.uid !== "guest-user")) return null;
 
   const handleReloadDemo = () => {
     soundFX.playCompleteChime();

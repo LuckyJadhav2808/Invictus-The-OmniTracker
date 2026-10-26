@@ -4,7 +4,8 @@ import { type Category, type Transaction, type Debt } from "@/types";
 import { getCustomSession } from "@/lib/custom-auth";
 import { executeOfflineMutation } from "@/lib/offline/offline-mutation";
 
-const isGuestMode = () => {
+const isGuestMode = (user?: any) => {
+  if (user?.uid && user.uid !== "guest-user") return false;
   if (typeof window === "undefined") return false;
   return localStorage.getItem("invictus_guest_mode") === "true";
 };
@@ -45,7 +46,7 @@ export function useCategories() {
   return useQuery<Category[]>({
     queryKey: ["categories", userId],
     queryFn: async () => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_categories");
         if (!local) {
           localStorage.setItem("invictus_categories", JSON.stringify(DEFAULT_CATEGORIES));
@@ -91,7 +92,7 @@ export function useAddCategory() {
   return useMutation({
     mutationFn: async (category: Omit<Category, "id" | "archived" | "createdAt">) => {
       const userId = getActiveUserId(user);
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_categories");
         const list = local ? JSON.parse(local) : [...DEFAULT_CATEGORIES];
         const newCategory = {
@@ -136,7 +137,7 @@ export function useUpdateCategory() {
   return useMutation({
     mutationFn: async (category: Partial<Category> & { id: string }) => {
       const userId = getActiveUserId(user);
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_categories");
         const list = local ? JSON.parse(local) : [...DEFAULT_CATEGORIES];
         const idx = list.findIndex((c: any) => c.id === category.id);
@@ -177,7 +178,7 @@ export function useDeleteCategory() {
   return useMutation({
     mutationFn: async (categoryId: string) => {
       const userId = getActiveUserId(user);
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_categories");
         const list = local ? JSON.parse(local) : [...DEFAULT_CATEGORIES];
         const filtered = list.filter((c: any) => c.id !== categoryId);
@@ -209,7 +210,7 @@ export function useTransactions() {
   return useQuery<Transaction[]>({
     queryKey: ["transactions", userId],
     queryFn: async () => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_transactions");
         return local ? JSON.parse(local) : [];
       }
@@ -231,7 +232,7 @@ export function useAddTransaction() {
   return useMutation({
     mutationFn: async (transaction: Omit<Transaction, "id" | "createdAt" | "updatedAt">) => {
       const userId = getActiveUserId(user);
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_transactions");
         const list = local ? JSON.parse(local) : [];
         const newTransaction = {
@@ -283,7 +284,7 @@ export function useBulkAddTransactions() {
       isRecurring?: boolean;
     }>) => {
       const userId = getActiveUserId(user);
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_transactions");
         const list = local ? JSON.parse(local) : [];
         const newTransactions = transactions.map((t, idx) => ({
@@ -328,7 +329,7 @@ export function useDeleteTransaction() {
   return useMutation({
     mutationFn: async (transactionId: string) => {
       const userId = getActiveUserId(user);
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_transactions");
         const list = local ? JSON.parse(local) : [];
         const filtered = list.filter((t: any) => t.id !== transactionId);
@@ -360,7 +361,7 @@ export function useUpdateTransaction() {
   return useMutation({
     mutationFn: async (transaction: Partial<Transaction> & { id: string }) => {
       const userId = getActiveUserId(user);
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_transactions");
         const list = local ? JSON.parse(local) : [];
         const idx = list.findIndex((t: any) => t.id === transaction.id);
@@ -399,7 +400,7 @@ export function useSavingsGoals() {
   return useQuery({
     queryKey: ["savingsGoals", userId],
     queryFn: async () => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_savings_goals");
         return local ? JSON.parse(local) : [];
       }
@@ -420,7 +421,7 @@ export function useAddSavingsGoal() {
   return useMutation({
     mutationFn: async (goal: any) => {
       const userId = getActiveUserId(user);
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_savings_goals");
         const list = local ? JSON.parse(local) : [];
         const newGoal = { ...goal, id: `sg_${Date.now()}` };
@@ -453,7 +454,7 @@ export function useUpdateSavingsGoal() {
   return useMutation({
     mutationFn: async (goal: any) => {
       const userId = getActiveUserId(user);
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_savings_goals");
         const list = local ? JSON.parse(local) : [];
         const idx = list.findIndex((g: any) => g.id === goal.id);
@@ -488,7 +489,7 @@ export function useDeleteSavingsGoal() {
   return useMutation({
     mutationFn: async (goalId: string) => {
       const userId = getActiveUserId(user);
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_savings_goals");
         const list = local ? JSON.parse(local) : [];
         const filtered = list.filter((g: any) => g.id !== goalId);
@@ -520,7 +521,7 @@ export function useSubscriptions() {
   return useQuery({
     queryKey: ["subscriptions", userId],
     queryFn: async () => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_subscriptions");
         return local ? JSON.parse(local) : [];
       }
@@ -541,7 +542,7 @@ export function useAddSubscription() {
   return useMutation({
     mutationFn: async (sub: any) => {
       const userId = getActiveUserId(user);
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_subscriptions");
         const list = local ? JSON.parse(local) : [];
         const newSub = { ...sub, id: `sub_${Date.now()}` };
@@ -574,7 +575,7 @@ export function useDeleteSubscription() {
   return useMutation({
     mutationFn: async (subId: string) => {
       const userId = getActiveUserId(user);
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_subscriptions");
         const list = local ? JSON.parse(local) : [];
         const filtered = list.filter((s: any) => s.id !== subId);
@@ -607,7 +608,7 @@ export function useDebts() {
   return useQuery<Debt[]>({
     queryKey: ["debts", userId],
     queryFn: async () => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_debts");
         return local ? JSON.parse(local) : [];
       }
@@ -631,7 +632,7 @@ export function useAddDebt() {
   return useMutation({
     mutationFn: async (newDebt: Omit<Debt, "id" | "userId" | "status" | "createdAt" | "updatedAt">) => {
       const userId = getActiveUserId(user);
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_debts");
         const list = local ? JSON.parse(local) : [];
         const item: Debt = {
@@ -671,7 +672,7 @@ export function useUpdateDebt() {
   return useMutation({
     mutationFn: async (updatedDebt: Partial<Debt> & { id: string }) => {
       const userId = getActiveUserId(user);
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_debts");
         const list = local ? JSON.parse(local) : [];
         const idx = list.findIndex((d: any) => d.id === updatedDebt.id);
@@ -706,7 +707,7 @@ export function useSettleDebt() {
   return useMutation({
     mutationFn: async ({ id }: { id: string }) => {
       const userId = getActiveUserId(user);
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_debts");
         const list = local ? JSON.parse(local) : [];
         const idx = list.findIndex((d: any) => d.id === id);
@@ -742,7 +743,7 @@ export function useDeleteDebt() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_debts");
         const list = local ? JSON.parse(local) : [];
         const filtered = list.filter((d: any) => d.id !== id);

@@ -2144,50 +2144,54 @@ export default function SettingsPage() {
               <p className="text-[9px] font-black text-[#161514]/70 text-right uppercase">Local Storage Usage Metric</p>
             </div>
 
-            {/* Evaluator Demo Data Card in Data & Backup */}
-            <div className="bg-[#FAF8F5] rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-amber-500 stroke-[2.5]" />
-                  <p className="text-xs font-black uppercase tracking-wider text-[#161514] font-heading">
-                    Evaluator Showcase & Demo Data
+            {/* Evaluator Demo Data Card in Data & Backup (Exclusively for Guest Accounts) */}
+            {isGuestActive && (
+              <>
+                <div className="bg-[#FAF8F5] rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-amber-500 stroke-[2.5]" />
+                      <p className="text-xs font-black uppercase tracking-wider text-[#161514] font-heading">
+                        Evaluator Showcase & Demo Data
+                      </p>
+                    </div>
+                    <span
+                      className={cn(
+                        "text-[9px] font-black uppercase px-2 py-0.5 rounded-full border border-[#161514] flex items-center gap-1",
+                        isDemoActive ? "bg-[#03D26F] text-[#161514]" : "bg-white text-[#161514]/70"
+                      )}
+                    >
+                      <span className={cn("h-1.5 w-1.5 rounded-full", isDemoActive ? "bg-[#161514]" : "bg-neutral-400")} />
+                      {isDemoActive ? "Showcase Loaded" : "Blank Canvas"}
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-[#161514]/70 font-bold">
+                    Seed realistic, relative demo data across all modules (Tasks, Habits, Gym Hypertrophy, Meal Tracker, Study Spaces, and Money Tracker) or delete all demo data for a blank testing slate.
                   </p>
+                  <div className="flex items-center gap-2 pt-1 flex-wrap">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleClearDemoData}
+                      className="rounded-xl border-2 border-red-600 text-red-600 bg-white hover:bg-red-50 shadow-[2px_2px_0px_0px_#dc2626] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer gap-1.5 text-xs font-black uppercase tracking-wider transition-all"
+                    >
+                      <Trash2 className="h-3.5 w-3.5 stroke-[2.5]" />
+                      Delete Demo Data
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={handleLoadDemoData}
+                      className="rounded-xl bg-[#CEF431] hover:bg-[#bce028] text-[#161514] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer gap-1.5 text-xs font-black uppercase tracking-wider transition-all"
+                    >
+                      <Sparkles className="h-3.5 w-3.5 stroke-[2.5]" />
+                      {isDemoActive ? "Reset / Reload Showcase" : "Load Evaluator Showcase"}
+                    </Button>
+                  </div>
                 </div>
-                <span
-                  className={cn(
-                    "text-[9px] font-black uppercase px-2 py-0.5 rounded-full border border-[#161514] flex items-center gap-1",
-                    isDemoActive ? "bg-[#03D26F] text-[#161514]" : "bg-white text-[#161514]/70"
-                  )}
-                >
-                  <span className={cn("h-1.5 w-1.5 rounded-full", isDemoActive ? "bg-[#161514]" : "bg-neutral-400")} />
-                  {isDemoActive ? "Showcase Loaded" : "Blank Canvas"}
-                </span>
-              </div>
-              <p className="text-[10px] text-[#161514]/70 font-bold">
-                Seed realistic, relative demo data across all modules (Tasks, Habits, Gym Hypertrophy, Meal Tracker, Study Spaces, and Money Tracker) or delete all demo data for a blank testing slate.
-              </p>
-              <div className="flex items-center gap-2 pt-1 flex-wrap">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleClearDemoData}
-                  className="rounded-xl border-2 border-red-600 text-red-600 bg-white hover:bg-red-50 shadow-[2px_2px_0px_0px_#dc2626] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer gap-1.5 text-xs font-black uppercase tracking-wider transition-all"
-                >
-                  <Trash2 className="h-3.5 w-3.5 stroke-[2.5]" />
-                  Delete Demo Data
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={handleLoadDemoData}
-                  className="rounded-xl bg-[#CEF431] hover:bg-[#bce028] text-[#161514] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer gap-1.5 text-xs font-black uppercase tracking-wider transition-all"
-                >
-                  <Sparkles className="h-3.5 w-3.5 stroke-[2.5]" />
-                  {isDemoActive ? "Reset / Reload Showcase" : "Load Evaluator Showcase"}
-                </Button>
-              </div>
-            </div>
 
-            <hr className="border-t-2 border-[#161514]/10" />
+                <hr className="border-t-2 border-[#161514]/10" />
+              </>
+            )}
 
             {/* Export Backup */}
             <div className="space-y-2 pt-2">

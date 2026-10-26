@@ -1,7 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/components/shared/AuthProvider";
 
-const isGuestMode = () => {
+const isGuestMode = (user?: any) => {
+  if (user?.uid && user.uid !== "guest-user") return false;
   if (typeof window === "undefined") return false;
   return localStorage.getItem("invictus_guest_mode") === "true";
 };
@@ -14,7 +15,7 @@ export function useGymRoutines(dayOfWeek?: string) {
   return useQuery({
     queryKey: ["gymRoutines", user?.uid, dayOfWeek],
     queryFn: async () => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_gym_routines");
         const list = local ? JSON.parse(local) : [];
         if (dayOfWeek) return list.filter((r: any) => r.dayOfWeek === dayOfWeek);
@@ -29,7 +30,7 @@ export function useGymRoutines(dayOfWeek?: string) {
       if (!res.ok) return [];
       return res.json();
     },
-    enabled: !!user || isGuestMode(),
+    enabled: !!user || isGuestMode(user),
   });
 }
 
@@ -39,7 +40,7 @@ export function useAddGymRoutine() {
 
   return useMutation({
     mutationFn: async (routine: any) => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_gym_routines");
         const list = local ? JSON.parse(local) : [];
         const existingIdx = list.findIndex((r: any) => r.dayOfWeek === routine.dayOfWeek);
@@ -77,7 +78,7 @@ export function useUpdateGymRoutine() {
 
   return useMutation({
     mutationFn: async (routine: any) => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_gym_routines");
         const list = local ? JSON.parse(local) : [];
         const idx = list.findIndex((r: any) => r.id === routine.id);
@@ -110,7 +111,7 @@ export function useDeleteGymRoutine() {
 
   return useMutation({
     mutationFn: async (routineId: string) => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_gym_routines");
         const list = local ? JSON.parse(local) : [];
         const filtered = list.filter((r: any) => r.id !== routineId);
@@ -140,7 +141,7 @@ export function useMealPlans(date?: string) {
   return useQuery({
     queryKey: ["mealPlans", user?.uid, date],
     queryFn: async () => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_meal_plans");
         const list = local ? JSON.parse(local) : [];
         if (date) return list.filter((m: any) => m.date === date);
@@ -155,7 +156,7 @@ export function useMealPlans(date?: string) {
       if (!res.ok) return [];
       return res.json();
     },
-    enabled: !!user || isGuestMode(),
+    enabled: !!user || isGuestMode(user),
   });
 }
 
@@ -165,7 +166,7 @@ export function useAddMealPlan() {
 
   return useMutation({
     mutationFn: async (meal: any) => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_meal_plans");
         const list = local ? JSON.parse(local) : [];
         const newMeal = { ...meal, id: `meal_${Date.now()}` };
@@ -196,7 +197,7 @@ export function useUpdateMealPlan() {
 
   return useMutation({
     mutationFn: async (meal: any) => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_meal_plans");
         const list = local ? JSON.parse(local) : [];
         const idx = list.findIndex((m: any) => m.id === meal.id);
@@ -229,7 +230,7 @@ export function useDeleteMealPlan() {
 
   return useMutation({
     mutationFn: async (mealId: string) => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_meal_plans");
         const list = local ? JSON.parse(local) : [];
         const filtered = list.filter((m: any) => m.id !== mealId);

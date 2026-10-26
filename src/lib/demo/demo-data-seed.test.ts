@@ -164,5 +164,39 @@ describe("Evaluator Demo Data Seed Engine", () => {
       expect(mockStorage["invictus_onboarded"]).toBe("true");
       expect(mockStorage["invictus_guest_name"]).toBeDefined();
     });
+
+    it("SAFETY AIR-GAP: Strictly prevents clearing data when a main account is active without demo flag", () => {
+      // Simulate real authenticated user
+      mockStorage["invictus_active_user"] = JSON.stringify({ uid: "usr_main_account_999", email: "user@example.com" });
+      mockStorage["invictus_custom_session_token"] = "token_usr_main_account_999_xyz";
+      mockStorage["invictus_tasks_db"] = JSON.stringify([{ id: "real_task_1", title: "Real Main Task" }]);
+
+      // Attempt to clear demo data without demo flag
+      const result = clearEvaluatorDemoData();
+      expect(result).toBe(false);
+
+      // Real user data must remain untouched!
+      expect(mockStorage["invictus_tasks_db"]).toBeDefined();
+      expect(JSON.parse(mockStorage["invictus_tasks_db"])[0].title).toBe("Real Main Task");
+    });
+  });
+
+  describe("Safety Air-Gaps for Main User Accounts", () => {
+    it("Strictly blocks loadEvaluatorDemoData() when an active main account is logged in", () => {
+      // Simulate real authenticated user
+      mockStorage["invictus_active_user"] = JSON.stringify({ uid: "usr_main_account_999", email: "user@example.com" });
+      mockStorage["invictus_custom_session_token"] = "token_usr_main_account_999_xyz";
+      mockStorage["invictus_tasks_db"] = JSON.stringify([{ id: "real_task_1", title: "Real Main Task" }]);
+
+      // Attempt to seed demo data over main account
+      const result = loadEvaluatorDemoData();
+      expect(result).toBe(false);
+
+      // Real task list must not be overwritten by demo tasks!
+      const tasks = JSON.parse(mockStorage["invictus_tasks_db"]);
+      expect(tasks.length).toBe(1);
+      expect(tasks[0].title).toBe("Real Main Task");
+      expect(isDemoDataActive()).toBe(false);
+    });
   });
 });

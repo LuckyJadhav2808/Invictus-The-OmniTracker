@@ -10,7 +10,8 @@ import { generateKeyBetween, generateInitialKey } from "@/lib/utils/lexorank";
 const TASKS_STORAGE_KEY = "invictus_tasks_db";
 const DEFAULT_SEED_TASKS: TaskItem[] = [];
 
-const isGuestMode = () => {
+const isGuestMode = (user?: any) => {
+  if (user?.uid && user.uid !== "guest-user") return false;
   if (typeof window === "undefined") return false;
   return localStorage.getItem("invictus_guest_mode") === "true";
 };
@@ -59,7 +60,7 @@ export function useTasks() {
   return useQuery<TaskItem[]>({
     queryKey: ["tasks", userId],
     queryFn: async () => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         return getLocalTasks();
       }
 
@@ -103,7 +104,7 @@ export function useCreateTask() {
       const updated = [task, ...existing];
       saveLocalTasks(updated);
 
-      if (!isGuestMode()) {
+      if (!isGuestMode(user)) {
         try {
           await fetch("/api/tasks", {
             method: "POST",
@@ -152,7 +153,7 @@ export function useUpdateTask() {
       existing[idx] = updatedTask;
       saveLocalTasks(existing);
 
-      if (!isGuestMode()) {
+      if (!isGuestMode(user)) {
         try {
           await fetch("/api/tasks", {
             method: "PUT",
@@ -191,7 +192,7 @@ export function useDeleteTask() {
       const filtered = existing.filter((t) => t.id !== taskId);
       saveLocalTasks(filtered);
 
-      if (!isGuestMode()) {
+      if (!isGuestMode(user)) {
         try {
           await fetch(`/api/tasks?id=${encodeURIComponent(taskId)}&userId=${encodeURIComponent(userId)}`, {
             method: "DELETE",
@@ -246,7 +247,7 @@ export function useToggleSubtask() {
       existing[taskIdx] = updatedTask;
       saveLocalTasks(existing);
 
-      if (!isGuestMode()) {
+      if (!isGuestMode(user)) {
         try {
           await fetch("/api/tasks", {
             method: "PUT",

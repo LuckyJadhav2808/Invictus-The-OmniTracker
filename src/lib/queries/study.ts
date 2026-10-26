@@ -3,7 +3,8 @@ import { useAuth } from "@/components/shared/AuthProvider";
 import { type Subject, type Topic, type StudySession, type Test } from "@/types";
 import { executeOfflineMutation } from "@/lib/offline/offline-mutation";
 
-const isGuestMode = () => {
+const isGuestMode = (user?: any) => {
+  if (user?.uid && user.uid !== "guest-user") return false;
   if (typeof window === "undefined") return false;
   return localStorage.getItem("invictus_guest_mode") === "true";
 };
@@ -16,7 +17,7 @@ export function useSubjects() {
   return useQuery<Subject[]>({
     queryKey: ["subjects", user?.uid],
     queryFn: async () => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_subjects");
         const list = local ? JSON.parse(local) : [];
         return list.filter((s: any) => !s.archived);
@@ -27,7 +28,7 @@ export function useSubjects() {
       const list = await res.json();
       return list.map((s: any) => ({ ...s, id: s.id || s._id })).filter((s: any) => !s.archived);
     },
-    enabled: !!user || isGuestMode(),
+    enabled: !!user || isGuestMode(user),
   });
 }
 
@@ -46,7 +47,7 @@ export function useAddSubject() {
         updatedAt: new Date().toISOString(),
       } as unknown as Subject;
 
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_subjects");
         const list = local ? JSON.parse(local) : [];
         list.push(newSubject);
@@ -78,7 +79,7 @@ export function useUpdateSubject() {
 
   return useMutation({
     mutationFn: async (subject: Partial<Subject> & { id: string }) => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_subjects");
         const list = local ? JSON.parse(local) : [];
         const idx = list.findIndex((s: any) => s.id === subject.id);
@@ -111,7 +112,7 @@ export function useDeleteSubject() {
 
   return useMutation({
     mutationFn: async (subjectId: string) => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_subjects");
         const list = local ? JSON.parse(local) : [];
         const filtered = list.filter((s: any) => s.id !== subjectId);
@@ -151,7 +152,7 @@ export function useTopics(subjectId: string) {
   return useQuery<Topic[]>({
     queryKey: ["topics", user?.uid, subjectId],
     queryFn: async () => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_topics");
         const list = local ? JSON.parse(local) : [];
         return list.filter((t: any) => t.subjectId === subjectId);
@@ -173,7 +174,7 @@ export function useAllTopics() {
   return useQuery<Topic[]>({
     queryKey: ["allTopics", user?.uid],
     queryFn: async () => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_topics");
         return local ? JSON.parse(local) : [];
       }
@@ -184,7 +185,7 @@ export function useAllTopics() {
       const list = await res.json();
       return list.map((t: any) => ({ ...t, id: t.id || t._id }));
     },
-    enabled: !!user || isGuestMode(),
+    enabled: !!user || isGuestMode(user),
   });
 }
 
@@ -202,7 +203,7 @@ export function useAddTopic() {
         updatedAt: new Date().toISOString(),
       } as unknown as Topic;
 
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_topics");
         const list = local ? JSON.parse(local) : [];
         list.push(newTopic);
@@ -238,7 +239,7 @@ export function useUpdateTopic() {
 
   return useMutation({
     mutationFn: async (topic: Partial<Topic> & { id: string; subjectId?: string }) => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_topics");
         const list = local ? JSON.parse(local) : [];
         const idx = list.findIndex((t: any) => t.id === topic.id);
@@ -277,7 +278,7 @@ export function useDeleteTopic() {
     mutationFn: async (payload: { topicId: string; subjectId?: string } | string) => {
       const topicId = typeof payload === "string" ? payload : payload.topicId;
       const subjectId = typeof payload === "string" ? undefined : payload.subjectId;
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_topics");
         const list = local ? JSON.parse(local) : [];
         const filtered = list.filter((t: any) => t.id !== topicId);
@@ -312,7 +313,7 @@ export function useStudySessions(subjectId?: string) {
   return useQuery<StudySession[]>({
     queryKey: ["studySessions", user?.uid, subjectId],
     queryFn: async () => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_study_sessions");
         const list = local ? JSON.parse(local) : [];
         if (subjectId) return list.filter((s: any) => s.subjectId === subjectId);
@@ -328,7 +329,7 @@ export function useStudySessions(subjectId?: string) {
       const list = await res.json();
       return list.map((s: any) => ({ ...s, id: s.id || s._id }));
     },
-    enabled: !!user || isGuestMode(),
+    enabled: !!user || isGuestMode(user),
   });
 }
 
@@ -345,7 +346,7 @@ export function useAddStudySession() {
         createdAt: new Date().toISOString(),
       } as unknown as StudySession;
 
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_study_sessions");
         const list = local ? JSON.parse(local) : [];
         list.unshift(newSession);
@@ -380,7 +381,7 @@ export function useDeleteStudySession() {
 
   return useMutation({
     mutationFn: async ({ sessionId, subjectId }: { sessionId: string; subjectId?: string }) => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_study_sessions");
         const list = local ? JSON.parse(local) : [];
         const filtered = list.filter((s: any) => s.id !== sessionId);
@@ -413,7 +414,7 @@ export function useTests() {
   return useQuery<Test[]>({
     queryKey: ["tests", user?.uid],
     queryFn: async () => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_tests");
         return local ? JSON.parse(local) : [];
       }
@@ -424,7 +425,7 @@ export function useTests() {
       const list = await res.json();
       return list.map((t: any) => ({ ...t, id: t.id || t._id }));
     },
-    enabled: !!user || isGuestMode(),
+    enabled: !!user || isGuestMode(user),
   });
 }
 
@@ -442,7 +443,7 @@ export function useAddTest() {
         updatedAt: new Date().toISOString(),
       } as unknown as Test;
 
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_tests");
         const list = local ? JSON.parse(local) : [];
         list.unshift(newTest);
@@ -472,7 +473,7 @@ export function useUpdateTest() {
 
   return useMutation({
     mutationFn: async (test: Partial<Test> & { id: string }) => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_tests");
         const list = local ? JSON.parse(local) : [];
         const idx = list.findIndex((t: any) => t.id === test.id);
@@ -505,7 +506,7 @@ export function useDeleteTest() {
 
   return useMutation({
     mutationFn: async (testId: string) => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_tests");
         const list = local ? JSON.parse(local) : [];
         const filtered = list.filter((t: any) => t.id !== testId);

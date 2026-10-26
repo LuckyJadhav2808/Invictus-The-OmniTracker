@@ -10,7 +10,7 @@ import {
   setCustomSession,
 } from "@/lib/custom-auth";
 import { registerServiceWorker } from "@/lib/utils/notifications";
-import { loadEvaluatorDemoData } from "@/lib/demo/demo-data-seed";
+import { loadEvaluatorDemoData, isDemoDataActive, clearEvaluatorDemoData } from "@/lib/demo/demo-data-seed";
 
 interface AuthContextType {
   user: User | null;
@@ -61,12 +61,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const isAdmin = user?.email?.toLowerCase() === "luckymanojjadhav@gmail.com" || user?.role === "admin";
 
   const login = async (email: string, password: string) => {
+    // If demo data was active from a guest evaluation session, purge it so main account starts clean
+    if (typeof window !== "undefined" && isDemoDataActive()) {
+      clearEvaluatorDemoData();
+    }
     const loggedUser = await customLoginUser({ email, password });
     setUser(loggedUser);
     return loggedUser;
   };
 
   const signup = async (email: string, password: string, displayName: string) => {
+    // If demo data was active from a guest evaluation session, purge it so main account starts clean
+    if (typeof window !== "undefined" && isDemoDataActive()) {
+      clearEvaluatorDemoData();
+    }
     const newUser = await customRegisterUser({ email, password, displayName });
     setUser(newUser);
     return newUser;

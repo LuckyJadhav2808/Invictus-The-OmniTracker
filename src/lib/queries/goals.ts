@@ -5,7 +5,8 @@ import { calculateStreak, evaluateAutonomousStreakFreeze, isHabitScheduledOnDate
 import { format } from "date-fns";
 import { executeOfflineMutation } from "@/lib/offline/offline-mutation";
 
-const isGuestMode = () => {
+const isGuestMode = (user?: any) => {
+  if (user?.uid && user.uid !== "guest-user") return false;
   if (typeof window === "undefined") return false;
   return localStorage.getItem("invictus_guest_mode") === "true";
 };
@@ -17,7 +18,7 @@ export function useHabits() {
   return useQuery<Habit[]>({
     queryKey: ["habits", user?.uid],
     queryFn: async () => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_habits");
         const list = local ? JSON.parse(local) : [];
         return list.filter((h: any) => !h.archived);
@@ -32,7 +33,7 @@ export function useHabits() {
         id: h.id || h._id,
       }));
     },
-    enabled: !!user || isGuestMode(),
+    enabled: !!user || isGuestMode(user),
   });
 }
 
@@ -43,7 +44,7 @@ export function useAddHabit() {
 
   return useMutation({
     mutationFn: async (habit: Omit<Habit, "id" | "archived" | "createdAt" | "updatedAt">) => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_habits");
         const list = local ? JSON.parse(local) : [];
         const newHabit = {
@@ -86,7 +87,7 @@ export function useUpdateHabit() {
 
   return useMutation({
     mutationFn: async (habit: Partial<Habit> & { id: string }) => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_habits");
         const list = local ? JSON.parse(local) : [];
         const idx = list.findIndex((h: any) => h.id === habit.id);
@@ -120,7 +121,7 @@ export function useDeleteHabit() {
 
   return useMutation({
     mutationFn: async (habitId: string) => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_habits");
         const list = local ? JSON.parse(local) : [];
         const filtered = list.filter((h: any) => h.id !== habitId);
@@ -151,7 +152,7 @@ export function useHabitLogs(date: string) {
   return useQuery<HabitLog[]>({
     queryKey: ["habitLogs", user?.uid, date],
     queryFn: async () => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_habit_logs");
         const logs = local ? JSON.parse(local) : [];
         return logs.filter((l: any) => l.date === date);
@@ -161,7 +162,7 @@ export function useHabitLogs(date: string) {
       if (!res.ok) throw new Error("Failed to fetch habit logs from MongoDB");
       return res.json();
     },
-    enabled: !!user || isGuestMode(),
+    enabled: !!user || isGuestMode(user),
   });
 }
 
@@ -172,7 +173,7 @@ export function useMonthHabitLogs(startDate: string, endDate: string) {
   return useQuery<HabitLog[]>({
     queryKey: ["habitLogsRange", user?.uid, startDate, endDate],
     queryFn: async () => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_habit_logs");
         const logs = local ? JSON.parse(local) : [];
         return logs.filter((l: any) => l.date >= startDate && l.date <= endDate && l.completed);
@@ -183,7 +184,7 @@ export function useMonthHabitLogs(startDate: string, endDate: string) {
       const logs = await res.json();
       return logs.filter((l: any) => l.completed);
     },
-    enabled: !!user || isGuestMode(),
+    enabled: !!user || isGuestMode(user),
   });
 }
 
@@ -198,7 +199,7 @@ export function useStreaks() {
       let logs: HabitLog[] = [];
       let frozenDates: string[] = [];
 
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const localStreaks = localStorage.getItem("invictus_streaks");
         if (localStreaks) {
           try {
@@ -269,7 +270,7 @@ export function useStreaks() {
 
       return streaks;
     },
-    enabled: !!user || isGuestMode(),
+    enabled: !!user || isGuestMode(user),
   });
 }
 
@@ -294,7 +295,7 @@ export function useToggleHabitLog() {
       note?: string;
       quickTags?: string[];
     }) => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const localLogs = localStorage.getItem("invictus_habit_logs");
         let logs = localLogs ? JSON.parse(localLogs) : [];
         const logId = `${habitId}_${date}`;
@@ -379,7 +380,7 @@ export function useHealthProfile() {
   return useQuery<HealthProfile>({
     queryKey: ["healthProfile", user?.uid],
     queryFn: async () => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_user_profile");
         if (local) {
           try {
@@ -407,7 +408,7 @@ export function useHealthProfile() {
         waterGoal: data.waterGoal || 2500,
       };
     },
-    enabled: !!user || isGuestMode(),
+    enabled: !!user || isGuestMode(user),
   });
 }
 
@@ -417,7 +418,7 @@ export function useUpdateHealthProfile() {
 
   return useMutation({
     mutationFn: async (profile: HealthProfile) => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_user_profile");
         const parsed = local ? JSON.parse(local) : {};
         localStorage.setItem(
@@ -451,7 +452,7 @@ export function useWaterLog(date: string) {
   return useQuery<WaterLog>({
     queryKey: ["waterLog", user?.uid, date],
     queryFn: async () => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const val = localStorage.getItem(`invictus_water_${date}`);
         return {
           id: date,
@@ -470,7 +471,7 @@ export function useWaterLog(date: string) {
         amount: data.amount !== undefined ? data.amount : 0,
       };
     },
-    enabled: !!user || isGuestMode(),
+    enabled: !!user || isGuestMode(user),
   });
 }
 
@@ -480,7 +481,7 @@ export function useLogWater() {
 
   return useMutation({
     mutationFn: async ({ date, amount }: { date: string; amount: number }) => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const val = localStorage.getItem(`invictus_water_${date}`);
         const current = val ? parseInt(val) : 0;
         const next = Math.max(0, current + amount);
@@ -532,7 +533,7 @@ export function useSetWater() {
   return useMutation({
     mutationFn: async ({ date, amount, waterGoal }: { date: string; amount: number; waterGoal?: number }) => {
       const next = Math.max(0, amount);
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         localStorage.setItem(`invictus_water_${date}`, next.toString());
         if (waterGoal) {
           localStorage.setItem("invictus_water_goal", waterGoal.toString());
@@ -584,7 +585,7 @@ export function useWorkouts(date: string) {
   return useQuery<Workout[]>({
     queryKey: ["workouts", user?.uid, date],
     queryFn: async () => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem(`invictus_workouts_${date}`);
         return local ? JSON.parse(local) : [];
       }
@@ -593,7 +594,7 @@ export function useWorkouts(date: string) {
       if (!res.ok) throw new Error("Failed to fetch workouts from MongoDB");
       return res.json();
     },
-    enabled: !!user || isGuestMode(),
+    enabled: !!user || isGuestMode(user),
   });
 }
 
@@ -606,7 +607,7 @@ export function useAddWorkout() {
       const id = Math.random().toString(36).substring(2, 9);
       const newW: Workout = { id, name, details, completed: false, date };
 
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem(`invictus_workouts_${date}`);
         const list = local ? JSON.parse(local) : [];
         list.push(newW);
@@ -642,7 +643,7 @@ export function useToggleWorkout() {
 
   return useMutation({
     mutationFn: async ({ date, id, completed }: { date: string; id: string; completed: boolean }) => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem(`invictus_workouts_${date}`);
         const list = local ? JSON.parse(local) : [];
         const idx = list.findIndex((w: any) => w.id === id);
@@ -678,7 +679,7 @@ export function useUpdateWorkout() {
   return useMutation({
     mutationFn: async (workout: Partial<Workout> & { id: string; date: string }) => {
       const { date, id, name, details, completed } = workout;
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem(`invictus_workouts_${date}`);
         const list = local ? JSON.parse(local) : [];
         const idx = list.findIndex((w: any) => w.id === id);
@@ -712,7 +713,7 @@ export function useDeleteWorkout() {
 
   return useMutation({
     mutationFn: async ({ date, id }: { date: string; id: string }) => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem(`invictus_workouts_${date}`);
         const list = local ? JSON.parse(local) : [];
         const filtered = list.filter((w: any) => w.id !== id);
@@ -742,7 +743,7 @@ export function useMacros(date: string) {
   return useQuery<Macros>({
     queryKey: ["macros", user?.uid, date],
     queryFn: async () => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem(`invictus_macros_${date}`);
         if (local) return JSON.parse(local);
         const defaults = { id: date, date, protein: 0, carbs: 0, fat: 0 };
@@ -754,7 +755,7 @@ export function useMacros(date: string) {
       if (!res.ok) throw new Error("Failed to fetch macros from MongoDB");
       return res.json();
     },
-    enabled: !!user || isGuestMode(),
+    enabled: !!user || isGuestMode(user),
   });
 }
 
@@ -765,7 +766,7 @@ export function useUpdateMacros() {
   return useMutation({
     mutationFn: async (macrosData: Macros) => {
       const { date, protein, carbs, fat } = macrosData;
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         localStorage.setItem(`invictus_macros_${date}`, JSON.stringify(macrosData));
         return macrosData;
       }
@@ -794,7 +795,7 @@ export function useDiet(date: string) {
   return useQuery<Diet[]>({
     queryKey: ["diet", user?.uid, date],
     queryFn: async () => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem(`invictus_diet_${date}`);
         return local ? JSON.parse(local) : [];
       }
@@ -803,7 +804,7 @@ export function useDiet(date: string) {
       if (!res.ok) throw new Error("Failed to fetch diets from MongoDB");
       return res.json();
     },
-    enabled: !!user || isGuestMode(),
+    enabled: !!user || isGuestMode(user),
   });
 }
 
@@ -816,7 +817,7 @@ export function useAddDiet() {
       const id = Math.random().toString(36).substring(2, 9);
       const newD: Diet = { id, name, details, completed: false, date };
 
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem(`invictus_diet_${date}`);
         const list = local ? JSON.parse(local) : [];
         list.push(newD);
@@ -848,7 +849,7 @@ export function useToggleDiet() {
 
   return useMutation({
     mutationFn: async ({ date, id, completed }: { date: string; id: string; completed: boolean }) => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem(`invictus_diet_${date}`);
         const list = local ? JSON.parse(local) : [];
         const idx = list.findIndex((d: any) => d.id === id);
@@ -884,7 +885,7 @@ export function useUpdateDiet() {
   return useMutation({
     mutationFn: async (dietItem: Partial<Diet> & { id: string; date: string }) => {
       const { date, id, name, details, completed } = dietItem;
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem(`invictus_diet_${date}`);
         const list = local ? JSON.parse(local) : [];
         const idx = list.findIndex((d: any) => d.id === id);
@@ -918,7 +919,7 @@ export function useDeleteDiet() {
 
   return useMutation({
     mutationFn: async ({ date, id }: { date: string; id: string }) => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem(`invictus_diet_${date}`);
         const list = local ? JSON.parse(local) : [];
         const filtered = list.filter((d: any) => d.id !== id);
@@ -948,7 +949,7 @@ export function useMoodLog(date: string) {
   return useQuery({
     queryKey: ["moodLog", user?.uid, date],
     queryFn: async () => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem(`invictus_mood_${date}`);
         return local ? JSON.parse(local) : null;
       }
@@ -959,7 +960,7 @@ export function useMoodLog(date: string) {
       const list = await res.json();
       return list && list.length > 0 ? list[0] : null;
     },
-    enabled: !!user || isGuestMode(),
+    enabled: !!user || isGuestMode(user),
   });
 }
 
@@ -969,7 +970,7 @@ export function useSaveMoodLog() {
 
   return useMutation({
     mutationFn: async ({ date, mood, energy, note }: { date: string; mood: string; energy: number; note: string }) => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const payload = { mood, energy, note, date, updatedAt: new Date().toISOString() };
         localStorage.setItem(`invictus_mood_${date}`, JSON.stringify(payload));
         return payload;
@@ -1012,7 +1013,7 @@ export function useStreakFreeze() {
   return useQuery<StreakFreezeData>({
     queryKey: ["streakFreeze", user?.uid],
     queryFn: async () => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_streak_freeze");
         let sf: StreakFreezeData = local
           ? JSON.parse(local)
@@ -1076,7 +1077,7 @@ export function useStreakFreeze() {
         autoShieldEvent: data.autoShieldEvent || null,
       };
     },
-    enabled: !!user || isGuestMode(),
+    enabled: !!user || isGuestMode(user),
   });
 }
 
@@ -1087,7 +1088,7 @@ export function useConsumeStreakFreeze() {
 
   return useMutation({
     mutationFn: async ({ frozenDate }: { frozenDate: string }) => {
-      if (isGuestMode()) {
+      if (isGuestMode(user)) {
         const localStr = localStorage.getItem("invictus_streak_freeze");
         const sf = localStr
           ? JSON.parse(localStr)
