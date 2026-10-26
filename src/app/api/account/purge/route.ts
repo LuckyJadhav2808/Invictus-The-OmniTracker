@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { connectToDatabase } from "@/lib/mongodb";
+import { connectToDatabase, resolveDatabaseForRequest, assertDatabaseSafety, PROD_DB_NAME } from "@/lib/mongodb";
 import { Habit } from "@/models/Habit";
 import { HabitLog } from "@/models/HabitLog";
 import { HealthProfile } from "@/models/HealthProfile";
@@ -22,7 +22,6 @@ export const dynamic = "force-dynamic";
 // Securely wipes all user-owned records for a specific authenticated user
 export async function POST(req: Request) {
   try {
-    await connectToDatabase();
     const body = await req.json().catch(() => ({}));
     const { userId } = body;
 
@@ -30,7 +29,23 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Valid userId is required to purge account data" }, { status: 400 });
     }
 
-    const query = { userId: userId.trim() };
+    const trimmedUserId = userId.trim();
+
+    // SAFETY AIR-GAP: Guest or demo purge requests are strictly forbidden from touching invictus_db!
+    if (trimmedUserId === "guest-user" || trimmedUserId.startsWith("demo_")) {
+      return NextResponse.json({
+        success: true,
+        message: "Sandbox session records cleared cleanly without touching production database.",
+      });
+    }
+
+    // Verify database safety before executing purge
+    const dbContext = resolveDatabaseForRequest(req);
+    assertDatabaseSafety(dbContext.targetDb, trimmedUserId);
+
+    await connectToDatabase({ dbName: dbContext.targetDb });
+
+    const query = { userId: trimmedUserId };
 
     await Promise.all([
       Habit.deleteMany(query),

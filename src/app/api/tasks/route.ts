@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { connectToDatabase } from "@/lib/mongodb";
+import { connectToDatabase, resolveDatabaseForRequest, assertDatabaseSafety } from "@/lib/mongodb";
 import { Task } from "@/models/Task";
 
 export const dynamic = "force-dynamic";
@@ -17,13 +17,22 @@ function getTargetUserIds(userId: string) {
 // GET /api/tasks?userId=xxx
 export async function GET(req: Request) {
   try {
-    await connectToDatabase();
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get("userId");
 
     if (!userId) {
       return NextResponse.json({ error: "UserId is required for data isolation" }, { status: 400 });
     }
+
+    // AIR-GAP: Guest or demo tasks do not query or pollute invictus_db!
+    if (userId === "guest-user" || userId.startsWith("demo_")) {
+      return NextResponse.json([]);
+    }
+
+    const dbContext = resolveDatabaseForRequest(req, userId);
+    assertDatabaseSafety(dbContext.targetDb, userId);
+
+    await connectToDatabase({ dbName: dbContext.targetDb });
 
     const targetUserIds = getTargetUserIds(userId);
     const tasks = await Task.find({ userId: { $in: targetUserIds } }).sort({ orderKey: 1, createdAt: -1 });
@@ -37,7 +46,6 @@ export async function GET(req: Request) {
 // POST /api/tasks
 export async function POST(req: Request) {
   try {
-    await connectToDatabase();
     const body = await req.json();
 
     if (!body.title) {
@@ -46,6 +54,34 @@ export async function POST(req: Request) {
 
     const userId = body.userId || ADMIN_UID;
     const taskId = body.id || `task_${Math.random().toString(36).substring(2, 9)}_${Date.now()}`;
+
+    // AIR-GAP: Guest or demo tasks stay in guest client-side storage, no write to invictus_db
+    if (userId === "guest-user" || (typeof userId === "string" && userId.startsWith("demo_"))) {
+      return NextResponse.json(
+        {
+          id: taskId,
+          userId,
+          title: body.title,
+          description: body.description || "",
+          status: body.status || "todo",
+          priority: body.priority || "p2",
+          dueDate: body.dueDate || null,
+          dueTime: body.dueTime || null,
+          estimatedMinutes: Number(body.estimatedMinutes) || 0,
+          loggedMinutes: Number(body.loggedMinutes) || 0,
+          projectTag: body.projectTag || "General",
+          orderKey: body.orderKey || "a0",
+          subtasks: body.subtasks || [],
+          completedAt: body.completedAt || null,
+        },
+        { status: 201 }
+      );
+    }
+
+    const dbContext = resolveDatabaseForRequest(req, userId);
+    assertDatabaseSafety(dbContext.targetDb, userId);
+
+    await connectToDatabase({ dbName: dbContext.targetDb });
 
     const task = await Task.findOneAndUpdate(
       { id: taskId },
@@ -79,7 +115,6 @@ export async function POST(req: Request) {
 // PUT /api/tasks
 export async function PUT(req: Request) {
   try {
-    await connectToDatabase();
     const body = await req.json();
 
     if (!body.id) {
@@ -87,6 +122,17 @@ export async function PUT(req: Request) {
     }
 
     const userId = body.userId || ADMIN_UID;
+
+    // AIR-GAP: Guest or demo tasks
+    if (userId === "guest-user" || (typeof userId === "string" && userId.startsWith("demo_"))) {
+      return NextResponse.json({ ...body, updatedAt: new Date().toISOString() });
+    }
+
+    const dbContext = resolveDatabaseForRequest(req, userId);
+    assertDatabaseSafety(dbContext.targetDb, userId);
+
+    await connectToDatabase({ dbName: dbContext.targetDb });
+
     const targetUserIds = getTargetUserIds(userId);
 
     const updatedTask = await Task.findOneAndUpdate(
@@ -122,7 +168,6 @@ export async function PUT(req: Request) {
 // DELETE /api/tasks?id=xxx&userId=yyy
 export async function DELETE(req: Request) {
   try {
-    await connectToDatabase();
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
     const userId = searchParams.get("userId") || ADMIN_UID;
@@ -130,6 +175,16 @@ export async function DELETE(req: Request) {
     if (!id) {
       return NextResponse.json({ error: "Task ID is required" }, { status: 400 });
     }
+
+    // AIR-GAP: Guest or demo tasks
+    if (userId === "guest-user" || userId.startsWith("demo_")) {
+      return NextResponse.json({ success: true, message: "Task deleted from sandbox" });
+    }
+
+    const dbContext = resolveDatabaseForRequest(req, userId);
+    assertDatabaseSafety(dbContext.targetDb, userId);
+
+    await connectToDatabase({ dbName: dbContext.targetDb });
 
     const targetUserIds = getTargetUserIds(userId);
     await Task.findOneAndDelete({ id, userId: { $in: targetUserIds } });

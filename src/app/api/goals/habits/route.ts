@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { connectToDatabase } from "@/lib/mongodb";
+import { connectToDatabase, resolveDatabaseForRequest, assertDatabaseSafety } from "@/lib/mongodb";
 import { Habit } from "@/models/Habit";
 import { HabitLog } from "@/models/HabitLog";
 
@@ -8,13 +8,22 @@ export const dynamic = "force-dynamic";
 // GET /api/goals/habits?userId=xxx
 export async function GET(req: Request) {
   try {
-    await connectToDatabase();
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get("userId");
 
     if (!userId) {
       return NextResponse.json({ error: "UserId is required" }, { status: 400 });
     }
+
+    // AIR-GAP: Guest or demo habits do not query or pollute invictus_db!
+    if (userId === "guest-user" || userId.startsWith("demo_")) {
+      return NextResponse.json([]);
+    }
+
+    const dbContext = resolveDatabaseForRequest(req, userId);
+    assertDatabaseSafety(dbContext.targetDb, userId);
+
+    await connectToDatabase({ dbName: dbContext.targetDb });
 
     const targetUserIds = (userId === "user-admin-default" || userId === "user_1kapw9sad_1784744868999")
       ? ["user-admin-default", "user_1kapw9sad_1784744868999"]
@@ -30,7 +39,6 @@ export async function GET(req: Request) {
 // POST /api/goals/habits (Create new habit)
 export async function POST(req: Request) {
   try {
-    await connectToDatabase();
     const body = await req.json();
 
     if (!body.userId || !body.title) {
@@ -44,6 +52,27 @@ export async function POST(req: Request) {
     const goalTarget = body.goalTarget ?? body.targetValue;
     const unit = body.unit ?? body.goalUnit;
     const goalUnit = body.goalUnit ?? body.unit;
+
+    // AIR-GAP: Guest or demo habits stay in guest client storage, no write to invictus_db
+    if (body.userId === "guest-user" || (typeof body.userId === "string" && body.userId.startsWith("demo_"))) {
+      return NextResponse.json(
+        {
+          ...body,
+          id: habitId,
+          archived: false,
+          targetValue,
+          goalTarget,
+          unit,
+          goalUnit,
+        },
+        { status: 201 }
+      );
+    }
+
+    const dbContext = resolveDatabaseForRequest(req, body.userId);
+    assertDatabaseSafety(dbContext.targetDb, body.userId);
+
+    await connectToDatabase({ dbName: dbContext.targetDb });
 
     const newHabit = await Habit.create({
       ...body,
@@ -64,13 +93,22 @@ export async function POST(req: Request) {
 // PUT /api/goals/habits (Update habit)
 export async function PUT(req: Request) {
   try {
-    await connectToDatabase();
     const body = await req.json();
     const { id, userId, ...updates } = body;
 
     if (!id || !userId) {
       return NextResponse.json({ error: "Habit id and userId are required" }, { status: 400 });
     }
+
+    // AIR-GAP: Guest or demo habits
+    if (userId === "guest-user" || (typeof userId === "string" && userId.startsWith("demo_"))) {
+      return NextResponse.json({ ...body, updatedAt: new Date().toISOString() });
+    }
+
+    const dbContext = resolveDatabaseForRequest(req, userId);
+    assertDatabaseSafety(dbContext.targetDb, userId);
+
+    await connectToDatabase({ dbName: dbContext.targetDb });
 
     const targetUserIds = (userId === "user-admin-default" || userId === "user_1kapw9sad_1784744868999")
       ? ["user-admin-default", "user_1kapw9sad_1784744868999"]
@@ -91,7 +129,6 @@ export async function PUT(req: Request) {
 // DELETE /api/goals/habits?id=xxx&userId=yyy (Delete habit)
 export async function DELETE(req: Request) {
   try {
-    await connectToDatabase();
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
     const userId = searchParams.get("userId");
@@ -99,6 +136,16 @@ export async function DELETE(req: Request) {
     if (!id || !userId) {
       return NextResponse.json({ error: "Habit id and userId are required" }, { status: 400 });
     }
+
+    // AIR-GAP: Guest or demo habits
+    if (userId === "guest-user" || userId.startsWith("demo_")) {
+      return NextResponse.json({ success: true, id, message: "Habit deleted from sandbox" });
+    }
+
+    const dbContext = resolveDatabaseForRequest(req, userId);
+    assertDatabaseSafety(dbContext.targetDb, userId);
+
+    await connectToDatabase({ dbName: dbContext.targetDb });
 
     const targetUserIds = (userId === "user-admin-default" || userId === "user_1kapw9sad_1784744868999")
       ? ["user-admin-default", "user_1kapw9sad_1784744868999"]
