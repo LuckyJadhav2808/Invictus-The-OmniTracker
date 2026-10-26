@@ -4,7 +4,8 @@ import { useState, useMemo, useEffect, useDeferredValue, useRef } from "react";
 import { Dumbbell, Plus, Trash2, Edit3, CheckCircle2, Circle, Flame, Sparkles, Layers, Search, Info, Eye, ChevronDown, ChevronUp, Timer, Play, Pause, X, RotateCcw } from "lucide-react";
 import { AdaptiveDrawerDialog } from "@/components/shared/AdaptiveDrawerDialog";
 import { soundFX } from "@/components/shared/SoundFX";
-import { TemplateSelectionModal, TemplatePack } from "@/components/shared/TemplateSelectionModal";
+import { TemplatePack } from "@/components/shared/TemplateSelectionModal";
+import { GymChoiceModal } from "@/components/goals/GymChoiceModal";
 import { GYM_TEMPLATE_PACKS } from "@/lib/templates-data";
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
 import { ExerciseGuideModal } from "@/components/goals/ExerciseGuideModal";
@@ -86,12 +87,60 @@ export function GymRoutineTracker() {
   const [collapsedExercises, setCollapsedExercises] = useState<Record<string, boolean>>({});
   const [showBodyMapFilter, setShowBodyMapFilter] = useState(false);
   const [isSplitAnatomyOpen, setIsSplitAnatomyOpen] = useState(false);
+  const [isAnatomyExpanded, setIsAnatomyExpanded] = useState(true);
 
   const toggleCollapse = (exId: string) => {
     setCollapsedExercises((prev) => ({
       ...prev,
       [exId]: !prev[exId],
     }));
+  };
+
+  const handleAddCustomExerciseFromChoice = async (custom: {
+    name: string;
+    machineName?: string;
+    targetMuscle?: string;
+    notes?: string;
+  }) => {
+    const newExercise = {
+      id: `ex_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+      name: custom.name,
+      machineName: custom.machineName || "Free Weights",
+      targetMuscle: custom.targetMuscle || "Chest",
+      equipment: custom.machineName || "Free Weights",
+      instructions: [],
+      images: [],
+      gifUrl: "",
+      secondaryMuscles: [],
+      notes: custom.notes || "",
+      sets: [
+        { id: `set_1_${Date.now()}`, setNumber: 1, weight: 20, reps: 12, completed: false },
+        { id: `set_2_${Date.now()}`, setNumber: 2, weight: 25, reps: 10, completed: false },
+        { id: `set_3_${Date.now()}`, setNumber: 3, weight: 30, reps: 8, completed: false },
+      ],
+    };
+
+    const existingExercises = currentRoutine?.exercises || [];
+    const updatedExercises = [...existingExercises, newExercise];
+
+    try {
+      if (currentRoutine) {
+        await updateRoutineMutation.mutateAsync({
+          id: currentRoutine.id,
+          exercises: updatedExercises,
+        });
+      } else {
+        await addRoutineMutation.mutateAsync({
+          dayOfWeek: selectedDay,
+          routineTitle: defaultRoutineTitles[selectedDay] || "Daily Workout Split",
+          exercises: updatedExercises,
+        });
+      }
+      toast.success(`Exercise '${custom.name}' added to ${selectedDay}! 💪`);
+      setIsChoiceOpen(false);
+    } catch {
+      toast.error("Failed to add exercise");
+    }
   };
 
   const handleApplyGymPack = (pack: TemplatePack) => {
@@ -682,38 +731,165 @@ export function GymRoutineTracker() {
         </div>
       </div>
 
-      {/* Routine Title Banner */}
-      <div className="bg-cream-bg/50 rounded-2xl p-3.5 sm:p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          <span className="text-[9.5px] font-heading font-black uppercase tracking-widest text-[#161514]/70 block">
-            {selectedDay} Workout Routine
-          </span>
-          <h4 className="text-sm sm:text-base font-heading font-black text-[#161514] mt-0.5 leading-snug break-words">
-            {currentRoutine?.routineTitle || defaultRoutineTitles[selectedDay]}
-          </h4>
+      {/* Stage 1 Sub-Banner: Routine Split Title & Telemetry Progress */}
+      <div className="bg-[#FAF8F5] border-2 border-[#161514] rounded-2xl p-4 shadow-[3px_3px_0px_0px_#161514] space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <span className="text-[9.5px] font-heading font-black uppercase tracking-widest text-[#161514]/70 block">
+              {selectedDay} Workout Split
+            </span>
+            <h4 className="text-base sm:text-lg font-heading font-black text-[#161514] mt-0.5 leading-snug break-words">
+              {currentRoutine?.routineTitle || defaultRoutineTitles[selectedDay]}
+            </h4>
+          </div>
+
+          {/* Quick Telemetry Chips */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white border-2 border-[#161514] shadow-[1.5px_1.5px_0px_#161514] text-xs font-mono font-black text-[#161514]">
+              <Flame className="size-3.5 fill-rose-500 text-rose-600" />
+              <span>{splitAnatomy.primary.length + splitAnatomy.secondary.length} Focus Areas</span>
+            </div>
+            {isTimerRunning && (
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-[#C084FC] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_#161514] text-xs font-mono font-black text-[#161514] animate-pulse">
+                <Timer className="size-3.5 text-[#161514]" />
+                <span>REST: {gymRest.secondsLeft}s</span>
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0 self-start sm:self-center">
-          {currentExercises.length > 0 && (
-            <button
-              type="button"
-              onClick={() => {
-                setIsSplitAnatomyOpen(true);
-                soundFX.playPop();
-              }}
-              className="bg-rose-100 hover:bg-rose-200 text-[#161514] font-heading font-black rounded-xl py-1.5 px-2.5 sm:px-3 text-xs border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] cursor-pointer transition-all flex items-center gap-1 active:translate-y-0.5"
-              title="Inspect anatomical muscle activation for today's routine"
-            >
-              <Flame className="size-3.5 fill-rose-500 text-rose-600" />
-              <span>Muscle Map</span>
-            </button>
-          )}
+        {/* Sets Progress Bar */}
+        <div className="space-y-1.5 pt-1">
+          <div className="flex items-center justify-between text-xs font-mono font-bold text-[#161514]">
+            <span>Workout Completion</span>
+            <span>
+              {totalSets > 0 ? Math.round((totalCompletedSets / totalSets) * 100) : 0}% Complete ({totalCompletedSets}/{totalSets} sets)
+            </span>
+          </div>
+          <div className="h-2.5 w-full bg-white rounded-full border-2 border-[#161514] overflow-hidden p-0.5 shadow-[1px_1px_0px_0px_#161514]">
+            <div
+              className="h-full bg-[#03D26F] rounded-full transition-all duration-300"
+              style={{ width: `${totalSets > 0 ? (totalCompletedSets / totalSets) * 100 : 0}%` }}
+            />
+          </div>
+        </div>
+      </div>
 
+      {/* ─── STAGE 2: TARGET MUSCLE BODY SVG STAGE (EMBEDDED IN PAGE) ─── */}
+      <div className="bg-white border-2 border-[#161514] rounded-2xl p-4 sm:p-5 shadow-[4px_4px_0px_0px_#161514] space-y-3.5">
+        <div className="flex items-center justify-between gap-3 pb-2 border-b-2 border-[#161514]/15 flex-wrap">
+          <div className="flex items-center gap-2.5">
+            <div className="size-9 rounded-xl bg-[#CEF431] border-2 border-[#161514] flex items-center justify-center text-sm font-black shadow-[1.5px_1.5px_0px_#161514]">
+              🧬
+            </div>
+            <div>
+              <h4 className="font-heading font-black text-sm text-[#161514] leading-tight flex items-center gap-2">
+                <span>Target Muscle Anatomy & Activation</span>
+                <span className="text-[9px] font-mono font-bold bg-[#161514] text-[#CEF431] px-1.5 py-0.5 rounded border border-[#161514]">
+                  REAL-TIME
+                </span>
+              </h4>
+              <p className="text-[11px] font-bold text-[#161514]/65">
+                {splitAnatomy.primary.length + splitAnatomy.secondary.length > 0
+                  ? `${splitAnatomy.primary.length + splitAnatomy.secondary.length} muscle groups illuminated in today's split`
+                  : "No movements logged yet for today. Add exercises below to illuminate your anatomical heatmap!"}
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setIsAnatomyExpanded(!isAnatomyExpanded)}
+            className="text-xs font-heading font-black px-3 py-1.5 rounded-xl border-2 border-[#161514] bg-[#FAF8F5] hover:bg-amber-100 shadow-[1.5px_1.5px_0px_#161514] cursor-pointer transition-all flex items-center gap-1.5 active:translate-y-0.5"
+          >
+            {isAnatomyExpanded ? (
+              <>
+                <ChevronUp className="size-3.5 stroke-[2.5]" />
+                <span>Hide Anatomy</span>
+              </>
+            ) : (
+              <>
+                <ChevronDown className="size-3.5 stroke-[2.5]" />
+                <span>Inspect Anatomy ({splitAnatomy.primary.length + splitAnatomy.secondary.length})</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Embedded Body Model */}
+        {isAnatomyExpanded && (
+          <div className="space-y-3 pt-1 animate-in fade-in duration-200">
+            <div className="flex justify-center py-2 bg-[#FAF8F5] rounded-xl border-2 border-[#161514]/20 shadow-inner">
+              <HumanMuscleAnatomy
+                highlightedMuscles={splitAnatomy}
+                size="md"
+                interactive={true}
+                showViewToggle={true}
+                showLegend={true}
+              />
+            </div>
+
+            {/* Focus Area Badges Strip */}
+            <div className="bg-[#FAF8F5] p-3 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] space-y-2">
+              <div className="flex items-center justify-between text-[11px] font-heading font-black text-[#161514]">
+                <span className="uppercase">Active Split Focus Areas:</span>
+                <span className="text-[#047857]">
+                  {splitAnatomy.primary.length} Primary &bull; {splitAnatomy.secondary.length} Secondary
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {splitAnatomy.primary.map((m) => (
+                  <span
+                    key={m}
+                    className="px-2.5 py-1 rounded-lg bg-rose-100 text-rose-900 border-2 border-[#161514] text-[10px] font-black uppercase shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center gap-1"
+                  >
+                    <Flame className="size-3 fill-rose-500 text-rose-600" />
+                    <span>{m}</span>
+                  </span>
+                ))}
+                {splitAnatomy.secondary.map((m) => (
+                  <span
+                    key={m}
+                    className="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-900 border-2 border-[#161514] text-[10px] font-black uppercase shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center gap-1"
+                  >
+                    <Sparkles className="size-3 text-amber-600" />
+                    <span>{m}</span>
+                  </span>
+                ))}
+                {splitAnatomy.primary.length === 0 && splitAnatomy.secondary.length === 0 && (
+                  <span className="text-[11px] font-bold text-[#161514]/50 italic">
+                    Add movements in Stage 3 below to light up muscle activation.
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ─── STAGE 3: IN BETWEEN: IMMERSIVE MOVEMENT CHOICE & ACTION BAR ─── */}
+      <div className="bg-cream-bg/60 rounded-2xl p-3.5 sm:p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex flex-col sm:flex-row sm:items-center justify-between gap-3 w-full min-w-0">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-heading font-black text-[#161514]">
+              {selectedDay} Movements
+            </span>
+            <span className="bg-[#161514] text-white text-[10px] font-mono font-black px-2 py-0.5 rounded-full">
+              {currentExercises.length} Exercises
+            </span>
+          </div>
+          <p className="text-[11px] font-bold text-[#161514]/65 mt-0.5">
+            Log sets, weights, and reps below. Tap '+ Add Movement' to choose from 4,300+ DB or custom exercises.
+          </p>
+        </div>
+
+        {/* Action Buttons with flex-wrap ensuring ZERO OVERFLOW */}
+        <div className="flex flex-wrap items-center justify-end gap-2 shrink min-w-0 w-full sm:w-auto">
           {currentExercises.length > 1 && (
             <button
               type="button"
               onClick={toggleAllCollapse}
-              className="bg-white hover:bg-cream-bg text-[#161514] font-heading font-black rounded-xl py-1.5 px-2.5 text-xs border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] cursor-pointer transition-all flex items-center gap-1 active:translate-y-0.5"
+              className="bg-white hover:bg-cream-bg text-[#161514] font-heading font-black rounded-xl py-2 px-3 text-xs border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] cursor-pointer transition-all flex items-center gap-1 active:translate-y-0.5 whitespace-nowrap"
               title={isAllCollapsed ? "Expand all exercises" : "Collapse all exercises"}
             >
               {isAllCollapsed ? (
@@ -731,11 +907,14 @@ export function GymRoutineTracker() {
           )}
 
           <button
-            onClick={() => setIsChoiceOpen(true)}
-            className="bg-[#CEF431] hover:bg-[#D8F74E] text-[#161514] font-heading font-black rounded-xl py-1.5 px-3.5 text-xs border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none cursor-pointer flex items-center gap-1.5 transition-all"
+            onClick={() => {
+              setIsChoiceOpen(true);
+              soundFX.playPop();
+            }}
+            className="bg-[#CEF431] hover:bg-[#D8F74E] text-[#161514] font-heading font-black rounded-xl py-2 px-4 text-xs border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none cursor-pointer flex items-center gap-1.5 transition-all whitespace-nowrap"
           >
-            <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
-            <span>Add Exercise</span>
+            <Plus className="h-3.5 w-3.5 stroke-[3]" />
+            <span>Add Movement</span>
           </button>
         </div>
       </div>
@@ -1038,22 +1217,16 @@ export function GymRoutineTracker() {
         </div>
       )}
 
-      {/* Add Exercise Choice Modal */}
-      <TemplateSelectionModal
+      {/* ─── IMMERSIVE MOVEMENT CHOICE MODAL (4,300+ DB VAULT, CUSTOM, PRESETS) ─── */}
+      <GymChoiceModal
         open={isChoiceOpen}
         onOpenChange={setIsChoiceOpen}
-        title="Add Workout Routine"
-        subtitle="Start from scratch or choose a workout preset."
-        blankLabel="Custom Exercise"
-        blankDesc="Exercise name, muscle, and sets"
-        templatesLabel="Workout Presets"
-        templatesDesc="Push day, pull day, legs, etc."
-        templatePacks={GYM_TEMPLATE_PACKS}
-        onSelectBlank={() => {
-          setAddModalTab("library");
-          setIsAddExerciseOpen(true);
-        }}
-        onApplyTemplatePack={handleApplyGymPack}
+        selectedDay={selectedDay}
+        onSelectExerciseFromLibrary={handleAddExerciseFromLibrary}
+        onAddCustomExercise={handleAddCustomExerciseFromChoice}
+        onApplyPresetPack={handleApplyGymPack}
+        onViewGuide={(ex) => setSelectedGuideExercise(ex)}
+        isPending={addRoutineMutation.isPending || updateRoutineMutation.isPending}
       />
 
       {/* Routine Title Modal */}
@@ -1083,338 +1256,6 @@ export function GymRoutineTracker() {
             Save Routine Title
           </Button>
         </form>
-      </AdaptiveDrawerDialog>
-
-      {/* Add Exercise Modal */}
-      <AdaptiveDrawerDialog
-        open={isAddExerciseOpen}
-        onOpenChange={setIsAddExerciseOpen}
-        title={`Add Exercise to ${selectedDay}`}
-        description="Search movements or add a custom exercise."
-      >
-        <div className="space-y-3 pt-1">
-          {/* Segmented Mode Toggle: Library vs Custom Exercise */}
-          <div className="flex p-1 bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] gap-1">
-            <button
-              type="button"
-              onClick={() => setAddModalTab("library")}
-              className={cn(
-                "flex-1 py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer",
-                addModalTab === "library"
-                  ? "bg-[#161514] text-white shadow-[1px_1px_0px_0px_#161514]"
-                  : "text-[#161514] hover:bg-white"
-              )}
-            >
-              <Search className="h-3.5 w-3.5 stroke-[2.5]" />
-              <span>Library ({libData?.totalCount || 4325})</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setAddModalTab("custom")}
-              className={cn(
-                "flex-1 py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer",
-                addModalTab === "custom"
-                  ? "bg-[#161514] text-white shadow-[1px_1px_0px_0px_#161514]"
-                  : "text-[#161514] hover:bg-white"
-              )}
-            >
-              <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
-              <span>Custom Exercise</span>
-            </button>
-          </div>
-
-          {addModalTab === "library" ? (
-            /* 🔍 4,300+ EXERCISES SEARCH & DIRECT 1-TAP ADD */
-            <div className="space-y-3">
-              {/* Search Input with Clear Button */}
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search exercise name or muscle (e.g. Bench Press, Lat Pulldown)..."
-                  value={libQuery}
-                  onChange={(e) => setLibQuery(e.target.value)}
-                  className="w-full bg-white rounded-xl border-2 border-[#161514] pl-3.5 pr-8 py-2.5 text-xs font-bold text-[#161514] outline-none placeholder:text-[#161514]/40 shadow-[2px_2px_0px_0px_#161514] focus:bg-[#FFF9EA]"
-                  autoFocus
-                />
-                {libQuery && (
-                  <button
-                    type="button"
-                    onClick={() => setLibQuery("")}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-[#161514]/60 hover:text-[#161514] hover:bg-[#161514]/10 cursor-pointer transition-colors"
-                    title="Clear search"
-                  >
-                    <X className="h-3.5 w-3.5" />
-                  </button>
-                )}
-              </div>
-
-              {/* Muscle Group Quick Filters + Interactive Body Map Toggle */}
-              <div className="flex items-center justify-between gap-2 pt-0.5">
-                <span className="text-[10px] font-heading font-black uppercase text-[#161514]/70">
-                  Filter By Muscle Group
-                </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowBodyMapFilter(!showBodyMapFilter);
-                    soundFX.playPop();
-                  }}
-                  className={cn(
-                    "text-[10px] font-heading font-black px-2.5 py-1 rounded-xl border-2 border-[#161514] transition-all cursor-pointer flex items-center gap-1 active:translate-y-0.5",
-                    showBodyMapFilter
-                      ? "bg-[#161514] text-[#CEF431] shadow-[1px_1px_0px_0px_#161514]"
-                      : "bg-amber-100 hover:bg-amber-200 text-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]"
-                  )}
-                >
-                  <span>{showBodyMapFilter ? "Hide Visual Map" : "Visual Muscle Map 🗺️"}</span>
-                </button>
-              </div>
-
-              {/* Interactive Visual Anatomy Body Map Filter */}
-              {showBodyMapFilter && (
-                <div className="bg-[#FAF8F5] p-3 rounded-2xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] animate-in fade-in zoom-in-95 duration-150">
-                  <div className="text-center mb-2 min-h-[38px] flex flex-col items-center justify-center">
-                    <p className="text-[10px] font-heading font-black uppercase text-[#161514]/70">
-                      Tap any muscle on the model to filter 4,300+ exercises
-                    </p>
-                    {libBodyPart !== "all" ? (
-                      <span className="inline-block mt-0.5 text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-[#CEF431] text-[#161514] border border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
-                        Filtered by: {libBodyPart}
-                      </span>
-                    ) : (
-                      <span className="inline-block mt-0.5 text-[9.5px] font-bold text-[#161514]/40">
-                        Viewing all muscle groups
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex justify-center">
-                    <HumanMuscleAnatomy
-                      size="sm"
-                      interactive={true}
-                      selectedMuscle={mapBodyPartToMuscleGroup(libBodyPart)}
-                      onMuscleClick={(muscle) => {
-                        const mappedPart = mapMuscleGroupToBodyPart(muscle);
-                        setLibBodyPart(mappedPart);
-                        toast.info(`Filtered exercises for ${mappedPart}`);
-                      }}
-                      showViewToggle={true}
-                      showLegend={false}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* Muscle Group Quick Filters */}
-              <div className="flex flex-wrap gap-1.5 pt-0.5">
-                {["all", "Chest", "Back", "Shoulders", "Biceps", "Triceps", "Quadriceps", "Hamstrings", "Glutes", "Calves", "Abdominals", "Cardio"].map((m) => (
-                  <button
-                    key={m}
-                    type="button"
-                    onClick={() => setLibBodyPart(m)}
-                    className={cn(
-                      "text-[9px] font-black px-2 py-0.5 rounded-lg border-2 border-[#161514] transition-all cursor-pointer",
-                      libBodyPart === m
-                        ? "bg-[#161514] text-white shadow-[1px_1px_0px_0px_#161514]"
-                        : "bg-white text-[#161514] hover:bg-amber-100"
-                    )}
-                  >
-                    {m === "all" ? "ALL MUSCLES" : m.toUpperCase()}
-                  </button>
-                ))}
-              </div>
-
-              {/* Counter & Search Status */}
-              <div className="flex items-center justify-between text-[11px] font-bold text-[#161514]/70 px-0.5">
-                <span>
-                  Showing <strong className="text-[#161514] font-black">{libData?.exercises ? Math.min(libData.exercises.length, libData.totalCount) : 0}</strong> of <strong className="text-[#161514] font-black">{libData?.totalCount || 4334}</strong> exercises
-                </span>
-                {isLibFetching && (
-                  <span className="text-rose-600 font-black text-[10px] uppercase tracking-wider animate-pulse flex items-center gap-1">
-                    <span className="size-1.5 rounded-full bg-rose-500 animate-ping inline-block" />
-                    Searching...
-                  </span>
-                )}
-              </div>
-
-              {/* Live Search Results List with 1-TAP DIRECT ADD */}
-              {libData?.exercises && libData.exercises.length > 0 ? (
-                <div className="max-h-[50vh] overflow-y-auto space-y-2 pr-1 pt-1 divide-y divide-amber-200/60 overscroll-contain">
-                  {libData.exercises.map((item) => {
-                    const thumbUrl = (item.images && item.images[0]) || item.gifUrl;
-                    return (
-                    <div
-                      key={item.id}
-                      onClick={() => handleAddExerciseFromLibrary(item)}
-                      className="p-2.5 rounded-xl bg-white hover:bg-amber-100/90 border-2 border-[#161514] cursor-pointer transition-all flex items-center justify-between gap-2.5 shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-y-0.5 group"
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        {thumbUrl ? (
-                          <div className="h-11 w-11 rounded-lg bg-[#242220] border-2 border-[#161514] overflow-hidden shrink-0 flex items-center justify-center">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={thumbUrl}
-                              alt={item.title}
-                              loading="lazy"
-                              onError={(e) => {
-                                (e.currentTarget as HTMLElement).style.display = "none";
-                              }}
-                              className="h-full w-full object-contain"
-                            />
-                          </div>
-                        ) : (
-                          <div className="h-11 w-11 rounded-lg bg-amber-200 border-2 border-[#161514] flex items-center justify-center text-[#161514] font-black text-xs shrink-0">
-                            🏋️
-                          </div>
-                        )}
-                        <div className="min-w-0 flex-1">
-                          <h5 className="font-black text-xs text-[#161514] leading-snug break-words group-hover:text-rose-600 transition-colors">
-                            {item.title}
-                          </h5>
-                          <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                            <span className="text-[8.5px] font-black uppercase px-1.5 py-0.5 rounded bg-amber-300 text-[#161514] border-2 border-[#161514]">
-                              {item.bodyPart}
-                            </span>
-                            <span className="text-[8.5px] font-black uppercase px-1.5 py-0.5 rounded bg-sky-200 text-[#161514] border-2 border-[#161514]">
-                              {item.equipment}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedGuideExercise(item);
-                          }}
-                          className="px-2 py-1 rounded-lg bg-amber-200 hover:bg-amber-300 text-[#161514] text-[9px] font-black border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514] flex items-center gap-1 cursor-pointer transition-all active:translate-y-0.5"
-                          title="View Exercise Form Guide"
-                        >
-                          <Eye className="h-2.5 w-2.5 stroke-[2.5]" />
-                          <span>Guide</span>
-                        </button>
-                        <button
-                          type="button"
-                          disabled={addRoutineMutation.isPending || updateRoutineMutation.isPending}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleAddExerciseFromLibrary(item);
-                          }}
-                          className="text-[9px] font-black bg-[#03D26F] hover:bg-[#02b861] active:translate-y-0.5 text-[#161514] px-2.5 py-1 rounded-lg border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center gap-1 cursor-pointer transition-all"
-                        >
-                          <span>USE</span>
-                          <span className="font-black">➔</span>
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-
-                  {/* Infinite Scroll Sentinel */}
-                  <div ref={loadMoreSentinelRef} className="h-2 w-full" />
-
-                  {/* Load More Button */}
-                  {libData && libData.totalCount > libData.exercises.length && (
-                    <div className="pt-2 pb-1 text-center">
-                      <button
-                        type="button"
-                        onClick={() => setDisplayLimit((prev) => prev + 50)}
-                        disabled={isLibFetching}
-                        className="w-full py-2.5 px-4 rounded-xl bg-amber-300 hover:bg-amber-400 text-[#161514] font-heading font-black text-xs border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-y-0.5 cursor-pointer flex items-center justify-center gap-2 transition-all disabled:opacity-60"
-                      >
-                        <span>
-                          {isLibFetching
-                            ? "Loading More Exercises..."
-                            : `Load More Movements (${libData.totalCount - libData.exercises.length} remaining)`}
-                        </span>
-                        <ChevronDown className="h-4 w-4 stroke-[3]" />
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="p-5 text-center bg-white rounded-2xl border-2 border-dashed border-[#161514]/40 space-y-2.5">
-                  <p className="text-xs font-black text-[#161514]">
-                    No exercise found matching &ldquo;{libQuery}&rdquo;
-                  </p>
-                  <p className="text-[11px] font-bold text-[#161514]/70">
-                    Can&apos;t find this variation? Create it as a custom exercise with your own machines and target muscles.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setExerciseName(libQuery);
-                      setAddModalTab("custom");
-                    }}
-                    className="text-xs font-black bg-rose-400 hover:bg-rose-500 text-[#161514] px-3.5 py-1.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] cursor-pointer inline-flex items-center gap-1.5 active:translate-y-0.5 transition-all"
-                  >
-                    <Plus className="h-3.5 w-3.5 stroke-[3]" />
-                    <span>Create &ldquo;{libQuery || "Custom"}&rdquo; Exercise</span>
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
-            /* ✍️ CUSTOM EXERCISE CREATION FORM */
-            <form onSubmit={handleAddExercise} className="space-y-4 pt-1">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Exercise Name</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Incline Dumbbell Press, Lat Pulldown"
-                  value={exerciseName}
-                  onChange={(e) => setExerciseName(e.target.value)}
-                  className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:ring-2 focus:ring-rose-500 font-medium"
-                  required
-                  autoFocus
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Machine / Equipment</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Cable Station, Smith Machine"
-                    value={machineName}
-                    onChange={(e) => setMachineName(e.target.value)}
-                    className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:ring-2 focus:ring-rose-500 font-medium"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Target Muscle</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Chest, Back, Abdominals"
-                    value={targetMuscle}
-                    onChange={(e) => setTargetMuscle(e.target.value)}
-                    className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:ring-2 focus:ring-rose-500 font-medium"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-extrabold uppercase tracking-widest text-navy-600">Notes / Form Cue</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Squeeze at top, 2 second slow negative"
-                  value={exerciseNotes}
-                  onChange={(e) => setExerciseNotes(e.target.value)}
-                  className="w-full bg-cream-bg rounded-xl border border-border/85 px-4 py-2.5 text-xs text-navy-900 focus:outline-none focus:ring-2 focus:ring-rose-500 font-medium"
-                />
-              </div>
-
-              <Button
-                type="submit"
-                disabled={addRoutineMutation.isPending || updateRoutineMutation.isPending}
-                className="w-full bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-full py-2.5 mt-2 border-none cursor-pointer"
-              >
-                Add Custom Exercise & Start Logging
-              </Button>
-            </form>
-          )}
-        </div>
       </AdaptiveDrawerDialog>
 
       {/* Edit Exercise Modal */}
