@@ -97,7 +97,12 @@ public class SmsBridgePlugin extends Plugin {
 
         long startTime = call.getLong("startTime", 0L);
         long endTime = call.getLong("endTime", System.currentTimeMillis());
-        int limit = call.getInt("limit", 200);
+        long now = System.currentTimeMillis();
+        // Generous forward buffer prevents carrier telecom clock skew from cutting off today's messages
+        if (endTime >= now - 300000) {
+            endTime = now + (12 * 60 * 60 * 1000L);
+        }
+        int limit = call.getInt("limit", 300);
 
         JSArray messagesArray = new JSArray();
         ContentResolver cr = context.getContentResolver();
@@ -106,7 +111,7 @@ public class SmsBridgePlugin extends Plugin {
         String selection = "date >= ? AND date <= ?";
         String[] selectionArgs = new String[]{String.valueOf(startTime), String.valueOf(endTime)};
         String sortOrder = "date DESC";
-        int maxScanRows = 800;
+        int maxScanRows = 1200;
         int rowsScanned = 0;
 
         try (Cursor cursor = cr.query(uri, new String[]{"_id", "address", "body", "date"}, selection, selectionArgs, sortOrder)) {
@@ -128,15 +133,20 @@ public class SmsBridgePlugin extends Plugin {
                     String id = idIdx != -1 ? cursor.getString(idIdx) : "";
 
                     if (address != null && !address.isEmpty() && body != null && !body.isEmpty()) {
+                        String addressClean = address.trim().replaceFirst("^\\+?91", "");
                         String bodyUpper = body.toUpperCase();
-                        boolean isBank = BANK_HEADER_PATTERN.matcher(address.trim()).matches()
-                                || bodyUpper.contains("-PNB") || bodyUpper.contains("-SBI") || bodyUpper.contains("-HDFC") || bodyUpper.contains("-ICICI")
-                                || bodyUpper.contains("-AXIS") || bodyUpper.contains("-KOTAK") || bodyUpper.contains("-BOB") || bodyUpper.contains("-BOI")
-                                || bodyUpper.contains("-CANBNK") || bodyUpper.contains("-UBI") || bodyUpper.contains("-IDFC") || bodyUpper.contains("-PAYTM")
-                                || bodyUpper.contains("PUNJAB NATIONAL BANK") || bodyUpper.contains("STATE BANK OF INDIA")
-                                || bodyUpper.contains("HDFC BANK") || bodyUpper.contains("ICICI BANK") || bodyUpper.contains("AXIS BANK")
-                                || bodyUpper.contains("KOTAK BANK") || bodyUpper.contains("BANK OF BARODA");
-                        if (isBank) {
+
+                        // Broad financial candidate filter: pass business/financial SMS to the JS parser
+                        boolean isCandidate = BANK_HEADER_PATTERN.matcher(address.trim()).matches()
+                                || BANK_HEADER_PATTERN.matcher(addressClean).matches()
+                                || addressClean.matches("^[A-Za-z0-9+_-]{3,15}$")
+                                || bodyUpper.contains("DEBIT") || bodyUpper.contains("DEBITED") || bodyUpper.contains("SPENT")
+                                || bodyUpper.contains("PAID") || bodyUpper.contains("SENT") || bodyUpper.contains("WITHDRAWN")
+                                || bodyUpper.contains("TRANSFERRED") || bodyUpper.contains("TRANSFER TO")
+                                || bodyUpper.contains("A/C") || bodyUpper.contains("ACCOUNT") || bodyUpper.contains("UPI")
+                                || bodyUpper.contains("INR") || bodyUpper.contains("RS.") || bodyUpper.contains("RS ");
+
+                        if (isCandidate) {
                             JSObject msgObj = new JSObject();
                             msgObj.put("id", id);
                             msgObj.put("address", address);

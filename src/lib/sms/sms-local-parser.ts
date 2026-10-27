@@ -26,8 +26,8 @@ export interface ParsedSmsTransaction {
   confidence: "high" | "medium";
 }
 
-// 1. TRAI Approved Indian Bank Alphanumeric Headers & Sender Patterns
-export const BANK_HEADER_REGEX = /^(?:[A-Za-z]{2}[-_]?)?(HDFC(?:BK)?|SBI(?:NB|PSG|UPI|INB)?|ICICI(?:B)?|AXIS(?:BK)?|KOTAK(?:B)?|INDUS(?:B)?|YES(?:BNK)?|PNB(?:SMS)?|PUNJAB|BOI(?:SMS)?|CAN(?:BNK|ARA)?|UBI(?:SMS)?|UNION(?:B)?|IDFC(?:FB)?|FED(?:BNK)?|PAYTM(?:B)?|CRED(?:BK)?|CENT(?:BK)?|BOB(?:SMS)?|MAH(?:BK)?|IOB|UCO(?:BNK)?|RBL(?:BNK)?|AUFIN(?:B)?|BANDH(?:N)?|IDBI(?:BK)?|SC(?:ISMS)?|AMEX(?:IN)?|AIRTEL|JIO(?:BNK)?)(?:[-_][A-Za-z0-9]+)?$/i;
+// 1. TRAI Approved Indian Bank Alphanumeric Headers & Sender Patterns (Supports +91, FinTech, & All Banks)
+export const BANK_HEADER_REGEX = /^(?:[A-Za-z0-9]{2}[-_]?)?(HDFC(?:BK)?|SBI(?:NB|PSG|UPI|INB|TXN)?|ICICI(?:B)?|AXIS(?:BK)?|KOTAK(?:B)?|INDUS(?:B)?|YES(?:BNK)?|PNB(?:SMS|TXN)?|PUNJAB|BOI(?:SMS)?|CAN(?:BNK|ARA)?|UBI(?:SMS)?|UNION(?:B)?|IDFC(?:FB)?|FED(?:BNK)?|PAYTM(?:B)?|CRED(?:BK)?|CENT(?:BK)?|BOB(?:SMS|TXN)?|MAH(?:BK|A)?|IOB|UCO(?:BNK)?|RBL(?:BNK)?|AUFIN(?:B)?|BANDH(?:N)?|IDBI(?:BK)?|SC(?:ISMS)?|AMEX(?:IN)?|AIRTEL|JIO(?:BNK)?|PHONEPE|PHONEP|GPAY|GOOGLP|BHIM|NPCI|UPI|ONECRD|ONECARD|JUPITR|FIBANK|SLICEN|SLICE|NIYO|TATANEU|AMZPAY|INDBNK|INDIANB|BOMAH|CBIN|DBS|HSBC|CITI|KVB|SIB|CSB)(?:[-_][A-Za-z0-9]+)?$/i;
 
 // 2. Strict Zero-Tolerance OTP / Secret Token Dropper
 export const OTP_REGEX = /\b(otp|one time password|verification code|secret code|cvv|atm pin|upi pin|password|passcode)\b/i;
@@ -41,8 +41,8 @@ export const FAILED_TX_REGEX = /\b(failed|declined|unsuccessful|aborted|cancelle
 // 5. Balance Clause Stripper (Ensures available balance is NEVER extracted as spend amount)
 export const BALANCE_STRIPPER_REGEX = /(?:\.|\s)*(?:Avl\s*Bal|Avail\s*Bal|Available\s*Balance|Bal:|Total\s*Bal|Clear\s*Bal|Bal\s+INR|Bal\s+Rs).*$/i;
 
-// 6. Spend & Debit Intent Verification
-export const DEBIT_INTENT_REGEX = /\b(debited|spent|paid|sent|withdrawn|purchase|deducted|transfer to)\b/i;
+// 6. Spend & Debit Intent Verification (Broadened to include debit of, transferred from, txn of, payment of)
+export const DEBIT_INTENT_REGEX = /\b(debited|debit|spent|paid|sent|withdrawn|purchase|deducted|transfer to|transferred to|transferred from|transferred|payment to|payment of|txn of|transaction of|charged|auto[- ]?debit)\b/i;
 
 // 7. Amount Pattern (Supports INR, Rs, Re, ₹, with commas and decimals)
 export const AMOUNT_REGEX = /(?:(?:Rs\.?|Re\.?|INR|₹)\s*([\d,]+(?:\.\d{1,2})?))|(?:debited\s*(?:by|with|for)?|spent|paid|sent)\s*(?:Rs\.?|Re\.?|INR|₹)?\s*([\d,]+(?:\.\d{1,2})?)/i;
@@ -147,7 +147,14 @@ export function extractCleanMerchant(text: string): string {
  */
 export function extractDateAndTime(text: string, fallbackTimestampMs?: number): { date: string; time?: string } {
   const fallback = new Date(fallbackTimestampMs || Date.now());
-  const fallbackDateStr = fallback.toISOString().split("T")[0];
+  const year = fallback.getFullYear();
+  const month = String(fallback.getMonth() + 1).padStart(2, "0");
+  const day = String(fallback.getDate()).padStart(2, "0");
+  const fallbackDateStr = `${year}-${month}-${day}`;
+  const hours = String(fallback.getHours()).padStart(2, "0");
+  const minutes = String(fallback.getMinutes()).padStart(2, "0");
+  const seconds = String(fallback.getSeconds()).padStart(2, "0");
+  const fallbackTimeStr = `${hours}:${minutes}:${seconds}`;
 
   // Pattern 1: "Dt 01-10-26 12:03:31" or "01-10-2026 12:03:31" or "dated 26-10-2026 18:30:15"
   const dtTimeMatch = text.match(/(?:Dt|dated)\s*(\d{2})[-/](\d{2})[-/](\d{2,4})\s+(\d{2}:\d{2}(?::\d{2})?)/i);
@@ -176,7 +183,7 @@ export function extractDateAndTime(text: string, fallbackTimestampMs?: number): 
       month = monthMap[month.toLowerCase()] || "01";
     }
 
-    return { date: `${year}-${month}-${day}` };
+    return { date: `${year}-${month}-${day}`, time: fallbackTimeStr };
   }
 
   // Pattern 3: Standalone date with slash or dash: "27/10/26", "26-10-2026"
@@ -189,11 +196,11 @@ export function extractDateAndTime(text: string, fallbackTimestampMs?: number): 
     const dNum = parseInt(day, 10);
     const mNum = parseInt(month, 10);
     if (dNum >= 1 && dNum <= 31 && mNum >= 1 && mNum <= 12) {
-      return { date: `${year}-${month}-${day}` };
+      return { date: `${year}-${month}-${day}`, time: fallbackTimeStr };
     }
   }
 
-  return { date: fallbackDateStr };
+  return { date: fallbackDateStr, time: fallbackTimeStr };
 }
 
 /**
@@ -218,6 +225,15 @@ export function identifyBankName(sender: string = "", bodyText: string = ""): st
   if (cleanSender.includes("YES") || cleanSender.includes("YESBNK")) return "Yes Bank";
   if (cleanSender.includes("INDUS") || cleanSender.includes("INDUSB")) return "IndusInd";
   if (cleanSender.includes("BOB") || cleanSender.includes("BOBSMS")) return "Bank of Baroda";
+  if (cleanSender.includes("PHONEP")) return "PhonePe";
+  if (cleanSender.includes("GPAY") || cleanSender.includes("GOOGL")) return "Google Pay";
+  if (cleanSender.includes("BHIM") || cleanSender.includes("NPCI")) return "BHIM UPI";
+  if (cleanSender.includes("ONECRD") || cleanSender.includes("ONECARD")) return "OneCard";
+  if (cleanSender.includes("JUPITR")) return "Jupiter";
+  if (cleanSender.includes("FIBANK")) return "Fi Money";
+  if (cleanSender.includes("SLICE")) return "Slice";
+  if (cleanSender.includes("INDBNK") || cleanSender.includes("INDIANB")) return "Indian Bank";
+  if (cleanSender.includes("BOMAH")) return "Bank of Maharashtra";
 
   // 2. Trailing Bank Signature check (e.g. -PNB, -SBI, -HDFC)
   const trailingBankMatch = bodyText.match(/-(PNB|SBI|HDFC|ICICI|AXIS|KOTAK|BOI|CANBNK|UBI|IDFC|PAYTM)$/i);
@@ -258,12 +274,23 @@ export function parseBankSms(
   const bodyText = rawBody.replace(/[\r\n]+/g, " ").trim();
   if (bodyText.length < 10) return null;
 
-  // Rule 1: Sender Header Verification (If sender provided, must match known institution pattern or end with bank code)
-  if (rawSender && rawSender.trim()) {
+  // Rule 1: Sender Header Verification
+  // Clean raw sender: strip country code (+91 / 91 / 0) and leading punctuation
+  const cleanSender = (rawSender || "")
+    .replace(/^(\+?91|0)/, "")
+    .replace(/^[-_]/, "")
+    .trim();
+
+  if (cleanSender || (rawSender && rawSender.trim())) {
     const isApprovedSender =
+      BANK_HEADER_REGEX.test(cleanSender) ||
       BANK_HEADER_REGEX.test(rawSender.trim()) ||
-      /-(?:PNB|SBI|HDFC|ICICI|AXIS|KOTAK|BOB|BOI|CANBNK|UBI|IDFC|PAYTM)$/i.test(bodyText) ||
-      /(?:Punjab National Bank|State Bank of India|HDFC Bank|ICICI Bank|Axis Bank|Kotak Bank|Bank of Baroda|Union Bank|Paytm)/i.test(bodyText);
+      /-(?:PNB|SBI|HDFC|ICICI|AXIS|KOTAK|BOB|BOI|CANBNK|UBI|IDFC|PAYTM|CRED|AIRTEL|JIO)$/i.test(bodyText) ||
+      /(?:Punjab National Bank|State Bank of India|HDFC Bank|ICICI Bank|Axis Bank|Kotak Bank|Bank of Baroda|Union Bank|Canara Bank|Indian Bank|Bank of Maharashtra|Paytm|PhonePe|Google Pay|CRED)/i.test(bodyText) ||
+      // Defensively allow any SMS that has clear banking debit context + account/UPI
+      ((DEBIT_INTENT_REGEX.test(bodyText) || bodyText.toLowerCase().includes("debited")) &&
+       (ACCOUNT_MASKED_REGEX.test(bodyText) || UPI_TOKEN_REGEX.test(bodyText) || /UPI/i.test(bodyText)));
+
     if (!isApprovedSender) {
       return null;
     }

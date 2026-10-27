@@ -270,4 +270,51 @@ describe("Invictus Zero-Knowledge Local SMS Parser Engine", () => {
       expect(parsed?.date).toBe("2026-10-27");
     });
   });
+
+  describe("10. Indian Telecom Prefix Stripping & FinTech Senders", () => {
+    it("should handle +91 and 91 prefixed carrier sender headers like +91AD-PNBSMS", () => {
+      const pnbSms =
+        "A/c X3866 debited INR 120.00 to Chai Point thru UPI:12345.Bal INR 15000.-PNB";
+      const parsed = parseBankSms(pnbSms, "+91AD-PNBSMS");
+
+      expect(parsed).not.toBeNull();
+      expect(parsed?.amount).toBe(120.0);
+      expect(parsed?.merchant).toBe("Chai Point");
+      expect(parsed?.bankName).toBe("PNB");
+    });
+
+    it("should identify PhonePe and Google Pay sender headers", () => {
+      const phonePeSms =
+        "Paid Rs.85 to Sharma General Store from your PNB A/c **3866 via PhonePe. Txn ID: T2610271400. Bal Rs.14915";
+      const parsedPhonePe = parseBankSms(phonePeSms, "VM-PHONEP");
+
+      expect(parsedPhonePe).not.toBeNull();
+      expect(parsedPhonePe?.amount).toBe(85.0);
+      expect(parsedPhonePe?.bankName).toBe("PhonePe");
+      expect(parsedPhonePe?.accountMasked).toBe("3866");
+
+      const gpaySms =
+        "You paid Rs. 210.00 to Uber India using Google Pay on 27-Oct-2026. Ref: 693810294. A/c XX3866 debited.";
+      const parsedGpay = parseBankSms(gpaySms, "VK-GPAY");
+
+      expect(parsedGpay).not.toBeNull();
+      expect(parsedGpay?.amount).toBe(210.0);
+      expect(parsedGpay?.bankName).toBe("Google Pay");
+      expect(parsedGpay?.accountMasked).toBe("3866");
+    });
+
+    it("should support fallback timestamp extraction using local device calendar without UTC shift", () => {
+      // Midnight IST transaction: 01:30 AM on Oct 27, 2026 IST = 20:00 UTC on Oct 26.
+      // UTC toISOString() would yield 2026-10-26, but local device must yield 2026-10-27!
+      const smsWithoutDate =
+        "A/c *3866 debited INR 50.00 to Chai Stall thru UPI:9999. Avail Bal: Rs 14000";
+      // Construct a Date object for local time
+      const localDate = new Date(2026, 9, 27, 1, 30, 0); // Month 9 is October
+      const parsed = parseBankSms(smsWithoutDate, "PNBSMS", localDate.getTime());
+
+      expect(parsed).not.toBeNull();
+      expect(parsed?.date).toBe("2026-10-27");
+      expect(parsed?.time).toBe("01:30:00");
+    });
+  });
 });

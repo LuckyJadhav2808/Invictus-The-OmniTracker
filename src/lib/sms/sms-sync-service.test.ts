@@ -59,6 +59,17 @@ describe("SMS Sync Service & On-Launch Auto-Scanner", () => {
       expect(range.label).toContain("Yesterday");
     });
 
+    it("computes 'today_and_yesterday' range spanning from start of yesterday to now + 12h", () => {
+      const now = new Date();
+      const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+      const startOfYesterday = startOfToday - 24 * 60 * 60 * 1000;
+
+      const range = getPresetDateRange("today_and_yesterday");
+      expect(range.startTime).toBe(startOfYesterday);
+      expect(range.endTime).toBeGreaterThan(startOfToday);
+      expect(range.label).toContain("Today & Yesterday");
+    });
+
     it("computes 'past_7_days' lookback span", () => {
       const range = getPresetDateRange("past_7_days");
       const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;

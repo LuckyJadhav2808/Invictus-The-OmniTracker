@@ -10,19 +10,19 @@ export interface AppVersionInfo {
 }
 
 export const APP_VERSION_CONFIG: AppVersionInfo = {
-  version: "1.7.7",
-  buildNumber: 28,
+  version: "1.7.8",
+  buildNumber: 29,
   releaseDate: "October 27, 2026",
   channel: "stable",
   minSupportedVersion: "1.0.0",
   githubRepoUrl: "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker",
   latestReleaseApiUrl: "https://api.github.com/repos/LuckyJadhav2808/Invictus-The-OmniTracker/releases/latest",
   changelog: [
-    "⚡ Autonomous On-Launch SMS Sync: Automatically checks for today's bank transactions with a 2-hour midnight buffer on app entry",
-    "📅 Date-Targeted SMS Scanner: Interactive presets (Today, Yesterday, 7 Days, Month, Custom Range) to scan specific dates",
-    "🛡️ Frictionless Android Permission Flow: Native system runtime dialog (Allow/Don't allow) with 1-tap Settings deep-link fallback",
-    "🛑 15-Minute Cooldown Guardrail: Prevents battery and SQLite thrashing across rapid page transitions",
-    "💳 Zero-Clipping Neobrutalist Wallet Cockpit: Fluid responsive tabs, tabular numerals, and unclipped ink drop shadows",
+    "🎯 Today & Yesterday 1-Tap Scanner Preset: Dedicated quick-filter spanning current day and day before with real-time telemetry readout",
+    "📡 Telecom +91 & 91 Sender Normalization: Seamlessly handles Indian carrier prefixes on bank sender headers (e.g., +91AD-PNBSMS)",
+    "💳 FinTech Sender Support: Native recognition for PhonePe, Google Pay, BHIM/NPCI UPI, OneCard, Jupiter, and Fi Money",
+    "🕒 IST Timezone Drift Fix: Local device calendar extraction eliminating midnight UTC date slippage",
+    "⏱️ Carrier Clock Skew Resilience: 12-hour forward lookahead buffer capturing all fresh same-day transactions",
   ],
 };
 

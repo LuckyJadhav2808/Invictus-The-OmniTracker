@@ -102,14 +102,23 @@ export interface SyncBankSmsOptions {
   ) => Promise<Category>;
 }
 
-export type SmsDatePreset = "today" | "yesterday" | "past_7_days" | "this_month" | "custom";
+export type SmsDatePreset = "today" | "today_and_yesterday" | "yesterday" | "past_7_days" | "this_month" | "custom";
 
 export function getPresetDateRange(preset: SmsDatePreset): { startTime: number; endTime: number; label: string } {
   const now = new Date();
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-  const endOfToday = now.getTime();
+  const safeFutureBuffer = 12 * 60 * 60 * 1000; // 12-hr forward buffer protects against carrier clock drift
+  const endOfToday = now.getTime() + safeFutureBuffer;
 
   switch (preset) {
+    case "today_and_yesterday": {
+      const startOfYesterday = startOfToday - 24 * 60 * 60 * 1000;
+      return {
+        startTime: startOfYesterday,
+        endTime: endOfToday,
+        label: "Today & Yesterday (Full 48 hrs)",
+      };
+    }
     case "today": {
       // 2hr buffer back to 10:00 PM yesterday for midnight transactions
       return {
@@ -316,8 +325,8 @@ export async function autoScanTodayBankSms(
       return null;
     }
 
-    // Current Day bounds with 2hr late-night buffer
-    const range = getPresetDateRange("today");
+    // Scan current day and day before (today & yesterday) on launch
+    const range = getPresetDateRange("today_and_yesterday");
 
     const result = await syncRecentBankSms(categories, existingTransactions, {
       startTime: range.startTime,
