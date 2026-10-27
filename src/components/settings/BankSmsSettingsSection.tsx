@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useAuth } from "@/components/shared/AuthProvider";
+import { useQueryClient } from "@tanstack/react-query";
 import { soundFX } from "@/components/shared/SoundFX";
 import { cn } from "@/lib/utils";
 import {
@@ -15,6 +17,7 @@ import {
   Sliders,
   ChevronDown,
   ChevronUp,
+  Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -31,11 +34,15 @@ import { detectCategoryFromNote } from "@/lib/utils/merchant-categorizer";
 import { LearnedMerchantDictionaryModal } from "@/components/money/modals/LearnedMerchantDictionaryModal";
 
 export function BankSmsSettingsSection() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
   const { data: categories = [] } = useCategories();
   const { data: transactions = [] } = useTransactions();
 
   const [isNative, setIsNative] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [isPurging, setIsPurging] = useState(false);
+  const [showPurgeConfirm, setShowPurgeConfirm] = useState(false);
   const [isDictionaryOpen, setIsDictionaryOpen] = useState(false);
   const [lastSyncText, setLastSyncText] = useState<string | null>(null);
 
@@ -140,6 +147,43 @@ export function BankSmsSettingsSection() {
     resetLastSmsSyncTimestamp();
     refreshSyncTime();
     toast.success("High-water mark reset. Next scan will inspect past 30 days.");
+  };
+
+  const handlePurgeSmsBatch = async () => {
+    if (!user?.uid) {
+      toast.error("User session not found");
+      return;
+    }
+    const currentUserId = user.uid;
+    setIsPurging(true);
+    soundFX.play("trash");
+    try {
+      const res = await fetch("/api/money/sms-cleanup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: currentUserId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to purge SMS data");
+
+      resetLastSmsSyncTimestamp();
+      refreshSyncTime();
+
+      await queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      await queryClient.invalidateQueries({ queryKey: ["categories"] });
+
+      soundFX.play("celebrate");
+      toast.success(
+        `🧹 Cleaned up! Purged ${data.deletedTransactionsCount} SMS transactions and ${data.deletedCategoriesCount} categories.`,
+        { description: "Manual expenses and core categories were preserved 100%." }
+      );
+      setShowPurgeConfirm(false);
+    } catch (err: any) {
+      soundFX.play("error");
+      toast.error(err.message || "Failed to clean SMS transactions");
+    } finally {
+      setIsPurging(false);
+    }
   };
 
   const handleImportTestParsed = async () => {
@@ -272,7 +316,56 @@ export function BankSmsSettingsSection() {
           </div>
         </div>
 
-        {/* Feature 3: Collapsible Interactive Parser Sandbox */}
+        {/* Feature 3: Purge SMS Scan Batch & Reset Ledger */}
+        <div className="bg-rose-50/70 border-2 border-[#161514] rounded-2xl p-3.5 shadow-[2px_2px_0px_0px_#161514] space-y-2.5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3 min-w-0 pr-2">
+              <div className="size-9 rounded-xl bg-rose-100 border-2 border-[#161514] flex items-center justify-center text-rose-700 shadow-[1px_1px_0px_0px_#161514] shrink-0">
+                <Trash2 className="size-4" />
+              </div>
+              <div className="min-w-0">
+                <h5 className="font-black text-xs text-[#161514] uppercase font-heading truncate">
+                  Purge SMS Scan Batch
+                </h5>
+                <p className="text-[10px] text-[#161514]/70 font-bold truncate">
+                  Wipes SMS-imported transactions & merchant categories • Keeps manual entries
+                </p>
+              </div>
+            </div>
+            {!showPurgeConfirm ? (
+              <button
+                type="button"
+                onClick={() => {
+                  soundFX.play("pop");
+                  setShowPurgeConfirm(true);
+                }}
+                className="px-3 py-1.5 rounded-xl border-2 border-[#161514] bg-white hover:bg-rose-100 text-rose-700 font-black text-xs uppercase shadow-[2px_2px_0px_0px_#161514] active:translate-y-0.5 transition-all cursor-pointer whitespace-nowrap shrink-0"
+              >
+                Reset Ledger
+              </button>
+            ) : (
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  disabled={isPurging}
+                  onClick={handlePurgeSmsBatch}
+                  className="px-3 py-1.5 rounded-xl border-2 border-[#161514] bg-rose-600 hover:bg-rose-700 text-white font-black text-xs uppercase shadow-[2px_2px_0px_0px_#161514] active:translate-y-0.5 transition-all cursor-pointer whitespace-nowrap"
+                >
+                  {isPurging ? "Purging..." : "Confirm Purge"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowPurgeConfirm(false)}
+                  className="px-2.5 py-1.5 rounded-xl border border-[#161514] bg-white text-[#161514] font-black text-xs uppercase hover:bg-zinc-100 cursor-pointer"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Feature 4: Collapsible Interactive Parser Sandbox */}
         <div className="border-2 border-[#161514] rounded-2xl overflow-hidden shadow-[2px_2px_0px_0px_#161514]">
           <button
             type="button"
