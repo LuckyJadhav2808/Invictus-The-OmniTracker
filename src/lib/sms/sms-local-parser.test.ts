@@ -201,4 +201,73 @@ describe("Invictus Zero-Knowledge Local SMS Parser Engine", () => {
       }
     });
   });
+
+  describe("9. Modern UPI Patterns, Wallet Disambiguation & Date Parsing", () => {
+    it("should never extract bare 'wallet' as merchant and cleanly normalize to 'Wallet Top-up'", () => {
+      const walletSms =
+        "A/c X3866 debited INR 50.00 Dt 26-10-26 14:00:00 to wallet thru UPI:123456789.Bal INR 100.00-PNB";
+      const parsed = parseBankSms(walletSms, "PNBSMS");
+
+      expect(parsed).not.toBeNull();
+      expect(parsed?.amount).toBe(50.0);
+      expect(parsed?.merchant).toBe("Wallet Top-up");
+      expect(parsed?.merchant).not.toBe("wallet");
+      expect(parsed?.date).toBe("2026-10-26");
+    });
+
+    it("should extract branded wallet names like 'Paytm Wallet'", () => {
+      const paytmWalletSms =
+        "A/c X3866 debited INR 200.00 to Paytm Wallet thru UPI:987654321.-PNB";
+      const parsed = parseBankSms(paytmWalletSms, "PNBSMS");
+
+      expect(parsed).not.toBeNull();
+      expect(parsed?.amount).toBe(200.0);
+      expect(parsed?.merchant).toBe("Paytm Wallet");
+    });
+
+    it("should disallow currency abbreviations like 'Eur' from becoming merchant names", () => {
+      const eurSms =
+        "A/c X3866 debited INR 23.00 to Eur thru UPI:111122223333.-PNB";
+      const parsed = parseBankSms(eurSms, "PNBSMS");
+
+      expect(parsed).not.toBeNull();
+      expect(parsed?.amount).toBe(23.0);
+      expect(parsed?.merchant).not.toBe("Eur");
+      expect(parsed?.merchant).toBe("UPI Payment");
+    });
+
+    it("should extract merchant from modern UPI P2M/P2P slashes and capture yesterday's date", () => {
+      const swiggySms =
+        "Dear Customer, INR 150.00 debited from A/c XX3866 on 26-10-2026 18:30:15 towards UPI/P2M/Swiggy/swiggy@icici.-PNB";
+      const parsed = parseBankSms(swiggySms, "PNBSMS");
+
+      expect(parsed).not.toBeNull();
+      expect(parsed?.amount).toBe(150.0);
+      expect(parsed?.merchant).toBe("Swiggy");
+      expect(parsed?.date).toBe("2026-10-26");
+    });
+
+    it("should extract merchant from UPI transfer slashes and capture today's date with slashes", () => {
+      const zeptoSms =
+        "A/c *3866 debited by 35.00 on 27/10/26 transfer to UPI/ZEPTO/zepto@hdfcbank-PNB";
+      const parsed = parseBankSms(zeptoSms, "PNBSMS");
+
+      expect(parsed).not.toBeNull();
+      expect(parsed?.amount).toBe(35.0);
+      expect(parsed?.merchant).toBe("ZEPTO");
+      expect(parsed?.date).toBe("2026-10-27");
+    });
+
+    it("should cleanly extract store merchant from Credit Card transactions without card noise", () => {
+      const starbucksSms =
+        "Rs. 250.00 spent on your Credit Card XX1234 at STARBUCKS on 27-Oct-26. Avail Bal: Rs 10000";
+      const parsed = parseBankSms(starbucksSms, "HDFCBK");
+
+      expect(parsed).not.toBeNull();
+      expect(parsed?.amount).toBe(250.0);
+      expect(parsed?.merchant).toBe("STARBUCKS");
+      expect(parsed?.paymentMethod).toBe("Card");
+      expect(parsed?.date).toBe("2026-10-27");
+    });
+  });
 });

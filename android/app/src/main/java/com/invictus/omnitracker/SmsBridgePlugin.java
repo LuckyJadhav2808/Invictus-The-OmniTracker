@@ -35,7 +35,7 @@ import java.util.regex.Pattern;
 public class SmsBridgePlugin extends Plugin {
 
     private static final Pattern BANK_HEADER_PATTERN = Pattern.compile(
-            "^(?:[A-Za-z]{2}[-_]?)?(HDFCBK|SBINB|SBIPSG|SBIUPI|ICICIB|AXISBK|KOTAKB|INDUSB|YESBNK|PNBSMS|PNB|BOISMS|CANBNK|UBISMS|UNIONB|IDFCFB|FEDBNK|PAYTMB|CREDBK|CENTBK|BOBSMS|MAHBK|IOB|UCOBNK|RBLBNK|AUFINB|BANDHN|IDBIBK|SCISMS|AMEXIN|AIRTEL|JIOBNK)(?:[-_][A-Za-z0-9]+)?$",
+            "^(?:[A-Za-z]{2}[-_]?)?(HDFC(?:BK)?|SBI(?:NB|PSG|UPI|INB)?|ICICI(?:B)?|AXIS(?:BK)?|KOTAK(?:B)?|INDUS(?:B)?|YES(?:BNK)?|PNB(?:SMS)?|PUNJAB|BOI(?:SMS)?|CAN(?:BNK|ARA)?|UBI(?:SMS)?|UNION(?:B)?|IDFC(?:FB)?|FED(?:BNK)?|PAYTM(?:B)?|CRED(?:BK)?|CENT(?:BK)?|BOB(?:SMS)?|MAH(?:BK)?|IOB|UCO(?:BNK)?|RBL(?:BNK)?|AUFIN(?:B)?|BANDH(?:N)?|IDBI(?:BK)?|SC(?:ISMS)?|AMEX(?:IN)?|AIRTEL|JIO(?:BNK)?)(?:[-_][A-Za-z0-9]+)?$",
             Pattern.CASE_INSENSITIVE
     );
 
@@ -99,7 +99,9 @@ public class SmsBridgePlugin extends Plugin {
 
         String selection = "date >= ? AND date <= ?";
         String[] selectionArgs = new String[]{String.valueOf(startTime), String.valueOf(endTime)};
-        String sortOrder = "date DESC LIMIT " + limit;
+        String sortOrder = "date DESC";
+        int maxScanRows = 800;
+        int rowsScanned = 0;
 
         try (Cursor cursor = cr.query(uri, new String[]{"_id", "address", "body", "date"}, selection, selectionArgs, sortOrder)) {
             if (cursor != null && cursor.moveToFirst()) {
@@ -109,14 +111,25 @@ public class SmsBridgePlugin extends Plugin {
                 int dateIdx = cursor.getColumnIndex("date");
 
                 do {
+                    rowsScanned++;
+                    if (rowsScanned > maxScanRows || messagesArray.length() >= limit) {
+                        break;
+                    }
+
                     String address = addressIdx != -1 ? cursor.getString(addressIdx) : "";
                     String body = bodyIdx != -1 ? cursor.getString(bodyIdx) : "";
                     long date = dateIdx != -1 ? cursor.getLong(dateIdx) : 0L;
                     String id = idIdx != -1 ? cursor.getString(idIdx) : "";
 
                     if (address != null && !address.isEmpty() && body != null && !body.isEmpty()) {
+                        String bodyUpper = body.toUpperCase();
                         boolean isBank = BANK_HEADER_PATTERN.matcher(address.trim()).matches()
-                                || body.contains("-PNB") || body.contains("-SBI") || body.contains("-HDFC") || body.contains("-ICICI");
+                                || bodyUpper.contains("-PNB") || bodyUpper.contains("-SBI") || bodyUpper.contains("-HDFC") || bodyUpper.contains("-ICICI")
+                                || bodyUpper.contains("-AXIS") || bodyUpper.contains("-KOTAK") || bodyUpper.contains("-BOB") || bodyUpper.contains("-BOI")
+                                || bodyUpper.contains("-CANBNK") || bodyUpper.contains("-UBI") || bodyUpper.contains("-IDFC") || bodyUpper.contains("-PAYTM")
+                                || bodyUpper.contains("PUNJAB NATIONAL BANK") || bodyUpper.contains("STATE BANK OF INDIA")
+                                || bodyUpper.contains("HDFC BANK") || bodyUpper.contains("ICICI BANK") || bodyUpper.contains("AXIS BANK")
+                                || bodyUpper.contains("KOTAK BANK") || bodyUpper.contains("BANK OF BARODA");
                         if (isBank) {
                             JSObject msgObj = new JSObject();
                             msgObj.put("id", id);

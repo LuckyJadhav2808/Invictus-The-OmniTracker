@@ -24,6 +24,20 @@ export const SmsBridge = registerPlugin<SmsBridgePluginInterface>("SmsBridge");
 
 export const LAST_SMS_SYNC_KEY = "invictus_last_sms_sync_timestamp";
 
+export function getLastSmsSyncTimestamp(): number | null {
+  if (typeof window === "undefined") return null;
+  const saved = localStorage.getItem(LAST_SMS_SYNC_KEY);
+  if (!saved) return null;
+  const num = parseInt(saved, 10);
+  return isNaN(num) ? null : num;
+}
+
+export function resetLastSmsSyncTimestamp(): void {
+  if (typeof window !== "undefined") {
+    localStorage.removeItem(LAST_SMS_SYNC_KEY);
+  }
+}
+
 export async function isSmsSyncAvailable(): Promise<boolean> {
   if (typeof window === "undefined") return false;
   try {
@@ -79,10 +93,12 @@ export async function syncRecentBankSms(
 
   // 2. Determine High-Water Mark Timestamp
   let startTime = 0;
-  if (!options?.forceFullScan) {
+  if (options?.forceFullScan) {
+    startTime = Date.now() - 30 * 24 * 60 * 60 * 1000; // Force 30-day lookback
+  } else {
     const saved = localStorage.getItem(LAST_SMS_SYNC_KEY);
     if (saved) {
-      startTime = Math.max(0, parseInt(saved, 10) - 24 * 60 * 60 * 1000); // 24hr lookback buffer
+      startTime = Math.max(0, parseInt(saved, 10) - 48 * 60 * 60 * 1000); // 48hr lookback buffer ensures today + yesterday are captured
     } else {
       // Default initial scan: last 30 days
       startTime = Date.now() - 30 * 24 * 60 * 60 * 1000;

@@ -62,6 +62,7 @@ import {
 import Link from "next/link";
 import { toast } from "sonner";
 import { SubscriptionsTracker } from "@/components/money/SubscriptionsTracker";
+import { BankSmsSettingsSection } from "@/components/settings/BankSmsSettingsSection";
 import { ReminderManagerModal } from "@/components/shared/ReminderManagerModal";
 import { getReminderConfig, type ReminderConfig } from "@/lib/utils/reminder-scheduler";
 import { ReportIssueModal } from "@/components/shared/ReportIssueModal";
@@ -1139,6 +1140,9 @@ export default function SettingsPage() {
           </div>
         </ResponsiveFormContainer>
 
+
+        {/* FEATURE 5D: 📱 BANK SMS TELEMETRY & LEARNED RULES */}
+        <BankSmsSettingsSection />
 
         {/* REMINDERS & FEEDBACK SECTION */}
         <div className="space-y-3 pt-2">

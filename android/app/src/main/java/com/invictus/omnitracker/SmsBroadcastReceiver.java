@@ -39,7 +39,7 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
 
     // 1. TRAI Approved Bank Headers (Pre-compiled Regex)
     private static final Pattern BANK_HEADER_PATTERN = Pattern.compile(
-            "^(?:[A-Za-z]{2}[-_]?)?(HDFCBK|SBINB|SBIPSG|SBIUPI|ICICIB|AXISBK|KOTAKB|INDUSB|YESBNK|PNBSMS|PNB|BOISMS|CANBNK|UBISMS|UNIONB|IDFCFB|FEDBNK|PAYTMB|CREDBK|CENTBK|BOBSMS|MAHBK|IOB|UCOBNK|RBLBNK|AUFINB|BANDHN|IDBIBK|SCISMS|AMEXIN|AIRTEL|JIOBNK)(?:[-_][A-Za-z0-9]+)?$",
+            "^(?:[A-Za-z]{2}[-_]?)?(HDFC(?:BK)?|SBI(?:NB|PSG|UPI|INB)?|ICICI(?:B)?|AXIS(?:BK)?|KOTAK(?:B)?|INDUS(?:B)?|YES(?:BNK)?|PNB(?:SMS)?|PUNJAB|BOI(?:SMS)?|CAN(?:BNK|ARA)?|UBI(?:SMS)?|UNION(?:B)?|IDFC(?:FB)?|FED(?:BNK)?|PAYTM(?:B)?|CRED(?:BK)?|CENT(?:BK)?|BOB(?:SMS)?|MAH(?:BK)?|IOB|UCO(?:BNK)?|RBL(?:BNK)?|AUFIN(?:B)?|BANDH(?:N)?|IDBI(?:BK)?|SC(?:ISMS)?|AMEX(?:IN)?|AIRTEL|JIO(?:BNK)?)(?:[-_][A-Za-z0-9]+)?$",
             Pattern.CASE_INSENSITIVE
     );
 

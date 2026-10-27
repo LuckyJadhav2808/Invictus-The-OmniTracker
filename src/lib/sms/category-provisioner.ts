@@ -104,6 +104,15 @@ export const CATEGORY_BLUEPRINTS: Record<string, CategoryBlueprint> = {
     monthlyBudget: 15000,
     synonyms: ["rent", "housing", "flat", "room", "pg", "hostel", "maintenance", "deposit"],
   },
+  "cat-transfers": {
+    key: "cat-transfers",
+    name: "Transfers & Top-up",
+    icon: "🔄",
+    color: "amber",
+    type: "expense",
+    monthlyBudget: 3000,
+    synonyms: ["transfer", "transfers", "wallet", "wallet top-up", "paytm wallet", "amazon pay wallet", "mobikwik wallet", "topup", "top-up", "recharge", "self transfer"],
+  },
   "cat-general": {
     key: "cat-general",
     name: "General Expense",
