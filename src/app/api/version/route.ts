@@ -75,17 +75,17 @@ export async function GET(request: Request) {
       ? reqUrl.origin
       : "https://invictus-the-omni-tracker.vercel.app";
 
-    // If local file is missing on this server instance (e.g. Vercel serverless), point directly to GitHub latest release
-    if (!localFileExists && (!apkDownloadUrl || apkDownloadUrl.includes("/downloads/Invictus.apk"))) {
-      apkDownloadUrl = `https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/latest/download/Invictus.apk`;
-    } else if (apkDownloadUrl && apkDownloadUrl.startsWith("/")) {
-      apkDownloadUrl = `${serverOrigin}${apkDownloadUrl}`;
-    }
-
     const effectiveTargetVersion =
       compareSemver(latestVersion, APP_VERSION_CONFIG.version) >= 0
         ? latestVersion
         : APP_VERSION_CONFIG.version;
+
+    // If local file is missing on this server instance (e.g. Vercel serverless), point directly to the exact target release APK
+    if (!localFileExists && (!apkDownloadUrl || apkDownloadUrl.includes("/downloads/Invictus.apk"))) {
+      apkDownloadUrl = `https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v${effectiveTargetVersion}/Invictus.apk`;
+    } else if (apkDownloadUrl && apkDownloadUrl.startsWith("/")) {
+      apkDownloadUrl = `${serverOrigin}${apkDownloadUrl}`;
+    }
 
     const hasUpdate = compareSemver(effectiveTargetVersion, clientInstalledVersion) > 0;
     const isMandatory =

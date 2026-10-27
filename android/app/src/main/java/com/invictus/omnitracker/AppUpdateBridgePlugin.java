@@ -2,6 +2,8 @@ package com.invictus.omnitracker;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
@@ -107,41 +109,11 @@ public class AppUpdateBridgePlugin extends Plugin {
                         connection = (HttpURLConnection) url.openConnection();
                         connection.setConnectTimeout(15000);
                         connection.setReadTimeout(30000);
+                        connection.setRequestProperty("Accept-Encoding", "identity");
                         connection.connect();
                         responseCode = connection.getResponseCode();
                     }
                     redirectCount++;
-                }
-
-                // Fallback to official GitHub release if server returned an error (e.g. 404)
-                if (responseCode != HttpURLConnection.HTTP_OK) {
-                    String fallbackUrl = "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/latest/download/Invictus.apk";
-                    if (!finalDownloadUrl.equals(fallbackUrl)) {
-                        connection.disconnect();
-                        url = new URL(fallbackUrl);
-                        connection = (HttpURLConnection) url.openConnection();
-                        connection.setConnectTimeout(15000);
-                        connection.setReadTimeout(30000);
-                        connection.connect();
-                        responseCode = connection.getResponseCode();
-
-                        redirectCount = 0;
-                        while ((responseCode == HttpURLConnection.HTTP_MOVED_TEMP || 
-                                responseCode == HttpURLConnection.HTTP_MOVED_PERM || 
-                                responseCode == 307 || responseCode == 308) && redirectCount < 5) {
-                            String redirectUrl = connection.getHeaderField("Location");
-                            connection.disconnect();
-                            if (redirectUrl != null && !redirectUrl.isEmpty()) {
-                                url = new URL(redirectUrl);
-                                connection = (HttpURLConnection) url.openConnection();
-                                connection.setConnectTimeout(15000);
-                                connection.setReadTimeout(30000);
-                                connection.connect();
-                                responseCode = connection.getResponseCode();
-                            }
-                            redirectCount++;
-                        }
-                    }
                 }
 
                 if (responseCode != HttpURLConnection.HTTP_OK) {
@@ -179,6 +151,39 @@ public class AppUpdateBridgePlugin extends Plugin {
                 input.close();
                 connection.disconnect();
 
+                // Pre-flight package verification before invoking Android PackageInstaller
+                PackageManager pm = context.getPackageManager();
+                PackageInfo packageInfo = pm.getPackageArchiveInfo(apkFile.getAbsolutePath(), 0);
+                if (packageInfo == null) {
+                    call.reject("Downloaded file is not a valid Android package archive or is corrupted.");
+                    return;
+                }
+
+                if (!context.getPackageName().equals(packageInfo.packageName)) {
+                    call.reject("Downloaded package (" + packageInfo.packageName + ") does not match Invictus (" + context.getPackageName() + ").");
+                    return;
+                }
+
+                long downloadedVersionCode;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    downloadedVersionCode = packageInfo.getLongVersionCode();
+                } else {
+                    downloadedVersionCode = packageInfo.versionCode;
+                }
+
+                PackageInfo currentAppInfo = pm.getPackageInfo(context.getPackageName(), 0);
+                long currentVersionCode;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    currentVersionCode = currentAppInfo.getLongVersionCode();
+                } else {
+                    currentVersionCode = currentAppInfo.versionCode;
+                }
+
+                if (downloadedVersionCode < currentVersionCode) {
+                    call.reject("Downloaded APK (v" + packageInfo.versionName + ", build " + downloadedVersionCode + ") is older than your installed app (build " + currentVersionCode + "). Update aborted to prevent invalid package downgrade.");
+                    return;
+                }
+
                 // Launch Android PackageInstaller via FileProvider
                 Uri apkUri = FileProvider.getUriForFile(
                     context,
@@ -194,7 +199,7 @@ public class AppUpdateBridgePlugin extends Plugin {
 
                 JSObject ret = new JSObject();
                 ret.put("success", true);
-                ret.put("message", "Package installer invoked");
+                ret.put("message", "Package installer invoked for v" + packageInfo.versionName);
                 call.resolve(ret);
             } catch (Exception e) {
                 JSObject errorObj = new JSObject();
