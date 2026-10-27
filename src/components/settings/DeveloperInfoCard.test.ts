@@ -12,6 +12,8 @@ describe("DeveloperInfoCard Component Architecture", () => {
     const developer = {
       name: "Lucky Jadhav",
       role: "Lead Architect & Founder",
+      education: "3rd Year, Computer Engineering",
+      college: "Sinhgad College of Engineering Vadgaon (Bk)",
       email: "luckymanojjadhav@gmail.com",
       githubUrl: "https://github.com/LuckyJadhav2808",
       repoUrl: "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker",
@@ -20,6 +22,8 @@ describe("DeveloperInfoCard Component Architecture", () => {
     };
 
     expect(developer.name).toBe("Lucky Jadhav");
+    expect(developer.education).toContain("Computer Engineering");
+    expect(developer.college).toContain("Sinhgad College of Engineering");
     expect(developer.email).toBe("luckymanojjadhav@gmail.com");
     expect(developer.githubUrl).toContain("LuckyJadhav2808");
     expect(developer.repoUrl).toContain("Invictus-The-OmniTracker");

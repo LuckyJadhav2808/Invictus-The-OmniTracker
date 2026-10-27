@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Mail, Copy, Check, ExternalLink, Code2, Sparkles, Heart, ShieldCheck } from "lucide-react";
+import { Mail, Copy, Check, ExternalLink, Code2, Sparkles, Heart, ShieldCheck, GraduationCap } from "lucide-react";
 import { toast } from "sonner";
 import { APP_VERSION_CONFIG } from "@/config/version";
 
@@ -15,6 +15,8 @@ export const DeveloperInfoCard: React.FC<DeveloperInfoCardProps> = ({ className 
   const developer = {
     name: "Lucky Jadhav",
     role: "Lead Architect & Founder",
+    education: "3rd Year, Computer Engineering",
+    college: "Sinhgad College of Engineering Vadgaon (Bk)",
     email: "luckymanojjadhav@gmail.com",
     githubUrl: "https://github.com/LuckyJadhav2808",
     repoUrl: "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker",
@@ -87,6 +89,26 @@ export const DeveloperInfoCard: React.FC<DeveloperInfoCardProps> = ({ className 
         <p className="text-xs font-semibold text-[#161514] leading-relaxed">
           &ldquo;Invictus was born out of a desire for a single, uncompromising life operating system that unites finances, biomechanics, study telemetry, and daily discipline without cloud bloat.&rdquo;
         </p>
+      </div>
+
+      {/* Academic & Engineering Background Slip */}
+      <div className="bg-[#FAF8F5] rounded-2xl p-3.5 border-2 border-[#161514] flex items-center gap-3">
+        <div className="h-10 w-10 rounded-xl bg-amber-400 border-2 border-[#161514] flex items-center justify-center shrink-0 shadow-[1.5px_1.5px_0px_0px_#161514]">
+          <GraduationCap className="h-5 w-5 text-[#161514] stroke-[2.5]" />
+        </div>
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h5 className="font-heading font-black text-xs sm:text-sm text-[#161514] tracking-tight">
+              3rd Year • Computer Engineering
+            </h5>
+            <span className="bg-[#CEF431] text-[#161514] text-[9px] font-mono font-black uppercase px-2 py-0.5 rounded-full border border-[#161514]">
+              SCOE
+            </span>
+          </div>
+          <p className="text-[11px] text-[#161514]/75 font-bold tracking-tight truncate mt-0.5">
+            Sinhgad College of Engineering, Vadgaon (Bk)
+          </p>
+        </div>
       </div>
 
       {/* Connect & Developer Links */}

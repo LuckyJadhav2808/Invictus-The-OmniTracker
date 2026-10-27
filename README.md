@@ -278,8 +278,8 @@ flowchart LR
     <tr>
       <td style="padding: 24px; text-align: left;">
         <h3 style="margin: 0; font-size: 20px; font-weight: 900; color: #161514;">Lucky Jadhav</h3>
-        <p style="margin: 4px 0 12px 0; font-size: 13px; font-weight: 700; color: #161514; opacity: 0.7;">
-          Lead Architect & Creator of Invictus OS • Student & Solo Founder
+        <p style="margin: 4px 0 12px 0; font-size: 13px; font-weight: 700; color: #161514; opacity: 0.8;">
+          Lead Architect & Creator of Invictus OS • 3rd Year, Computer Engineering, Sinhgad College of Engineering Vadgaon (Bk)
         </p>
         <p style="margin: 0 0 16px 0; font-size: 13px; line-height: 1.5; color: #161514;">
           <i>"Invictus was born out of a desire for a single, uncompromising life operating system that unites finances, biomechanics, study telemetry, and daily discipline without cloud bloat."</i>

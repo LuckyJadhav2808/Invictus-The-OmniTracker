@@ -12,7 +12,6 @@ import {
   Zap,
   Moon,
   Sparkles,
-  Clock,
 } from 'lucide-react';
 import { VixPixelCompanion, VixPixelState } from '@/components/mascot/VixPixelCompanion';
 import {
@@ -133,12 +132,12 @@ export function TodayGreetingHero({
       {/* 2. 🌅 Time-Warp Dayparting Hero Banner */}
       <div
         className={cn(
-          "rounded-2xl border-2 border-[#161514] p-4 sm:p-5 shadow-[4px_4px_0px_0px_#161514] transition-all duration-300",
+          "rounded-2xl border-2 border-[#161514] p-4 sm:p-5 shadow-[4px_4px_0px_0px_#161514] transition-all duration-300 text-[#161514]",
           effectiveDaypart === "dawn"
             ? "bg-[#FFFDF5]"
             : effectiveDaypart === "forge"
             ? "bg-[#FAF5FF]"
-            : "bg-[#161514] text-white"
+            : "bg-[#F8FAFC]"
         )}
       >
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -147,8 +146,7 @@ export function TodayGreetingHero({
             <div
               className={cn(
                 "p-2.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] shrink-0",
-                daypartConfig.accentBg,
-                effectiveDaypart === "night" ? "text-[#161514] bg-[#CEF431]" : "text-[#161514]"
+                daypartConfig.accentBg
               )}
             >
               <DaypartIcon className="size-5 stroke-[2.5]" />
@@ -159,36 +157,18 @@ export function TodayGreetingHero({
                 <span
                   className={cn(
                     "text-[10px] font-mono font-black uppercase tracking-wider px-2 py-0.5 rounded-full border border-[#161514]",
-                    effectiveDaypart === "night"
-                      ? "bg-[#CEF431] text-[#161514]"
-                      : daypartConfig.badgeBg
+                    daypartConfig.badgeBg
                   )}
                 >
                   {daypartConfig.badgeText}
                 </span>
-                {daypartMode === "auto" && (
-                  <span className="text-[10px] font-mono text-[#161514]/60 dark:text-white/60 font-semibold flex items-center gap-1">
-                    <Clock className="size-3" />
-                    <span>Live Clock Synced</span>
-                  </span>
-                )}
               </div>
 
-              <h2
-                className={cn(
-                  "font-heading font-black text-lg sm:text-xl tracking-tight mt-1 truncate",
-                  effectiveDaypart === "night" ? "text-white" : "text-[#161514]"
-                )}
-              >
+              <h2 className="font-heading font-black text-lg sm:text-xl tracking-tight mt-1 truncate text-[#161514]">
                 {daypartConfig.greeting}
               </h2>
 
-              <p
-                className={cn(
-                  "text-xs font-semibold mt-0.5 leading-snug",
-                  effectiveDaypart === "night" ? "text-white/70" : "text-[#161514]/70"
-                )}
-              >
+              <p className="text-xs font-semibold mt-0.5 leading-snug text-[#161514]/70">
                 {daypartConfig.subtitle}
               </p>
             </div>

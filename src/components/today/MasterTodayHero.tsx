@@ -5,7 +5,6 @@ import { format } from "date-fns";
 import {
   Flame,
   Shield,
-  Clock,
   Wallet,
   Play,
   Pause,
@@ -196,12 +195,6 @@ export function MasterTodayHero({
                 >
                   {daypartConfig.badgeText}
                 </span>
-                {daypartMode === "auto" && (
-                  <span className="text-[10px] font-mono font-semibold text-[#161514]/65 flex items-center gap-1">
-                    <Clock className="size-3" />
-                    <span>Live Clock Synced</span>
-                  </span>
-                )}
               </div>
 
               {/* Time-Warp Scrubber Pill */}
@@ -261,13 +254,19 @@ export function MasterTodayHero({
               </div>
             </div>
 
-            {/* Grand Morning Greeting Headline */}
+            {/* Grand Greeting Headline */}
             <div className="space-y-1">
               <h1 className="font-heading font-black text-2xl sm:text-3xl tracking-tight leading-tight text-[#161514]">
-                Rise & Conquer, {displayName}.
+                {effectiveDaypart === "night"
+                  ? `Night Fortress Active, ${displayName}.`
+                  : effectiveDaypart === "forge"
+                  ? `Focus Sprint in Progress, ${displayName}.`
+                  : `Rise & Conquer, ${displayName}.`}
               </h1>
               <p className="text-xs sm:text-sm font-semibold leading-relaxed text-[#161514]/75">
-                {totalHabitsCount} habits loaded on deck. 4.0h study goal primed for victory.
+                {effectiveDaypart === "night"
+                  ? "Evening reflection on deck. Review today's ledger, preserve streaks, and seal tomorrow's victory."
+                  : `${totalHabitsCount} habits loaded on deck. 4.0h study goal primed for victory.`}
               </p>
             </div>
 
