@@ -18,6 +18,7 @@ import {
   ChevronDown,
   ChevronUp,
   Trash2,
+  Calendar,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -32,6 +33,7 @@ import { ensureCategoryExists } from "@/lib/sms/category-provisioner";
 import { useCategories, useTransactions, useBulkAddTransactions, useAddTransaction, useAddCategory } from "@/lib/queries/money";
 import { detectCategoryFromNote } from "@/lib/utils/merchant-categorizer";
 import { LearnedMerchantDictionaryModal } from "@/components/money/modals/LearnedMerchantDictionaryModal";
+import { SmsDateFilterModal } from "@/components/money/modals/SmsDateFilterModal";
 
 export function BankSmsSettingsSection() {
   const { user } = useAuth();
@@ -44,6 +46,7 @@ export function BankSmsSettingsSection() {
   const [isPurging, setIsPurging] = useState(false);
   const [showPurgeConfirm, setShowPurgeConfirm] = useState(false);
   const [isDictionaryOpen, setIsDictionaryOpen] = useState(false);
+  const [isDateFilterOpen, setIsDateFilterOpen] = useState(false);
   const [lastSyncText, setLastSyncText] = useState<string | null>(null);
 
   // Live Test Sandbox State
@@ -285,7 +288,35 @@ export function BankSmsSettingsSection() {
           </button>
         </div>
 
-        {/* Feature 2: 30-Day Recovery & Rescan */}
+        {/* Feature 2: Targeted Date Range Scanner */}
+        <div className="flex items-center justify-between bg-[#FAF8F5] border-2 border-[#161514] rounded-2xl p-3.5 shadow-[2px_2px_0px_0px_#161514]">
+          <div className="flex items-center gap-3 min-w-0 pr-2">
+            <div className="size-9 rounded-xl bg-blue-100 border-2 border-[#161514] flex items-center justify-center text-blue-800 shadow-[1px_1px_0px_0px_#161514] shrink-0">
+              <Calendar className="size-4" />
+            </div>
+            <div className="min-w-0">
+              <h5 className="font-black text-xs text-[#161514] uppercase font-heading truncate">
+                Targeted Date Range Scanner
+              </h5>
+              <p className="text-[10px] text-[#161514]/70 font-bold truncate">
+                Scan SMS for Today, Yesterday, Past 7 Days, or a custom date window
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              soundFX.play("pop");
+              setIsDateFilterOpen(true);
+            }}
+            className="px-3 py-1.5 rounded-xl border-2 border-[#161514] bg-[#FFFFFF] hover:bg-zinc-50 text-[#161514] font-black text-xs uppercase shadow-[2px_2px_0px_0px_#161514] active:translate-y-0.5 transition-all cursor-pointer whitespace-nowrap shrink-0 flex items-center gap-1.5"
+          >
+            <Calendar className="size-3.5" />
+            <span>Filter Dates</span>
+          </button>
+        </div>
+
+        {/* Feature 3: 30-Day Recovery & Rescan */}
         <div className="flex items-center justify-between bg-[#FAF8F5] border-2 border-[#161514] rounded-2xl p-3.5 shadow-[2px_2px_0px_0px_#161514]">
           <div className="flex items-center gap-3 min-w-0 pr-2">
             <div className="size-9 rounded-xl bg-amber-100 border-2 border-[#161514] flex items-center justify-center text-amber-800 shadow-[1px_1px_0px_0px_#161514] shrink-0">
@@ -461,6 +492,15 @@ export function BankSmsSettingsSection() {
         open={isDictionaryOpen}
         onOpenChange={setIsDictionaryOpen}
         categories={categories}
+      />
+
+      {/* Date Filter Scanner Modal */}
+      <SmsDateFilterModal
+        isOpen={isDateFilterOpen}
+        onClose={() => setIsDateFilterOpen(false)}
+        categories={categories}
+        transactions={transactions}
+        onScanComplete={() => refreshSyncTime()}
       />
     </div>
   );

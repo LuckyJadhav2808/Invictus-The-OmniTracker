@@ -58,7 +58,13 @@ public class SmsBridgePlugin extends Plugin {
 
     @PluginMethod
     public void requestPermissions(PluginCall call) {
+        Context context = getContext();
+        boolean hasNotif = true;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            hasNotif = ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !hasNotif) {
             requestPermissionForAliases(new String[]{"sms", "notifications"}, call, "allPermCallback");
         } else {
             requestPermissionForAlias("sms", call, "allPermCallback");

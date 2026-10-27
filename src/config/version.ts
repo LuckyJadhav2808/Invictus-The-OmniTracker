@@ -10,19 +10,19 @@ export interface AppVersionInfo {
 }
 
 export const APP_VERSION_CONFIG: AppVersionInfo = {
-  version: "1.7.6",
-  buildNumber: 27,
+  version: "1.7.7",
+  buildNumber: 28,
   releaseDate: "October 27, 2026",
   channel: "stable",
   minSupportedVersion: "1.0.0",
   githubRepoUrl: "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker",
   latestReleaseApiUrl: "https://api.github.com/repos/LuckyJadhav2808/Invictus-The-OmniTracker/releases/latest",
   changelog: [
-    "🎨 Widget Contrast Fix: Locked Android widget to high-contrast Neobrutalist Warm Cream palette for day and night modes",
-    "🏛️ Widget Selection Icon & Preview: Configured Monolith icon and @drawable/widget_preview for Android launcher widget drawer",
-    "📱 Responsive Layout Polish: Fixed button overflow in Settings daily spending limit and Today's mindset reflection",
-    "⚡ Refined Neobrutalist Split-Deck Widget: Real-time safe-to-spend limit, liquidity breakdown, and habit checklist",
-    "📲 In-App APK Updater: Instant background download with live progress and native Android package installer integration",
+    "⚡ Autonomous On-Launch SMS Sync: Automatically checks for today's bank transactions with a 2-hour midnight buffer on app entry",
+    "📅 Date-Targeted SMS Scanner: Interactive presets (Today, Yesterday, 7 Days, Month, Custom Range) to scan specific dates",
+    "🛡️ Frictionless Android Permission Flow: Native system runtime dialog (Allow/Don't allow) with 1-tap Settings deep-link fallback",
+    "🛑 15-Minute Cooldown Guardrail: Prevents battery and SQLite thrashing across rapid page transitions",
+    "💳 Zero-Clipping Neobrutalist Wallet Cockpit: Fluid responsive tabs, tabular numerals, and unclipped ink drop shadows",
   ],
 };
 
