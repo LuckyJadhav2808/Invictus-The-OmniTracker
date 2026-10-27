@@ -29,6 +29,10 @@ export const NativeAppUpdater = {
     return Capacitor.isNativePlatform() && Capacitor.getPlatform() === "android";
   },
 
+  resolveUrl(rawUrl?: string): string {
+    return resolveAbsoluteApkUrl(rawUrl);
+  },
+
   async canInstallPackages(): Promise<boolean> {
     if (!this.isSupported()) return true;
     try {
@@ -53,10 +57,12 @@ export const NativeAppUpdater = {
     apkUrl: string,
     onProgress?: (progress: DownloadProgressEvent) => void
   ): Promise<{ success: boolean; message?: string }> {
+    const safeUrl = resolveAbsoluteApkUrl(apkUrl);
+
     if (!this.isSupported()) {
       // Web browser direct download fallback
       const link = document.createElement("a");
-      link.href = apkUrl;
+      link.href = safeUrl;
       link.setAttribute("download", "Invictus.apk");
       document.body.appendChild(link);
       link.click();
@@ -73,7 +79,7 @@ export const NativeAppUpdater = {
         });
       }
 
-      const res = await AppUpdateBridge.downloadAndInstallApk({ url: apkUrl });
+      const res = await AppUpdateBridge.downloadAndInstallApk({ url: safeUrl });
       return res;
     } finally {
       if (progressListener && typeof progressListener.remove === "function") {
@@ -82,3 +88,28 @@ export const NativeAppUpdater = {
     }
   },
 };
+
+export function resolveAbsoluteApkUrl(rawUrl?: string): string {
+  const fallback = "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/latest/download/Invictus.apk";
+  if (!rawUrl || typeof rawUrl !== "string" || !rawUrl.trim()) {
+    return fallback;
+  }
+
+  const trimmed = rawUrl.trim();
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return trimmed;
+  }
+
+  // Handle relative URLs
+  const productionOrigin = "https://invictus-the-omni-tracker.vercel.app";
+  let origin = productionOrigin;
+
+  if (typeof window !== "undefined") {
+    const locOrigin = window.location.origin;
+    if (locOrigin && locOrigin.startsWith("http") && !locOrigin.includes("localhost")) {
+      origin = locOrigin;
+    }
+  }
+
+  return `${origin}${trimmed.startsWith("/") ? "" : "/"}${trimmed}`;
+}

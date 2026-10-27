@@ -6,7 +6,7 @@ import { APP_VERSION_CONFIG } from "@/config/version";
 import { toast } from "sonner";
 import { Capacitor } from "@capacitor/core";
 import { App } from "@capacitor/app";
-import { NativeAppUpdater } from "@/lib/native/app-update-bridge";
+import { NativeAppUpdater, resolveAbsoluteApkUrl } from "@/lib/native/app-update-bridge";
 
 interface UpdateData {
   currentVersion: string;
@@ -91,7 +91,7 @@ export function UpdateCheckModal({ open, onOpenChange, autoCheck = false }: Upda
   const latestVer = data?.latestVersion || APP_VERSION_CONFIG.version;
   const hasUpdate = data?.hasUpdate || false;
   const releaseNotes = data?.releaseNotes || APP_VERSION_CONFIG.changelog;
-  const apkUrl = data?.apkDownloadUrl || `${APP_VERSION_CONFIG.githubRepoUrl}/releases/latest`;
+  const apkUrl = resolveAbsoluteApkUrl(data?.apkDownloadUrl);
   const releaseUrl = data?.downloadUrl || `${APP_VERSION_CONFIG.githubRepoUrl}/releases/latest`;
 
   const handleInAppDownload = async () => {

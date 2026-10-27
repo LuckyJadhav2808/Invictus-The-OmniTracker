@@ -56,10 +56,19 @@ public class AppUpdateBridgePlugin extends Plugin {
     @PluginMethod
     public void downloadAndInstallApk(PluginCall call) {
         String downloadUrl = call.getString("url");
-        if (downloadUrl == null || downloadUrl.isEmpty()) {
+        if (downloadUrl == null || downloadUrl.trim().isEmpty()) {
             call.reject("Missing APK download URL");
             return;
         }
+
+        downloadUrl = downloadUrl.trim();
+        // Defensive Protocol Repair: Auto-prepend HTTPS domain if relative path is passed
+        if (!downloadUrl.startsWith("http://") && !downloadUrl.startsWith("https://")) {
+            String baseOrigin = "https://invictus-the-omni-tracker.vercel.app";
+            downloadUrl = baseOrigin + (downloadUrl.startsWith("/") ? "" : "/") + downloadUrl;
+        }
+
+        final String finalDownloadUrl = downloadUrl;
 
         // Run background thread for network streaming
         new Thread(() -> {
@@ -75,7 +84,7 @@ public class AppUpdateBridgePlugin extends Plugin {
                     apkFile.delete();
                 }
 
-                URL url = new URL(downloadUrl);
+                URL url = new URL(finalDownloadUrl);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setConnectTimeout(15000);
                 connection.setReadTimeout(30000);
@@ -83,17 +92,61 @@ public class AppUpdateBridgePlugin extends Plugin {
                 connection.connect();
 
                 int responseCode = connection.getResponseCode();
-                // Handle 301 / 302 redirects (e.g. GitHub Releases redirect to AWS S3)
-                if (responseCode == HttpURLConnection.HTTP_MOVED_TEMP || 
-                    responseCode == HttpURLConnection.HTTP_MOVED_PERM || 
-                    responseCode == 307 || responseCode == 308) {
+                // Handle multi-hop 301 / 302 redirects (e.g. GitHub Releases redirect to AWS S3)
+                int redirectCount = 0;
+                while ((responseCode == HttpURLConnection.HTTP_MOVED_TEMP || 
+                        responseCode == HttpURLConnection.HTTP_MOVED_PERM || 
+                        responseCode == 307 || responseCode == 308) && redirectCount < 5) {
                     String redirectUrl = connection.getHeaderField("Location");
                     connection.disconnect();
-                    url = new URL(redirectUrl);
-                    connection = (HttpURLConnection) url.openConnection();
-                    connection.setConnectTimeout(15000);
-                    connection.setReadTimeout(30000);
-                    connection.connect();
+                    if (redirectUrl != null && !redirectUrl.isEmpty()) {
+                        if (!redirectUrl.startsWith("http://") && !redirectUrl.startsWith("https://")) {
+                            redirectUrl = new URL(url, redirectUrl).toString();
+                        }
+                        url = new URL(redirectUrl);
+                        connection = (HttpURLConnection) url.openConnection();
+                        connection.setConnectTimeout(15000);
+                        connection.setReadTimeout(30000);
+                        connection.connect();
+                        responseCode = connection.getResponseCode();
+                    }
+                    redirectCount++;
+                }
+
+                // Fallback to official GitHub release if server returned an error (e.g. 404)
+                if (responseCode != HttpURLConnection.HTTP_OK) {
+                    String fallbackUrl = "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/latest/download/Invictus.apk";
+                    if (!finalDownloadUrl.equals(fallbackUrl)) {
+                        connection.disconnect();
+                        url = new URL(fallbackUrl);
+                        connection = (HttpURLConnection) url.openConnection();
+                        connection.setConnectTimeout(15000);
+                        connection.setReadTimeout(30000);
+                        connection.connect();
+                        responseCode = connection.getResponseCode();
+
+                        redirectCount = 0;
+                        while ((responseCode == HttpURLConnection.HTTP_MOVED_TEMP || 
+                                responseCode == HttpURLConnection.HTTP_MOVED_PERM || 
+                                responseCode == 307 || responseCode == 308) && redirectCount < 5) {
+                            String redirectUrl = connection.getHeaderField("Location");
+                            connection.disconnect();
+                            if (redirectUrl != null && !redirectUrl.isEmpty()) {
+                                url = new URL(redirectUrl);
+                                connection = (HttpURLConnection) url.openConnection();
+                                connection.setConnectTimeout(15000);
+                                connection.setReadTimeout(30000);
+                                connection.connect();
+                                responseCode = connection.getResponseCode();
+                            }
+                            redirectCount++;
+                        }
+                    }
+                }
+
+                if (responseCode != HttpURLConnection.HTTP_OK) {
+                    call.reject("APK download server returned HTTP " + responseCode);
+                    return;
                 }
 
                 int fileLength = connection.getContentLength();

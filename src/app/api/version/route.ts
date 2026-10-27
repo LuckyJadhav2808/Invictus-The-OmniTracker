@@ -52,17 +52,35 @@ export async function GET(request: Request) {
     }
 
     // 2. Check local self-hosted public/downloads/Invictus.apk
-    try {
-      const localApkPath = path.join(process.cwd(), "public", "downloads", "Invictus.apk");
-      if (fs.existsSync(localApkPath)) {
-        if (!apkDownloadUrl || apkDownloadUrl.includes("github.com") || apkDownloadUrl === "/api/download/android") {
-          apkDownloadUrl = "/downloads/Invictus.apk";
-        }
-        if (!apkSizeBytes) {
-          apkSizeBytes = fs.statSync(localApkPath).size;
-        }
+    const localApkPath = path.join(process.cwd(), "public", "downloads", "Invictus.apk");
+    const localFileExists = fs.existsSync(localApkPath);
+    if (localFileExists) {
+      if (!apkDownloadUrl || apkDownloadUrl.includes("github.com") || apkDownloadUrl === "/api/download/android") {
+        apkDownloadUrl = "/downloads/Invictus.apk";
       }
-    } catch {}
+      if (!apkSizeBytes) {
+        try {
+          apkSizeBytes = fs.statSync(localApkPath).size;
+        } catch {}
+      }
+    }
+
+    // 3. Resolve absolute server origin for native mobile bridges (Guarantees protocol)
+    const reqUrl = new URL(request.url);
+    const forwardedHost = request.headers.get("x-forwarded-host");
+    const forwardedProto = request.headers.get("x-forwarded-proto") || "https";
+    const serverOrigin = forwardedHost
+      ? `${forwardedProto}://${forwardedHost}`
+      : reqUrl.origin && !reqUrl.origin.includes("localhost")
+      ? reqUrl.origin
+      : "https://invictus-the-omni-tracker.vercel.app";
+
+    // If local file is missing on this server instance (e.g. Vercel serverless), point directly to GitHub latest release
+    if (!localFileExists && (!apkDownloadUrl || apkDownloadUrl.includes("/downloads/Invictus.apk"))) {
+      apkDownloadUrl = `https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/latest/download/Invictus.apk`;
+    } else if (apkDownloadUrl && apkDownloadUrl.startsWith("/")) {
+      apkDownloadUrl = `${serverOrigin}${apkDownloadUrl}`;
+    }
 
     const effectiveTargetVersion =
       compareSemver(latestVersion, APP_VERSION_CONFIG.version) >= 0

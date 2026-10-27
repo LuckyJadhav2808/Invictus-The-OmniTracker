@@ -67,6 +67,20 @@ export async function GET(request: Request) {
       }
     }
 
+    // Ensure directDownloadUrl is fully-qualified absolute URL
+    const reqUrl = new URL(request.url);
+    const forwardedHost = request.headers.get("x-forwarded-host");
+    const forwardedProto = request.headers.get("x-forwarded-proto") || "https";
+    const serverOrigin = forwardedHost
+      ? `${forwardedProto}://${forwardedHost}`
+      : reqUrl.origin && !reqUrl.origin.includes("localhost")
+      ? reqUrl.origin
+      : "https://invictus-the-omni-tracker.vercel.app";
+
+    if (directDownloadUrl.startsWith("/")) {
+      directDownloadUrl = `${serverOrigin}${directDownloadUrl}`;
+    }
+
     return NextResponse.redirect(directDownloadUrl, {
       status: 302,
       headers: {
