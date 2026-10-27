@@ -1,8 +1,10 @@
 /**
  * Invictus Categorize-Once Local Merchant Cache & Learned Rules Engine
- * Provides O(1) lookups for previously categorized merchants.
+ * Powered by Fuse.js for typo-tolerant fuzzy merchant normalization.
  * Guarantees zero network calls in steady state!
  */
+
+import Fuse, { type IFuseOptions } from "fuse.js";
 
 export interface MerchantRuleItem {
   merchantPattern: string;
@@ -15,6 +17,20 @@ export interface MerchantRuleItem {
 }
 
 const STORAGE_KEY = "invictus_merchant_category_cache";
+
+// Strict financial-grade Fuse.js configuration for merchant matching
+const FUSE_OPTIONS: IFuseOptions<MerchantRuleItem> = {
+  keys: [
+    { name: "merchantPattern", weight: 0.7 },
+    { name: "displayName", weight: 0.3 },
+  ],
+  threshold: 0.32, // 0.0 = perfect match, 0.32 = strict financial fuzzy match
+  distance: 100,
+  minMatchCharLength: 3,
+  ignoreLocation: true,
+  includeScore: true,
+  shouldSort: true,
+};
 
 // Pre-seeded high-confidence Indian merchant mappings
 const PRESEEDED_MERCHANTS: Record<string, { categoryId: string; categoryName: string }> = {
@@ -99,6 +115,19 @@ export function normalizeMerchantKey(merchant: string): string {
 export class MerchantCategoryCache {
   private static memoryCache: Record<string, MerchantRuleItem> = {};
   private static isHydrated = false;
+  private static fuseInstance: Fuse<MerchantRuleItem> | null = null;
+
+  private static getFuseInstance(): Fuse<MerchantRuleItem> {
+    if (!this.fuseInstance) {
+      const items = Object.values(this.memoryCache);
+      this.fuseInstance = new Fuse(items, FUSE_OPTIONS);
+    }
+    return this.fuseInstance;
+  }
+
+  private static invalidateFuseIndex(): void {
+    this.fuseInstance = null;
+  }
 
   private static initDefaults(): void {
     const map: Record<string, MerchantRuleItem> = {};
@@ -113,6 +142,7 @@ export class MerchantCategoryCache {
       };
     }
     this.memoryCache = map;
+    this.invalidateFuseIndex();
   }
 
   private static hydrate(): void {
@@ -141,9 +171,11 @@ export class MerchantCategoryCache {
     }
 
     this.isHydrated = true;
+    this.invalidateFuseIndex();
   }
 
   private static persist(): void {
+    this.invalidateFuseIndex();
     if (typeof window === "undefined") return;
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(this.memoryCache));
@@ -151,10 +183,11 @@ export class MerchantCategoryCache {
   }
 
   /**
-   * 3-Tier Fuzzy Lookup for a merchant name in O(1) / O(k).
-   * Tier 1: Exact normalized key match.
+   * 4-Tier Fuzzy Lookup for a merchant name in O(1) / O(k) / Bitap.
+   * Tier 1: Exact normalized key match (O(1)).
    * Tier 2: Token / Word boundary match.
-   * Tier 3: Substring match for tokens >= 4 characters.
+   * Tier 3: Fuse.js Bitap Fuzzy Search (typos, e.g. "Swigy", "Blink it", "Apollo Pharmcy").
+   * Tier 4: Substring match for tokens >= 4 characters.
    */
   static get(merchant: string): MerchantRuleItem | null {
     this.hydrate();
@@ -166,7 +199,7 @@ export class MerchantCategoryCache {
       return this.memoryCache[key];
     }
 
-    // Tier 2: Token-level match (e.g. "dmart kandivali" or "upi dmart" against "dmart")
+    // Tier 2: Token-level match (e.g. "dmart kandivali" against "dmart")
     const words = key.split(/\s+/).filter((w) => w.length >= 3);
     for (const word of words) {
       if (this.memoryCache[word]) {
@@ -174,25 +207,39 @@ export class MerchantCategoryCache {
       }
     }
 
-    // Tier 3: Substring or Word boundary search across existing rules
-    // Prioritize user-defined rules over preseeded rules
-    const rules = Object.values(this.memoryCache).sort((a, b) => {
-      if (a.isUserDefined && !b.isUserDefined) return -1;
-      if (!a.isUserDefined && b.isUserDefined) return 1;
-      return b.matchCount - a.matchCount;
-    });
-
-    for (const rule of rules) {
-      const pattern = rule.merchantPattern;
-      if (pattern.length < 3) continue;
-
-      // Word boundary regex test
-      const wordRegex = new RegExp(`\\b${pattern}\\b`, "i");
-      if (wordRegex.test(key)) {
-        return rule;
+    // Tier 3: Fuse.js Bitap Fuzzy Search (strict financial-grade threshold <= 0.32)
+    const fuse = this.getFuseInstance();
+    const searchResults = fuse.search(key);
+    if (searchResults.length > 0) {
+      const best = searchResults[0];
+      if (best.score !== undefined && best.score <= 0.32) {
+        return best.item;
       }
+    }
 
-      // Substring test if pattern >= 4 chars
+    // Also fuzzy search significant words from compound string (e.g. "UPI/98124/SWIGY-BLR")
+    for (const word of words) {
+      if (word.length >= 4) {
+        const wordResults = fuse.search(word);
+        if (wordResults.length > 0) {
+          const bestWord = wordResults[0];
+          const patternLen = bestWord.item.merchantPattern.length;
+          // Require strict score (<= 0.22) and close length proximity (within 2 chars)
+          // to prevent generic words like "shop" from falsely matching specific brands like "meesho"
+          if (
+            bestWord.score !== undefined &&
+            bestWord.score <= 0.22 &&
+            Math.abs(patternLen - word.length) <= 2
+          ) {
+            return bestWord.item;
+          }
+        }
+      }
+    }
+
+    // Tier 4: Substring test across existing rules as legacy fallback
+    for (const rule of Object.values(this.memoryCache)) {
+      const pattern = rule.merchantPattern;
       if (pattern.length >= 4 && (key.includes(pattern) || pattern.includes(key))) {
         return rule;
       }

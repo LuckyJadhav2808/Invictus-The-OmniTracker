@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import Fuse from "fuse.js";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
 import { type Category } from "@/types";
 import { soundFX } from "@/components/shared/SoundFX";
@@ -44,17 +45,34 @@ export function LearnedMerchantDictionaryModal({
     }
   }, [expenseCategories, newCategoryId]);
 
-  // Filtered rules
+  // Memoized Fuse instance for instant typo-tolerant rules search
+  const rulesFuse = useMemo(() => {
+    return new Fuse(rules, {
+      keys: [
+        { name: "displayName", weight: 0.5 },
+        { name: "merchantPattern", weight: 0.3 },
+        { name: "categoryName", weight: 0.2 },
+      ],
+      threshold: 0.38,
+      minMatchCharLength: 2,
+    });
+  }, [rules]);
+
+  // Filtered rules powered by Fuse.js
   const filteredRules = useMemo(() => {
-    const q = search.toLowerCase().trim();
+    const q = search.trim();
     if (!q) return rules;
+    const fuseMatches = rulesFuse.search(q).map((res) => res.item);
+    if (fuseMatches.length > 0) return fuseMatches;
+
+    const lower = q.toLowerCase();
     return rules.filter(
       (r) =>
-        r.displayName.toLowerCase().includes(q) ||
-        r.merchantPattern.toLowerCase().includes(q) ||
-        r.categoryName.toLowerCase().includes(q)
+        r.displayName.toLowerCase().includes(lower) ||
+        r.merchantPattern.toLowerCase().includes(lower) ||
+        r.categoryName.toLowerCase().includes(lower)
     );
-  }, [rules, search]);
+  }, [rules, search, rulesFuse]);
 
   const stats = useMemo(() => {
     const total = rules.length;
