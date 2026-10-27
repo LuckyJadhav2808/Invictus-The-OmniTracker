@@ -10,9 +10,9 @@ export interface AppVersionInfo {
 }
 
 export const APP_VERSION_CONFIG: AppVersionInfo = {
-  version: "1.7.2",
-  buildNumber: 23,
-  releaseDate: "October 9, 2026",
+  version: "1.7.3",
+  buildNumber: 24,
+  releaseDate: "October 27, 2026",
   channel: "stable",
   minSupportedVersion: "1.0.0",
   githubRepoUrl: "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker",
