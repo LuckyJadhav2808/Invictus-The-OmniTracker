@@ -234,16 +234,16 @@ export function SmsSyncControlBanner({
       )}
 
       {/* 2. Main SMS Telemetry & Action Banner */}
-      <div className="bg-[#FAF8F5] border-2 border-[#161514] rounded-2xl p-3 shadow-[3px_3px_0px_0px_#161514] mb-4">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      <div className="bg-[#FAF8F5] border-2 border-[#161514] rounded-2xl p-3 sm:p-3.5 shadow-[3px_3px_0px_0px_#161514] mb-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 w-full">
           {/* Left Side: Telemetry Info */}
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="size-8 rounded-xl bg-[#CEF431] border-2 border-[#161514] flex items-center justify-center shadow-[1px_1px_0px_0px_#161514] shrink-0">
+          <div className="flex items-start sm:items-center gap-2.5 min-w-0 flex-1">
+            <div className="size-8 rounded-xl bg-[#CEF431] border-2 border-[#161514] flex items-center justify-center shadow-[1px_1px_0px_0px_#161514] shrink-0 mt-0.5 sm:mt-0">
               <Smartphone className="size-4 text-[#161514]" />
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-xs font-black uppercase text-[#161514] truncate font-heading">
+                <span className="text-xs font-black uppercase text-[#161514] font-heading">
                   {isNative ? "Bank SMS Auto-Sync" : "Local SMS Engine"}
                 </span>
                 <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-400 shrink-0">
@@ -251,7 +251,7 @@ export function SmsSyncControlBanner({
                   <span>On-Device</span>
                 </span>
               </div>
-              <p className="text-[11px] text-[#161514]/70 font-medium truncate">
+              <p className="text-[11px] text-[#161514]/75 font-medium leading-relaxed break-words whitespace-normal mt-0.5">
                 {isNative
                   ? `Launch auto-scan active. Last scan: ${lastSyncText || "Never"}`
                   : "Air-gapped on-device regex. Configure learned rules in Settings."}
@@ -260,7 +260,7 @@ export function SmsSyncControlBanner({
           </div>
 
           {/* Right Side: Primary Actions with Zero Overlap */}
-          <div className="flex items-center gap-2 w-full sm:w-auto justify-end shrink-0 flex-wrap sm:flex-nowrap">
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-start sm:justify-end shrink-0 flex-wrap sm:flex-nowrap pt-1 sm:pt-0">
             {/* Quick Cash Button */}
             <button
               type="button"

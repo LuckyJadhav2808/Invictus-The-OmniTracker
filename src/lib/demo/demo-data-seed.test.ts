@@ -40,7 +40,7 @@ describe("Evaluator Demo Data Seed Engine", () => {
   });
 
   describe("generateEvaluatorDemoDataset()", () => {
-    it("generates an exhaustive dataset with dynamic relative timestamps", () => {
+    it("generates a calibrated, realistic dataset with dynamic relative timestamps", () => {
       const data = generateEvaluatorDemoDataset();
 
       expect(data).toBeDefined();
@@ -48,48 +48,48 @@ describe("Evaluator Demo Data Seed Engine", () => {
       expect(data.currentMonthKey).toMatch(/^\d{4}-\d{2}$/);
 
       // 1. Tasks
-      expect(data.tasks.length).toBeGreaterThanOrEqual(6);
+      expect(data.tasks.length).toBe(3);
       const inProgressTask = data.tasks.find((t) => t.status === "in_progress");
       expect(inProgressTask).toBeDefined();
       expect(inProgressTask?.projectTag).toBe("Engineering");
       expect(inProgressTask?.subtasks.length).toBeGreaterThan(0);
 
       // 2. Habits
-      expect(data.habits.length).toBeGreaterThanOrEqual(6);
+      expect(data.habits.length).toBe(4);
       expect(Object.keys(data.habitLogs).length).toBeGreaterThan(0);
       expect(Object.keys(data.streaks).length).toBeGreaterThan(0);
 
       // 3. Iron Arena & Macro Forge
-      expect(data.gymRoutines.length).toBeGreaterThanOrEqual(3); // Push, Pull, Legs
+      expect(data.gymRoutines.length).toBe(1); // Push Day
       const pushDay = data.gymRoutines.find((r) => r.title.toLowerCase().includes("push"));
       expect(pushDay).toBeDefined();
       expect(pushDay?.exercises.length).toBeGreaterThan(0);
       expect(pushDay?.exercises[0].sets.length).toBeGreaterThan(0);
 
-      expect(data.nutritionTargets.calories).toBe(2400);
+      expect(data.nutritionTargets.calories).toBe(2200);
       expect(data.mealPlans.length).toBe(4);
 
       // 4. Study Space
-      expect(data.subjects.length).toBe(3);
-      expect(data.topics.length).toBe(5);
-      expect(data.studySessions.length).toBeGreaterThanOrEqual(3);
-      expect(data.tests.length).toBe(2);
+      expect(data.subjects.length).toBe(2);
+      expect(data.topics.length).toBe(3);
+      expect(data.studySessions.length).toBeGreaterThanOrEqual(1);
+      expect(data.tests.length).toBe(1);
 
       // 5. Money Space
-      expect(data.categories.length).toBeGreaterThanOrEqual(8);
-      expect(data.transactions.length).toBeGreaterThanOrEqual(14);
+      expect(data.categories.length).toBeGreaterThanOrEqual(6);
+      expect(data.transactions.length).toBe(5);
       const cashTx = data.transactions.find((tx) => tx.paymentMethod?.toLowerCase() === "cash");
       const upiTx = data.transactions.find((tx) => tx.paymentMethod?.toLowerCase() === "upi");
       expect(cashTx).toBeDefined();
       expect(upiTx).toBeDefined();
-      expect(data.debts.length).toBeGreaterThanOrEqual(2);
-      expect(data.savingsGoals.length).toBeGreaterThanOrEqual(2);
-      expect(data.subscriptions.length).toBeGreaterThanOrEqual(3);
+      expect(data.debts.length).toBe(1);
+      expect(data.savingsGoals.length).toBe(1);
+      expect(data.subscriptions.length).toBe(1);
 
       // 6. Scratchpad
       expect(data.scratchpadContent).toContain("# ⚡ FOUNDER & STUDENT RADAR");
-      expect(data.scratchpadContent).toContain("Deploy Next.js RSC");
-      expect(data.scratchpadContent).toContain("₹180");
+      expect(data.scratchpadContent).toContain("Finalize Next.js Server Action");
+      expect(data.scratchpadContent).toContain("₹140");
     });
   });
 

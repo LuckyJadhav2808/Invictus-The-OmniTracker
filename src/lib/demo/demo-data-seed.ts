@@ -9,26 +9,25 @@ export function isDemoDataActive(): boolean {
 }
 
 /**
- * Generates an exhaustive, high-utility evaluator showcase dataset with dynamic relative timestamps.
- * Benchmarked for students, indie builders, and evaluators.
+ * Generates a clean, calibrated evaluator showcase dataset with dynamic relative timestamps.
+ * Benchmarked for students, indie builders, and evaluators: lightweight, realistic, and zero clutter.
  */
 export function generateEvaluatorDemoDataset() {
   const now = new Date();
   const todayStr = format(now, "yyyy-MM-dd");
   const yesterdayStr = format(subDays(now, 1), "yyyy-MM-dd");
   const tomorrowStr = format(addDays(now, 1), "yyyy-MM-dd");
-  const dayAfterTomorrowStr = format(addDays(now, 2), "yyyy-MM-dd");
   const currentMonthKey = format(now, "yyyy-MM");
   const lastMonthKey = format(subMonths(now, 1), "yyyy-MM");
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // 1. TASKS SPACE (invictus_tasks_db)
+  // 1. TASKS SPACE (invictus_tasks_db) - Exactly 3 crisp, purposeful tasks
   // ─────────────────────────────────────────────────────────────────────────────
   const tasks: TaskItem[] = [
     {
       id: "demo_task_1",
       userId: "guest-user",
-      title: "Finalize Next.js 15 Server Action Optimizations",
+      title: "Finalize Next.js Server Action Optimizations",
       description: "Audit layout thrashing, implement cache invalidation, and benchmark load times.",
       status: "in_progress",
       priority: "p1",
@@ -46,16 +45,15 @@ export function generateEvaluatorDemoDataset() {
     {
       id: "demo_task_2",
       userId: "guest-user",
-      title: "Review Discrete Mathematics Chapter 4 Graph Algorithms",
-      description: "Prepare Dijkstra, Bellman-Ford, and topological sort flashcard deck for final exam.",
+      title: "Review Computer Networks Chapter 3 (TCP Congestion)",
+      description: "Review TCP slow start, congestion avoidance, and fast retransmit flashcards.",
       status: "todo",
       priority: "p2",
-      dueDate: todayStr,
+      dueDate: tomorrowStr,
       projectTag: "Academics",
       orderKey: "a1",
       subtasks: [
-        { id: "st_4", title: "Solve 5 practice problems on Euler circuits", completed: false },
-        { id: "st_5", title: "Review adjacency matrix proofs", completed: false },
+        { id: "st_4", title: "Solve 3 practice problems on sliding window", completed: false },
       ],
       createdAt: new Date(subDays(now, 1)).toISOString(),
       updatedAt: new Date().toISOString(),
@@ -63,71 +61,24 @@ export function generateEvaluatorDemoDataset() {
     {
       id: "demo_task_3",
       userId: "guest-user",
-      title: "Submit Distributed Systems Lab Report 2",
-      description: "Document Raft consensus leader election implementation and test under network partition.",
-      status: "todo",
-      priority: "p1",
-      dueDate: tomorrowStr,
+      title: "Submit Database Management Systems Lab Report",
+      description: "B-Tree indexing and query optimization analysis document.",
+      status: "completed",
+      priority: "p3",
+      dueDate: yesterdayStr,
+      completedAt: new Date(subDays(now, 1)).toISOString(),
       projectTag: "Academics",
       orderKey: "a2",
       subtasks: [
-        { id: "st_6", title: "Run 3-node chaos simulation", completed: true },
-        { id: "st_7", title: "Write partition recovery conclusion", completed: false },
+        { id: "st_5", title: "Export EXPLAIN query plan graphs", completed: true },
       ],
       createdAt: new Date(subDays(now, 3)).toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    {
-      id: "demo_task_4",
-      userId: "guest-user",
-      title: "Weekly Budget & Cashflow Audit",
-      description: "Review UPI transactions, reconcile petty cash expenses, and check remaining rollover.",
-      status: "todo",
-      priority: "p3",
-      dueDate: dayAfterTomorrowStr,
-      projectTag: "Finances",
-      orderKey: "a3",
-      subtasks: [],
-      createdAt: new Date(subDays(now, 1)).toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    {
-      id: "demo_task_5",
-      userId: "guest-user",
-      title: "Design Neobrutalist UI components for Life Space",
-      description: "Craft 4-stage gym and nutrition studios with hard drop shadows and ink borders.",
-      status: "completed",
-      priority: "p2",
-      dueDate: yesterdayStr,
-      completedAt: new Date(subDays(now, 1)).toISOString(),
-      projectTag: "Design",
-      orderKey: "a4",
-      subtasks: [
-        { id: "st_8", title: "Target Muscle Body SVG layout", completed: true },
-        { id: "st_9", title: "Caloric Fuel Distribution Bar", completed: true },
-      ],
-      createdAt: new Date(subDays(now, 4)).toISOString(),
-      updatedAt: new Date(subDays(now, 1)).toISOString(),
-    },
-    {
-      id: "demo_task_6",
-      userId: "guest-user",
-      title: "Book train tickets for Regional Hackathon",
-      description: "Confirm ticket reservations and hotel room for hackathon weekend.",
-      status: "completed",
-      priority: "p3",
-      dueDate: yesterdayStr,
-      completedAt: new Date(subDays(now, 1)).toISOString(),
-      projectTag: "Personal",
-      orderKey: "a5",
-      subtasks: [],
-      createdAt: new Date(subDays(now, 5)).toISOString(),
       updatedAt: new Date(subDays(now, 1)).toISOString(),
     },
   ];
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // 2. HABITS & LIFE SPACE (invictus_habits, logs, streaks, water)
+  // 2. HABITS & LIFE SPACE - 4 Core Habits & 7-Day History
   // ─────────────────────────────────────────────────────────────────────────────
   const habits: Habit[] = [
     {
@@ -142,7 +93,7 @@ export function generateEvaluatorDemoDataset() {
       goalTarget: 500,
       goalUnit: "ml",
       archived: false,
-      createdAt: new Date(subDays(now, 30)).toISOString(),
+      createdAt: new Date(subDays(now, 7)).toISOString(),
       updatedAt: new Date().toISOString(),
     },
     {
@@ -157,7 +108,7 @@ export function generateEvaluatorDemoDataset() {
       goalTarget: 10000,
       goalUnit: "steps",
       archived: false,
-      createdAt: new Date(subDays(now, 30)).toISOString(),
+      createdAt: new Date(subDays(now, 7)).toISOString(),
       updatedAt: new Date().toISOString(),
     },
     {
@@ -172,7 +123,7 @@ export function generateEvaluatorDemoDataset() {
       goalTarget: 15,
       goalUnit: "pages",
       archived: false,
-      createdAt: new Date(subDays(now, 30)).toISOString(),
+      createdAt: new Date(subDays(now, 7)).toISOString(),
       updatedAt: new Date().toISOString(),
     },
     {
@@ -187,83 +138,44 @@ export function generateEvaluatorDemoDataset() {
       goalTarget: 90,
       goalUnit: "mins",
       archived: false,
-      createdAt: new Date(subDays(now, 30)).toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    {
-      id: "demo_h_protein",
-      title: "Hit 140g Protein Target",
-      icon: "Apple",
-      color: "emerald",
-      frequency: { type: "daily", targetPerDay: 1 },
-      reminderTime: "08:00 PM",
-      allowGraceSkip: false,
-      isGoalStyle: true,
-      goalTarget: 140,
-      goalUnit: "g",
-      archived: false,
-      createdAt: new Date(subDays(now, 30)).toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    {
-      id: "demo_h_sleep",
-      title: "Sleep by 10:45 PM",
-      icon: "Moon",
-      color: "purple",
-      frequency: { type: "daily", targetPerDay: 1 },
-      reminderTime: "10:30 PM",
-      allowGraceSkip: true,
-      isGoalStyle: false,
-      archived: false,
-      createdAt: new Date(subDays(now, 30)).toISOString(),
+      createdAt: new Date(subDays(now, 7)).toISOString(),
       updatedAt: new Date().toISOString(),
     },
   ];
 
-  // Generate 30 days of realistic habit logs for the heatmap & velocity charts
+  // Populate past 7 days of realistic habit logs (instead of 30 days)
   const habitLogs: any[] = [];
   const streaks: Record<string, any> = {
-    demo_h_water: { habitId: "demo_h_water", currentStreak: 14, longestStreak: 21, lastCompletedDate: todayStr },
-    demo_h_steps: { habitId: "demo_h_steps", currentStreak: 9, longestStreak: 18, lastCompletedDate: todayStr },
-    demo_h_reading: { habitId: "demo_h_reading", currentStreak: 21, longestStreak: 21, lastCompletedDate: yesterdayStr },
-    demo_h_deepwork: { habitId: "demo_h_deepwork", currentStreak: 12, longestStreak: 15, lastCompletedDate: todayStr },
-    demo_h_protein: { habitId: "demo_h_protein", currentStreak: 8, longestStreak: 14, lastCompletedDate: todayStr },
-    demo_h_sleep: { habitId: "demo_h_sleep", currentStreak: 5, longestStreak: 10, lastCompletedDate: yesterdayStr },
+    demo_h_water: { habitId: "demo_h_water", currentStreak: 6, longestStreak: 7, lastCompletedDate: todayStr },
+    demo_h_steps: { habitId: "demo_h_steps", currentStreak: 4, longestStreak: 5, lastCompletedDate: todayStr },
+    demo_h_reading: { habitId: "demo_h_reading", currentStreak: 5, longestStreak: 6, lastCompletedDate: yesterdayStr },
+    demo_h_deepwork: { habitId: "demo_h_deepwork", currentStreak: 4, longestStreak: 5, lastCompletedDate: todayStr },
   };
 
-  // Populate 30 days of history
-  for (let i = 29; i >= 0; i--) {
+  for (let i = 6; i >= 0; i--) {
     const dStr = format(subDays(now, i), "yyyy-MM-dd");
     const isToday = i === 0;
 
-    // Log water for almost every day
-    if (i < 28) {
+    // Water logged 6 of 7 days
+    if (i !== 3) {
       habitLogs.push({ id: `demo_h_water_${dStr}`, habitId: "demo_h_water", date: dStr, completed: true, countLogged: 1 });
     }
-    // Steps logged for ~85% of days
-    if (i % 7 !== 3) {
+    // Steps logged 5 of 7 days
+    if (i !== 2 && i !== 5) {
       habitLogs.push({ id: `demo_h_steps_${dStr}`, habitId: "demo_h_steps", date: dStr, completed: true, countLogged: 1 });
     }
-    // Reading logged for consecutive streak
-    if (i <= 21 && !isToday) {
+    // Reading logged 5 of 7 days
+    if (i <= 5 && !isToday) {
       habitLogs.push({ id: `demo_h_reading_${dStr}`, habitId: "demo_h_reading", date: dStr, completed: true, countLogged: 1 });
     }
     // Deep work logged weekdays
     if (i % 7 !== 0 && i % 7 !== 6) {
       habitLogs.push({ id: `demo_h_deepwork_${dStr}`, habitId: "demo_h_deepwork", date: dStr, completed: true, countLogged: 1 });
     }
-    // Protein target logged
-    if (i < 8 || (i > 10 && i < 20)) {
-      habitLogs.push({ id: `demo_h_protein_${dStr}`, habitId: "demo_h_protein", date: dStr, completed: true, countLogged: 1 });
-    }
-    // Sleep logged
-    if (i < 6) {
-      habitLogs.push({ id: `demo_h_sleep_${dStr}`, habitId: "demo_h_sleep", date: dStr, completed: true, countLogged: 1 });
-    }
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // 3. THE IRON ARENA GYM ROUTINES (invictus_gym_routines)
+  // 3. THE IRON ARENA GYM ROUTINES - 1 Clean Push Day Routine
   // ─────────────────────────────────────────────────────────────────────────────
   const gymRoutines = [
     {
@@ -280,8 +192,7 @@ export function generateEvaluatorDemoDataset() {
           sets: [
             { id: "s1", setNumber: 1, weight: 28, reps: 10, completed: true, targetReps: 10, previousWeight: 26, previousReps: 10 },
             { id: "s2", setNumber: 2, weight: 30, reps: 8, completed: true, targetReps: 8, previousWeight: 28, previousReps: 8 },
-            { id: "s3", setNumber: 3, weight: 32, reps: 8, completed: true, targetReps: 8, previousWeight: 30, previousReps: 8 },
-            { id: "s4", setNumber: 4, weight: 32, reps: 6, completed: false, targetReps: 8, previousWeight: 32, previousReps: 7 },
+            { id: "s3", setNumber: 3, weight: 32, reps: 8, completed: false, targetReps: 8, previousWeight: 30, previousReps: 8 },
           ],
         },
         {
@@ -290,9 +201,8 @@ export function generateEvaluatorDemoDataset() {
           targetMuscle: "Shoulders",
           equipment: "Dumbbells",
           sets: [
-            { id: "s5", setNumber: 1, weight: 10, reps: 15, completed: true, targetReps: 15 },
-            { id: "s6", setNumber: 2, weight: 12, reps: 12, completed: true, targetReps: 12 },
-            { id: "s7", setNumber: 3, weight: 12, reps: 12, completed: false, targetReps: 12 },
+            { id: "s4", setNumber: 1, weight: 10, reps: 15, completed: true, targetReps: 15 },
+            { id: "s5", setNumber: 2, weight: 12, reps: 12, completed: true, targetReps: 12 },
           ],
         },
         {
@@ -301,67 +211,8 @@ export function generateEvaluatorDemoDataset() {
           targetMuscle: "Triceps",
           equipment: "Cable",
           sets: [
-            { id: "s8", setNumber: 1, weight: 25, reps: 15, completed: true, targetReps: 15 },
-            { id: "s9", setNumber: 2, weight: 30, reps: 12, completed: true, targetReps: 12 },
-            { id: "s10", setNumber: 3, weight: 30, reps: 10, completed: false, targetReps: 10 },
-          ],
-        },
-      ],
-    },
-    {
-      id: "gr_wed_pull",
-      dayOfWeek: "Wednesday",
-      title: "Pull Day A (Back & Biceps)",
-      notes: "Drive through elbows on pulldowns and keep torso still on rows.",
-      exercises: [
-        {
-          id: "ex_4",
-          name: "Wide Grip Lat Pulldown",
-          targetMuscle: "Back",
-          equipment: "Cable",
-          sets: [
-            { id: "s11", setNumber: 1, weight: 60, reps: 10, completed: true, targetReps: 10 },
-            { id: "s12", setNumber: 2, weight: 65, reps: 8, completed: true, targetReps: 8 },
-            { id: "s13", setNumber: 3, weight: 70, reps: 8, completed: true, targetReps: 8 },
-          ],
-        },
-        {
-          id: "ex_5",
-          name: "Incline Dumbbell Bicep Curl",
-          targetMuscle: "Biceps",
-          equipment: "Dumbbells",
-          sets: [
-            { id: "s14", setNumber: 1, weight: 14, reps: 12, completed: true, targetReps: 12 },
-            { id: "s15", setNumber: 2, weight: 14, reps: 10, completed: true, targetReps: 10 },
-          ],
-        },
-      ],
-    },
-    {
-      id: "gr_fri_legs",
-      dayOfWeek: "Friday",
-      title: "Legs & Core Overload",
-      notes: "Barbell back squat progressive overload followed by RDL hamstrings focus.",
-      exercises: [
-        {
-          id: "ex_6",
-          name: "Barbell Back Squat",
-          targetMuscle: "Quads",
-          equipment: "Barbell",
-          sets: [
-            { id: "s16", setNumber: 1, weight: 80, reps: 10, completed: true, targetReps: 10 },
-            { id: "s17", setNumber: 2, weight: 90, reps: 8, completed: true, targetReps: 8 },
-            { id: "s18", setNumber: 3, weight: 100, reps: 6, completed: true, targetReps: 6 },
-          ],
-        },
-        {
-          id: "ex_7",
-          name: "Dumbbell Romanian Deadlift",
-          targetMuscle: "Hamstrings",
-          equipment: "Dumbbells",
-          sets: [
-            { id: "s19", setNumber: 1, weight: 26, reps: 10, completed: true, targetReps: 10 },
-            { id: "s20", setNumber: 2, weight: 28, reps: 8, completed: true, targetReps: 8 },
+            { id: "s6", setNumber: 1, weight: 25, reps: 15, completed: true, targetReps: 15 },
+            { id: "s7", setNumber: 2, weight: 30, reps: 12, completed: false, targetReps: 12 },
           ],
         },
       ],
@@ -369,13 +220,13 @@ export function generateEvaluatorDemoDataset() {
   ];
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // 4. THE MACRO FORGE NUTRITION (invictus_meal_plans, targets)
+  // 4. THE MACRO FORGE NUTRITION - Streamlined Targets & Today's Meals
   // ─────────────────────────────────────────────────────────────────────────────
   const nutritionTargets = {
-    calories: 2400,
-    protein: 145,
-    carbs: 240,
-    fat: 65,
+    calories: 2200,
+    protein: 135,
+    carbs: 230,
+    fat: 60,
   };
 
   const mealPlans = [
@@ -384,80 +235,71 @@ export function generateEvaluatorDemoDataset() {
       date: todayStr,
       name: "Oatmeal, Whey Protein & Peanut Butter Bowl",
       mealType: "Breakfast",
-      calories: 540,
-      protein: 42,
-      carbs: 58,
-      fat: 16,
+      calories: 520,
+      protein: 40,
+      carbs: 55,
+      fat: 15,
       time: "08:30 AM",
       completed: true,
     },
     {
       id: "meal_demo_2",
       date: todayStr,
-      name: "Grilled Chicken / Paneer Rice Bowl with Broccoli",
+      name: "Grilled Paneer / Chicken Rice Bowl with Greens",
       mealType: "Lunch",
-      calories: 680,
-      protein: 52,
-      carbs: 72,
-      fat: 18,
+      calories: 650,
+      protein: 48,
+      carbs: 70,
+      fat: 16,
       time: "01:15 PM",
       completed: true,
     },
     {
       id: "meal_demo_3",
       date: todayStr,
-      name: "Greek Yogurt, Raw Almonds & Honey Parfait",
+      name: "Greek Yogurt Parfait & Almonds",
       mealType: "Snack",
-      calories: 320,
-      protein: 26,
-      carbs: 34,
-      fat: 9,
+      calories: 280,
+      protein: 22,
+      carbs: 28,
+      fat: 8,
       time: "05:00 PM",
       completed: true,
     },
     {
       id: "meal_demo_4",
       date: todayStr,
-      name: "Baked Salmon / Tofu Quinoa Harvest Bowl",
+      name: "Tofu / Salmon Quinoa Bowl",
       mealType: "Dinner",
-      calories: 580,
-      protein: 38,
-      carbs: 48,
-      fat: 15,
+      calories: 550,
+      protein: 36,
+      carbs: 45,
+      fat: 14,
       time: "08:30 PM",
       completed: false,
     },
   ];
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // 5. STUDY SPACE (invictus_subjects, topics, study_sessions, tests)
+  // 5. STUDY SPACE - 2 Core Subjects & 3 Topics
   // ─────────────────────────────────────────────────────────────────────────────
   const subjects: Subject[] = [
     {
       id: "demo_sub_cs",
-      name: "Computer Science: Distributed Systems",
+      name: "Computer Networks & Protocols",
       color: "indigo",
       icon: "Cpu",
       archived: false,
-      createdAt: new Date(subDays(now, 20)).toISOString(),
+      createdAt: new Date(subDays(now, 10)).toISOString(),
       updatedAt: new Date().toISOString(),
     },
     {
-      id: "demo_sub_math",
-      name: "Discrete Mathematics & Graph Theory",
+      id: "demo_sub_dbms",
+      name: "Database Management Systems",
       color: "emerald",
       icon: "Binary",
       archived: false,
-      createdAt: new Date(subDays(now, 20)).toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    {
-      id: "demo_sub_ml",
-      name: "Machine Learning & Neural Architectures",
-      color: "amber",
-      icon: "Brain",
-      archived: false,
-      createdAt: new Date(subDays(now, 15)).toISOString(),
+      createdAt: new Date(subDays(now, 10)).toISOString(),
       updatedAt: new Date().toISOString(),
     },
   ];
@@ -466,96 +308,58 @@ export function generateEvaluatorDemoDataset() {
     {
       id: "demo_top_1",
       subjectId: "demo_sub_cs",
-      title: "Raft Consensus Algorithm",
+      title: "TCP 3-Way Handshake & Flow Control",
       status: "completed",
-      estimatedHours: 4,
-      loggedHours: 3.5,
+      estimatedHours: 3,
+      loggedHours: 2.5,
       confidence: 5,
-      revisionsCount: 4,
+      revisionsCount: 3,
       easinessFactor: 2.5,
       intervalDays: 4,
       nextRevisionDate: format(addDays(now, 3), "yyyy-MM-dd"),
       lastRevisedAt: yesterdayStr,
-      notes: "Leader election heartbeat timeout 150-300ms, log replication appendEntries RPC.",
-      resourceLinks: ["https://raft.github.io/"],
+      notes: "SYN, SYN-ACK, ACK. Sliding window buffer flow control.",
+      resourceLinks: [],
       order: 0,
-      createdAt: new Date(subDays(now, 10)).toISOString(),
+      createdAt: new Date(subDays(now, 7)).toISOString(),
       updatedAt: new Date().toISOString(),
     },
     {
       id: "demo_top_2",
       subjectId: "demo_sub_cs",
-      title: "Two-Phase Commit (2PC) & CAP Theorem",
+      title: "TCP Congestion Avoidance & Fast Recovery",
       status: "needsRevision",
       estimatedHours: 3,
-      loggedHours: 2,
+      loggedHours: 1.5,
       confidence: 3,
-      revisionsCount: 3,
-      easinessFactor: 2.4,
-      intervalDays: 3,
+      revisionsCount: 2,
+      easinessFactor: 2.3,
+      intervalDays: 2,
       nextRevisionDate: todayStr,
       lastRevisedAt: format(subDays(now, 2), "yyyy-MM-dd"),
-      notes: "Prepare phase followed by Commit/Abort. Blocking protocol drawback.",
+      notes: "Slow start threshold (ssthresh), additive increase multiplicative decrease (AIMD).",
       resourceLinks: [],
       order: 1,
-      createdAt: new Date(subDays(now, 12)).toISOString(),
+      createdAt: new Date(subDays(now, 6)).toISOString(),
       updatedAt: new Date().toISOString(),
     },
     {
       id: "demo_top_3",
-      subjectId: "demo_sub_math",
-      title: "Dijkstra vs Bellman-Ford Algorithms",
-      status: "completed",
-      estimatedHours: 5,
-      loggedHours: 4,
-      confidence: 5,
-      revisionsCount: 5,
-      easinessFactor: 2.6,
-      intervalDays: 5,
-      nextRevisionDate: format(addDays(now, 2), "yyyy-MM-dd"),
-      lastRevisedAt: format(subDays(now, 3), "yyyy-MM-dd"),
-      notes: "Dijkstra uses greedy min-priority queue (non-negative edges). Bellman-Ford handles negative cycles.",
-      resourceLinks: [],
-      order: 0,
-      createdAt: new Date(subDays(now, 15)).toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    {
-      id: "demo_top_4",
-      subjectId: "demo_sub_math",
-      title: "Eulerian & Hamiltonian Graph Paths",
-      status: "inProgress",
-      estimatedHours: 3,
-      loggedHours: 1,
-      confidence: 2,
-      revisionsCount: 1,
-      easinessFactor: 2.1,
-      intervalDays: 1,
-      nextRevisionDate: todayStr,
-      lastRevisedAt: format(subDays(now, 5), "yyyy-MM-dd"),
-      notes: "Eulerian path visits every edge once. Degree conditions for connected graph.",
-      resourceLinks: [],
-      order: 1,
-      createdAt: new Date(subDays(now, 8)).toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    {
-      id: "demo_top_5",
-      subjectId: "demo_sub_ml",
-      title: "Backpropagation & Gradient Descent",
+      subjectId: "demo_sub_dbms",
+      title: "B+ Tree Indexing & Query Execution Plans",
       status: "completed",
       estimatedHours: 4,
       loggedHours: 3.5,
       confidence: 4,
       revisionsCount: 3,
-      easinessFactor: 2.5,
-      intervalDays: 4,
+      easinessFactor: 2.6,
+      intervalDays: 5,
       nextRevisionDate: format(addDays(now, 4), "yyyy-MM-dd"),
-      lastRevisedAt: yesterdayStr,
-      notes: "Chain rule of calculus to compute partial derivatives of loss with respect to weights.",
+      lastRevisedAt: format(subDays(now, 3), "yyyy-MM-dd"),
+      notes: "B+ Tree node fanout, clustered vs secondary indexing, range scan optimality.",
       resourceLinks: [],
       order: 0,
-      createdAt: new Date(subDays(now, 14)).toISOString(),
+      createdAt: new Date(subDays(now, 8)).toISOString(),
       updatedAt: new Date().toISOString(),
     },
   ];
@@ -566,77 +370,44 @@ export function generateEvaluatorDemoDataset() {
       subjectId: "demo_sub_cs",
       topicId: "demo_top_1",
       date: yesterdayStr,
-      durationMinutes: 90,
-      type: "revision",
-      notes: "Deep focus Pomodoro on Raft leader election failure recoveries.",
-      createdAt: new Date(subDays(now, 1)).toISOString(),
-    },
-    {
-      id: "demo_sess_2",
-      subjectId: "demo_sub_math",
-      topicId: "demo_top_3",
-      date: format(subDays(now, 2), "yyyy-MM-dd"),
       durationMinutes: 60,
-      type: "practice",
-      notes: "Solved practice graph algorithm complexity questions.",
-      createdAt: new Date(subDays(now, 2)).toISOString(),
-    },
-    {
-      id: "demo_sess_3",
-      subjectId: "demo_sub_ml",
-      topicId: "demo_top_5",
-      date: format(subDays(now, 3), "yyyy-MM-dd"),
-      durationMinutes: 45,
-      type: "reading",
-      notes: "Implemented toy backpropagation network in PyTorch.",
-      createdAt: new Date(subDays(now, 3)).toISOString(),
+      type: "revision",
+      notes: "Reviewed TCP handshake wireshark captures.",
+      createdAt: new Date(subDays(now, 1)).toISOString(),
     },
   ];
 
   const tests: Test[] = [
     {
       id: "demo_test_1",
-      name: "Distributed Systems Mid-Term Examination",
-      date: format(addDays(now, 12), "yyyy-MM-dd"),
+      name: "Computer Networks Mid-Semester Exam",
+      date: format(addDays(now, 10), "yyyy-MM-dd"),
       scope: ["demo_sub_cs"],
       score: 88,
       totalScore: 100,
-      timeTakenMinutes: 75,
-      weakAreas: ["2PC Network Partitions", "Vector Clock Concurrency"],
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: "demo_test_2",
-      name: "Discrete Mathematics Departmental Final",
-      date: format(addDays(now, 24), "yyyy-MM-dd"),
-      scope: ["demo_sub_math"],
-      score: 92,
-      totalScore: 100,
-      timeTakenMinutes: 90,
-      weakAreas: ["Hamiltonian Cycle Proofs"],
+      timeTakenMinutes: 60,
+      weakAreas: ["Congestion Control Window calculations"],
       createdAt: new Date().toISOString(),
     },
   ];
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // 6. MONEY SPACE (invictus_categories, transactions, debts, savings)
+  // 6. MONEY SPACE - Calibrated, Normal Daily Transactions (Zero Clutter)
   // ─────────────────────────────────────────────────────────────────────────────
   const categories: Category[] = [
     { id: "cat-salary", name: "Salary & Stipends", type: "income", icon: "DollarSign", color: "mint", archived: false },
-    { id: "cat-freelance", name: "Freelance & Projects", type: "income", icon: "Briefcase", color: "amber", archived: false },
-    { id: "cat-food", name: "Food & Dining", type: "expense", icon: "Coffee", color: "coral", monthlyBudget: 5000, archived: false },
-    { id: "cat-groceries", name: "Groceries & Kitchen", type: "expense", icon: "ShoppingBag", color: "mint", monthlyBudget: 3500, archived: false },
-    { id: "cat-transport", name: "Commute & Transit", type: "expense", icon: "Car", color: "orange", monthlyBudget: 2000, archived: false },
-    { id: "cat-education", name: "Books & Courses", type: "expense", icon: "BookOpen", color: "indigo", monthlyBudget: 2500, archived: false },
-    { id: "cat-bills", name: "Tech & Subscriptions", type: "expense", icon: "Zap", color: "sky", monthlyBudget: 1500, archived: false },
-    { id: "cat-health", name: "Gym & Healthcare", type: "expense", icon: "HeartPulse", color: "rose", monthlyBudget: 2000, archived: false },
+    { id: "cat-food", name: "Food & Dining", type: "expense", icon: "Coffee", color: "coral", monthlyBudget: 4000, archived: false },
+    { id: "cat-groceries", name: "Groceries & Kitchen", type: "expense", icon: "ShoppingBag", color: "mint", monthlyBudget: 3000, archived: false },
+    { id: "cat-transport", name: "Commute & Transit", type: "expense", icon: "Car", color: "orange", monthlyBudget: 1500, archived: false },
+    { id: "cat-education", name: "Books & Study", type: "expense", icon: "BookOpen", color: "indigo", monthlyBudget: 1500, archived: false },
+    { id: "cat-bills", name: "Tech & Subscriptions", type: "expense", icon: "Zap", color: "sky", monthlyBudget: 1000, archived: false },
   ];
 
   const transactions: Transaction[] = [
     // Today
     {
       id: "tx_demo_1",
-      amount: 180,
+      amount: 140,
       type: "expense",
       categoryId: "cat-food",
       date: todayStr,
@@ -646,135 +417,46 @@ export function generateEvaluatorDemoDataset() {
     },
     {
       id: "tx_demo_2",
-      amount: 60,
+      amount: 40,
       type: "expense",
       categoryId: "cat-transport",
       date: todayStr,
-      note: "Metro Rapid Transit Ticket",
+      note: "Metro Transit Smart Card",
       paymentMethod: "cash",
       isRecurring: false,
     },
+    // Yesterday
     {
       id: "tx_demo_3",
-      amount: 120,
-      type: "expense",
-      categoryId: "cat-food",
-      date: todayStr,
-      note: "Local Coffee & Pastry",
-      paymentMethod: "cash",
-      isRecurring: false,
-    },
-    // Yesterday & Recent Days
-    {
-      id: "tx_demo_4",
-      amount: 1240,
+      amount: 350,
       type: "expense",
       categoryId: "cat-groceries",
       date: yesterdayStr,
-      note: "Weekly Groceries, Oats & Fruits",
+      note: "Oats, Fruits & Greek Yogurt",
       paymentMethod: "upi",
       isRecurring: false,
     },
+    // Past 3 days
     {
-      id: "tx_demo_5",
-      amount: 420,
-      type: "expense",
-      categoryId: "cat-bills",
-      date: format(subDays(now, 3), "yyyy-MM-dd"),
-      note: "AWS Cloud Server Hosting",
-      paymentMethod: "card",
-      isRecurring: true,
-    },
-    {
-      id: "tx_demo_6",
-      amount: 850,
+      id: "tx_demo_4",
+      amount: 180,
       type: "expense",
       categoryId: "cat-education",
-      date: format(subDays(now, 4), "yyyy-MM-dd"),
-      note: "Textbook: Algorithms in C++",
-      paymentMethod: "upi",
-      isRecurring: false,
-    },
-    {
-      id: "tx_demo_7",
-      amount: 250,
-      type: "expense",
-      categoryId: "cat-transport",
-      date: format(subDays(now, 5), "yyyy-MM-dd"),
-      note: "Auto Rickshaw to Campus",
+      date: format(subDays(now, 3), "yyyy-MM-dd"),
+      note: "Engineering Spiral Notebooks & Pens",
       paymentMethod: "cash",
       isRecurring: false,
-    },
-    {
-      id: "tx_demo_8",
-      amount: 650,
-      type: "expense",
-      categoryId: "cat-food",
-      date: format(subDays(now, 7), "yyyy-MM-dd"),
-      note: "Weekend Team Pizza Sprint",
-      paymentMethod: "upi",
-      isRecurring: false,
-    },
-    {
-      id: "tx_demo_9",
-      amount: 1500,
-      type: "expense",
-      categoryId: "cat-health",
-      date: format(subDays(now, 10), "yyyy-MM-dd"),
-      note: "Gym Membership Monthly Dues",
-      paymentMethod: "upi",
-      isRecurring: true,
     },
     // Inflow Income
     {
-      id: "tx_demo_10",
-      amount: 15000,
+      id: "tx_demo_5",
+      amount: 8000,
       type: "income",
       categoryId: "cat-salary",
-      date: format(subDays(now, 12), "yyyy-MM-dd"),
-      note: "Part-Time Research Assistant Stipend",
+      date: format(subDays(now, 5), "yyyy-MM-dd"),
+      note: "Research Assistant Monthly Stipend",
       paymentMethod: "bank",
       isRecurring: true,
-    },
-    {
-      id: "tx_demo_11",
-      amount: 8500,
-      type: "income",
-      categoryId: "cat-freelance",
-      date: format(subDays(now, 6), "yyyy-MM-dd"),
-      note: "Freelance React Consulting Milestone 1",
-      paymentMethod: "upi",
-      isRecurring: false,
-    },
-    {
-      id: "tx_demo_12",
-      amount: 140,
-      type: "expense",
-      categoryId: "cat-food",
-      date: format(subDays(now, 2), "yyyy-MM-dd"),
-      note: "Evening Tea & Snacks",
-      paymentMethod: "cash",
-      isRecurring: false,
-    },
-    {
-      id: "tx_demo_13",
-      amount: 299,
-      type: "expense",
-      categoryId: "cat-bills",
-      date: format(subDays(now, 8), "yyyy-MM-dd"),
-      note: "Spotify Premium Duo",
-      paymentMethod: "upi",
-      isRecurring: true,
-    },
-    {
-      id: "tx_demo_14",
-      amount: 320,
-      type: "expense",
-      categoryId: "cat-transport",
-      date: format(subDays(now, 9), "yyyy-MM-dd"),
-      note: "Uber to Tech Meetup",
-      paymentMethod: "upi",
-      isRecurring: false,
     },
   ];
 
@@ -782,44 +464,24 @@ export function generateEvaluatorDemoDataset() {
     {
       id: "debt_demo_1",
       userId: "guest-user",
-      personName: "Alex Vance (Study Partner)",
+      personName: "Alex Vance (Lab Partner)",
       type: "lent",
-      amount: 600,
-      note: "Lent for algorithms textbook sharing",
-      dueDate: format(addDays(now, 7), "yyyy-MM-dd"),
+      amount: 200,
+      note: "Lent for lab manual printing split",
+      dueDate: format(addDays(now, 5), "yyyy-MM-dd"),
       status: "pending",
-      createdAt: new Date(subDays(now, 3)).toISOString(),
-    },
-    {
-      id: "debt_demo_2",
-      userId: "guest-user",
-      personName: "Devon (Roommate)",
-      type: "borrowed",
-      amount: 250,
-      note: "Borrowed for grocery delivery split",
-      status: "settled",
-      settledAt: yesterdayStr,
-      createdAt: new Date(subDays(now, 6)).toISOString(),
+      createdAt: new Date(subDays(now, 2)).toISOString(),
     },
   ];
 
   const savingsGoals = [
     {
-      id: "goal_demo_mac",
-      name: "M3 MacBook Pro Setup Fund",
-      targetAmount: 120000,
-      currentAmount: 85000,
+      id: "goal_demo_laptop",
+      name: "Laptop Setup Upgrade Fund",
+      targetAmount: 25000,
+      currentAmount: 18000,
       icon: "Laptop",
       color: "indigo",
-      targetDate: format(addDays(now, 90), "yyyy-MM-dd"),
-    },
-    {
-      id: "goal_demo_emergency",
-      name: "Emergency Rainy Day Buffer",
-      targetAmount: 30000,
-      currentAmount: 25000,
-      icon: "Shield",
-      color: "emerald",
       targetDate: format(addDays(now, 60), "yyyy-MM-dd"),
     },
   ];
@@ -834,36 +496,16 @@ export function generateEvaluatorDemoDataset() {
       category: "Entertainment",
       icon: "Music",
     },
-    {
-      id: "sub_github",
-      name: "GitHub Copilot Pro",
-      amount: 830,
-      billingCycle: "monthly",
-      nextBillingDate: format(addDays(now, 18), "yyyy-MM-dd"),
-      category: "Tech",
-      icon: "Code",
-    },
-    {
-      id: "sub_chatgpt",
-      name: "ChatGPT Plus Subscription",
-      amount: 1999,
-      billingCycle: "monthly",
-      nextBillingDate: format(addDays(now, 22), "yyyy-MM-dd"),
-      category: "Productivity",
-      icon: "Sparkles",
-    },
   ];
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // 7. TODAY DASHBOARD & SCRATCHPAD (invictus_sticky_scratchpad)
+  // 7. TODAY DASHBOARD & SCRATCHPAD
   // ─────────────────────────────────────────────────────────────────────────────
   const scratchpadContent = `# ⚡ FOUNDER & STUDENT RADAR
-- [ ] Deploy Next.js RSC production build by 6pm @p1
-- [ ] Review Raft consensus election timeouts #CS
-- [x] Paid ₹180 for lunch at cafeteria #Food
-- [ ] Pick up creatine & electrolytes from store ₹450 #Health
-- [x] Read 15 pages of Designing Data-Intensive Applications
-*Key note*: "Good architecture is about what you can postpone without making it hard to change later."`;
+- [ ] Finalize Next.js Server Action benchmarks @p1
+- [ ] Review TCP congestion control notes #CS
+- [x] Paid ₹140 for cafeteria lunch #Food
+- [x] Read 15 pages of technical book`;
 
   return {
     todayStr,
@@ -930,7 +572,7 @@ export function loadEvaluatorDemoData(): boolean {
         autoShieldEvent: null,
       })
     );
-    localStorage.setItem(`invictus_water_${data.todayStr}`, "2250");
+    localStorage.setItem(`invictus_water_${data.todayStr}`, "2000");
     localStorage.setItem("invictus_water_goal", "3000");
     localStorage.setItem(
       `invictus_mood_${data.todayStr}`,
@@ -938,8 +580,8 @@ export function loadEvaluatorDemoData(): boolean {
         dateStr: data.todayStr,
         rating: 4,
         energy: 4,
-        tags: ["high_focus", "flow_state", "gym_pr"],
-        note: "Crushed 90m deep work sprint on Invictus and hit a personal record on incline press.",
+        tags: ["high_focus", "flow_state"],
+        note: "Crushed 90m deep work sprint on Invictus.",
       })
     );
 
@@ -960,10 +602,10 @@ export function loadEvaluatorDemoData(): boolean {
     localStorage.setItem("invictus_debts", JSON.stringify(data.debts));
     localStorage.setItem("invictus_savings_goals", JSON.stringify(data.savingsGoals));
     localStorage.setItem("invictus_subscriptions", JSON.stringify(data.subscriptions));
-    localStorage.setItem("invictus_monthly_upi_budget", "12000");
-    localStorage.setItem("invictus_monthly_cash_budget", "3000");
+    localStorage.setItem("invictus_monthly_upi_budget", "8000");
+    localStorage.setItem("invictus_monthly_cash_budget", "2000");
     localStorage.setItem("invictus_enable_rollover", "true");
-    localStorage.setItem("invictus_custom_daily_budget", "500");
+    localStorage.setItem("invictus_custom_daily_budget", "350");
 
     // 6. Scratchpad
     localStorage.setItem("invictus_sticky_scratchpad", data.scratchpadContent);
@@ -981,8 +623,8 @@ export function loadEvaluatorDemoData(): boolean {
         "invictus_user_profile",
         JSON.stringify({
           displayName: "Alex Vance",
-          age: "22 Years",
-          weight: "72 kg",
+          age: "21 Years",
+          weight: "70 kg",
           gender: "Male",
           waterGoal: 3000,
           currency: "INR",
