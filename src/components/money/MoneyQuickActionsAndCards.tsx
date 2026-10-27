@@ -256,7 +256,7 @@ export function MoneyQuickActionsAndCards({
           )}
         </div>
       ) : (
-        <div className="flex gap-3.5 overflow-x-auto snap-x snap-mandatory no-scrollbar px-1 py-2">
+        <div className="flex gap-3.5 overflow-x-auto snap-x snap-mandatory no-scrollbar px-2 py-3 -my-1">
           {categories.map((cat, idx) => {
             const theme = getCategoryColors(cat, idx);
             const isSelected = selectedCategoryId === cat.id;
@@ -272,7 +272,7 @@ export function MoneyQuickActionsAndCards({
                   onSelectCategory?.(isSelected ? "all" : cat.id);
                 }}
                 className={cn(
-                  "w-[230px] sm:w-[260px] shrink-0 snap-start relative group cursor-pointer transition-all duration-200 ease-out hover:-translate-y-1",
+                  "w-[240px] sm:w-[270px] shrink-0 snap-start relative group cursor-pointer transition-all duration-200 ease-out hover:-translate-y-1",
                   isSelected && "-translate-y-1"
                 )}
               >
@@ -280,16 +280,16 @@ export function MoneyQuickActionsAndCards({
                 <div
                   style={{ backgroundColor: theme.bg, color: theme.text }}
                   className={cn(
-                    "w-36 h-6.5 rounded-t-xl ml-3 text-[9px] font-black uppercase px-2.5 flex items-center justify-between border-2 border-b-0 border-[#161514] -mb-[2px] relative z-10",
+                    "w-auto max-w-[85%] h-7 rounded-t-xl ml-3 text-[10px] font-black uppercase px-3 flex items-center justify-between gap-2 border-2 border-b-0 border-[#161514] -mb-[2px] relative z-10 shrink-0",
                     isSelected && "ring-2 ring-black ring-b-0"
                   )}
                 >
-                  <span className="truncate flex items-center gap-1.5">
-                    <span className="text-xs">{renderCategoryEmoji(cat.icon)}</span>
-                    <span className="truncate tracking-wider">{cat.name.slice(0, 12)}</span>
-                  </span>
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <span className="text-xs shrink-0">{renderCategoryEmoji(cat.icon)}</span>
+                    <span className="truncate tracking-wider font-heading">{cat.name}</span>
+                  </div>
                   <div
-                    className="flex items-center gap-1.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
+                    className="flex items-center gap-1.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity shrink-0 ml-1"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {onEditCategory && (
@@ -298,7 +298,7 @@ export function MoneyQuickActionsAndCards({
                         className="text-current hover:scale-110 p-0.5 cursor-pointer border-none bg-transparent"
                         title="Edit wallet"
                       >
-                        <Edit3 className="h-2.5 w-2.5 stroke-[2.5]" />
+                        <Edit3 className="size-2.5 stroke-[2.5]" />
                       </button>
                     )}
                     {onDeleteCategory && (
@@ -307,7 +307,7 @@ export function MoneyQuickActionsAndCards({
                         className="text-current hover:scale-110 p-0.5 cursor-pointer border-none bg-transparent"
                         title="Delete wallet"
                       >
-                        <Trash2 className="h-2.5 w-2.5 stroke-[2.5]" />
+                        <Trash2 className="size-2.5 stroke-[2.5]" />
                       </button>
                     )}
                   </div>
@@ -321,43 +321,49 @@ export function MoneyQuickActionsAndCards({
                     isSelected && "ring-2 ring-black shadow-[5px_5px_0px_0px_#161514]"
                   )}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xl">{renderCategoryEmoji(cat.icon)}</span>
-                      <span className="text-xs font-black tracking-wide block truncate opacity-90 font-heading">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <span className="text-xl shrink-0">{renderCategoryEmoji(cat.icon)}</span>
+                      <span className="text-xs font-black tracking-wide truncate opacity-95 font-heading">
                         {cat.name}
                       </span>
                     </div>
                     {isSelected ? (
-                      <span className="text-[9px] font-black uppercase bg-[#161514] text-white px-2 py-0.5 rounded-lg border border-[#161514] flex items-center gap-1">
-                        <Check className="h-2.5 w-2.5 stroke-[3]" />
+                      <span className="text-[9px] font-black uppercase bg-[#161514] text-white px-2 py-0.5 rounded-lg border border-[#161514] flex items-center gap-1 shrink-0">
+                        <Check className="size-2.5 stroke-[3]" />
                         <span>Active</span>
                       </span>
                     ) : (
-                      <span className="text-[9px] font-black uppercase bg-black/15 px-2 py-0.5 rounded-lg border border-[#161514]">
+                      <span className="text-[9px] font-black uppercase bg-black/15 px-2 py-0.5 rounded-lg border border-[#161514] shrink-0">
                         {cat.type || "Expense"}
                       </span>
                     )}
                   </div>
 
-                  <div className="flex items-end justify-between pt-0.5">
-                    <div>
-                      <span className="text-[8px] sm:text-[9px] font-black uppercase opacity-75 block tracking-wider">
+                  <div className="grid grid-cols-2 gap-2 pt-1 border-t border-black/10">
+                    <div className="min-w-0">
+                      <span className="text-[8px] sm:text-[9px] font-black uppercase opacity-75 block tracking-wider truncate">
                         Spent Balance
                       </span>
-                      <span className="text-lg sm:text-xl font-black block tracking-tight font-heading">
+                      <span className="text-base sm:text-lg font-black block tracking-tight font-mono tabular-nums truncate mt-0.5">
                         {isHideBalance
                           ? "••••••"
                           : `${currencySymbol}${cat.amount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`}
                       </span>
                     </div>
-                    {budgetCap > 0 && (
-                      <div className="text-right">
-                        <span className="text-[8px] sm:text-[9px] font-black uppercase opacity-75 block tracking-wider">
+                    {budgetCap > 0 ? (
+                      <div className="text-right min-w-0">
+                        <span className="text-[8px] sm:text-[9px] font-black uppercase opacity-75 block tracking-wider truncate">
                           Budget Cap
                         </span>
-                        <span className="text-xs font-black opacity-90 font-heading">
+                        <span className="text-xs sm:text-sm font-black opacity-95 font-mono tabular-nums block truncate mt-0.5">
                           {currencySymbol}{budgetCap.toLocaleString()}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="text-right min-w-0 flex flex-col justify-end">
+                        <span className="text-[9px] font-bold opacity-60 block tracking-wider">
+                          No Limit
                         </span>
                       </div>
                     )}
@@ -365,7 +371,7 @@ export function MoneyQuickActionsAndCards({
 
                   {/* Progress Meter if Budget Cap exists */}
                   {budgetCap > 0 && (
-                    <div className="space-y-1 pt-1">
+                    <div className="space-y-1 pt-0.5">
                       <div className="w-full bg-black/20 rounded-full h-2 overflow-hidden border border-[#161514]/40">
                         <div
                           className={cn(

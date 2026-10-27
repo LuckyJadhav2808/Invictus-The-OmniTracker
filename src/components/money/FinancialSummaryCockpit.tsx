@@ -59,20 +59,20 @@ export function FinancialSummaryCockpit({
         <div className="border-2 border-dashed border-white/20 rounded-2xl sm:rounded-[24px] p-3 sm:p-4.5 space-y-3.5">
           
           {/* Top Leather Tag & Status */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#CEF431] border border-[#161514]" />
-              <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-[#FAF8F5]" style={{ fontFamily: "var(--font-heading)" }}>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#CEF431] border border-[#161514] shrink-0" />
+              <span className="text-[11px] sm:text-xs font-black uppercase tracking-wider text-[#FAF8F5] truncate font-heading">
                 Money Wallet
               </span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-[#161514] text-[#FAF8F5] border border-white/10 font-mono">
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-[#161514] text-[#FAF8F5] border border-white/10 font-mono whitespace-nowrap">
                 {monthlyStats.targetMonthLabel}
               </span>
               <span
                 className={cn(
-                  "text-[10px] font-black uppercase px-2 py-0.5 rounded-full border border-[#161514]",
+                  "text-[10px] font-black uppercase px-2 py-0.5 rounded-full border border-[#161514] whitespace-nowrap",
                   budgetPercentageRemaining <= 15
                     ? "bg-rose-400 text-[#161514]"
                     : budgetPercentageRemaining <= 30
@@ -107,20 +107,28 @@ export function FinancialSummaryCockpit({
                   )}
                 </div>
 
-                <div className="space-y-0.5 relative z-10 pt-1">
-                  <span className="text-[10px] sm:text-[11px] font-black uppercase text-[#1B5E20] tracking-wider block">
-                    Remaining to Spend
-                  </span>
-                  <div className="flex flex-wrap items-baseline gap-2">
+                <div className="space-y-1 relative z-10 pt-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="size-2 rounded-full bg-[#1B5E20] shrink-0" />
+                    <span className="text-[10px] sm:text-[11px] font-black uppercase text-[#1B5E20] tracking-wider font-heading">
+                      Remaining to Spend
+                    </span>
+                  </div>
+
+                  <div className="space-y-1">
                     <div
-                      className="text-4xl sm:text-5xl font-black tracking-tight text-[#161514]"
-                      style={{ fontFamily: "var(--font-heading)" }}
+                      className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-[#161514] font-mono tabular-nums truncate leading-tight"
                     >
                       {currencySymbol}{monthlyStats.remainingBudget.toLocaleString()}
                     </div>
-                    <span className="text-xs sm:text-sm font-bold text-[#161514]/65 font-mono">
-                      / {currencySymbol}{monthlyStats.totalAvailableBudget.toLocaleString()} Budget
-                    </span>
+                    <div className="flex items-center gap-2 flex-wrap pt-0.5">
+                      <span className="text-[10px] sm:text-xs font-black text-[#161514]/75 font-mono px-2 py-0.5 rounded bg-white/60 border border-[#161514]/20 shadow-[1px_1px_0px_0px_#161514]">
+                        Budget: {currencySymbol}{monthlyStats.totalAvailableBudget.toLocaleString()}
+                      </span>
+                      <span className="text-[10px] sm:text-xs font-bold text-[#1B5E20] font-mono">
+                        • {currencySymbol}{monthlyStats.monthlyExpense.toLocaleString()} Spent
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -140,10 +148,10 @@ export function FinancialSummaryCockpit({
                     style={{ width: `${Math.max(4, budgetPercentageRemaining)}%` }}
                   />
                 </div>
-                <div className="flex justify-between text-[9px] font-black font-mono text-[#1B5E20]/80 px-0.5 uppercase">
+                <div className="flex justify-between text-[9px] font-black font-mono text-[#1B5E20]/80 px-0.5 uppercase gap-1 flex-wrap">
                   <span>{currencySymbol}0 Spent</span>
-                  <span>{budgetPercentageRemaining}% Remaining</span>
-                  <span>{currencySymbol}{monthlyStats.totalAvailableBudget.toLocaleString()} Budget</span>
+                  <span className="text-center">{budgetPercentageRemaining}% Left</span>
+                  <span className="text-right">{currencySymbol}{monthlyStats.totalAvailableBudget.toLocaleString()} Total</span>
                 </div>
               </div>
             </div>
@@ -342,25 +350,28 @@ export function FinancialSummaryCockpit({
             {/* Pocket Vix Wallet Companion */}
             <div
               onClick={onAddTransaction}
-              className="bg-[#FFF9EA] p-2.5 sm:p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center gap-3 cursor-pointer hover:bg-white active:translate-x-0.5 active:translate-y-0.5 transition-all"
+              className="bg-[#FFF9EA] p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center gap-3 cursor-pointer hover:bg-white active:translate-x-0.5 active:translate-y-0.5 transition-all"
               title="Click to Log Expense"
             >
               <div className="shrink-0">
                 <VixPixelCompanion
                   gear="money"
                   state={dailyStats.isOverDailyBudget ? "fire" : "idle"}
-                  size={34}
+                  size={36}
                 />
               </div>
               <div className="min-w-0 flex-1">
-                <div className="text-[10px] font-black uppercase text-[#161514] font-heading">
-                  Vix Wallet Companion
+                <div className="text-[10px] font-black uppercase text-[#161514] font-heading flex items-center gap-1.5">
+                  <span>Vix Wallet Companion</span>
+                  <span className="text-[8px] font-bold px-1.5 py-0.2 bg-[#CEF431] text-[#161514] rounded border border-[#161514]/30">
+                    Daily Telemetry
+                  </span>
                 </div>
-                <div className="text-xs font-bold text-[#161514]/75 truncate mt-0.5">
+                <p className="text-xs font-bold text-[#161514]/85 leading-snug mt-0.5">
                   {dailyStats.isOverDailyBudget
                     ? `Over daily spend limit by ${currencySymbol}${dailyStats.overDailyAmount.toLocaleString()} today.`
                     : `${budgetPercentageRemaining}% budget available. Safe to spend ~${currencySymbol}${dailyStats.todayRemaining.toLocaleString()} today.`}
-                </div>
+                </p>
               </div>
             </div>
           </div>
