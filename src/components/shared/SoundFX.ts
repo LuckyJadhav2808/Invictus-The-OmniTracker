@@ -49,6 +49,22 @@ class SoundManager {
     return this.muted;
   }
 
+  // Generic sound dispatcher for tactile feedback
+  public play(name: "click" | "pop" | "coin" | "cash" | "celebrate" | "error" | string) {
+    if (this.muted) return;
+    if (name === "click" || name === "pop") {
+      this.playClick();
+    } else if (name === "coin" || name === "cash") {
+      this.playCashRegister();
+    } else if (name === "celebrate" || name === "chime") {
+      this.playCompleteChime();
+    } else if (name === "beep") {
+      this.playKeypadBeep();
+    } else {
+      this.playClick();
+    }
+  }
+
   // Zero-lag Web Audio API hardware pre-buffering & context unfreezing
   public prewarm() {
     if (typeof window === "undefined") return;

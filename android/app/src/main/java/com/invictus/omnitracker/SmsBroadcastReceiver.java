@@ -35,11 +35,11 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
     private static final String TAG = "InvictusSmsReceiver";
     private static final String CHANNEL_ID = "invictus_money_channel";
     private static final String DEFAULT_USER_ID = "user_1kapw9sad_1784744868999";
-    private static final String SYNC_ENDPOINT = "https://invictus-the-omni-tracker.vercel.app/api/money/auto-sync";
+    private static final String SYNC_ENDPOINT = "https://invictus-the-omni-tracker.vercel.app/api/money/sms-webhook";
 
     // 1. TRAI Approved Bank Headers (Pre-compiled Regex)
     private static final Pattern BANK_HEADER_PATTERN = Pattern.compile(
-            "^(?:[A-Za-z]{2}[-_]?)?(HDFCBK|SBINB|SBIPSG|SBIUPI|ICICIB|AXISBK|KOTAKB|INDUSB|YESBNK|PNBSMS|BOISMS|CANBNK|UBISMS|UNIONB|IDFCFB|FEDBNK|PAYTMB|CREDBK|CENTBK|BOBSMS|MAHBK|IOB|UCOBNK|RBLBNK|AUFINB|BANDHN|IDBIBK|SCISMS|AMEXIN|AIRTEL|JIOBNK)(?:[-_][A-Za-z0-9]+)?$",
+            "^(?:[A-Za-z]{2}[-_]?)?(HDFCBK|SBINB|SBIPSG|SBIUPI|ICICIB|AXISBK|KOTAKB|INDUSB|YESBNK|PNBSMS|PNB|BOISMS|CANBNK|UBISMS|UNIONB|IDFCFB|FEDBNK|PAYTMB|CREDBK|CENTBK|BOBSMS|MAHBK|IOB|UCOBNK|RBLBNK|AUFINB|BANDHN|IDBIBK|SCISMS|AMEXIN|AIRTEL|JIOBNK)(?:[-_][A-Za-z0-9]+)?$",
             Pattern.CASE_INSENSITIVE
     );
 
@@ -51,19 +51,25 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
 
     // 3. Balance Clause Stripper (Ensures balance is never parsed as transaction amount)
     private static final Pattern BALANCE_STRIPPER = Pattern.compile(
-            "(?:AvlBal|Avail\\s*Bal|Available\\s*Balance|Bal:|Total\\s*Bal).*$",
+            "(?:\\.|\\s)*(?:Avl\\s*Bal|Avail\\s*Bal|Available\\s*Balance|Bal:|Total\\s*Bal|Clear\\s*Bal|Bal\\s+INR|Bal\\s+Rs).*$",
             Pattern.CASE_INSENSITIVE
     );
 
     // 4. Amount Pattern (Supports Rs, Re, INR, ₹, and singular Re. 1.00 amounts)
     private static final Pattern AMOUNT_PATTERN = Pattern.compile(
-            "(?:(?:Rs\\.?|Re\\.?|INR|₹)\\s*([\\d,]+(?:\\.\\d{1,2})?))|(?:debited\\s*(?:by|with|for)|credited\\s*(?:by|with|for)|paid|sent)\\s*(?:Rs\\.?|Re\\.?|INR|₹)?\\s*([\\d,]+(?:\\.\\d{1,2})?)",
+            "(?:(?:Rs\\.?|Re\\.?|INR|₹)\\s*([\\d,]+(?:\\.\\d{1,2})?))|(?:debited\\s*(?:by|with|for)?|spent|paid|sent)\\s*(?:Rs\\.?|Re\\.?|INR|₹)?\\s*([\\d,]+(?:\\.\\d{1,2})?)",
             Pattern.CASE_INSENSITIVE
     );
 
     // 5. Account Last 4 Digits
     private static final Pattern ACCOUNT_PATTERN = Pattern.compile(
             "(?:A/C|acct|acc|card|ending|vpa|xx|\\*{2,})\\s*([xX*]*(\\d{4}))",
+            Pattern.CASE_INSENSITIVE
+    );
+
+    // 6. Failed Transaction Pattern
+    private static final Pattern FAILED_PATTERN = Pattern.compile(
+            "\\b(failed|declined|unsuccessful|aborted|cancelled)\\b",
             Pattern.CASE_INSENSITIVE
     );
 
@@ -114,10 +120,20 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                 return; // 0 bytes logged or transmitted
             }
 
-            // Step 3: Transaction Intent Check
-            boolean isDebit = Pattern.compile("(?i)(debited|spent|paid|sent|withdrawn|purchase)").matcher(bodyText).find();
-            boolean isCredit = Pattern.compile("(?i)(credited|received|deposited|refunded)").matcher(bodyText).find();
-            if (!isDebit && !isCredit) {
+            // Step 2b: Failed Transaction Dropper
+            if (FAILED_PATTERN.matcher(bodyText).find()) {
+                Log.d(TAG, "Failure Drop: Failed/declined transaction. Aborting.");
+                return;
+            }
+
+            // Step 3: Transaction Intent Check & Outflow Policy
+            boolean isDebit = Pattern.compile("(?i)(debited|spent|paid|sent|withdrawn|purchase|deducted|transfer to)").matcher(bodyText).find();
+            boolean isCredit = Pattern.compile("(?i)(credited|received|deposited|refunded|reversed|cashback received)").matcher(bodyText).find();
+            if (isCredit && !isDebit) {
+                Log.d(TAG, "Credit Drop: Inflows dropped to maintain strict outflow focus.");
+                return; // Outflow policy
+            }
+            if (!isDebit) {
                 return; // Non-transactional promo SMS -> Drop
             }
 
@@ -158,22 +174,16 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                 else if (code.contains("UBI") || code.contains("UNION")) bankName = "Union Bank";
                 else if (code.contains("IDFC")) bankName = "IDFC First";
                 else bankName = code.replaceAll("(?i)(BK|SMS|PSG)$", "");
+            } else if (bodyText.contains("-PNB")) {
+                bankName = "PNB";
             }
 
             // Step 7: Extract Merchant Name
-            String rawMerchant = isCredit ? "Inflow / Deposit" : "UPI Payment";
-            if (isDebit) {
-                Pattern debitMerchant = Pattern.compile("(?i)(?:to|at|info:?|vpa|paid to|spent on)\\s+([A-Za-z0-9._\\-* ]{2,35}?)(?:\\s*(?:on|ref|upi|avail|bal|\\.|/|$))");
-                Matcher m = debitMerchant.matcher(bodyText);
-                if (m.find() && m.group(1) != null) {
-                    rawMerchant = m.group(1).trim();
-                }
-            } else {
-                Pattern creditMerchant = Pattern.compile("(?i)(?:from|by)\\s+([A-Za-z0-9._\\-* ]{2,35}?)(?:\\s*(?:on|ref|upi|avail|bal|\\.|/|$))");
-                Matcher m = creditMerchant.matcher(bodyText);
-                if (m.find() && m.group(1) != null) {
-                    rawMerchant = m.group(1).trim();
-                }
+            String rawMerchant = "UPI Payment";
+            Pattern debitMerchant = Pattern.compile("(?i)(?:to|at|info:?|vpa|paid to|spent on|transfer to)\\s+([A-Za-z0-9._\\-* ]{2,35}?)(?:\\s*(?:thru|via|on|ref|upi|avail|bal|\\.|/|$))");
+            Matcher m = debitMerchant.matcher(textForAmount);
+            if (m.find() && m.group(1) != null) {
+                rawMerchant = m.group(1).trim();
             }
 
             // Clean merchant string (strip trailing thru/via UPI)
@@ -183,8 +193,17 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                     .trim();
 
             String todayDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
-            String type = (isCredit && !isDebit) ? "income" : "expense";
-            String dedupSig = "sms_dedup_" + Math.abs((amount + "_" + cleanMerchant.toLowerCase() + "_" + todayDate + "_" + accountLast4).hashCode()) + "_" + todayDate.replace("-", "");
+            Matcher dtMatcher = Pattern.compile("(?i)Dt\\s*(\\d{2})[-/](\\d{2})[-/](\\d{2,4})").matcher(bodyText);
+            if (dtMatcher.find() && dtMatcher.group(1) != null && dtMatcher.group(2) != null && dtMatcher.group(3) != null) {
+                String d = dtMatcher.group(1);
+                String mo = dtMatcher.group(2);
+                String y = dtMatcher.group(3);
+                if (y.length() == 2) y = "20" + y;
+                todayDate = y + "-" + mo + "-" + d;
+            }
+
+            String type = "expense";
+            String dedupSig = "sms_dedup_" + Math.abs((amount + "_" + cleanMerchant.toLowerCase().replaceAll("[^a-z0-9]", "") + "_" + todayDate + "_" + accountLast4).hashCode()) + "_" + todayDate.replace("-", "");
 
             final double finalAmount = amount;
             final String finalMerchant = cleanMerchant;

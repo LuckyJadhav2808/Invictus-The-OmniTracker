@@ -44,6 +44,8 @@ import { AllowanceSettingsModal } from "@/components/money/modals/AllowanceSetti
 import { MoveMoneyModal } from "@/components/money/modals/MoveMoneyModal";
 import { SendMoneyModal } from "@/components/money/modals/SendMoneyModal";
 import { NeobrutalistCalculator } from "@/components/shared/NeobrutalistCalculator";
+import { SmsSyncControlBanner } from "@/components/money/SmsSyncControlBanner";
+import { QuickCashEntryModal } from "@/components/money/QuickCashEntryModal";
 
 const PDFExportModal = dynamic(
   () => import("@/components/money/PDFExportModal").then((mod) => mod.PDFExportModal),
@@ -146,6 +148,7 @@ function MoneyPageContent() {
   const [isMoveMoneyOpen, setIsMoveMoneyOpen] = useState(false);
   const [isSendMoneyOpen, setIsSendMoneyOpen] = useState(false);
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
+  const [isCashModalOpen, setIsCashModalOpen] = useState(false);
   const [reopenTxAfterCat, setReopenTxAfterCat] = useState(false);
 
   // Deletion Safeguard
@@ -478,6 +481,13 @@ function MoneyPageContent() {
         onSelectPaymentMethod={handleSelectPaymentMethodFromHero}
       />
 
+      {/* 🔒 Zero-Knowledge SMS Sync Banner & Cash Action */}
+      <SmsSyncControlBanner
+        categories={categories}
+        transactions={transactions}
+        onOpenCashModal={() => setIsCashModalOpen(true)}
+      />
+
       {/* 📑 TABS CONTROLS */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         <div className="w-full overflow-x-auto no-scrollbar pb-1 mb-4">
@@ -588,6 +598,24 @@ function MoneyPageContent() {
         }}
         onSave={handleSaveTransaction}
         onDelete={handleDeleteTransaction}
+      />
+
+      {/* 1b. 1-Tap Quick Cash Entry Modal */}
+      <QuickCashEntryModal
+        open={isCashModalOpen}
+        onOpenChange={setIsCashModalOpen}
+        categories={categories}
+        currencySymbol={currencySymbol}
+        onSave={async (payload) => {
+          return handleSaveTransaction({
+            amount: payload.amount,
+            type: "expense",
+            categoryId: payload.categoryId,
+            date: payload.date,
+            note: payload.note,
+            paymentMethod: "Cash",
+          });
+        }}
       />
 
       {/* 2. Transaction Inspector Modal */}

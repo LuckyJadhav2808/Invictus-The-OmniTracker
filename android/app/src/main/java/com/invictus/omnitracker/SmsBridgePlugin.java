@@ -35,7 +35,7 @@ import java.util.regex.Pattern;
 public class SmsBridgePlugin extends Plugin {
 
     private static final Pattern BANK_HEADER_PATTERN = Pattern.compile(
-            "^(?:[A-Za-z]{2}[-_]?)?(HDFCBK|SBINB|SBIPSG|SBIUPI|ICICIB|AXISBK|KOTAKB|INDUSB|YESBNK|PNBSMS|BOISMS|CANBNK|UBISMS|UNIONB|IDFCFB|FEDBNK|PAYTMB|CREDBK|CENTBK|BOBSMS|MAHBK|IOB|UCOBNK|RBLBNK|AUFINB|BANDHN|IDBIBK|SCISMS|AMEXIN|AIRTEL|JIOBNK)(?:[-_][A-Za-z0-9]+)?$",
+            "^(?:[A-Za-z]{2}[-_]?)?(HDFCBK|SBINB|SBIPSG|SBIUPI|ICICIB|AXISBK|KOTAKB|INDUSB|YESBNK|PNBSMS|PNB|BOISMS|CANBNK|UBISMS|UNIONB|IDFCFB|FEDBNK|PAYTMB|CREDBK|CENTBK|BOBSMS|MAHBK|IOB|UCOBNK|RBLBNK|AUFINB|BANDHN|IDBIBK|SCISMS|AMEXIN|AIRTEL|JIOBNK)(?:[-_][A-Za-z0-9]+)?$",
             Pattern.CASE_INSENSITIVE
     );
 
@@ -115,7 +115,9 @@ public class SmsBridgePlugin extends Plugin {
                     String id = idIdx != -1 ? cursor.getString(idIdx) : "";
 
                     if (address != null && !address.isEmpty() && body != null && !body.isEmpty()) {
-                        if (BANK_HEADER_PATTERN.matcher(address.trim()).matches()) {
+                        boolean isBank = BANK_HEADER_PATTERN.matcher(address.trim()).matches()
+                                || body.contains("-PNB") || body.contains("-SBI") || body.contains("-HDFC") || body.contains("-ICICI");
+                        if (isBank) {
                             JSObject msgObj = new JSObject();
                             msgObj.put("id", id);
                             msgObj.put("address", address);

@@ -156,6 +156,30 @@ export function AnalyticsTabView({
     return { upi, cash, other };
   }, [monthFilteredTransactions]);
 
+  // 4. Top Merchants Leaderboard (Month-Filtered)
+  const topMerchantsData = useMemo(() => {
+    const map = new Map<string, { count: number; total: number }>();
+    monthFilteredTransactions.forEach((tx) => {
+      if (tx.type === "expense") {
+        const name = tx.note?.trim() || "Unspecified";
+        const current = map.get(name) || { count: 0, total: 0 };
+        current.count += 1;
+        current.total += Number(tx.amount) || 0;
+        map.set(name, current);
+      }
+    });
+
+    return Array.from(map.entries())
+      .map(([name, stats]) => ({
+        name,
+        count: stats.count,
+        total: Math.round(stats.total * 100) / 100,
+      }))
+      .filter((m) => m.total > 0)
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 5);
+  }, [monthFilteredTransactions]);
+
   if (transactions.length === 0) {
     return (
       <div className="bg-[#FAF8F5] rounded-3xl border-2 border-[#161514] shadow-[4px_4px_0px_0px_#161514] p-8 text-center space-y-3">
@@ -346,6 +370,53 @@ export function AnalyticsTabView({
           </div>
         </div>
       </div>
+
+      {/* 🏆 Top Merchants Leaderboard */}
+      {topMerchantsData.length > 0 && (
+        <div className="bg-white rounded-3xl p-5 sm:p-6 border-2 border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">🏪</span>
+              <h3 className="font-black text-sm uppercase tracking-wider text-[#161514]" style={{ fontFamily: "var(--font-heading)" }}>
+                Top Merchants Outflow
+              </h3>
+            </div>
+            <span className="text-[10px] font-black text-[#161514]/60 uppercase">
+              By Spend Volume
+            </span>
+          </div>
+
+          <div className="space-y-2">
+            {topMerchantsData.map((m, idx) => {
+              const pct = monthMetrics.expense > 0 ? Math.round((m.total / monthMetrics.expense) * 100) : 0;
+              return (
+                <div
+                  key={m.name}
+                  className="bg-[#FAF8F5] p-3 rounded-2xl border border-[#161514] flex items-center justify-between gap-3 shadow-[1.5px_1.5px_0px_0px_#161514]"
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="size-6 rounded-lg bg-[#CEF431] border border-[#161514] flex items-center justify-center font-black text-xs shrink-0">
+                      #{idx + 1}
+                    </div>
+                    <div className="min-w-0">
+                      <span className="text-xs font-black text-[#161514] truncate block">
+                        {m.name}
+                      </span>
+                      <span className="text-[10px] text-[#161514]/60 font-bold block">
+                        {m.count} {m.count === 1 ? "transaction" : "transactions"} • {pct}% of outflows
+                      </span>
+                    </div>
+                  </div>
+
+                  <span className="text-sm font-black text-[#161514] font-mono shrink-0">
+                    {currencySymbol}{m.total.toLocaleString()}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { connectToDatabase } from "@/lib/mongodb";
+import { connectToDatabase, resolveDatabaseForRequest, assertDatabaseSafety } from "@/lib/mongodb";
 import { Transaction } from "@/models/Transaction";
 
 export const dynamic = "force-dynamic";
@@ -7,7 +7,6 @@ export const dynamic = "force-dynamic";
 // GET /api/money/transactions?userId=xxx
 export async function GET(req: Request) {
   try {
-    await connectToDatabase();
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get("userId");
 
@@ -15,11 +14,20 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "UserId is required" }, { status: 400 });
     }
 
+    // AIR-GAP: Guest or demo transactions stay in client storage, no query to invictus_db
+    if (userId === "guest-user" || userId.startsWith("demo_")) {
+      return NextResponse.json([]);
+    }
+
+    const dbContext = resolveDatabaseForRequest(req, userId);
+    assertDatabaseSafety(dbContext.targetDb, userId);
+    await connectToDatabase({ dbName: dbContext.targetDb });
+
     const targetUserIds = (userId === "user-admin-default" || userId === "user_1kapw9sad_1784744868999")
       ? ["user-admin-default", "user_1kapw9sad_1784744868999"]
       : [userId];
 
-    const txs = await Transaction.find({ userId: { $in: targetUserIds } }).sort({ date: -1 });
+    const txs = await Transaction.find({ userId: { $in: targetUserIds } }).sort({ date: -1, createdAt: -1 });
     return NextResponse.json(txs);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -29,7 +37,6 @@ export async function GET(req: Request) {
 // POST /api/money/transactions (Supports single or bulk transactions)
 export async function POST(req: Request) {
   try {
-    await connectToDatabase();
     const body = await req.json();
 
     // 1. Bulk Transactions Insertion
@@ -43,6 +50,15 @@ export async function POST(req: Request) {
         return NextResponse.json({ success: true, count: 0, transactions: [] }, { status: 200 });
       }
 
+      // AIR-GAP: Guest accounts
+      if (userId === "guest-user" || (typeof userId === "string" && userId.startsWith("demo_"))) {
+        return NextResponse.json({ success: true, count: transactions.length, transactions }, { status: 201 });
+      }
+
+      const dbContext = resolveDatabaseForRequest(req, userId);
+      assertDatabaseSafety(dbContext.targetDb, userId);
+      await connectToDatabase({ dbName: dbContext.targetDb });
+
       const today = new Date().toISOString().split("T")[0];
       const validDocs = [];
 
@@ -50,6 +66,12 @@ export async function POST(req: Request) {
         const t = transactions[idx];
         const numAmount = Number(t.amount);
         if (isNaN(numAmount) || numAmount <= 0) continue;
+
+        // Skip duplicates with same dedupSignature
+        if (t.dedupSignature) {
+          const exists = await Transaction.findOne({ userId, dedupSignature: t.dedupSignature });
+          if (exists) continue;
+        }
 
         validDocs.push({
           id: t.id || `tx_${Date.now()}_${idx}_${Math.random().toString(36).substring(2, 6)}`,
@@ -60,11 +82,14 @@ export async function POST(req: Request) {
           date: t.date || today,
           note: typeof t.note === "string" ? t.note.slice(0, 500) : "",
           paymentMethod: typeof t.paymentMethod === "string" ? t.paymentMethod.slice(0, 50) : "UPI",
+          source: t.source || "manual",
+          dedupSignature: t.dedupSignature || undefined,
+          sourceMetadata: t.sourceMetadata || undefined,
         });
       }
 
       if (validDocs.length === 0) {
-        return NextResponse.json({ error: "No valid transactions with positive amounts provided" }, { status: 400 });
+        return NextResponse.json({ success: true, count: 0, message: "All transactions already recorded or invalid" }, { status: 200 });
       }
 
       const created = await Transaction.insertMany(validDocs, { ordered: false });
@@ -81,6 +106,33 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Amount must be a positive number" }, { status: 400 });
     }
 
+    // AIR-GAP: Guest accounts
+    if (body.userId === "guest-user" || (typeof body.userId === "string" && body.userId.startsWith("demo_"))) {
+      return NextResponse.json(
+        {
+          id: body.id || `tx_${Date.now()}_guest`,
+          ...body,
+          amount: Math.round(numAmount * 100) / 100,
+        },
+        { status: 201 }
+      );
+    }
+
+    const dbContext = resolveDatabaseForRequest(req, body.userId);
+    assertDatabaseSafety(dbContext.targetDb, body.userId);
+    await connectToDatabase({ dbName: dbContext.targetDb });
+
+    // Idempotency check for single transaction
+    if (body.dedupSignature) {
+      const existing = await Transaction.findOne({
+        userId: body.userId,
+        dedupSignature: body.dedupSignature,
+      });
+      if (existing) {
+        return NextResponse.json(existing, { status: 200 });
+      }
+    }
+
     const today = new Date().toISOString().split("T")[0];
     const newTx = await Transaction.create({
       id: body.id || `tx_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
@@ -91,6 +143,9 @@ export async function POST(req: Request) {
       date: body.date || today,
       note: typeof body.note === "string" ? body.note.slice(0, 500) : "",
       paymentMethod: typeof body.paymentMethod === "string" ? body.paymentMethod.slice(0, 50) : "UPI",
+      source: body.source || "manual",
+      dedupSignature: body.dedupSignature || undefined,
+      sourceMetadata: body.sourceMetadata || undefined,
     });
 
     return NextResponse.json(newTx, { status: 201 });
@@ -102,13 +157,20 @@ export async function POST(req: Request) {
 // PUT /api/money/transactions - update transaction
 export async function PUT(req: Request) {
   try {
-    await connectToDatabase();
     const body = await req.json();
     const { id, userId, amount, type, categoryId, date, note, paymentMethod } = body;
 
     if (!id || !userId) {
       return NextResponse.json({ error: "Id and userId required" }, { status: 400 });
     }
+
+    if (userId === "guest-user" || (typeof userId === "string" && userId.startsWith("demo_"))) {
+      return NextResponse.json({ ...body, updatedAt: new Date().toISOString() });
+    }
+
+    const dbContext = resolveDatabaseForRequest(req, userId);
+    assertDatabaseSafety(dbContext.targetDb, userId);
+    await connectToDatabase({ dbName: dbContext.targetDb });
 
     const updateFields: any = {};
     if (amount !== undefined) {
@@ -144,7 +206,6 @@ export async function PUT(req: Request) {
 // DELETE /api/money/transactions?id=xxx&userId=yyy
 export async function DELETE(req: Request) {
   try {
-    await connectToDatabase();
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
     const userId = searchParams.get("userId");
@@ -152,6 +213,14 @@ export async function DELETE(req: Request) {
     if (!id || !userId) {
       return NextResponse.json({ error: "Id and userId required" }, { status: 400 });
     }
+
+    if (userId === "guest-user" || userId.startsWith("demo_")) {
+      return NextResponse.json({ success: true, id });
+    }
+
+    const dbContext = resolveDatabaseForRequest(req, userId);
+    assertDatabaseSafety(dbContext.targetDb, userId);
+    await connectToDatabase({ dbName: dbContext.targetDb });
 
     await Transaction.deleteOne({ id, userId });
     return NextResponse.json({ success: true, id });

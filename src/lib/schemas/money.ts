@@ -22,7 +22,7 @@ export const TransactionSchema = z.object({
   note: z.string().optional(),
   paymentMethod: z.string().optional(), // e.g. "cash", "card", "upi"
   attachmentUrl: z.string().optional(),
-  isRecurring: z.boolean().default(false),
+  isRecurring: z.boolean().default(false).optional(),
   recurringRuleId: z.string().optional(),
   source: z.enum(["manual", "bank_sms", "recurring"]).default("manual").optional(),
   dedupSignature: z.string().optional(),
