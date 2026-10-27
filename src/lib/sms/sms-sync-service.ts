@@ -58,6 +58,9 @@ export async function syncRecentBankSms(
   options?: {
     forceFullScan?: boolean;
     provider?: "gemini" | "openai" | "none";
+    addCategoryFn?: (
+      cat: Omit<Category, "id" | "archived" | "createdAt"> & { id?: string }
+    ) => Promise<Category>;
   }
 ): Promise<SyncSmsResult> {
   const isNative = await isSmsSyncAvailable();
@@ -131,6 +134,7 @@ export async function syncRecentBankSms(
   const uniqueMerchants = Array.from(new Set(parsedList.map((p) => p.merchant)));
   const categorizations = await categorizeMerchants(uniqueMerchants, categories, {
     provider: options?.provider || "none",
+    addCategoryFn: options?.addCategoryFn,
   });
 
   // 6. Build Final Transaction List

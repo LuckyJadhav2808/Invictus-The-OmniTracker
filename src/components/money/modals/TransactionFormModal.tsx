@@ -12,6 +12,8 @@ import { Trash2, Calendar, Plus, Sparkles, Tag } from "lucide-react";
 import { renderCategoryEmoji } from "@/components/money/MoneyQuickActionsAndCards";
 
 import { detectCategoryFromNote } from "@/lib/utils/merchant-categorizer";
+import { MerchantCategoryCache } from "@/lib/sms/merchant-cache";
+import { useSaveMerchantRule } from "@/lib/queries/merchant-rules";
 
 interface TransactionFormModalProps {
   open: boolean;
@@ -63,6 +65,8 @@ export function TransactionFormModal({
 
   // Visual auto-match feedback badge
   const [matchedCategoryName, setMatchedCategoryName] = useState<string | null>(null);
+
+  const saveMerchantRuleMutation = useSaveMerchantRule();
 
   // Track previous open state so we ONLY initialize/reset form fields when opening modal or switching tx
   const prevOpenRef = React.useRef(false);
@@ -121,6 +125,26 @@ export function TransactionFormModal({
       setMatchedCategoryName(null);
       return;
     }
+
+    // Tier 1: Check learned merchant dictionary first (O(1))
+    const hit = MerchantCategoryCache.get(val);
+    if (hit) {
+      // Find matching category in active filtered categories
+      const targetCat = filteredCategories.find(
+        (c) => c.id === hit.categoryId || c.name.toLowerCase() === hit.categoryName.toLowerCase()
+      );
+      if (targetCat) {
+        if (categoryId !== targetCat.id) {
+          soundFX.playPop();
+          soundFX.vibrate(15);
+          setCategoryId(targetCat.id);
+          setMatchedCategoryName(targetCat.name);
+        }
+        return;
+      }
+    }
+
+    // Tier 2: Keyword & semantic dictionary mapping
     const match = detectCategoryFromNote(val, filteredCategories);
     if (match) {
       if (categoryId !== match.categoryId) {
@@ -141,15 +165,32 @@ export function TransactionFormModal({
 
     setIsSubmitting(true);
     try {
+      const trimmedNote = note.trim();
+      const targetCatId = categoryId || filteredCategories[0]?.id || "";
+
       await onSave({
         id: initialData?.id,
         amount: numAmt,
         type,
-        categoryId: categoryId || filteredCategories[0]?.id || "",
+        categoryId: targetCatId,
         date,
-        note: note.trim(),
+        note: trimmedNote,
         paymentMethod,
       });
+
+      // Auto-learn merchant rule if this is an expense with a merchant name/note
+      if (type === "expense" && trimmedNote.length >= 2) {
+        const selectedCat = categories.find((c) => c.id === targetCatId);
+        if (selectedCat) {
+          saveMerchantRuleMutation.mutate({
+            merchant: trimmedNote,
+            categoryId: targetCatId,
+            categoryName: selectedCat.name,
+            displayName: trimmedNote,
+          });
+        }
+      }
+
       soundFX.playCashRegister();
       soundFX.vibrate([30, 50, 30]);
       onOpenChange(false);

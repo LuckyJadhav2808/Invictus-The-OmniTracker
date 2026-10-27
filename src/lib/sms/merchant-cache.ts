@@ -1,8 +1,18 @@
 /**
- * Invictus Categorize-Once Local Merchant Cache
+ * Invictus Categorize-Once Local Merchant Cache & Learned Rules Engine
  * Provides O(1) lookups for previously categorized merchants.
  * Guarantees zero network calls in steady state!
  */
+
+export interface MerchantRuleItem {
+  merchantPattern: string;
+  displayName: string;
+  categoryId: string;
+  categoryName: string;
+  matchCount: number;
+  isUserDefined: boolean;
+  updatedAt?: string;
+}
 
 const STORAGE_KEY = "invictus_merchant_category_cache";
 
@@ -82,26 +92,55 @@ const PRESEEDED_MERCHANTS: Record<string, { categoryId: string; categoryName: st
   "bookstore": { categoryId: "cat-education", categoryName: "Books & Tuition" },
 };
 
-function normalizeMerchantKey(merchant: string): string {
-  return merchant.toLowerCase().trim().replace(/[^a-z0-9 ]/g, "").replace(/\s+/g, " ");
+export function normalizeMerchantKey(merchant: string): string {
+  return merchant.toLowerCase().trim().replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
 }
 
 export class MerchantCategoryCache {
-  private static memoryCache: Record<string, { categoryId: string; categoryName: string }> = { ...PRESEEDED_MERCHANTS };
+  private static memoryCache: Record<string, MerchantRuleItem> = {};
   private static isHydrated = false;
 
-  private static hydrate(): void {
-    if (this.isHydrated || typeof window === "undefined") return;
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        this.memoryCache = { ...PRESEEDED_MERCHANTS, ...parsed };
-      }
-      this.isHydrated = true;
-    } catch {
-      this.memoryCache = { ...PRESEEDED_MERCHANTS };
+  private static initDefaults(): void {
+    const map: Record<string, MerchantRuleItem> = {};
+    for (const [key, val] of Object.entries(PRESEEDED_MERCHANTS)) {
+      map[key] = {
+        merchantPattern: key,
+        displayName: key.charAt(0).toUpperCase() + key.slice(1),
+        categoryId: val.categoryId,
+        categoryName: val.categoryName,
+        matchCount: 0,
+        isUserDefined: false,
+      };
     }
+    this.memoryCache = map;
+  }
+
+  private static hydrate(): void {
+    if (this.isHydrated) return;
+    this.initDefaults();
+
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          for (const [k, v] of Object.entries(parsed)) {
+            const raw = v as any;
+            this.memoryCache[k] = {
+              merchantPattern: k,
+              displayName: raw.displayName || (k.charAt(0).toUpperCase() + k.slice(1)),
+              categoryId: raw.categoryId,
+              categoryName: raw.categoryName,
+              matchCount: typeof raw.matchCount === "number" ? raw.matchCount : 0,
+              isUserDefined: Boolean(raw.isUserDefined),
+              updatedAt: raw.updatedAt,
+            };
+          }
+        }
+      } catch {}
+    }
+
+    this.isHydrated = true;
   }
 
   private static persist(): void {
@@ -112,21 +151,50 @@ export class MerchantCategoryCache {
   }
 
   /**
-   * Looks up a merchant in the cache in O(1).
+   * 3-Tier Fuzzy Lookup for a merchant name in O(1) / O(k).
+   * Tier 1: Exact normalized key match.
+   * Tier 2: Token / Word boundary match.
+   * Tier 3: Substring match for tokens >= 4 characters.
    */
-  static get(merchant: string): { categoryId: string; categoryName: string } | null {
+  static get(merchant: string): MerchantRuleItem | null {
     this.hydrate();
     const key = normalizeMerchantKey(merchant);
+    if (!key) return null;
 
-    // Direct key match
+    // Tier 1: Exact normalized key match
     if (this.memoryCache[key]) {
       return this.memoryCache[key];
     }
 
-    // Substring match for compound merchants (e.g. "Ambika Chemist" matching "chemist")
-    for (const [cachedKey, val] of Object.entries(this.memoryCache)) {
-      if (key.includes(cachedKey) || cachedKey.includes(key)) {
-        return val;
+    // Tier 2: Token-level match (e.g. "dmart kandivali" or "upi dmart" against "dmart")
+    const words = key.split(/\s+/).filter((w) => w.length >= 3);
+    for (const word of words) {
+      if (this.memoryCache[word]) {
+        return this.memoryCache[word];
+      }
+    }
+
+    // Tier 3: Substring or Word boundary search across existing rules
+    // Prioritize user-defined rules over preseeded rules
+    const rules = Object.values(this.memoryCache).sort((a, b) => {
+      if (a.isUserDefined && !b.isUserDefined) return -1;
+      if (!a.isUserDefined && b.isUserDefined) return 1;
+      return b.matchCount - a.matchCount;
+    });
+
+    for (const rule of rules) {
+      const pattern = rule.merchantPattern;
+      if (pattern.length < 3) continue;
+
+      // Word boundary regex test
+      const wordRegex = new RegExp(`\\b${pattern}\\b`, "i");
+      if (wordRegex.test(key)) {
+        return rule;
+      }
+
+      // Substring test if pattern >= 4 chars
+      if (pattern.length >= 4 && (key.includes(pattern) || pattern.includes(key))) {
+        return rule;
       }
     }
 
@@ -134,28 +202,95 @@ export class MerchantCategoryCache {
   }
 
   /**
-   * Sets a merchant category in the cache and persists to localStorage.
+   * Sets or updates a merchant rule in the cache and persists to localStorage.
    */
-  static set(merchant: string, categoryId: string, categoryName: string): void {
+  static set(
+    merchant: string,
+    categoryId: string,
+    categoryName: string,
+    isUserDefined = true,
+    displayName?: string
+  ): MerchantRuleItem {
     this.hydrate();
     const key = normalizeMerchantKey(merchant);
-    if (!key) return;
+    if (!key) {
+      throw new Error("Invalid merchant string");
+    }
 
-    this.memoryCache[key] = { categoryId, categoryName };
+    const existing = this.memoryCache[key];
+    const item: MerchantRuleItem = {
+      merchantPattern: key,
+      displayName: displayName || (merchant.trim().length > 0 ? merchant.trim() : key),
+      categoryId,
+      categoryName,
+      matchCount: existing ? existing.matchCount + 1 : 1,
+      isUserDefined: existing ? (existing.isUserDefined || isUserDefined) : isUserDefined,
+      updatedAt: new Date().toISOString(),
+    };
+
+    this.memoryCache[key] = item;
     this.persist();
+    return item;
+  }
+
+  /**
+   * Increments the match counter for analytics and sorting.
+   */
+  static incrementMatch(merchant: string): void {
+    this.hydrate();
+    const match = this.get(merchant);
+    if (match && this.memoryCache[match.merchantPattern]) {
+      this.memoryCache[match.merchantPattern].matchCount += 1;
+      this.persist();
+    }
+  }
+
+  /**
+   * Removes a rule (or resets to default if it was preseeded).
+   */
+  static deleteRule(merchantPattern: string): void {
+    this.hydrate();
+    const key = normalizeMerchantKey(merchantPattern);
+    if (PRESEEDED_MERCHANTS[key]) {
+      // Reset back to non-user preseeded
+      const def = PRESEEDED_MERCHANTS[key];
+      this.memoryCache[key] = {
+        merchantPattern: key,
+        displayName: key.charAt(0).toUpperCase() + key.slice(1),
+        categoryId: def.categoryId,
+        categoryName: def.categoryName,
+        matchCount: 0,
+        isUserDefined: false,
+      };
+    } else {
+      delete this.memoryCache[key];
+    }
+    this.persist();
+  }
+
+  /**
+   * Returns all active rules sorted with user-defined rules and highest match count first.
+   */
+  static getAllRules(): MerchantRuleItem[] {
+    this.hydrate();
+    return Object.values(this.memoryCache).sort((a, b) => {
+      if (a.isUserDefined && !b.isUserDefined) return -1;
+      if (!a.isUserDefined && b.isUserDefined) return 1;
+      if (b.matchCount !== a.matchCount) return b.matchCount - a.matchCount;
+      return a.displayName.localeCompare(b.displayName);
+    });
   }
 
   /**
    * Bulk checks a list of merchant strings and separates into cached vs uncached.
    */
   static partition(merchants: string[]): {
-    cached: Record<string, { categoryId: string; categoryName: string }>;
+    cached: Record<string, MerchantRuleItem>;
     uncached: string[];
   } {
     this.hydrate();
-    const cached: Record<string, { categoryId: string; categoryName: string }> = {};
+    const cached: Record<string, MerchantRuleItem> = {};
     const uncached: string[] = [];
-
     const seen = new Set<string>();
 
     for (const m of merchants) {
@@ -175,10 +310,27 @@ export class MerchantCategoryCache {
   }
 
   /**
+   * Merges server-synced rules from MongoDB into the local memory cache.
+   */
+  static syncWithServer(rules: MerchantRuleItem[]): void {
+    this.hydrate();
+    for (const r of rules) {
+      const key = normalizeMerchantKey(r.merchantPattern);
+      if (!key) continue;
+      this.memoryCache[key] = {
+        ...r,
+        merchantPattern: key,
+        isUserDefined: true,
+      };
+    }
+    this.persist();
+  }
+
+  /**
    * Clears user added mappings and resets to pre-seeded defaults.
    */
   static reset(): void {
-    this.memoryCache = { ...PRESEEDED_MERCHANTS };
+    this.initDefaults();
     this.persist();
   }
 }

@@ -3,13 +3,15 @@
  *
  * Guarantees:
  * 1. O(1) Cache-First lookup via MerchantCategoryCache.
- * 2. Only unclassified, deduplicated merchant names cross the network.
- * 3. Fallback to rich local keyword dictionary if offline or provider === "none".
+ * 2. Dynamic Category Auto-Provisioning: if a merchant maps to a category that the user
+ *    hasn't created (e.g. Groceries for D-Mart), it resolves synonyms or auto-provisions it.
+ * 3. Only unclassified, deduplicated merchant names cross the network.
  * 4. Steady-state network calls: 0.
  */
 
 import { MerchantCategoryCache } from "./merchant-cache";
 import { detectCategoryFromNote } from "@/lib/utils/merchant-categorizer";
+import { ensureCategoryExists } from "./category-provisioner";
 import { type Category } from "@/types";
 
 export interface CategorizedMerchantResult {
@@ -17,6 +19,7 @@ export interface CategorizedMerchantResult {
   categoryId: string;
   categoryName: string;
   source: "cache" | "keyword" | "ai" | "fallback";
+  wasCategoryCreated?: boolean;
 }
 
 export async function categorizeMerchants(
@@ -24,20 +27,42 @@ export async function categorizeMerchants(
   availableCategories: Category[],
   options?: {
     provider?: "gemini" | "openai" | "none";
+    addCategoryFn?: (
+      cat: Omit<Category, "id" | "archived" | "createdAt"> & { id?: string }
+    ) => Promise<Category>;
   }
 ): Promise<Record<string, CategorizedMerchantResult>> {
   const provider = options?.provider || "none";
   const results: Record<string, CategorizedMerchantResult> = {};
+  const currentCategories = [...availableCategories];
+
+  // Helper to ensure category existence
+  const resolveOrProvisionCategory = async (desiredIdOrName: string) => {
+    const res = await ensureCategoryExists(
+      desiredIdOrName,
+      currentCategories,
+      options?.addCategoryFn
+    );
+    if (res.wasCreated && !currentCategories.some((c) => c.id === res.category.id)) {
+      currentCategories.push(res.category);
+    }
+    return res;
+  };
 
   // Step 1: Check Categorize-Once Local Cache
   const { cached, uncached } = MerchantCategoryCache.partition(merchants);
 
   for (const [merchant, hit] of Object.entries(cached)) {
+    // Verify that target category actually exists in user's category list
+    const resolved = await resolveOrProvisionCategory(hit.categoryId || hit.categoryName);
+    MerchantCategoryCache.incrementMatch(merchant);
+
     results[merchant] = {
       merchant,
-      categoryId: hit.categoryId,
-      categoryName: hit.categoryName,
+      categoryId: resolved.category.id,
+      categoryName: resolved.category.name,
       source: "cache",
+      wasCategoryCreated: resolved.wasCreated,
     };
   }
 
@@ -50,7 +75,7 @@ export async function categorizeMerchants(
   const remainingForAi: string[] = [];
 
   for (const merchant of uncached) {
-    const match = detectCategoryFromNote(merchant, availableCategories);
+    const match = detectCategoryFromNote(merchant, currentCategories);
     if (match) {
       results[merchant] = {
         merchant,
@@ -58,18 +83,40 @@ export async function categorizeMerchants(
         categoryName: match.categoryName,
         source: "keyword",
       };
-      MerchantCategoryCache.set(merchant, match.categoryId, match.categoryName);
+      MerchantCategoryCache.set(merchant, match.categoryId, match.categoryName, false);
     } else {
-      remainingForAi.push(merchant);
+      // Check if any category blueprint matches the merchant token directly
+      const resolved = await resolveOrProvisionCategory(merchant);
+      if (resolved.category && resolved.category.id !== "cat-general") {
+        results[merchant] = {
+          merchant,
+          categoryId: resolved.category.id,
+          categoryName: resolved.category.name,
+          source: "keyword",
+          wasCategoryCreated: resolved.wasCreated,
+        };
+        MerchantCategoryCache.set(
+          merchant,
+          resolved.category.id,
+          resolved.category.name,
+          false
+        );
+      } else {
+        remainingForAi.push(merchant);
+      }
     }
   }
 
   // If no AI provider requested or no merchants left for AI, assign fallback category
   if (remainingForAi.length === 0 || provider === "none") {
     for (const merchant of remainingForAi) {
-      const defaultCat = availableCategories.find((c) => c.id === "cat-food") || availableCategories[0] || {
+      const defaultCat = currentCategories.find((c) => c.type === "expense") || currentCategories[0] || {
         id: "cat-general",
         name: "General",
+        type: "expense" as const,
+        icon: "💳",
+        color: "slate",
+        archived: false,
       };
       results[merchant] = {
         merchant,
@@ -77,7 +124,7 @@ export async function categorizeMerchants(
         categoryName: defaultCat.name,
         source: "fallback",
       };
-      MerchantCategoryCache.set(merchant, defaultCat.id, defaultCat.name);
+      MerchantCategoryCache.set(merchant, defaultCat.id, defaultCat.name, false);
     }
     return results;
   }
@@ -89,7 +136,7 @@ export async function categorizeMerchants(
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         merchants: remainingForAi,
-        categories: availableCategories.map((c) => ({ id: c.id, name: c.name })),
+        categories: currentCategories.map((c) => ({ id: c.id, name: c.name })),
       }),
     });
 
@@ -99,25 +146,34 @@ export async function categorizeMerchants(
         for (const merchant of remainingForAi) {
           const classified = data.classifications[merchant];
           if (classified && classified.categoryId) {
+            const resolved = await resolveOrProvisionCategory(
+              classified.categoryId || classified.categoryName
+            );
             results[merchant] = {
               merchant,
-              categoryId: classified.categoryId,
-              categoryName: classified.categoryName || "Expense",
+              categoryId: resolved.category.id,
+              categoryName: resolved.category.name,
               source: "ai",
+              wasCategoryCreated: resolved.wasCreated,
             };
-            MerchantCategoryCache.set(merchant, classified.categoryId, classified.categoryName);
+            MerchantCategoryCache.set(
+              merchant,
+              resolved.category.id,
+              resolved.category.name,
+              false
+            );
             continue;
           }
 
           // Fallback if AI missed this merchant
-          const defaultCat = availableCategories[0] || { id: "cat-food", name: "Food & Dining" };
+          const defaultCat = currentCategories.find((c) => c.type === "expense") || currentCategories[0];
           results[merchant] = {
             merchant,
             categoryId: defaultCat.id,
             categoryName: defaultCat.name,
             source: "fallback",
           };
-          MerchantCategoryCache.set(merchant, defaultCat.id, defaultCat.name);
+          MerchantCategoryCache.set(merchant, defaultCat.id, defaultCat.name, false);
         }
         return results;
       }
@@ -129,14 +185,21 @@ export async function categorizeMerchants(
   // Fallback for remaining merchants
   for (const merchant of remainingForAi) {
     if (!results[merchant]) {
-      const defaultCat = availableCategories[0] || { id: "cat-food", name: "Food & Dining" };
+      const defaultCat = currentCategories.find((c) => c.type === "expense") || currentCategories[0] || {
+        id: "cat-general",
+        name: "General",
+        type: "expense" as const,
+        icon: "💳",
+        color: "slate",
+        archived: false,
+      };
       results[merchant] = {
         merchant,
         categoryId: defaultCat.id,
         categoryName: defaultCat.name,
         source: "fallback",
       };
-      MerchantCategoryCache.set(merchant, defaultCat.id, defaultCat.name);
+      MerchantCategoryCache.set(merchant, defaultCat.id, defaultCat.name, false);
     }
   }
 
