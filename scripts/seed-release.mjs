@@ -15,21 +15,21 @@ async function seed() {
   const collection = db.collection("app_releases");
 
   const releaseData = {
-    version: "1.7.7",
-    buildNumber: 28,
+    version: "1.7.8",
+    buildNumber: 29,
     releaseDate: "October 27, 2026",
     channel: "stable",
     changelog: [
-      "⚡ Autonomous On-Launch SMS Sync: Automatically checks for today's bank transactions with a 2-hour midnight buffer on app entry",
-      "📅 Date-Targeted SMS Scanner: Interactive presets (Today, Yesterday, 7 Days, Month, Custom Range) to scan specific dates",
-      "🛡️ Frictionless Android Permission Flow: Native system runtime dialog (Allow/Don't allow) with 1-tap Settings deep-link fallback",
-      "🛑 15-Minute Cooldown Guardrail: Prevents battery and SQLite thrashing across rapid page transitions",
-      "💳 Zero-Clipping Neobrutalist Wallet Cockpit: Fluid responsive tabs, tabular numerals, and unclipped ink drop shadows",
-      "📲 In-App APK Updater: Pre-flight package validation with version downgrade protection"
+      "🎯 Today & Yesterday 1-Tap Scanner Preset: Dedicated quick-filter spanning current day and day before with real-time telemetry readout",
+      "📡 Telecom +91 & 91 Sender Normalization: Seamlessly handles Indian carrier prefixes on bank sender headers (e.g., +91AD-PNBSMS)",
+      "💳 FinTech Sender Support: Native recognition for PhonePe, Google Pay, BHIM/NPCI UPI, OneCard, Jupiter, and Fi Money",
+      "🕒 IST Timezone Drift Fix: Local device calendar extraction eliminating midnight UTC date slippage",
+      "⏱️ Carrier Clock Skew Resilience: 12-hour forward lookahead buffer capturing all fresh same-day transactions",
+      "💳 Zero-Clipping Neobrutalist Wallet Cockpit: Fluid responsive tabs, tabular numerals, and unclipped ink drop shadows"
     ],
     minSupportedVersion: "1.0.0",
     isMandatory: false,
-    apkDownloadUrl: "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v1.7.7/Invictus.apk",
+    apkDownloadUrl: "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v1.7.8/Invictus.apk",
     apkSha256: "b896e236f5197ea6365891748055b1157d2b28f88bed0cef82b627e07d04e886",
     apkSizeBytes: 4337861,
     otaBundleUrl: "",
@@ -39,13 +39,13 @@ async function seed() {
   };
 
   const res = await collection.updateOne(
-    { version: "1.7.7" },
+    { version: "1.7.8" },
     { $set: releaseData, $setOnInsert: { createdAt: new Date() } },
     { upsert: true }
   );
 
   console.log("MongoDB app_releases upsert result:", res.acknowledged, "matched:", res.matchedCount, "upserted:", res.upsertedId);
-  const doc = await collection.findOne({ version: "1.7.7" });
+  const doc = await collection.findOne({ version: "1.7.8" });
   console.log("Verified stored release:", doc.version, "Build:", doc.buildNumber, "URL:", doc.apkDownloadUrl);
   await client.close();
 }
