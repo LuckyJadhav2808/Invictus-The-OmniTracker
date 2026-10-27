@@ -68,6 +68,7 @@ import { getReminderConfig, type ReminderConfig } from "@/lib/utils/reminder-sch
 import { ReportIssueModal } from "@/components/shared/ReportIssueModal";
 import { UpdateCheckModal } from "@/components/shared/UpdateCheckModal";
 import { InAppDiagnosticsModal } from "@/components/shared/InAppDiagnosticsModal";
+import { DeveloperInfoCard } from "@/components/settings/DeveloperInfoCard";
 import { APP_VERSION_CONFIG } from "@/config/version";
 import { Capacitor } from "@capacitor/core";
 import { encryptVaultPayload, decryptVaultPayload } from "@/lib/vault/vault-crypto";
@@ -1465,6 +1466,14 @@ export default function SettingsPage() {
           open={isDiagnosticsOpen}
           onOpenChange={setIsDiagnosticsOpen}
         />
+
+        {/* 👑 DEVELOPER & ARCHITECT SHOWCASE */}
+        <div className="space-y-3 pt-2">
+          <span className="text-[10px] font-black text-[#161514]/70 uppercase tracking-widest px-1">
+            ABOUT THE ARCHITECT & SYSTEM
+          </span>
+          <DeveloperInfoCard />
+        </div>
 
         {/* ACCOUNT SECTION */}
         <div className="space-y-3 pt-2">
