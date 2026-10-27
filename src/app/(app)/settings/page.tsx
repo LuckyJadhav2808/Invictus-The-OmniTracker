@@ -1614,7 +1614,7 @@ export default function SettingsPage() {
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
                     <h3 className="font-black text-xs uppercase tracking-wider text-[#161514] font-heading">
-                      Evaluator Sandbox Controls
+                      Guest Demo Data Controls
                     </h3>
                     <span
                       className={cn(

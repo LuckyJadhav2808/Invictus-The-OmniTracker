@@ -84,7 +84,7 @@ function LoginForm() {
 
   const handleGuestLogin = () => {
     enterGuestMode("Guest Explorer");
-    toast.success("Entered Evaluator Sandbox Mode! 🧪✨");
+    toast.success("Exploring as Offline Guest! 🚀✨");
     router.push("/today");
   };
 
