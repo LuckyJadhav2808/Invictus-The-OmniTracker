@@ -90,6 +90,19 @@ export function FinancialSummaryCockpit({
             
             {/* LEFT COLUMN (lg:col-span-6): THE CASH BILLFOLD (Remaining Budget & Progress) */}
             <div className="lg:col-span-6 flex flex-col justify-between bg-[#E8F5E9] border-2 border-[#161514] rounded-2xl p-4 sm:p-5 shadow-[0px_4px_0px_0px_rgba(0,0,0,0.35)] relative overflow-hidden">
+              {/* 💵 Banknote Denomination Watermark (Middle-Right Open Canvas, Zero Collision) */}
+              {monthlyStats.totalAvailableBudget > 0 && (
+                <div
+                  aria-hidden="true"
+                  className="absolute right-3.5 sm:right-5 top-1/2 -translate-y-1/2 text-5xl sm:text-6xl lg:text-7xl font-black text-[#1B5E20]/[0.08] select-none pointer-events-none font-mono tracking-tighter z-0"
+                >
+                  {currencySymbol}
+                  {monthlyStats.totalAvailableBudget >= 1000
+                    ? `${(monthlyStats.totalAvailableBudget / 1000).toFixed(monthlyStats.totalAvailableBudget % 1000 === 0 ? 0 : 1)}K`
+                    : monthlyStats.totalAvailableBudget}
+                </div>
+              )}
+
               <div>
                 <div className="flex flex-wrap items-center justify-between gap-1 mb-2">
                   <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider bg-[#161514] text-[#CEF431] px-2 py-0.5 rounded border border-[#161514] font-mono">
