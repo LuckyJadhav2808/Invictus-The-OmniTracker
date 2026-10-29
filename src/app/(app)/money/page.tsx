@@ -176,11 +176,14 @@ function MoneyPageContent() {
 
   useEffect(() => {
     if (cloudBudgetPrefs) {
-      if (cloudBudgetPrefs.upiBudget !== undefined && cloudBudgetPrefs.upiBudget > 0) {
-        setBaseUpiBudget(cloudBudgetPrefs.upiBudget);
-      }
-      if (cloudBudgetPrefs.cashBudget !== undefined && cloudBudgetPrefs.cashBudget >= 0) {
-        setBaseCashBudget(cloudBudgetPrefs.cashBudget);
+      const hasCloudBudget = (cloudBudgetPrefs.upiBudget ?? 0) > 0 || (cloudBudgetPrefs.cashBudget ?? 0) > 0;
+      if (hasCloudBudget) {
+        if (cloudBudgetPrefs.upiBudget !== undefined && cloudBudgetPrefs.upiBudget > 0) {
+          setBaseUpiBudget(cloudBudgetPrefs.upiBudget);
+        }
+        if (cloudBudgetPrefs.cashBudget !== undefined && cloudBudgetPrefs.cashBudget >= 0) {
+          setBaseCashBudget(cloudBudgetPrefs.cashBudget);
+        }
       }
       if (cloudBudgetPrefs.customDailyBudget !== undefined) {
         setCustomDailyBudget(cloudBudgetPrefs.customDailyBudget);

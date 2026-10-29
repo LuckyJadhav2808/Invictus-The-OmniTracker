@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { type User } from "@/types";
 import {
   getCustomSession,
@@ -11,6 +12,7 @@ import {
 } from "@/lib/custom-auth";
 import { registerServiceWorker } from "@/lib/utils/notifications";
 import { loadEvaluatorDemoData, isDemoDataActive, clearEvaluatorDemoData } from "@/lib/demo/demo-data-seed";
+import { hydrateDeviceFromCloud } from "@/lib/offline/device-hydration";
 
 interface AuthContextType {
   user: User | null;
@@ -37,6 +39,7 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const queryClient = useQueryClient();
   const [user, setUser] = useState<User | null>(() => {
     if (typeof window === "undefined") return null;
     return getCustomSession();
@@ -55,6 +58,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     refreshUser();
     registerServiceWorker();
+    const current = getCustomSession();
+    if (current && current.uid !== "guest-user") {
+      hydrateDeviceFromCloud(current);
+    }
   }, []);
 
   const isGuest = user?.uid === "guest-user";
@@ -66,7 +73,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       clearEvaluatorDemoData();
     }
     const loggedUser = await customLoginUser({ email, password });
+    
+    // Purge in-memory queries so fresh user data is fetched cleanly
+    queryClient.clear();
+    
+    // Hydrate device localStorage from cloud document
+    hydrateDeviceFromCloud(loggedUser);
+    
     setUser(loggedUser);
+    queryClient.invalidateQueries();
     return loggedUser;
   };
 
@@ -76,7 +91,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       clearEvaluatorDemoData();
     }
     const newUser = await customRegisterUser({ email, password, displayName });
+    
+    queryClient.clear();
+    hydrateDeviceFromCloud(newUser);
+    
     setUser(newUser);
+    queryClient.invalidateQueries();
     return newUser;
   };
 
@@ -107,6 +127,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     customLogout();
+    queryClient.clear();
     setUser(null);
   };
 

@@ -250,10 +250,19 @@ export default function TodayPage() {
     [todayTransactions]
   );
 
-  const baseUpiBudget = cloudBudgetPrefs?.upiBudget ?? 9000;
-  const baseCashBudget = cloudBudgetPrefs?.cashBudget ?? 0;
-  const enableRollover = cloudBudgetPrefs?.enableRollover ?? true;
-  const customDailyBudget = cloudBudgetPrefs?.customDailyBudget ?? null;
+  const localUpiBudget = typeof window !== "undefined" ? Number(localStorage.getItem("invictus_monthly_upi_budget")) : 0;
+  const localCashBudget = typeof window !== "undefined" ? Number(localStorage.getItem("invictus_monthly_cash_budget")) : 0;
+
+  const baseUpiBudget = (cloudBudgetPrefs?.upiBudget && cloudBudgetPrefs.upiBudget > 0)
+    ? cloudBudgetPrefs.upiBudget
+    : (localUpiBudget > 0 ? localUpiBudget : 8000);
+
+  const baseCashBudget = (cloudBudgetPrefs?.cashBudget !== undefined && cloudBudgetPrefs.cashBudget > 0)
+    ? cloudBudgetPrefs.cashBudget
+    : (localCashBudget > 0 ? localCashBudget : 2000);
+
+  const enableRollover = cloudBudgetPrefs?.enableRollover ?? (typeof window !== "undefined" ? localStorage.getItem("invictus_budget_rollover_enabled") !== "false" : true);
+  const customDailyBudget = cloudBudgetPrefs?.customDailyBudget ?? (typeof window !== "undefined" && localStorage.getItem("invictus_custom_daily_budget") ? Number(localStorage.getItem("invictus_custom_daily_budget")) : null);
 
   const budgetStats = useMemo(() => {
     const currentMonthKey = format(currentDateObj, "yyyy-MM");
