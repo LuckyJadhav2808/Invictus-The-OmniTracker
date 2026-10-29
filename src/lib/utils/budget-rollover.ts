@@ -55,6 +55,9 @@ export interface MonthlyBudgetStats {
   cashBudgetUsedPercentage: number;
   dailySafeToSpendUpi: number;
   dailySafeToSpendCash: number;
+  // Running Cash Envelope
+  envelopeCashExpense: number;
+  isCashEnvelopeExhausted: boolean;
   // Intelligent Burn Pace
   burnPaceStatus: "fast" | "frugal" | "on_track";
   burnPaceMessage: string;
@@ -204,38 +207,60 @@ export function computeMonthlyBudgetStats({
   const resolvedPrevUpiBudget =
     previousMonthUpiBudget !== undefined
       ? previousMonthUpiBudget
-      : (prevMonthTxs.length > 0 ? effectiveUpiBudget : 0);
+      : (previousMonthUpiExpense > 0 ? effectiveUpiBudget : 0);
 
-  // Cash rollover: only recognize previous month cash budget if:
-  // 1. It was explicitly recorded in previousMonthCashBudget, OR
-  // 2. The user actually logged cash expenses in that previous month.
-  // If previous cash spend is 0 and no prior cash budget was set, resolvedPrevCashBudget MUST be 0
-  // to avoid manufacturing a phantom 100% savings surplus on a newly set cash budget!
-  const resolvedPrevCashBudget =
-    previousMonthCashBudget !== undefined
-      ? previousMonthCashBudget
-      : (previousMonthCashExpense > 0 ? effectiveCashBudget : 0);
-
-  // Independent Rollover Calculations
+  // Rollover Calculations: ONLY UPI unspent allowance is eligible for monthly rollover.
+  // Physical Cash is an ongoing wallet envelope (not a monthly resetting allowance) and does not generate rollover surplus.
   const previousMonthUpiSavings =
     resolvedPrevUpiBudget > 0 ? Math.max(0, resolvedPrevUpiBudget - previousMonthUpiExpense) : 0;
-  const previousMonthCashSavings =
-    resolvedPrevCashBudget > 0 ? Math.max(0, resolvedPrevCashBudget - previousMonthCashExpense) : 0;
-  const previousMonthSavings = previousMonthUpiSavings + previousMonthCashSavings;
+  const previousMonthCashSavings = 0;
+  const previousMonthSavings = previousMonthUpiSavings;
 
   const upiRolloverSurplus =
-    enableRollover && resolvedPrevUpiBudget > 0 && prevMonthTxs.length > 0 ? previousMonthUpiSavings : 0;
-  const cashRolloverSurplus =
-    enableRollover && resolvedPrevCashBudget > 0 ? previousMonthCashSavings : 0;
-  const rolloverSurplus = upiRolloverSurplus + cashRolloverSurplus;
+    enableRollover && resolvedPrevUpiBudget > 0 && previousMonthUpiExpense > 0 ? previousMonthUpiSavings : 0;
+  const cashRolloverSurplus = 0;
+  const rolloverSurplus = upiRolloverSurplus;
+
+  // Running Cash Envelope Model:
+  // Cash budget runs continuously across months until the budget limit is reached.
+  // Sort all cash expenses chronologically up to the target month.
+  let envelopeCashExpense = 0;
+  if (effectiveCashBudget > 0) {
+    const historicalCashTxs = safeTransactions
+      .filter(
+        (t) =>
+          t.type === "expense" &&
+          isCashTransaction(t.paymentMethod) &&
+          t.date &&
+          t.date.slice(0, 7) <= targetMonthKey
+      )
+      .sort((a, b) => (a.date > b.date ? 1 : a.date < b.date ? -1 : 0));
+
+    let cycleSpent = 0;
+    for (const tx of historicalCashTxs) {
+      const amt = Number(tx.amount || 0);
+      if (cycleSpent + amt > effectiveCashBudget) {
+        // Limit reached: new envelope cycle starts with overflow
+        const overflow = (cycleSpent + amt) % effectiveCashBudget;
+        cycleSpent = overflow === 0 && amt > 0 ? effectiveCashBudget : overflow;
+      } else {
+        cycleSpent += amt;
+      }
+    }
+    envelopeCashExpense = cycleSpent;
+  } else {
+    envelopeCashExpense = cashExpense;
+  }
+
+  const isCashEnvelopeExhausted = effectiveCashBudget > 0 && envelopeCashExpense >= effectiveCashBudget;
+  const remainingCashBudget = effectiveCashBudget > 0 ? Math.max(0, effectiveCashBudget - envelopeCashExpense) : 0;
 
   // Channel-Specific Available & Remaining Pools
   const totalAvailableUpiBudget = effectiveUpiBudget + upiRolloverSurplus;
-  const totalAvailableCashBudget = effectiveCashBudget + cashRolloverSurplus;
+  const totalAvailableCashBudget = effectiveCashBudget;
   const totalAvailableBudget = totalAvailableUpiBudget + totalAvailableCashBudget;
 
   const remainingUpiBudget = totalAvailableUpiBudget - onlineExpense;
-  const remainingCashBudget = totalAvailableCashBudget - cashExpense;
   const remainingBudget = remainingUpiBudget + remainingCashBudget;
 
   const upiBudgetUsedPercentage =
@@ -244,8 +269,8 @@ export function computeMonthlyBudgetStats({
       : 0;
 
   const cashBudgetUsedPercentage =
-    totalAvailableCashBudget > 0
-      ? Math.min(100, Math.round((cashExpense / totalAvailableCashBudget) * 100))
+    effectiveCashBudget > 0
+      ? Math.min(100, Math.round((envelopeCashExpense / effectiveCashBudget) * 100))
       : 0;
 
   const budgetUsedPercentage =
@@ -375,6 +400,8 @@ export function computeMonthlyBudgetStats({
     cashBudgetUsedPercentage,
     dailySafeToSpendUpi,
     dailySafeToSpendCash,
+    envelopeCashExpense,
+    isCashEnvelopeExhausted,
     burnPaceStatus,
     burnPaceMessage,
     percentDaysPassed,

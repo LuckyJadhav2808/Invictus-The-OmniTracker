@@ -40,7 +40,7 @@ describe("computeMonthlyBudgetStats", () => {
     { id: "cat3", name: "Salary", type: "income", color: "mint", icon: "💰", monthlyBudget: 0, archived: false },
   ];
 
-  it("computes stats with rollover enabled", () => {
+  it("computes stats with rollover enabled (strictly isolated to UPI, cash runs as envelope)", () => {
     const stats = computeMonthlyBudgetStats({
       transactions: sampleTransactions,
       categories: sampleCategories,
@@ -52,25 +52,60 @@ describe("computeMonthlyBudgetStats", () => {
       previousMonthCashBudget: 500,
     });
 
-    // Prev month: UPI budget 1000 - spent 400 = 600 saved
-    // Cash budget 500 - spent 50 = 450 saved
-    // Total rollover = 1050
+    // Prev month (August): UPI budget 1000 - spent 400 = 600 saved
+    // Cash does NOT rollover into monthly surplus: cashRolloverSurplus = 0
+    // Total rollover = 600 (strictly UPI)
     expect(stats.upiRolloverSurplus).toBe(600);
-    expect(stats.cashRolloverSurplus).toBe(450);
-    expect(stats.rolloverSurplus).toBe(1050);
+    expect(stats.cashRolloverSurplus).toBe(0);
+    expect(stats.rolloverSurplus).toBe(600);
 
     // Effective base budget = 1000 + 500 = 1500
-    // Total available budget = 1500 + 1050 = 2550
+    // Total available budget = 1000 base UPI + 600 rollover + 500 base Cash = 2100
     expect(stats.baseBudget).toBe(1500);
-    expect(stats.totalAvailableBudget).toBe(2550);
+    expect(stats.totalAvailableBudget).toBe(2100);
 
     // Current month expenses: 200 UPI + 100 Cash = 300
     expect(stats.monthlyExpense).toBe(300);
     expect(stats.upiExpense).toBe(200);
     expect(stats.cashExpense).toBe(100);
 
-    // Remaining total = 2550 - 300 = 2250
-    expect(stats.remainingBudget).toBe(2250);
+    // Running Cash Envelope: August cash (50) + September cash (100) = 150 / 500
+    expect(stats.envelopeCashExpense).toBe(150);
+    expect(stats.remainingCashBudget).toBe(350);
+
+    // Remaining total = remaining UPI (1600 - 200 = 1400) + remaining Cash (350) = 1750
+    expect(stats.remainingBudget).toBe(1750);
+  });
+
+  it("continues cash used across months until budget limit is reached", () => {
+    const cashTransactions: Transaction[] = [
+      { id: "c1", amount: 352, date: "2026-09-12", type: "expense", categoryId: "cat2", isRecurring: false, paymentMethod: "cash" },
+      { id: "c2", amount: 300, date: "2026-10-15", type: "expense", categoryId: "cat2", isRecurring: false, paymentMethod: "cash" },
+    ];
+
+    // In September: 352 used out of 2000
+    const septStats = computeMonthlyBudgetStats({
+      transactions: cashTransactions,
+      targetMonthKey: "2026-09",
+      baseUpiBudget: 10000,
+      baseCashBudget: 2000,
+    });
+    expect(septStats.envelopeCashExpense).toBe(352);
+    expect(septStats.remainingCashBudget).toBe(1648);
+    expect(septStats.cashRolloverSurplus).toBe(0);
+
+    // In October before spending: if no Oct cash tx existed, it would continue showing 352.
+    // With Oct cash tx of 300, cumulative cash used is 352 + 300 = 652 out of 2000!
+    const octStats = computeMonthlyBudgetStats({
+      transactions: cashTransactions,
+      targetMonthKey: "2026-10",
+      baseUpiBudget: 10000,
+      baseCashBudget: 2000,
+    });
+    expect(octStats.envelopeCashExpense).toBe(652);
+    expect(octStats.remainingCashBudget).toBe(1348);
+    expect(octStats.cashRolloverSurplus).toBe(0);
+    expect(octStats.rolloverSurplus).toBe(0);
   });
 
   it("computes stats with rollover disabled", () => {
@@ -88,7 +123,8 @@ describe("computeMonthlyBudgetStats", () => {
     expect(stats.cashRolloverSurplus).toBe(0);
     expect(stats.baseBudget).toBe(1500);
     expect(stats.totalAvailableBudget).toBe(1500);
-    expect(stats.remainingBudget).toBe(1200); // 1500 - 300
+    // Remaining = 800 UPI (1000 - 200) + 350 Cash envelope (500 - 150 cumulative cash) = 1150
+    expect(stats.remainingBudget).toBe(1150);
   });
 
   it("handles missing categories and transactions gracefully without throwing", () => {

@@ -90,11 +90,6 @@ export function FinancialSummaryCockpit({
             
             {/* LEFT COLUMN (lg:col-span-6): THE CASH BILLFOLD (Remaining Budget & Progress) */}
             <div className="lg:col-span-6 flex flex-col justify-between bg-[#E8F5E9] border-2 border-[#161514] rounded-2xl p-4 sm:p-5 shadow-[0px_4px_0px_0px_rgba(0,0,0,0.35)] relative overflow-hidden">
-              {/* Currency Watermark - Positioned in the top right corner so it NEVER collides with numbers */}
-              <div className="absolute top-2 right-3 text-4xl sm:text-5xl font-black text-[#1B5E20]/10 select-none pointer-events-none font-mono">
-                {currencySymbol}{monthlyStats.totalAvailableBudget >= 1000 ? `${Math.round(monthlyStats.totalAvailableBudget / 1000)}K` : monthlyStats.totalAvailableBudget}
-              </div>
-
               <div>
                 <div className="flex flex-wrap items-center justify-between gap-1 mb-2">
                   <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider bg-[#161514] text-[#CEF431] px-2 py-0.5 rounded border border-[#161514] font-mono">
@@ -241,6 +236,47 @@ export function FinancialSummaryCockpit({
                     </span>
                   </div>
                 </div>
+
+                {/* Running Cash Envelope Telemetry */}
+                {monthlyStats.baseCashBudget > 0 && (
+                  <div className="mt-2 pt-1.5 border-t border-[#161514]/10 space-y-1">
+                    <div className="flex items-center justify-between text-[9px] font-black font-mono">
+                      <span className="text-[#161514]/75 uppercase flex items-center gap-1">
+                        <span>Envelope:</span>
+                        <span className="text-[#161514]">
+                          {currencySymbol}{monthlyStats.envelopeCashExpense.toLocaleString()} / {currencySymbol}{monthlyStats.baseCashBudget.toLocaleString()}
+                        </span>
+                      </span>
+                      <span
+                        className={cn(
+                          "font-bold uppercase text-[8px] px-1 py-0.2 rounded border",
+                          monthlyStats.isCashEnvelopeExhausted
+                            ? "bg-rose-100 text-rose-700 border-rose-300"
+                            : "bg-[#03D26F]/15 text-emerald-800 border-emerald-300"
+                        )}
+                      >
+                        {monthlyStats.isCashEnvelopeExhausted
+                          ? "Limit Reached"
+                          : `${currencySymbol}{monthlyStats.remainingCashBudget.toLocaleString()} Left`}
+                      </span>
+                    </div>
+                    <div className="h-1.5 w-full bg-[#161514]/10 rounded-full overflow-hidden p-0.2 border border-[#161514]/20">
+                      <div
+                        className={cn(
+                          "h-full rounded-full transition-all duration-300",
+                          monthlyStats.cashBudgetUsedPercentage >= 100
+                            ? "bg-rose-500"
+                            : monthlyStats.cashBudgetUsedPercentage >= 80
+                            ? "bg-amber-400"
+                            : "bg-[#03D26F]"
+                        )}
+                        style={{
+                          width: `${Math.min(100, Math.max(3, monthlyStats.cashBudgetUsedPercentage))}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Slot 3: Inflow & Outflow Monthly Ledger + Net Cashflow Strip */}

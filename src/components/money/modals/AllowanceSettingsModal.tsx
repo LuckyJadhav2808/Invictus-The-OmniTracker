@@ -128,7 +128,7 @@ export function AllowanceSettingsModal({
             <label htmlFor="cash-allowance-input" className="text-xs font-black uppercase tracking-wider text-[#161514]">
               💵 Cash Budget ({currencySymbol})
             </label>
-            <span className="text-[10px] font-bold text-[#161514]/60">ATM Notes & Coins</span>
+            <span className="text-[10px] font-bold text-[#161514]/60">ATM Notes & Coins • Running envelope until limit is reached</span>
           </div>
           <input
             id="cash-allowance-input"

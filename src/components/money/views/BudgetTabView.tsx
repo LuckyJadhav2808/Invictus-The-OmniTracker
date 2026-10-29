@@ -53,7 +53,7 @@ export function BudgetTabView({
               <span>Monthly Rollover & Allowances</span>
             </span>
             <span className="text-[10px] text-[#161514]/60 font-bold block">
-              Previous month unspent cashflow carries over automatically
+              Unspent UPI rolls over monthly • Cash envelope runs continuously until limit is reached
             </span>
           </div>
 
