@@ -82,7 +82,7 @@ export default function TodayPage() {
     soundFX.playSplash();
     soundFX.vibrate(15);
     logWaterMutation.mutate({ date: selectedDate, amount });
-    toast.success(`Logged +${amount}ml water.`);
+    toast.success(`Logged +${amount}ml water`);
   };
 
   // User Cloud Budget Preferences
@@ -135,21 +135,21 @@ export default function TodayPage() {
 
       toast.custom(
         () => (
-          <div className="bg-[#FAF8F5] border-2 border-[#161514] p-3.5 rounded-xl shadow-[3px_3px_0px_0px_#161514] flex items-center gap-3 w-full max-w-sm">
-            <div className="size-9 rounded-lg bg-[#03D26F] border-2 border-[#161514] flex items-center justify-center shrink-0 shadow-[1px_1px_0px_#161514]">
-              <Shield className="size-5 text-[#161514] stroke-[2.5]" />
+          <div className="bg-white border border-[#E8E5DF] p-3.5 rounded-xl shadow-md flex items-center gap-3 w-full max-w-sm">
+            <div className="size-8 rounded-lg bg-[#DCFAE5] flex items-center justify-center shrink-0">
+              <Shield className="size-4 text-[#047857] stroke-[1.5]" />
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5">
-                <span className="font-heading font-black text-xs text-[#161514] uppercase tracking-wide">
-                  Streak Shield Deployed
+                <span className="font-semibold text-xs text-[#161514]">
+                  Streak Protected
                 </span>
-                <span className="bg-[#CEF431] text-[#161514] font-black text-[9px] px-1.5 py-0.5 rounded border border-[#161514]">
-                  SAVED
+                <span className="bg-[#DCFAE5] text-[#04250e] font-medium text-xs px-1.5 py-0.5 rounded">
+                  Saved
                 </span>
               </div>
-              <p className="text-[11px] text-[#161514]/80 font-medium leading-tight mt-0.5">
-                Protected {datesList} while you were away. Flame preserved! ({streakFreeze.tokensAvailable}/2 tokens left)
+              <p className="text-xs text-[#6B6B6B] leading-tight mt-0.5">
+                Protected {datesList} ({streakFreeze.tokensAvailable}/2 tokens remaining)
               </p>
             </div>
           </div>
@@ -211,7 +211,7 @@ export default function TodayPage() {
         sessionStorage.setItem(celebrationKey, "true");
       }
       setShowConfetti(true);
-      toast.success("All daily habits conquered! Vix salutes you.");
+      toast.success("All daily habits completed");
     }
     previousConqueredRef.current = allHabitsConquered;
   }, [allHabitsConquered, selectedDate]);

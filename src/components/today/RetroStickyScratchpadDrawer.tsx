@@ -358,23 +358,23 @@ export function RetroStickyScratchpadDrawer({
         className={cn(
           "fixed right-4 sm:right-6 z-40",
           "bottom-[calc(5.25rem+env(safe-area-inset-bottom,0px))] lg:bottom-6",
-          "bg-[#FAF8F5] hover:bg-white text-[#161514] border-2 border-[#161514]",
-          "px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-xl shadow-[3px_3px_0px_#161514]",
-          "active:translate-x-0.5 active:translate-y-0.5 flex items-center gap-2",
-          "font-heading font-black text-xs cursor-pointer transition-all select-none"
+          "bg-white hover:bg-[#F5F3EF] text-[#161514] border border-[#E8E5DF]",
+          "px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-xl shadow-md",
+          "active:translate-y-px flex items-center gap-2",
+          "font-medium text-xs cursor-pointer transition-colors select-none"
         )}
         aria-label="Open Scratchpad (Cmd+J)"
         title="Open Scratchpad (Cmd+J)"
       >
-        <div className="size-5 rounded-md bg-[#FFB800] border border-[#161514] flex items-center justify-center shrink-0">
-          <FileText className="size-3 text-[#161514] stroke-[2.5]" />
+        <div className="size-6 rounded-md bg-[#F1EFEA] flex items-center justify-center shrink-0">
+          <FileText className="size-3.5 text-[#161514] stroke-[1.5]" />
         </div>
         <span>Scratchpad</span>
-        <kbd className="hidden sm:inline-block font-mono text-[9px] bg-[#F1EFEA] border border-[#161514] px-1 py-0.2 rounded text-[#161514]/80">
+        <kbd className="hidden sm:inline-block font-mono text-[10px] bg-[#F1EFEA] border border-[#E8E5DF] px-1.5 py-0.5 rounded text-[#6B6B6B]">
           ⌘J
         </kbd>
         {activeLinesCount > 0 && (
-          <span className="size-2 rounded-full bg-[#03D26F] animate-pulse" />
+          <span className="size-2 rounded-full bg-[#03D26F]" />
         )}
       </button>
 
@@ -383,19 +383,19 @@ export function RetroStickyScratchpadDrawer({
         <SheetContent
           side="right"
           showCloseButton={false}
-          className="bg-[#FAF8F5] border-l-2 border-[#161514] shadow-[-6px_0px_0px_0px_#161514] w-full sm:max-w-md md:max-w-lg p-4 sm:p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))] flex flex-col justify-between text-[#161514] space-y-4"
+          className="bg-white border-l border-[#E8E5DF] shadow-2xl w-full sm:max-w-md md:max-w-lg p-4 sm:p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))] flex flex-col justify-between text-[#161514] space-y-4"
         >
           {/* Header */}
-          <div className="flex items-center justify-between border-b-2 border-[#161514]/15 pb-3 shrink-0">
+          <div className="flex items-center justify-between border-b border-[#E8E5DF] pb-3 shrink-0">
             <div className="flex items-center gap-2.5">
-              <div className="size-8 rounded-lg bg-[#FFB800] border-2 border-[#161514] flex items-center justify-center shadow-[1.5px_1.5px_0px_#161514]">
-                <FileText className="size-4 text-[#161514] stroke-[2.5]" />
+              <div className="size-8 rounded-lg bg-[#F1EFEA] flex items-center justify-center text-[#161514]">
+                <FileText className="size-4 stroke-[1.5]" />
               </div>
               <div>
-                <SheetTitle className="font-heading font-black text-sm sm:text-base text-[#161514] tracking-tight">
+                <SheetTitle className="font-sans font-semibold text-base text-[#161514] tracking-tight">
                   Desk Scratchpad
                 </SheetTitle>
-                <div className="flex items-center gap-2 text-[10px] font-mono text-[#161514]/70">
+                <div className="flex items-center gap-2 text-xs font-mono text-[#6B6B6B]">
                   <span>{isSaved ? "Saved" : "Saving..."}</span>
                   <span>•</span>
                   <span>{activeLinesCount} active lines</span>
@@ -408,7 +408,7 @@ export function RetroStickyScratchpadDrawer({
                 <button
                   type="button"
                   onClick={handleClearConverted}
-                  className="p-1.5 rounded-lg border border-[#161514] bg-white hover:bg-[#F3EFEA] text-[10px] font-mono font-bold text-[#161514]"
+                  className="p-1.5 rounded-lg border border-[#E8E5DF] bg-white hover:bg-[#F5F3EF] text-xs font-mono font-medium text-[#161514]"
                   title="Clear converted items"
                 >
                   <RotateCcw className="size-3.5" />
@@ -418,36 +418,36 @@ export function RetroStickyScratchpadDrawer({
               <button
                 type="button"
                 onClick={() => onOpenChange(false)}
-                className="bg-white hover:bg-rose-100 text-[#161514] p-1.5 rounded-lg border-2 border-[#161514] shadow-[1.5px_1.5px_0px_#161514] active:scale-95 transition-all cursor-pointer"
+                className="bg-white hover:bg-[#F5F3EF] text-[#161514] p-1.5 rounded-lg border border-[#E8E5DF] active:translate-y-px transition-colors cursor-pointer"
                 aria-label="Close scratchpad"
               >
-                <X className="size-4 stroke-[2.5]" />
+                <X className="size-4 stroke-[1.5]" />
               </button>
             </div>
           </div>
 
           {/* Body: Ruled Writing Surface */}
           <div className="flex-1 min-h-0 flex flex-col space-y-3">
-            <div className="flex-1 bg-white border-2 border-[#161514] rounded-xl p-3 shadow-[2px_2px_0px_#161514] flex flex-col">
+            <div className="flex-1 bg-[#FBF9F5] border border-[#E8E5DF] rounded-xl p-3 flex flex-col">
               <textarea
                 ref={textareaRef}
                 value={content}
                 onChange={handleChange}
                 onSelect={handleSelect}
                 placeholder="Jot down quick thoughts...&#10;Finish chem problem tomorrow p1&#10;Chai with team 60"
-                className="w-full flex-1 bg-transparent border-none resize-none focus:outline-none text-xs sm:text-sm font-mono text-[#161514] placeholder-[#161514]/35 leading-relaxed"
+                className="w-full flex-1 bg-transparent border-none resize-none focus:outline-none text-xs sm:text-sm font-mono text-[#161514] placeholder-[#6B6B6B]/50 leading-relaxed"
               />
 
               {/* Live Target Line NLP Indicator */}
               {targetParsed.cleanTitle && !targetParsed.isConverted && (
-                <div className="mt-2 pt-2 border-t border-[#161514]/15 flex items-center justify-between text-[11px] font-mono">
+                <div className="mt-2 pt-2 border-t border-[#E8E5DF] flex items-center justify-between text-xs font-mono">
                   <div className="flex items-center gap-1.5 truncate">
-                    <span className="font-bold text-[#161514]/60">Selected:</span>
-                    <span className="font-black text-[#161514] truncate">
+                    <span className="text-[#6B6B6B]">Selected:</span>
+                    <span className="font-medium text-[#161514] truncate">
                       {targetParsed.cleanTitle}
                     </span>
                     {targetParsed.amount && (
-                      <span className="bg-[#03D26F] text-[#161514] px-1 py-0.2 rounded font-black text-[10px]">
+                      <span className="bg-[#DCFAE5] text-[#04250e] px-1.5 py-0.5 rounded font-medium text-xs">
                         ₹{targetParsed.amount}
                       </span>
                     )}
@@ -457,7 +457,7 @@ export function RetroStickyScratchpadDrawer({
                     <button
                       type="button"
                       onClick={handleCreateTaskFromNote}
-                      className="min-h-[34px] px-2.5 py-1 rounded-lg border-2 border-[#161514] bg-[#CEF431] font-heading font-black text-xs hover:bg-[#D8F74E] active:scale-95 shadow-[1px_1px_0px_#161514] transition-all cursor-pointer"
+                      className="min-h-[32px] px-2.5 py-1 rounded-md bg-[#161514] text-white hover:bg-[#252321] font-medium text-xs transition-colors cursor-pointer active:translate-y-px"
                       title="Convert to Task"
                     >
                       + Task
@@ -465,7 +465,7 @@ export function RetroStickyScratchpadDrawer({
                     <button
                       type="button"
                       onClick={handleCreateExpenseFromNote}
-                      className="min-h-[34px] px-2.5 py-1 rounded-lg border-2 border-[#161514] bg-white font-heading font-black text-xs hover:bg-[#F3EFEA] active:scale-95 shadow-[1px_1px_0px_#161514] transition-all cursor-pointer"
+                      className="min-h-[32px] px-2.5 py-1 rounded-md border border-[#E8E5DF] bg-white text-[#161514] hover:bg-[#F5F3EF] font-medium text-xs transition-colors cursor-pointer active:translate-y-px"
                       title="Convert to Expense"
                     >
                       + Expense
@@ -480,9 +480,9 @@ export function RetroStickyScratchpadDrawer({
               <button
                 type="button"
                 onClick={handleBatchConvertAll}
-                className="w-full min-h-[40px] bg-[#03D26F] hover:bg-[#02B860] active:translate-x-0.5 active:translate-y-0.5 border-2 border-[#161514] rounded-xl font-heading font-black text-xs text-[#161514] shadow-[2.5px_2.5px_0px_#161514] flex items-center justify-center gap-2 cursor-pointer transition-all"
+                className="w-full min-h-[40px] bg-[#03D26F] hover:bg-[#02B860] active:translate-y-px rounded-xl font-medium text-xs text-white flex items-center justify-center gap-2 cursor-pointer transition-colors"
               >
-                <CheckCheck className="size-4 text-[#161514] stroke-[2.5]" />
+                <CheckCheck className="size-4 stroke-[2]" />
                 <span>
                   Convert All ({analysis.taskCount} Tasks, {analysis.expenseCount} Expenses)
                 </span>
@@ -491,13 +491,13 @@ export function RetroStickyScratchpadDrawer({
           </div>
 
           {/* Footer Metadata & Clear */}
-          <div className="flex items-center justify-between text-[11px] font-mono text-[#161514]/65 pt-2 border-t border-[#161514]/15 shrink-0">
+          <div className="flex items-center justify-between text-xs font-mono text-[#6B6B6B] pt-2 border-t border-[#E8E5DF] shrink-0">
             <span>Shortcut: Press ⌘J anywhere</span>
             {content && (
               <button
                 type="button"
                 onClick={handleClearAll}
-                className="text-rose-600 hover:underline cursor-pointer font-bold text-[10px]"
+                className="text-rose-600 hover:underline cursor-pointer font-medium text-xs"
               >
                 Clear all notes
               </button>

@@ -57,49 +57,49 @@ export function HabitMomentumCard({
     <div
       id="habits-section"
       className={cn(
-        "bg-white border-2 border-[#161514] p-5 rounded-xl shadow-[3px_3px_0px_#161514] flex flex-col justify-between space-y-4",
+        "bg-white border border-[#E8E5DF] p-5 rounded-xl flex flex-col justify-between space-y-4",
         className
       )}
     >
       {/* Header & Filter Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-[#161514]/15 pb-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E8E5DF] pb-3">
         <div className="flex items-center gap-2.5">
-          <div className="size-8 rounded-lg bg-[#03D26F] border-2 border-[#161514] flex items-center justify-center shadow-[1px_1px_0px_#161514] shrink-0">
-            <CheckSquare className="size-4 text-[#161514] stroke-[2.5]" />
+          <div className="size-7 rounded-lg bg-[#F1EFEA] flex items-center justify-center text-[#161514] shrink-0">
+            <CheckSquare className="size-3.5 stroke-[1.5]" />
           </div>
 
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="font-heading font-black text-base text-[#161514] tracking-tight">
+              <h2 className="font-sans font-semibold text-[15px] text-[#161514] tracking-tight">
                 Habit Momentum
               </h2>
               {percent === 100 && totalCount > 0 ? (
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-heading font-black bg-[#03D26F] text-[#161514] border border-[#161514]">
-                  CONQUERED
+                <span className="px-2 py-0.5 rounded text-xs font-medium bg-[#DCFAE5] text-[#04250e] border border-[#03D26F]/30">
+                  Completed
                 </span>
               ) : (
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-black bg-[#F1EFEA] text-[#161514] border border-[#161514] tabular-nums">
+                <span className="px-2 py-0.5 rounded text-xs font-mono font-medium bg-[#F1EFEA] text-[#161514] tabular-nums">
                   {percent}%
                 </span>
               )}
             </div>
-            <p className="text-xs text-[#161514]/70 font-medium font-mono mt-0.5">
-              <span className="font-black text-[#161514] tabular-nums">{completedCount}</span> of <span className="tabular-nums">{totalCount}</span> completed today
+            <p className="text-xs text-[#6B6B6B] mt-0.5">
+              <span className="font-semibold text-[#161514] tabular-nums">{completedCount}</span> of <span className="tabular-nums">{totalCount}</span> completed today
             </p>
           </div>
         </div>
 
         {/* Filter Pills */}
-        <div className="flex items-center gap-1 p-0.5 bg-[#F1EFEA] border-2 border-[#161514] rounded-lg self-start sm:self-auto">
+        <div className="flex items-center gap-1 p-0.5 bg-[#F1EFEA] border border-[#E8E5DF] rounded-lg self-start sm:self-auto">
           {(['all', 'pending', 'completed'] as const).map((mode) => (
             <button
               key={mode}
               onClick={() => setHabitFilter(mode)}
               className={cn(
-                'px-2.5 py-1 text-[11px] font-heading font-black rounded capitalize transition-all cursor-pointer',
+                'px-2.5 py-1 text-xs font-medium rounded capitalize transition-colors cursor-pointer',
                 habitFilter === mode
-                  ? 'bg-white text-[#161514] border border-[#161514] shadow-[1px_1px_0px_#161514]'
-                  : 'text-[#161514]/65 hover:text-[#161514]'
+                  ? 'bg-white text-[#161514] shadow-sm font-semibold'
+                  : 'text-[#6B6B6B] hover:text-[#161514]'
               )}
             >
               {mode}
@@ -108,21 +108,21 @@ export function HabitMomentumCard({
         </div>
       </div>
 
-      {/* Hydration Velocity Bar (Synchronized with Life / Goals Space) */}
+      {/* Hydration Bar */}
       {typeof waterAmount === 'number' && (
-        <div className="bg-[#FAF8F5] border-2 border-[#161514] p-3 rounded-xl flex items-center justify-between gap-3 shadow-[1.5px_1.5px_0px_#161514]">
+        <div className="bg-[#FBF9F5] border border-[#E8E5DF] p-3 rounded-lg flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="size-8 rounded-lg bg-white border-2 border-[#161514] flex items-center justify-center shrink-0 shadow-[1px_1px_0px_#161514]">
-              <Droplets className="size-4 text-[#161514] stroke-[2.5]" />
+            <div className="size-7 rounded-lg bg-white border border-[#E8E5DF] flex items-center justify-center shrink-0 text-[#161514]">
+              <Droplets className="size-3.5 stroke-[1.5]" />
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-heading font-black text-xs text-[#161514]">Daily Hydration</span>
-                <span className="text-[10px] font-mono font-bold text-[#161514]/70 tabular-nums">
+                <span className="text-xs font-medium text-[#161514]">Daily Hydration</span>
+                <span className="text-xs font-mono text-[#6B6B6B] tabular-nums">
                   {waterAmount} / {waterTarget} ml ({Math.min(100, Math.round((waterAmount / waterTarget) * 100))}%)
                 </span>
               </div>
-              <div className="w-28 sm:w-44 h-2 bg-white rounded-full border border-[#161514] overflow-hidden mt-1">
+              <div className="w-28 sm:w-44 h-1.5 bg-[#E8E5DF] rounded-full overflow-hidden mt-1">
                 <div
                   className="h-full bg-[#161514] transition-all duration-300"
                   style={{ width: `${Math.min(100, Math.round((waterAmount / waterTarget) * 100))}%` }}
@@ -135,11 +135,11 @@ export function HabitMomentumCard({
             <button
               type="button"
               onClick={onQuickLogWater}
-              className="px-2.5 py-1.5 min-h-[38px] rounded-lg bg-white hover:bg-[#F1EFEA] active:translate-x-0.5 active:translate-y-0.5 text-[#161514] font-heading font-black text-[11px] border-2 border-[#161514] shadow-[1px_1px_0px_#161514] flex items-center gap-1.5 cursor-pointer transition-all shrink-0 active:scale-95"
+              className="px-2.5 py-1 min-h-[34px] rounded-lg bg-white hover:bg-[#F5F3EF] border border-[#E8E5DF] text-[#161514] text-xs font-medium flex items-center gap-1.5 cursor-pointer transition-colors active:translate-y-px shrink-0"
               title="Quick log 250ml glass of water"
             >
-              <Plus className="size-3 stroke-[3]" />
-              <span className="font-mono font-black tabular-nums">250ml</span>
+              <Plus className="size-3 stroke-[1.5]" />
+              <span className="font-mono tabular-nums">250ml</span>
             </button>
           )}
         </div>
@@ -147,10 +147,10 @@ export function HabitMomentumCard({
 
       {/* Habit Items List */}
       {filteredHabits.length === 0 ? (
-        <div className="p-8 text-center space-y-3 bg-[#FBF9F5] border-2 border-dashed border-[#161514]/25 rounded-xl">
-          <CheckSquare className="size-8 mx-auto text-[#161514]/40" />
+        <div className="p-8 text-center space-y-3 bg-[#FBF9F5] border border-dashed border-[#E8E5DF] rounded-xl">
+          <CheckSquare className="size-8 mx-auto text-[#6B6B6B]/40" />
           <div className="space-y-1">
-            <p className="font-heading font-extrabold text-sm text-[#161514]">
+            <p className="font-medium text-sm text-[#161514]">
               {habitFilter === 'completed'
                 ? 'No completed habits yet.'
                 : habitFilter === 'pending'
@@ -166,7 +166,7 @@ export function HabitMomentumCard({
           </Button>
         </div>
       ) : (
-        <div className="flex-1 overflow-y-auto max-h-[300px] sm:max-h-[320px] space-y-2.5 pr-1 scrollbar-thin">
+        <div className="flex-1 overflow-y-auto max-h-[300px] sm:max-h-[320px] space-y-2 pr-1 scrollbar-thin">
           {filteredHabits.map((habit) => {
             const isDone = logs.some((l) => l.habitId === habit.id && l.completed);
             const streakData = streaks[habit.id];
@@ -175,40 +175,40 @@ export function HabitMomentumCard({
               <div
                 key={habit.id}
                 className={cn(
-                  'flex items-center justify-between p-3 rounded-xl border-2 border-[#161514] transition-all',
+                  'flex items-center justify-between p-3 rounded-lg border border-[#E8E5DF] transition-colors',
                   isDone
-                    ? 'bg-emerald-50/70 border-[#161514] opacity-90 shadow-none'
-                    : 'bg-white shadow-[2px_2px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5'
+                    ? 'bg-[#F9FAF9] opacity-80'
+                    : 'bg-white hover:bg-[#FBF9F5]'
                 )}
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  {/* Ergonomic 44px min-touch completion button */}
+                  {/* Checkbox button */}
                   <button
                     onClick={() => onToggleHabit(habit.id, !isDone)}
                     aria-label={isDone ? `Mark ${habit.title} incomplete` : `Mark ${habit.title} complete`}
                     className={cn(
-                      'size-9 rounded-lg border-2 border-[#161514] flex items-center justify-center shrink-0 transition-all cursor-pointer active:scale-[0.95]',
+                      'size-7 rounded-md border flex items-center justify-center shrink-0 transition-colors cursor-pointer active:translate-y-px',
                       isDone
-                        ? 'bg-[#03D26F] text-[#161514] shadow-none'
-                        : 'bg-white hover:bg-[#F1EFEA] shadow-[1px_1px_0px_#161514]'
+                        ? 'bg-[#03D26F] border-[#03D26F] text-white'
+                        : 'bg-white border-[#D1D5DB] hover:bg-[#F1EFEA]'
                     )}
                   >
-                    {isDone && <Check className="size-4 stroke-[3]" />}
+                    {isDone && <Check className="size-3.5 stroke-[2.5]" />}
                   </button>
 
                   <div className="min-w-0">
                     <p
                       className={cn(
-                        'font-heading font-black text-sm truncate text-[#161514]',
-                        isDone && 'line-through text-[#161514]/50'
+                        'font-medium text-sm truncate text-[#161514]',
+                        isDone && 'line-through text-[#6B6B6B]'
                       )}
                     >
                       {habit.title}
                     </p>
-                    <div className="flex items-center gap-2 mt-0.5 text-[11px] text-[#161514]/70 font-medium">
+                    <div className="flex items-center gap-2 mt-0.5 text-xs text-[#6B6B6B]">
                       <span className="capitalize">{habit.frequency?.type || 'Daily'}</span>
                       {streakData?.currentStreak > 0 && (
-                        <span className="flex items-center gap-0.5 text-orange-600 font-bold">
+                        <span className="flex items-center gap-0.5 text-orange-600 font-medium">
                           <Flame className="size-3 fill-orange-500" />
                           {streakData.currentStreak}d
                         </span>
@@ -219,8 +219,8 @@ export function HabitMomentumCard({
 
                 <span
                   className={cn(
-                    'px-2 py-0.5 rounded text-[10px] font-mono font-extrabold border border-[#161514]',
-                    isDone ? 'bg-[#03D26F] text-[#161514]' : 'bg-[#F1EFEA] text-[#161514]/70'
+                    'px-2 py-0.5 rounded text-xs font-mono font-medium',
+                    isDone ? 'bg-[#DCFAE5] text-[#04250e]' : 'bg-[#F1EFEA] text-[#6B6B6B]'
                   )}
                 >
                   {isDone ? 'Done' : 'Due'}

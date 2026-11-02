@@ -33,42 +33,42 @@ export function TaskBattleQueue({
     <div
       id="tasks-section"
       className={cn(
-        "bg-white border-2 border-[#161514] p-5 rounded-xl shadow-[3px_3px_0px_#161514] flex flex-col justify-between space-y-4",
+        "bg-white border border-[#E8E5DF] p-5 rounded-xl flex flex-col justify-between space-y-4",
         className
       )}
     >
       {/* Header */}
-      <div className="flex items-center justify-between border-b-2 border-[#161514]/15 pb-3">
+      <div className="flex items-center justify-between border-b border-[#E8E5DF] pb-3">
         <div className="flex items-center gap-2">
-          <div className="size-7 rounded-lg bg-[#FFB800] border-2 border-[#161514] flex items-center justify-center text-[#161514]">
-            <Kanban className="size-3.5 stroke-[2.5]" />
+          <div className="size-7 rounded-lg bg-[#F1EFEA] flex items-center justify-center text-[#161514]">
+            <Kanban className="size-3.5 stroke-[1.5]" />
           </div>
-          <h2 className="font-heading font-black text-base text-[#161514] tracking-tight">
-            Priority Battle Queue
+          <h2 className="font-sans font-semibold text-[15px] text-[#161514] tracking-tight">
+            Priority Tasks
           </h2>
         </div>
 
         <Link
           href="/tasks"
-          className="text-xs font-heading font-black text-[#161514] hover:underline flex items-center gap-1"
+          className="text-xs font-medium text-[#6B6B6B] hover:text-[#161514] flex items-center gap-1 transition-colors"
         >
           <span>All Tasks</span>
-          <ArrowRight className="size-3" />
+          <ArrowRight className="size-3 stroke-[1.5]" />
         </Link>
       </div>
 
       {/* Task Items */}
       {priorityTasks.length === 0 ? (
-        <div className="flex-1 p-6 text-center space-y-2 bg-[#FBF9F5] border-2 border-dashed border-[#161514]/20 rounded-xl flex flex-col items-center justify-center">
-          <div className="size-9 rounded-full bg-[#03D26F]/20 border-2 border-[#161514] flex items-center justify-center mx-auto text-[#03D26F]">
-            <ShieldCheck className="size-5 text-[#161514]" />
+        <div className="flex-1 p-6 text-center space-y-2 bg-[#FBF9F5] border border-dashed border-[#E8E5DF] rounded-xl flex flex-col items-center justify-center">
+          <div className="size-8 rounded-full bg-[#DCFAE5] flex items-center justify-center mx-auto text-[#047857]">
+            <ShieldCheck className="size-4 stroke-[1.5]" />
           </div>
-          <p className="font-heading font-black text-sm text-[#161514]">
-            All Priorities Cleared
+          <p className="font-medium text-sm text-[#161514]">
+            All priority tasks cleared
           </p>
         </div>
       ) : (
-        <div className="flex-1 overflow-y-auto max-h-[220px] sm:max-h-[260px] space-y-2 pr-1 scrollbar-thin">
+        <div className="flex-1 overflow-y-auto max-h-[220px] sm:max-h-[260px] space-y-1.5 pr-1 scrollbar-thin">
           {priorityTasks.map((task) => {
             const completedSubtasksCount = task.subtasks?.filter((s) => s.completed).length || 0;
             const totalSubtasksCount = task.subtasks?.length || 0;
@@ -76,35 +76,35 @@ export function TaskBattleQueue({
             return (
               <div
                 key={task.id}
-                className="p-3 bg-white border-2 border-[#161514] rounded-xl shadow-[2px_2px_0px_#161514] flex items-center justify-between gap-3 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all"
+                className="p-3 bg-white border border-[#E8E5DF] rounded-lg flex items-center justify-between gap-3 hover:bg-[#FBF9F5] transition-colors"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  {/* Ergonomic 44px touch checkbox */}
+                  {/* Completion Checkbox */}
                   <button
                     onClick={() => onCompleteTask(task.id, task.title)}
-                    className="size-8 rounded-lg border-2 border-[#161514] bg-white hover:bg-emerald-100 flex items-center justify-center shrink-0 cursor-pointer active:scale-95 transition-transform shadow-[0.5px_0.5px_0px_#161514]"
+                    className="size-7 rounded-md border border-[#D1D5DB] bg-white hover:bg-[#DCFAE5] hover:border-[#03D26F] flex items-center justify-center shrink-0 cursor-pointer active:translate-y-px transition-colors group"
                     aria-label={`Complete task: ${task.title}`}
                   >
-                    <Check className="size-4 stroke-[3] opacity-0 hover:opacity-100 transition-opacity" />
+                    <Check className="size-3.5 stroke-[2] opacity-0 group-hover:opacity-100 text-[#047857] transition-opacity" />
                   </button>
 
                   <div className="min-w-0">
-                    <p className="font-heading font-black text-xs text-[#161514] truncate">
+                    <p className="font-medium text-xs text-[#161514] truncate">
                       {task.title}
                     </p>
                     <div className="flex items-center gap-2 mt-0.5">
                       <span
                         className={cn(
-                          'text-[9px] font-mono font-black uppercase px-1.5 py-0.5 rounded border border-[#161514]',
+                          'text-xs font-mono font-medium px-1.5 py-0.2 rounded',
                           task.priority === 'p1'
-                            ? 'bg-[#FF4343] text-white'
-                            : 'bg-[#FFB800] text-[#161514]'
+                            ? 'bg-[#FFEDEA] text-[#831C1E]'
+                            : 'bg-[#FFFBEB] text-[#92400E]'
                         )}
                       >
                         {task.priority.toUpperCase()}
                       </span>
                       {task.projectTag && (
-                        <span className="text-[10px] font-mono text-[#161514]/65 font-bold">
+                        <span className="text-xs font-mono text-[#6B6B6B]">
                           #{task.projectTag}
                         </span>
                       )}
@@ -113,7 +113,7 @@ export function TaskBattleQueue({
                 </div>
 
                 {totalSubtasksCount > 0 && (
-                  <span className="text-[10px] font-mono font-bold bg-[#F1EFEA] border border-[#161514]/30 px-1.5 py-0.5 rounded shrink-0 tabular-nums">
+                  <span className="text-xs font-mono text-[#6B6B6B] bg-[#F1EFEA] px-1.5 py-0.5 rounded shrink-0 tabular-nums">
                     {completedSubtasksCount}/{totalSubtasksCount}
                   </span>
                 )}
@@ -124,14 +124,14 @@ export function TaskBattleQueue({
       )}
 
       {/* Footer Navigation Link */}
-      <div className="pt-2 border-t border-[#161514]/15 flex items-center justify-between text-xs">
-        <span className="text-[#161514]/60 font-medium">Kanban board & milestone tracking</span>
+      <div className="pt-2 border-t border-[#E8E5DF] flex items-center justify-between text-xs">
+        <span className="text-[#6B6B6B]">Upcoming tasks & milestones</span>
         <Link
           href="/tasks"
-          className="font-heading font-black text-[#161514] hover:underline flex items-center gap-1"
+          className="font-medium text-[#161514] hover:underline flex items-center gap-1"
         >
           <span>Tasks Hub</span>
-          <ArrowRight className="size-3.5" />
+          <ArrowRight className="size-3.5 stroke-[1.5]" />
         </Link>
       </div>
     </div>
