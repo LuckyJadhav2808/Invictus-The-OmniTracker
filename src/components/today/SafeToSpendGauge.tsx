@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
-import { Wallet, Plus, ArrowRight, AlertTriangle, Sliders } from 'lucide-react';
+import { Wallet, Plus, AlertTriangle, Sliders } from 'lucide-react';
 import { type Transaction, type Category } from '@/types';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -19,6 +18,7 @@ interface SafeToSpendGaugeProps {
   onAddExpense: (amount: number, categoryId: string, note: string) => Promise<void>;
   isSavingExpense: boolean;
   onOpenSetDailyLimit?: () => void;
+  className?: string;
 }
 
 export function SafeToSpendGauge({
@@ -33,6 +33,7 @@ export function SafeToSpendGauge({
   onAddExpense,
   isSavingExpense,
   onOpenSetDailyLimit,
+  className,
 }: SafeToSpendGaugeProps) {
   const [amount, setAmount] = useState('');
   const [categoryId, setCategoryId] = useState('');
@@ -56,7 +57,13 @@ export function SafeToSpendGauge({
   const expenseCategories = categories.filter((c) => c.type === 'expense');
 
   return (
-    <div id="expense-section" className="bg-white border-2 border-[#161514] p-5 rounded-xl shadow-[3px_3px_0px_#161514] space-y-4">
+    <div
+      id="expense-section"
+      className={cn(
+        "bg-white border-2 border-[#161514] p-5 rounded-xl shadow-[3px_3px_0px_#161514] flex flex-col justify-between space-y-4",
+        className
+      )}
+    >
       {/* Header */}
       <div className="flex items-center justify-between border-b-2 border-[#161514]/15 pb-3">
         <div className="flex items-center gap-2">
@@ -227,17 +234,14 @@ export function SafeToSpendGauge({
 
       {/* Today's Transactions List */}
       {transactions.length === 0 ? (
-        <div className="p-5 text-center space-y-1.5 bg-[#FBF9F5] border-2 border-dashed border-[#161514]/25 rounded-xl">
-          <p className="font-heading font-black text-xs text-[#161514]">
-            No expenses logged today!
-          </p>
-          <p className="text-[11px] text-[#161514]/60">
-            Daily safe limit is intact and untouched.
+        <div className="flex-1 p-4 text-center bg-[#FBF9F5] border-2 border-dashed border-[#161514]/20 rounded-xl flex items-center justify-center">
+          <p className="font-mono font-bold text-xs text-[#161514]/70">
+            {currencySymbol}0 spent today • Full daily reserve intact
           </p>
         </div>
       ) : (
-        <div className="space-y-2">
-          {transactions.slice(0, 4).map((tx) => (
+        <div className="flex-1 overflow-y-auto max-h-[160px] space-y-2 pr-1 scrollbar-thin">
+          {transactions.slice(0, 6).map((tx) => (
             <div
               key={tx.id}
               className="p-2.5 bg-white border-2 border-[#161514] rounded-lg flex items-center justify-between text-xs shadow-[1.5px_1.5px_0px_#161514]"
@@ -261,18 +265,6 @@ export function SafeToSpendGauge({
           ))}
         </div>
       )}
-
-      {/* Footer Navigation Link */}
-      <div className="pt-2 border-t border-[#161514]/15 flex items-center justify-between text-xs">
-        <span className="text-[#161514]/60 font-medium">Vault balances & rollover</span>
-        <Link
-          href="/money"
-          className="font-heading font-black text-[#161514] hover:underline flex items-center gap-1"
-        >
-          <span>Ledger & Vault</span>
-          <ArrowRight className="size-3.5" />
-        </Link>
-      </div>
     </div>
   );
 }

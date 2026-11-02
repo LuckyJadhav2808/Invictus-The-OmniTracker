@@ -189,7 +189,6 @@ export function GladiatorCloseoutCard({
             <Sparkles className="size-3.5 text-[#161514]" />
             <span>Daily Mindset & Evening Pulse</span>
           </div>
-          <span className="text-[10px] font-mono font-bold text-[#161514]/60">1-Tap Reflection</span>
         </div>
 
         {/* 5-scale sentiment buttons */}
@@ -289,7 +288,7 @@ export function GladiatorCloseoutCard({
       </div>
 
       {/* 5. Tomorrow Battle Preview (Things 3 Benchmark) */}
-      <div className="bg-white/80 border border-[#161514]/20 rounded-xl p-3 flex flex-wrap items-center justify-between gap-2 text-xs">
+      <div className="bg-white/80 border border-[#161514]/15 rounded-xl p-3 flex flex-wrap items-center justify-between gap-2 text-xs">
         <div className="flex items-center gap-2 font-mono text-[#161514]/80">
           <span className="font-bold text-[#161514] flex items-center gap-1.5">
             <Moon className="size-3.5 text-[#161514]" />
@@ -301,10 +300,6 @@ export function GladiatorCloseoutCard({
             {currencySymbol}<span className="tabular-nums">{tomorrowSafeToSpend ?? metrics.dailySafeToSpend}</span> safe limit
           </span>
         </div>
-
-        <span className="text-[11px] font-mono font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-          Rest & Recover, Gladiator
-        </span>
       </div>
     </div>
   );

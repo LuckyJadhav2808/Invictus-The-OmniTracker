@@ -1,8 +1,7 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
-import { GraduationCap, Play, Pause, Check, RotateCcw, ArrowRight } from 'lucide-react';
+import { GraduationCap, Play, Pause, Check, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -31,6 +30,7 @@ interface StudySprintWidgetProps {
   allTopics: TopicOption[];
   todayStudyHours: string;
   studyCompletionPercent: number;
+  className?: string;
 }
 
 export function StudySprintWidget({
@@ -47,6 +47,7 @@ export function StudySprintWidget({
   allTopics,
   todayStudyHours,
   studyCompletionPercent,
+  className,
 }: StudySprintWidgetProps) {
   const formatTimer = (totalSecs: number) => {
     const hrs = Math.floor(totalSecs / 3600);
@@ -60,7 +61,13 @@ export function StudySprintWidget({
   );
 
   return (
-    <div id="study-section" className="bg-white border-2 border-[#161514] p-5 rounded-xl shadow-[3px_3px_0px_#161514] space-y-4">
+    <div
+      id="study-section"
+      className={cn(
+        "bg-white border-2 border-[#161514] p-5 rounded-xl shadow-[3px_3px_0px_#161514] flex flex-col justify-between space-y-4",
+        className
+      )}
+    >
       {/* Header */}
       <div className="flex items-center justify-between border-b-2 border-[#161514]/15 pb-3">
         <div className="flex items-center gap-2">
@@ -68,7 +75,7 @@ export function StudySprintWidget({
             <GraduationCap className="size-3.5 text-[#161514] stroke-[2.5]" />
           </div>
           <h2 className="font-heading font-black text-base text-[#161514] tracking-tight">
-            Study Sprint Hub
+            Study Focus
           </h2>
         </div>
         <div className="text-right">
@@ -89,53 +96,16 @@ export function StudySprintWidget({
         />
       </div>
 
-      {/* Stopwatch Tactical Card */}
-      <div className="p-4 sm:p-5 rounded-xl bg-[#FBF9F5] border-2 border-[#161514] shadow-[2px_2px_0px_#161514] text-center space-y-3">
-        <div className="font-mono font-black text-3xl sm:text-4xl lg:text-5xl tracking-widest text-[#161514] tabular-nums">
-          {formatTimer(stopwatchSeconds)}
-        </div>
-
-        {/* Subject & Topic Pickers */}
-        <div className="grid grid-cols-2 gap-2 text-left">
-          <div>
-            <label className="text-[10px] font-heading font-extrabold uppercase text-[#161514]/70 block mb-1">
-              Subject
-            </label>
-            <select
-              value={selectedSubjectId}
-              onChange={(e) => onChangeSubject(e.target.value)}
-              className="w-full text-xs font-bold px-2.5 py-2 min-h-[38px] rounded-lg border-2 border-[#161514] bg-white outline-none cursor-pointer shadow-[1px_1px_0px_#161514] focus:ring-1 focus:ring-[#161514]"
-            >
-              <option value="">General Focus</option>
-              {subjects.map((sub) => (
-                <option key={sub.id} value={sub.id}>
-                  {sub.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="text-[10px] font-heading font-extrabold uppercase text-[#161514]/70 block mb-1">
-              Topic
-            </label>
-            <select
-              value={selectedTopicId}
-              onChange={(e) => onChangeTopic(e.target.value)}
-              className="w-full text-xs font-bold px-2.5 py-2 min-h-[38px] rounded-lg border-2 border-[#161514] bg-white outline-none cursor-pointer shadow-[1px_1px_0px_#161514] focus:ring-1 focus:ring-[#161514]"
-            >
-              <option value="">Current Topic</option>
-              {filteredTopics.map((top) => (
-                <option key={top.id} value={top.id}>
-                  {top.title}
-                </option>
-              ))}
-            </select>
+      {/* Stopwatch Tactical Card (Flex-1 to dynamically match sibling height) */}
+      <div className="flex-1 p-4 sm:p-5 rounded-xl bg-[#FBF9F5] border-2 border-[#161514] shadow-[2px_2px_0px_#161514] text-center flex flex-col justify-between space-y-3">
+        <div className="my-auto py-2">
+          <div className="font-mono font-black text-3xl sm:text-4xl lg:text-5xl tracking-widest text-[#161514] tabular-nums">
+            {formatTimer(stopwatchSeconds)}
           </div>
         </div>
 
-        {/* Action Controls */}
-        <div className="flex items-center justify-center gap-2 pt-1">
+        {/* Primary Action Controls (Thumb-Zone Priority) */}
+        <div className="flex items-center justify-center gap-2 pt-0.5">
           <Button
             onClick={onToggleTimer}
             className={cn(
@@ -185,18 +155,45 @@ export function StudySprintWidget({
             </>
           )}
         </div>
-      </div>
 
-      {/* Footer Navigation Link */}
-      <div className="pt-2 border-t border-[#161514]/15 flex items-center justify-between text-xs">
-        <span className="text-[#161514]/60 font-medium">Syllabus & exam countdowns</span>
-        <Link
-          href="/study"
-          className="font-heading font-black text-[#161514] hover:underline flex items-center gap-1"
-        >
-          <span>Study Hub</span>
-          <ArrowRight className="size-3.5" />
-        </Link>
+        {/* Compact Subject & Topic Configuration Row */}
+        <div className="grid grid-cols-2 gap-2 text-left pt-1 border-t border-[#161514]/10">
+          <div>
+            <label className="text-[10px] font-heading font-extrabold uppercase text-[#161514]/70 block mb-1">
+              Subject
+            </label>
+            <select
+              value={selectedSubjectId}
+              onChange={(e) => onChangeSubject(e.target.value)}
+              className="w-full text-xs font-bold px-2 py-1.5 min-h-[36px] rounded-lg border-2 border-[#161514] bg-white outline-none cursor-pointer shadow-[1px_1px_0px_#161514] focus:ring-1 focus:ring-[#161514]"
+            >
+              <option value="">General Focus</option>
+              {subjects.map((sub) => (
+                <option key={sub.id} value={sub.id}>
+                  {sub.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="text-[10px] font-heading font-extrabold uppercase text-[#161514]/70 block mb-1">
+              Topic
+            </label>
+            <select
+              value={selectedTopicId}
+              onChange={(e) => onChangeTopic(e.target.value)}
+              className="w-full text-xs font-bold px-2 py-1.5 min-h-[36px] rounded-lg border-2 border-[#161514] bg-white outline-none cursor-pointer shadow-[1px_1px_0px_#161514] focus:ring-1 focus:ring-[#161514]"
+            >
+              <option value="">Current Topic</option>
+              {filteredTopics.map((top) => (
+                <option key={top.id} value={top.id}>
+                  {top.title}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -11,6 +11,7 @@ import {
   CheckSquare,
   ChevronRight,
   Zap,
+  Moon,
 } from "lucide-react";
 import { VixPixelCompanion, VixPixelState } from "@/components/mascot/VixPixelCompanion";
 import {
@@ -49,6 +50,7 @@ export interface MasterTodayHeroProps {
   onScrollToMoney?: () => void;
   onToggleTimer?: () => void;
   onOpenExpenseModal?: () => void;
+  onOpenCloseoutDrawer?: () => void;
   className?: string;
 }
 
@@ -78,6 +80,7 @@ export function MasterTodayHero({
   onScrollToMoney,
   onToggleTimer,
   onOpenExpenseModal,
+  onOpenCloseoutDrawer,
   className,
 }: MasterTodayHeroProps) {
   // Determine pixel companion state
@@ -261,6 +264,26 @@ export function MasterTodayHero({
                     <Wallet className="size-3 text-[#161514] stroke-[2.5]" />
                   </div>
                   <span>+ Log Expense</span>
+                </button>
+              )}
+
+              {/* Closeout / Evening Review Drawer Trigger */}
+              {onOpenCloseoutDrawer && (
+                <button
+                  type="button"
+                  onClick={() => handleInteractiveClick(onOpenCloseoutDrawer)}
+                  className={cn(
+                    "min-h-[42px] px-3.5 py-2 border-2 border-[#161514] rounded-xl shadow-[2.5px_2.5px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 flex items-center gap-1.5 font-heading font-black text-xs text-[#161514] transition-all cursor-pointer",
+                    effectiveDaypart === "night"
+                      ? "bg-[#C084FC] hover:bg-[#D4A8FF]"
+                      : "bg-white hover:bg-[#F3EFEA]"
+                  )}
+                  title="Open Evening Closeout & Reflection Drawer"
+                >
+                  <div className="size-5 rounded-md bg-[#161514] text-white flex items-center justify-center shrink-0">
+                    <Moon className="size-3 text-[#CEF431]" />
+                  </div>
+                  <span>{effectiveDaypart === "night" ? "Review & Seal Day" : "Review Day"}</span>
                 </button>
               )}
             </div>

@@ -16,6 +16,7 @@ interface HabitMomentumCardProps {
   waterAmount?: number;
   waterTarget?: number;
   onQuickLogWater?: () => void;
+  className?: string;
 }
 
 export function HabitMomentumCard({
@@ -27,6 +28,7 @@ export function HabitMomentumCard({
   waterAmount,
   waterTarget = 2000,
   onQuickLogWater,
+  className,
 }: HabitMomentumCardProps) {
   const [habitFilter, setHabitFilter] = useState<'all' | 'pending' | 'completed'>('all');
 
@@ -52,7 +54,13 @@ export function HabitMomentumCard({
   }, [activeHabits, logs, habitFilter]);
 
   return (
-    <div id="habits-section" className="bg-white border-2 border-[#161514] p-5 rounded-xl shadow-[3px_3px_0px_#161514] space-y-4">
+    <div
+      id="habits-section"
+      className={cn(
+        "bg-white border-2 border-[#161514] p-5 rounded-xl shadow-[3px_3px_0px_#161514] flex flex-col justify-between space-y-4",
+        className
+      )}
+    >
       {/* Header & Filter Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-[#161514]/15 pb-3">
         <div className="flex items-center gap-2.5">
@@ -149,9 +157,6 @@ export function HabitMomentumCard({
                 ? 'All pending habits cleared!'
                 : 'No habits scheduled for today.'}
             </p>
-            <p className="text-xs text-[#161514]/60">
-              Keep your streak alive by logging consistent actions.
-            </p>
           </div>
           <Button variant="outline" size="sm" asChild>
             <Link href="/goals">
@@ -161,7 +166,7 @@ export function HabitMomentumCard({
           </Button>
         </div>
       ) : (
-        <div className="space-y-2.5">
+        <div className="flex-1 overflow-y-auto max-h-[300px] sm:max-h-[320px] space-y-2.5 pr-1 scrollbar-thin">
           {filteredHabits.map((habit) => {
             const isDone = logs.some((l) => l.habitId === habit.id && l.completed);
             const streakData = streaks[habit.id];
@@ -225,18 +230,6 @@ export function HabitMomentumCard({
           })}
         </div>
       )}
-
-      {/* Footer Navigation Link */}
-      <div className="pt-2 border-t border-[#161514]/15 flex items-center justify-between text-xs">
-        <span className="text-[#161514]/60 font-medium">Routine configuration & splits</span>
-        <Link
-          href="/goals"
-          className="font-heading font-black text-[#161514] hover:underline flex items-center gap-1"
-        >
-          <span>Habits Hub</span>
-          <ArrowRight className="size-3.5" />
-        </Link>
-      </div>
     </div>
   );
 }

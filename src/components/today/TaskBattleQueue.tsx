@@ -10,12 +10,14 @@ interface TaskBattleQueueProps {
   tasks: TaskItem[];
   onCompleteTask: (taskId: string, title: string) => void;
   selectedDate: string;
+  className?: string;
 }
 
 export function TaskBattleQueue({
   tasks,
   onCompleteTask,
   selectedDate,
+  className,
 }: TaskBattleQueueProps) {
   // Filter for pending high-priority or due-today tasks
   const priorityTasks = tasks
@@ -28,7 +30,13 @@ export function TaskBattleQueue({
     .slice(0, 5);
 
   return (
-    <div id="tasks-section" className="bg-white border-2 border-[#161514] p-5 rounded-xl shadow-[3px_3px_0px_#161514] space-y-4">
+    <div
+      id="tasks-section"
+      className={cn(
+        "bg-white border-2 border-[#161514] p-5 rounded-xl shadow-[3px_3px_0px_#161514] flex flex-col justify-between space-y-4",
+        className
+      )}
+    >
       {/* Header */}
       <div className="flex items-center justify-between border-b-2 border-[#161514]/15 pb-3">
         <div className="flex items-center gap-2">
@@ -51,19 +59,16 @@ export function TaskBattleQueue({
 
       {/* Task Items */}
       {priorityTasks.length === 0 ? (
-        <div className="p-6 text-center space-y-2 bg-[#FBF9F5] border-2 border-dashed border-[#161514]/25 rounded-xl">
+        <div className="flex-1 p-6 text-center space-y-2 bg-[#FBF9F5] border-2 border-dashed border-[#161514]/20 rounded-xl flex flex-col items-center justify-center">
           <div className="size-9 rounded-full bg-[#03D26F]/20 border-2 border-[#161514] flex items-center justify-center mx-auto text-[#03D26F]">
             <ShieldCheck className="size-5 text-[#161514]" />
           </div>
           <p className="font-heading font-black text-sm text-[#161514]">
             All Priorities Cleared
           </p>
-          <p className="text-xs text-[#161514]/65">
-            No urgent or high-priority targets pending for today.
-          </p>
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="flex-1 overflow-y-auto max-h-[220px] sm:max-h-[260px] space-y-2 pr-1 scrollbar-thin">
           {priorityTasks.map((task) => {
             const completedSubtasksCount = task.subtasks?.filter((s) => s.completed).length || 0;
             const totalSubtasksCount = task.subtasks?.length || 0;

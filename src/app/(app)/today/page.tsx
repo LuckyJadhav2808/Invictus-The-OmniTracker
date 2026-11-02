@@ -37,8 +37,8 @@ import { HabitMomentumCard } from "@/components/today/HabitMomentumCard";
 import { StudySprintWidget } from "@/components/today/StudySprintWidget";
 import { SafeToSpendGauge } from "@/components/today/SafeToSpendGauge";
 import { TaskBattleQueue } from "@/components/today/TaskBattleQueue";
-import { RetroStickyScratchpad } from "@/components/today/RetroStickyScratchpad";
-import { GladiatorCloseoutCard } from "@/components/today/GladiatorCloseoutCard";
+import { RetroStickyScratchpadDrawer } from "@/components/today/RetroStickyScratchpadDrawer";
+import { EveningCloseoutDrawer } from "@/components/today/EveningCloseoutDrawer";
 import { StickyIslandMiniCockpit } from "@/components/today/StickyIslandMiniCockpit";
 import { ConfettiCelebration } from "@/components/common/ConfettiCelebration";
 import { useTodayCockpitViewModel, computeDailyConquestScore } from "@/components/today/useTodayCockpitViewModel";
@@ -89,6 +89,8 @@ export default function TodayPage() {
   const { data: cloudBudgetPrefs } = useBudgetPreferences();
   const updateBudgetMutation = useUpdateBudgetPreferences();
   const [isDailyLimitModalOpen, setIsDailyLimitModalOpen] = useState(false);
+  const [isCloseoutDrawerOpen, setIsCloseoutDrawerOpen] = useState(false);
+  const [isScratchpadDrawerOpen, setIsScratchpadDrawerOpen] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const previousConqueredRef = useRef(false);
   const isInitialMountRef = useRef(true);
@@ -519,13 +521,15 @@ export default function TodayPage() {
         onScrollToMoney={scrollToMoney}
         onToggleTimer={() => setIsTimerRunning(!isTimerRunning)}
         onOpenExpenseModal={() => setIsQuickExpenseOpen(true)}
+        onOpenCloseoutDrawer={() => setIsCloseoutDrawerOpen(true)}
       />
 
-      {/* ZONE 2: DAILY CORE HUB (Bento Row 1 - Habits & Study Focus) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      {/* ZONE 2: DAILY CORE HUB (Bento Row 1 - Habits & Study Focus - Locked Baseline) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
         {/* Habit Momentum Card (7 Cols) */}
-        <div id="habits-section" className="lg:col-span-7">
+        <div id="habits-section" className="lg:col-span-7 h-full">
           <HabitMomentumCard
+            className="h-full flex flex-col justify-between"
             habits={habits}
             logs={logs}
             streaks={streaks}
@@ -544,8 +548,9 @@ export default function TodayPage() {
         </div>
 
         {/* Study Sprint Stopwatch Widget (5 Cols) */}
-        <div id="study-section" className="lg:col-span-5">
+        <div id="study-section" className="lg:col-span-5 h-full">
           <StudySprintWidget
+            className="h-full flex flex-col justify-between"
             stopwatchSeconds={stopwatchSeconds}
             isTimerRunning={isTimerRunning}
             onToggleTimer={() => setIsTimerRunning(!isTimerRunning)}
@@ -566,11 +571,12 @@ export default function TodayPage() {
         </div>
       </div>
 
-      {/* ZONE 3: OPERATIONS HUB (Bento Row 2 - Balanced 6:6 Ratio) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      {/* ZONE 3: OPERATIONS HUB (Bento Row 2 - Money & Tasks - Locked Baseline) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
         {/* Safe-to-Spend Financial Gauge (6 Cols) */}
-        <div id="money-section" className="lg:col-span-6">
+        <div id="money-section" className="lg:col-span-6 h-full">
           <SafeToSpendGauge
+            className="h-full flex flex-col justify-between"
             spentToday={spentToday}
             dailySafeToSpend={budgetStats.dailySafeToSpend}
             customDailyBudget={customDailyBudget}
@@ -586,8 +592,9 @@ export default function TodayPage() {
         </div>
 
         {/* Priority Battle Queue (6 Cols) */}
-        <div id="tasks-section" className="lg:col-span-6">
+        <div id="tasks-section" className="lg:col-span-6 h-full">
           <TaskBattleQueue
+            className="h-full flex flex-col justify-between"
             tasks={tasks}
             selectedDate={selectedDate}
             onCompleteTask={(taskId, title) => {
@@ -601,8 +608,10 @@ export default function TodayPage() {
         </div>
       </div>
 
-      {/* ZONE 4: THE INDIVIDUAL DESK POST-IT NOTE (Student Analog Desk Pad) */}
-      <RetroStickyScratchpad
+      {/* ZONE 4: ON-DEMAND SLIDE-OVER DESK SCRATCHPAD & FLOATING ACTION DOCK */}
+      <RetroStickyScratchpadDrawer
+        open={isScratchpadDrawerOpen}
+        onOpenChange={setIsScratchpadDrawerOpen}
         categories={categories}
         onConvertToTask={(task) => {
           createTaskMutation.mutate({
@@ -638,8 +647,10 @@ export default function TodayPage() {
         }}
       />
 
-      {/* ZONE 5: NIGHT CLOSEOUT THERMAL RECEIPT SLIP */}
-      <GladiatorCloseoutCard
+      {/* ZONE 5: CONTEXTUAL EVENING CLOSEOUT DRAWER (Bottom Sheet Triggered at Night / on Demand) */}
+      <EveningCloseoutDrawer
+        open={isCloseoutDrawerOpen}
+        onOpenChange={setIsCloseoutDrawerOpen}
         metrics={conquestMetrics}
         selectedDate={selectedDate}
         isToday={isCurrentDayToday}

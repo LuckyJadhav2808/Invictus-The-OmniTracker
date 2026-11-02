@@ -12,6 +12,7 @@ import {
   CheckCheck,
   RotateCcw,
   Tag,
+  ChevronDown,
 } from "lucide-react";
 import { soundFX } from "@/components/shared/SoundFX";
 import { toast } from "sonner";
@@ -71,6 +72,7 @@ export function RetroStickyScratchpad({
   const [content, setContent] = useState<string>("");
   const [isSaved, setIsSaved] = useState(true);
   const [cursorIndex, setCursorIndex] = useState<number>(0);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -80,9 +82,22 @@ export function RetroStickyScratchpad({
       try {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) setContent(saved);
+        const savedCollapse = localStorage.getItem("invictus_scratchpad_collapsed");
+        if (savedCollapse === "true") setIsCollapsed(true);
       } catch {}
     }
   }, []);
+
+  const toggleCollapse = () => {
+    soundFX.playPop();
+    const next = !isCollapsed;
+    setIsCollapsed(next);
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("invictus_scratchpad_collapsed", String(next));
+      } catch {}
+    }
+  };
 
   // 2. Debounced auto-save (300ms)
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -348,33 +363,53 @@ export function RetroStickyScratchpad({
   return (
     <div
       className={cn(
-        "relative bg-[#FEF9C3] rounded-2xl border-2 border-[#161514] p-4 sm:p-5 shadow-[4px_4px_0px_0px_#161514]",
-        "sm:-rotate-1 hover:rotate-0 transition-transform duration-200 select-text flex flex-col justify-between",
-        "min-h-[280px]",
+        "relative bg-[#FEF9C3] rounded-2xl border-2 border-[#161514] p-3.5 sm:p-4 shadow-[3px_3px_0px_0px_#161514]",
+        "transition-all duration-200 select-text flex flex-col justify-between",
+        isCollapsed ? "min-h-0" : "min-h-[260px] sm:-rotate-1 hover:rotate-0",
         className
       )}
     >
       {/* Physical Washi Tape Strip Simulation at Top */}
-      <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-28 h-6 bg-[#E2E8F0]/90 border border-[#161514] rotate-2 shadow-sm rounded-sm pointer-events-none flex items-center justify-center">
-        <span className="text-[9px] font-mono tracking-widest text-[#161514]/60 font-black uppercase">
-          SCRATCHPAD
-        </span>
-      </div>
+      {!isCollapsed && (
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-28 h-6 bg-[#E2E8F0]/90 border border-[#161514] rotate-2 shadow-sm rounded-sm pointer-events-none flex items-center justify-center">
+          <span className="text-[9px] font-mono tracking-widest text-[#161514]/60 font-black uppercase">
+            SCRATCHPAD
+          </span>
+        </div>
+      )}
 
-      {/* Header bar */}
-      <div className="flex items-center justify-between border-b border-[#161514]/20 pb-2 pt-1">
-        <div className="flex items-center gap-1.5">
+      {/* Header bar with toggle */}
+      <div className={cn("flex items-center justify-between", !isCollapsed && "border-b border-[#161514]/20 pb-2 pt-1")}>
+        <button
+          type="button"
+          onClick={toggleCollapse}
+          className="flex items-center gap-2 cursor-pointer group text-left active:scale-[0.98] transition-transform"
+          title={isCollapsed ? "Expand scratchpad" : "Minimize scratchpad"}
+        >
           <FileText className="size-4 stroke-[2.5] text-[#161514]" />
           <span className="font-heading font-black text-xs text-[#161514] uppercase tracking-wider">
             Quick Sticky Note
           </span>
-        </div>
+          {content && (
+            <span className="text-[10px] font-mono text-[#161514]/70 font-bold tabular-nums">
+              ({wordCount} words{eligibleItemCount > 0 ? ` • ${eligibleItemCount} ready` : ""})
+            </span>
+          )}
+          <ChevronDown
+            className={cn(
+              "size-3.5 text-[#161514]/60 group-hover:text-[#161514] transition-transform duration-200",
+              !isCollapsed && "rotate-180"
+            )}
+          />
+        </button>
 
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-mono text-[#161514]/60 font-bold">
-            {isSaved ? "Saved ✦" : "Typing…"}
-          </span>
-          {content && (
+          {!isCollapsed && (
+            <span className="text-[10px] font-mono text-[#161514]/60 font-bold">
+              {isSaved ? "Saved ✦" : "Typing…"}
+            </span>
+          )}
+          {content && !isCollapsed && (
             <button
               type="button"
               onClick={handleClearAll}
@@ -384,11 +419,22 @@ export function RetroStickyScratchpad({
               <Trash2 className="size-3.5" />
             </button>
           )}
+          {isCollapsed && (
+            <button
+              type="button"
+              onClick={toggleCollapse}
+              className="text-[10px] font-mono font-bold text-[#161514]/70 hover:text-[#161514] underline cursor-pointer"
+            >
+              Open Pad
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Ruled Ruled Writing Body */}
-      <div className="flex-1 my-2 relative">
+      {!isCollapsed && (
+        <>
+          {/* Ruled Ruled Writing Body */}
+          <div className="flex-1 my-2 relative">
         <textarea
           ref={textareaRef}
           value={content}
@@ -516,6 +562,8 @@ export function RetroStickyScratchpad({
           </span>
         </div>
       </div>
-    </div>
+      </>
+    )}
+  </div>
   );
 }
