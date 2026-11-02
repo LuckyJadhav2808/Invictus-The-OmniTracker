@@ -88,11 +88,12 @@ export function SafeToSpendGauge({
               variant="outline"
               size="xs"
               onClick={onOpenSetDailyLimit}
+              aria-label="Set Daily Spending Limit"
               className="border border-[#E8E5DF] hover:bg-[#F5F3EF] min-h-[34px] px-2.5 cursor-pointer text-xs font-medium text-[#161514]"
               title="Set Daily Spending Amount"
             >
               <Sliders className="size-3 stroke-[1.5]" />
-              <span className="hidden sm:inline">{isCustomCap ? `${currencySymbol}${customDailyBudget}/d` : "Set Limit"}</span>
+              <span className="hidden sm:inline">Set Limit</span>
             </Button>
           )}
 

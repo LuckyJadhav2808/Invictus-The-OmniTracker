@@ -119,17 +119,32 @@ export function QuickActionModal() {
     };
   }, []);
 
-  // Keyboard shortcut listener (Ctrl+E or Cmd+E for instant expense modal)
+  // Keyboard shortcut listener (Ctrl+E or Cmd+E for expense, Ctrl+K or Cmd+K for general actions)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "e") {
+      if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === "e" || e.key.toLowerCase() === "k")) {
         e.preventDefault();
-        setActiveTab("expense");
+        if (e.key.toLowerCase() === "e") {
+          setActiveTab("expense");
+        }
         setIsOpen((prev) => !prev);
       }
     };
+
+    const handleCustomOpen = (e: Event) => {
+      const customEvent = e as CustomEvent<{ tab?: "expense" | "habits" }>;
+      if (customEvent.detail?.tab) {
+        setActiveTab(customEvent.detail.tab);
+      }
+      setIsOpen(true);
+    };
+
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener("invictus:open-quick-actions", handleCustomOpen);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("invictus:open-quick-actions", handleCustomOpen);
+    };
   }, []);
 
   // Auto focus amount input on open

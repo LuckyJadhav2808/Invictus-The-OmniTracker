@@ -357,24 +357,24 @@ export function RetroStickyScratchpadDrawer({
         }}
         className={cn(
           "fixed right-4 sm:right-6 z-40",
-          "bottom-[calc(5.25rem+env(safe-area-inset-bottom,0px))] lg:bottom-6",
-          "bg-white hover:bg-[#F5F3EF] text-[#161514] border border-[#E8E5DF]",
-          "px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-xl shadow-md",
-          "active:translate-y-px flex items-center gap-2",
-          "font-medium text-xs cursor-pointer transition-colors select-none"
+          "bottom-[calc(7.75rem+env(safe-area-inset-bottom,0px))] lg:bottom-6",
+          "bg-white hover:bg-[#F5F3EF] text-[#161514] border-2 border-[#161514]",
+          "size-11 sm:size-auto sm:px-3.5 sm:py-2.5 rounded-xl shadow-[2.5px_2.5px_0px_0px_#161514]",
+          "active:translate-x-0.5 active:translate-y-0.5 active:shadow-none flex items-center justify-center sm:gap-2",
+          "font-heading font-bold text-xs cursor-pointer transition-all select-none"
         )}
         aria-label="Open Scratchpad (Cmd+J)"
         title="Open Scratchpad (Cmd+J)"
       >
         <div className="size-6 rounded-md bg-[#F1EFEA] flex items-center justify-center shrink-0">
-          <FileText className="size-3.5 text-[#161514] stroke-[1.5]" />
+          <FileText className="size-4 text-[#161514] stroke-[2]" />
         </div>
-        <span>Scratchpad</span>
-        <kbd className="hidden sm:inline-block font-mono text-[10px] bg-[#F1EFEA] border border-[#E8E5DF] px-1.5 py-0.5 rounded text-[#6B6B6B]">
+        <span className="hidden sm:inline">Scratchpad</span>
+        <kbd className="hidden sm:inline-block font-mono text-[10px] bg-[#F1EFEA] border border-[#161514]/30 px-1.5 py-0.5 rounded text-[#161514]">
           ⌘J
         </kbd>
         {activeLinesCount > 0 && (
-          <span className="size-2 rounded-full bg-[#03D26F]" />
+          <span className="size-2 rounded-full bg-[#03D26F] animate-pulse" />
         )}
       </button>
 

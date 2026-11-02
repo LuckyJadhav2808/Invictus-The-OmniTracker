@@ -206,7 +206,9 @@ export function HabitMomentumCard({
                       {habit.title}
                     </p>
                     <div className="flex items-center gap-2 mt-0.5 text-xs text-[#6B6B6B]">
-                      <span className="capitalize">{habit.frequency?.type || 'Daily'}</span>
+                      <span className="capitalize">
+                        {habit.frequency?.type === 'customDays' ? 'Custom Schedule' : (habit.frequency?.type || 'Daily')}
+                      </span>
                       {streakData?.currentStreak > 0 && (
                         <span className="flex items-center gap-0.5 text-orange-600 font-medium">
                           <Flame className="size-3 fill-orange-500" />

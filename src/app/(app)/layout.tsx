@@ -102,7 +102,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       {/* Main Content Viewport */}
       <main
         id="main-scroll-container"
-        className="flex-1 pb-24 lg:pb-0 min-h-screen relative overflow-y-auto flex flex-col"
+        className="flex-1 pb-36 lg:pb-0 min-h-screen relative overflow-y-auto flex flex-col"
       >
         {/* Proactive Auto-Update Notification Banner */}
         <AutoUpdateBanner />
@@ -118,7 +118,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Minimalist Production Status Footer */}
-        <footer className="mt-auto border-t-2 border-[#161514]/15 py-4 px-6 text-center sm:flex sm:items-center sm:justify-between max-w-6xl mx-auto w-full text-[#161514]/60 text-[11px] font-semibold gap-4 select-none">
+        <footer className="mt-auto border-t-2 border-[#161514]/15 py-4 px-6 lg:pr-64 text-center sm:flex sm:items-center sm:justify-between max-w-6xl mx-auto w-full text-[#161514]/60 text-[11px] font-semibold gap-4 select-none">
           <div className="flex items-center justify-center sm:justify-start gap-2">
             <span className="font-heading font-black text-[#161514]">Invictus OS</span>
             <span>•</span>
@@ -128,9 +128,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="flex items-center justify-center gap-3">
-            <span className="bg-white border-2 border-[#161514] px-2.5 py-1 rounded-lg text-[10px] font-heading font-extrabold text-[#161514] flex items-center gap-1 shadow-[1.5px_1.5px_0px_0px_#161514]">
-              <kbd className="font-mono bg-[#F1EFEA] px-1 rounded border border-[#161514]/30">⌘ K</kbd> Quick Actions
-            </span>
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof window !== "undefined") {
+                  window.dispatchEvent(new CustomEvent("invictus:open-quick-actions"));
+                }
+              }}
+              className="bg-white border-2 border-[#161514] px-2.5 py-1 rounded-lg text-[10px] font-heading font-extrabold text-[#161514] flex items-center gap-1.5 shadow-[1.5px_1.5px_0px_0px_#161514] hover:bg-[#F1EFEA] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
+              title="Open Command Palette (⌘K)"
+            >
+              <kbd className="font-mono bg-[#F1EFEA] px-1 rounded border border-[#161514]/30">⌘ K</kbd>
+              <span>Quick Actions</span>
+            </button>
             <span>•</span>
             <span className="flex items-center gap-1.5">
               <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />

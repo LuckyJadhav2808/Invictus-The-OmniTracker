@@ -98,13 +98,54 @@ export function StudySprintWidget({
 
       {/* Stopwatch Tactical Card (One Craft Moment) */}
       <div className="flex-1 p-4 sm:p-5 rounded-xl bg-[#FBF9F5] border border-[#E8E5DF] text-center flex flex-col justify-between space-y-3">
+        {/* Step 1: Compact Subject & Topic Configuration Row (Context First) */}
+        <div className="grid grid-cols-2 gap-2 text-left pb-2.5 border-b border-[#E8E5DF]">
+          <div>
+            <label className="text-[11px] font-medium text-[#6B6B6B] block mb-1">
+              Subject
+            </label>
+            <select
+              value={selectedSubjectId}
+              onChange={(e) => onChangeSubject(e.target.value)}
+              className="w-full text-xs font-normal px-2.5 py-1.5 min-h-[36px] rounded-lg border border-[#E8E5DF] bg-white text-[#161514] outline-none cursor-pointer focus:border-[#161514]"
+            >
+              <option value="">General Focus</option>
+              {subjects.map((sub) => (
+                <option key={sub.id} value={sub.id}>
+                  {sub.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="text-[11px] font-medium text-[#6B6B6B] block mb-1">
+              Topic
+            </label>
+            <select
+              value={selectedTopicId}
+              onChange={(e) => onChangeTopic(e.target.value)}
+              disabled={!selectedSubjectId}
+              className="w-full text-xs font-normal px-2.5 py-1.5 min-h-[36px] rounded-lg border border-[#E8E5DF] bg-white text-[#161514] outline-none cursor-pointer focus:border-[#161514] disabled:opacity-50"
+            >
+              <option value="">Current Topic</option>
+              {filteredTopics.map((top) => (
+                <option key={top.id} value={top.id}>
+                  {top.title}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Step 2: Big Stopwatch Display */}
         <div className="my-auto py-2">
           <div className="font-mono font-bold text-3xl sm:text-4xl lg:text-5xl tracking-widest text-[#161514] tabular-nums">
             {formatTimer(stopwatchSeconds)}
           </div>
         </div>
 
-        {/* Primary Action Controls */}
+        {/* Step 3: Primary Action Controls */}
         <div className="flex items-center justify-center gap-2 pt-0.5">
           <Button
             onClick={onToggleTimer}
@@ -151,45 +192,6 @@ export function StudySprintWidget({
               </Button>
             </>
           )}
-        </div>
-
-        {/* Compact Subject & Topic Configuration Row */}
-        <div className="grid grid-cols-2 gap-2 text-left pt-2 border-t border-[#E8E5DF]">
-          <div>
-            <label className="text-xs font-medium text-[#6B6B6B] block mb-1">
-              Subject
-            </label>
-            <select
-              value={selectedSubjectId}
-              onChange={(e) => onChangeSubject(e.target.value)}
-              className="w-full text-xs font-normal px-2.5 py-1.5 min-h-[36px] rounded-lg border border-[#E8E5DF] bg-white text-[#161514] outline-none cursor-pointer focus:border-[#161514]"
-            >
-              <option value="">General Focus</option>
-              {subjects.map((sub) => (
-                <option key={sub.id} value={sub.id}>
-                  {sub.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="text-xs font-medium text-[#6B6B6B] block mb-1">
-              Topic
-            </label>
-            <select
-              value={selectedTopicId}
-              onChange={(e) => onChangeTopic(e.target.value)}
-              className="w-full text-xs font-normal px-2.5 py-1.5 min-h-[36px] rounded-lg border border-[#E8E5DF] bg-white text-[#161514] outline-none cursor-pointer focus:border-[#161514]"
-            >
-              <option value="">Current Topic</option>
-              {filteredTopics.map((top) => (
-                <option key={top.id} value={top.id}>
-                  {top.title}
-                </option>
-              ))}
-            </select>
-          </div>
         </div>
       </div>
     </div>
