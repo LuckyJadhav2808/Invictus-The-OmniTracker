@@ -116,9 +116,9 @@ describe("Cross-Device Data Hydration Engine", () => {
     const result = hydrateDeviceFromCloud(userWithoutBudget);
     expect(result).toBe(true);
 
-    // Falls back to safe ₹8,000 UPI and ₹2,000 Cash defaults
+    // Falls back to safe ₹8,000 UPI and ₹2,000 Cash defaults, rollover defaulted to OFF
     expect(mockStorage["invictus_monthly_upi_budget"]).toBe("8000");
     expect(mockStorage["invictus_monthly_cash_budget"]).toBe("2000");
-    expect(mockStorage["invictus_budget_rollover_enabled"]).toBe("true");
+    expect(mockStorage["invictus_budget_rollover_enabled"]).toBe("false");
   });
 });

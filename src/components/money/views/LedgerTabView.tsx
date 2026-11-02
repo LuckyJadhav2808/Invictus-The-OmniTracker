@@ -4,9 +4,9 @@ import React, { useState, useMemo, useEffect } from "react";
 import { type Transaction, type Category } from "@/types";
 import { cn } from "@/lib/utils";
 import { format, parseISO, isToday, isYesterday } from "date-fns";
-import { Search, Filter, FileDown, Plus, Copy, Edit2, Trash2, Calendar } from "lucide-react";
+import { Search, Filter, FileDown, Plus, Copy, Edit2, Trash2, Calendar, Zap, Smartphone, Banknote, Globe, Receipt } from "lucide-react";
 import { soundFX } from "@/components/shared/SoundFX";
-import { renderCategoryEmoji, MoneyQuickActionsAndCards } from "@/components/money/MoneyQuickActionsAndCards";
+import { renderCategoryEmoji, CategoryIcon, MoneyQuickActionsAndCards } from "@/components/money/MoneyQuickActionsAndCards";
 import { isCashTransaction, isOnlineTransaction, type MonthlyBudgetStats } from "@/lib/utils/budget-rollover";
 
 interface LedgerTabViewProps {
@@ -338,7 +338,7 @@ export function LedgerTabView({
               onChange={(e) => setSelectedMonth(e.target.value)}
               className="bg-transparent text-[10px] font-black uppercase text-[#161514] focus:outline-none cursor-pointer"
             >
-              <option value="all">📅 All Time (All Months)</option>
+              <option value="all">All Time (All Months)</option>
               {availableMonths.map((m) => (
                 <option key={m.key} value={m.key}>
                   {m.label} {m.isCurrent ? "• Current" : ""}
@@ -370,8 +370,8 @@ export function LedgerTabView({
           <div className="flex gap-1 bg-white p-1 rounded-xl border border-[#161514]">
             {[
               { id: "all", label: "All Modes" },
-              { id: "upi", label: "📱 UPI" },
-              { id: "cash", label: "💵 Cash" },
+              { id: "upi", label: "UPI" },
+              { id: "cash", label: "Cash" },
             ].map((m) => (
               <button
                 key={m.id}
@@ -417,82 +417,25 @@ export function LedgerTabView({
         </div>
       </div>
 
-      {/* 📅 Monthly Remaining Days Runway & Telemetry Banner */}
-      {selectedMonth === activeMonthKey && monthlyStats ? (
-        <div className="bg-[#FAF8F5] border-2 border-[#161514] rounded-2xl p-3 sm:p-3.5 shadow-[2px_2px_0px_0px_#161514] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="size-9 rounded-xl bg-[#CEF431] border-2 border-[#161514] flex items-center justify-center text-base shadow-[1.5px_1.5px_0px_0px_#161514] shrink-0 font-bold">
-              ⚡
-            </div>
-            <div className="space-y-0.5">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[10px] font-black uppercase tracking-wider text-[#161514]/60">
-                  Daily Safe Spend Limit:
-                </span>
-                <span className="text-sm font-black text-[#161514] font-heading">
-                  ~{currencySymbol}{monthlyStats.dailySafeToSpend.toLocaleString()} / day
-                </span>
-                <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-[#161514] text-[#FAF8F5] font-mono">
-                  {monthlyStats.daysRemainingInMonth} {monthlyStats.daysRemainingInMonth === 1 ? "day" : "days"} left
-                </span>
-              </div>
-              <div className="text-[11px] font-bold text-[#161514]/80 flex items-center gap-1.5 flex-wrap">
-                <span>Calculation:</span>
-                <span className="font-mono bg-white px-1.5 py-0.5 rounded border border-[#161514]/30 text-[#161514]">
-                  {currencySymbol}{monthlyStats.remainingBudget.toLocaleString()} left ÷ {monthlyStats.daysRemainingInMonth} days
-                </span>
-                <span className="text-[#161514]/50">•</span>
-                <span>in {monthlyStats.targetMonthLabel}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Dual Channel Split Pills */}
-          <div className="flex items-center gap-1.5 flex-wrap md:shrink-0 text-[10px] font-black uppercase">
-            <div className="bg-white px-2.5 py-1.5 rounded-xl border border-[#161514] shadow-[1px_1px_0px_0px_#161514] text-[#161514] flex items-center gap-1.5">
-              <span>📱</span>
-              <span>UPI: ~{currencySymbol}{monthlyStats.dailySafeToSpendUpi.toLocaleString()}/day</span>
-            </div>
-            <div className="bg-[#FFF9EA] px-2.5 py-1.5 rounded-xl border border-[#161514] shadow-[1px_1px_0px_0px_#161514] text-[#161514] flex items-center gap-1.5">
-              <span>💵</span>
-              <span>Cash: ~{currencySymbol}{monthlyStats.dailySafeToSpendCash.toLocaleString()}/day</span>
-            </div>
-          </div>
-        </div>
-      ) : selectedMonth !== "all" ? (
-        <div className="bg-[#FAF8F5] border-2 border-[#161514] rounded-xl px-3 py-2 shadow-[1.5px_1.5px_0px_0px_#161514] flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs">
-          <div className="flex items-center gap-2">
-            <span className="text-sm">🗓️</span>
-            <span className="font-bold text-[#161514]">
-              Showing statement for <strong className="font-black underline">{availableMonths.find((m) => m.key === selectedMonth)?.label || selectedMonth}</strong>
-            </span>
-          </div>
-          <span className="text-[10px] font-black uppercase text-[#161514]/70 font-mono">
-            {selectedMonthSummary.count} {selectedMonthSummary.count === 1 ? "record" : "records"} • Spent: {currencySymbol}{selectedMonthSummary.expense.toLocaleString()}
+      {/* Statement Summary Strip */}
+      <div className="bg-[#FAF8F5] border-2 border-[#161514] rounded-xl px-3 py-2 shadow-[1.5px_1.5px_0px_0px_#161514] flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs">
+        <div className="flex items-center gap-2">
+          <Calendar className="size-3.5 text-[#161514]" />
+          <span className="font-bold text-[#161514]">
+            Showing statement for <strong className="font-black">{selectedMonth === "all" ? "All Time" : (availableMonths.find((m) => m.key === selectedMonth)?.label || selectedMonth)}</strong>
           </span>
         </div>
-      ) : (
-        <div className="bg-[#FAF8F5] border-2 border-[#161514] rounded-xl px-3 py-2 shadow-[1.5px_1.5px_0px_0px_#161514] flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs">
-          <div className="flex items-center gap-2">
-            <span className="text-sm">🌐</span>
-            <span className="font-bold text-[#161514]">
-              Viewing All-Time History across all months ({selectedMonthSummary.count} records)
-            </span>
-          </div>
-          <button
-            type="button"
-            onClick={() => setSelectedMonth(activeMonthKey)}
-            className="text-[10px] font-black uppercase text-[#161514] bg-[#CEF431] px-2 py-0.5 rounded border border-[#161514] hover:underline cursor-pointer sm:self-auto self-start"
-          >
-            Switch to This Month
-          </button>
-        </div>
-      )}
+        <span className="text-[10px] font-bold uppercase text-[#161514]/70 font-mono tabular-nums">
+          {selectedMonthSummary.count} {selectedMonthSummary.count === 1 ? "record" : "records"} • Spent: {currencySymbol}{selectedMonthSummary.expense.toLocaleString()}
+        </span>
+      </div>
 
-      {/* 📜 TRANSACTION FEED LIST */}
+      {/* TRANSACTION FEED LIST */}
       {groupedByDate.length === 0 ? (
         <div className="bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] p-8 text-center space-y-3">
-          <div className="text-4xl">🧾</div>
+          <div className="size-12 rounded-2xl bg-white border-2 border-[#161514] flex items-center justify-center mx-auto shadow-[1.5px_1.5px_0px_0px_#161514]">
+            <Receipt className="size-6 text-[#161514]" />
+          </div>
           <span className="text-sm font-black text-[#161514] block">No Transactions Found</span>
           <p className="text-xs text-[#161514]/70 max-w-sm mx-auto">
             {searchQuery || selectedCategory !== "all" || selectedType !== "all" || selectedMonth !== "all"
@@ -502,7 +445,7 @@ export function LedgerTabView({
           <button
             type="button"
             onClick={onOpenAddTransaction}
-            className="inline-flex items-center gap-1.5 bg-[#CEF431] text-[#161514] font-black text-xs uppercase px-4 py-2 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer"
+            className="inline-flex items-center gap-1.5 bg-[#CEF431] hover:bg-[#bde422] text-[#161514] font-black text-xs uppercase px-4 py-2 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all"
           >
             <Plus className="size-3.5 stroke-[3]" />
             <span>+ Log Transaction</span>
@@ -514,10 +457,10 @@ export function LedgerTabView({
             <div key={group.dateKey} className="space-y-2">
               {/* Date Group Header */}
               <div className="flex items-center justify-between px-1">
-                <span className="text-[11px] font-black uppercase tracking-wider text-[#161514] bg-[#FAF8F5] px-2.5 py-0.5 rounded-lg border border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
-                  📅 {group.label}
+                <span className="text-[11px] font-bold text-[#161514] bg-[#FAF8F5] px-2.5 py-0.5 rounded-lg border border-[#161514] shadow-[1px_1px_0px_0px_#161514] font-mono">
+                  {group.label}
                 </span>
-                <span className="text-[10px] font-bold text-[#161514]/60">
+                <span className="text-[10px] font-bold text-[#161514]/60 font-mono">
                   {group.items.length} record{group.items.length === 1 ? "" : "s"}
                 </span>
               </div>
@@ -532,12 +475,12 @@ export function LedgerTabView({
                     <div
                       key={tx.id}
                       onClick={() => onInspectTransaction(tx)}
-                      className="bg-white rounded-2xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] hover:shadow-[4px_4px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all p-3 sm:p-3.5 flex items-center justify-between gap-3 cursor-pointer group"
+                      className="bg-white rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:shadow-[3.5px_3.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all p-3 sm:p-3.5 flex items-center justify-between gap-3 cursor-pointer group"
                     >
                       {/* Left: Category Icon & Details */}
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="size-10 rounded-xl bg-[#FAF8F5] border-2 border-[#161514] flex items-center justify-center text-xl shrink-0 shadow-[1px_1px_0px_0px_#161514] group-hover:scale-105 transition-transform">
-                          {renderCategoryEmoji(cat?.icon)}
+                        <div className="size-10 rounded-xl bg-[#FAF8F5] border-2 border-[#161514] flex items-center justify-center shrink-0 shadow-[1px_1px_0px_0px_#161514] group-hover:scale-105 transition-transform text-[#161514]">
+                          <CategoryIcon name={cat?.icon} className="size-4" />
                         </div>
 
                         <div className="min-w-0 space-y-0.5">
@@ -546,11 +489,11 @@ export function LedgerTabView({
                           </span>
 
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="text-[9px] font-black uppercase text-[#161514]/70 bg-[#FAF8F5] px-1.5 py-0.2 rounded border border-[#161514]/20">
+                            <span className="text-[9px] font-bold uppercase text-[#161514]/70 bg-[#FAF8F5] px-1.5 py-0.2 rounded border border-[#161514]/20">
                               {cat?.name || "Uncategorized"}
                             </span>
-                            <span className="text-[9px] font-bold text-[#161514]/60 uppercase">
-                              {tx.paymentMethod === "cash" ? "💵 Cash" : "📱 " + (tx.paymentMethod || "UPI")}
+                            <span className="text-[9px] font-mono font-bold text-[#161514]/60 uppercase">
+                              {tx.paymentMethod === "cash" ? "Cash" : tx.paymentMethod || "UPI"}
                             </span>
                           </div>
                         </div>
@@ -560,8 +503,8 @@ export function LedgerTabView({
                       <div className="flex items-center gap-2 sm:gap-3 shrink-0">
                         <span
                           className={cn(
-                            "text-sm sm:text-base font-black font-heading",
-                            isIncome ? "text-emerald-700" : "text-rose-600"
+                            "text-sm sm:text-base font-black font-mono tabular-nums",
+                            isIncome ? "text-[#03D26F]" : "text-rose-600"
                           )}
                         >
                           {isIncome ? "+" : "-"}{currencySymbol}{Number(tx.amount).toLocaleString()}

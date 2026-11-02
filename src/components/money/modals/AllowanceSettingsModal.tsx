@@ -36,7 +36,7 @@ export function AllowanceSettingsModal({
   const [upiBudget, setUpiBudget] = useState("");
   const [cashBudget, setCashBudget] = useState("");
   const [customDailyBudget, setCustomDailyBudget] = useState("");
-  const [enableRollover, setEnableRollover] = useState(true);
+  const [enableRollover, setEnableRollover] = useState(defaultEnableRollover ?? false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {

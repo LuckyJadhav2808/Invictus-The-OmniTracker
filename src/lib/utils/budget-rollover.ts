@@ -115,7 +115,7 @@ export function computeMonthlyBudgetStats({
   baseCashBudget = 0,
   previousMonthUpiBudget,
   previousMonthCashBudget,
-  enableRollover = true,
+  enableRollover = false,
   cashRefillDate,
   currencySymbol = "₹",
 }: {

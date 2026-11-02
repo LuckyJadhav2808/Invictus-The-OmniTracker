@@ -264,7 +264,7 @@ export default function TodayPage() {
     ? cloudBudgetPrefs.cashBudget
     : (localCashBudget > 0 ? localCashBudget : 2000);
 
-  const enableRollover = cloudBudgetPrefs?.enableRollover ?? (typeof window !== "undefined" ? localStorage.getItem("invictus_budget_rollover_enabled") !== "false" : true);
+  const enableRollover = cloudBudgetPrefs?.enableRollover ?? (typeof window !== "undefined" ? localStorage.getItem("invictus_budget_rollover_enabled") === "true" : false);
   const customDailyBudget = cloudBudgetPrefs?.customDailyBudget ?? (typeof window !== "undefined" && localStorage.getItem("invictus_custom_daily_budget") ? Number(localStorage.getItem("invictus_custom_daily_budget")) : null);
 
   const budgetStats = useMemo(() => {

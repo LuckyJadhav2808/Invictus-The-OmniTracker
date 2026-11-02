@@ -18,17 +18,17 @@ export function VaultTabView({ currencySymbol }: VaultTabViewProps) {
         widgets={[
           {
             id: "subscriptions",
-            title: "🔁 Active Subscriptions",
+            title: "Active Subscriptions",
             component: <SubscriptionsTracker />,
           },
           {
             id: "savings-goals",
-            title: "🐷 Savings Goals & Piggy Bank",
+            title: "Savings Goals & Reserves",
             component: <SavingsGoals />,
           },
           {
             id: "debt-tracker",
-            title: "💸 Lent & Borrowed Money Ledger",
+            title: "Lent & Borrowed Ledger",
             component: <DebtTracker currencySymbol={currencySymbol} />,
           },
         ]}

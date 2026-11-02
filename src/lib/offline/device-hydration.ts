@@ -35,7 +35,7 @@ export function hydrateDeviceFromCloud(user: User): boolean {
     const prefs = (user as any).budgetPreferences;
     const resolvedUpi = (prefs?.upiBudget && prefs.upiBudget > 0) ? prefs.upiBudget : 8000;
     const resolvedCash = (prefs?.cashBudget !== undefined && prefs.cashBudget >= 0) ? prefs.cashBudget : 2000;
-    const resolvedRollover = prefs?.enableRollover !== undefined ? prefs.enableRollover : true;
+    const resolvedRollover = prefs?.enableRollover !== undefined ? prefs.enableRollover : false;
 
     localStorage.setItem("invictus_monthly_upi_budget", String(resolvedUpi));
     localStorage.setItem("invictus_monthly_cash_budget", String(resolvedCash));

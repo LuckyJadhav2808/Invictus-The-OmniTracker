@@ -29,7 +29,7 @@ const DEFAULT_BUDGET_PREFERENCES = {
   cashBudget: 2000,
   monthlyBudget: 10000,
   customDailyBudget: null,
-  enableRollover: true,
+  enableRollover: false,
   budgetViewMode: "monthly",
   smsReaderEnabled: false,
 };
@@ -76,7 +76,7 @@ export async function GET(req: Request) {
             ? prefs.monthlyBudget
             : (prefs.upiBudget ?? 0) + (prefs.cashBudget ?? 0) || DEFAULT_BUDGET_PREFERENCES.monthlyBudget,
           customDailyBudget: prefs.customDailyBudget ?? null,
-          enableRollover: prefs.enableRollover ?? true,
+          enableRollover: prefs.enableRollover ?? false,
           budgetViewMode: prefs.budgetViewMode || "monthly",
           smsReaderEnabled: Boolean(prefs.smsReaderEnabled),
         };
@@ -120,7 +120,7 @@ export async function POST(req: Request) {
       cashBudget = DEFAULT_BUDGET_PREFERENCES.cashBudget,
       monthlyBudget,
       customDailyBudget = null,
-      enableRollover = true,
+      enableRollover = false,
       budgetViewMode = "monthly",
       smsReaderEnabled = false,
     } = body;

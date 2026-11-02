@@ -42,6 +42,25 @@ export function SmsSyncControlBanner({
   const [isSyncing, setIsSyncing] = useState(false);
   const [isDateFilterOpen, setIsDateFilterOpen] = useState(false);
   const [lastSyncText, setLastSyncText] = useState<string | null>(null);
+  // SMS background auto-fetch is STRICTLY toggled OFF by default for all users
+  const [autoSyncEnabled, setAutoSyncEnabled] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("invictus_sms_auto_fetch_enabled");
+      if (saved === "true") setAutoSyncEnabled(true);
+    }
+  }, []);
+
+  const handleToggleAutoSync = () => {
+    soundFX.play("pop");
+    const next = !autoSyncEnabled;
+    setAutoSyncEnabled(next);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("invictus_sms_auto_fetch_enabled", String(next));
+    }
+    toast.info(next ? "Automatic bank SMS fetching enabled" : "Automatic bank SMS fetching disabled");
+  };
 
   const bulkAddMutation = useBulkAddTransactions();
   const addCategoryMutation = useAddCategory();
@@ -81,9 +100,9 @@ export function SmsSyncControlBanner({
     };
   }, [refreshSyncTimestamp]);
 
-  // Autonomous On-Launch Silent Background Auto-Scan (Runs once per session with 15-min cooldown)
+  // Background Auto-Scan (STRICTLY GATED by autoSyncEnabled, which is false by default)
   useEffect(() => {
-    if (!isNative || hasSmsPermission !== true) return;
+    if (!isNative || hasSmsPermission !== true || !autoSyncEnabled) return;
 
     let cancelled = false;
 
@@ -253,7 +272,7 @@ export function SmsSyncControlBanner({
               </div>
               <p className="text-[11px] text-[#161514]/75 font-medium leading-relaxed break-words whitespace-normal mt-0.5">
                 {isNative
-                  ? `Launch auto-scan active. Last scan: ${lastSyncText || "Never"}`
+                  ? (autoSyncEnabled ? `Auto-fetch active. Last scan: ${lastSyncText || "Never"}` : "Auto-fetch off. Tap 'Scan Inbox' to sync on demand.")
                   : "Air-gapped on-device regex. Configure learned rules in Settings."}
               </p>
             </div>
@@ -261,6 +280,29 @@ export function SmsSyncControlBanner({
 
           {/* Right Side: Primary Actions with Zero Overlap */}
           <div className="flex items-center gap-2 w-full sm:w-auto justify-start sm:justify-end shrink-0 flex-wrap sm:flex-nowrap pt-1 sm:pt-0">
+            {/* Auto-Fetch Toggle (Default OFF for all users) */}
+            {isNative && (
+              <button
+                type="button"
+                onClick={handleToggleAutoSync}
+                className={cn(
+                  "px-3 py-1.5 rounded-xl border-2 border-[#161514] font-black text-xs uppercase shadow-[2px_2px_0px_0px_#161514] active:translate-y-0.5 transition-all cursor-pointer whitespace-nowrap shrink-0 flex items-center gap-1.5",
+                  autoSyncEnabled
+                    ? "bg-[#CEF431] text-[#161514]"
+                    : "bg-[#FFFFFF] text-[#161514]/65 hover:bg-[#FAF8F5]"
+                )}
+                title="Toggle automatic bank SMS scanning on launch (Default: Off)"
+              >
+                <span>Auto-Fetch:</span>
+                <span className={cn(
+                  "px-1.5 py-0.2 rounded text-[10px] font-mono",
+                  autoSyncEnabled ? "bg-[#161514] text-[#CEF431]" : "bg-zinc-200 text-zinc-700"
+                )}>
+                  {autoSyncEnabled ? "ON" : "OFF"}
+                </span>
+              </button>
+            )}
+
             {/* Quick Cash Button */}
             <button
               type="button"

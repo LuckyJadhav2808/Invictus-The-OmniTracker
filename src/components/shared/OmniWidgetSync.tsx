@@ -62,12 +62,12 @@ export function OmniWidgetSync() {
     if (cloudBudgetPrefs?.enableRollover !== undefined) {
       return cloudBudgetPrefs.enableRollover;
     }
-    if (typeof window === "undefined") return true;
+    if (typeof window === "undefined") return false;
     try {
       const saved = localStorage.getItem("invictus_budget_rollover_enabled");
       if (saved !== null) return saved === "true";
     } catch {}
-    return true;
+    return false;
   }, [cloudBudgetPrefs]);
 
   const customDailyBudget = useMemo(() => {

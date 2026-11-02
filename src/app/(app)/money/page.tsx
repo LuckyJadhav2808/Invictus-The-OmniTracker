@@ -158,7 +158,7 @@ function MoneyPageContent() {
   const [baseUpiBudget, setBaseUpiBudget] = useState(8000);
   const [baseCashBudget, setBaseCashBudget] = useState(2000);
   const [customDailyBudget, setCustomDailyBudget] = useState<number | null>(null);
-  const [enableRollover, setEnableRollover] = useState(true);
+  const [enableRollover, setEnableRollover] = useState(false);
   const [cashRefillDate, setCashRefillDate] = useState<string | null>(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("invictus_cash_refilled_at");
@@ -486,10 +486,7 @@ function MoneyPageContent() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
-      {/* Contextual Reminder */}
-      <ProactiveReminderBanner space="money" />
-
-      {/* 🚀 STICKY SUMMARY COCKPIT WITH CASHFLOW HIGHWAY GAUGE */}
+      {/* 🚀 STICKY SUMMARY COCKPIT */}
       <FinancialSummaryCockpit
         monthlyStats={monthlyStats}
         dailyStats={dailyStats}

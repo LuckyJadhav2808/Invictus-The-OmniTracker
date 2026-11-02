@@ -52,7 +52,7 @@ const UserSchema = new Schema<IUser>(
       cashBudget: { type: Number, default: 0 },
       monthlyBudget: { type: Number, default: 0 },
       customDailyBudget: { type: Number, default: null },
-      enableRollover: { type: Boolean, default: true },
+      enableRollover: { type: Boolean, default: false },
       budgetViewMode: { type: String, default: "monthly" },
       smsReaderEnabled: { type: Boolean, default: false },
     },
