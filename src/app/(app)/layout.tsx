@@ -32,6 +32,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       setSafeModeActive(status.isSafeMode);
     });
 
+    // Mark boot as healthy once layout is mounted cleanly
+    const healthyTimer = setTimeout(() => {
+      safeModeWatchdog.markBootAsHealthy();
+    }, 1500);
+
     // Run safe client storage migration in background
     migrationEngine.runMigrations().catch(() => {});
 
@@ -43,6 +48,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     }
 
     return () => {
+      clearTimeout(healthyTimer);
       unsub();
     };
   }, []);

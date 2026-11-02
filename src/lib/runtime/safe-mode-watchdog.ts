@@ -4,7 +4,7 @@ import { diagnosticLogger } from "./diagnostic-logger";
 
 const CRASH_COUNTER_KEY = "invictus_boot_crash_counter";
 const CRASH_THRESHOLD = 3;
-const HEALTHY_BOOT_WINDOW_MS = 15000;
+const HEALTHY_BOOT_WINDOW_MS = 3000;
 
 export interface SafeModeStatus {
   isSafeMode: boolean;
@@ -33,6 +33,13 @@ class BootloaderWatchdog {
 
   private evaluateStartupHealth() {
     try {
+      // In development mode, bypass circuit breaker on dev server restarts & hot reloads
+      if (process.env.NODE_ENV === "development") {
+        this.crashCount = 0;
+        localStorage.setItem(CRASH_COUNTER_KEY, "0");
+        return;
+      }
+
       const stored = localStorage.getItem(CRASH_COUNTER_KEY);
       this.crashCount = stored ? parseInt(stored, 10) : 0;
 
@@ -56,7 +63,7 @@ class BootloaderWatchdog {
         );
       }
 
-      // Schedule healthy reset after 15s clean execution
+      // Schedule healthy reset after clean execution
       this.healthyTimer = setTimeout(() => {
         this.markBootAsHealthy();
       }, HEALTHY_BOOT_WINDOW_MS);
