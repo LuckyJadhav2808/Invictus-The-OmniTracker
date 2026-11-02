@@ -75,13 +75,13 @@ export function SafeToSpendGauge({
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
           {onOpenSetDailyLimit && (
             <Button
               variant="outline"
               size="xs"
               onClick={onOpenSetDailyLimit}
-              className="border-2 border-[#161514] shadow-[1.5px_1.5px_0px_#161514] active:scale-[0.97]"
+              className="border-2 border-[#161514] shadow-[1.5px_1.5px_0px_#161514] active:scale-[0.97] min-h-[34px] px-2.5 cursor-pointer"
               title="Set Daily Spending Amount"
             >
               <Sliders className="size-3 stroke-[2.5]" />
@@ -93,7 +93,7 @@ export function SafeToSpendGauge({
             variant="outline"
             size="xs"
             onClick={onToggleQuickExpense}
-            className="border-2 border-[#161514] shadow-[1.5px_1.5px_0px_#161514] active:scale-[0.97]"
+            className="border-2 border-[#161514] shadow-[1.5px_1.5px_0px_#161514] active:scale-[0.97] min-h-[34px] px-2.5 cursor-pointer"
           >
             <Plus className="size-3 stroke-[3]" />
             <span>Quick Log</span>
@@ -250,12 +250,12 @@ export function SafeToSpendGauge({
               </div>
               <span
                 className={cn(
-                  'font-mono font-black',
+                  'font-mono font-black tabular-nums text-xs',
                   tx.type === 'expense' ? 'text-rose-600' : 'text-emerald-700'
                 )}
               >
                 {tx.type === 'expense' ? '-' : '+'}
-                {currencySymbol}{tx.amount}
+                {currencySymbol}{tx.amount.toLocaleString()}
               </span>
             </div>
           ))}

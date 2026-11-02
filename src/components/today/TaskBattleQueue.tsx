@@ -77,7 +77,7 @@ export function TaskBattleQueue({
                   {/* Ergonomic 44px touch checkbox */}
                   <button
                     onClick={() => onCompleteTask(task.id, task.title)}
-                    className="size-7 rounded-md border-2 border-[#161514] bg-white hover:bg-emerald-100 flex items-center justify-center shrink-0 cursor-pointer active:scale-95 transition-transform"
+                    className="size-8 rounded-lg border-2 border-[#161514] bg-white hover:bg-emerald-100 flex items-center justify-center shrink-0 cursor-pointer active:scale-95 transition-transform shadow-[0.5px_0.5px_0px_#161514]"
                     aria-label={`Complete task: ${task.title}`}
                   >
                     <Check className="size-4 stroke-[3] opacity-0 hover:opacity-100 transition-opacity" />
@@ -99,7 +99,7 @@ export function TaskBattleQueue({
                         {task.priority.toUpperCase()}
                       </span>
                       {task.projectTag && (
-                        <span className="text-[10px] text-[#161514]/65 font-bold">
+                        <span className="text-[10px] font-mono text-[#161514]/65 font-bold">
                           #{task.projectTag}
                         </span>
                       )}
@@ -108,7 +108,7 @@ export function TaskBattleQueue({
                 </div>
 
                 {totalSubtasksCount > 0 && (
-                  <span className="text-[10px] font-mono font-bold bg-[#F1EFEA] border border-[#161514]/30 px-1.5 py-0.5 rounded shrink-0">
+                  <span className="text-[10px] font-mono font-bold bg-[#F1EFEA] border border-[#161514]/30 px-1.5 py-0.5 rounded shrink-0 tabular-nums">
                     {completedSubtasksCount}/{totalSubtasksCount}
                   </span>
                 )}

@@ -104,7 +104,7 @@ export function StudySprintWidget({
             <select
               value={selectedSubjectId}
               onChange={(e) => onChangeSubject(e.target.value)}
-              className="w-full text-xs font-bold p-1.5 rounded-lg border-2 border-[#161514] bg-white outline-none cursor-pointer"
+              className="w-full text-xs font-bold px-2.5 py-2 min-h-[38px] rounded-lg border-2 border-[#161514] bg-white outline-none cursor-pointer shadow-[1px_1px_0px_#161514] focus:ring-1 focus:ring-[#161514]"
             >
               <option value="">General Focus</option>
               {subjects.map((sub) => (
@@ -122,7 +122,7 @@ export function StudySprintWidget({
             <select
               value={selectedTopicId}
               onChange={(e) => onChangeTopic(e.target.value)}
-              className="w-full text-xs font-bold p-1.5 rounded-lg border-2 border-[#161514] bg-white outline-none cursor-pointer"
+              className="w-full text-xs font-bold px-2.5 py-2 min-h-[38px] rounded-lg border-2 border-[#161514] bg-white outline-none cursor-pointer shadow-[1px_1px_0px_#161514] focus:ring-1 focus:ring-[#161514]"
             >
               <option value="">Current Topic</option>
               {filteredTopics.map((top) => (
@@ -139,14 +139,18 @@ export function StudySprintWidget({
           <Button
             onClick={onToggleTimer}
             className={cn(
-              'flex-1 min-h-[40px] font-heading font-black text-xs border-2 border-[#161514] shadow-[2px_2px_0px_#161514] active:scale-[0.97]',
+              'flex-1 min-h-[42px] font-heading font-black text-xs border-2 border-[#161514] shadow-[2px_2px_0px_#161514] active:scale-[0.97] transition-all cursor-pointer',
               isTimerRunning
-                ? 'bg-amber-300 hover:bg-amber-400 text-[#161514]'
+                ? 'bg-[#161514] text-white hover:bg-[#252321]'
                 : 'bg-[#CEF431] hover:bg-[#D8F74E] text-[#161514]'
             )}
           >
             {isTimerRunning ? (
               <>
+                <span className="relative flex size-2 shrink-0">
+                  <span className="animate-ping absolute inline-flex size-full rounded-full bg-red-400 opacity-75" />
+                  <span className="relative inline-flex size-2 rounded-full bg-red-500" />
+                </span>
                 <Pause className="size-4" />
                 <span>Pause</span>
               </>
@@ -163,7 +167,7 @@ export function StudySprintWidget({
               <Button
                 variant="secondary"
                 onClick={onSaveSession}
-                className="flex-1 min-h-[40px] font-heading font-black text-xs border-2 border-[#161514] bg-[#03D26F] hover:bg-[#02B860] text-[#161514] shadow-[2px_2px_0px_#161514] active:scale-[0.97]"
+                className="flex-1 min-h-[42px] font-heading font-black text-xs border-2 border-[#161514] bg-[#03D26F] hover:bg-[#02B860] text-[#161514] shadow-[2px_2px_0px_#161514] active:scale-[0.97] transition-all cursor-pointer"
               >
                 <Check className="size-4 stroke-[3]" />
                 <span>Log</span>
@@ -174,7 +178,7 @@ export function StudySprintWidget({
                 size="icon"
                 onClick={onResetTimer}
                 aria-label="Reset Timer"
-                className="min-h-[40px] min-w-[40px] border-2 border-[#161514] shadow-[2px_2px_0px_#161514] active:scale-[0.97]"
+                className="min-h-[42px] min-w-[42px] border-2 border-[#161514] bg-white hover:bg-[#F1EFEA] shadow-[2px_2px_0px_#161514] active:scale-[0.97] transition-all cursor-pointer flex items-center justify-center"
               >
                 <RotateCcw className="size-4" />
               </Button>

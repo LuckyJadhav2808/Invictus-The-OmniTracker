@@ -51,43 +51,13 @@ export function HabitMomentumCard({
     });
   }, [activeHabits, logs, habitFilter]);
 
-  // SVG Circular Ring calculation
-  const ringRadius = 26;
-  const circumference = 2 * Math.PI * ringRadius;
-  const strokeDashoffset = circumference - (percent / 100) * circumference;
-
   return (
     <div id="habits-section" className="bg-white border-2 border-[#161514] p-5 rounded-xl shadow-[3px_3px_0px_#161514] space-y-4">
       {/* Header & Filter Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-2 border-[#161514]/15 pb-3">
-        <div className="flex items-center gap-3">
-          {/* Circular Progress Gauge */}
-          <div className="relative size-14 shrink-0 flex items-center justify-center">
-            <svg className="size-full -rotate-90" viewBox="0 0 60 60">
-              <circle
-                cx="30"
-                cy="30"
-                r={ringRadius}
-                fill="none"
-                stroke="#F1EFEA"
-                strokeWidth="6"
-              />
-              <circle
-                cx="30"
-                cy="30"
-                r={ringRadius}
-                fill="none"
-                stroke={percent === 100 ? '#03D26F' : '#CEF431'}
-                strokeWidth="6"
-                strokeDasharray={circumference}
-                strokeDashoffset={strokeDashoffset}
-                strokeLinecap="round"
-                className="transition-all duration-500 ease-out"
-              />
-            </svg>
-            <span className="absolute font-mono font-black text-xs text-[#161514]">
-              {percent}%
-            </span>
+        <div className="flex items-center gap-2.5">
+          <div className="size-8 rounded-lg bg-[#03D26F] border-2 border-[#161514] flex items-center justify-center shadow-[1px_1px_0px_#161514] shrink-0">
+            <CheckSquare className="size-4 text-[#161514] stroke-[2.5]" />
           </div>
 
           <div>
@@ -95,14 +65,18 @@ export function HabitMomentumCard({
               <h2 className="font-heading font-black text-base text-[#161514] tracking-tight">
                 Habit Momentum
               </h2>
-              {percent === 100 && totalCount > 0 && (
+              {percent === 100 && totalCount > 0 ? (
                 <span className="px-1.5 py-0.5 rounded text-[10px] font-heading font-black bg-[#03D26F] text-[#161514] border border-[#161514]">
                   CONQUERED
                 </span>
+              ) : (
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-black bg-[#F1EFEA] text-[#161514] border border-[#161514] tabular-nums">
+                  {percent}%
+                </span>
               )}
             </div>
-            <p className="text-xs text-[#161514]/70 font-medium">
-              {completedCount} of {totalCount} completed for today
+            <p className="text-xs text-[#161514]/70 font-medium font-mono mt-0.5">
+              <span className="font-black text-[#161514] tabular-nums">{completedCount}</span> of <span className="tabular-nums">{totalCount}</span> completed today
             </p>
           </div>
         </div>
@@ -130,19 +104,19 @@ export function HabitMomentumCard({
       {typeof waterAmount === 'number' && (
         <div className="bg-[#FAF8F5] border-2 border-[#161514] p-3 rounded-xl flex items-center justify-between gap-3 shadow-[1.5px_1.5px_0px_#161514]">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="size-8 rounded-lg bg-sky-200 border-2 border-[#161514] flex items-center justify-center shrink-0 shadow-[1px_1px_0px_#161514]">
-              <Droplets className="size-4 text-sky-800 stroke-[2.5]" />
+            <div className="size-8 rounded-lg bg-white border-2 border-[#161514] flex items-center justify-center shrink-0 shadow-[1px_1px_0px_#161514]">
+              <Droplets className="size-4 text-[#161514] stroke-[2.5]" />
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="font-heading font-black text-xs text-[#161514]">Daily Hydration</span>
-                <span className="text-[10px] font-mono font-bold text-[#161514]/70">
+                <span className="text-[10px] font-mono font-bold text-[#161514]/70 tabular-nums">
                   {waterAmount} / {waterTarget} ml ({Math.min(100, Math.round((waterAmount / waterTarget) * 100))}%)
                 </span>
               </div>
               <div className="w-28 sm:w-44 h-2 bg-white rounded-full border border-[#161514] overflow-hidden mt-1">
                 <div
-                  className="h-full bg-sky-400 transition-all duration-300"
+                  className="h-full bg-[#161514] transition-all duration-300"
                   style={{ width: `${Math.min(100, Math.round((waterAmount / waterTarget) * 100))}%` }}
                 />
               </div>
@@ -153,11 +127,11 @@ export function HabitMomentumCard({
             <button
               type="button"
               onClick={onQuickLogWater}
-              className="px-2.5 py-1.5 rounded-lg bg-sky-200 hover:bg-sky-300 active:translate-x-0.5 active:translate-y-0.5 text-[#161514] font-heading font-black text-[11px] border-2 border-[#161514] shadow-[1px_1px_0px_#161514] flex items-center gap-1.5 cursor-pointer transition-all shrink-0"
+              className="px-2.5 py-1.5 min-h-[38px] rounded-lg bg-white hover:bg-[#F1EFEA] active:translate-x-0.5 active:translate-y-0.5 text-[#161514] font-heading font-black text-[11px] border-2 border-[#161514] shadow-[1px_1px_0px_#161514] flex items-center gap-1.5 cursor-pointer transition-all shrink-0 active:scale-95"
               title="Quick log 250ml glass of water"
             >
               <Plus className="size-3 stroke-[3]" />
-              <span>250ml</span>
+              <span className="font-mono font-black tabular-nums">250ml</span>
             </button>
           )}
         </div>

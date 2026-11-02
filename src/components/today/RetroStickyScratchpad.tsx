@@ -493,7 +493,7 @@ export function RetroStickyScratchpad({
               title={`Batch convert ${eligibleItemCount} thoughts into tasks & expenses`}
             >
               <Zap className="size-3 stroke-[3]" />
-              <span>Convert All ({eligibleItemCount})</span>
+              <span>Convert All (<span className="tabular-nums font-mono">{eligibleItemCount}</span>)</span>
             </button>
           )}
         </div>
