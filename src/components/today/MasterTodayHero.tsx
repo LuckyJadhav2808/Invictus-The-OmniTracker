@@ -163,16 +163,7 @@ export function MasterTodayHero({
       </div>
 
       {/* 2. Unified Master Cockpit Card: Context Hero + Tri-Rings HUD (Coliseum Layout) */}
-      <div
-        className={cn(
-          "rounded-2xl border-2 border-[#161514] p-5 sm:p-6 shadow-[4px_4px_0px_0px_#161514] transition-all duration-300 text-[#161514]",
-          effectiveDaypart === "dawn"
-            ? "bg-[#FFFDF5]"
-            : effectiveDaypart === "forge"
-            ? "bg-[#FAF5FF]"
-            : "bg-[#F8FAFC]"
-        )}
-      >
+      <div className="rounded-2xl border-2 border-[#161514] p-5 sm:p-6 shadow-[4px_4px_0px_0px_#161514] bg-[#FAF8F5] text-[#161514]">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
           {/* Left Column (lg:col-span-7): Grand Typography Greeting & Action Deck */}
           <div className="lg:col-span-7 space-y-4 min-w-0">
@@ -197,60 +188,24 @@ export function MasterTodayHero({
                 </span>
               </div>
 
-              {/* Time-Warp Scrubber Pill */}
+              {/* Time-Warp Context Mode Pill */}
               <div className="flex items-center p-0.5 rounded-lg border-2 border-[#161514] bg-[#F1EFEA] shadow-[1.5px_1.5px_0px_0px_#161514] shrink-0">
-                <button
-                  type="button"
-                  onClick={() => handleModeChange("auto")}
-                  className={cn(
-                    "px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer",
-                    daypartMode === "auto"
-                      ? "bg-white text-[#161514] border border-[#161514] shadow-[1px_1px_0px_0px_#161514]"
-                      : "text-[#161514]/60 hover:text-[#161514]"
-                  )}
-                  title="Live auto mode"
-                >
-                  Auto
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleModeChange("dawn")}
-                  className={cn(
-                    "px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer",
-                    daypartMode === "dawn"
-                      ? "bg-[#CEF431] text-[#161514] border border-[#161514] shadow-[1px_1px_0px_0px_#161514]"
-                      : "text-[#161514]/60 hover:text-[#161514]"
-                  )}
-                  title="Preview Dawn"
-                >
-                  Dawn
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleModeChange("forge")}
-                  className={cn(
-                    "px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer",
-                    daypartMode === "forge"
-                      ? "bg-[#C084FC] text-[#161514] border border-[#161514] shadow-[1px_1px_0px_0px_#161514]"
-                      : "text-[#161514]/60 hover:text-[#161514]"
-                  )}
-                  title="Preview Forge"
-                >
-                  Forge
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleModeChange("night")}
-                  className={cn(
-                    "px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer",
-                    daypartMode === "night"
-                      ? "bg-[#38BDF8] text-[#161514] border border-[#161514] shadow-[1px_1px_0px_0px_#161514]"
-                      : "text-[#161514]/60 hover:text-[#161514]"
-                  )}
-                  title="Preview Night"
-                >
-                  Night
-                </button>
+                {(["auto", "dawn", "forge", "night"] as const).map((mode) => (
+                  <button
+                    key={mode}
+                    type="button"
+                    onClick={() => handleModeChange(mode)}
+                    className={cn(
+                      "px-2 py-0.5 rounded text-[9px] font-mono font-black uppercase tracking-wider transition-all cursor-pointer",
+                      daypartMode === mode
+                        ? "bg-[#161514] text-white shadow-[1px_1px_0px_0px_#161514]"
+                        : "text-[#161514]/60 hover:text-[#161514]"
+                    )}
+                    title={`Switch to ${mode} mode`}
+                  >
+                    {mode}
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -258,27 +213,27 @@ export function MasterTodayHero({
             <div className="space-y-1">
               <h1 className="font-heading font-black text-2xl sm:text-3xl tracking-tight leading-tight text-[#161514]">
                 {effectiveDaypart === "night"
-                  ? `Night Fortress Active, ${displayName}.`
+                  ? `Night Fortress Active, ${displayName}`
                   : effectiveDaypart === "forge"
-                  ? `Focus Sprint in Progress, ${displayName}.`
-                  : `Rise & Conquer, ${displayName}.`}
+                  ? `Focus Sprint in Progress, ${displayName}`
+                  : `Rise & Conquer, ${displayName}`}
               </h1>
               <p className="text-xs sm:text-sm font-semibold leading-relaxed text-[#161514]/75">
                 {effectiveDaypart === "night"
                   ? "Evening reflection on deck. Review today's ledger, preserve streaks, and seal tomorrow's victory."
-                  : `${totalHabitsCount} habits loaded on deck. 4.0h study goal primed for victory.`}
+                  : `${totalHabitsCount} habits loaded on deck • 4.0h study goal primed for victory`}
               </p>
             </div>
 
-            {/* Action Buttons Row (Apple Fitness & Linear Benchmark) */}
+            {/* Action Buttons Row (Apple Fitness & Linear Benchmark - Strict 1 Primary + 1 Secondary) */}
             <div className="flex items-center gap-2.5 flex-wrap pt-1">
-              {/* Focus Stopwatch Trigger */}
+              {/* Primary Focus Stopwatch Trigger */}
               {onToggleTimer && (
                 <button
                   type="button"
                   onClick={() => handleInteractiveClick(onToggleTimer)}
                   className={cn(
-                    "min-h-[40px] px-3.5 py-2 border-2 border-[#161514] rounded-xl shadow-[2.5px_2.5px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 flex items-center gap-2 font-heading font-black text-xs text-[#161514] transition-all cursor-pointer",
+                    "min-h-[42px] px-4 py-2 border-2 border-[#161514] rounded-xl shadow-[3px_3px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 flex items-center gap-2 font-heading font-black text-xs text-[#161514] transition-all cursor-pointer",
                     isStudyingActive
                       ? "bg-amber-300 hover:bg-amber-400"
                       : "bg-[#CEF431] hover:bg-[#D8F74E]"
@@ -291,35 +246,21 @@ export function MasterTodayHero({
                       <Play className="size-3 text-[#161514] fill-current" />
                     )}
                   </div>
-                  <span>{isStudyingActive ? "Pause Sprint" : "⚡ Start Focus Sprint"}</span>
+                  <span>{isStudyingActive ? "Pause Sprint" : "Start Focus Sprint"}</span>
                 </button>
               )}
 
-              {/* Quick Expense Chip */}
+              {/* Secondary Quick Expense Trigger */}
               {onOpenExpenseModal && (
                 <button
                   type="button"
                   onClick={() => handleInteractiveClick(onOpenExpenseModal)}
-                  className="min-h-[40px] px-3 py-2 bg-white hover:bg-emerald-50 active:translate-x-0.5 active:translate-y-0.5 border-2 border-[#161514] rounded-xl shadow-[2.5px_2.5px_0px_#161514] flex items-center gap-1.5 font-heading font-black text-xs text-[#161514] transition-all cursor-pointer"
+                  className="min-h-[42px] px-3.5 py-2 bg-white hover:bg-[#F3EFEA] active:translate-x-0.5 active:translate-y-0.5 border-2 border-[#161514] rounded-xl shadow-[2.5px_2.5px_0px_#161514] flex items-center gap-1.5 font-heading font-black text-xs text-[#161514] transition-all cursor-pointer"
                 >
                   <div className="size-5 rounded-md bg-[#03D26F] border border-[#161514] flex items-center justify-center shrink-0">
                     <Wallet className="size-3 text-[#161514] stroke-[2.5]" />
                   </div>
-                  <span>+ ₹ Log Expense</span>
-                </button>
-              )}
-
-              {/* Habit Quick Anchor */}
-              {onScrollToHabits && (
-                <button
-                  type="button"
-                  onClick={() => handleInteractiveClick(onScrollToHabits)}
-                  className="min-h-[40px] px-3 py-2 bg-white hover:bg-violet-50 active:translate-x-0.5 active:translate-y-0.5 border-2 border-[#161514] rounded-xl shadow-[2.5px_2.5px_0px_#161514] flex items-center gap-1.5 font-heading font-black text-xs text-[#161514] transition-all cursor-pointer"
-                >
-                  <div className="size-5 rounded-md bg-[#C084FC] border border-[#161514] flex items-center justify-center shrink-0">
-                    <CheckSquare className="size-3 text-[#161514] stroke-[2.5]" />
-                  </div>
-                  <span>✓ Habits</span>
+                  <span>+ Log Expense</span>
                 </button>
               )}
             </div>
@@ -329,14 +270,15 @@ export function MasterTodayHero({
           <div className="lg:col-span-5 rounded-xl border-2 border-[#161514] p-4 bg-white text-[#161514] shadow-[3px_3px_0px_#161514] space-y-3">
             {/* Telemetry Header */}
             <div className="flex items-center justify-between pb-2 border-b border-[#161514]/15">
-              <span className="font-heading font-black text-xs uppercase tracking-wider text-[#161514] flex items-center gap-1">
-                <span>⚔️</span>
+              <span className="font-heading font-black text-xs uppercase tracking-wider text-[#161514] flex items-center gap-1.5">
+                <Zap className="size-3.5 text-[#161514] stroke-[2.5]" />
                 <span>Conquest Telemetry</span>
               </span>
 
               <div className="inline-flex items-center gap-1 bg-[#CEF431] text-[#161514] font-mono font-black text-[10px] uppercase px-2 py-0.5 rounded-lg border border-[#161514] shadow-[1px_1px_0px_#161514]">
                 <Zap className="size-3 fill-[#161514]" />
-                <span>{metrics.overallScore}% CONQUERED</span>
+                <span className="tabular-nums">{metrics.overallScore}%</span>
+                <span>CONQUERED</span>
               </div>
             </div>
 
@@ -406,7 +348,7 @@ export function MasterTodayHero({
 
                 {/* Score in center */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none select-none">
-                  <span className="font-heading font-black text-2xl text-[#161514] leading-none tracking-tight">
+                  <span className="font-heading font-black text-2xl text-[#161514] leading-none tracking-tight font-mono tabular-nums">
                     {metrics.overallScore}%
                   </span>
                   <span className="font-mono font-black text-[8px] uppercase tracking-widest text-[#161514]/60 mt-0.5">
@@ -431,7 +373,7 @@ export function MasterTodayHero({
                     </span>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
-                    <span className="font-mono font-black text-[11px] text-[#047857]">
+                    <span className="font-mono font-black text-[11px] text-[#047857] tabular-nums">
                       {metrics.completedHabitsCount}/{metrics.totalHabitsCount} ({metrics.habitPercent}%)
                     </span>
                     <ChevronRight className="size-3 text-[#161514]/40 group-hover:text-[#161514] group-hover:translate-x-0.5 transition-all" />
@@ -452,7 +394,7 @@ export function MasterTodayHero({
                     </span>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
-                    <span className="font-mono font-black text-[11px] text-[#7E22CE]">
+                    <span className="font-mono font-black text-[11px] text-[#7E22CE] tabular-nums">
                       {metrics.studyHoursFormatted}/{metrics.studyTargetHoursFormatted} ({metrics.studyPercent}%)
                     </span>
                     <ChevronRight className="size-3 text-[#161514]/40 group-hover:text-[#161514] group-hover:translate-x-0.5 transition-all" />
@@ -473,7 +415,7 @@ export function MasterTodayHero({
                     </span>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
-                    <span className="font-mono font-black text-[11px] text-amber-700">
+                    <span className="font-mono font-black text-[11px] text-amber-700 tabular-nums">
                       {metrics.currencySymbol}{metrics.remainingSafeToSpend.toLocaleString()}
                     </span>
                     <ChevronRight className="size-3 text-[#161514]/40 group-hover:text-[#161514] group-hover:translate-x-0.5 transition-all" />

@@ -153,11 +153,11 @@ export function HabitMomentumCard({
             <button
               type="button"
               onClick={onQuickLogWater}
-              className="px-2.5 py-1.5 rounded-lg bg-sky-300 hover:bg-sky-400 active:scale-95 text-[#161514] font-heading font-black text-[11px] border-2 border-[#161514] shadow-[1px_1px_0px_#161514] flex items-center gap-1 cursor-pointer transition-all shrink-0"
+              className="px-2.5 py-1.5 rounded-lg bg-sky-200 hover:bg-sky-300 active:translate-x-0.5 active:translate-y-0.5 text-[#161514] font-heading font-black text-[11px] border-2 border-[#161514] shadow-[1px_1px_0px_#161514] flex items-center gap-1.5 cursor-pointer transition-all shrink-0"
               title="Quick log 250ml glass of water"
             >
               <Plus className="size-3 stroke-[3]" />
-              <span>250ml 💧</span>
+              <span>250ml</span>
             </button>
           )}
         </div>

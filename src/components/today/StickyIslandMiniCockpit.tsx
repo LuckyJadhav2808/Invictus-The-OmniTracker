@@ -72,7 +72,7 @@ export function StickyIslandMiniCockpit({
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           <div className="inline-flex items-center gap-1 bg-[#CEF431] text-[#161514] font-mono font-black text-[10px] sm:text-xs px-2 py-0.5 rounded-lg border border-[#161514] shadow-[1px_1px_0px_#161514]">
             <Zap className="size-3 fill-[#161514]" />
-            <span>{metrics.overallScore}%</span>
+            <span className="tabular-nums">{metrics.overallScore}%</span>
           </div>
 
           <span className="font-heading font-black text-[11px] sm:text-xs text-[#161514] whitespace-nowrap hidden xs:inline">
@@ -93,7 +93,7 @@ export function StickyIslandMiniCockpit({
                 <span className="animate-ping absolute inline-flex size-full rounded-full bg-red-500 opacity-75" />
                 <span className="relative inline-flex size-2 rounded-full bg-red-600" />
               </span>
-              <span>{formatStopwatch(stopwatchSeconds)}</span>
+              <span className="tabular-nums">{formatStopwatch(stopwatchSeconds)}</span>
               <Pause className="size-3 fill-[#161514]" />
             </button>
           ) : (

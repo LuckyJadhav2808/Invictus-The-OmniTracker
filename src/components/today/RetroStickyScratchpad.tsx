@@ -11,6 +11,7 @@ import {
   Calendar,
   CheckCheck,
   RotateCcw,
+  Tag,
 } from "lucide-react";
 import { soundFX } from "@/components/shared/SoundFX";
 import { toast } from "sonner";
@@ -300,7 +301,7 @@ export function RetroStickyScratchpad({
     }
 
     toast.success(
-      `Conquered ${batchTasks.length + batchExpenses.length} items! ⚡`,
+      `Conquered ${batchTasks.length + batchExpenses.length} items!`,
       {
         description: `${batchTasks.length} task${batchTasks.length === 1 ? "" : "s"} & ${batchExpenses.length} expense${batchExpenses.length === 1 ? "" : "s"} recorded.`,
       }
@@ -417,15 +418,16 @@ export function RetroStickyScratchpad({
 
           {/* Amount Badge */}
           {targetParsed.amount !== undefined && (
-            <span className="text-[10px] font-mono font-black text-[#161514] bg-[#CEF431] px-1.5 py-0.5 rounded-md border border-[#161514] shadow-[0.5px_0.5px_0px_#161514]">
-              💰 ₹{targetParsed.amount}
+            <span className="text-[10px] font-mono font-black text-[#161514] bg-[#CEF431] px-1.5 py-0.5 rounded-md border border-[#161514] shadow-[0.5px_0.5px_0px_#161514] flex items-center gap-1">
+              <Wallet className="size-2.5 text-[#161514]" />
+              <span className="tabular-nums">₹{targetParsed.amount}</span>
             </span>
           )}
 
           {/* Category Badge */}
           {targetParsed.categoryName && (
             <span className="text-[10px] font-mono font-bold text-[#161514] bg-[#FAF8F5] px-1.5 py-0.5 rounded-md border border-[#161514] shadow-[0.5px_0.5px_0px_#161514] flex items-center gap-1">
-              <span>{targetParsed.categoryIcon || "🏷️"}</span>
+              {targetParsed.categoryIcon ? <span>{targetParsed.categoryIcon}</span> : <Tag className="size-2.5 text-[#161514]" />}
               <span>{targetParsed.categoryName}</span>
             </span>
           )}
@@ -505,12 +507,12 @@ export function RetroStickyScratchpad({
               className="text-[9px] font-mono text-[#161514]/60 hover:text-rose-600 font-bold underline cursor-pointer"
               title="Remove converted / struck-out lines"
             >
-              Clear converted ({analysis.convertedCount})
+              Clear converted (<span className="tabular-nums">{analysis.convertedCount}</span>)
             </button>
           )}
 
           <span className="text-[10px] font-mono text-[#161514]/50 font-bold">
-            {wordCount} words
+            <span className="tabular-nums">{wordCount}</span> words
           </span>
         </div>
       </div>

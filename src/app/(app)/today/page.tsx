@@ -22,6 +22,7 @@ import { useTasks, useUpdateTask, useCreateTask } from "@/lib/queries/tasks";
 import { computeMonthlyBudgetStats, computeDailyBudgetStats } from "@/lib/utils/budget-rollover";
 import { AllowanceSettingsModal } from "@/components/money/modals/AllowanceSettingsModal";
 import { toast } from "sonner";
+import { Shield } from "lucide-react";
 import {
   format,
   parseISO,
@@ -81,7 +82,7 @@ export default function TodayPage() {
     soundFX.playSplash();
     soundFX.vibrate(15);
     logWaterMutation.mutate({ date: selectedDate, amount });
-    toast.success(`Logged +${amount}ml water! Stay hydrated 🌊`);
+    toast.success(`Logged +${amount}ml water.`);
   };
 
   // User Cloud Budget Preferences
@@ -134,12 +135,12 @@ export default function TodayPage() {
         () => (
           <div className="bg-[#FAF8F5] border-2 border-[#161514] p-3.5 rounded-xl shadow-[3px_3px_0px_0px_#161514] flex items-center gap-3 w-full max-w-sm">
             <div className="size-9 rounded-lg bg-[#03D26F] border-2 border-[#161514] flex items-center justify-center shrink-0 shadow-[1px_1px_0px_#161514]">
-              <span className="text-lg">🛡️</span>
+              <Shield className="size-5 text-[#161514] stroke-[2.5]" />
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5">
                 <span className="font-heading font-black text-xs text-[#161514] uppercase tracking-wide">
-                  Streak Shield Deployed!
+                  Streak Shield Deployed
                 </span>
                 <span className="bg-[#CEF431] text-[#161514] font-black text-[9px] px-1.5 py-0.5 rounded border border-[#161514]">
                   SAVED
@@ -208,7 +209,7 @@ export default function TodayPage() {
         sessionStorage.setItem(celebrationKey, "true");
       }
       setShowConfetti(true);
-      toast.success("🔥 VICTORY! All daily habits conquered. Vix salutes you!");
+      toast.success("All daily habits conquered! Vix salutes you.");
     }
     previousConqueredRef.current = allHabitsConquered;
   }, [allHabitsConquered, selectedDate]);
@@ -322,9 +323,9 @@ export default function TodayPage() {
         customDailyBudget: payload.customDailyBudget,
         enableRollover: payload.enableRollover,
       });
-      toast.success("Daily spending limit saved & synced to database! 🎯");
+      toast.success("Daily spending limit saved & synced.");
     } catch {
-      toast.success("Daily limit saved locally! 🎯");
+      toast.success("Daily limit saved locally.");
     }
   };
 

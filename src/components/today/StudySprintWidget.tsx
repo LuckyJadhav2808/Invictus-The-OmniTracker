@@ -72,10 +72,10 @@ export function StudySprintWidget({
           </h2>
         </div>
         <div className="text-right">
-          <span className="text-xs font-mono font-black text-[#161514]">
+          <span className="text-xs font-mono font-black text-[#161514] tabular-nums">
             {todayStudyHours}h / 4.0h
           </span>
-          <span className="block text-[10px] text-[#161514]/65 font-bold">
+          <span className="block text-[10px] text-[#161514]/65 font-bold tabular-nums">
             {studyCompletionPercent}% Daily Goal
           </span>
         </div>
@@ -91,7 +91,7 @@ export function StudySprintWidget({
 
       {/* Stopwatch Tactical Card */}
       <div className="p-4 sm:p-5 rounded-xl bg-[#FBF9F5] border-2 border-[#161514] shadow-[2px_2px_0px_#161514] text-center space-y-3">
-        <div className="font-mono font-black text-3xl sm:text-4xl tracking-wider text-[#161514]">
+        <div className="font-mono font-black text-3xl sm:text-4xl lg:text-5xl tracking-widest text-[#161514] tabular-nums">
           {formatTimer(stopwatchSeconds)}
         </div>
 

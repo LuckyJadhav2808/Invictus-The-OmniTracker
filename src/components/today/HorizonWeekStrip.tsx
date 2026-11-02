@@ -115,7 +115,7 @@ export function HorizonWeekStrip({
               {/* Day Number (e.g. 24, 25) */}
               <span
                 className={cn(
-                  "font-heading font-black text-xs sm:text-sm leading-none mt-0.5",
+                  "font-mono font-black text-xs sm:text-sm leading-none mt-0.5 tabular-nums",
                   isSelected ? "text-white" : "text-[#161514]"
                 )}
               >

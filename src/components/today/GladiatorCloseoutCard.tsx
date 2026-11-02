@@ -43,11 +43,11 @@ interface GladiatorCloseoutCardProps {
 }
 
 const MOOD_OPTIONS = [
-  { id: "awesome", label: "Great", Icon: Zap, bg: "bg-emerald-300" },
-  { id: "good", label: "Good", Icon: Smile, bg: "bg-[#CEF431]" },
-  { id: "okay", label: "Okay", Icon: Meh, bg: "bg-cyan-200" },
-  { id: "low", label: "Low", Icon: Frown, bg: "bg-amber-200" },
-  { id: "tired", label: "Tired", Icon: Moon, bg: "bg-rose-200" },
+  { id: "awesome", label: "Great", Icon: Zap },
+  { id: "good", label: "Good", Icon: Smile },
+  { id: "okay", label: "Okay", Icon: Meh },
+  { id: "low", label: "Low", Icon: Frown },
+  { id: "tired", label: "Tired", Icon: Moon },
 ];
 
 export function GladiatorCloseoutCard({
@@ -89,7 +89,7 @@ export function GladiatorCloseoutCard({
       soundFX.vibrate(30);
     } catch {}
 
-    toast.success("🔥 Day Sealed! Today's conquest score minted into history.");
+    toast.success("Day Sealed! Today's conquest score minted into history.");
 
     if (onSealComplete) {
       onSealComplete();
@@ -131,8 +131,9 @@ export function GladiatorCloseoutCard({
 
         {/* Telemetry Conquest Badge */}
         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border-2 border-[#161514] shadow-[1.5px_1.5px_0px_#161514] font-mono font-black text-xs text-[#161514]">
-          <span>⚡</span>
-          <span>{metrics.overallScore}% CONQUERED</span>
+          <Zap className="size-3 fill-[#161514] text-[#161514]" />
+          <span className="tabular-nums">{metrics.overallScore}%</span>
+          <span className="text-[10px] uppercase">Conquered</span>
         </div>
       </div>
 
@@ -145,10 +146,10 @@ export function GladiatorCloseoutCard({
               <CheckCircle2 className="size-3.5 text-[#03D26F]" />
               <span>Habits</span>
             </span>
-            <span className="text-[#03D26F] font-black">{metrics.habitPercent}%</span>
+            <span className="text-[#03D26F] font-black tabular-nums">{metrics.habitPercent}%</span>
           </div>
           <p className="text-xs font-heading font-black text-[#161514]">
-            {metrics.completedHabitsCount}/{metrics.totalHabitsCount} Conquered
+            <span className="font-mono tabular-nums">{metrics.completedHabitsCount}/{metrics.totalHabitsCount}</span> Conquered
           </p>
         </div>
 
@@ -159,10 +160,10 @@ export function GladiatorCloseoutCard({
               <GraduationCap className="size-3.5 text-[#C084FC]" />
               <span>Study Focus</span>
             </span>
-            <span className="text-[#C084FC] font-black">{metrics.studyPercent}%</span>
+            <span className="text-[#C084FC] font-black tabular-nums">{metrics.studyPercent}%</span>
           </div>
           <p className="text-xs font-heading font-black text-[#161514]">
-            {metrics.studyHoursFormatted} / {metrics.studyTargetHoursFormatted} Logged
+            <span className="font-mono tabular-nums">{metrics.studyHoursFormatted} / {metrics.studyTargetHoursFormatted}</span> Logged
           </p>
         </div>
 
@@ -173,10 +174,10 @@ export function GladiatorCloseoutCard({
               <Wallet className="size-3.5 text-amber-600" />
               <span>Safe Reserve</span>
             </span>
-            <span className="text-emerald-600 font-black">{metrics.budgetPercent}%</span>
+            <span className="text-emerald-600 font-black tabular-nums">{metrics.budgetPercent}%</span>
           </div>
           <p className="text-xs font-heading font-black text-[#161514]">
-            {currencySymbol}{metrics.remainingSafeToSpend.toLocaleString()} Safe Left
+            <span className="font-mono tabular-nums">{currencySymbol}{metrics.remainingSafeToSpend.toLocaleString()}</span> Safe Left
           </p>
         </div>
       </div>
@@ -185,7 +186,7 @@ export function GladiatorCloseoutCard({
       <div className="bg-white border-2 border-[#161514] rounded-xl p-3.5 shadow-[2px_2px_0px_#161514] space-y-3">
         <div className="flex items-center justify-between border-b border-[#161514]/10 pb-2">
           <div className="flex items-center gap-1.5 font-heading font-black text-xs text-[#161514] uppercase tracking-wide">
-            <span>💭</span>
+            <Sparkles className="size-3.5 text-[#161514]" />
             <span>Daily Mindset & Evening Pulse</span>
           </div>
           <span className="text-[10px] font-mono font-bold text-[#161514]/60">1-Tap Reflection</span>
@@ -205,13 +206,13 @@ export function GladiatorCloseoutCard({
                 className={cn(
                   "p-2 rounded-lg border-2 border-[#161514] flex flex-col items-center justify-center gap-1 transition-all cursor-pointer active:scale-95",
                   isSelected
-                    ? `${m.bg} shadow-[2px_2px_0px_#161514] scale-[1.02]`
-                    : "bg-[#FAF8F5] opacity-65 hover:opacity-100"
+                    ? "bg-[#161514] text-white shadow-[2px_2px_0px_#161514] scale-[1.02]"
+                    : "bg-[#FAF8F5] text-[#161514] opacity-75 hover:opacity-100 hover:bg-white shadow-[1px_1px_0px_#161514]"
                 )}
                 title={`Mark mood: ${m.label}`}
               >
-                <Icon className="size-4 text-[#161514]" />
-                <span className="text-[10px] font-heading font-black text-[#161514]">
+                <Icon className={cn("size-4", isSelected ? "text-[#CEF431]" : "text-[#161514]")} />
+                <span className={cn("text-[10px] font-heading font-black", isSelected ? "text-white" : "text-[#161514]")}>
                   {m.label}
                 </span>
               </button>
@@ -263,7 +264,7 @@ export function GladiatorCloseoutCard({
                   </span>
                 </div>
                 <p className="text-[11px] text-white/80 font-mono mt-0.5">
-                  Conquest Score: ⚡ {sealStatus.score ?? metrics.overallScore}% permanent record.
+                  Conquest Score: <span className="tabular-nums">{sealStatus.score ?? metrics.overallScore}%</span> permanent record.
                 </p>
               </div>
             </div>
@@ -290,11 +291,14 @@ export function GladiatorCloseoutCard({
       {/* 5. Tomorrow Battle Preview (Things 3 Benchmark) */}
       <div className="bg-white/80 border border-[#161514]/20 rounded-xl p-3 flex flex-wrap items-center justify-between gap-2 text-xs">
         <div className="flex items-center gap-2 font-mono text-[#161514]/80">
-          <span className="font-bold text-[#161514]">⚔️ Tomorrow&apos;s Horizon:</span>
-          <span>{tomorrowPendingTasksCount} tasks queued</span>
+          <span className="font-bold text-[#161514] flex items-center gap-1.5">
+            <Moon className="size-3.5 text-[#161514]" />
+            <span>Tomorrow&apos;s Horizon:</span>
+          </span>
+          <span className="tabular-nums">{tomorrowPendingTasksCount} tasks queued</span>
           <span>•</span>
           <span>
-            {currencySymbol}{tomorrowSafeToSpend ?? metrics.dailySafeToSpend} safe limit
+            {currencySymbol}<span className="tabular-nums">{tomorrowSafeToSpend ?? metrics.dailySafeToSpend}</span> safe limit
           </span>
         </div>
 

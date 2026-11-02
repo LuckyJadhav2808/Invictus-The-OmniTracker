@@ -56,7 +56,7 @@ export function TaskBattleQueue({
             <ShieldCheck className="size-5 text-[#161514]" />
           </div>
           <p className="font-heading font-black text-sm text-[#161514]">
-            Battlefield Clear!
+            All Priorities Cleared
           </p>
           <p className="text-xs text-[#161514]/65">
             No urgent or high-priority targets pending for today.

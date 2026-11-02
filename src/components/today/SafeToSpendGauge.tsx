@@ -105,21 +105,21 @@ export function SafeToSpendGauge({
       <div className="p-3.5 bg-[#FBF9F5] border-2 border-[#161514] rounded-xl space-y-2 shadow-[2px_2px_0px_#161514]">
         <div className="flex items-baseline justify-between">
           <div>
-            <span className="text-[10px] font-mono font-black uppercase text-[#161514]/65 block">
-              TODAY'S SPENT
+            <span className="text-[10px] font-mono font-bold uppercase text-[#161514]/65 block">
+              Today's spend
             </span>
-            <span className="font-mono font-black text-2xl text-[#161514]">
+            <span className="font-mono font-black text-2xl text-[#161514] tabular-nums">
               {currencySymbol}{spentToday.toFixed(0)}
             </span>
           </div>
 
           <div className="text-right">
-            <span className="text-[10px] font-mono font-black uppercase text-[#161514]/65 block">
-              {isCustomCap ? "DAILY LIMIT LEFT" : "SAFE BUDGET LEFT"}
+            <span className="text-[10px] font-mono font-bold uppercase text-[#161514]/65 block">
+              {isCustomCap ? "Daily limit left" : "Safe budget left"}
             </span>
             <span
               className={cn(
-                'font-mono font-black text-base',
+                'font-mono font-black text-base tabular-nums',
                 isOverBudget ? 'text-rose-600' : 'text-emerald-700'
               )}
             >
