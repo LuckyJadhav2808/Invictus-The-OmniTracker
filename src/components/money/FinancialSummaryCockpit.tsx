@@ -17,6 +17,7 @@ interface FinancialSummaryCockpitProps {
   onOpenEditAllowances: () => void;
   onOpenCalculator?: () => void;
   onSelectPaymentMethod?: (method: "upi" | "cash") => void;
+  onRefillCashTill?: () => void;
 }
 
 export function FinancialSummaryCockpit({
@@ -29,6 +30,7 @@ export function FinancialSummaryCockpit({
   onOpenEditAllowances,
   onOpenCalculator,
   onSelectPaymentMethod,
+  onRefillCashTill,
 }: FinancialSummaryCockpitProps) {
   const budgetPercentageRemaining = Math.max(
     0,
@@ -106,7 +108,7 @@ export function FinancialSummaryCockpit({
               <div>
                 <div className="flex flex-wrap items-center justify-between gap-1 mb-2">
                   <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider bg-[#161514] text-[#CEF431] px-2 py-0.5 rounded border border-[#161514] font-mono">
-                    Monthly Budget
+                    Monthly Digital Budget
                   </span>
                   {monthlyStats.rolloverSurplus > 0 && (
                     <span className="text-[10px] font-black font-mono text-[#1B5E20] bg-[#1B5E20]/15 px-2 py-0.5 rounded border border-[#1B5E20]/30">
@@ -134,7 +136,7 @@ export function FinancialSummaryCockpit({
                         Budget: {currencySymbol}{monthlyStats.totalAvailableBudget.toLocaleString()}
                       </span>
                       <span className="text-[10px] sm:text-xs font-bold text-[#1B5E20] font-mono">
-                        • {currencySymbol}{monthlyStats.monthlyExpense.toLocaleString()} Spent
+                        • {currencySymbol}{monthlyStats.onlineExpense.toLocaleString()} Spent
                       </span>
                     </div>
                   </div>
@@ -157,7 +159,7 @@ export function FinancialSummaryCockpit({
                   />
                 </div>
                 <div className="flex justify-between text-[9px] font-black font-mono text-[#1B5E20]/80 px-0.5 uppercase gap-1 flex-wrap">
-                  <span>{currencySymbol}0 Spent</span>
+                  <span>{currencySymbol}{monthlyStats.onlineExpense.toLocaleString()} Spent</span>
                   <span className="text-center">{budgetPercentageRemaining}% Left</span>
                   <span className="text-right">{currencySymbol}{monthlyStats.totalAvailableBudget.toLocaleString()} Total</span>
                 </div>
@@ -221,12 +223,26 @@ export function FinancialSummaryCockpit({
                 <div className="flex items-center justify-between pb-1.5 border-b border-[#161514]/10">
                   <div className="flex items-center gap-1.5 font-heading text-xs font-black uppercase text-[#161514]">
                     <span>💵</span>
-                    <span>Cash Payments</span>
+                    <span>Physical Cash Till</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <span className="text-[9px] font-bold text-[#161514]/60 uppercase">
-                      {cashMonthPercent}% of spend
+                      Pocket Till
                     </span>
+                    {onRefillCashTill && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onRefillCashTill();
+                        }}
+                        className="text-[8px] font-black uppercase px-1.5 py-0.5 bg-[#CEF431] hover:bg-[#bde422] text-[#161514] rounded border border-[#161514] shadow-[1px_1px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer flex items-center gap-0.5"
+                        title="Refill Cash Till (ATM Withdrawal)"
+                      >
+                        <span>🔄</span>
+                        <span>Refill</span>
+                      </button>
+                    )}
                     {onSelectPaymentMethod && (
                       <span className="text-[8px] font-black uppercase px-1 py-0.2 bg-[#CEF431] text-[#161514] rounded border border-[#161514]/30">
                         View
@@ -262,15 +278,15 @@ export function FinancialSummaryCockpit({
                       </span>
                       <span
                         className={cn(
-                          "font-bold uppercase text-[8px] px-1 py-0.2 rounded border",
+                          "font-black uppercase text-[8.5px] px-1.5 py-0.5 rounded border shadow-[1px_1px_0px_#161514]",
                           monthlyStats.isCashEnvelopeExhausted
                             ? "bg-rose-100 text-rose-700 border-rose-300"
-                            : "bg-[#03D26F]/15 text-emerald-800 border-emerald-300"
+                            : "bg-[#03D26F]/20 text-emerald-900 border-emerald-400"
                         )}
                       >
                         {monthlyStats.isCashEnvelopeExhausted
-                          ? "Limit Reached"
-                          : `${currencySymbol}{monthlyStats.remainingCashBudget.toLocaleString()} Left`}
+                          ? "Till Empty"
+                          : `${currencySymbol}{monthlyStats.remainingCashBudget.toLocaleString()} in Pocket`}
                       </span>
                     </div>
                     <div className="h-1.5 w-full bg-[#161514]/10 rounded-full overflow-hidden p-0.2 border border-[#161514]/20">

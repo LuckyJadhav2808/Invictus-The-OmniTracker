@@ -159,6 +159,12 @@ function MoneyPageContent() {
   const [baseCashBudget, setBaseCashBudget] = useState(2000);
   const [customDailyBudget, setCustomDailyBudget] = useState<number | null>(null);
   const [enableRollover, setEnableRollover] = useState(true);
+  const [cashRefillDate, setCashRefillDate] = useState<string | null>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("invictus_cash_refilled_at");
+    }
+    return null;
+  });
 
   // Hydrate allowances from Cloud & LocalStorage
   useEffect(() => {
@@ -205,8 +211,20 @@ function MoneyPageContent() {
       baseUpiBudget,
       baseCashBudget,
       enableRollover,
+      cashRefillDate,
     });
-  }, [transactions, categories, targetMonthKey, baseUpiBudget, baseCashBudget, enableRollover]);
+  }, [transactions, categories, targetMonthKey, baseUpiBudget, baseCashBudget, enableRollover, cashRefillDate]);
+
+  const handleRefillCashTill = () => {
+    const nowIso = new Date().toISOString();
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("invictus_cash_refilled_at", nowIso);
+      } catch {}
+    }
+    setCashRefillDate(nowIso);
+    toast.success(`Cash Till refilled to full ${currencySymbol}${baseCashBudget.toLocaleString()}! 💵✨`);
+  };
 
   const dailyStats = useMemo(() => {
     return computeDailyBudgetStats({
@@ -482,6 +500,7 @@ function MoneyPageContent() {
         onOpenEditAllowances={() => setIsAllowanceModalOpen(true)}
         onOpenCalculator={() => setIsCalculatorOpen(true)}
         onSelectPaymentMethod={handleSelectPaymentMethodFromHero}
+        onRefillCashTill={handleRefillCashTill}
       />
 
       {/* 🔒 Zero-Knowledge SMS Sync Banner & Cash Action */}

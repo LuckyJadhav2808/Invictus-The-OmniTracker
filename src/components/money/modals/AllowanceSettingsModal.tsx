@@ -93,9 +93,9 @@ export function AllowanceSettingsModal({
         <div className="space-y-1.5 bg-[#FAF8F5] p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514]">
           <div className="flex items-center justify-between">
             <label htmlFor="upi-allowance-input" className="text-xs font-black uppercase tracking-wider text-[#161514]">
-              📱 UPI & Online Budget ({currencySymbol})
+              📱 Monthly Digital / UPI Budget ({currencySymbol})
             </label>
-            <span className="text-[10px] font-bold text-[#161514]/60">GPay, Paytm, Cards</span>
+            <span className="text-[10px] font-bold text-[#161514]/60">Resets monthly • Eligible for rollover</span>
           </div>
           <input
             id="upi-allowance-input"
@@ -109,7 +109,7 @@ export function AllowanceSettingsModal({
             className="w-full neo-input text-sm font-black bg-white"
           />
           <div className="flex gap-1.5 pt-1 overflow-x-auto no-scrollbar">
-            {[5000, 8000, 12000, 20000].map((val) => (
+            {[5000, 8000, 10000, 12000, 20000].map((val) => (
               <button
                 key={`upi-${val}`}
                 type="button"
@@ -126,9 +126,9 @@ export function AllowanceSettingsModal({
         <div className="space-y-1.5 bg-[#FAF8F5] p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514]">
           <div className="flex items-center justify-between">
             <label htmlFor="cash-allowance-input" className="text-xs font-black uppercase tracking-wider text-[#161514]">
-              💵 Cash Budget ({currencySymbol})
+              💵 Physical Cash Till Capacity ({currencySymbol})
             </label>
-            <span className="text-[10px] font-bold text-[#161514]/60">ATM Notes & Coins • Running envelope until limit is reached</span>
+            <span className="text-[10px] font-bold text-[#161514]/60">Continuous pocket till • Decoupled from monthly calendar</span>
           </div>
           <input
             id="cash-allowance-input"

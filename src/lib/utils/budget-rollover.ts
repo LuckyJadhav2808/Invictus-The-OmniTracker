@@ -40,6 +40,10 @@ export interface MonthlyBudgetStats {
   budgetUsedPercentage: number;
   daysRemainingInMonth: number;
   dailySafeToSpend: number;
+  // Combined Totals (Across Digital + Cash Till)
+  totalCombinedBudget: number;
+  totalCombinedRemaining: number;
+  totalMonthlyExpense: number;
   // Channel-Specific Budget Metrics (UPI/Digital vs Physical Cash)
   previousMonthUpiExpense: number;
   previousMonthCashExpense: number;
@@ -112,6 +116,7 @@ export function computeMonthlyBudgetStats({
   previousMonthUpiBudget,
   previousMonthCashBudget,
   enableRollover = true,
+  cashRefillDate,
   currencySymbol = "₹",
 }: {
   transactions?: Transaction[];
@@ -123,6 +128,7 @@ export function computeMonthlyBudgetStats({
   previousMonthUpiBudget?: number;
   previousMonthCashBudget?: number;
   enableRollover?: boolean;
+  cashRefillDate?: string | null;
   currencySymbol?: string;
 }): MonthlyBudgetStats {
   const safeTransactions = transactions || [];
@@ -232,7 +238,8 @@ export function computeMonthlyBudgetStats({
           t.type === "expense" &&
           isCashTransaction(t.paymentMethod) &&
           t.date &&
-          t.date.slice(0, 7) <= targetMonthKey
+          t.date.slice(0, 7) <= targetMonthKey &&
+          (!cashRefillDate || t.date >= cashRefillDate.slice(0, 10))
       )
       .sort((a, b) => (a.date > b.date ? 1 : a.date < b.date ? -1 : 0));
 
@@ -258,10 +265,18 @@ export function computeMonthlyBudgetStats({
   // Channel-Specific Available & Remaining Pools
   const totalAvailableUpiBudget = effectiveUpiBudget + upiRolloverSurplus;
   const totalAvailableCashBudget = effectiveCashBudget;
-  const totalAvailableBudget = totalAvailableUpiBudget + totalAvailableCashBudget;
-
   const remainingUpiBudget = totalAvailableUpiBudget - onlineExpense;
-  const remainingBudget = remainingUpiBudget + remainingCashBudget;
+
+  // Option 3 Decoupling:
+  // The top-line Monthly Budget strictly reflects the digital / UPI monthly budget.
+  // Physical Cash Till operates independently as a continuous wallet envelope.
+  const totalAvailableBudget = totalAvailableUpiBudget;
+  const remainingBudget = remainingUpiBudget;
+
+  // Combined totals (preserved for overall portfolio tracking)
+  const totalCombinedBudget = totalAvailableUpiBudget + totalAvailableCashBudget;
+  const totalCombinedRemaining = remainingUpiBudget + remainingCashBudget;
+  const totalMonthlyExpense = monthlyExpense;
 
   const upiBudgetUsedPercentage =
     totalAvailableUpiBudget > 0
@@ -273,10 +288,7 @@ export function computeMonthlyBudgetStats({
       ? Math.min(100, Math.round((envelopeCashExpense / effectiveCashBudget) * 100))
       : 0;
 
-  const budgetUsedPercentage =
-    totalAvailableBudget > 0
-      ? Math.min(100, Math.round((monthlyExpense / totalAvailableBudget) * 100))
-      : 0;
+  const budgetUsedPercentage = upiBudgetUsedPercentage;
 
   // 4. Daily Safe-to-Spend & Intelligent Burn Pace
   let daysRemainingInMonth = 1;
@@ -363,7 +375,7 @@ export function computeMonthlyBudgetStats({
     targetMonthKey,
     targetMonthLabel,
     isCurrentCalendarMonth,
-    baseBudget: effectiveBaseBudget,
+    baseBudget: effectiveUpiBudget,
     baseUpiBudget: effectiveUpiBudget,
     baseCashBudget: effectiveCashBudget,
     monthlyExpense,
@@ -384,6 +396,9 @@ export function computeMonthlyBudgetStats({
     totalAvailableBudget,
     remainingBudget,
     budgetUsedPercentage,
+    totalCombinedBudget,
+    totalCombinedRemaining,
+    totalMonthlyExpense,
     daysRemainingInMonth,
     dailySafeToSpend,
     previousMonthUpiExpense,

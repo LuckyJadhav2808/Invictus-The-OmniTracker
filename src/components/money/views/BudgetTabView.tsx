@@ -70,28 +70,28 @@ export function BudgetTabView({
         {/* Rollover Metrics Strip */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
           <div className="bg-white p-2.5 rounded-xl border border-[#161514]">
-            <span className="text-[9px] font-black uppercase text-[#161514]/60 block">Base Allowance</span>
+            <span className="text-[9px] font-black uppercase text-[#161514]/60 block">Base Digital Allowance</span>
             <span className="text-sm sm:text-base font-black text-[#161514] font-heading mt-0.5 block">
               {currencySymbol}{monthlyStats.baseBudget.toLocaleString()}
             </span>
           </div>
 
           <div className="bg-white p-2.5 rounded-xl border border-[#161514]">
-            <span className="text-[9px] font-black uppercase text-emerald-700 block">Rollover Surplus</span>
+            <span className="text-[9px] font-black uppercase text-emerald-700 block">UPI Rollover Surplus</span>
             <span className="text-sm sm:text-base font-black text-emerald-700 font-heading mt-0.5 block">
               +{currencySymbol}{monthlyStats.rolloverSurplus.toLocaleString()}
             </span>
           </div>
 
           <div className="bg-white p-2.5 rounded-xl border border-[#161514]">
-            <span className="text-[9px] font-black uppercase text-[#161514]/60 block">Total Spendable</span>
+            <span className="text-[9px] font-black uppercase text-[#161514]/60 block">Total Spendable Digital</span>
             <span className="text-sm sm:text-base font-black text-[#161514] font-heading mt-0.5 block">
               {currencySymbol}{monthlyStats.totalAvailableBudget.toLocaleString()}
             </span>
           </div>
 
           <div className="bg-white p-2.5 rounded-xl border border-[#161514]">
-            <span className="text-[9px] font-black uppercase text-[#161514]/60 block">Daily Spend Limit</span>
+            <span className="text-[9px] font-black uppercase text-[#161514]/60 block">Daily Digital Pace</span>
             <span className="text-sm sm:text-base font-black text-[#03D26F] font-heading mt-0.5 block">
               ~{currencySymbol}{monthlyStats.dailySafeToSpend.toLocaleString()}/day
             </span>
@@ -100,6 +100,39 @@ export function BudgetTabView({
             </span>
           </div>
         </div>
+
+        {/* Independent Physical Cash Till Showcase */}
+        {monthlyStats.baseCashBudget > 0 && (
+          <div className="bg-[#FFF9EA] p-3 rounded-xl border border-[#161514] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 mt-2">
+            <div className="space-y-0.5">
+              <div className="flex items-center gap-1.5 font-heading text-xs font-black uppercase text-[#161514]">
+                <span>💵</span>
+                <span>Physical Cash Till</span>
+                <span className="text-[8.5px] font-mono px-1.5 py-0.2 bg-[#161514] text-[#FAF8F5] rounded">
+                  Independent Pocket Envelope
+                </span>
+              </div>
+              <p className="text-[10px] text-[#161514]/70 font-bold">
+                Envelope: {currencySymbol}{monthlyStats.envelopeCashExpense.toLocaleString()} / {currencySymbol}{monthlyStats.baseCashBudget.toLocaleString()} Used • Decoupled from monthly calendar resets.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 self-start sm:self-center">
+              <span
+                className={cn(
+                  "font-black uppercase text-[10px] px-2.5 py-1 rounded-lg border shadow-[1px_1px_0px_#161514] font-mono",
+                  monthlyStats.isCashEnvelopeExhausted
+                    ? "bg-rose-100 text-rose-700 border-rose-300"
+                    : "bg-[#03D26F]/20 text-emerald-900 border-emerald-400"
+                )}
+              >
+                {monthlyStats.isCashEnvelopeExhausted
+                  ? "Till Empty"
+                  : `${currencySymbol}{monthlyStats.remainingCashBudget.toLocaleString()} in Pocket`}
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 🏷️ CATEGORY ENVELOPES SECTION */}
