@@ -348,14 +348,21 @@ export function RetroStickyScratchpadDrawer({
 
   return (
     <>
-      {/* 1. Persistent Floating Action Dock Button (Bottom-Right) */}
+      {/* 1. Persistent Floating Action Dock Button (Anchored above mobile BottomNav) */}
       <button
         type="button"
         onClick={() => {
           soundFX.playPop();
           onOpenChange(true);
         }}
-        className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-30 bg-[#FAF8F5] hover:bg-white text-[#161514] border-2 border-[#161514] px-3.5 py-2 rounded-xl shadow-[3px_3px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 flex items-center gap-2 font-heading font-black text-xs cursor-pointer transition-all select-none"
+        className={cn(
+          "fixed right-4 sm:right-6 z-40",
+          "bottom-[calc(5.25rem+env(safe-area-inset-bottom,0px))] lg:bottom-6",
+          "bg-[#FAF8F5] hover:bg-white text-[#161514] border-2 border-[#161514]",
+          "px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-xl shadow-[3px_3px_0px_#161514]",
+          "active:translate-x-0.5 active:translate-y-0.5 flex items-center gap-2",
+          "font-heading font-black text-xs cursor-pointer transition-all select-none"
+        )}
         aria-label="Open Scratchpad (Cmd+J)"
         title="Open Scratchpad (Cmd+J)"
       >
@@ -363,7 +370,7 @@ export function RetroStickyScratchpadDrawer({
           <FileText className="size-3 text-[#161514] stroke-[2.5]" />
         </div>
         <span>Scratchpad</span>
-        <kbd className="hidden xs:inline-block font-mono text-[9px] bg-[#F1EFEA] border border-[#161514] px-1 py-0.2 rounded text-[#161514]/80">
+        <kbd className="hidden sm:inline-block font-mono text-[9px] bg-[#F1EFEA] border border-[#161514] px-1 py-0.2 rounded text-[#161514]/80">
           ⌘J
         </kbd>
         {activeLinesCount > 0 && (
@@ -376,7 +383,7 @@ export function RetroStickyScratchpadDrawer({
         <SheetContent
           side="right"
           showCloseButton={false}
-          className="bg-[#FAF8F5] border-l-2 border-[#161514] shadow-[-6px_0px_0px_0px_#161514] w-full sm:max-w-md md:max-w-lg p-5 flex flex-col justify-between text-[#161514] space-y-4"
+          className="bg-[#FAF8F5] border-l-2 border-[#161514] shadow-[-6px_0px_0px_0px_#161514] w-full sm:max-w-md md:max-w-lg p-4 sm:p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))] flex flex-col justify-between text-[#161514] space-y-4"
         >
           {/* Header */}
           <div className="flex items-center justify-between border-b-2 border-[#161514]/15 pb-3 shrink-0">
@@ -446,11 +453,11 @@ export function RetroStickyScratchpadDrawer({
                     )}
                   </div>
 
-                  <div className="flex items-center gap-1 shrink-0 ml-2">
+                  <div className="flex items-center gap-1.5 shrink-0 ml-2">
                     <button
                       type="button"
                       onClick={handleCreateTaskFromNote}
-                      className="px-2 py-0.5 rounded border border-[#161514] bg-[#CEF431] font-heading font-black text-[10px] hover:bg-[#D8F74E]"
+                      className="min-h-[34px] px-2.5 py-1 rounded-lg border-2 border-[#161514] bg-[#CEF431] font-heading font-black text-xs hover:bg-[#D8F74E] active:scale-95 shadow-[1px_1px_0px_#161514] transition-all cursor-pointer"
                       title="Convert to Task"
                     >
                       + Task
@@ -458,7 +465,7 @@ export function RetroStickyScratchpadDrawer({
                     <button
                       type="button"
                       onClick={handleCreateExpenseFromNote}
-                      className="px-2 py-0.5 rounded border border-[#161514] bg-white font-heading font-black text-[10px] hover:bg-[#F3EFEA]"
+                      className="min-h-[34px] px-2.5 py-1 rounded-lg border-2 border-[#161514] bg-white font-heading font-black text-xs hover:bg-[#F3EFEA] active:scale-95 shadow-[1px_1px_0px_#161514] transition-all cursor-pointer"
                       title="Convert to Expense"
                     >
                       + Expense

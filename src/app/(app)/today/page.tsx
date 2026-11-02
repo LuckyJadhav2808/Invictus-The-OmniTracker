@@ -522,6 +522,7 @@ export default function TodayPage() {
         onToggleTimer={() => setIsTimerRunning(!isTimerRunning)}
         onOpenExpenseModal={() => setIsQuickExpenseOpen(true)}
         onOpenCloseoutDrawer={() => setIsCloseoutDrawerOpen(true)}
+        onOpenScratchpad={() => setIsScratchpadDrawerOpen(true)}
       />
 
       {/* ZONE 2: DAILY CORE HUB (Bento Row 1 - Habits & Study Focus - Locked Baseline) */}

@@ -12,6 +12,7 @@ import {
   ChevronRight,
   Zap,
   Moon,
+  FileText,
 } from "lucide-react";
 import { VixPixelCompanion, VixPixelState } from "@/components/mascot/VixPixelCompanion";
 import {
@@ -51,6 +52,7 @@ export interface MasterTodayHeroProps {
   onToggleTimer?: () => void;
   onOpenExpenseModal?: () => void;
   onOpenCloseoutDrawer?: () => void;
+  onOpenScratchpad?: () => void;
   className?: string;
 }
 
@@ -81,6 +83,7 @@ export function MasterTodayHero({
   onToggleTimer,
   onOpenExpenseModal,
   onOpenCloseoutDrawer,
+  onOpenScratchpad,
   className,
 }: MasterTodayHeroProps) {
   // Determine pixel companion state
@@ -264,6 +267,21 @@ export function MasterTodayHero({
                     <Wallet className="size-3 text-[#161514] stroke-[2.5]" />
                   </div>
                   <span>+ Log Expense</span>
+                </button>
+              )}
+
+              {/* Quick Scratchpad Trigger (Dual Access for Mobile & Desktop) */}
+              {onOpenScratchpad && (
+                <button
+                  type="button"
+                  onClick={() => handleInteractiveClick(onOpenScratchpad)}
+                  className="min-h-[42px] px-3.5 py-2 bg-white hover:bg-[#F3EFEA] active:translate-x-0.5 active:translate-y-0.5 border-2 border-[#161514] rounded-xl shadow-[2.5px_2.5px_0px_#161514] flex items-center gap-1.5 font-heading font-black text-xs text-[#161514] transition-all cursor-pointer"
+                  title="Open Quick Scratchpad (⌘J)"
+                >
+                  <div className="size-5 rounded-md bg-[#FFB800] border border-[#161514] flex items-center justify-center shrink-0">
+                    <FileText className="size-3 text-[#161514] stroke-[2.5]" />
+                  </div>
+                  <span>Scratchpad</span>
                 </button>
               )}
 
