@@ -6,6 +6,7 @@ import { type Category } from "@/types";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
 import { Trash2 } from "lucide-react";
+import { CategoryIcon } from "@/components/money/MoneyQuickActionsAndCards";
 
 interface CategoryFormModalProps {
   open: boolean;
@@ -24,9 +25,30 @@ interface CategoryFormModalProps {
 }
 
 const PRESET_ICONS = [
-  "🍔", "☕", "🚕", "🛒", "🛍️", "🍿", "💊", "📚",
-  "⚡", "🏠", "✈️", "🏋️", "💻", "🎮", "🐾", "🎁",
-  "💰", "💼", "📈", "💵", "🏦", "🎯", "✨", "💳"
+  "Wallet",
+  "Briefcase",
+  "Coffee",
+  "Home",
+  "Compass",
+  "DollarSign",
+  "Smile",
+  "ShoppingBag",
+  "Utensils",
+  "Zap",
+  "BookOpen",
+  "HeartPulse",
+  "Tag",
+  "PiggyBank",
+  "Smartphone",
+  "CreditCard",
+  "Dumbbell",
+  "Gamepad",
+  "Laptop",
+  "Sparkles",
+  "GraduationCap",
+  "Music",
+  "Shield",
+  "Car",
 ];
 
 const PRESET_COLORS = [
@@ -52,7 +74,7 @@ export function CategoryFormModal({
 
   const [name, setName] = useState("");
   const [type, setType] = useState<"expense" | "income">("expense");
-  const [icon, setIcon] = useState("💳");
+  const [icon, setIcon] = useState("Wallet");
   const [color, setColor] = useState("lime");
   const [monthlyBudget, setMonthlyBudget] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -63,13 +85,13 @@ export function CategoryFormModal({
       if (initialData) {
         setName(initialData.name || "");
         setType(initialData.type || "expense");
-        setIcon(initialData.icon || "💳");
+        setIcon(initialData.icon || "Wallet");
         setColor(initialData.color || "lime");
         setMonthlyBudget(String(initialData.monthlyBudget || ""));
       } else {
         setName("");
         setType("expense");
-        setIcon("🍔");
+        setIcon("Tag");
         setColor("lime");
         setMonthlyBudget("");
       }
@@ -177,23 +199,24 @@ export function CategoryFormModal({
           <label className="text-[10px] font-black uppercase tracking-wider text-[#161514]">
             Select Icon
           </label>
-          <div className="grid grid-cols-8 gap-1 bg-[#FAF8F5] p-2 rounded-xl border-2 border-[#161514]">
-            {PRESET_ICONS.map((emoji) => (
+          <div className="grid grid-cols-6 sm:grid-cols-8 gap-1.5 bg-[#FAF8F5] p-2.5 rounded-xl border-2 border-[#161514]">
+            {PRESET_ICONS.map((presetIcon) => (
               <button
-                key={emoji}
+                key={presetIcon}
                 type="button"
                 onClick={() => {
                   soundFX.playPop();
-                  setIcon(emoji);
+                  setIcon(presetIcon);
                 }}
                 className={cn(
-                  "p-1.5 rounded-lg text-lg flex items-center justify-center transition-all cursor-pointer",
-                  icon === emoji
-                    ? "bg-[#CEF431] border border-[#161514] scale-110 shadow-[1px_1px_0px_0px_#161514]"
-                    : "hover:bg-white/80"
+                  "p-2 rounded-xl flex items-center justify-center transition-all cursor-pointer border",
+                  icon === presetIcon
+                    ? "bg-[#CEF431] border-[#161514] scale-105 shadow-[1.5px_1.5px_0px_0px_#161514]"
+                    : "bg-white border-transparent hover:bg-white hover:border-[#161514]/40"
                 )}
+                title={presetIcon}
               >
-                {emoji}
+                <CategoryIcon name={presetIcon} className="size-4 text-[#161514]" />
               </button>
             ))}
           </div>

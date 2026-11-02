@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
 import { type Category } from "@/types";
-import { Send, RefreshCw } from "lucide-react";
+import { Send, RefreshCw, Smartphone, QrCode, Banknote, CreditCard, Building2, Zap } from "lucide-react";
 import { soundFX } from "@/components/shared/SoundFX";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -24,12 +24,12 @@ interface SendMoneyModalProps {
 }
 
 const PAYMENT_METHODS = [
-  { id: "upi", label: "UPI / QR", icon: "⚡" },
-  { id: "gpay", label: "GPay", icon: "📱" },
-  { id: "phonepe", label: "PhonePe", icon: "🟣" },
-  { id: "cash", label: "Cash", icon: "💵" },
-  { id: "card", label: "Card", icon: "💳" },
-  { id: "bank", label: "Bank Transfer", icon: "🏦" },
+  { id: "upi", label: "UPI / QR", icon: QrCode },
+  { id: "gpay", label: "GPay", icon: Smartphone },
+  { id: "phonepe", label: "PhonePe", icon: Zap },
+  { id: "cash", label: "Cash", icon: Banknote },
+  { id: "card", label: "Card", icon: CreditCard },
+  { id: "bank", label: "Bank Transfer", icon: Building2 },
 ];
 
 const QUICK_AMOUNTS = [50, 100, 200, 500, 1000, 2000];
@@ -105,6 +105,7 @@ export function SendMoneyModal({
     value: c.id,
     label: c.name,
     icon: c.icon,
+    badge: c.monthlyBudget ? `${currencySymbol}${c.monthlyBudget.toLocaleString()}` : undefined,
   }));
 
   return (
@@ -198,6 +199,7 @@ export function SendMoneyModal({
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
             {PAYMENT_METHODS.map((pm) => {
               const isSelected = paymentMethod === pm.id;
+              const IconComp = pm.icon;
               return (
                 <button
                   key={pm.id}
@@ -207,14 +209,14 @@ export function SendMoneyModal({
                     setPaymentMethod(pm.id);
                   }}
                   className={cn(
-                    "flex flex-col items-center justify-center py-2 px-1 rounded-xl border-2 border-[#161514] transition-all cursor-pointer text-center",
+                    "flex flex-col items-center justify-center py-2 px-1 rounded-xl border-2 border-[#161514] transition-all cursor-pointer text-center gap-1",
                     isSelected
                       ? "bg-[#03D26F] text-[#161514] shadow-[2px_2px_0px_0px_#161514] -translate-y-0.5 font-black"
                       : "bg-white text-[#161514]/70 hover:bg-[#FAF8F5] shadow-[1px_1px_0px_0px_#161514] font-bold"
                   )}
                 >
-                  <span className="text-base">{pm.icon}</span>
-                  <span className="text-[10px] truncate max-w-full mt-0.5">{pm.label}</span>
+                  <IconComp className="size-4 shrink-0 text-[#161514]" />
+                  <span className="text-[10px] truncate max-w-full font-heading">{pm.label}</span>
                 </button>
               );
             })}

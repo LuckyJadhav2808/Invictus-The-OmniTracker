@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { format, parseISO, isToday, isYesterday } from "date-fns";
 import { Search, Filter, FileDown, Plus, Copy, Edit2, Trash2, Calendar, Zap, Smartphone, Banknote, Globe, Receipt } from "lucide-react";
 import { soundFX } from "@/components/shared/SoundFX";
+import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
 import { renderCategoryEmoji, CategoryIcon, MoneyQuickActionsAndCards } from "@/components/money/MoneyQuickActionsAndCards";
 import { isCashTransaction, isOnlineTransaction, type MonthlyBudgetStats } from "@/lib/utils/budget-rollover";
 
@@ -331,24 +332,26 @@ export function LedgerTabView({
           </div>
 
           {/* Dedicated Month Filter Dropdown */}
-          <div className="flex items-center gap-1.5 bg-white px-2.5 py-1 rounded-xl border border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
-            <Calendar className="size-3 text-[#161514]/70 shrink-0" />
-            <select
+          <div className="w-auto min-w-[140px]">
+            <NeobrutalistSelect
+              size="sm"
               value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-              className="bg-transparent text-[10px] font-black uppercase text-[#161514] focus:outline-none cursor-pointer"
-            >
-              <option value="all">All Time (All Months)</option>
-              {availableMonths.map((m) => (
-                <option key={m.key} value={m.key}>
-                  {m.label} {m.isCurrent ? "• Current" : ""}
-                </option>
-              ))}
-            </select>
+              onChange={setSelectedMonth}
+              options={[
+                { value: "all", label: "All Months", icon: "Calendar" },
+                ...availableMonths.map((m) => ({
+                  value: m.key,
+                  label: m.label,
+                  badge: m.isCurrent ? "Current" : undefined,
+                  icon: "Calendar",
+                })),
+              ]}
+              placeholder="Select month"
+            />
           </div>
 
           {/* Type Filter */}
-          <div className="flex gap-1 bg-white p-1 rounded-xl border border-[#161514]">
+          <div className="flex gap-1 bg-white p-1 rounded-xl border border-[#161514] shadow-[1px_1px_0px_#161514]">
             {(["all", "expense", "income"] as const).map((t) => (
               <button
                 key={t}
@@ -367,7 +370,7 @@ export function LedgerTabView({
           </div>
 
           {/* Payment Method Filter */}
-          <div className="flex gap-1 bg-white p-1 rounded-xl border border-[#161514]">
+          <div className="flex gap-1 bg-white p-1 rounded-xl border border-[#161514] shadow-[1px_1px_0px_#161514]">
             {[
               { id: "all", label: "All Modes" },
               { id: "upi", label: "UPI" },
@@ -390,18 +393,22 @@ export function LedgerTabView({
           </div>
 
           {/* Category Dropdown Filter */}
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="bg-white px-2.5 py-1 text-[10px] font-black rounded-xl border border-[#161514] uppercase text-[#161514] cursor-pointer"
-          >
-            <option value="all">All Categories</option>
-            {categories.map((c) => (
-              <option key={c.id} value={c.id}>
-                {renderCategoryEmoji(c.icon)} {c.name}
-              </option>
-            ))}
-          </select>
+          <div className="w-auto min-w-[160px]">
+            <NeobrutalistSelect
+              size="sm"
+              value={selectedCategory}
+              onChange={setSelectedCategory}
+              options={[
+                { value: "all", label: "All Categories", icon: "Tag" },
+                ...categories.map((c) => ({
+                  value: c.id,
+                  label: c.name,
+                  icon: c.icon,
+                })),
+              ]}
+              placeholder="All Categories"
+            />
+          </div>
 
           {isFilterActive && (
             <button

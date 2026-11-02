@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
+import { Smartphone, Banknote, Zap, RefreshCw } from "lucide-react";
 
 interface AllowanceSettingsModalProps {
   open: boolean;
@@ -89,11 +90,12 @@ export function AllowanceSettingsModal({
           </span>
         </div>
 
-        {/* 📱 UPI & Online Allowance */}
+        {/* UPI & Online Allowance */}
         <div className="space-y-1.5 bg-[#FAF8F5] p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514]">
           <div className="flex items-center justify-between">
-            <label htmlFor="upi-allowance-input" className="text-xs font-black uppercase tracking-wider text-[#161514]">
-              📱 Monthly Digital / UPI Budget ({currencySymbol})
+            <label htmlFor="upi-allowance-input" className="text-xs font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5">
+              <Smartphone className="size-3.5 text-[#161514]" />
+              <span>Monthly Digital / UPI Budget ({currencySymbol})</span>
             </label>
             <span className="text-[10px] font-bold text-[#161514]/60">Resets monthly • Eligible for rollover</span>
           </div>
@@ -122,11 +124,12 @@ export function AllowanceSettingsModal({
           </div>
         </div>
 
-        {/* 💵 Physical Cash Allowance */}
+        {/* Physical Cash Allowance */}
         <div className="space-y-1.5 bg-[#FAF8F5] p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514]">
           <div className="flex items-center justify-between">
-            <label htmlFor="cash-allowance-input" className="text-xs font-black uppercase tracking-wider text-[#161514]">
-              💵 Physical Cash Till Capacity ({currencySymbol})
+            <label htmlFor="cash-allowance-input" className="text-xs font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5">
+              <Banknote className="size-3.5 text-[#161514]" />
+              <span>Physical Cash Till Capacity ({currencySymbol})</span>
             </label>
             <span className="text-[10px] font-bold text-[#161514]/60">Continuous pocket till • Decoupled from monthly calendar</span>
           </div>
@@ -155,11 +158,12 @@ export function AllowanceSettingsModal({
           </div>
         </div>
 
-        {/* ⚡ Daily Spending Limit (Optional Custom Cap) */}
+        {/* Daily Spending Limit (Optional Custom Cap) */}
         <div className="space-y-1.5 bg-[#FAF8F5] p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514]">
           <div className="flex items-center justify-between">
-            <label htmlFor="daily-allowance-input" className="text-xs font-black uppercase tracking-wider text-[#161514]">
-              ⚡ Fixed Daily Cap (Optional) ({currencySymbol})
+            <label htmlFor="daily-allowance-input" className="text-xs font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5">
+              <Zap className="size-3.5 text-[#161514]" />
+              <span>Fixed Daily Cap (Optional) ({currencySymbol})</span>
             </label>
             <span className="text-[10px] font-bold text-[#161514]/60">Recommended Limit</span>
           </div>
@@ -196,11 +200,12 @@ export function AllowanceSettingsModal({
           </div>
         </div>
 
-        {/* 🔄 Automatic Monthly Rollover Switch */}
+        {/* Automatic Monthly Rollover Switch */}
         <div className="p-3 bg-white rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-between gap-3">
           <div className="space-y-0.5">
-            <span className="text-xs font-black uppercase tracking-wider text-[#161514] block">
-              Monthly Rollover Surplus
+            <span className="text-xs font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5">
+              <RefreshCw className="size-3.5 text-[#161514]" />
+              <span>Monthly Rollover Surplus</span>
             </span>
             <p className="text-[11px] text-[#161514]/70 font-medium leading-tight">
               Roll unspent savings into next month&apos;s allowance

@@ -8,8 +8,8 @@ import { soundFX } from "@/components/shared/SoundFX";
 import { cn } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
 import { type Transaction, type Category } from "@/types";
-import { Trash2, Calendar, Plus, Sparkles, Tag } from "lucide-react";
-import { renderCategoryEmoji } from "@/components/money/MoneyQuickActionsAndCards";
+import { Trash2, Calendar, Plus, Sparkles, Tag, Smartphone, Banknote, CreditCard, Building2, TrendingDown, TrendingUp } from "lucide-react";
+import { CategoryIcon } from "@/components/money/MoneyQuickActionsAndCards";
 
 import { detectCategoryFromNote } from "@/lib/utils/merchant-categorizer";
 import { MerchantCategoryCache } from "@/lib/sms/merchant-cache";
@@ -253,7 +253,14 @@ export function TransactionFormModal({
                     : "bg-white text-[#161514]/70 hover:bg-[#FAF8F5]"
                 )}
               >
-                {t === "expense" ? "💸 Expense" : "💰 Income"}
+                <span className="flex items-center justify-center gap-1.5">
+                  {t === "expense" ? (
+                    <TrendingDown className="size-3.5 stroke-[2.5]" />
+                  ) : (
+                    <TrendingUp className="size-3.5 stroke-[2.5]" />
+                  )}
+                  <span>{t === "expense" ? "Expense" : "Income"}</span>
+                </span>
               </button>
             ))}
           </div>
@@ -331,14 +338,14 @@ export function TransactionFormModal({
                         setMatchedCategoryName(null);
                       }}
                       className={cn(
-                        "p-2 rounded-xl border-2 border-[#161514] text-center transition-all cursor-pointer flex flex-col items-center gap-1 shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
+                        "p-2 rounded-xl border-2 border-[#161514] text-center transition-all cursor-pointer flex flex-col items-center gap-1.5 shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
                         isSelected
                           ? "bg-[#CEF431] text-[#161514] ring-2 ring-[#161514]"
                           : "bg-white text-[#161514]/80 hover:bg-[#FAF8F5]"
                       )}
                     >
-                      <span className="text-lg leading-none">{renderCategoryEmoji(cat.icon)}</span>
-                      <span className="text-[9px] font-black uppercase tracking-tight truncate w-full">
+                      <CategoryIcon name={cat.icon} className="size-4 sm:size-5 text-[#161514]" />
+                      <span className="text-[9.5px] font-black uppercase tracking-tight truncate w-full">
                         {cat.name}
                       </span>
                     </button>
@@ -373,14 +380,14 @@ export function TransactionFormModal({
                 options={filteredCategories.map((c) => ({
                   value: c.id,
                   label: c.name,
-                  icon: renderCategoryEmoji(c.icon),
+                  icon: c.icon,
                 }))}
                 placeholder="Select Category"
               />
             )}
           </div>
 
-          {/* 📱 PAYMENT METHOD & 📅 NEOBRUTALIST DATE PICKER */}
+          {/* PAYMENT METHOD & NEOBRUTALIST DATE PICKER */}
           <div className="grid grid-cols-2 gap-3">
             {/* Payment Method */}
             <div className="space-y-1">
@@ -391,9 +398,9 @@ export function TransactionFormModal({
                 <button
                   type="button"
                   onClick={() => setShowMorePaymentMethods(!showMorePaymentMethods)}
-                  className="text-[9px] font-black uppercase text-navy-700 hover:underline cursor-pointer border-none bg-transparent"
+                  className="text-[9px] font-black uppercase text-[#161514] hover:underline cursor-pointer border-none bg-transparent"
                 >
-                  {showMorePaymentMethods ? "Simple" : "Card/Bank ▾"}
+                  {showMorePaymentMethods ? "Simple" : "More ▾"}
                 </button>
               </div>
 
@@ -406,13 +413,13 @@ export function TransactionFormModal({
                       setPaymentMethod("upi");
                     }}
                     className={cn(
-                      "py-2 px-2 rounded-xl border-2 border-[#161514] text-xs font-black transition-all flex items-center justify-center gap-1 shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer",
+                      "py-2 px-2 rounded-xl border-2 border-[#161514] text-xs font-black transition-all flex items-center justify-center gap-1.5 shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer",
                       paymentMethod !== "cash"
                         ? "bg-[#03D26F] text-[#161514]"
                         : "bg-white text-[#161514]/70 hover:bg-[#FAF8F5]"
                     )}
                   >
-                    <span>📱</span>
+                    <Smartphone className="size-3.5 stroke-[2.5]" />
                     <span>UPI</span>
                   </button>
 
@@ -423,13 +430,13 @@ export function TransactionFormModal({
                       setPaymentMethod("cash");
                     }}
                     className={cn(
-                      "py-2 px-2 rounded-xl border-2 border-[#161514] text-xs font-black transition-all flex items-center justify-center gap-1 shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer",
+                      "py-2 px-2 rounded-xl border-2 border-[#161514] text-xs font-black transition-all flex items-center justify-center gap-1.5 shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer",
                       paymentMethod === "cash"
                         ? "bg-amber-400 text-[#161514]"
                         : "bg-white text-[#161514]/70 hover:bg-[#FAF8F5]"
                     )}
                   >
-                    <span>💵</span>
+                    <Banknote className="size-3.5 stroke-[2.5]" />
                     <span>Cash</span>
                   </button>
                 </div>
@@ -438,10 +445,10 @@ export function TransactionFormModal({
                   value={paymentMethod}
                   onChange={setPaymentMethod}
                   options={[
-                    { value: "upi", label: "UPI / Online", icon: "📱" },
-                    { value: "cash", label: "Cash", icon: "💵" },
-                    { value: "card", label: "Debit/Credit Card", icon: "💳" },
-                    { value: "bank", label: "Bank Transfer", icon: "🏦" },
+                    { value: "upi", label: "UPI / Online", icon: "Smartphone" },
+                    { value: "cash", label: "Cash", icon: "Banknote" },
+                    { value: "card", label: "Debit/Credit Card", icon: "CreditCard" },
+                    { value: "bank", label: "Bank Transfer", icon: "Building2" },
                   ]}
                 />
               )}
@@ -516,7 +523,7 @@ export function TransactionFormModal({
               disabled={isSubmitting}
               className="flex-1 bg-[#CEF431] hover:bg-[#bde422] text-[#161514] font-black text-xs uppercase tracking-wider rounded-xl py-3 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all disabled:opacity-50"
             >
-              {isSubmitting ? "Saving…" : isEditing ? "Save Changes" : "Log Record 🚀"}
+              {isSubmitting ? "Saving…" : isEditing ? "Save Changes" : "Log Record"}
             </button>
           </div>
         </form>

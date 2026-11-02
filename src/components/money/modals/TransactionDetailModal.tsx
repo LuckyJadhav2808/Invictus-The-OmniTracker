@@ -5,9 +5,9 @@ import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormConta
 import { type Transaction, type Category } from "@/types";
 import { cn } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
-import { Copy, Edit2, Trash2, Calendar, CreditCard, Tag, ExternalLink, Receipt, FileText } from "lucide-react";
+import { Copy, Edit2, Trash2, Calendar, CreditCard, Tag, ExternalLink, Receipt, FileText, TrendingUp, TrendingDown, Smartphone, Banknote } from "lucide-react";
 import { soundFX } from "@/components/shared/SoundFX";
-import { renderCategoryEmoji } from "@/components/money/MoneyQuickActionsAndCards";
+import { CategoryIcon } from "@/components/money/MoneyQuickActionsAndCards";
 import { ThermalReceiptSlip } from "@/components/money/ThermalReceiptSlip";
 
 interface TransactionDetailModalProps {
@@ -143,11 +143,21 @@ export function TransactionDetailModal({
             >
               <span
                 className={cn(
-                  "text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border border-[#161514] inline-block",
+                  "text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border border-[#161514] inline-flex items-center gap-1",
                   isIncome ? "bg-[#03D26F] text-[#161514]" : "bg-rose-400 text-[#161514]"
                 )}
               >
-                {isIncome ? "💰 Income Deposit" : "💸 Expense Outflow"}
+                {isIncome ? (
+                  <>
+                    <TrendingUp className="size-3 stroke-[2.5]" />
+                    <span>Income Deposit</span>
+                  </>
+                ) : (
+                  <>
+                    <TrendingDown className="size-3 stroke-[2.5]" />
+                    <span>Expense Outflow</span>
+                  </>
+                )}
               </span>
 
               <span
@@ -174,8 +184,8 @@ export function TransactionDetailModal({
                   <Tag className="size-3.5" />
                   <span>Category</span>
                 </span>
-                <span className="font-black text-[#161514] flex items-center gap-1 bg-white px-2 py-0.5 rounded-lg border border-[#161514]">
-                  <span>{renderCategoryEmoji(category?.icon)}</span>
+                <span className="font-black text-[#161514] flex items-center gap-1.5 bg-white px-2 py-0.5 rounded-lg border border-[#161514]">
+                  <CategoryIcon name={category?.icon} className="size-3.5 text-[#161514]" />
                   <span>{category?.name || "Uncategorized"}</span>
                 </span>
               </div>
@@ -195,8 +205,18 @@ export function TransactionDetailModal({
                   <CreditCard className="size-3.5" />
                   <span>Payment Mode</span>
                 </span>
-                <span className="font-black uppercase text-[#161514] bg-white px-2 py-0.5 rounded-lg border border-[#161514]">
-                  {transaction.paymentMethod === "cash" ? "💵 Cash" : "📱 " + (transaction.paymentMethod || "UPI")}
+                <span className="font-black uppercase text-[#161514] bg-white px-2 py-0.5 rounded-lg border border-[#161514] flex items-center gap-1">
+                  {transaction.paymentMethod === "cash" ? (
+                    <>
+                      <Banknote className="size-3 text-[#161514]" />
+                      <span>Cash</span>
+                    </>
+                  ) : (
+                    <>
+                      <Smartphone className="size-3 text-[#161514]" />
+                      <span>{transaction.paymentMethod || "UPI"}</span>
+                    </>
+                  )}
                 </span>
               </div>
 

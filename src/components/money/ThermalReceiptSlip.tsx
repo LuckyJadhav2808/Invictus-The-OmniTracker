@@ -17,7 +17,7 @@ import {
 import { soundFX } from "@/components/shared/SoundFX";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { renderCategoryEmoji } from "@/components/money/MoneyQuickActionsAndCards";
+import { CategoryIcon } from "@/components/money/MoneyQuickActionsAndCards";
 
 interface ThermalReceiptSlipProps {
   transaction: Transaction;
@@ -101,7 +101,7 @@ export function ThermalReceiptSlip({
   const perPersonShare = splitCount > 1 ? Math.ceil(totalAmount / splitCount) : totalAmount;
 
   const categoryName = category?.name || "General Expense";
-  const categoryIcon = renderCategoryEmoji(category?.icon);
+  const categoryIcon = "";
 
   const billBreakdown = formatReceiptShareText(
     transaction,
@@ -235,7 +235,7 @@ export function ThermalReceiptSlip({
           {/* Category Stamp & Payment Badge */}
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-1.5 bg-[#FAF8F5] border border-[#161514] px-2 py-1 rounded text-xs font-black">
-              <span>{categoryIcon}</span>
+              <CategoryIcon name={category?.icon} className="size-3.5 text-[#161514]" />
               <span className="truncate max-w-[120px]">{categoryName}</span>
             </div>
 

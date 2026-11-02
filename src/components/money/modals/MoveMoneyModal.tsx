@@ -98,6 +98,7 @@ export function MoveMoneyModal({
     value: c.id,
     label: c.name,
     icon: c.icon,
+    badge: c.monthlyBudget ? `${currencySymbol}${c.monthlyBudget.toLocaleString()}` : undefined,
   }));
 
   return (

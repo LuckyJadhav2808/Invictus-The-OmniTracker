@@ -12,6 +12,7 @@ import {
 } from "@/lib/queries/merchant-rules";
 import { Search, Plus, Trash2, Sparkles, Tag, Check, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
 
 interface LearnedMerchantDictionaryModalProps {
   open: boolean;
@@ -155,21 +156,23 @@ export function LearnedMerchantDictionaryModal({
               onChange={(e) => setNewMerchant(e.target.value)}
               className="flex-1 min-w-[160px] h-9 px-3 text-xs sm:text-sm font-bold bg-white border-2 border-[#161514] rounded-xl shadow-[2px_2px_0px_0px_#161514] focus:outline-none focus:ring-1 focus:ring-[#161514]"
             />
-            <select
-              value={newCategoryId}
-              onChange={(e) => setNewCategoryId(e.target.value)}
-              className="h-9 px-2 text-xs font-bold bg-white border-2 border-[#161514] rounded-xl shadow-[2px_2px_0px_0px_#161514] focus:outline-none"
-            >
-              {expenseCategories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
+            <div className="w-44">
+              <NeobrutalistSelect
+                size="sm"
+                value={newCategoryId}
+                onChange={setNewCategoryId}
+                options={expenseCategories.map((c) => ({
+                  value: c.id,
+                  label: c.name,
+                  icon: c.icon,
+                }))}
+                placeholder="Select category"
+              />
+            </div>
             <button
               type="submit"
               disabled={!newMerchant.trim() || saveMutation.isPending}
-              className="h-9 px-3 flex items-center justify-center gap-1 text-xs font-black bg-[#CEF431] text-[#161514] border-2 border-[#161514] rounded-xl shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all disabled:opacity-50"
+              className="h-9 px-3 flex items-center justify-center gap-1 text-xs font-black bg-[#CEF431] text-[#161514] border-2 border-[#161514] rounded-xl shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all disabled:opacity-50 cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5 stroke-[3]" />
               <span>Add</span>
@@ -248,20 +251,24 @@ export function LearnedMerchantDictionaryModal({
                   <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
                     {isEditing ? (
                       <div className="flex items-center gap-1.5">
-                        <select
-                          defaultValue={rule.categoryId}
-                          onChange={(e) => handleCategoryChange(rule.merchantPattern, e.target.value)}
-                          className="h-8 px-2 text-xs font-bold bg-white border-2 border-[#161514] rounded-lg focus:outline-none"
-                        >
-                          {expenseCategories.map((c) => (
-                            <option key={c.id} value={c.id}>
-                              {c.name}
-                            </option>
-                          ))}
-                        </select>
+                        <div className="w-40">
+                          <NeobrutalistSelect
+                            size="sm"
+                            value={rule.categoryId}
+                            onChange={(val) => {
+                              handleCategoryChange(rule.merchantPattern, val);
+                            }}
+                            options={expenseCategories.map((c) => ({
+                              value: c.id,
+                              label: c.name,
+                              icon: c.icon,
+                            }))}
+                          />
+                        </div>
                         <button
+                          type="button"
                           onClick={() => setEditingMerchant(null)}
-                          className="h-8 px-2 text-xs font-bold border border-[#161514]/30 rounded-lg hover:bg-stone-100"
+                          className="h-8 px-2 text-xs font-bold border border-[#161514] rounded-lg hover:bg-stone-100 cursor-pointer"
                         >
                           Done
                         </button>
