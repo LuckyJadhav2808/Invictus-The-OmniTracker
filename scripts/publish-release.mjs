@@ -108,10 +108,21 @@ Download \`Invictus.apk\` below and tap to install/update seamlessly.
   }
 
   // 4. Locate or acquire Invictus.apk binary
-  let apkPath = path.join(rootDir, "android", "app", "build", "outputs", "apk", "debug", "Invictus.apk");
+  let apkPath = null;
+  const candidates = [
+    path.join(rootDir, "public", "downloads", "Invictus.apk"),
+    path.join(rootDir, "android", "app", "build", "outputs", "apk", "debug", "Invictus.apk"),
+    path.join(rootDir, "android", "app", "build", "outputs", "apk", "release", "Invictus.apk"),
+  ];
+  for (const c of candidates) {
+    if (fs.existsSync(c)) {
+      apkPath = c;
+      break;
+    }
+  }
   let apkBuffer = null;
 
-  if (fs.existsSync(apkPath)) {
+  if (apkPath && fs.existsSync(apkPath)) {
     console.log(`  ✓ Found local APK at ${apkPath}`);
     apkBuffer = fs.readFileSync(apkPath);
   } else {
