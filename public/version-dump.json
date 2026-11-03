@@ -6,18 +6,18 @@
   "releaseDate": "November 4, 2026",
   "minSupportedVersion": "1.0.0",
   "git": {
-    "commitHash": "5bf9835eb3923449f3831d07b3c831870e7a2a2e",
-    "shortHash": "5bf9835",
+    "commitHash": "7b681536f46d30654013d4b3d12f42b85f284779",
+    "shortHash": "7b68153",
     "branch": "main",
     "commitAuthor": "Lucky Manoj Jadhav",
-    "commitDate": "2026-11-04 04:51:20 +0530",
-    "commitMessage": "feat(uiux): massive neobrutalist overhaul, dark mode harmonization, continuous calculator, version dump engine & v1.7.9 release"
+    "commitDate": "2026-11-04 04:58:07 +0530",
+    "commitMessage": "feat(release): attach v1.7.9 APK binary and seed MongoDB release registry"
   },
   "apk": {
     "exists": true,
     "fileName": "Invictus.apk",
-    "sha256": "68b34f68efa2b5b242906c9a5be9faa106491bcd8b13deb6d6103f9a8d36c6b3",
-    "sizeBytes": 4338413,
+    "sha256": "4cb3efd9a63d8b5905fdda9853f7f0d759cabf1c9968081c9c7aa4fa3726f0bc",
+    "sizeBytes": 4340478,
     "sizeFormatted": "4.14 MB",
     "directDownloadUrl": "https://invictus-the-omni-tracker.vercel.app/downloads/Invictus.apk",
     "githubReleaseAssetUrl": "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v1.7.9/Invictus.apk"
@@ -40,6 +40,6 @@
     "nodeVersion": "v24.12.0",
     "platform": "win32",
     "arch": "x64",
-    "generatedAt": "2026-11-03T23:21:43.863Z"
+    "generatedAt": "2026-11-03T23:35:07.215Z"
   }
 }
