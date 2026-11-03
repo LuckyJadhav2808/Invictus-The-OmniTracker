@@ -6,12 +6,12 @@
   "releaseDate": "November 4, 2026",
   "minSupportedVersion": "1.0.0",
   "git": {
-    "commitHash": "0ca059106b06428240699b0438a162e3ebbb1dfd",
-    "shortHash": "0ca0591",
+    "commitHash": "5bf9835eb3923449f3831d07b3c831870e7a2a2e",
+    "shortHash": "5bf9835",
     "branch": "main",
     "commitAuthor": "Lucky Manoj Jadhav",
-    "commitDate": "2026-11-02 23:14:38 +0530",
-    "commitMessage": "feat(money): upgrade modals and select dropdowns to ui-ux-pro-max neobrutalist standard"
+    "commitDate": "2026-11-04 04:51:20 +0530",
+    "commitMessage": "feat(uiux): massive neobrutalist overhaul, dark mode harmonization, continuous calculator, version dump engine & v1.7.9 release"
   },
   "apk": {
     "exists": true,
@@ -40,6 +40,6 @@
     "nodeVersion": "v24.12.0",
     "platform": "win32",
     "arch": "x64",
-    "generatedAt": "2026-11-03T23:20:59.294Z"
+    "generatedAt": "2026-11-03T23:21:43.863Z"
   }
 }
