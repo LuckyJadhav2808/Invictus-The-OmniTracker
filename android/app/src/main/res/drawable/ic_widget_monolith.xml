@@ -1,0 +1,22 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Top Crown Pediment -->
+    <path
+        android:fillColor="@color/widget_text_primary"
+        android:pathData="M4.5,3.5 L19.5,3.5 L17,6.5 L7,6.5 Z" />
+    <!-- Monolith Stem -->
+    <path
+        android:fillColor="@color/widget_accent_lime"
+        android:pathData="M8.5,7.5 L15.5,7.5 L15.5,16.5 L8.5,16.5 Z" />
+    <!-- Ascending Victory Arrow Cutout -->
+    <path
+        android:fillColor="@color/widget_bg"
+        android:pathData="M12,9.2 L14.5,13.2 L13.2,13.2 L12,11.5 L10.8,13.2 L9.5,13.2 Z" />
+    <!-- Bottom Pedestal Base -->
+    <path
+        android:fillColor="@color/widget_text_primary"
+        android:pathData="M7,17.5 L17,17.5 L19.5,20.5 L4.5,20.5 Z" />
+</vector>

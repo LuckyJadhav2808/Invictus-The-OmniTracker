@@ -4,11 +4,13 @@ import React, { useState, useMemo, useEffect } from "react";
 import { type Transaction, type Category } from "@/types";
 import { cn } from "@/lib/utils";
 import { format, parseISO, isToday, isYesterday } from "date-fns";
-import { Search, Filter, FileDown, Plus, Copy, Edit2, Trash2, Calendar, Zap, Smartphone, Banknote, Globe, Receipt } from "lucide-react";
+import { Search, Filter, FileDown, Plus, Copy, Edit2, Trash2, Calendar, Zap, Smartphone, Banknote, Globe, Receipt, X } from "lucide-react";
 import { soundFX } from "@/components/shared/SoundFX";
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
-import { renderCategoryEmoji, CategoryIcon, MoneyQuickActionsAndCards } from "@/components/money/MoneyQuickActionsAndCards";
+import { CategoryIcon, MoneyQuickActionsAndCards } from "@/components/money/MoneyQuickActionsAndCards";
 import { isCashTransaction, isOnlineTransaction, type MonthlyBudgetStats } from "@/lib/utils/budget-rollover";
+import { useAddTransaction } from "@/lib/queries/money";
+import { toast } from "sonner";
 
 interface LedgerTabViewProps {
   transactions: Transaction[];
@@ -139,6 +141,38 @@ export function LedgerTabView({
       sessionStorage.removeItem("invictus_ledger_type");
       sessionStorage.removeItem("invictus_ledger_method");
       sessionStorage.removeItem("invictus_ledger_month");
+    }
+  };
+
+  const addTxMutation = useAddTransaction();
+  const [isQuickLogging, setIsQuickLogging] = useState(false);
+
+  const handleQuickLogExpense = async (item: { name: string; amount: number; method: string; cat: string }) => {
+    try {
+      setIsQuickLogging(true);
+      const targetCat = categories.find((c) =>
+        c.type === "expense" && (
+          c.name.toLowerCase().includes(item.cat.toLowerCase()) ||
+          c.name.toLowerCase().includes(item.name.toLowerCase())
+        )
+      ) || categories.find((c) => c.type === "expense") || categories[0];
+
+      await addTxMutation.mutateAsync({
+        amount: item.amount,
+        type: "expense",
+        categoryId: targetCat?.id || "general",
+        date: format(new Date(), "yyyy-MM-dd"),
+        note: item.name,
+        paymentMethod: item.method,
+      } as any);
+
+      soundFX.playCompleteChime();
+      soundFX.vibrate(20);
+      toast.success(`Logged ${currencySymbol}${item.amount} for ${item.name}! ⚡`);
+    } catch {
+      toast.error("Failed to log quick expense");
+    } finally {
+      setIsQuickLogging(false);
     }
   };
 
@@ -299,17 +333,17 @@ export function LedgerTabView({
       />
 
       {/* 🔍 Search & Filters Bar */}
-      <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-3">
+      <div className="bg-white dark:bg-[#1C1A18] p-4 rounded-xl border border-[#E8E5DF] dark:border-[#383531] space-y-3">
         <div className="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center justify-between">
           {/* Search Input */}
           <div className="relative flex-1">
-            <Search className="size-4 text-[#161514]/50 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Search className="size-4 text-[#A8A29E] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by merchant, note, or category…"
-              className="w-full bg-white pl-9 pr-3 py-2 text-xs font-bold rounded-xl border-2 border-[#161514] focus:outline-none focus:ring-2 focus:ring-[#CEF431]"
+              className="w-full bg-white dark:bg-[#252321] pl-9 pr-3 py-2 text-xs font-medium rounded-lg border border-[#E8E5DF] dark:border-[#383531] text-[#161514] dark:text-[#FAF8F5] placeholder:text-[#A8A29E] focus:outline-none focus:ring-1 focus:ring-[#161514] dark:focus:ring-[#CEF431]"
             />
           </div>
 
@@ -317,17 +351,17 @@ export function LedgerTabView({
           <button
             type="button"
             onClick={onOpenExportModal}
-            className="bg-white hover:bg-[#FAF8F5] text-[#161514] font-black text-xs uppercase tracking-wider py-2 px-3 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
+            className="bg-white dark:bg-[#252321] hover:bg-[#F5F3EF] dark:hover:bg-[#2e2b28] text-[#161514] dark:text-[#FAF8F5] font-medium text-xs py-2 px-3 rounded-lg border border-[#E8E5DF] dark:border-[#383531] transition-colors flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
           >
-            <FileDown className="size-3.5 stroke-[2.5]" />
+            <FileDown className="size-3.5 stroke-[1.5]" />
             <span>Export Statement</span>
           </button>
         </div>
 
         {/* Filter Pills Row */}
-        <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-[#161514]/10">
-          <div className="flex items-center gap-1 text-[10px] font-black uppercase text-[#161514]/60 mr-1">
-            <Filter className="size-3" />
+        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-[#E8E5DF] dark:border-[#383531]">
+          <div className="flex items-center gap-1 text-xs font-medium text-[#6B6B6B] dark:text-[#A8A29E] mr-1">
+            <Filter className="size-3 stroke-[1.5]" />
             <span>Filter:</span>
           </div>
 
@@ -351,17 +385,17 @@ export function LedgerTabView({
           </div>
 
           {/* Type Filter */}
-          <div className="flex gap-1 bg-white p-1 rounded-xl border border-[#161514] shadow-[1px_1px_0px_#161514]">
+          <div className="flex gap-0.5 bg-[#F1EFEA] dark:bg-[#252321] p-0.5 rounded-lg border border-[#E8E5DF] dark:border-[#383531]">
             {(["all", "expense", "income"] as const).map((t) => (
               <button
                 key={t}
                 type="button"
                 onClick={() => setSelectedType(t)}
                 className={cn(
-                  "px-2 py-0.5 rounded-lg text-[10px] font-black uppercase transition-all cursor-pointer",
+                  "px-2.5 py-1 rounded text-xs font-medium capitalize transition-colors cursor-pointer",
                   selectedType === t
-                    ? "bg-[#161514] text-white"
-                    : "text-[#161514]/70 hover:bg-[#FAF8F5]"
+                    ? "bg-white dark:bg-[#161514] text-[#161514] dark:text-[#FAF8F5] shadow-sm font-semibold"
+                    : "text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5]"
                 )}
               >
                 {t}
@@ -370,7 +404,7 @@ export function LedgerTabView({
           </div>
 
           {/* Payment Method Filter */}
-          <div className="flex gap-1 bg-white p-1 rounded-xl border border-[#161514] shadow-[1px_1px_0px_#161514]">
+          <div className="flex gap-0.5 bg-[#F1EFEA] dark:bg-[#252321] p-0.5 rounded-lg border border-[#E8E5DF] dark:border-[#383531]">
             {[
               { id: "all", label: "All Modes" },
               { id: "upi", label: "UPI" },
@@ -381,10 +415,10 @@ export function LedgerTabView({
                 type="button"
                 onClick={() => setSelectedMethod(m.id)}
                 className={cn(
-                  "px-2 py-0.5 rounded-lg text-[10px] font-black uppercase transition-all cursor-pointer",
+                  "px-2.5 py-1 rounded text-xs font-medium transition-colors cursor-pointer",
                   selectedMethod === m.id
-                    ? "bg-[#CEF431] text-[#161514]"
-                    : "text-[#161514]/70 hover:bg-[#FAF8F5]"
+                    ? "bg-white dark:bg-[#161514] text-[#161514] dark:text-[#FAF8F5] shadow-sm font-semibold"
+                    : "text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5]"
                 )}
               >
                 {m.label}
@@ -414,10 +448,10 @@ export function LedgerTabView({
             <button
               type="button"
               onClick={handleResetFilters}
-              className="bg-rose-100 hover:bg-rose-200 text-[#161514] border border-[#161514] px-2 py-1 text-[9.5px] font-black rounded-xl shadow-[1px_1px_0px_#161514] transition-all cursor-pointer flex items-center gap-1 shrink-0"
+              className="bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-900/40 px-2 py-1 text-xs font-medium rounded-lg transition-colors cursor-pointer flex items-center gap-1 shrink-0"
               title="Reset all search queries and filters to defaults"
             >
-              <span>✕</span>
+              <X className="size-3 stroke-[2]" />
               <span>Reset</span>
             </button>
           )}
@@ -425,49 +459,117 @@ export function LedgerTabView({
       </div>
 
       {/* Statement Summary Strip */}
-      <div className="bg-[#FAF8F5] border-2 border-[#161514] rounded-xl px-3 py-2 shadow-[1.5px_1.5px_0px_0px_#161514] flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs">
+      <div className="bg-[#F1EFEA] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#383531] rounded-lg px-3.5 py-2 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs">
         <div className="flex items-center gap-2">
-          <Calendar className="size-3.5 text-[#161514]" />
-          <span className="font-bold text-[#161514]">
-            Showing statement for <strong className="font-black">{selectedMonth === "all" ? "All Time" : (availableMonths.find((m) => m.key === selectedMonth)?.label || selectedMonth)}</strong>
+          <Calendar className="size-3.5 stroke-[1.5] text-[#161514] dark:text-[#FAF8F5]" />
+          <span className="text-[#161514] dark:text-[#FAF8F5] font-medium">
+            Statement for <strong className="font-semibold">{selectedMonth === "all" ? "All Time" : (availableMonths.find((m) => m.key === selectedMonth)?.label || selectedMonth)}</strong>
           </span>
         </div>
-        <span className="text-[10px] font-bold uppercase text-[#161514]/70 font-mono tabular-nums">
+        <span className="text-xs font-mono font-medium text-[#6B6B6B] dark:text-[#A8A29E] tabular-nums">
           {selectedMonthSummary.count} {selectedMonthSummary.count === 1 ? "record" : "records"} • Spent: {currencySymbol}{selectedMonthSummary.expense.toLocaleString()}
         </span>
       </div>
 
       {/* TRANSACTION FEED LIST */}
       {groupedByDate.length === 0 ? (
-        <div className="bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] p-8 text-center space-y-3">
-          <div className="size-12 rounded-2xl bg-white border-2 border-[#161514] flex items-center justify-center mx-auto shadow-[1.5px_1.5px_0px_0px_#161514]">
-            <Receipt className="size-6 text-[#161514]" />
+        transactions.length === 0 ? (
+          /* ─── ZERO-CONFUSION FIRST-RUN ONBOARDING COCKPIT ─── */
+          <div className="bg-white dark:bg-[#161514] rounded-2xl p-6 sm:p-8 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="size-2 rounded-full bg-[#03D26F] animate-pulse" />
+                  <h4 className="text-sm font-heading font-black text-[#161514] dark:text-stone-100 uppercase tracking-wider">
+                    Start Your Financial Ledger 💳
+                  </h4>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border border-emerald-500/20 font-bold">
+                    1-TAP QUICK LOG
+                  </span>
+                </div>
+                <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] max-w-lg leading-relaxed">
+                  Your ledger tracks every rupee across digital UPI and cash till envelopes. Tap any common student daily expense below to record your first transaction instantly.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={onOpenAddTransaction}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#161514] text-white hover:bg-[#2A2826] dark:bg-white dark:text-[#161514] dark:hover:bg-stone-200 text-xs font-heading font-black shadow-xs cursor-pointer transition-all self-start sm:self-auto shrink-0"
+              >
+                <Plus className="size-3.5 stroke-[2.2]" />
+                <span>+ Custom Transaction</span>
+              </button>
+            </div>
+
+            {/* Quick 1-Tap Student Expenses */}
+            <div className="space-y-2 pt-1">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6B6B6B] dark:text-[#A8A29E] block">
+                Quick Log Common Student Expenses:
+              </span>
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+                {[
+                  { name: "Chai & Snack", icon: "☕", amount: 40, method: "UPI", cat: "Food & Dining" },
+                  { name: "Mess / Lunch", icon: "🍛", amount: 120, method: "UPI", cat: "Food & Dining" },
+                  { name: "Metro / Auto", icon: "🚇", amount: 50, method: "UPI", cat: "Transport" },
+                  { name: "Books / Prints", icon: "📚", amount: 150, method: "UPI", cat: "Education" },
+                  { name: "Groceries / Milk", icon: "🛒", amount: 180, method: "Cash", cat: "Groceries" },
+                ].map((item) => (
+                  <button
+                    key={item.name}
+                    type="button"
+                    onClick={() => handleQuickLogExpense(item)}
+                    disabled={isQuickLogging}
+                    className="p-3 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] hover:bg-white dark:hover:bg-[#252321] border border-[#E8E5DF] dark:border-[#2A2724] hover:border-[#161514]/40 hover:shadow-xs transition-all text-left cursor-pointer group flex flex-col justify-between"
+                  >
+                    <div>
+                      <span className="text-lg block mb-1">{item.icon}</span>
+                      <h5 className="font-heading font-black text-xs text-[#161514] dark:text-stone-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors truncate">
+                        {item.name}
+                      </h5>
+                      <span className="text-[9px] font-mono text-[#6B6B6B] dark:text-[#A8A29E]">
+                        {item.method} • {item.cat}
+                      </span>
+                    </div>
+                    <div className="mt-2 pt-1.5 border-t border-[#E8E5DF]/60 dark:border-[#2A2724] flex items-center justify-between text-xs font-mono font-bold">
+                      <span className="text-[#161514] dark:text-stone-200">{currencySymbol}{item.amount}</span>
+                      <span className="text-emerald-700 dark:text-emerald-400 text-[10px] group-hover:translate-x-0.5 transition-transform">+ Log</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
-          <span className="text-sm font-black text-[#161514] block">No Transactions Found</span>
-          <p className="text-xs text-[#161514]/70 max-w-sm mx-auto">
-            {searchQuery || selectedCategory !== "all" || selectedType !== "all" || selectedMonth !== "all"
-              ? "No records match your active filters. Try picking another month or clearing search filters."
-              : "Your financial ledger is clear. Log an expense or income to start tracking!"}
-          </p>
-          <button
-            type="button"
-            onClick={onOpenAddTransaction}
-            className="inline-flex items-center gap-1.5 bg-[#CEF431] hover:bg-[#bde422] text-[#161514] font-black text-xs uppercase px-4 py-2 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all"
-          >
-            <Plus className="size-3.5 stroke-[3]" />
-            <span>+ Log Transaction</span>
-          </button>
-        </div>
+        ) : (
+          /* Active Filter Empty State */
+          <div className="bg-white dark:bg-[#161514] rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] p-8 text-center space-y-3 shadow-xs">
+            <div className="size-10 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] flex items-center justify-center mx-auto text-[#161514] dark:text-stone-200">
+              <Receipt className="size-5 stroke-[1.5]" />
+            </div>
+            <span className="text-sm font-semibold text-[#161514] dark:text-stone-100 block">No Matching Records</span>
+            <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] max-w-sm mx-auto">
+              No transactions match your active query or filters. Clear your search or change the month selector.
+            </p>
+            <button
+              type="button"
+              onClick={handleResetFilters}
+              className="inline-flex items-center gap-1.5 bg-[#161514] hover:bg-[#2A2826] dark:bg-white dark:text-[#161514] dark:hover:bg-stone-200 text-white font-medium text-xs px-3.5 py-2 rounded-xl border border-[#161514] cursor-pointer transition-colors"
+            >
+              <X className="size-3.5 stroke-[2]" />
+              <span>Reset Filters</span>
+            </button>
+          </div>
+        )
       ) : (
         <div className="space-y-4">
           {groupedByDate.map((group) => (
             <div key={group.dateKey} className="space-y-2">
               {/* Date Group Header */}
               <div className="flex items-center justify-between px-1">
-                <span className="text-[11px] font-bold text-[#161514] bg-[#FAF8F5] px-2.5 py-0.5 rounded-lg border border-[#161514] shadow-[1px_1px_0px_0px_#161514] font-mono">
+                <span className="text-xs font-mono font-medium text-[#161514] dark:text-[#FAF8F5] bg-[#F1EFEA] dark:bg-[#252321] px-2.5 py-0.5 rounded-md border border-[#E8E5DF] dark:border-[#383531]">
                   {group.label}
                 </span>
-                <span className="text-[10px] font-bold text-[#161514]/60 font-mono">
+                <span className="text-xs font-mono text-[#6B6B6B] dark:text-[#A8A29E]">
                   {group.items.length} record{group.items.length === 1 ? "" : "s"}
                 </span>
               </div>
@@ -482,24 +584,24 @@ export function LedgerTabView({
                     <div
                       key={tx.id}
                       onClick={() => onInspectTransaction(tx)}
-                      className="bg-white rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:shadow-[3.5px_3.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all p-3 sm:p-3.5 flex items-center justify-between gap-3 cursor-pointer group"
+                      className="bg-white dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#383531] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] transition-colors p-3 sm:p-3.5 flex items-center justify-between gap-3 cursor-pointer group"
                     >
                       {/* Left: Category Icon & Details */}
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="size-10 rounded-xl bg-[#FAF8F5] border-2 border-[#161514] flex items-center justify-center shrink-0 shadow-[1px_1px_0px_0px_#161514] group-hover:scale-105 transition-transform text-[#161514]">
-                          <CategoryIcon name={cat?.icon} className="size-4" />
+                        <div className="size-9 rounded-lg bg-[#F1EFEA] dark:bg-[#252321] flex items-center justify-center shrink-0 text-[#161514] dark:text-[#FAF8F5]">
+                          <CategoryIcon name={cat?.icon} className="size-4 stroke-[1.5]" />
                         </div>
 
                         <div className="min-w-0 space-y-0.5">
-                          <span className="text-xs sm:text-sm font-black text-[#161514] truncate block">
+                          <span className="text-xs sm:text-[13px] font-medium text-[#161514] dark:text-[#FAF8F5] truncate block">
                             {tx.note || cat?.name || "Transaction"}
                           </span>
 
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="text-[9px] font-bold uppercase text-[#161514]/70 bg-[#FAF8F5] px-1.5 py-0.2 rounded border border-[#161514]/20">
+                            <span className="text-[10px] font-medium text-[#6B6B6B] dark:text-[#A8A29E] bg-[#F1EFEA] dark:bg-[#252321] px-1.5 py-0.5 rounded border border-[#E8E5DF] dark:border-[#383531]">
                               {cat?.name || "Uncategorized"}
                             </span>
-                            <span className="text-[9px] font-mono font-bold text-[#161514]/60 uppercase">
+                            <span className="text-[10px] font-mono text-[#6B6B6B] dark:text-[#A8A29E]">
                               {tx.paymentMethod === "cash" ? "Cash" : tx.paymentMethod || "UPI"}
                             </span>
                           </div>
@@ -510,8 +612,8 @@ export function LedgerTabView({
                       <div className="flex items-center gap-2 sm:gap-3 shrink-0">
                         <span
                           className={cn(
-                            "text-sm sm:text-base font-black font-mono tabular-nums",
-                            isIncome ? "text-[#03D26F]" : "text-rose-600"
+                            "text-sm sm:text-[15px] font-semibold font-mono tabular-nums",
+                            isIncome ? "text-[#03D26F]" : "text-rose-600 dark:text-rose-400"
                           )}
                         >
                           {isIncome ? "+" : "-"}{currencySymbol}{Number(tx.amount).toLocaleString()}
@@ -528,26 +630,26 @@ export function LedgerTabView({
                               soundFX.playPop();
                               onDuplicateTransaction(tx);
                             }}
-                            className="p-1 rounded-lg bg-[#FAF8F5] hover:bg-[#CEF431] border border-[#161514] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
+                            className="p-1 rounded-md bg-white dark:bg-[#252321] hover:bg-[#F1EFEA] dark:hover:bg-[#2e2b28] border border-[#E8E5DF] dark:border-[#383531] text-[#161514] dark:text-[#FAF8F5] transition-colors cursor-pointer"
                             title="1-Click Duplicate"
                           >
-                            <Copy className="size-3 text-[#161514]" />
+                            <Copy className="size-3 stroke-[1.5]" />
                           </button>
                           <button
                             type="button"
                             onClick={() => onEditTransaction(tx)}
-                            className="p-1 rounded-lg bg-[#FAF8F5] hover:bg-white border border-[#161514] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
+                            className="p-1 rounded-md bg-white dark:bg-[#252321] hover:bg-[#F1EFEA] dark:hover:bg-[#2e2b28] border border-[#E8E5DF] dark:border-[#383531] text-[#161514] dark:text-[#FAF8F5] transition-colors cursor-pointer"
                             title="Edit"
                           >
-                            <Edit2 className="size-3 text-[#161514]" />
+                            <Edit2 className="size-3 stroke-[1.5]" />
                           </button>
                           <button
                             type="button"
                             onClick={() => onDeleteTransaction(tx.id)}
-                            className="p-1 rounded-lg bg-rose-50 hover:bg-rose-100 border border-[#161514] text-rose-700 active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
+                            className="p-1 rounded-md bg-white dark:bg-[#252321] hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-[#E8E5DF] dark:border-[#383531] text-rose-600 dark:text-rose-400 transition-colors cursor-pointer"
                             title="Delete"
                           >
-                            <Trash2 className="size-3" />
+                            <Trash2 className="size-3 stroke-[1.5]" />
                           </button>
                         </div>
                       </div>

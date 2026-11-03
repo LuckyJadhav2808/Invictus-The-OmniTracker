@@ -137,48 +137,48 @@ export function WeeklyVelocityAndHabitMatrix() {
   }, [heatmapDays]);
 
   return (
-    <div className="space-y-5 my-4">
+    <div className="space-y-4 my-4">
       {/* Top Banner: Peak Productivity Insight */}
-      <div className="bg-white rounded-2xl p-5 md:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
+      <div className="bg-white dark:bg-[#1C1A18] rounded-xl p-5 border border-[#E8E5DF] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-2xl bg-[#CEF431] border-2 border-[#161514] flex items-center justify-center text-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] shrink-0">
-              <Zap className="h-6 w-6 stroke-[2.5]" />
+            <div className="size-9 rounded-lg bg-[#F1EFEA] dark:bg-[#252321] flex items-center justify-center text-[#161514] dark:text-[#CEF431] shrink-0 border border-[#E8E5DF] dark:border-[#383531]">
+              <Zap className="size-4 stroke-[1.5]" />
             </div>
             <div>
-              <h3 className="text-base sm:text-lg font-black text-[#161514] uppercase tracking-wider flex items-center gap-2" style={{ fontFamily: "var(--font-heading)" }}>
+              <h3 className="text-[15px] sm:text-base font-sans font-semibold text-[#161514] dark:text-[#FAF8F5] tracking-tight flex items-center gap-2">
                 Weekly Consistency
               </h3>
-              <p className="text-xs text-[#161514]/70 font-bold mt-0.5">
-                Most active day: <strong className="text-[#03D26F] font-black">{weekdayStats.peakDay.name}s</strong> ({weekdayStats.peakDay.avg} avg logs/day)
+              <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] mt-0.5">
+                Most active day: <strong className="text-[#047857] dark:text-[#03D26F] font-semibold">{weekdayStats.peakDay.name}s</strong> ({weekdayStats.peakDay.avg} avg logs/day)
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 self-start sm:self-auto">
-            <div className="bg-[#03D26F] text-[#161514] px-3.5 py-1.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-center">
-              <span className="text-sm font-black block leading-none">{total28DaysCompleted}</span>
-              <span className="text-[9px] font-black uppercase tracking-widest block opacity-90 mt-0.5">28D LOGS</span>
+            <div className="bg-[#F1EFEA] dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] px-3 py-1.5 rounded-lg border border-[#E8E5DF] dark:border-[#383531] text-center">
+              <span className="text-sm font-sans font-semibold block leading-none font-mono tabular-nums">{total28DaysCompleted}</span>
+              <span className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E] block mt-0.5">28d logs</span>
             </div>
-            <div className="bg-[#CEF431] text-[#161514] px-3.5 py-1.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-center">
-              <span className="text-sm font-black block leading-none">{habits.length}</span>
-              <span className="text-[9px] font-black uppercase tracking-widest block opacity-90 mt-0.5">HABITS</span>
+            <div className="bg-[#F1EFEA] dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] px-3 py-1.5 rounded-lg border border-[#E8E5DF] dark:border-[#383531] text-center">
+              <span className="text-sm font-sans font-semibold block leading-none font-mono tabular-nums">{habits.length}</span>
+              <span className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E] block mt-0.5">Habits</span>
             </div>
           </div>
         </div>
 
         {/* 4-Week Activity Heatmap Grid (28 Days) */}
-        <div className="space-y-2 pt-2 border-t-2 border-[#161514]/10">
+        <div className="space-y-2 pt-2 border-t border-[#E8E5DF] dark:border-[#383531]">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5">
-              <Calendar className="h-4 w-4 stroke-[2.5]" /> 4-Week Activity
+            <span className="text-xs font-sans font-medium text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5">
+              <Calendar className="size-3.5 stroke-[1.5]" /> 4-Week activity matrix
             </span>
-            <div className="flex items-center gap-1 text-[10px] font-bold text-[#161514]/70">
+            <div className="flex items-center gap-1 text-[10px] text-[#6B6B6B] dark:text-[#A8A29E]">
               <span>Less</span>
-              <div className="h-3 w-3 rounded bg-[#FAF8F5] border-2 border-[#161514]" />
-              <div className="h-3 w-3 rounded bg-[#CEF431]/40 border-2 border-[#161514]" />
-              <div className="h-3 w-3 rounded bg-[#CEF431] border-2 border-[#161514]" />
-              <div className="h-3 w-3 rounded bg-[#03D26F] border-2 border-[#161514]" />
+              <div className="size-2.5 rounded-sm bg-white dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#383531]" />
+              <div className="size-2.5 rounded-sm bg-[#DCFAE5]/50 dark:bg-[#03D26F]/20 border border-[#E8E5DF] dark:border-[#383531]" />
+              <div className="size-2.5 rounded-sm bg-[#DCFAE5] dark:bg-[#03D26F]/50 border border-[#E8E5DF] dark:border-[#383531]" />
+              <div className="size-2.5 rounded-sm bg-[#03D26F]" />
               <span>More</span>
             </div>
           </div>
@@ -192,31 +192,31 @@ export function WeeklyVelocityAndHabitMatrix() {
                   onMouseEnter={() => setHoveredDay(d)}
                   onMouseLeave={() => setHoveredDay(null)}
                   className={cn(
-                    "relative aspect-square sm:aspect-auto sm:h-12 rounded-xl border-2 border-[#161514] p-1 flex flex-col items-center justify-center text-center transition-all cursor-pointer select-none overflow-hidden hover:-translate-x-0.5 hover:-translate-y-0.5",
-                    d.intensity === 0 && "bg-[#FAF8F5] text-[#161514]",
-                    d.intensity === 1 && "bg-[#CEF431]/30 text-[#161514]",
-                    d.intensity === 2 && "bg-[#CEF431]/60 text-[#161514] shadow-[1px_1px_0px_0px_#161514]",
-                    d.intensity === 3 && "bg-[#CEF431] text-[#161514] shadow-[2px_2px_0px_0px_#161514] font-black",
-                    d.intensity === 4 && "bg-[#03D26F] text-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] font-black scale-[1.03]",
-                    d.isToday && "ring-2 ring-[#161514] ring-offset-2"
+                    "relative aspect-square sm:aspect-auto sm:h-11 rounded-lg border border-[#E8E5DF] dark:border-[#383531] p-1 flex flex-col items-center justify-center text-center transition-colors cursor-pointer select-none overflow-hidden",
+                    d.intensity === 0 && "bg-white dark:bg-[#252321] text-[#6B6B6B] dark:text-[#A8A29E]",
+                    d.intensity === 1 && "bg-[#DCFAE5]/40 dark:bg-[#03D26F]/20 text-[#04250e] dark:text-[#03D26F]",
+                    d.intensity === 2 && "bg-[#DCFAE5]/80 dark:bg-[#03D26F]/40 text-[#04250e] dark:text-[#03D26F]",
+                    d.intensity === 3 && "bg-[#A7F3D0] dark:bg-[#03D26F]/70 text-[#04250e] dark:text-[#FAF8F5] font-medium",
+                    d.intensity === 4 && "bg-[#03D26F] text-white dark:text-[#161514] font-semibold",
+                    d.isToday && "ring-1.5 ring-[#161514] dark:ring-[#CEF431]"
                   )}
                 >
-                  <span className="text-[8px] font-black uppercase opacity-70 leading-none">{d.monthName}</span>
-                  <span className="text-xs font-black leading-none mt-0.5">{d.dayNum}</span>
+                  <span className="text-[8px] font-mono uppercase opacity-70 leading-none">{d.monthName}</span>
+                  <span className="text-xs font-mono font-medium leading-none mt-0.5">{d.dayNum}</span>
 
                   {d.count > 0 && (
-                    <span className="absolute bottom-1 right-1 h-1.5 w-1.5 rounded-full bg-current opacity-90" />
+                    <span className="absolute bottom-1 right-1 size-1 rounded-full bg-current opacity-90" />
                   )}
 
                   {/* Tooltip on Hover */}
                   {isHovered && (
-                    <div className="absolute bottom-[calc(100%+6px)] left-1/2 -translate-x-1/2 z-50 bg-[#161514] text-white p-2.5 rounded-xl border-2 border-white shadow-[3px_3px_0px_0px_#161514] text-[10px] w-44 pointer-events-none space-y-1">
-                      <div className="font-black text-[#CEF431] uppercase tracking-wider flex justify-between">
+                    <div className="absolute bottom-[calc(100%+6px)] left-1/2 -translate-x-1/2 z-50 bg-[#161514] text-white p-2.5 rounded-lg border border-[#383531] shadow-md text-xs w-44 pointer-events-none space-y-1">
+                      <div className="font-semibold text-[#03D26F] flex justify-between">
                         <span>{d.shortDate} ({d.dayName})</span>
                         <span>{d.count} Logs</span>
                       </div>
                       {d.loggedTitles.length > 0 ? (
-                        <div className="space-y-0.5 max-h-20 overflow-hidden text-[#FAF8F5]/90 font-bold">
+                        <div className="space-y-0.5 max-h-20 overflow-hidden text-zinc-300 text-[11px]">
                           {d.loggedTitles.slice(0, 3).map((t, idx) => (
                             <div key={idx} className="truncate flex items-center gap-1">
                               <span>✓</span> <span className="truncate">{t}</span>
@@ -240,17 +240,17 @@ export function WeeklyVelocityAndHabitMatrix() {
 
       {/* Habit Streak & Consistency Leaderboard */}
       {habitLeaderboard.length > 0 && (
-        <div className="bg-white rounded-2xl p-5 md:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
+        <div className="bg-white dark:bg-[#1C1A18] rounded-xl p-5 border border-[#E8E5DF] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-black text-[#161514] uppercase tracking-wider flex items-center gap-2" style={{ fontFamily: "var(--font-heading)" }}>
-              <Trophy className="h-4 w-4 text-amber-500 stroke-[2.5]" /> Habit Streak & Consistency Leaderboard
+            <h3 className="text-[15px] font-sans font-semibold text-[#161514] dark:text-[#FAF8F5] flex items-center gap-2">
+              <Trophy className="size-4 text-amber-500 stroke-[1.5]" /> Habit consistency leaderboard
             </h3>
-            <span className="text-[10px] font-black uppercase text-[#161514] bg-[#FFF9EA] px-2.5 py-1 rounded-full border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
-              30-Day Evaluation
+            <span className="text-xs font-mono text-[#6B6B6B] dark:text-[#A8A29E] bg-[#F1EFEA] dark:bg-[#252321] px-2 py-0.5 rounded border border-[#E8E5DF] dark:border-[#383531]">
+              30-day view
             </span>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2">
             {habitLeaderboard.map((h) => {
               const IconComp = (LucideIcons as any)[h.icon] || LucideIcons.Target;
               const isEmoji = h.icon && /\p{Emoji}/u.test(h.icon);
@@ -258,40 +258,40 @@ export function WeeklyVelocityAndHabitMatrix() {
               return (
                 <div
                   key={h.id}
-                  className="p-3.5 rounded-2xl border-2 border-[#161514] bg-[#FAF8F5] shadow-[2.5px_2.5px_0px_0px_#161514] space-y-2.5"
+                  className="p-3 rounded-lg border border-[#E8E5DF] dark:border-[#383531] bg-white dark:bg-[#252321] space-y-2 transition-colors hover:bg-[#FAF8F5] dark:hover:bg-[#2A2724]"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="h-8 w-8 rounded-xl bg-amber-300 border-2 border-[#161514] flex items-center justify-center text-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] shrink-0">
+                      <div className="size-7 rounded-md bg-[#F1EFEA] dark:bg-[#1C1A18] flex items-center justify-center text-[#161514] dark:text-[#FAF8F5] shrink-0 border border-[#E8E5DF] dark:border-[#383531]">
                         {isEmoji ? (
-                          <span className="text-sm leading-none">{h.icon}</span>
+                          <span className="text-xs leading-none">{h.icon}</span>
                         ) : (
-                          <IconComp className="h-4 w-4 stroke-[2.5]" />
+                          <IconComp className="size-3.5 stroke-[1.5]" />
                         )}
                       </div>
-                      <h4 className="font-black text-xs sm:text-sm text-[#161514] truncate leading-snug">
+                      <h4 className="font-sans font-medium text-xs sm:text-sm text-[#161514] dark:text-[#FAF8F5] truncate leading-snug">
                         {h.title}
                       </h4>
                     </div>
 
-                    <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto pl-10 sm:pl-0">
-                      <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded-xl bg-amber-300 text-[#161514] border-2 border-[#161514] flex items-center gap-1 shadow-[1.5px_1.5px_0px_0px_#161514]">
-                        <Flame className="h-3 w-3 text-rose-600 fill-rose-600" />
-                        {h.currentStreak}D Streak
+                    <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto pl-9 sm:pl-0">
+                      <span className="text-xs font-mono text-[#92400E] dark:text-amber-300 px-2 py-0.5 rounded border border-[#E8E5DF] dark:border-[#383531] bg-[#FFFBEB] dark:bg-amber-950/40 flex items-center gap-1">
+                        <Flame className="size-3 text-orange-500 fill-orange-500" />
+                        <span className="tabular-nums">{h.currentStreak}d streak</span>
                       </span>
-                      <span className="text-xs font-black text-[#161514] bg-[#03D26F]/30 px-2.5 py-1 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]">
-                        {h.consistencyPct}% Consistency
+                      <span className="text-xs font-mono font-medium text-[#04250e] dark:text-[#03D26F] bg-[#DCFAE5] dark:bg-[#03D26F]/20 px-2 py-0.5 rounded border border-[#03D26F]/30 dark:border-[#03D26F]/40 tabular-nums">
+                        {h.consistencyPct}% consistency
                       </span>
                     </div>
                   </div>
 
                   {/* Progress Bar */}
-                  <div className="w-full h-3 bg-white rounded-full border-2 border-[#161514] p-0.5 overflow-hidden">
+                  <div className="w-full h-1.5 bg-[#E8E5DF] dark:bg-[#383531] rounded-full overflow-hidden">
                     <div
                       style={{ width: `${h.consistencyPct}%` }}
                       className={cn(
                         "h-full rounded-full transition-all duration-500",
-                        h.consistencyPct >= 80 ? "bg-[#03D26F]" : h.consistencyPct >= 50 ? "bg-[#CEF431]" : "bg-amber-400"
+                        h.consistencyPct >= 80 ? "bg-[#03D26F]" : h.consistencyPct >= 50 ? "bg-[#161514] dark:bg-[#CEF431]" : "bg-amber-500"
                       )}
                     />
                   </div>

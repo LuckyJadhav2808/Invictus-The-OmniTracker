@@ -9,7 +9,7 @@ import {
   DEFAULT_REMINDER_CONFIG,
 } from "@/lib/utils/reminder-scheduler";
 import { requestNotificationPermission, sendNativeNotification } from "@/lib/utils/notifications";
-import { Bell, Clock, DollarSign, Target, BookOpen, Volume2, VolumeX, CheckCircle2 } from "lucide-react";
+import { Bell, Clock, Wallet, CheckSquare, GraduationCap, Target, Volume2, VolumeX, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { NeobrutalistTimeInput } from "@/components/shared/NeobrutalistTimeInput";
@@ -70,7 +70,9 @@ export function ReminderManagerModal({
     await enableWebPushNotifications(user?.uid || "guest", config).catch(() => {});
 
     saveReminderConfig(config);
-    toast.success("Daily Reminders Saved & Active! 🔔 (Exact Hardware Alarms & Cloud Ready)");
+    toast.success("Daily reminders saved", {
+      description: "Hardware alarms & local schedule synchronized",
+    });
     onOpenChange(false);
   };
 
@@ -84,12 +86,12 @@ export function ReminderManagerModal({
     const granted = await requestNotificationPermission();
     if (granted) {
       sendNativeNotification(
-        "🔔 Test Invictus Notification",
-        "Your daily reminders are working perfectly! You'll be notified at your chosen times.",
+        "Invictus System Alert",
+        "Your daily reminders are active. Notifications will appear at your scheduled times.",
         "/today"
       );
       await triggerTestPushNotification().catch(() => {});
-      toast.success("Test notification fired! Check your status bar / device notifications 📲");
+      toast.success("Test notification dispatched to status bar");
     } else {
       toast.error("Notification permission denied by browser settings.");
     }
@@ -99,43 +101,43 @@ export function ReminderManagerModal({
     <ResponsiveFormContainer
       open={open}
       onOpenChange={onOpenChange}
-      title="DAILY REMINDER & NOTIFICATION SETTINGS"
+      title="Daily Reminder & Notification Settings"
       description="Pick exact times to be reminded so you never miss a streak or budget log"
     >
       <form onSubmit={handleSave} className="space-y-4 pt-1">
         {/* Permission Banner */}
         {permissionState === "granted" ? (
-          <div className="bg-emerald-100 p-2.5 sm:p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] text-xs font-bold text-emerald-950 flex flex-wrap items-center justify-between gap-2">
+          <div className="bg-emerald-50 dark:bg-emerald-950/30 p-3 rounded-xl border border-emerald-200 dark:border-emerald-800 text-xs font-bold text-emerald-950 dark:text-emerald-200 flex flex-wrap items-center justify-between gap-2 shadow-xs transition-colors">
             <span className="flex items-center gap-1.5 font-black text-[11px] sm:text-xs">
-              <CheckCircle2 className="h-4 w-4 text-emerald-700 stroke-[2.5] shrink-0" />
-              {isNative ? "🟢 Native Hardware Alarms Granted & Active" : "🟢 Browser Notifications Granted & Active"}
+              <CheckCircle2 className="h-4 w-4 text-emerald-700 dark:text-emerald-400 stroke-[2.5] shrink-0" />
+              {isNative ? "Native Hardware Alarms Granted & Active" : "Browser Notifications Granted & Active"}
             </span>
             <button
               type="button"
               onClick={handleTestNotification}
-              className="px-3 py-1 rounded-xl bg-white hover:bg-emerald-200 text-[#161514] font-black text-[10px] uppercase border border-[#161514] cursor-pointer shrink-0 ml-auto"
+              className="px-3 py-1 rounded-lg bg-white dark:bg-[#1C1A18] hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-[#161514] dark:text-[#FAF8F5] font-black text-[10px] uppercase border border-emerald-300 dark:border-emerald-700 cursor-pointer shrink-0 ml-auto shadow-xs transition-colors"
             >
               Test Alarm 🔔
             </button>
           </div>
         ) : permissionState === "denied" ? (
-          <div className="bg-rose-100 p-2.5 sm:p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] text-xs font-bold text-rose-950 space-y-1">
+          <div className="bg-rose-50 dark:bg-rose-950/30 p-3 rounded-xl border border-rose-200 dark:border-rose-800 text-xs font-bold text-rose-950 dark:text-rose-200 space-y-1 shadow-xs transition-colors">
             <div className="flex items-center gap-1.5 font-black text-[11px] sm:text-xs">
-              <Bell className="h-4 w-4 text-rose-700 stroke-[2.5] shrink-0" />
-              {isNative ? "⚠️ Notifications Blocked in Device Settings" : "⚠️ Notifications Blocked in Browser Settings"}
+              <Bell className="h-4 w-4 text-rose-700 dark:text-rose-400 stroke-[2.5] shrink-0" />
+              {isNative ? "Notifications Blocked in Device Settings" : "Notifications Blocked in Browser Settings"}
             </div>
-            <p className="text-[11px] font-medium text-rose-900 leading-tight">
+            <p className="text-[11px] font-medium text-rose-900 dark:text-rose-300 leading-tight">
               {isNative ? (
                 <>To enable: Open your phone&apos;s <strong>Settings &gt; Apps &gt; Invictus &gt; Notifications</strong> and toggle <strong>Allow notifications</strong> to On.</>
               ) : (
-                <>To enable: Click the 🔒 lock icon on your browser address bar next to <code className="bg-white/80 px-1 py-0.5 rounded text-[10px]">localhost:3000</code> &rarr; Switch <strong>Notifications</strong> to <strong>Allow</strong>.</>
+                <>To enable: Click the 🔒 lock icon on your browser address bar next to <code className="bg-white/80 dark:bg-[#1C1A18] px-1 py-0.5 rounded text-[10px]">localhost:3000</code> &rarr; Switch <strong>Notifications</strong> to <strong>Allow</strong>.</>
               )}
             </p>
           </div>
         ) : (
-          <div className="bg-amber-100 p-2.5 sm:p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] text-xs font-bold text-[#161514] flex flex-wrap items-center justify-between gap-2">
+          <div className="bg-amber-50 dark:bg-amber-950/30 p-3 rounded-xl border border-amber-200 dark:border-amber-800 text-xs font-bold text-[#161514] dark:text-[#FAF8F5] flex flex-wrap items-center justify-between gap-2 shadow-xs transition-colors">
             <span className="flex items-center gap-1.5 text-[11px] sm:text-xs">
-              <Bell className="h-4 w-4 text-amber-700 stroke-[2.5] shrink-0" />
+              <Bell className="h-4 w-4 text-amber-700 dark:text-amber-400 stroke-[2.5] shrink-0" />
               {isNative ? "Enable Native Hardware Alarms for lock screen alerts" : "Allow browser notifications for background alerts"}
             </span>
             <button
@@ -156,7 +158,7 @@ export function ReminderManagerModal({
                   }
                 }
               }}
-              className="px-2.5 py-1 rounded-xl bg-[#CEF431] text-[#161514] font-black text-[10px] uppercase border border-[#161514] cursor-pointer shrink-0"
+              className="px-2.5 py-1 rounded-lg bg-[#CEF431] text-[#161514] font-black text-[10px] uppercase border border-[#CEF431] shadow-xs cursor-pointer shrink-0 hover:-translate-y-0.5 active:translate-y-0 transition-all"
             >
               Enable Now
             </button>
@@ -164,13 +166,13 @@ export function ReminderManagerModal({
         )}
 
         {/* 1. Money & Expense Log Reminder */}
-        <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] space-y-2">
+        <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] p-3.5 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-2 transition-colors">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="h-7 w-7 rounded-lg bg-[#03D26F]/30 border border-[#161514] flex items-center justify-center text-emerald-950 font-black">
-                💰
+            <div className="flex items-center gap-2.5">
+              <div className="size-8 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
+                <Wallet className="size-4 stroke-[2.2]" />
               </div>
-              <span className="text-xs font-black uppercase text-[#161514]">
+              <span className="text-xs font-black uppercase text-[#161514] dark:text-[#FAF8F5]">
                 Money & Expense Log Reminder
               </span>
             </div>
@@ -183,7 +185,7 @@ export function ReminderManagerModal({
           </div>
 
           {config.moneyEnabled && (
-            <div className="pt-1 border-t border-[#161514]/10">
+            <div className="pt-2 border-t border-[#E8E5DF] dark:border-[#2A2724]">
               <NeobrutalistTimeInput
                 value={config.moneyTime}
                 onChange={(val) => setConfig({ ...config, moneyTime: val })}
@@ -193,13 +195,13 @@ export function ReminderManagerModal({
         </div>
 
         {/* 2. Habits & Streaks Log Reminder */}
-        <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] space-y-2">
+        <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] p-3.5 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-2 transition-colors">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="h-7 w-7 rounded-lg bg-amber-300 border border-[#161514] flex items-center justify-center text-amber-950 font-black">
-                🌱
+            <div className="flex items-center gap-2.5">
+              <div className="size-8 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
+                <CheckSquare className="size-4 stroke-[2.2]" />
               </div>
-              <span className="text-xs font-black uppercase text-[#161514]">
+              <span className="text-xs font-black uppercase text-[#161514] dark:text-[#FAF8F5]">
                 Habits & Streaks Check-in
               </span>
             </div>
@@ -212,7 +214,7 @@ export function ReminderManagerModal({
           </div>
 
           {config.habitsEnabled && (
-            <div className="pt-1 border-t border-[#161514]/10">
+            <div className="pt-2 border-t border-[#E8E5DF] dark:border-[#2A2724]">
               <NeobrutalistTimeInput
                 value={config.habitsTime}
                 onChange={(val) => setConfig({ ...config, habitsTime: val })}
@@ -222,13 +224,13 @@ export function ReminderManagerModal({
         </div>
 
         {/* 3. Study Session & Exam Syllabus Reminder */}
-        <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] space-y-2">
+        <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] p-3.5 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-2 transition-colors">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="h-7 w-7 rounded-lg bg-indigo-200 border border-[#161514] flex items-center justify-center text-indigo-950 font-black">
-                📚
+            <div className="flex items-center gap-2.5">
+              <div className="size-8 rounded-lg bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-600 dark:text-purple-400 shrink-0">
+                <GraduationCap className="size-4 stroke-[2.2]" />
               </div>
-              <span className="text-xs font-black uppercase text-[#161514]">
+              <span className="text-xs font-black uppercase text-[#161514] dark:text-[#FAF8F5]">
                 Study Log & PYQ Review
               </span>
             </div>
@@ -236,12 +238,12 @@ export function ReminderManagerModal({
               type="checkbox"
               checked={config.studyEnabled}
               onChange={(e) => setConfig({ ...config, studyEnabled: e.target.checked })}
-              className="h-4 w-4 rounded accent-indigo-600 cursor-pointer"
+              className="h-4 w-4 rounded accent-purple-600 cursor-pointer"
             />
           </div>
 
           {config.studyEnabled && (
-            <div className="pt-1 border-t border-[#161514]/10">
+            <div className="pt-2 border-t border-[#E8E5DF] dark:border-[#2A2724]">
               <NeobrutalistTimeInput
                 value={config.studyTime}
                 onChange={(val) => setConfig({ ...config, studyTime: val })}
@@ -251,13 +253,13 @@ export function ReminderManagerModal({
         </div>
 
         {/* 4. Exam Targets & Countdown Review */}
-        <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] space-y-2">
+        <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] p-3.5 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-2 transition-colors">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="h-7 w-7 rounded-lg bg-rose-300 border border-[#161514] flex items-center justify-center text-rose-950 font-black">
-                🎯
+            <div className="flex items-center gap-2.5">
+              <div className="size-8 rounded-lg bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-600 dark:text-rose-400 shrink-0">
+                <Target className="size-4 stroke-[2.2]" />
               </div>
-              <span className="text-xs font-black uppercase text-[#161514]">
+              <span className="text-xs font-black uppercase text-[#161514] dark:text-[#FAF8F5]">
                 Exam Target & Countdown Review
               </span>
             </div>
@@ -270,7 +272,7 @@ export function ReminderManagerModal({
           </div>
 
           {config.examEnabled && (
-            <div className="pt-1 border-t border-[#161514]/10">
+            <div className="pt-2 border-t border-[#E8E5DF] dark:border-[#2A2724]">
               <NeobrutalistTimeInput
                 value={config.examTime}
                 onChange={(val) => setConfig({ ...config, examTime: val })}
@@ -285,8 +287,10 @@ export function ReminderManagerModal({
             type="button"
             onClick={() => setConfig({ ...config, soundEnabled: !config.soundEnabled })}
             className={cn(
-              "flex-1 min-w-[125px] px-2.5 py-1.5 rounded-xl text-xs font-black border-2 border-[#161514] flex items-center justify-center gap-1.5 shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all",
-              config.soundEnabled ? "bg-[#CEF431] text-[#161514]" : "bg-white text-gray-500"
+              "flex-1 min-w-[125px] px-2.5 py-2 rounded-xl text-xs font-black border flex items-center justify-center gap-1.5 shadow-xs hover:-translate-y-0.5 active:translate-y-0 cursor-pointer transition-all",
+              config.soundEnabled
+                ? "bg-[#CEF431] text-[#161514] border-[#CEF431]"
+                : "bg-white dark:bg-[#252321] text-gray-500 dark:text-gray-400 border-[#E8E5DF] dark:border-[#2A2724]"
             )}
           >
             {config.soundEnabled ? <Volume2 className="h-3.5 w-3.5 stroke-[2.5]" /> : <VolumeX className="h-3.5 w-3.5 stroke-[2.5]" />}
@@ -296,7 +300,7 @@ export function ReminderManagerModal({
           <button
             type="button"
             onClick={handleTestNotification}
-            className="flex-1 min-w-[125px] px-2.5 py-1.5 rounded-xl bg-white hover:bg-[#FFF9EA] text-[#161514] text-xs font-black border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center justify-center gap-1"
+            className="flex-1 min-w-[125px] px-2.5 py-2 rounded-xl bg-white dark:bg-[#252321] hover:bg-[#FFF9EA] dark:hover:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] text-xs font-black border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs hover:-translate-y-0.5 active:translate-y-0 cursor-pointer transition-all flex items-center justify-center gap-1.5"
           >
             <Bell className="h-3.5 w-3.5 stroke-[2.5]" />
             <span>Test Alert</span>
@@ -306,7 +310,7 @@ export function ReminderManagerModal({
         {/* Submit Save */}
         <button
           type="submit"
-          className="w-full bg-[#03D26F] hover:bg-[#02b35d] text-[#161514] font-black text-xs uppercase tracking-wider rounded-2xl py-3 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center justify-center gap-2 mt-2"
+          className="w-full bg-[#03D26F] hover:bg-[#02b35d] text-[#161514] font-black text-xs uppercase tracking-wider rounded-xl py-3 border border-[#03D26F] shadow-xs hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center gap-2 mt-2 cursor-pointer"
         >
           <CheckCircle2 className="h-4 w-4 stroke-[2.5]" />
           <span>Save All Reminder Settings</span>

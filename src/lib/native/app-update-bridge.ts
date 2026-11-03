@@ -95,7 +95,13 @@ export function resolveAbsoluteApkUrl(rawUrl?: string): string {
     return fallback;
   }
 
-  const trimmed = rawUrl.trim();
+  let trimmed = rawUrl.trim();
+
+  // Guard against localhost / 127.0.0.1 loopbacks on mobile devices
+  if (trimmed.includes("localhost") || trimmed.includes("127.0.0.1")) {
+    trimmed = trimmed.replace(/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/, "https://invictus-the-omni-tracker.vercel.app");
+  }
+
   if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
     return trimmed;
   }
@@ -106,7 +112,7 @@ export function resolveAbsoluteApkUrl(rawUrl?: string): string {
 
   if (typeof window !== "undefined") {
     const locOrigin = window.location.origin;
-    if (locOrigin && locOrigin.startsWith("http") && !locOrigin.includes("localhost")) {
+    if (locOrigin && locOrigin.startsWith("http") && !locOrigin.includes("localhost") && !locOrigin.includes("127.0.0.1")) {
       origin = locOrigin;
     }
   }

@@ -110,11 +110,11 @@ export function MoveMoneyModal({
     >
       <form onSubmit={handleSubmit} className="space-y-4 pt-1">
         {/* Source & Destination Envelope Selectors */}
-        <div className="space-y-3 bg-[#FAF8F5] p-3.5 sm:p-4 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514]">
+        <div className="space-y-3 bg-[#FAF8F5] dark:bg-[#1C1A18] p-3.5 sm:p-4 rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs">
           <div className="space-y-1">
-            <label className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514] flex items-center justify-between">
+            <label className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] flex items-center justify-between">
               <span>From Envelope (Source) *</span>
-              <span className="text-[9px] text-[#161514]/60 font-bold">Deducts from here</span>
+              <span className="text-[9px] text-[#161514]/60 dark:text-[#A8A29E] font-bold">Deducts from here</span>
             </label>
             <NeobrutalistSelect
               value={fromCatId}
@@ -129,7 +129,7 @@ export function MoveMoneyModal({
             <button
               type="button"
               onClick={handleSwap}
-              className="p-1.5 rounded-xl bg-white hover:bg-[#FAF8F5] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer flex items-center gap-1.5 text-[10px] font-black uppercase"
+              className="p-1.5 rounded-xl bg-white dark:bg-[#252321] hover:bg-[#FAF8F5] dark:hover:bg-[#2A2724] border border-[#E8E5DF] dark:border-[#2A2724] text-[#161514] dark:text-[#FAF8F5] shadow-xs hover:-translate-y-0.5 active:translate-y-0.5 transition-all cursor-pointer flex items-center gap-1.5 text-[10px] font-black uppercase"
               title="Swap source and destination"
             >
               <ArrowDownUp className="h-3.5 w-3.5 stroke-[2.5]" />
@@ -138,9 +138,9 @@ export function MoveMoneyModal({
           </div>
 
           <div className="space-y-1">
-            <label className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514] flex items-center justify-between">
+            <label className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] flex items-center justify-between">
               <span>To Envelope (Destination) *</span>
-              <span className="text-[9px] text-[#161514]/60 font-bold">Adds to here</span>
+              <span className="text-[9px] text-[#161514]/60 dark:text-[#A8A29E] font-bold">Adds to here</span>
             </label>
             <NeobrutalistSelect
               value={toCatId}
@@ -153,11 +153,11 @@ export function MoveMoneyModal({
 
         {/* Transfer Amount */}
         <div className="space-y-2">
-          <label htmlFor="move-amount" className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514] block">
+          <label htmlFor="move-amount" className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] block">
             Transfer Amount ({currencySymbol}) *
           </label>
           <div className="relative">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-black text-[#161514] font-heading">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-black text-[#161514] dark:text-[#FAF8F5] font-heading">
               {currencySymbol}
             </span>
             <input
@@ -169,7 +169,7 @@ export function MoveMoneyModal({
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0.00"
-              className="w-full pl-10 pr-4 py-3 bg-white rounded-2xl border-2 border-[#161514] text-xl font-black text-[#161514] font-heading shadow-[3px_3px_0px_0px_#161514] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
+              className="w-full pl-10 pr-4 py-3 bg-white dark:bg-[#1C1A18] rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] text-xl font-black text-[#161514] dark:text-[#FAF8F5] font-heading shadow-xs focus:outline-none focus:border-[#161514] dark:focus:border-white transition-all"
             />
           </div>
 
@@ -180,7 +180,7 @@ export function MoveMoneyModal({
                 key={amt}
                 type="button"
                 onClick={() => handleAddAmount(amt)}
-                className="px-2.5 py-1 rounded-xl bg-white hover:bg-[#CEF431] border-2 border-[#161514] text-[11px] font-black text-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer font-heading"
+                className="px-2.5 py-1 rounded-xl bg-white dark:bg-[#252321] hover:bg-[#CEF431] dark:hover:bg-[#CEF431] border border-[#E8E5DF] dark:border-[#2A2724] text-[11px] font-black text-[#161514] dark:text-[#FAF8F5] hover:text-[#161514] shadow-xs hover:-translate-y-0.5 active:translate-y-0.5 transition-all cursor-pointer font-heading"
               >
                 +{currencySymbol}{amt.toLocaleString()}
               </button>
@@ -189,7 +189,7 @@ export function MoveMoneyModal({
               <button
                 type="button"
                 onClick={() => setAmount("")}
-                className="px-2.5 py-1 rounded-xl bg-[#FAF8F5] hover:bg-rose-100 border-2 border-[#161514] text-[10px] font-black text-rose-700 shadow-[1.5px_1.5px_0px_0px_#161514] transition-all cursor-pointer"
+                className="px-2.5 py-1 rounded-xl bg-[#FAF8F5] dark:bg-[#252321] hover:bg-rose-100 dark:hover:bg-rose-950/40 border border-[#E8E5DF] dark:border-[#2A2724] text-[10px] font-black text-rose-700 dark:text-rose-400 shadow-xs transition-all cursor-pointer"
               >
                 Clear
               </button>
@@ -199,7 +199,7 @@ export function MoveMoneyModal({
 
         {/* Note / Memo */}
         <div className="space-y-1">
-          <label htmlFor="move-note" className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514] block">
+          <label htmlFor="move-note" className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] block">
             Transfer Note / Reason (Optional)
           </label>
           <input
@@ -208,7 +208,7 @@ export function MoveMoneyModal({
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="e.g. Budget rebalance, Dinner contribution, Weekend trip"
-            className="w-full px-4 py-2.5 bg-white rounded-2xl border-2 border-[#161514] text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
+            className="w-full px-4 py-2.5 bg-white dark:bg-[#1C1A18] rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] text-base font-bold text-[#161514] dark:text-[#FAF8F5] shadow-xs focus:outline-none focus:border-[#161514] dark:focus:border-white transition-all"
           />
         </div>
 
@@ -216,7 +216,7 @@ export function MoveMoneyModal({
         <button
           type="submit"
           disabled={isSubmitting || !amount || Number(amount) <= 0}
-          className="w-full py-3 px-4 rounded-2xl bg-[#FACC15] hover:bg-[#EAB308] text-[#161514] font-black text-sm uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+          className="w-full py-3 px-4 rounded-2xl bg-[#FACC15] hover:bg-[#EAB308] text-[#161514] font-black text-sm uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2 border border-[#161514] shadow-xs active:translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmitting ? (
             <>

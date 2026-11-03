@@ -108,8 +108,8 @@ export function initReminderScheduler() {
     if (config.moneyEnabled && config.moneyTime === currentTimeStr) {
       await triggerReminder(
         "money",
-        "💰 Time to Log Today's Expenses!",
-        "Keep your budget on track. Log your spending & income in Money Space.",
+        "Daily Expense Log",
+        "Record today's spending to calibrate your remaining safe spend pace.",
         "/money"
       );
     }
@@ -118,8 +118,8 @@ export function initReminderScheduler() {
     if (config.habitsEnabled && config.habitsTime === currentTimeStr) {
       await triggerReminder(
         "habits",
-        "🔥 Keep Your Habit Streaks Glowing!",
-        "Don't lose your streak! Check off today's habits in Life Space.",
+        "Daily Habit Check-in",
+        "Review your scheduled habits and lock in today's streaks.",
         "/goals"
       );
     }
@@ -128,8 +128,8 @@ export function initReminderScheduler() {
     if (config.studyEnabled && config.studyTime === currentTimeStr) {
       await triggerReminder(
         "study",
-        "📚 Study Session & PYQ Check-in!",
-        "Log your study hours and PYQs solved today in Study Space.",
+        "Study & PYQ Review",
+        "Log completed focus hours and solved past-year questions.",
         "/study"
       );
     }
@@ -138,8 +138,8 @@ export function initReminderScheduler() {
     if (config.examEnabled && config.examTime === currentTimeStr) {
       await triggerReminder(
         "exam",
-        "⚡ Review Today's Exam Syllabus Targets!",
-        "Stay ahead of your target date. Review study topics in Study Space.",
+        "Exam Syllabus Targets",
+        "Review today's target topics and countdown milestones.",
         "/study"
       );
     }

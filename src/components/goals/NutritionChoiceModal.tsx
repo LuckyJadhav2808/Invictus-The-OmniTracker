@@ -135,25 +135,25 @@ export function NutritionChoiceModal({
       <div className="space-y-4 pt-1">
         {/* Navigation Bar when inside sub-screens */}
         {view !== "menu" && (
-          <div className="flex items-center justify-between pb-2 border-b-2 border-[#161514]">
+          <div className="flex items-center justify-between pb-2 border-b border-[#E8E5DF] dark:border-[#2A2724]">
             <button
               type="button"
               onClick={() => {
                 setView("menu");
                 soundFX.playPop();
               }}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-[#FAF8F5] text-[#161514] font-heading font-black text-xs border-2 border-[#161514] shadow-[2px_2px_0px_#161514] cursor-pointer transition-all active:translate-y-0.5"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] text-[#161514] dark:text-stone-200 font-heading font-black text-xs border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs cursor-pointer transition-all active:translate-y-0"
             >
-              <ArrowLeft className="size-3.5 stroke-[2.5]" />
+              <ArrowLeft className="size-3.5 stroke-[2.2]" />
               <span>Back to Options</span>
             </button>
-            <span className="text-[11px] font-mono font-bold text-[#161514]/70 uppercase">
+            <span className="text-[11px] font-mono font-bold text-[#6B6B6B] dark:text-[#A8A29E] uppercase">
               {view === "vault" ? "Dishes Database" : view === "custom" ? "Custom Recipe" : "Presets"}
             </span>
           </div>
         )}
 
-        {/* 1. SELECTION STAGE (3 Rich Neobrutalist Cards) */}
+        {/* 1. SELECTION STAGE (3 Clean Hairline Cards) */}
         {view === "menu" && (
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {/* Card 1: 1,000+ Dishes Database */}
@@ -163,22 +163,22 @@ export function NutritionChoiceModal({
                 setView("vault");
                 soundFX.playPop();
               }}
-              className="p-4 rounded-2xl bg-[#03D26F] hover:bg-[#02b861] border-2 border-[#161514] shadow-[3px_3px_0px_#161514] text-left cursor-pointer transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none flex flex-col justify-between min-h-[160px] group"
+              className="p-4 rounded-2xl bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs text-left cursor-pointer transition-all hover:-translate-y-0.5 flex flex-col justify-between min-h-[160px] group"
             >
               <div>
-                <div className="size-10 rounded-xl bg-[#161514] text-[#03D26F] border-2 border-[#161514] flex items-center justify-center font-black mb-3 shadow-[1.5px_1.5px_0px_#161514]">
-                  <Search className="size-5 stroke-[2.5]" />
+                <div className="size-10 rounded-xl bg-[#03D26F]/10 text-[#047857] dark:text-[#03D26F] border border-[#03D26F]/20 flex items-center justify-center font-black mb-3 shadow-none">
+                  <Search className="size-5 stroke-[2.2]" />
                 </div>
-                <h4 className="font-heading font-black text-sm text-[#161514] leading-tight">
-                  Dishes & Macros Vault
+                <h4 className="font-heading font-black text-sm text-[#161514] dark:text-stone-100 leading-tight">
+                  Dishes &amp; Macros Vault
                 </h4>
-                <p className="text-[11px] font-bold text-[#161514]/75 mt-1 leading-snug">
-                  1,000+ curated Indian & global dishes with verified calories and P/C/F macros.
+                <p className="text-[11px] text-[#6B6B6B] dark:text-[#A8A29E] mt-1 leading-snug">
+                  1,000+ curated Indian &amp; global dishes with verified calories and P/C/F macros.
                 </p>
               </div>
-              <div className="pt-3 flex items-center justify-between text-[11px] font-black text-[#161514]">
-                <span className="bg-[#161514] text-[#03D26F] px-2 py-0.5 rounded-md text-[9.5px]">1,000+ DISHES</span>
-                <span className="group-hover:translate-x-1 transition-transform">Search ➔</span>
+              <div className="pt-3 flex items-center justify-between text-[11px] font-bold text-[#161514] dark:text-stone-200">
+                <span className="bg-[#03D26F]/15 text-[#047857] dark:text-[#03D26F] px-2 py-0.5 rounded-full text-[9.5px] font-mono font-bold">1,000+ DISHES</span>
+                <span className="group-hover:translate-x-0.5 transition-transform font-heading font-black">Search ➔</span>
               </div>
             </button>
 
@@ -189,22 +189,22 @@ export function NutritionChoiceModal({
                 setView("custom");
                 soundFX.playPop();
               }}
-              className="p-4 rounded-2xl bg-[#FEF9C3] hover:bg-[#FEF08A] border-2 border-[#161514] shadow-[3px_3px_0px_#161514] text-left cursor-pointer transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none flex flex-col justify-between min-h-[160px] group"
+              className="p-4 rounded-2xl bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs text-left cursor-pointer transition-all hover:-translate-y-0.5 flex flex-col justify-between min-h-[160px] group"
             >
               <div>
-                <div className="size-10 rounded-xl bg-amber-400 text-[#161514] border-2 border-[#161514] flex items-center justify-center font-black mb-3 shadow-[1.5px_1.5px_0px_#161514]">
-                  <Plus className="size-5 stroke-[2.5]" />
+                <div className="size-10 rounded-xl bg-amber-400/10 text-amber-700 dark:text-amber-400 border border-amber-400/20 flex items-center justify-center font-black mb-3 shadow-none">
+                  <Plus className="size-5 stroke-[2.2]" />
                 </div>
-                <h4 className="font-heading font-black text-sm text-[#161514] leading-tight">
+                <h4 className="font-heading font-black text-sm text-[#161514] dark:text-stone-100 leading-tight">
                   Custom Meal / Recipe
                 </h4>
-                <p className="text-[11px] font-bold text-[#161514]/70 mt-1 leading-snug">
+                <p className="text-[11px] text-[#6B6B6B] dark:text-[#A8A29E] mt-1 leading-snug">
                   Quickly log your own homemade recipes, shake formulas, or restaurant meals.
                 </p>
               </div>
-              <div className="pt-3 flex items-center justify-between text-[11px] font-black text-[#161514]">
-                <span className="bg-[#161514] text-[#FEF9C3] px-2 py-0.5 rounded-md text-[9.5px]">FREEFORM</span>
-                <span className="group-hover:translate-x-1 transition-transform">Create ➔</span>
+              <div className="pt-3 flex items-center justify-between text-[11px] font-bold text-[#161514] dark:text-stone-200">
+                <span className="bg-amber-400/15 text-amber-800 dark:text-amber-300 px-2 py-0.5 rounded-full text-[9.5px] font-mono font-bold">FREEFORM</span>
+                <span className="group-hover:translate-x-0.5 transition-transform font-heading font-black">Create ➔</span>
               </div>
             </button>
 
@@ -215,22 +215,22 @@ export function NutritionChoiceModal({
                 setView("presets");
                 soundFX.playPop();
               }}
-              className="p-4 rounded-2xl bg-[#C084FC]/30 hover:bg-[#C084FC]/40 border-2 border-[#161514] shadow-[3px_3px_0px_#161514] text-left cursor-pointer transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none flex flex-col justify-between min-h-[160px] group"
+              className="p-4 rounded-2xl bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs text-left cursor-pointer transition-all hover:-translate-y-0.5 flex flex-col justify-between min-h-[160px] group"
             >
               <div>
-                <div className="size-10 rounded-xl bg-[#C084FC] text-[#161514] border-2 border-[#161514] flex items-center justify-center font-black mb-3 shadow-[1.5px_1.5px_0px_#161514]">
-                  <Layers className="size-5 stroke-[2.5]" />
+                <div className="size-10 rounded-xl bg-purple-500/10 text-purple-700 dark:text-purple-400 border border-purple-500/20 flex items-center justify-center font-black mb-3 shadow-none">
+                  <Layers className="size-5 stroke-[2.2]" />
                 </div>
-                <h4 className="font-heading font-black text-sm text-[#161514] leading-tight">
+                <h4 className="font-heading font-black text-sm text-[#161514] dark:text-stone-100 leading-tight">
                   Diet Split Packs
                 </h4>
-                <p className="text-[11px] font-bold text-[#161514]/70 mt-1 leading-snug">
+                <p className="text-[11px] text-[#6B6B6B] dark:text-[#A8A29E] mt-1 leading-snug">
                   1-tap apply High-Protein Bulk, Lean Cutting, or Student Budget diet splits.
                 </p>
               </div>
-              <div className="pt-3 flex items-center justify-between text-[11px] font-black text-[#161514]">
-                <span className="bg-[#161514] text-[#C084FC] px-2 py-0.5 rounded-md text-[9.5px]">PRESETS</span>
-                <span className="group-hover:translate-x-1 transition-transform">Apply ➔</span>
+              <div className="pt-3 flex items-center justify-between text-[11px] font-bold text-[#161514] dark:text-stone-200">
+                <span className="bg-purple-500/15 text-purple-800 dark:text-purple-300 px-2 py-0.5 rounded-full text-[9.5px] font-mono font-bold">PRESETS</span>
+                <span className="group-hover:translate-x-0.5 transition-transform font-heading font-black">Apply ➔</span>
               </div>
             </button>
           </div>
@@ -246,14 +246,14 @@ export function NutritionChoiceModal({
                 placeholder="Search dish (e.g. Garam Chai, Paneer Bhurji, Dal Tadka, Oats, Egg White)..."
                 value={dishQuery}
                 onChange={(e) => setDishQuery(e.target.value)}
-                className="w-full bg-white rounded-xl border-2 border-[#161514] pl-3.5 pr-9 py-2.5 text-xs font-bold text-[#161514] outline-none placeholder:text-[#161514]/40 shadow-[2px_2px_0px_#161514] focus:bg-[#FFF9EA]"
+                className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] pl-3.5 pr-9 py-2.5 text-xs font-bold text-[#161514] dark:text-stone-100 outline-none placeholder:text-[#161514]/40 dark:placeholder:text-stone-500 shadow-none focus:border-[#161514] dark:focus:border-white"
                 autoFocus
               />
               {dishQuery && (
                 <button
                   type="button"
                   onClick={() => setDishQuery("")}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-[#161514]/60 hover:text-[#161514] hover:bg-[#161514]/10 cursor-pointer transition-colors"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-[#161514]/60 dark:text-stone-400 hover:text-[#161514] dark:hover:text-white cursor-pointer transition-colors"
                   title="Clear search"
                 >
                   <X className="size-3.5" />
@@ -269,10 +269,10 @@ export function NutritionChoiceModal({
                   type="button"
                   onClick={() => setDishQuery(tag === "All" ? "" : tag)}
                   className={cn(
-                    "text-[9px] font-black px-2 py-0.5 rounded-lg border-2 border-[#161514] transition-all cursor-pointer",
+                    "text-[9px] font-mono font-bold px-2.5 py-1 rounded-lg border transition-all cursor-pointer",
                     (tag === "All" && !dishQuery) || dishQuery.toLowerCase() === tag.toLowerCase()
-                      ? "bg-[#161514] text-[#03D26F] shadow-[1px_1px_0px_#161514]"
-                      : "bg-white text-[#161514] hover:bg-emerald-100"
+                      ? "bg-[#161514] dark:bg-white text-white dark:text-[#161514] border-[#161514] dark:border-white shadow-xs"
+                      : "bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-stone-300 border-[#E8E5DF] dark:border-[#2A2724] hover:bg-[#FAF8F5] dark:hover:bg-[#252321]"
                   )}
                 >
                   {tag.toUpperCase()}
@@ -281,12 +281,12 @@ export function NutritionChoiceModal({
             </div>
 
             {/* Counter & Status */}
-            <div className="flex items-center justify-between text-[11px] font-bold text-[#161514]/70 px-0.5">
+            <div className="flex items-center justify-between text-[11px] font-medium text-[#6B6B6B] dark:text-[#A8A29E] px-0.5">
               <span>
-                Showing <strong className="text-[#161514] font-black">{nutritionData?.dishes ? Math.min(nutritionData.dishes.length, nutritionData.totalCount) : 0}</strong> of <strong className="text-[#161514] font-black">{nutritionData?.totalCount || 1015}</strong> dishes
+                Showing <strong className="text-[#161514] dark:text-stone-200 font-bold">{nutritionData?.dishes ? Math.min(nutritionData.dishes.length, nutritionData.totalCount) : 0}</strong> of <strong className="text-[#161514] dark:text-stone-200 font-bold">{nutritionData?.totalCount || 1015}</strong> dishes
               </span>
               {isNutritionFetching && (
-                <span className="text-emerald-700 font-black text-[10px] uppercase tracking-wider animate-pulse flex items-center gap-1">
+                <span className="text-emerald-700 dark:text-emerald-400 font-mono font-bold text-[10px] uppercase tracking-wider animate-pulse flex items-center gap-1">
                   <span className="size-1.5 rounded-full bg-emerald-500 animate-ping inline-block" />
                   Searching...
                 </span>
@@ -295,29 +295,29 @@ export function NutritionChoiceModal({
 
             {/* Dishes Search Results List */}
             {nutritionData?.dishes && nutritionData.dishes.length > 0 ? (
-              <div className="max-h-[50vh] overflow-y-auto space-y-2 pr-1 pt-1 divide-y divide-emerald-200/60 overscroll-contain">
+              <div className="max-h-[50vh] overflow-y-auto space-y-2 pr-1 pt-1 overscroll-contain">
                 {nutritionData.dishes.map((dish) => (
                   <div
                     key={dish.id}
                     onClick={() => handleSelectVaultDish(dish)}
-                    className="p-2.5 rounded-xl bg-white hover:bg-emerald-50 border-2 border-[#161514] cursor-pointer transition-all flex items-center justify-between gap-2.5 shadow-[1.5px_1.5px_0px_#161514] active:translate-y-0.5 group"
+                    className="p-2.5 rounded-xl bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] border border-[#E8E5DF] dark:border-[#2A2724] cursor-pointer transition-all flex items-center justify-between gap-2.5 shadow-none group"
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="size-10 rounded-xl bg-[#ECFDF5] border-2 border-[#161514] flex items-center justify-center text-sm font-black text-[#161514] shrink-0">
+                      <div className="size-9 rounded-lg bg-[#FAF8F5] dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#2A2724] flex items-center justify-center text-sm font-bold text-[#161514] dark:text-stone-200 shrink-0">
                         🥗
                       </div>
                       <div className="min-w-0 flex-1">
-                        <h5 className="font-black text-xs text-[#161514] leading-snug break-words group-hover:text-emerald-700 transition-colors">
+                        <h5 className="font-heading font-black text-xs text-[#161514] dark:text-stone-100 leading-snug break-words group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
                           {dish.dishName}
                         </h5>
                         <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                          <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-rose-100 text-rose-900 border border-[#161514]">
+                          <span className="text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded bg-rose-50 text-rose-800 dark:bg-rose-950/40 dark:text-rose-300 border border-rose-200/60 dark:border-rose-900/40">
                             🔥 {dish.calories} kcal
                           </span>
-                          <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-[#03D26F]/30 text-emerald-950 border border-[#161514]">
+                          <span className="text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded bg-[#03D26F]/15 text-[#047857] dark:text-[#03D26F] border border-[#03D26F]/30">
                             {dish.protein}g P
                           </span>
-                          <span className="text-[9px] font-bold text-[#161514]/70">
+                          <span className="text-[9px] font-mono text-[#6B6B6B] dark:text-[#A8A29E]">
                             • {dish.carbs}g C • {dish.fats}g F
                           </span>
                         </div>
@@ -331,7 +331,7 @@ export function NutritionChoiceModal({
                         e.stopPropagation();
                         handleSelectVaultDish(dish);
                       }}
-                      className="text-[9px] font-black bg-[#03D26F] hover:bg-[#02b861] active:translate-y-0.5 text-[#161514] px-2.5 py-1 rounded-lg border-2 border-[#161514] shadow-[1.5px_1.5px_0px_#161514] flex items-center gap-1 cursor-pointer transition-all shrink-0"
+                      className="text-[9px] font-mono font-bold bg-[#161514] hover:bg-[#2A2724] dark:bg-white dark:hover:bg-stone-200 dark:text-[#161514] text-white px-2.5 py-1 rounded-lg border border-[#161514] dark:border-white shadow-xs flex items-center gap-1 cursor-pointer transition-all shrink-0"
                     >
                       <span>LOG</span>
                       <span className="font-black">➔</span>
@@ -345,24 +345,24 @@ export function NutritionChoiceModal({
                       type="button"
                       onClick={() => setDishLimit((prev) => prev + 30)}
                       disabled={isNutritionFetching}
-                      className="w-full py-2.5 px-4 rounded-xl bg-emerald-300 hover:bg-emerald-400 text-[#161514] font-heading font-black text-xs border-2 border-[#161514] shadow-[2px_2px_0px_#161514] active:translate-y-0.5 cursor-pointer flex items-center justify-center gap-2 transition-all disabled:opacity-60"
+                      className="w-full py-2 px-4 rounded-xl bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] text-[#161514] dark:text-stone-200 font-heading font-black text-xs border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs cursor-pointer flex items-center justify-center gap-2 transition-all disabled:opacity-60"
                     >
                       <span>
                         {isNutritionFetching
                           ? "Loading More Dishes..."
                           : `Load More Dishes (${nutritionData.totalCount - nutritionData.dishes.length} remaining)`}
                       </span>
-                      <ChevronDown className="size-4 stroke-[3]" />
+                      <ChevronDown className="size-4 stroke-[2.2]" />
                     </button>
                   </div>
                 )}
               </div>
             ) : (
-              <div className="p-5 text-center bg-white rounded-2xl border-2 border-dashed border-[#161514]/40 space-y-2.5">
-                <p className="text-xs font-black text-[#161514]">
+              <div className="p-5 text-center bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-2xl border border-dashed border-[#E8E5DF] dark:border-[#2A2724] space-y-2.5">
+                <p className="text-xs font-bold text-[#161514] dark:text-stone-200">
                   No dish found matching &ldquo;{dishQuery}&rdquo;
                 </p>
-                <p className="text-[11px] font-bold text-[#161514]/70">
+                <p className="text-[11px] text-[#6B6B6B] dark:text-[#A8A29E]">
                   Can&apos;t find this dish? Create it as a custom meal entry with your own macros.
                 </p>
                 <button
@@ -371,9 +371,9 @@ export function NutritionChoiceModal({
                     setCustomName(dishQuery);
                     setView("custom");
                   }}
-                  className="text-xs font-black bg-[#CEF431] hover:bg-[#D8F74E] text-[#161514] px-3.5 py-1.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_#161514] cursor-pointer inline-flex items-center gap-1.5 active:translate-y-0.5 transition-all"
+                  className="text-xs font-heading font-black bg-[#161514] text-white hover:bg-[#2A2724] dark:bg-white dark:text-[#161514] dark:hover:bg-stone-200 px-3.5 py-1.5 rounded-xl border border-[#161514] dark:border-white shadow-xs cursor-pointer inline-flex items-center gap-1.5 transition-all"
                 >
-                  <Plus className="size-3.5 stroke-[3]" />
+                  <Plus className="size-3.5 stroke-[2.2]" />
                   <span>Create &ldquo;{dishQuery || "Custom"}&rdquo; Meal</span>
                 </button>
               </div>
@@ -385,7 +385,7 @@ export function NutritionChoiceModal({
         {view === "custom" && (
           <form onSubmit={handleCustomSubmit} className="space-y-3.5 pt-1">
             <div className="space-y-1">
-              <label className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514]">
+              <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#161514] dark:text-stone-200">
                 Meal Name *
               </label>
               <input
@@ -393,7 +393,7 @@ export function NutritionChoiceModal({
                 placeholder="e.g. Oatmeal with Whey & Almonds, Grilled Paneer Rice"
                 value={customName}
                 onChange={(e) => setCustomName(e.target.value)}
-                className="w-full bg-white rounded-xl border-2 border-[#161514] px-3.5 py-2.5 text-xs font-bold text-[#161514] shadow-[2px_2px_0px_#161514] focus:bg-[#FFF9EA] outline-none"
+                className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-3.5 py-2.5 text-xs font-bold text-[#161514] dark:text-stone-100 shadow-none focus:border-[#161514] dark:focus:border-white outline-none"
                 required
                 autoFocus
               />
@@ -401,7 +401,7 @@ export function NutritionChoiceModal({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514]">
+                <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#161514] dark:text-stone-200">
                   Meal Type
                 </label>
                 <NeobrutalistSelect
@@ -416,7 +416,7 @@ export function NutritionChoiceModal({
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514]">
+                <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#161514] dark:text-stone-200">
                   Time (Optional)
                 </label>
                 <input
@@ -424,7 +424,7 @@ export function NutritionChoiceModal({
                   placeholder="e.g. 01:30 PM"
                   value={customTime}
                   onChange={(e) => setCustomTime(e.target.value)}
-                  className="w-full bg-white rounded-xl border-2 border-[#161514] px-3.5 py-2 text-xs font-bold text-[#161514] shadow-[2px_2px_0px_#161514] focus:bg-[#FFF9EA] outline-none"
+                  className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-3.5 py-2 text-xs font-bold text-[#161514] dark:text-stone-100 shadow-none focus:border-[#161514] dark:focus:border-white outline-none"
                 />
               </div>
             </div>
@@ -432,50 +432,50 @@ export function NutritionChoiceModal({
             {/* Macro Inputs Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
               <div className="space-y-1">
-                <label className="text-[9px] font-heading font-black uppercase text-[#161514]">Calories (kcal)</label>
+                <label className="text-[9px] font-mono font-bold uppercase text-[#161514] dark:text-stone-200">Calories (kcal)</label>
                 <input
                   type="number"
                   placeholder="450"
                   inputMode="numeric"
                   value={customCalories}
                   onChange={(e) => setCustomCalories(e.target.value)}
-                  className="w-full bg-white rounded-xl border-2 border-[#161514] px-3 py-2 text-xs font-mono font-black text-[#161514] shadow-[1.5px_1.5px_0px_#161514]"
+                  className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-3 py-2 text-xs font-mono font-bold text-[#161514] dark:text-stone-100 shadow-none focus:border-[#161514] dark:focus:border-white outline-none"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-[9px] font-heading font-black uppercase text-emerald-800">Protein (g)</label>
+                <label className="text-[9px] font-mono font-bold uppercase text-emerald-700 dark:text-emerald-400">Protein (g)</label>
                 <input
                   type="number"
                   placeholder="35"
                   inputMode="numeric"
                   value={customProtein}
                   onChange={(e) => setCustomProtein(e.target.value)}
-                  className="w-full bg-white rounded-xl border-2 border-[#161514] px-3 py-2 text-xs font-mono font-black text-[#161514] shadow-[1.5px_1.5px_0px_#161514]"
+                  className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-3 py-2 text-xs font-mono font-bold text-[#161514] dark:text-stone-100 shadow-none focus:border-[#161514] dark:focus:border-white outline-none"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-[9px] font-heading font-black uppercase text-amber-800">Carbs (g)</label>
+                <label className="text-[9px] font-mono font-bold uppercase text-amber-700 dark:text-amber-400">Carbs (g)</label>
                 <input
                   type="number"
                   placeholder="50"
                   inputMode="numeric"
                   value={customCarbs}
                   onChange={(e) => setCustomCarbs(e.target.value)}
-                  className="w-full bg-white rounded-xl border-2 border-[#161514] px-3 py-2 text-xs font-mono font-black text-[#161514] shadow-[1.5px_1.5px_0px_#161514]"
+                  className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-3 py-2 text-xs font-mono font-bold text-[#161514] dark:text-stone-100 shadow-none focus:border-[#161514] dark:focus:border-white outline-none"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-[9px] font-heading font-black uppercase text-rose-800">Fat (g)</label>
+                <label className="text-[9px] font-mono font-bold uppercase text-sky-700 dark:text-sky-400">Fat (g)</label>
                 <input
                   type="number"
                   placeholder="12"
                   inputMode="numeric"
                   value={customFat}
                   onChange={(e) => setCustomFat(e.target.value)}
-                  className="w-full bg-white rounded-xl border-2 border-[#161514] px-3 py-2 text-xs font-mono font-black text-[#161514] shadow-[1.5px_1.5px_0px_#161514]"
+                  className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-3 py-2 text-xs font-mono font-bold text-[#161514] dark:text-stone-100 shadow-none focus:border-[#161514] dark:focus:border-white outline-none"
                 />
               </div>
             </div>
@@ -483,7 +483,7 @@ export function NutritionChoiceModal({
             <button
               type="submit"
               disabled={isPending || !customName.trim()}
-              className="w-full min-h-[46px] bg-[#03D26F] hover:bg-[#02b861] text-[#161514] font-heading font-black text-xs uppercase tracking-wider rounded-xl py-3 border-2 border-[#161514] shadow-[3px_3px_0px_#161514] cursor-pointer transition-all active:translate-y-0.5 disabled:opacity-50"
+              className="w-full min-h-[44px] bg-[#161514] hover:bg-[#2A2724] dark:bg-white dark:text-[#161514] dark:hover:bg-stone-200 text-white font-heading font-black text-xs uppercase tracking-wider rounded-xl py-2.5 border border-[#161514] dark:border-white shadow-xs cursor-pointer transition-all active:translate-y-0 disabled:opacity-50"
             >
               Log Custom Meal &amp; Save Macros ➔
             </button>
@@ -493,26 +493,26 @@ export function NutritionChoiceModal({
         {/* 4. CURATED NUTRITION PRESETS */}
         {view === "presets" && (
           <div className="space-y-3">
-            <p className="text-xs font-bold text-[#161514]/70">
+            <p className="text-xs font-medium text-[#6B6B6B] dark:text-[#A8A29E]">
               Select a battle-tested nutrition pack to instantly load into today&apos;s diet:
             </p>
             <div className="grid grid-cols-1 gap-2.5 max-h-[50vh] overflow-y-auto pr-1">
               {MEAL_TEMPLATE_PACKS.map((pack) => (
                 <div
                   key={pack.id}
-                  className="p-3.5 rounded-xl bg-white border-2 border-[#161514] shadow-[2px_2px_0px_#161514] flex items-center justify-between gap-3 hover:bg-[#FAF8F5] transition-colors"
+                  className="p-3.5 rounded-xl bg-white dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] shadow-none flex items-center justify-between gap-3 hover:bg-[#FAF8F5] dark:hover:bg-[#252321] transition-colors"
                 >
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-base">{pack.icon || "🥗"}</span>
-                      <h5 className="font-heading font-black text-xs text-[#161514] truncate">
+                      <span className="text-base">{pack.icon === "Target" ? "🎯" : pack.icon === "Sparkles" ? "⚡" : "🥗"}</span>
+                      <h5 className="font-heading font-black text-xs text-[#161514] dark:text-stone-100 truncate">
                         {pack.name}
                       </h5>
                     </div>
-                    <p className="text-[11px] font-bold text-[#161514]/65 mt-0.5 line-clamp-1">
+                    <p className="text-[11px] text-[#6B6B6B] dark:text-[#A8A29E] mt-0.5 line-clamp-1">
                       {pack.tagline}
                     </p>
-                    <span className="inline-block mt-1 text-[9px] font-mono font-black text-[#161514] bg-[#FAF8F5] px-2 py-0.5 rounded border border-[#161514]">
+                    <span className="inline-block mt-1 text-[9px] font-mono font-bold text-[#161514] dark:text-stone-300 bg-[#FAF8F5] dark:bg-[#252321] px-2 py-0.5 rounded border border-[#E8E5DF] dark:border-[#2A2724]">
                       {pack.items.length} Meals included
                     </span>
                   </div>
@@ -523,7 +523,7 @@ export function NutritionChoiceModal({
                       onApplyPresetPack(pack);
                       soundFX.playPop();
                     }}
-                    className="px-3 py-1.5 rounded-xl bg-[#03D26F] hover:bg-[#02b861] text-[#161514] font-heading font-black text-xs border-2 border-[#161514] shadow-[1.5px_1.5px_0px_#161514] cursor-pointer transition-all active:translate-y-0.5 whitespace-nowrap"
+                    className="px-3 py-1.5 rounded-xl bg-[#161514] hover:bg-[#2A2724] dark:bg-white dark:hover:bg-stone-200 text-white dark:text-[#161514] font-heading font-black text-xs border border-[#161514] dark:border-white shadow-xs cursor-pointer transition-all active:translate-y-0 whitespace-nowrap"
                   >
                     Apply Pack ➔
                   </button>

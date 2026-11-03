@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { format, parseISO } from "date-fns";
 import { type Transaction, type Category } from "@/types";
-import { renderCategoryEmoji } from "@/components/money/MoneyQuickActionsAndCards";
+import { CategoryIcon } from "@/components/money/MoneyQuickActionsAndCards";
 import { cn } from "@/lib/utils";
 
 interface NeobrutalistPDFStatementProps {
@@ -153,7 +153,7 @@ export function NeobrutalistPDFStatement({
                 key={c.id}
                 className="px-3 py-1.5 rounded-xl border border-[#161514] bg-[#FAF8F5] text-xs font-black flex items-center gap-1.5 shadow-[1px_1px_0px_0px_rgba(22,21,20,1)]"
               >
-                <span>{renderCategoryEmoji(c.icon)}</span>
+                <CategoryIcon name={c.icon} className="size-3.5 inline-block text-[#161514]" />
                 <span>{c.name}:</span>
                 <span className="text-[#047857] font-extrabold">{currencySymbol}{c.totalAmount.toLocaleString()}</span>
                 <span className="text-[10px] text-[#161514] opacity-60 font-bold">({c.count})</span>
@@ -166,7 +166,7 @@ export function NeobrutalistPDFStatement({
       {/* 4. Chronological Day-by-Day Transaction Records */}
       <div className="space-y-4 pt-2">
         <h4 className="text-xs font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5">
-          📜 Itemized Transaction Ledger
+          Itemized Transaction Ledger
         </h4>
 
         {groupedTxs.length === 0 ? (
@@ -202,7 +202,7 @@ export function NeobrutalistPDFStatement({
                           style={{ breakInside: "avoid", pageBreakInside: "avoid" }}
                         >
                           <div className="flex items-center gap-2.5 truncate">
-                            <span className="text-base shrink-0">{renderCategoryEmoji(category?.icon)}</span>
+                            <CategoryIcon name={category?.icon} className="size-4 shrink-0 text-[#161514]" />
                             <div className="truncate">
                               <span className="font-black text-[#161514]">{category?.name || "Uncategorized"}</span>
                               {tx.note && <span className="text-[#161514] opacity-60 font-semibold truncate ml-1.5">- {tx.note}</span>}

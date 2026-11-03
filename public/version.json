@@ -1,0 +1,45 @@
+{
+  "application": "Invictus Life OS & Omni-Tracker",
+  "version": "1.7.9",
+  "buildNumber": 30,
+  "channel": "stable",
+  "releaseDate": "November 4, 2026",
+  "minSupportedVersion": "1.0.0",
+  "git": {
+    "commitHash": "0ca059106b06428240699b0438a162e3ebbb1dfd",
+    "shortHash": "0ca0591",
+    "branch": "main",
+    "commitAuthor": "Lucky Manoj Jadhav",
+    "commitDate": "2026-11-02 23:14:38 +0530",
+    "commitMessage": "feat(money): upgrade modals and select dropdowns to ui-ux-pro-max neobrutalist standard"
+  },
+  "apk": {
+    "exists": true,
+    "fileName": "Invictus.apk",
+    "sha256": "68b34f68efa2b5b242906c9a5be9faa106491bcd8b13deb6d6103f9a8d36c6b3",
+    "sizeBytes": 4338413,
+    "sizeFormatted": "4.14 MB",
+    "directDownloadUrl": "https://invictus-the-omni-tracker.vercel.app/downloads/Invictus.apk",
+    "githubReleaseAssetUrl": "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v1.7.9/Invictus.apk"
+  },
+  "changelog": [
+    "🌓 Full Neobrutalist Dark Mode & Theme Harmonization: Complete zero-blur obsidian contrast overhaul across all 8 spaces (Today, Goals, Money, Study, Tasks, Analytics, Profile, Settings) with instantaneous zero-flicker theme toggle",
+    "🦴 Skeletons vs Spinner Loading Engine: Route-preserving Neobrutalist wireframe pulses for page routes, paired with high-energy monogram spinner for indeterminate transitions",
+    "🧮 Continuous Arithmetic Calculator: Fluid multi-step chaining (e.g., 2+2+2), operator switching, and 1-tap budget insertion with haptic audio feedback",
+    "🚀 First-Run Quick-Start HUD: Instant frictionless onboarding deck with interactive quick-action missions replacing legacy onboarding wizard",
+    "📱 Android Safe-Spend Monolith Widget: High-contrast layout, direct SMS sync intents, and native update bridge integration",
+    "📦 Resilient In-App APK Downloader: Direct in-app updates with multi-hop redirect streaming, Android User-Agent header bypass, and live version dump telemetry engine"
+  ],
+  "links": {
+    "repoUrl": "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker",
+    "latestReleaseUrl": "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/latest",
+    "inAppDownloadUrl": "https://invictus-the-omni-tracker.vercel.app/downloads/Invictus.apk",
+    "githubAssetDownloadUrl": "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v1.7.9/Invictus.apk"
+  },
+  "environment": {
+    "nodeVersion": "v24.12.0",
+    "platform": "win32",
+    "arch": "x64",
+    "generatedAt": "2026-11-03T23:20:59.294Z"
+  }
+}

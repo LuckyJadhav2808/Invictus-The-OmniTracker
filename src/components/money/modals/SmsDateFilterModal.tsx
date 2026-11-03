@@ -130,18 +130,18 @@ export function SmsDateFilterModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
-      <div className="bg-[#FAF8F5] border-2 border-[#161514] rounded-2xl w-full max-w-lg shadow-[6px_6px_0px_0px_#161514] overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="bg-[#FAF8F5] dark:bg-[#161514] border border-[#E8E5DF] dark:border-[#2A2724] rounded-2xl w-full max-w-lg shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="p-4 bg-[#FFFFFF] border-b-2 border-[#161514] flex items-center justify-between">
+        <div className="p-4 bg-white dark:bg-[#1C1A18] border-b border-[#E8E5DF] dark:border-[#2A2724] flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="size-8 rounded-xl bg-[#CEF431] border-2 border-[#161514] flex items-center justify-center shadow-[1px_1px_0px_0px_#161514]">
+            <div className="size-8 rounded-xl bg-[#CEF431] border border-[#CEF431] flex items-center justify-center shadow-xs">
               <Calendar className="size-4 text-[#161514]" />
             </div>
             <div>
-              <h3 className="text-sm font-black uppercase text-[#161514] font-heading">
+              <h3 className="text-sm font-black uppercase text-[#161514] dark:text-[#FAF8F5] font-heading">
                 Date-Targeted SMS Scanner
               </h3>
-              <p className="text-[11px] text-[#161514]/70 font-medium">
+              <p className="text-[11px] text-[#161514]/70 dark:text-[#FAF8F5]/70 font-medium">
                 Collect bank transactions for today, yesterday, or custom dates
               </p>
             </div>
@@ -152,9 +152,9 @@ export function SmsDateFilterModal({
               soundFX.play("click");
               onClose();
             }}
-            className="size-8 rounded-xl border-2 border-[#161514] bg-[#FFFFFF] hover:bg-zinc-100 flex items-center justify-center shadow-[2px_2px_0px_0px_#161514] active:translate-y-0.5 transition-all cursor-pointer"
+            className="size-8 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] bg-white dark:bg-[#1C1A18] hover:bg-zinc-100 dark:hover:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] flex items-center justify-center shadow-xs active:translate-y-0.5 transition-all cursor-pointer"
           >
-            <X className="size-4 text-[#161514]" />
+            <X className="size-4" />
           </button>
         </div>
 
@@ -162,7 +162,7 @@ export function SmsDateFilterModal({
         <div className="p-4 space-y-4 overflow-y-auto">
           {/* Quick Preset Chips */}
           <div>
-            <label className="text-xs font-black uppercase tracking-wider text-[#161514] block mb-2 font-mono">
+            <label className="text-xs font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5]/80 block mb-2 font-mono">
               Select Date Window:
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -186,13 +186,13 @@ export function SmsDateFilterModal({
                       setSelectedPreset(preset.id);
                     }}
                     className={cn(
-                      "p-2.5 rounded-xl border-2 border-[#161514] text-left transition-all cursor-pointer",
+                      "p-2.5 rounded-xl border text-left transition-all cursor-pointer shadow-xs",
                       isSelected
-                        ? "bg-[#CEF431] shadow-[2px_2px_0px_0px_#161514] -translate-y-0.5"
-                        : "bg-[#FFFFFF] hover:bg-zinc-50 shadow-[1px_1px_0px_0px_#161514]"
+                        ? "bg-[#CEF431] text-[#161514] border-[#CEF431] -translate-y-0.5"
+                        : "bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] border-[#E8E5DF] dark:border-[#2A2724]"
                     )}
                   >
-                    <div className="text-xs font-black uppercase text-[#161514] font-heading leading-tight flex items-center justify-between">
+                    <div className="text-xs font-black uppercase font-heading leading-tight flex items-center justify-between">
                       <span>{preset.label}</span>
                       {preset.id === "today_and_yesterday" && (
                         <span className="text-[8px] bg-[#161514] text-[#FAF8F5] px-1 py-0.2 rounded font-mono">
@@ -200,7 +200,7 @@ export function SmsDateFilterModal({
                         </span>
                       )}
                     </div>
-                    <div className="text-[10px] text-[#161514]/70 font-medium mt-0.5">
+                    <div className={cn("text-[10px] font-medium mt-0.5", isSelected ? "text-[#161514]/80" : "text-[#161514]/70 dark:text-[#FAF8F5]/70")}>
                       {preset.desc}
                     </div>
                   </button>
@@ -211,13 +211,13 @@ export function SmsDateFilterModal({
 
           {/* Custom Date Range Pickers (Visible only when 'custom' is selected) */}
           {selectedPreset === "custom" && (
-            <div className="p-3 bg-[#FFFFFF] border-2 border-[#161514] rounded-xl shadow-[2px_2px_0px_0px_#161514] space-y-3 animate-in fade-in slide-in-from-top-2 duration-150">
-              <div className="text-xs font-black uppercase text-[#161514] font-mono">
+            <div className="p-3 bg-white dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] rounded-xl shadow-xs space-y-3 animate-in fade-in slide-in-from-top-2 duration-150">
+              <div className="text-xs font-black uppercase text-[#161514] dark:text-[#FAF8F5] font-mono">
                 Custom Window (Start & End):
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[10px] font-bold uppercase text-[#161514]/70 block mb-1">
+                  <label className="text-[10px] font-bold uppercase text-[#161514]/70 dark:text-[#FAF8F5]/70 block mb-1">
                     From Date
                   </label>
                   <input
@@ -225,11 +225,11 @@ export function SmsDateFilterModal({
                     value={customStartDate}
                     max={customEndDate || todayStr}
                     onChange={(e) => setCustomStartDate(e.target.value)}
-                    className="w-full px-3 py-1.5 text-xs font-mono font-bold bg-[#FAF8F5] border-2 border-[#161514] rounded-lg shadow-[1px_1px_0px_0px_#161514] focus:outline-hidden"
+                    className="w-full px-3 py-1.5 text-xs font-mono font-bold bg-[#FAF8F5] dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#2A2724] text-[#161514] dark:text-[#FAF8F5] rounded-lg shadow-xs focus:outline-hidden"
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-bold uppercase text-[#161514]/70 block mb-1">
+                  <label className="text-[10px] font-bold uppercase text-[#161514]/70 dark:text-[#FAF8F5]/70 block mb-1">
                     To Date
                   </label>
                   <input
@@ -238,7 +238,7 @@ export function SmsDateFilterModal({
                     min={customStartDate}
                     max={todayStr}
                     onChange={(e) => setCustomEndDate(e.target.value)}
-                    className="w-full px-3 py-1.5 text-xs font-mono font-bold bg-[#FAF8F5] border-2 border-[#161514] rounded-lg shadow-[1px_1px_0px_0px_#161514] focus:outline-hidden"
+                    className="w-full px-3 py-1.5 text-xs font-mono font-bold bg-[#FAF8F5] dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#2A2724] text-[#161514] dark:text-[#FAF8F5] rounded-lg shadow-xs focus:outline-hidden"
                   />
                 </div>
               </div>
@@ -246,12 +246,12 @@ export function SmsDateFilterModal({
           )}
 
           {/* Active Range Telemetry Pill */}
-          <div className="p-3 rounded-xl bg-zinc-100 border-2 border-[#161514] flex items-center justify-between text-xs font-mono">
-            <span className="text-[#161514]/70 font-bold uppercase flex items-center gap-1.5">
-              <Clock className="size-3.5 text-[#161514]" />
+          <div className="p-3 rounded-xl bg-zinc-100 dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] flex items-center justify-between text-xs font-mono shadow-xs">
+            <span className="text-[#161514]/70 dark:text-[#FAF8F5]/70 font-bold uppercase flex items-center gap-1.5">
+              <Clock className="size-3.5 text-[#161514] dark:text-[#FAF8F5]" />
               <span>Target Span:</span>
             </span>
-            <span className="font-black text-[#161514] truncate ml-2">
+            <span className="font-black text-[#161514] dark:text-[#FAF8F5] truncate ml-2">
               {format(new Date(computedRange.startTime), "MMM d, yyyy")} →{" "}
               {format(new Date(Math.min(computedRange.endTime, Date.now())), "MMM d, yyyy")}
             </span>
@@ -259,31 +259,31 @@ export function SmsDateFilterModal({
 
           {/* Real-time Scan Result Summary */}
           {lastResult && (
-            <div className="p-3 bg-emerald-50 border-2 border-emerald-500 rounded-xl space-y-1.5 animate-in fade-in">
-              <div className="flex items-center gap-1.5 text-emerald-900 font-black text-xs uppercase">
-                <CheckCircle2 className="size-4 text-emerald-600 shrink-0" />
+            <div className="p-3 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-500/30 rounded-xl space-y-1.5 animate-in fade-in">
+              <div className="flex items-center gap-1.5 text-emerald-900 dark:text-emerald-200 font-black text-xs uppercase">
+                <CheckCircle2 className="size-4 text-emerald-600 dark:text-[#03D26F] shrink-0" />
                 <span>Inbox Scan Report ({computedRange.label})</span>
               </div>
               <div className="grid grid-cols-3 gap-2 text-center pt-1">
-                <div className="p-1.5 rounded-lg bg-white/80 border border-emerald-300">
-                  <div className="text-[10px] text-zinc-500 font-bold uppercase">SMS Read</div>
-                  <div className="text-sm font-black font-mono text-zinc-800">{lastResult.scannedCount}</div>
+                <div className="p-1.5 rounded-lg bg-white/80 dark:bg-[#1C1A18] border border-emerald-300 dark:border-emerald-800/40">
+                  <div className="text-[10px] text-zinc-500 dark:text-zinc-400 font-bold uppercase">SMS Read</div>
+                  <div className="text-sm font-black font-mono text-zinc-800 dark:text-zinc-200">{lastResult.scannedCount}</div>
                 </div>
-                <div className="p-1.5 rounded-lg bg-white/80 border border-emerald-300">
-                  <div className="text-[10px] text-zinc-500 font-bold uppercase">Debits Found</div>
-                  <div className="text-sm font-black font-mono text-zinc-800">{lastResult.parsedCount}</div>
+                <div className="p-1.5 rounded-lg bg-white/80 dark:bg-[#1C1A18] border border-emerald-300 dark:border-emerald-800/40">
+                  <div className="text-[10px] text-zinc-500 dark:text-zinc-400 font-bold uppercase">Debits Found</div>
+                  <div className="text-sm font-black font-mono text-zinc-800 dark:text-zinc-200">{lastResult.parsedCount}</div>
                 </div>
-                <div className="p-1.5 rounded-lg bg-emerald-100 border border-emerald-400">
-                  <div className="text-[10px] text-emerald-800 font-bold uppercase">Imported</div>
-                  <div className="text-sm font-black font-mono text-emerald-900">{lastResult.savedCount}</div>
+                <div className="p-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 border border-emerald-400 dark:border-emerald-700/50">
+                  <div className="text-[10px] text-emerald-800 dark:text-emerald-300 font-bold uppercase">Imported</div>
+                  <div className="text-sm font-black font-mono text-emerald-900 dark:text-emerald-200">{lastResult.savedCount}</div>
                 </div>
               </div>
             </div>
           )}
 
           {/* Privacy Guarantee */}
-          <div className="flex items-start gap-2 p-2.5 bg-amber-50 border border-amber-300 rounded-xl text-[11px] text-amber-900">
-            <ShieldCheck className="size-4 text-amber-700 shrink-0 mt-0.5" />
+          <div className="flex items-start gap-2 p-2.5 bg-amber-500/10 dark:bg-amber-950/20 border border-amber-500/20 dark:border-amber-800/40 rounded-xl text-[11px] text-amber-900 dark:text-amber-200">
+            <ShieldCheck className="size-4 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
             <p>
               100% on-device zero-knowledge parser. Personal chats, calls, and OTPs are dropped with zero network transfer.
             </p>
@@ -291,11 +291,11 @@ export function SmsDateFilterModal({
         </div>
 
         {/* Modal Action Footer */}
-        <div className="p-4 bg-[#FFFFFF] border-t-2 border-[#161514] flex items-center justify-between gap-3">
+        <div className="p-4 bg-white dark:bg-[#1C1A18] border-t border-[#E8E5DF] dark:border-[#2A2724] flex items-center justify-between gap-3">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-xl border-2 border-[#161514] bg-[#FFFFFF] text-[#161514] font-black text-xs uppercase hover:bg-zinc-50 shadow-[2px_2px_0px_0px_#161514] active:translate-y-0.5 transition-all cursor-pointer"
+            className="px-4 py-2 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] font-black text-xs uppercase hover:bg-zinc-50 dark:hover:bg-[#252321] shadow-xs active:translate-y-0.5 transition-all cursor-pointer"
           >
             Close
           </button>
@@ -305,10 +305,10 @@ export function SmsDateFilterModal({
             disabled={isScanning}
             onClick={handleScan}
             className={cn(
-              "px-5 py-2 rounded-xl border-2 border-[#161514] font-black text-xs uppercase flex items-center gap-2 shadow-[3px_3px_0px_0px_#161514] active:translate-y-0.5 transition-all cursor-pointer",
+              "px-5 py-2 rounded-xl border font-black text-xs uppercase flex items-center gap-2 shadow-xs active:translate-y-0.5 transition-all cursor-pointer",
               isScanning
-                ? "bg-zinc-200 text-zinc-500 cursor-not-allowed"
-                : "bg-[#CEF431] text-[#161514] hover:bg-[#bfe627]"
+                ? "bg-zinc-200 dark:bg-[#252321] text-zinc-500 border-[#E8E5DF] dark:border-[#2A2724] cursor-not-allowed"
+                : "bg-[#CEF431] text-[#161514] border-[#CEF431] hover:bg-[#bfe627]"
             )}
           >
             <RefreshCw className={cn("size-4 shrink-0", isScanning && "animate-spin")} />

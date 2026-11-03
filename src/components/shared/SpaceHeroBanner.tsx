@@ -36,40 +36,40 @@ export function SpaceHeroBanner({
   // Master Studio Duotone Palette (Aesthetic, Warm, Harmonious Neobrutalism)
   const themeStyles = {
     today: {
-      cardBg: "bg-[#FFF9EA] text-[#161514] border-[#161514]",
-      badgeBg: "bg-[#CEF431] text-[#161514] border-[#161514] font-heading font-black shadow-[2px_2px_0px_0px_#161514]",
-      statBg: "bg-white text-[#161514] border-[#161514] font-heading font-black shadow-[2px_2px_0px_0px_#161514] sm:shadow-[3px_3px_0px_0px_#161514]",
-      btnBg: "bg-[#161514] text-[#CEF431] hover:bg-[#252321] border-[#161514] shadow-[3px_3px_0px_0px_#161514] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
+      cardBg: "bg-[#FFF9EA] dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] border-[#161514] dark:border-[#383531]",
+      badgeBg: "bg-[#CEF431] text-[#161514] border-[#161514] dark:border-[#383531] font-heading font-black shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]",
+      statBg: "bg-white dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] border-[#161514] dark:border-[#383531] font-heading font-black shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]",
+      btnBg: "bg-[#161514] dark:bg-[#FAF8F5] text-[#CEF431] dark:text-[#161514] hover:bg-[#252321] dark:hover:bg-neutral-200 border-[#161514] dark:border-[#383531] shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
     },
     life: {
-      cardBg: "bg-[#ECFDF5] text-[#161514] border-[#161514]",
-      badgeBg: "bg-[#03D26F] text-[#161514] border-[#161514] font-heading font-black shadow-[2px_2px_0px_0px_#161514]",
-      statBg: "bg-white text-[#161514] border-[#161514] font-heading font-black shadow-[2px_2px_0px_0px_#161514] sm:shadow-[3px_3px_0px_0px_#161514]",
-      btnBg: "bg-[#161514] text-[#03D26F] hover:bg-[#252321] border-[#161514] shadow-[3px_3px_0px_0px_#161514] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
+      cardBg: "bg-[#ECFDF5] dark:bg-[#11241C] text-[#161514] dark:text-[#FAF8F5] border-[#161514] dark:border-[#383531]",
+      badgeBg: "bg-[#03D26F] text-[#161514] border-[#161514] dark:border-[#383531] font-heading font-black shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]",
+      statBg: "bg-white dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] border-[#161514] dark:border-[#383531] font-heading font-black shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]",
+      btnBg: "bg-[#161514] dark:bg-[#FAF8F5] text-[#03D26F] dark:text-[#161514] hover:bg-[#252321] dark:hover:bg-neutral-200 border-[#161514] dark:border-[#383531] shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
     },
     study: {
-      cardBg: "bg-[#F5F3FF] text-[#161514] border-[#161514]",
-      badgeBg: "bg-[#C084FC] text-[#161514] border-[#161514] font-heading font-black shadow-[2px_2px_0px_0px_#161514]",
-      statBg: "bg-white text-[#161514] border-[#161514] font-heading font-black shadow-[2px_2px_0px_0px_#161514] sm:shadow-[3px_3px_0px_0px_#161514]",
-      btnBg: "bg-[#161514] text-[#C084FC] hover:bg-[#252321] border-[#161514] shadow-[3px_3px_0px_0px_#161514] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
+      cardBg: "bg-[#F5F3FF] dark:bg-[#1E192B] text-[#161514] dark:text-[#FAF8F5] border-[#161514] dark:border-[#383531]",
+      badgeBg: "bg-[#C084FC] text-[#161514] border-[#161514] dark:border-[#383531] font-heading font-black shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]",
+      statBg: "bg-white dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] border-[#161514] dark:border-[#383531] font-heading font-black shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]",
+      btnBg: "bg-[#161514] dark:bg-[#FAF8F5] text-[#C084FC] dark:text-[#161514] hover:bg-[#252321] dark:hover:bg-neutral-200 border-[#161514] dark:border-[#383531] shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
     },
     tasks: {
-      cardBg: "bg-[#FFFBEB] text-[#161514] border-[#161514]",
-      badgeBg: "bg-[#F59E0B] text-white border-[#161514] font-heading font-black shadow-[2px_2px_0px_0px_#161514]",
-      statBg: "bg-white text-[#161514] border-[#161514] font-heading font-black shadow-[2px_2px_0px_0px_#161514] sm:shadow-[3px_3px_0px_0px_#161514]",
-      btnBg: "bg-[#161514] text-[#F59E0B] hover:bg-[#252321] border-[#161514] shadow-[3px_3px_0px_0px_#161514] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
+      cardBg: "bg-[#FFFBEB] dark:bg-[#261E14] text-[#161514] dark:text-[#FAF8F5] border-[#161514] dark:border-[#383531]",
+      badgeBg: "bg-[#F59E0B] text-white border-[#161514] dark:border-[#383531] font-heading font-black shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]",
+      statBg: "bg-white dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] border-[#161514] dark:border-[#383531] font-heading font-black shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]",
+      btnBg: "bg-[#161514] dark:bg-[#FAF8F5] text-[#F59E0B] dark:text-[#161514] hover:bg-[#252321] dark:hover:bg-neutral-200 border-[#161514] dark:border-[#383531] shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
     },
     money: {
-      cardBg: "bg-[#FFF1F2] text-[#161514] border-[#161514]",
-      badgeBg: "bg-[#FBCFE8] text-[#161514] border-[#161514] font-heading font-black shadow-[2px_2px_0px_0px_#161514]",
-      statBg: "bg-white text-[#161514] border-[#161514] font-heading font-black shadow-[2px_2px_0px_0px_#161514] sm:shadow-[3px_3px_0px_0px_#161514]",
-      btnBg: "bg-[#161514] text-[#FBCFE8] hover:bg-[#252321] border-[#161514] shadow-[3px_3px_0px_0px_#161514] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
+      cardBg: "bg-[#FFF1F2] dark:bg-[#261418] text-[#161514] dark:text-[#FAF8F5] border-[#161514] dark:border-[#383531]",
+      badgeBg: "bg-[#FBCFE8] text-[#161514] border-[#161514] dark:border-[#383531] font-heading font-black shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]",
+      statBg: "bg-white dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] border-[#161514] dark:border-[#383531] font-heading font-black shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]",
+      btnBg: "bg-[#161514] dark:bg-[#FAF8F5] text-[#FBCFE8] dark:text-[#161514] hover:bg-[#252321] dark:hover:bg-neutral-200 border-[#161514] dark:border-[#383531] shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
     },
     analytics: {
-      cardBg: "bg-[#F0F9FF] text-[#161514] border-[#161514]",
-      badgeBg: "bg-[#7DD3FC] text-[#161514] border-[#161514] font-heading font-black shadow-[2px_2px_0px_0px_#161514]",
-      statBg: "bg-white text-[#161514] border-[#161514] font-heading font-black shadow-[2px_2px_0px_0px_#161514] sm:shadow-[3px_3px_0px_0px_#161514]",
-      btnBg: "bg-[#161514] text-[#7DD3FC] hover:bg-[#252321] border-[#161514] shadow-[3px_3px_0px_0px_#161514] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
+      cardBg: "bg-[#F0F9FF] dark:bg-[#12222E] text-[#161514] dark:text-[#FAF8F5] border-[#161514] dark:border-[#383531]",
+      badgeBg: "bg-[#7DD3FC] text-[#161514] border-[#161514] dark:border-[#383531] font-heading font-black shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]",
+      statBg: "bg-white dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] border-[#161514] dark:border-[#383531] font-heading font-black shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]",
+      btnBg: "bg-[#161514] dark:bg-[#FAF8F5] text-[#7DD3FC] dark:text-[#161514] hover:bg-[#252321] dark:hover:bg-neutral-200 border-[#161514] dark:border-[#383531] shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
     },
   }[space];
 
@@ -114,7 +114,7 @@ export function SpaceHeroBanner({
 
               {/* Capsule Pill Filters: All, Year, Month, Week (Overflow Resilient) */}
               {onFilterChange && (
-                <div className="flex items-center gap-0.5 sm:gap-1 bg-white/90 p-0.5 sm:p-1 rounded-full border-1.5 sm:border-2 border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] max-w-full overflow-x-auto no-scrollbar">
+                <div className="flex items-center gap-0.5 sm:gap-1 bg-white/90 dark:bg-[#1C1A18]/90 p-0.5 sm:p-1 rounded-full border-1.5 sm:border-2 border-[#161514] dark:border-[#383531] shadow-[1px_1px_0px_0px_#161514] dark:shadow-[1px_1px_0px_0px_#000000] max-w-full overflow-x-auto no-scrollbar">
                   {["All", "Year", "Month", "Week"].map((flt) => {
                     const isAct = (activeFilter || "All").toLowerCase() === flt.toLowerCase();
                     return (
@@ -125,8 +125,8 @@ export function SpaceHeroBanner({
                         className={cn(
                           "px-1.5 sm:px-3 py-0.5 text-[8px] sm:text-[10px] font-black rounded-full transition-all cursor-pointer uppercase tracking-wider shrink-0",
                           isAct
-                            ? "bg-[#CEF431] text-[#161514] border border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)]"
-                            : "bg-transparent text-[#161514]/70 border-transparent hover:bg-[#EAF4F4]"
+                            ? "bg-[#CEF431] text-[#161514] border border-[#161514] dark:border-[#383531] shadow-[1px_1px_0px_0px_#161514] dark:shadow-[1px_1px_0px_0px_#000000]"
+                            : "bg-transparent text-[#161514]/70 dark:text-[#FAF8F5]/70 border-transparent hover:bg-[#FAF8F5] dark:hover:bg-[#252321]"
                         )}
                       >
                         {flt}
@@ -138,13 +138,12 @@ export function SpaceHeroBanner({
             </div>
 
             <h1
-              className="text-base sm:text-3xl md:text-4xl font-black tracking-tight leading-tight text-[#161514] truncate sm:whitespace-normal"
-              style={{ fontFamily: "var(--font-heading)" }}
+              className="text-base sm:text-3xl md:text-4xl font-black tracking-tight leading-tight text-[#161514] dark:text-[#FAF8F5] truncate sm:whitespace-normal font-heading"
             >
               {title}
             </h1>
 
-            <p className="text-[11px] sm:text-sm font-bold text-[#161514]/80 leading-snug sm:leading-relaxed max-w-lg hidden sm:block">
+            <p className="text-[11px] sm:text-sm font-bold text-[#161514]/80 dark:text-[#FAF8F5]/80 leading-snug sm:leading-relaxed max-w-lg hidden sm:block">
               {subtitle}
             </p>
 

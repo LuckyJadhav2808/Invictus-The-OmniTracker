@@ -30,7 +30,7 @@ import {
 } from "@/lib/utils/ocr-expense-parser";
 import { useBulkAddTransactions } from "@/lib/queries/money";
 import { type Category } from "@/types";
-import { renderCategoryEmoji } from "@/components/money/MoneyQuickActionsAndCards";
+import { CategoryIcon } from "@/components/money/MoneyQuickActionsAndCards";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -58,23 +58,23 @@ function NeoCategoryPicker({
         <button
           type="button"
           className={cn(
-            "w-full bg-amber-100/90 hover:bg-amber-200/90 active:translate-y-0.5 rounded-lg border border-navy-950 text-xs font-black text-navy-950 px-2.5 py-1 outline-none cursor-pointer flex items-center justify-between gap-1 transition-all shadow-[1px_1px_0px_0px_rgba(31,36,48,1)] text-left truncate",
+            "w-full bg-[#FAF8F5] dark:bg-[#1C1A18] hover:bg-[#F1EFEA] dark:hover:bg-[#252321] active:translate-y-0.5 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] text-xs font-bold text-[#161514] dark:text-[#FAF8F5] px-2.5 py-1 outline-none cursor-pointer flex items-center justify-between gap-1 transition-all shadow-xs text-left truncate",
             className
           )}
         >
           <span className="flex items-center gap-1.5 truncate">
             {currentCat?.icon && (
-              <span className="shrink-0 text-xs">{renderCategoryEmoji(currentCat.icon)}</span>
+              <CategoryIcon name={currentCat.icon} className="size-3.5 shrink-0 text-[#161514] dark:text-[#FAF8F5]" />
             )}
             <span className="truncate">{currentCat?.name || "Select"}</span>
           </span>
-          <ChevronDown className="h-3 w-3 stroke-[3] text-navy-950 shrink-0 opacity-70 ml-1" />
+          <ChevronDown className="h-3 w-3 stroke-[2.5] text-[#161514]/60 dark:text-[#FAF8F5]/60 shrink-0 ml-1" />
         </button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
         align="start"
-        className="z-[999] bg-white rounded-2xl border-2 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] p-1.5 min-w-[170px] max-h-56 overflow-y-auto space-y-1"
+        className="z-[999] bg-white dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xl p-1.5 min-w-[170px] max-h-56 overflow-y-auto space-y-1"
       >
         {categories.map((cat) => {
           const isSelected = cat.id === value;
@@ -83,17 +83,17 @@ function NeoCategoryPicker({
               key={cat.id}
               onClick={() => onChange(cat.id)}
               className={cn(
-                "px-2.5 py-1.5 rounded-xl text-xs font-black transition-all flex items-center justify-between gap-2 cursor-pointer border outline-none",
+                "px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-between gap-2 cursor-pointer border outline-none",
                 isSelected
-                  ? "bg-[#CEF431] text-navy-950 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)]"
-                  : "bg-white text-navy-950 border-transparent hover:bg-amber-100 hover:border-navy-950/40"
+                  ? "bg-[#CEF431] text-[#161514] border-[#CEF431] shadow-xs"
+                  : "bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] border-transparent hover:bg-[#FAF8F5] dark:hover:bg-[#252321]"
               )}
             >
               <span className="flex items-center gap-1.5 truncate">
-                {cat.icon && <span>{renderCategoryEmoji(cat.icon)}</span>}
+                {cat.icon && <CategoryIcon name={cat.icon} className="size-3.5 shrink-0 text-[#161514] dark:text-[#FAF8F5]" />}
                 <span className="truncate">{cat.name}</span>
               </span>
-              {isSelected && <Check className="h-3.5 w-3.5 stroke-[3] text-navy-950 shrink-0" />}
+              {isSelected && <Check className="h-3.5 w-3.5 stroke-[2.5] text-[#161514] shrink-0" />}
             </DropdownMenuItem>
           );
         })}
@@ -117,16 +117,16 @@ function NeoPaymentMethodPicker({
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="bg-cream-100 hover:bg-cream-200 active:translate-y-0.5 rounded-lg border border-navy-950/60 text-[11px] font-black text-navy-900 px-2 py-1 outline-none cursor-pointer flex items-center gap-1 shrink-0 transition-all shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]"
+          className="bg-[#FAF8F5] dark:bg-[#1C1A18] hover:bg-[#F1EFEA] dark:hover:bg-[#252321] active:translate-y-0.5 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] text-[11px] font-bold text-[#161514] dark:text-[#FAF8F5] px-2 py-1 outline-none cursor-pointer flex items-center gap-1 shrink-0 transition-all shadow-xs"
         >
           <span>{value || "UPI"}</span>
-          <ChevronDown className="h-2.5 w-2.5 stroke-[3] text-navy-600 shrink-0" />
+          <ChevronDown className="h-2.5 w-2.5 stroke-[2.5] text-[#161514]/60 dark:text-[#FAF8F5]/60 shrink-0" />
         </button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
         align="end"
-        className="z-[999] bg-white rounded-xl border-2 border-navy-950 shadow-[3px_3px_0px_0px_rgba(31,36,48,1)] p-1 min-w-[110px] space-y-0.5"
+        className="z-[999] bg-white dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xl p-1 min-w-[110px] space-y-0.5"
       >
         {methods.map((method) => {
           const isSelected = method === value;
@@ -135,14 +135,14 @@ function NeoPaymentMethodPicker({
               key={method}
               onClick={() => onChange(method)}
               className={cn(
-                "px-2 py-1 rounded-lg text-[11px] font-black transition-all flex items-center justify-between cursor-pointer border outline-none",
+                "px-2 py-1 rounded-lg text-[11px] font-bold transition-all flex items-center justify-between cursor-pointer border outline-none",
                 isSelected
-                  ? "bg-[#CEF431] text-navy-950 border-navy-950"
-                  : "bg-white text-navy-950 border-transparent hover:bg-cream-100"
+                  ? "bg-[#CEF431] text-[#161514] border-[#CEF431]"
+                  : "bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] border-transparent hover:bg-[#FAF8F5] dark:hover:bg-[#252321]"
               )}
             >
               <span>{method}</span>
-              {isSelected && <Check className="h-3 w-3 stroke-[3] text-navy-950" />}
+              {isSelected && <Check className="h-3 w-3 stroke-[2.5] text-[#161514]" />}
             </DropdownMenuItem>
           );
         })}
@@ -664,15 +664,15 @@ export function BulkExpenseModal({
         {!isReviewMode ? (
           <>
             {/* Minimal Segmented Control */}
-            <div className="grid grid-cols-2 p-1 bg-cream-100/90 rounded-2xl border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] gap-1">
+            <div className="grid grid-cols-2 p-1 bg-[#F1EFEA] dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs gap-1">
               <button
                 type="button"
                 onClick={() => setActiveTab("ocr")}
                 className={cn(
-                  "py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer",
+                  "py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer",
                   activeTab === "ocr"
-                    ? "bg-navy-950 text-white shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]"
-                    : "text-navy-800 hover:bg-cream-200"
+                    ? "bg-[#161514] dark:bg-[#FAF8F5] text-white dark:text-[#161514] shadow-xs"
+                    : "text-[#161514]/70 dark:text-[#FAF8F5]/70 hover:bg-white dark:hover:bg-[#252321]"
                 )}
               >
                 <Camera className="h-3.5 w-3.5 stroke-[2.5]" />
@@ -683,10 +683,10 @@ export function BulkExpenseModal({
                 type="button"
                 onClick={() => setActiveTab("grid")}
                 className={cn(
-                  "py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer",
+                  "py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer",
                   activeTab === "grid"
-                    ? "bg-navy-950 text-white shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]"
-                    : "text-navy-800 hover:bg-cream-200"
+                    ? "bg-[#161514] dark:bg-[#FAF8F5] text-white dark:text-[#161514] shadow-xs"
+                    : "text-[#161514]/70 dark:text-[#FAF8F5]/70 hover:bg-white dark:hover:bg-[#252321]"
                 )}
               >
                 <Zap className="h-3.5 w-3.5 stroke-[2.5]" />
@@ -736,43 +736,43 @@ export function BulkExpenseModal({
                     if (file && !isOcrProcessing) processImageFile(file);
                   }}
                   className={cn(
-                    "border-2 border-dashed border-navy-950 rounded-2xl p-5 sm:p-6 text-center transition-all bg-cream-50/70 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] select-none",
-                    isDragging && "bg-amber-100 border-navy-950 scale-[1.01]",
+                    "border border-dashed border-[#E8E5DF] dark:border-[#2A2724] rounded-2xl p-5 sm:p-6 text-center transition-all bg-[#FAF8F5] dark:bg-[#1C1A18] shadow-xs select-none",
+                    isDragging && "bg-[#CEF431]/20 border-[#161514] dark:border-[#CEF431] scale-[1.01]",
                     isOcrProcessing && "pointer-events-none opacity-85"
                   )}
                 >
                   {isOcrProcessing ? (
                     <div className="space-y-3 py-2">
-                      <div className="h-11 w-11 rounded-2xl bg-amber-300 border-2 border-navy-950 mx-auto flex items-center justify-center text-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)]">
+                      <div className="h-11 w-11 rounded-xl bg-amber-400/20 dark:bg-amber-400/10 border border-amber-400/40 mx-auto flex items-center justify-center text-amber-900 dark:text-amber-200 shadow-xs">
                         <Loader2 className="h-5 w-5 stroke-[2.5] animate-spin" />
                       </div>
                       <div>
-                        <h5 className="font-black text-xs sm:text-sm text-navy-950">
+                        <h5 className="font-black text-xs sm:text-sm text-[#161514] dark:text-[#FAF8F5]">
                           {ocrStatusText}
                         </h5>
-                        <p className="text-[10px] font-bold text-navy-500 mt-0.5">
+                        <p className="text-[10px] font-bold text-[#161514]/60 dark:text-[#FAF8F5]/60 mt-0.5">
                           Processing on-device
                         </p>
                       </div>
 
                       {/* Progress Bar */}
-                      <div className="w-full max-w-xs mx-auto bg-white rounded-full h-2.5 border-2 border-navy-950 overflow-hidden shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]">
+                      <div className="w-full max-w-xs mx-auto bg-[#F1EFEA] dark:bg-[#252321] rounded-full h-2 border border-[#E8E5DF] dark:border-[#2A2724] overflow-hidden">
                         <div
-                          className="bg-emerald-400 h-full transition-all duration-300"
+                          className="bg-[#03D26F] h-full transition-all duration-300"
                           style={{ width: `${Math.max(10, ocrProgress)}%` }}
                         />
                       </div>
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      <div className="h-11 w-11 rounded-2xl bg-amber-300 border-2 border-navy-950 mx-auto flex items-center justify-center text-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)]">
+                      <div className="h-11 w-11 rounded-xl bg-amber-400/20 dark:bg-amber-400/10 border border-amber-400/40 mx-auto flex items-center justify-center text-amber-900 dark:text-amber-200 shadow-xs">
                         <Upload className="h-5 w-5 stroke-[2.5]" />
                       </div>
                       <div>
-                        <h4 className="font-black text-sm text-navy-950">
+                        <h4 className="font-black text-sm text-[#161514] dark:text-[#FAF8F5]">
                           Upload receipt or screenshot
                         </h4>
-                        <p className="text-[11px] font-bold text-navy-500 max-w-xs mx-auto mt-0.5">
+                        <p className="text-[11px] font-bold text-[#161514]/60 dark:text-[#FAF8F5]/60 max-w-xs mx-auto mt-0.5">
                           Drag & drop, paste from clipboard, or pick a file
                         </p>
                       </div>
@@ -782,7 +782,7 @@ export function BulkExpenseModal({
                         <button
                           type="button"
                           onClick={() => galleryInputRef.current?.click()}
-                          className="px-3.5 py-2 rounded-xl bg-navy-950 hover:bg-navy-900 text-white font-black text-xs border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] cursor-pointer flex items-center gap-1.5 active:translate-y-0.5 transition-all"
+                          className="px-3.5 py-2 rounded-xl bg-[#161514] hover:bg-[#161514]/90 dark:bg-[#FAF8F5] dark:hover:bg-[#FAF8F5]/90 text-white dark:text-[#161514] font-black text-xs border border-[#161514] dark:border-[#FAF8F5] shadow-xs cursor-pointer flex items-center gap-1.5 active:translate-y-0.5 transition-all"
                         >
                           <ImageIcon className="h-3.5 w-3.5 stroke-[2.5]" />
                           <span>Choose Image</span>
@@ -791,7 +791,7 @@ export function BulkExpenseModal({
                         <button
                           type="button"
                           onClick={() => cameraInputRef.current?.click()}
-                          className="px-3.5 py-2 rounded-xl bg-white hover:bg-cream-100 text-navy-950 font-black text-xs border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] cursor-pointer flex items-center gap-1.5 active:translate-y-0.5 transition-all"
+                          className="px-3.5 py-2 rounded-xl bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] font-black text-xs border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs cursor-pointer flex items-center gap-1.5 active:translate-y-0.5 transition-all"
                         >
                           <Camera className="h-3.5 w-3.5 stroke-[2.5]" />
                           <span>Camera</span>
@@ -799,13 +799,13 @@ export function BulkExpenseModal({
                       </div>
 
                       {/* Privacy & Paste Footnote */}
-                      <div className="flex items-center justify-center gap-2 text-[10px] font-bold text-navy-500 pt-1">
+                      <div className="flex items-center justify-center gap-2 text-[10px] font-bold text-[#161514]/60 dark:text-[#FAF8F5]/60 pt-1">
                         <span className="inline-flex items-center gap-1">
-                          <Lock className="h-3 w-3 text-navy-400" /> On-device OCR
+                          <Lock className="h-3 w-3 text-[#161514]/40 dark:text-[#FAF8F5]/40" /> On-device OCR
                         </span>
                         <span>•</span>
                         <span>
-                          <kbd className="px-1.5 py-0.5 bg-white border border-navy-950/40 rounded text-[9px] font-mono font-bold">
+                          <kbd className="px-1.5 py-0.5 bg-white dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#2A2724] rounded text-[9px] font-mono font-bold">
                             Ctrl+V
                           </kbd>{" "}
                           to paste
@@ -816,21 +816,21 @@ export function BulkExpenseModal({
                 </div>
 
                 {/* Collapsible SMS / Text Parser */}
-                <div className="bg-cream-50/70 rounded-2xl p-3 border-2 border-navy-950/20 space-y-2">
+                <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl p-3 border border-[#E8E5DF] dark:border-[#2A2724] space-y-2">
                   <div
                     onClick={() => setIsSmsOpen(!isSmsOpen)}
                     className="flex items-center justify-between cursor-pointer select-none"
                   >
                     <div className="flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-navy-700" />
-                      <span className="text-xs font-black text-navy-950">
+                      <FileText className="h-4 w-4 text-[#161514]/70 dark:text-[#FAF8F5]/70" />
+                      <span className="text-xs font-black text-[#161514] dark:text-[#FAF8F5]">
                         Paste bank SMS or raw text
                       </span>
                     </div>
                     {isSmsOpen ? (
-                      <ChevronUp className="h-3.5 w-3.5 text-navy-600" />
+                      <ChevronUp className="h-3.5 w-3.5 text-[#161514]/60 dark:text-[#FAF8F5]/60" />
                     ) : (
-                      <ChevronDown className="h-3.5 w-3.5 text-navy-600" />
+                      <ChevronDown className="h-3.5 w-3.5 text-[#161514]/60 dark:text-[#FAF8F5]/60" />
                     )}
                   </div>
 
@@ -841,12 +841,12 @@ export function BulkExpenseModal({
                         value={smsInputText}
                         onChange={(e) => setSmsInputText(e.target.value)}
                         placeholder="e.g. Paid Rs 40 for Chai, Zepto Rs 350, Uber Rs 220..."
-                        className="w-full bg-white rounded-xl border-2 border-navy-950 p-2.5 text-xs font-bold text-navy-950 outline-none placeholder:text-navy-400 focus:ring-2 focus:ring-amber-300"
+                        className="w-full bg-white dark:bg-[#252321] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] p-2.5 text-xs font-bold text-[#161514] dark:text-[#FAF8F5] outline-none placeholder:text-[#161514]/40 dark:placeholder:text-[#FAF8F5]/30 focus:ring-2 focus:ring-[#CEF431]"
                       />
                       <button
                         type="button"
                         onClick={handleParseSmsText}
-                        className="w-full py-2 bg-amber-300 hover:bg-amber-400 text-navy-950 font-black text-xs rounded-xl border-2 border-navy-950 shadow-[1.5px_1.5px_0px_0px_rgba(31,36,48,1)] cursor-pointer transition-all active:translate-y-0.5"
+                        className="w-full py-2 bg-[#CEF431] hover:bg-[#b8dd24] text-[#161514] font-black text-xs rounded-xl border border-[#CEF431] shadow-xs cursor-pointer transition-all active:translate-y-0.5"
                       >
                         Extract Items →
                       </button>
@@ -861,17 +861,17 @@ export function BulkExpenseModal({
               <div className="space-y-3">
                 <div className="flex items-center justify-between px-0.5 gap-2 flex-wrap">
                   <div className="flex items-center gap-2">
-                    <span className="text-[11px] font-bold text-navy-500 hidden sm:inline">
-                      Press <kbd className="px-1 py-0.5 bg-white border border-navy-950/40 rounded text-[9px] font-mono font-bold">Enter</kbd> to add row
+                    <span className="text-[11px] font-bold text-[#161514]/60 dark:text-[#FAF8F5]/60 hidden sm:inline">
+                      Press <kbd className="px-1 py-0.5 bg-white dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#2A2724] rounded text-[9px] font-mono font-bold">Enter</kbd> to add row
                     </span>
 
                     {/* Batch Date Selector */}
                     <div
-                      className="relative bg-cream-100 hover:bg-cream-200 active:translate-y-0.5 rounded-lg border border-navy-950/60 px-2 py-1 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)] flex items-center gap-1.5 cursor-pointer transition-all"
+                      className="relative bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] active:translate-y-0.5 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] px-2 py-1 shadow-xs flex items-center gap-1.5 cursor-pointer transition-all"
                       title="Set date for batch entry"
                     >
-                      <Calendar className="h-3 w-3 text-navy-700 pointer-events-none shrink-0" />
-                      <span className="text-[10px] font-black text-navy-900 pointer-events-none whitespace-nowrap">
+                      <Calendar className="h-3 w-3 text-[#161514]/70 dark:text-[#FAF8F5]/70 pointer-events-none shrink-0" />
+                      <span className="text-[10px] font-black text-[#161514] dark:text-[#FAF8F5] pointer-events-none whitespace-nowrap">
                         {formatDateBadge(batchDate)}
                       </span>
                       <input
@@ -886,7 +886,7 @@ export function BulkExpenseModal({
                   <button
                     type="button"
                     onClick={handleAddTurboRow}
-                    className="text-[11px] font-black px-2.5 py-1 rounded-lg bg-amber-200 hover:bg-amber-300 text-navy-950 border border-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)] flex items-center gap-1 cursor-pointer transition-all active:translate-y-0.5"
+                    className="text-[11px] font-black px-2.5 py-1 rounded-lg bg-[#FAF8F5] dark:bg-[#1C1A18] hover:bg-[#CEF431] dark:hover:bg-[#CEF431] hover:text-[#161514] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex items-center gap-1 cursor-pointer transition-all active:translate-y-0.5"
                   >
                     <Plus className="h-3.5 w-3.5 stroke-[3]" /> Add Row
                   </button>
@@ -897,11 +897,11 @@ export function BulkExpenseModal({
                   {turboRows.map((row, idx) => (
                     <div
                       key={row.id}
-                      className="p-2.5 rounded-2xl bg-white border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] space-y-2"
+                      className="p-2.5 rounded-xl bg-white dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-2"
                     >
                       {/* Line 1: Index + Note + Remove */}
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-black text-navy-400 w-5 text-center shrink-0">
+                        <span className="text-[10px] font-black text-[#161514]/40 dark:text-[#FAF8F5]/40 w-5 text-center shrink-0">
                           #{idx + 1}
                         </span>
                         <input
@@ -915,12 +915,12 @@ export function BulkExpenseModal({
                             }
                           }}
                           placeholder="Description (e.g. Chai, Groceries, Uber)"
-                          className="flex-1 min-w-0 bg-cream-50/70 focus:bg-white rounded-lg border border-navy-950/30 focus:border-navy-950 px-2.5 py-1 text-xs font-bold text-navy-950 placeholder:text-navy-400 outline-none transition-colors"
+                          className="flex-1 min-w-0 bg-[#FAF8F5] dark:bg-[#252321] focus:bg-white dark:focus:bg-[#1C1A18] rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] px-2.5 py-1 text-xs font-bold text-[#161514] dark:text-[#FAF8F5] placeholder:text-[#161514]/40 dark:placeholder:text-[#FAF8F5]/30 outline-none transition-colors"
                         />
                         <button
                           type="button"
                           onClick={() => handleRemoveTurboRow(row.id)}
-                          className="p-1 rounded-lg text-navy-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer shrink-0"
+                          className="p-1 rounded-lg text-[#161514]/40 dark:text-[#FAF8F5]/40 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer shrink-0"
                           title="Remove row"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
@@ -930,7 +930,7 @@ export function BulkExpenseModal({
                       {/* Line 2: Amount + Category */}
                       <div className="flex items-center gap-2 pl-7">
                         <div className="relative w-28 shrink-0">
-                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-black text-navy-500 pointer-events-none">
+                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-black text-[#161514]/50 dark:text-[#FAF8F5]/50 pointer-events-none">
                             {currencySymbol}
                           </span>
                           <input
@@ -944,7 +944,7 @@ export function BulkExpenseModal({
                               }
                             }}
                             placeholder="0"
-                            className="w-full bg-cream-50/70 focus:bg-white rounded-lg border border-navy-950/40 focus:border-navy-950 pl-6 pr-2 py-1 text-xs font-black text-navy-950 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            className="w-full bg-[#FAF8F5] dark:bg-[#252321] focus:bg-white dark:focus:bg-[#1C1A18] rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] pl-6 pr-2 py-1 text-xs font-black text-[#161514] dark:text-[#FAF8F5] outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             autoFocus={idx === 0}
                           />
                         </div>
@@ -964,7 +964,7 @@ export function BulkExpenseModal({
                 <button
                   type="button"
                   onClick={handleConvertTurboToReview}
-                  className="w-full py-2.5 bg-emerald-400 hover:bg-emerald-500 text-navy-950 font-black text-xs rounded-xl border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] cursor-pointer flex items-center justify-center gap-1.5 transition-all active:translate-y-0.5"
+                  className="w-full py-2.5 bg-[#03D26F] hover:bg-[#02b35d] text-[#161514] font-black text-xs rounded-xl border border-[#03D26F] shadow-xs cursor-pointer flex items-center justify-center gap-1.5 transition-all active:translate-y-0.5"
                 >
                   <span>Review Items</span>
                   <ArrowRight className="h-3.5 w-3.5 stroke-[2.5]" />
@@ -978,15 +978,15 @@ export function BulkExpenseModal({
             {/* Header: Action Bar */}
             <div className="flex items-center justify-between pb-1 flex-wrap gap-2">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs font-black text-navy-950 uppercase tracking-wide">
+                <span className="text-xs font-black text-[#161514] dark:text-[#FAF8F5] uppercase tracking-wide">
                   Review Items
                 </span>
-                <span className="text-[10px] font-black bg-amber-300 text-navy-950 px-2 py-0.5 rounded-full border border-navy-950">
+                <span className="text-[10px] font-black bg-[#CEF431] text-[#161514] px-2 py-0.5 rounded-full border border-[#CEF431]">
                   {selectedReviewItems.length} of {reviewItems.length} selected
                 </span>
                 {incompleteCount > 0 && (
-                  <span className="text-[10px] font-bold text-amber-900 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-300 flex items-center gap-1">
-                    <AlertCircle className="h-3 w-3 text-amber-700" />
+                  <span className="text-[10px] font-bold text-amber-900 dark:text-amber-200 bg-amber-100 dark:bg-amber-950/40 px-2 py-0.5 rounded-full border border-amber-300 dark:border-amber-800 flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3 text-amber-700 dark:text-amber-400" />
                     <span>{incompleteCount} need{incompleteCount === 1 ? "s" : ""} info</span>
                   </span>
                 )}
@@ -994,10 +994,10 @@ export function BulkExpenseModal({
                   <button
                     type="button"
                     onClick={handleFixAllPhantomRupees}
-                    className="text-[10px] font-black bg-[#CEF431] hover:bg-[#b8dd24] text-navy-950 px-2 py-0.5 rounded-full border border-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)] flex items-center gap-1 cursor-pointer transition-all active:translate-y-0.5"
+                    className="text-[10px] font-black bg-[#CEF431] hover:bg-[#b8dd24] text-[#161514] px-2 py-0.5 rounded-full border border-[#161514] dark:border-[#CEF431] shadow-xs flex items-center gap-1 cursor-pointer transition-all active:translate-y-0.5"
                     title="Remove leading digits fused from ₹ symbol by OCR"
                   >
-                    <Zap className="h-2.5 w-2.5 fill-navy-950 stroke-navy-950" />
+                    <Zap className="h-2.5 w-2.5 fill-[#161514] stroke-[#161514]" />
                     <span>Fix {unfixedPhantomCount} Fused ₹</span>
                   </button>
                 )}
@@ -1007,7 +1007,7 @@ export function BulkExpenseModal({
                 <button
                   type="button"
                   onClick={() => handleSelectAll(selectedReviewItems.length !== reviewItems.length)}
-                  className="text-[11px] font-bold text-navy-700 hover:text-navy-950 underline cursor-pointer"
+                  className="text-[11px] font-bold text-[#161514]/70 dark:text-[#FAF8F5]/70 hover:text-[#161514] dark:hover:text-[#FAF8F5] underline cursor-pointer"
                 >
                   {selectedReviewItems.length === reviewItems.length ? "Deselect all" : "Select all"}
                 </button>
@@ -1015,22 +1015,22 @@ export function BulkExpenseModal({
                 <button
                   type="button"
                   onClick={() => setIsReviewMode(false)}
-                  className="text-[11px] font-black text-navy-800 bg-white hover:bg-cream-100 px-2 py-1 rounded-lg border border-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)] cursor-pointer flex items-center gap-1 active:translate-y-0.5 transition-all"
+                  className="text-[11px] font-black text-[#161514] dark:text-[#FAF8F5] bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] px-2 py-1 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs cursor-pointer flex items-center gap-1 active:translate-y-0.5 transition-all"
                 >
                   <RefreshCw className="h-3 w-3" /> New scan
                 </button>
               </div>
             </div>
 
-            {/* Checklist Items: Spacious, 2-tier card (NO horizontal squishing!) */}
+            {/* Checklist Items: Spacious, 2-tier card */}
             <div className="max-h-[48vh] overflow-y-auto space-y-2.5 pr-0.5 overscroll-contain">
               {reviewItems.length === 0 ? (
-                <div className="text-center py-8 text-navy-400 space-y-2">
+                <div className="text-center py-8 text-[#161514]/50 dark:text-[#FAF8F5]/50 space-y-2">
                   <p className="text-xs font-bold">No expenses left in queue.</p>
                   <button
                     type="button"
                     onClick={handleAddReviewRow}
-                    className="text-xs font-black text-navy-950 underline cursor-pointer"
+                    className="text-xs font-black text-[#161514] dark:text-[#FAF8F5] underline cursor-pointer"
                   >
                     + Add an expense
                   </button>
@@ -1040,8 +1040,10 @@ export function BulkExpenseModal({
                   <div
                     key={item.id}
                     className={cn(
-                      "p-3 rounded-2xl border-2 border-navy-950 transition-all space-y-2.5 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)]",
-                      item.selected ? "bg-white" : "bg-cream-50/50 border-dashed opacity-65"
+                      "p-3 rounded-xl border transition-all space-y-2.5 shadow-xs",
+                      item.selected
+                        ? "bg-white dark:bg-[#1C1A18] border-[#E8E5DF] dark:border-[#2A2724]"
+                        : "bg-[#FAF8F5]/60 dark:bg-[#252321]/40 border-dashed border-[#E8E5DF] dark:border-[#2A2724] opacity-65"
                     )}
                   >
                     {/* Line 1: Checkbox + Merchant/Note (Full flex-1) + Trash */}
@@ -1050,10 +1052,10 @@ export function BulkExpenseModal({
                         type="button"
                         onClick={() => handleToggleSelectItem(item.id)}
                         className={cn(
-                          "h-6 w-6 rounded-lg border-2 border-navy-950 flex items-center justify-center text-xs font-black cursor-pointer shrink-0 transition-all",
+                          "h-6 w-6 rounded-lg border flex items-center justify-center text-xs font-black cursor-pointer shrink-0 transition-all",
                           item.selected
-                            ? "bg-emerald-400 text-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)]"
-                            : "bg-white text-transparent"
+                            ? "bg-[#03D26F] text-[#161514] border-[#03D26F] shadow-xs"
+                            : "bg-white dark:bg-[#1C1A18] border-[#E8E5DF] dark:border-[#2A2724] text-transparent"
                         )}
                         aria-label="Toggle select"
                       >
@@ -1065,12 +1067,12 @@ export function BulkExpenseModal({
                         value={item.note}
                         onChange={(e) => handleUpdateReviewItem(item.id, "note", e.target.value)}
                         placeholder="Merchant / Note"
-                        className="flex-1 min-w-0 bg-cream-50/70 focus:bg-white rounded-lg border border-navy-950/30 focus:border-navy-950 px-2.5 py-1 text-xs font-black text-navy-950 placeholder:text-navy-400 outline-none transition-colors"
+                        className="flex-1 min-w-0 bg-[#FAF8F5] dark:bg-[#252321] focus:bg-white dark:focus:bg-[#1C1A18] rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] px-2.5 py-1 text-xs font-black text-[#161514] dark:text-[#FAF8F5] placeholder:text-[#161514]/40 dark:placeholder:text-[#FAF8F5]/30 outline-none transition-colors"
                       />
 
                       {item.isIncomplete && (
-                        <span className="text-[10px] font-black bg-amber-200 text-amber-950 px-1.5 py-0.5 rounded border border-amber-950/40 flex items-center gap-1 shrink-0">
-                          <AlertCircle className="h-3 w-3 text-amber-800" />
+                        <span className="text-[10px] font-black bg-amber-200 dark:bg-amber-950 text-amber-950 dark:text-amber-200 px-1.5 py-0.5 rounded border border-amber-950/40 dark:border-amber-800 flex items-center gap-1 shrink-0">
+                          <AlertCircle className="h-3 w-3 text-amber-800 dark:text-amber-300" />
                           <span>Needs info</span>
                         </span>
                       )}
@@ -1078,7 +1080,7 @@ export function BulkExpenseModal({
                       <button
                         type="button"
                         onClick={() => handleRemoveReviewItem(item.id)}
-                        className="p-1 rounded-lg text-navy-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer shrink-0"
+                        className="p-1 rounded-lg text-[#161514]/40 dark:text-[#FAF8F5]/40 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer shrink-0"
                         title="Remove item"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -1090,7 +1092,7 @@ export function BulkExpenseModal({
                       {/* Amount Input */}
                       <div className="flex items-center gap-1.5 shrink-0">
                         <div className="relative w-24 sm:w-28 shrink-0">
-                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-black text-navy-600 pointer-events-none">
+                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-black text-[#161514]/50 dark:text-[#FAF8F5]/50 pointer-events-none">
                             {currencySymbol}
                           </span>
                           <input
@@ -1101,10 +1103,10 @@ export function BulkExpenseModal({
                             }
                             placeholder={item.amount <= 0 ? "Enter ₹" : "0"}
                             className={cn(
-                              "w-full rounded-lg pl-6 pr-2 py-1 text-xs font-black text-navy-950 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-all",
+                              "w-full rounded-lg pl-6 pr-2 py-1 text-xs font-black text-[#161514] dark:text-[#FAF8F5] outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-all",
                               item.amount <= 0
-                                ? "bg-amber-50 border-2 border-dashed border-amber-500 placeholder:text-amber-800/60 focus:border-navy-950 ring-1 ring-amber-300"
-                                : "bg-cream-50/70 focus:bg-white border border-navy-950/40 focus:border-navy-950"
+                                ? "bg-amber-50 dark:bg-amber-950/20 border border-dashed border-amber-500 placeholder:text-amber-800/60 focus:border-[#161514] ring-1 ring-amber-300"
+                                : "bg-[#FAF8F5] dark:bg-[#252321] focus:bg-white dark:focus:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724]"
                             )}
                           />
                         </div>
@@ -1114,10 +1116,10 @@ export function BulkExpenseModal({
                             type="button"
                             onClick={() => handleTogglePhantomRupee(item.id)}
                             className={cn(
-                              "inline-flex items-center gap-1 text-[10px] font-black px-2 py-1 rounded-lg border border-navy-950 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)] transition-all active:translate-y-0.5 cursor-pointer shrink-0",
+                              "inline-flex items-center gap-1 text-[10px] font-black px-2 py-1 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs transition-all active:translate-y-0.5 cursor-pointer shrink-0",
                               item.isPhantomFixed
-                                ? "bg-cream-100 text-navy-600 hover:bg-cream-200"
-                                : "bg-[#CEF431] text-navy-950 hover:bg-[#b8dd24]"
+                                ? "bg-[#FAF8F5] dark:bg-[#252321] text-[#161514]/70 dark:text-[#FAF8F5]/70 hover:bg-[#F1EFEA]"
+                                : "bg-[#CEF431] text-[#161514] hover:bg-[#b8dd24]"
                             )}
                             title={
                               item.isPhantomFixed
@@ -1142,11 +1144,11 @@ export function BulkExpenseModal({
 
                       {/* Date Badge (Interactive) */}
                       <div
-                        className="relative bg-cream-100 hover:bg-cream-200 active:translate-y-0.5 rounded-lg border border-navy-950/60 px-2 py-1 shadow-[1px_1px_0px_0px_rgba(31,36,48,1)] flex items-center gap-1 shrink-0 cursor-pointer transition-all"
+                        className="relative bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] active:translate-y-0.5 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] px-2 py-1 shadow-xs flex items-center gap-1 shrink-0 cursor-pointer transition-all"
                         title="Change transaction date"
                       >
-                        <Calendar className="h-3 w-3 stroke-[2.5] text-navy-700 pointer-events-none shrink-0" />
-                        <span className="text-[10px] font-black text-navy-900 pointer-events-none whitespace-nowrap">
+                        <Calendar className="h-3 w-3 stroke-[2.5] text-[#161514]/70 dark:text-[#FAF8F5]/70 pointer-events-none shrink-0" />
+                        <span className="text-[10px] font-black text-[#161514] dark:text-[#FAF8F5] pointer-events-none whitespace-nowrap">
                           {formatDateBadge(item.date)}
                         </span>
                         <input
@@ -1171,21 +1173,21 @@ export function BulkExpenseModal({
               <button
                 type="button"
                 onClick={handleAddReviewRow}
-                className="w-full py-2.5 rounded-xl border-2 border-dashed border-navy-950/30 hover:border-navy-950 text-navy-800 hover:bg-amber-50/60 text-xs font-black cursor-pointer flex items-center justify-center gap-1.5 transition-all"
+                className="w-full py-2.5 rounded-xl border border-dashed border-[#E8E5DF] dark:border-[#2A2724] text-[#161514]/70 dark:text-[#FAF8F5]/70 hover:bg-[#FAF8F5] dark:hover:bg-[#252321] text-xs font-black cursor-pointer flex items-center justify-center gap-1.5 transition-all"
               >
                 <Plus className="h-4 w-4 stroke-[3]" /> Add item manually
               </button>
             </div>
 
             {/* Commit Footer: Modern, spacious action bar */}
-            <div className="pt-3 border-t-2 border-navy-950/10 flex items-center justify-between gap-3">
+            <div className="pt-3 border-t border-[#E8E5DF] dark:border-[#2A2724] flex items-center justify-between gap-3">
               <div>
-                <div className="text-[10px] font-bold uppercase tracking-wider text-navy-500">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-[#161514]/60 dark:text-[#FAF8F5]/60">
                   Total Selected
                 </div>
-                <div className="text-base sm:text-lg font-black text-navy-950 tracking-tight">
+                <div className="text-base sm:text-lg font-black text-[#161514] dark:text-[#FAF8F5] tracking-tight">
                   {currencySymbol}{totalSelectedAmount.toLocaleString()}
-                  <span className="text-[11px] font-bold text-navy-500 ml-1.5">
+                  <span className="text-[11px] font-bold text-[#161514]/60 dark:text-[#FAF8F5]/60 ml-1.5">
                     ({selectedReviewItems.length} {selectedReviewItems.length === 1 ? "item" : "items"})
                   </span>
                 </div>
@@ -1195,7 +1197,7 @@ export function BulkExpenseModal({
                 type="button"
                 disabled={bulkAddMutation.isPending || selectedReviewItems.length === 0}
                 onClick={handleSaveAll}
-                className="py-2.5 px-4 sm:px-5 bg-emerald-400 hover:bg-emerald-500 disabled:opacity-40 text-navy-950 font-black text-xs sm:text-sm rounded-xl border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] cursor-pointer flex items-center gap-2 active:translate-y-0.5 transition-all shrink-0"
+                className="py-2.5 px-4 sm:px-5 bg-[#03D26F] hover:bg-[#02b35d] disabled:opacity-40 text-[#161514] font-black text-xs sm:text-sm rounded-xl border border-[#03D26F] shadow-xs cursor-pointer flex items-center gap-2 active:translate-y-0.5 transition-all shrink-0"
               >
                 {bulkAddMutation.isPending ? (
                   <>

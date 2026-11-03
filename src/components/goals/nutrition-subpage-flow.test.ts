@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { ATOMIC_HABITS_VAULT } from "@/components/goals/HabitChoiceModal";
-import { HABIT_TEMPLATE_PACKS } from "@/lib/templates-data";
+import { HABIT_TEMPLATE_PACKS, MEAL_TEMPLATE_PACKS } from "@/lib/templates-data";
 
 describe("Subpages Redesign & Habit Studio Flow Architecture", () => {
   it("calculates caloric macro percentages correctly based on standard metabolic factors", () => {
@@ -101,6 +101,37 @@ describe("Subpages Redesign & Habit Studio Flow Architecture", () => {
       expect(sp.stage2).toBeDefined();
       expect(sp.stage3).toBeDefined();
       expect(sp.stage4).toBeDefined();
+    });
+  });
+
+  it("verifies the curated diet split packs and zero-confusion onboarding presets", () => {
+    expect(MEAL_TEMPLATE_PACKS.length).toBeGreaterThanOrEqual(3);
+
+    const bulkPack = MEAL_TEMPLATE_PACKS.find((p) => p.id === "high-protein-bulk");
+    expect(bulkPack).toBeDefined();
+    expect(bulkPack?.items.length).toBeGreaterThanOrEqual(3);
+
+    const shredPack = MEAL_TEMPLATE_PACKS.find((p) => p.id === "lean-cutting-monk");
+    expect(shredPack).toBeDefined();
+    expect(shredPack?.items.length).toBeGreaterThanOrEqual(4);
+
+    const studentPack = MEAL_TEMPLATE_PACKS.find((p) => p.id === "student-budget-fuel");
+    expect(studentPack).toBeDefined();
+    expect(studentPack?.items.length).toBeGreaterThanOrEqual(4);
+
+    // Verify macro parsing logic
+    MEAL_TEMPLATE_PACKS.forEach((pack) => {
+      pack.items.forEach((item) => {
+        expect(item.title.length).toBeGreaterThan(0);
+        if (item.desc) {
+          const calMatch = item.desc.match(/(\d+)\s*kcal/i);
+          const pMatch = item.desc.match(/(\d+)g\s*Protein/i);
+          expect(calMatch).toBeTruthy();
+          expect(pMatch).toBeTruthy();
+          expect(Number(calMatch![1])).toBeGreaterThan(0);
+          expect(Number(pMatch![1])).toBeGreaterThan(0);
+        }
+      });
     });
   });
 });

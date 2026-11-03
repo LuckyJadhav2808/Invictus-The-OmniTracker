@@ -18,25 +18,25 @@ export interface LifeSpaceTabItem {
 export const LIFE_SPACE_TABS: LifeSpaceTabItem[] = [
   {
     id: "habits",
-    label: "Habits & Routines",
+    label: "Habits",
     href: "/goals",
     icon: CheckSquare,
   },
   {
     id: "gym",
-    label: "The Iron Arena",
+    label: "Gym & Anatomy",
     href: "/goals/gym",
     icon: Dumbbell,
   },
   {
     id: "nutrition",
-    label: "The Macro Forge",
+    label: "Meal & Fuel",
     href: "/goals/nutrition",
     icon: Utensils,
   },
   {
     id: "analytics",
-    label: "Analytics & Heatmap",
+    label: "Analytics",
     href: "/goals/analytics",
     icon: BarChart2,
   },
@@ -66,7 +66,7 @@ export function LifeSpaceSubNav({ className }: LifeSpaceSubNavProps) {
       className={cn("w-full overflow-x-auto no-scrollbar pb-1 mb-5 select-none", className)}
       aria-label="Life Space Sub Navigation"
     >
-      <div className="bg-[#FAF8F5] rounded-2xl p-1.5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex items-center gap-1.5 w-max min-w-full sm:min-w-0 sm:w-auto">
+      <div className="bg-white/80 dark:bg-[#161514]/80 backdrop-blur-md rounded-2xl p-1 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex items-center gap-1.5 w-max min-w-full sm:min-w-0 sm:w-auto">
         {LIFE_SPACE_TABS.map((tab) => {
           const active = isTabActive(tab.href);
           const Icon = tab.icon;
@@ -77,17 +77,17 @@ export function LifeSpaceSubNav({ className }: LifeSpaceSubNavProps) {
               href={tab.href}
               onClick={handleTabClick}
               className={cn(
-                "rounded-xl text-xs font-heading font-extrabold py-2 px-3 sm:px-3.5 border-2 transition-all flex items-center gap-1.5 shrink-0 cursor-pointer active:scale-95",
+                "rounded-xl text-xs font-medium py-2 px-3 sm:px-3.5 border transition-all flex items-center gap-1.5 shrink-0 cursor-pointer active:scale-98",
                 active
-                  ? "border-[#161514] bg-[#03D26F] text-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]"
-                  : "border-transparent text-[#161514]/70 hover:text-[#161514] hover:bg-white/60"
+                  ? "border-[#E8E5DF] dark:border-white/10 bg-[#161514] text-white dark:bg-white dark:text-[#161514] shadow-xs"
+                  : "border-transparent text-[#6E6B65] dark:text-[#9E9A90] hover:text-[#161514] dark:hover:text-white hover:bg-[#F1EFEA] dark:hover:bg-white/5"
               )}
               aria-current={active ? "page" : undefined}
             >
-              <Icon className="size-3.5 stroke-[2.2]" />
+              <Icon className="size-3.5 stroke-[2]" />
               <span>{tab.label}</span>
               {tab.badge && (
-                <span className="bg-[#CEF431] text-[#161514] text-[9px] font-mono font-black px-1.5 py-0.2 rounded border border-[#161514]">
+                <span className="bg-[#03D26F]/15 text-[#047857] text-[10px] font-mono font-semibold px-1.5 py-0.2 rounded-md border border-[#03D26F]/30">
                   {tab.badge}
                 </span>
               )}

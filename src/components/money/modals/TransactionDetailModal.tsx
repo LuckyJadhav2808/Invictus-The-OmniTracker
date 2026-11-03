@@ -84,7 +84,7 @@ export function TransactionDetailModal({
     >
       <div className="space-y-4 pt-1">
         {/* View Mode Toggle Pill */}
-        <div className="flex items-center justify-center gap-1.5 p-1 bg-[#F1EFEA] border-2 border-[#161514] rounded-2xl max-w-xs mx-auto shadow-[2px_2px_0px_0px_#161514]">
+        <div className="flex items-center justify-center gap-1 p-1 bg-[#F1EFEA] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] rounded-xl max-w-xs mx-auto">
           <button
             type="button"
             onClick={() => {
@@ -92,13 +92,13 @@ export function TransactionDetailModal({
               setViewMode("receipt");
             }}
             className={cn(
-              "flex-1 py-1.5 px-3 rounded-xl font-heading font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer",
+              "flex-1 py-1.5 px-3 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer",
               viewMode === "receipt"
-                ? "bg-[#CEF431] text-[#161514] border border-[#161514] shadow-[1px_1px_0px_0px_#161514]"
-                : "text-[#161514]/60 hover:text-[#161514]"
+                ? "bg-white dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs font-semibold"
+                : "text-[#8C8882] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5]"
             )}
           >
-            <Receipt className="size-3.5" />
+            <Receipt className="size-3.5 stroke-[1.75]" />
             <span>Printed Slip</span>
           </button>
 
@@ -109,13 +109,13 @@ export function TransactionDetailModal({
               setViewMode("inspector");
             }}
             className={cn(
-              "flex-1 py-1.5 px-3 rounded-xl font-heading font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer",
+              "flex-1 py-1.5 px-3 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer",
               viewMode === "inspector"
-                ? "bg-white text-[#161514] border border-[#161514] shadow-[1px_1px_0px_0px_#161514]"
-                : "text-[#161514]/60 hover:text-[#161514]"
+                ? "bg-white dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs font-semibold"
+                : "text-[#8C8882] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5]"
             )}
           >
-            <FileText className="size-3.5" />
+            <FileText className="size-3.5 stroke-[1.75]" />
             <span>Audit Details</span>
           </button>
         </div>
@@ -137,13 +137,13 @@ export function TransactionDetailModal({
             {/* Hero Amount & Type Card */}
             <div
               className={cn(
-                "p-4 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] text-center space-y-1",
-                isIncome ? "bg-[#03D26F]/15" : "bg-rose-50"
+                "p-4 rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs text-center space-y-1",
+                isIncome ? "bg-[#03D26F]/15 dark:bg-emerald-950/20" : "bg-rose-50 dark:bg-rose-950/20"
               )}
             >
               <span
                 className={cn(
-                  "text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border border-[#161514] inline-flex items-center gap-1",
+                  "text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border border-[#161514] dark:border-white/20 inline-flex items-center gap-1 shadow-xs",
                   isIncome ? "bg-[#03D26F] text-[#161514]" : "bg-rose-400 text-[#161514]"
                 )}
               >
@@ -163,57 +163,57 @@ export function TransactionDetailModal({
               <span
                 className={cn(
                   "text-3xl sm:text-4xl font-black block font-heading",
-                  isIncome ? "text-emerald-700" : "text-rose-600"
+                  isIncome ? "text-emerald-700 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
                 )}
               >
                 {isIncome ? "+" : "-"}{currencySymbol}{Number(transaction.amount).toLocaleString()}
               </span>
 
               {transaction.note && (
-                <p className="text-sm font-bold text-[#161514] pt-1">
+                <p className="text-sm font-bold text-[#161514] dark:text-[#FAF8F5] pt-1">
                   &ldquo;{transaction.note}&rdquo;
                 </p>
               )}
             </div>
 
             {/* Telemetry Breakdown Details */}
-            <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] space-y-2.5 text-xs">
+            <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] p-3.5 rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-2.5 text-xs">
               {/* Category */}
-              <div className="flex items-center justify-between py-1 border-b border-[#161514]/10">
-                <span className="text-[#161514]/60 font-bold flex items-center gap-1.5">
+              <div className="flex items-center justify-between py-1 border-b border-[#E8E5DF] dark:border-[#2A2724]">
+                <span className="text-[#161514]/60 dark:text-[#A8A29E] font-bold flex items-center gap-1.5">
                   <Tag className="size-3.5" />
                   <span>Category</span>
                 </span>
-                <span className="font-black text-[#161514] flex items-center gap-1.5 bg-white px-2 py-0.5 rounded-lg border border-[#161514]">
-                  <CategoryIcon name={category?.icon} className="size-3.5 text-[#161514]" />
+                <span className="font-black text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5 bg-white dark:bg-[#252321] px-2 py-0.5 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs">
+                  <CategoryIcon name={category?.icon} className="size-3.5 text-[#161514] dark:text-[#FAF8F5]" />
                   <span>{category?.name || "Uncategorized"}</span>
                 </span>
               </div>
 
               {/* Date */}
-              <div className="flex items-center justify-between py-1 border-b border-[#161514]/10">
-                <span className="text-[#161514]/60 font-bold flex items-center gap-1.5">
+              <div className="flex items-center justify-between py-1 border-b border-[#E8E5DF] dark:border-[#2A2724]">
+                <span className="text-[#161514]/60 dark:text-[#A8A29E] font-bold flex items-center gap-1.5">
                   <Calendar className="size-3.5" />
                   <span>Date Logged</span>
                 </span>
-                <span className="font-bold text-[#161514]">{formattedDate}</span>
+                <span className="font-bold text-[#161514] dark:text-[#FAF8F5]">{formattedDate}</span>
               </div>
 
               {/* Payment Method */}
-              <div className="flex items-center justify-between py-1 border-b border-[#161514]/10">
-                <span className="text-[#161514]/60 font-bold flex items-center gap-1.5">
+              <div className="flex items-center justify-between py-1 border-b border-[#E8E5DF] dark:border-[#2A2724]">
+                <span className="text-[#161514]/60 dark:text-[#A8A29E] font-bold flex items-center gap-1.5">
                   <CreditCard className="size-3.5" />
                   <span>Payment Mode</span>
                 </span>
-                <span className="font-black uppercase text-[#161514] bg-white px-2 py-0.5 rounded-lg border border-[#161514] flex items-center gap-1">
+                <span className="font-black uppercase text-[#161514] dark:text-[#FAF8F5] bg-white dark:bg-[#252321] px-2 py-0.5 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] flex items-center gap-1 shadow-xs">
                   {transaction.paymentMethod === "cash" ? (
                     <>
-                      <Banknote className="size-3 text-[#161514]" />
+                      <Banknote className="size-3 text-[#161514] dark:text-[#FAF8F5]" />
                       <span>Cash</span>
                     </>
                   ) : (
                     <>
-                      <Smartphone className="size-3 text-[#161514]" />
+                      <Smartphone className="size-3 text-[#161514] dark:text-[#FAF8F5]" />
                       <span>{transaction.paymentMethod || "UPI"}</span>
                     </>
                   )}
@@ -221,7 +221,7 @@ export function TransactionDetailModal({
               </div>
 
               {/* Telemetry ID */}
-              <div className="flex items-center justify-between py-1 text-[10px] text-[#161514]/50">
+              <div className="flex items-center justify-between py-1 text-[10px] text-[#161514]/50 dark:text-[#A8A29E]/60">
                 <span>Audit Ref:</span>
                 <span className="font-mono">{transaction.id}</span>
               </div>
@@ -229,9 +229,9 @@ export function TransactionDetailModal({
 
             {/* Receipt Attachment (if present) */}
             {transaction.attachmentUrl && (
-              <div className="bg-white p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] space-y-2">
-                <span className="text-[10px] font-black uppercase text-[#161514] block">Attached Receipt</span>
-                <div className="relative rounded-xl overflow-hidden border border-[#161514] max-h-48 bg-gray-100 flex items-center justify-center">
+              <div className="bg-white dark:bg-[#1C1A18] p-3 rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-2">
+                <span className="text-[10px] font-black uppercase text-[#161514] dark:text-[#FAF8F5] block">Attached Receipt</span>
+                <div className="relative rounded-xl overflow-hidden border border-[#E8E5DF] dark:border-[#2A2724] max-h-48 bg-gray-100 dark:bg-[#121110] flex items-center justify-center">
                   <img
                     src={transaction.attachmentUrl}
                     alt="Receipt"
@@ -242,7 +242,7 @@ export function TransactionDetailModal({
                   href={transaction.attachmentUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[10px] font-black text-navy-700 flex items-center gap-1 hover:underline"
+                  className="text-[10px] font-black text-navy-700 dark:text-sky-400 flex items-center gap-1 hover:underline"
                 >
                   <span>View Full Resolution</span>
                   <ExternalLink className="size-3" />
@@ -256,7 +256,7 @@ export function TransactionDetailModal({
                 type="button"
                 disabled={isDuplicating}
                 onClick={handleDuplicate}
-                className="bg-[#CEF431] hover:bg-[#bde422] text-[#161514] font-black text-[11px] uppercase tracking-wider py-2.5 px-2 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center justify-center gap-1 cursor-pointer disabled:opacity-50"
+                className="bg-[#CEF431] hover:bg-[#bde422] text-[#161514] font-black text-[11px] uppercase tracking-wider py-2.5 px-2 rounded-xl border border-[#161514] shadow-xs active:translate-y-0.5 transition-all flex items-center justify-center gap-1 cursor-pointer disabled:opacity-50"
                 title="Duplicate with today's date"
               >
                 <Copy className="size-3.5" />
@@ -266,7 +266,7 @@ export function TransactionDetailModal({
               <button
                 type="button"
                 onClick={handleEdit}
-                className="bg-white hover:bg-[#FAF8F5] text-[#161514] font-black text-[11px] uppercase tracking-wider py-2.5 px-2 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center justify-center gap-1 cursor-pointer"
+                className="bg-white dark:bg-[#252321] hover:bg-[#FAF8F5] dark:hover:bg-[#2F2C29] text-[#161514] dark:text-[#FAF8F5] font-black text-[11px] uppercase tracking-wider py-2.5 px-2 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs active:translate-y-0.5 transition-all flex items-center justify-center gap-1 cursor-pointer"
               >
                 <Edit2 className="size-3.5" />
                 <span>Edit</span>
@@ -276,7 +276,7 @@ export function TransactionDetailModal({
                 type="button"
                 disabled={isDeleting}
                 onClick={handleDelete}
-                className="bg-rose-100 hover:bg-rose-200 text-rose-700 font-black text-[11px] uppercase tracking-wider py-2.5 px-2 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center justify-center gap-1 cursor-pointer disabled:opacity-50"
+                className="bg-rose-100 dark:bg-rose-950/40 hover:bg-rose-200 dark:hover:bg-rose-950/60 text-rose-700 dark:text-rose-300 font-black text-[11px] uppercase tracking-wider py-2.5 px-2 rounded-xl border border-rose-300 dark:border-rose-800/50 shadow-xs active:translate-y-0.5 transition-all flex items-center justify-center gap-1 cursor-pointer disabled:opacity-50"
               >
                 <Trash2 className="size-3.5" />
                 <span>{isDeleting ? "…" : "Delete"}</span>

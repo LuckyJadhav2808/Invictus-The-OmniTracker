@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AdaptiveDrawerDialog } from "@/components/shared/AdaptiveDrawerDialog";
 import { soundFX } from "@/components/shared/SoundFX";
 import { Plus, BookOpen, ChevronRight, ArrowLeft, Check, Sparkles } from "lucide-react";
+import { CategoryIcon } from "@/components/money/MoneyQuickActionsAndCards";
 
 export interface TemplateItem {
   id: string;
@@ -47,7 +48,7 @@ export function TemplateSelectionModal({
   open,
   onOpenChange,
   title,
-  subtitle = "START FROM SCRATCH OR APPLY A READY-MADE ROUTINE PACK.",
+  subtitle = "Start from scratch or apply a ready-made routine pack.",
   blankLabel,
   blankDesc,
   templatesLabel,
@@ -87,8 +88,8 @@ export function TemplateSelectionModal({
     <AdaptiveDrawerDialog
       open={open}
       onOpenChange={handleClose}
-      title={view === "choice" ? title : "TEMPLATE PACKS"}
-      description={view === "choice" ? subtitle : "SELECT A CURATED PACK TO ADD ALL ITEMS IN ONE CLICK"}
+      title={view === "choice" ? title : "Template Packs"}
+      description={view === "choice" ? subtitle : "Select a curated pack to add all items in one click"}
     >
       {view === "choice" ? (
         <div className="space-y-3.5 py-1">
@@ -100,22 +101,22 @@ export function TemplateSelectionModal({
               handleClose(false);
               onSelectBlank();
             }}
-            className="w-full bg-white rounded-2xl p-4 border-2 border-[#161514] shadow-[3.5px_3.5px_0px_0px_#161514] flex items-center justify-between gap-4 text-left hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-amber-50/60 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer group select-none"
+            className="w-full bg-white dark:bg-[#1C1A18] rounded-xl p-4 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex items-center justify-between gap-4 text-left hover:bg-[#FAF8F5] dark:hover:bg-[#252321] transition-all cursor-pointer group select-none"
           >
             <div className="flex items-center gap-3.5">
-              <div className="size-11 rounded-xl bg-amber-400 border-2 border-[#161514] flex items-center justify-center shrink-0 shadow-[2px_2px_0px_0px_#161514] group-hover:scale-105 transition-transform">
-                <Plus className="size-6 stroke-[3] text-[#161514]" />
+              <div className="size-11 rounded-lg bg-amber-400/20 dark:bg-amber-400/10 border border-amber-400/30 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <Plus className="size-6 stroke-[3] text-amber-900 dark:text-amber-200" />
               </div>
               <div>
-                <span className="text-sm font-heading font-black uppercase tracking-wider text-[#161514] block" style={{ fontFamily: "var(--font-heading)" }}>
+                <span className="text-sm font-heading font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] block" style={{ fontFamily: "var(--font-heading)" }}>
                   {blankLabel}
                 </span>
-                <span className="text-[10px] font-bold text-[#161514]/70 uppercase tracking-wide block mt-0.5">
+                <span className="text-[10px] font-bold text-[#161514]/60 dark:text-[#FAF8F5]/60 uppercase tracking-wide block mt-0.5">
                   {blankDesc}
                 </span>
               </div>
             </div>
-            <ChevronRight className="size-5 stroke-[2.5] text-[#161514] shrink-0 group-hover:translate-x-1 transition-transform" />
+            <ChevronRight className="size-5 stroke-[2.5] text-[#161514]/60 dark:text-[#FAF8F5]/60 shrink-0 group-hover:translate-x-1 transition-transform" />
           </button>
 
           {/* Option 2: Template Packs */}
@@ -125,22 +126,22 @@ export function TemplateSelectionModal({
               soundFX.playPop();
               setView("browse");
             }}
-            className="w-full bg-white rounded-2xl p-4 border-2 border-[#161514] shadow-[3.5px_3.5px_0px_0px_#161514] flex items-center justify-between gap-4 text-left hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-amber-50/60 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer group select-none"
+            className="w-full bg-white dark:bg-[#1C1A18] rounded-xl p-4 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex items-center justify-between gap-4 text-left hover:bg-[#FAF8F5] dark:hover:bg-[#252321] transition-all cursor-pointer group select-none"
           >
             <div className="flex items-center gap-3.5">
-              <div className="size-11 rounded-xl bg-amber-300 border-2 border-[#161514] flex items-center justify-center shrink-0 shadow-[2px_2px_0px_0px_#161514] group-hover:scale-105 transition-transform">
-                <BookOpen className="size-6 stroke-[2.5] text-[#161514]" />
+              <div className="size-11 rounded-lg bg-amber-300/20 dark:bg-amber-300/10 border border-amber-400/30 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <BookOpen className="size-6 stroke-[2.5] text-amber-900 dark:text-amber-200" />
               </div>
               <div>
-                <span className="text-sm font-heading font-black uppercase tracking-wider text-[#161514] block" style={{ fontFamily: "var(--font-heading)" }}>
+                <span className="text-sm font-heading font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] block" style={{ fontFamily: "var(--font-heading)" }}>
                   {templatesLabel}
                 </span>
-                <span className="text-[10px] font-bold text-[#161514]/70 uppercase tracking-wide block mt-0.5">
+                <span className="text-[10px] font-bold text-[#161514]/60 dark:text-[#FAF8F5]/60 uppercase tracking-wide block mt-0.5">
                   {templatesDesc}
                 </span>
               </div>
             </div>
-            <ChevronRight className="size-5 stroke-[2.5] text-[#161514] shrink-0 group-hover:translate-x-1 transition-transform" />
+            <ChevronRight className="size-5 stroke-[2.5] text-[#161514]/60 dark:text-[#FAF8F5]/60 shrink-0 group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
       ) : (
@@ -152,7 +153,7 @@ export function TemplateSelectionModal({
               soundFX.playPop();
               setView("choice");
             }}
-            className="flex items-center gap-1.5 text-xs font-heading font-black text-[#161514] hover:underline cursor-pointer"
+            className="flex items-center gap-1.5 text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5] hover:underline cursor-pointer"
           >
             <ArrowLeft className="size-4 stroke-[2.5]" />
             <span>Back to options</span>
@@ -164,21 +165,27 @@ export function TemplateSelectionModal({
               return (
                 <div
                   key={pack.id}
-                  className="bg-white rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-3"
+                  className="bg-white dark:bg-[#1C1A18] rounded-xl p-4 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-3"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-center gap-2.5">
-                      <span className="text-2xl shrink-0">{pack.icon}</span>
+                      <span className="size-9 rounded-lg bg-[#FAF8F5] dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#2A2724] flex items-center justify-center shrink-0">
+                        {/\p{Extended_Pictographic}/u.test(pack.icon) && pack.icon.length <= 4 ? (
+                          <span className="text-base leading-none">{pack.icon}</span>
+                        ) : (
+                          <CategoryIcon name={pack.icon} className="size-4 text-[#161514] dark:text-[#FAF8F5]" />
+                        )}
+                      </span>
                       <div>
                         <div className="flex items-center gap-2 flex-wrap">
-                          <h4 className="text-sm font-heading font-black text-[#161514] tracking-tight">{pack.name}</h4>
+                          <h4 className="text-sm font-heading font-black text-[#161514] dark:text-[#FAF8F5] tracking-tight">{pack.name}</h4>
                           {pack.badge && (
-                            <span className="bg-amber-300 text-[#161514] text-[9px] font-heading font-black uppercase px-2 py-0.5 rounded-lg border border-[#161514] shadow-[1px_1px_0px_0px_#161514] whitespace-nowrap shrink-0">
+                            <span className="bg-amber-300/30 dark:bg-amber-400/20 text-amber-900 dark:text-amber-200 text-[9px] font-heading font-black uppercase px-2 py-0.5 rounded-md border border-amber-400/40 whitespace-nowrap shrink-0">
                               {pack.badge}
                             </span>
                           )}
                         </div>
-                        <p className="text-[10px] font-bold text-[#161514]/70">{pack.tagline}</p>
+                        <p className="text-[10px] font-medium text-[#161514]/70 dark:text-[#FAF8F5]/70">{pack.tagline}</p>
                       </div>
                     </div>
 
@@ -187,7 +194,7 @@ export function TemplateSelectionModal({
                         <button
                           type="button"
                           onClick={() => handleUnapply(pack)}
-                          className="bg-rose-400 hover:bg-rose-500 text-[#161514] border-2 border-[#161514] px-2.5 py-1.5 rounded-xl text-xs font-heading font-black shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer transition-all flex items-center gap-1 whitespace-nowrap shrink-0"
+                          className="bg-rose-500/10 hover:bg-rose-500/20 text-rose-700 dark:text-rose-400 border border-rose-300 dark:border-rose-900 px-2.5 py-1.5 rounded-lg text-xs font-heading font-bold shadow-xs active:translate-y-0.5 cursor-pointer transition-all flex items-center gap-1 whitespace-nowrap shrink-0"
                         >
                           <span>Unapply</span>
                         </button>
@@ -195,7 +202,7 @@ export function TemplateSelectionModal({
                       <button
                         type="button"
                         onClick={() => handleApply(pack)}
-                        className="bg-[#CEF431] hover:bg-[#bde325] text-[#161514] border-2 border-[#161514] px-3 py-1.5 rounded-xl text-xs font-heading font-black shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer transition-all flex items-center gap-1 whitespace-nowrap shrink-0"
+                        className="bg-[#CEF431] hover:bg-[#bde325] text-[#161514] border border-[#CEF431] px-3 py-1.5 rounded-lg text-xs font-heading font-black shadow-xs active:translate-y-0.5 cursor-pointer transition-all flex items-center gap-1 whitespace-nowrap shrink-0"
                       >
                         <Sparkles className="size-3.5 stroke-[2.5]" />
                         <span>{isApplied ? "Re-Apply" : "Apply Pack"}</span>
@@ -204,13 +211,13 @@ export function TemplateSelectionModal({
                   </div>
 
                   {/* Items included pill list */}
-                  <div className="pt-2 border-t border-[#161514]/10 flex flex-wrap gap-1.5">
+                  <div className="pt-2 border-t border-[#E8E5DF] dark:border-[#2A2724] flex flex-wrap gap-1.5">
                     {pack.items.map((item, idx) => (
                       <span
                         key={idx}
-                        className="bg-[#FAF8F5] text-[#161514] border border-[#161514] px-2 py-0.5 rounded-lg text-[9px] font-bold flex items-center gap-1 shadow-[1px_1px_0px_0px_#161514]"
+                        className="bg-[#FAF8F5] dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#2A2724] px-2 py-0.5 rounded-md text-[9px] font-medium flex items-center gap-1 shadow-xs"
                       >
-                        <Check className="size-2.5 text-emerald-600 stroke-[3]" />
+                        <Check className="size-2.5 text-emerald-600 dark:text-[#03D26F] stroke-[3]" />
                         <span>{item.title}</span>
                       </span>
                     ))}

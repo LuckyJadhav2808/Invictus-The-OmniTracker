@@ -118,22 +118,22 @@ export function EveningCloseoutDrawer({
       <SheetContent
         side="bottom"
         showCloseButton={false}
-        className="bg-white border-t border-[#E8E5DF] rounded-t-2xl shadow-xl max-h-[92vh] overflow-y-auto sm:max-w-2xl sm:mx-auto p-4 sm:p-6 text-[#161514] space-y-4"
+        className="bg-white dark:bg-[#161514] border-t border-[#E8E5DF] dark:border-[#2A2724] rounded-t-2xl shadow-xl max-h-[92vh] overflow-y-auto sm:max-w-2xl sm:mx-auto p-4 sm:p-6 text-[#161514] dark:text-[#FAF8F5] space-y-4"
       >
         {/* Drawer Drag Handle */}
-        <div className="w-10 h-1 bg-[#E8E5DF] rounded-full mx-auto -mt-1 sm:-mt-2 mb-2" />
+        <div className="w-10 h-1 bg-[#E8E5DF] dark:bg-[#2A2724] rounded-full mx-auto -mt-1 sm:-mt-2 mb-2" />
 
         {/* 1. Header Bar: Clean Header & Close Button */}
-        <div className="flex items-center justify-between gap-3 border-b border-[#E8E5DF] pb-3">
+        <div className="flex items-center justify-between gap-3 border-b border-[#E8E5DF] dark:border-[#2A2724] pb-3">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="size-8 rounded-lg bg-[#F1EFEA] flex items-center justify-center text-[#161514] shrink-0">
+            <div className="size-8 rounded-lg bg-[#F1EFEA] dark:bg-[#252220] flex items-center justify-center text-[#161514] dark:text-[#FAF8F5] shrink-0">
               <Award className="size-4 stroke-[1.5]" />
             </div>
             <div className="min-w-0">
-              <SheetTitle className="font-sans font-semibold text-base text-[#161514] tracking-tight">
-                Evening Review
+              <SheetTitle className="font-heading font-black text-base text-[#161514] dark:text-[#FAF8F5] tracking-tight">
+                Evening Review & Closeout
               </SheetTitle>
-              <p className="text-xs text-[#6B6B6B]">
+              <p className="text-xs text-[#6B6B6B] dark:text-[#FAF8F5]/60">
                 {isToday ? "Daily closeout & reflection" : `Review for ${selectedDate}`}
               </p>
             </div>
@@ -141,7 +141,7 @@ export function EveningCloseoutDrawer({
 
           <div className="flex items-center gap-2 shrink-0">
             {/* Overall Score Badge */}
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#DCFAE5] font-mono font-medium text-xs text-[#04250e] border border-[#03D26F]/30">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#DCFAE5] dark:bg-emerald-950/50 font-mono font-medium text-xs text-[#04250e] dark:text-emerald-300 border border-[#03D26F]/30">
               <Zap className="size-3 text-[#03D26F]" />
               <span className="tabular-nums font-semibold">{metrics.overallScore}%</span>
             </div>
@@ -150,7 +150,7 @@ export function EveningCloseoutDrawer({
             <button
               type="button"
               onClick={() => onOpenChange(false)}
-              className="bg-white hover:bg-[#F5F3EF] text-[#161514] p-1.5 rounded-lg border border-[#E8E5DF] active:translate-y-px transition-colors cursor-pointer"
+              className="bg-white dark:bg-[#252220] hover:bg-[#FAF8F5] dark:hover:bg-[#2e2a28] text-[#161514] dark:text-[#FAF8F5] p-1.5 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] active:translate-y-px transition-colors cursor-pointer"
               aria-label="Close evening review"
             >
               <X className="size-4 stroke-[1.5]" />
@@ -158,50 +158,58 @@ export function EveningCloseoutDrawer({
           </div>
         </div>
 
+        {/* First-Time User Context Banner */}
+        <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl p-3 border border-[#E8E5DF] dark:border-[#2A2724] flex items-start gap-2.5 text-xs text-[#161514]/80 dark:text-[#FAF8F5]/80">
+          <Moon className="size-4 text-purple-600 dark:text-purple-400 shrink-0 mt-0.5" />
+          <p className="leading-snug">
+            <strong>Day Closeout:</strong> Seals today&apos;s habits, study focus, and spending into your permanent streak history so you wake up tomorrow with zero cognitive clutter.
+          </p>
+        </div>
+
         {/* 2. Compact Review Summary */}
         <div className="grid grid-cols-3 gap-2 sm:gap-3">
           {/* Habits */}
-          <div className="bg-[#FBF9F5] border border-[#E8E5DF] rounded-lg p-2.5 sm:p-3 text-center space-y-0.5">
-            <div className="flex items-center justify-center gap-1 text-xs text-[#6B6B6B]">
+          <div className="bg-[#FBF9F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] rounded-xl p-2.5 sm:p-3 text-center space-y-0.5">
+            <div className="flex items-center justify-center gap-1 text-xs text-[#6B6B6B] dark:text-[#FAF8F5]/60">
               <CheckCircle2 className="size-3 text-[#03D26F]" />
               <span>Habits</span>
             </div>
-            <p className="text-xs sm:text-sm font-semibold text-[#161514]">
+            <p className="text-xs sm:text-sm font-semibold text-[#161514] dark:text-[#FAF8F5]">
               <span className="font-mono tabular-nums">{metrics.completedHabitsCount}/{metrics.totalHabitsCount}</span>
             </p>
           </div>
 
           {/* Study */}
-          <div className="bg-[#FBF9F5] border border-[#E8E5DF] rounded-lg p-2.5 sm:p-3 text-center space-y-0.5">
-            <div className="flex items-center justify-center gap-1 text-xs text-[#6B6B6B]">
-              <GraduationCap className="size-3 text-[#161514]" />
+          <div className="bg-[#FBF9F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] rounded-xl p-2.5 sm:p-3 text-center space-y-0.5">
+            <div className="flex items-center justify-center gap-1 text-xs text-[#6B6B6B] dark:text-[#FAF8F5]/60">
+              <GraduationCap className="size-3 text-[#161514] dark:text-[#FAF8F5]" />
               <span>Focus</span>
             </div>
-            <p className="text-xs sm:text-sm font-semibold text-[#161514]">
+            <p className="text-xs sm:text-sm font-semibold text-[#161514] dark:text-[#FAF8F5]">
               <span className="font-mono tabular-nums">{metrics.studyHoursFormatted}</span>
             </p>
           </div>
 
           {/* Spend */}
-          <div className="bg-[#FBF9F5] border border-[#E8E5DF] rounded-lg p-2.5 sm:p-3 text-center space-y-0.5">
-            <div className="flex items-center justify-center gap-1 text-xs text-[#6B6B6B]">
+          <div className="bg-[#FBF9F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] rounded-xl p-2.5 sm:p-3 text-center space-y-0.5">
+            <div className="flex items-center justify-center gap-1 text-xs text-[#6B6B6B] dark:text-[#FAF8F5]/60">
               <Wallet className="size-3 text-[#D97706]" />
               <span>Spent</span>
             </div>
-            <p className="text-xs sm:text-sm font-semibold text-[#161514]">
+            <p className="text-xs sm:text-sm font-semibold text-[#161514] dark:text-[#FAF8F5]">
               <span className="font-mono tabular-nums">{currencySymbol}{metrics.spentToday}</span>
             </p>
           </div>
         </div>
 
         {/* 3. Daily Energy & Mood */}
-        <div className="bg-white border border-[#E8E5DF] rounded-xl p-3.5 space-y-2">
+        <div className="bg-white dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] rounded-xl p-3.5 space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-[#161514]">
-              Daily Energy & Mood
+            <span className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5] uppercase tracking-wider">
+              Daily Energy & Mindset
             </span>
-            <span className="text-xs text-[#6B6B6B]">
-              How was your day?
+            <span className="text-xs text-[#6B6B6B] dark:text-[#FAF8F5]/60">
+              How did you feel today?
             </span>
           </div>
 
@@ -216,11 +224,11 @@ export function EveningCloseoutDrawer({
                   className={cn(
                     "min-h-[44px] flex flex-col items-center justify-center gap-1 py-1.5 px-1 rounded-lg border transition-colors cursor-pointer active:translate-y-px",
                     isSelected
-                      ? "bg-[#161514] text-white border-[#161514] font-medium"
-                      : "bg-[#FBF9F5] hover:bg-[#F5F3EF] text-[#6B6B6B] border-[#E8E5DF]"
+                      ? "bg-[#161514] dark:bg-white text-white dark:text-[#161514] border-[#161514] dark:border-white font-bold"
+                      : "bg-[#FBF9F5] dark:bg-[#252220] hover:bg-[#F5F3EF] dark:hover:bg-[#2e2a28] text-[#6B6B6B] dark:text-[#FAF8F5]/70 border-[#E8E5DF] dark:border-[#2A2724]"
                   )}
                 >
-                  <Icon className={cn("size-3.5 stroke-[1.5]", isSelected ? "text-white" : "text-[#6B6B6B]")} />
+                  <Icon className={cn("size-3.5 stroke-[1.5]", isSelected ? "text-white dark:text-[#161514]" : "text-[#6B6B6B] dark:text-[#FAF8F5]/70")} />
                   <span className="text-xs leading-none">{label}</span>
                 </button>
               );
@@ -229,13 +237,13 @@ export function EveningCloseoutDrawer({
         </div>
 
         {/* 4. Reflection Log */}
-        <div className="bg-white border border-[#E8E5DF] rounded-xl p-3.5 space-y-1.5">
+        <div className="bg-white dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] rounded-xl p-3.5 space-y-1.5">
           <div className="flex items-center justify-between">
-            <label htmlFor="evening-reflection" className="text-xs font-medium text-[#161514]">
+            <label htmlFor="evening-reflection" className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5] uppercase tracking-wider">
               Evening Reflection
             </label>
             {isSavingMood && (
-              <span className="text-xs font-mono text-[#047857]">
+              <span className="text-xs font-mono text-[#047857] dark:text-[#03D26F]">
                 Saved
               </span>
             )}
@@ -247,28 +255,28 @@ export function EveningCloseoutDrawer({
             onBlur={() => onSaveMood && onSaveMood()}
             placeholder="What went well today? What can improve tomorrow?"
             rows={3}
-            className="w-full bg-[#FBF9F5] border border-[#E8E5DF] focus:border-[#161514] rounded-lg p-2.5 text-xs text-[#161514] placeholder-[#6B6B6B]/60 font-normal resize-none focus:outline-none transition-colors"
+            className="w-full bg-[#FBF9F5] dark:bg-[#161514] border border-[#E8E5DF] dark:border-[#2A2724] focus:border-[#161514] dark:focus:border-white rounded-lg p-2.5 text-xs text-[#161514] dark:text-[#FAF8F5] placeholder-[#6B6B6B]/60 dark:placeholder-[#FAF8F5]/40 font-normal resize-none focus:outline-none transition-colors"
           />
         </div>
 
         {/* 5. Tomorrow Preview */}
         <div className="grid grid-cols-2 gap-2 text-xs">
-          <div className="bg-[#FBF9F5] border border-[#E8E5DF] rounded-lg p-2.5 flex items-center justify-between">
-            <div className="flex items-center gap-1.5 text-[#161514]">
-              <Calendar className="size-3.5 text-[#6B6B6B] stroke-[1.5]" />
+          <div className="bg-[#FBF9F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] rounded-lg p-2.5 flex items-center justify-between">
+            <div className="flex items-center gap-1.5 text-[#161514] dark:text-[#FAF8F5]">
+              <Calendar className="size-3.5 text-[#6B6B6B] dark:text-[#FAF8F5]/60 stroke-[1.5]" />
               <span className="font-medium text-xs">Tomorrow tasks</span>
             </div>
-            <span className="font-mono text-xs bg-white border border-[#E8E5DF] px-2 py-0.5 rounded tabular-nums">
+            <span className="font-mono text-xs bg-white dark:bg-[#252220] border border-[#E8E5DF] dark:border-[#2A2724] px-2 py-0.5 rounded tabular-nums text-[#161514] dark:text-[#FAF8F5]">
               {tomorrowPendingTasksCount} queued
             </span>
           </div>
 
-          <div className="bg-[#FBF9F5] border border-[#E8E5DF] rounded-lg p-2.5 flex items-center justify-between">
-            <div className="flex items-center gap-1.5 text-[#161514]">
-              <Wallet className="size-3.5 text-[#6B6B6B] stroke-[1.5]" />
+          <div className="bg-[#FBF9F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] rounded-lg p-2.5 flex items-center justify-between">
+            <div className="flex items-center gap-1.5 text-[#161514] dark:text-[#FAF8F5]">
+              <Wallet className="size-3.5 text-[#D97706] stroke-[1.5]" />
               <span className="font-medium text-xs">Tomorrow safe</span>
             </div>
-            <span className="font-mono text-xs bg-white border border-[#E8E5DF] px-2 py-0.5 rounded tabular-nums">
+            <span className="font-mono text-xs bg-white dark:bg-[#252220] border border-[#E8E5DF] dark:border-[#2A2724] px-2 py-0.5 rounded tabular-nums text-[#161514] dark:text-[#FAF8F5]">
               {currencySymbol}{tomorrowSafeToSpend ?? metrics.dailySafeToSpend}
             </span>
           </div>
@@ -277,16 +285,16 @@ export function EveningCloseoutDrawer({
         {/* 6. Primary Action: Seal Day */}
         <div className="pt-1">
           {sealStatus.isSealed ? (
-            <div className="p-3 bg-[#DCFAE5]/40 border border-[#03D26F]/30 rounded-xl flex items-center justify-between">
+            <div className="p-3 bg-[#DCFAE5]/40 dark:bg-emerald-950/30 border border-[#03D26F]/30 rounded-xl flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="size-7 rounded-lg bg-[#03D26F] text-white flex items-center justify-center">
+                <div className="size-7 rounded-lg bg-[#03D26F] text-[#161514] flex items-center justify-center font-bold">
                   <Lock className="size-3.5 stroke-[1.5]" />
                 </div>
                 <div>
-                  <p className="font-medium text-xs text-[#161514]">
+                  <p className="font-bold text-xs text-[#161514] dark:text-[#FAF8F5]">
                     Day review saved at {sealStatus.score}%
                   </p>
-                  <p className="text-xs font-mono text-[#6B6B6B]">
+                  <p className="text-xs font-mono text-[#6B6B6B] dark:text-[#FAF8F5]/60">
                     Recorded {sealStatus.sealedAt ? new Date(sealStatus.sealedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "today"}
                   </p>
                 </div>
@@ -294,7 +302,7 @@ export function EveningCloseoutDrawer({
               <button
                 type="button"
                 onClick={handleSealDay}
-                className="text-xs font-medium text-[#161514] underline hover:no-underline cursor-pointer"
+                className="text-xs font-bold text-[#161514] dark:text-[#FAF8F5] underline hover:no-underline cursor-pointer"
               >
                 Re-save
               </button>
@@ -303,10 +311,10 @@ export function EveningCloseoutDrawer({
             <button
               type="button"
               onClick={handleSealDay}
-              className="w-full min-h-[44px] bg-[#161514] hover:bg-[#252321] active:translate-y-px rounded-xl font-medium text-xs sm:text-sm text-white flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              className="w-full min-h-[44px] bg-[#161514] dark:bg-white hover:bg-[#252321] dark:hover:bg-neutral-100 active:translate-y-px rounded-xl font-bold text-xs sm:text-sm text-white dark:text-[#161514] flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-xs"
             >
               <Check className="size-4 stroke-[2]" />
-              <span>Save Day Review ({metrics.overallScore}%)</span>
+              <span>Seal & Save Day Review ({metrics.overallScore}%)</span>
             </button>
           )}
         </div>

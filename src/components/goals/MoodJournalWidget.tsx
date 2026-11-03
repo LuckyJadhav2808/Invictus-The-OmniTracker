@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Smile, Frown, Meh, Sun, Moon, Zap, PenTool, Sparkles, Check } from "lucide-react";
+import { Smile, Frown, Meh, Sun, Moon, Zap, PenTool, Sparkles, Check, SmilePlus } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useMoodLog, useSaveMoodLog } from "@/lib/queries/goals";
@@ -12,11 +12,11 @@ interface MoodJournalWidgetProps {
 }
 
 const MOODS = [
-  { id: "great", label: "Great", emoji: "😄", color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
-  { id: "good", label: "Good", emoji: "🙂", color: "bg-sky-50 text-sky-700 border-sky-200" },
-  { id: "okay", label: "Okay", emoji: "😐", color: "bg-amber-50 text-amber-700 border-amber-200" },
-  { id: "low", label: "Low", emoji: "😔", color: "bg-rose-50 text-rose-700 border-rose-200" },
-  { id: "tired", label: "Tired", emoji: "😴", color: "bg-purple-50 text-purple-700 border-purple-200" },
+  { id: "great", label: "Great", icon: SmilePlus, color: "text-emerald-700" },
+  { id: "good", label: "Good", icon: Smile, color: "text-sky-700" },
+  { id: "okay", label: "Okay", icon: Meh, color: "text-amber-700" },
+  { id: "low", label: "Low", icon: Frown, color: "text-rose-700" },
+  { id: "tired", label: "Tired", icon: Moon, color: "text-indigo-700" },
 ];
 
 export function MoodJournalWidget({ dateStr }: MoodJournalWidgetProps) {
@@ -56,46 +56,47 @@ export function MoodJournalWidget({ dateStr }: MoodJournalWidgetProps) {
         note: noteToSave,
       });
       setSavedSuccess(true);
-      toast.success("Mood & energy saved! 🌟");
+      toast.success("Mood & energy logged");
       setTimeout(() => setSavedSuccess(false), 2500);
     } catch {
-      toast.error("Failed to save mood & energy log");
+      toast.error("Failed to save mood log");
     }
   };
 
   return (
-    <div className="bg-white rounded-2xl sm:rounded-3xl p-5 md:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4 my-4">
+    <div className="bg-white dark:bg-[#1C1A18] rounded-xl p-5 border border-[#E8E5DF] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] space-y-4 my-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="h-10 w-10 rounded-xl bg-amber-300 border-2 border-[#161514] text-[#161514] flex items-center justify-center font-black shadow-[2px_2px_0px_0px_#161514]">
-            <Smile className="h-5 w-5 stroke-[2.5]" />
+          <div className="size-8 rounded-lg bg-[#F1EFEA] dark:bg-[#252321] flex items-center justify-center text-[#161514] dark:text-[#CEF431] shrink-0 border border-[#E8E5DF] dark:border-[#383531]">
+            <Smile className="size-4 stroke-[1.5]" />
           </div>
           <div>
-            <h4 className="text-sm font-heading font-black text-[#161514] tracking-tight">Daily Mood & Journal</h4>
-            <p className="text-[10px] text-[#161514]/80 font-bold">Log feelings & daily reflections</p>
+            <h4 className="text-[15px] font-sans font-semibold text-[#161514] dark:text-[#FAF8F5] tracking-tight">Daily mood & reflection</h4>
+            <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E]">Log mental state & energy levels</p>
           </div>
         </div>
 
         {savedSuccess ? (
-          <span className="text-[10px] font-heading font-black text-[#161514] bg-[#03D26F] border-2 border-[#161514] px-3 py-1 rounded-full flex items-center gap-1 shadow-[2px_2px_0px_0px_#161514] animate-in fade-in">
-            <Check className="h-3 w-3 stroke-[3]" /> Saved
+          <span className="text-xs font-mono font-medium text-[#04250e] dark:text-[#03D26F] bg-[#DCFAE5] dark:bg-[#03D26F]/20 border border-[#03D26F]/30 px-2.5 py-1 rounded-md flex items-center gap-1 animate-in fade-in">
+            <Check className="size-3 stroke-[2]" /> Saved
           </span>
         ) : (
           <button
             onClick={() => handleSave()}
-            className="text-[10px] font-heading font-black text-[#161514] bg-[#CEF431] hover:bg-[#D8F74E] px-3.5 py-1.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer transition-all uppercase tracking-wider"
+            className="text-xs font-medium text-[#161514] dark:text-[#FAF8F5] bg-white dark:bg-[#252321] hover:bg-[#F5F3EF] dark:hover:bg-[#2A2724] px-3 py-1.5 rounded-lg border border-[#E8E5DF] dark:border-[#383531] transition-colors cursor-pointer"
           >
-            Save Log
+            Save log
           </button>
         )}
       </div>
 
       {/* Mood Selector Buttons */}
       <div className="space-y-1.5">
-        <label className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514]/70">How are you feeling today?</label>
+        <label className="text-xs font-medium text-[#161514] dark:text-[#FAF8F5]">How are you feeling today?</label>
         <div className="grid grid-cols-5 gap-2">
           {MOODS.map((m) => {
             const isSelected = selectedMood === m.id;
+            const MoodIcon = m.icon;
             return (
               <button
                 key={m.id}
@@ -105,14 +106,14 @@ export function MoodJournalWidget({ dateStr }: MoodJournalWidgetProps) {
                   handleSave(m.id, energyLevel, journalNote);
                 }}
                 className={cn(
-                  "flex flex-col items-center justify-center p-2 rounded-xl border-2 border-[#161514] transition-all cursor-pointer select-none shadow-[2.5px_2.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
+                  "flex flex-col items-center justify-center p-2 rounded-lg border transition-colors cursor-pointer select-none min-h-[54px]",
                   isSelected
-                    ? "bg-[#CEF431] shadow-[3px_3px_0px_0px_#161514] scale-105"
-                    : "bg-white hover:bg-amber-100"
+                    ? "bg-[#F1EFEA] dark:bg-[#252321] border-[#161514] dark:border-[#CEF431] font-medium text-[#161514] dark:text-[#FAF8F5]"
+                    : "bg-white dark:bg-[#1C1A18] border-[#E8E5DF] dark:border-[#383531] text-[#6B6B6B] dark:text-[#A8A29E] hover:bg-[#FAF8F5] dark:hover:bg-[#2A2724] hover:text-[#161514] dark:hover:text-[#FAF8F5]"
                 )}
               >
-                <span className="text-xl mb-0.5">{m.emoji}</span>
-                <span className="text-[9px] font-heading font-black text-[#161514]">{m.label}</span>
+                <MoodIcon className={cn("size-4 stroke-[1.5] mb-1", isSelected ? "text-[#161514] dark:text-[#FAF8F5]" : m.color)} />
+                <span className="text-[11px]">{m.label}</span>
               </button>
             );
           })}
@@ -121,11 +122,11 @@ export function MoodJournalWidget({ dateStr }: MoodJournalWidgetProps) {
 
       {/* Energy Level Bar */}
       <div className="space-y-1.5 pt-1">
-        <div className="flex justify-between items-center text-[10px] font-heading font-black text-[#161514]/70">
-          <span className="flex items-center gap-1 uppercase tracking-wider">
-            <Zap className="h-3 w-3 text-amber-500 fill-amber-500" /> Energy Level
+        <div className="flex justify-between items-center text-xs font-medium text-[#161514] dark:text-[#FAF8F5]">
+          <span className="flex items-center gap-1">
+            <Zap className="size-3 text-amber-500 fill-amber-500" /> Energy level
           </span>
-          <span className="text-[#161514] font-black">{energyLevel} / 5</span>
+          <span className="font-mono text-xs tabular-nums text-[#6B6B6B] dark:text-[#A8A29E]">{energyLevel} / 5</span>
         </div>
         <div className="flex gap-1.5">
           {[1, 2, 3, 4, 5].map((level) => (
@@ -137,8 +138,8 @@ export function MoodJournalWidget({ dateStr }: MoodJournalWidgetProps) {
                 handleSave(selectedMood, level, journalNote);
               }}
               className={cn(
-                "h-3 flex-1 rounded-full transition-all cursor-pointer border border-[#161514]",
-                level <= energyLevel ? "bg-[#03D26F] shadow-[1px_1px_0px_0px_#161514]" : "bg-gray-100"
+                "h-2 flex-1 rounded-full transition-colors cursor-pointer",
+                level <= energyLevel ? "bg-[#03D26F]" : "bg-[#E8E5DF] dark:bg-[#383531]"
               )}
             />
           ))}
@@ -147,16 +148,16 @@ export function MoodJournalWidget({ dateStr }: MoodJournalWidgetProps) {
 
       {/* Journal Reflection Note */}
       <div className="space-y-1 pt-1">
-        <label className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514]/70 flex items-center gap-1">
-          <PenTool className="h-3 w-3" /> Quick Journal Note
+        <label className="text-xs font-medium text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1">
+          <PenTool className="size-3 stroke-[1.5]" /> Reflection note
         </label>
         <input
           type="text"
           value={journalNote}
           onChange={(e) => setJournalNote(e.target.value)}
           onBlur={(e) => handleSave(selectedMood, energyLevel, e.target.value)}
-          placeholder="What went well today? Any thoughts..."
-          className="neo-input w-full text-xs font-medium"
+          placeholder="What went well today? Any reflections..."
+          className="w-full bg-white dark:bg-[#252321] rounded-lg p-2.5 border border-[#E8E5DF] dark:border-[#383531] text-xs font-medium text-[#161514] dark:text-[#FAF8F5] focus:border-[#161514] dark:focus:border-[#CEF431] outline-none placeholder:text-[#6B6B6B]/60 dark:placeholder:text-[#A8A29E]/60 transition-colors"
         />
       </div>
     </div>

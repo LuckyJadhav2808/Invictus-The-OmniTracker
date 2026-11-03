@@ -149,10 +149,10 @@ export function CategoryFormModal({
                 setType(t);
               }}
               className={cn(
-                "flex-1 py-2 rounded-xl border-2 border-[#161514] text-xs font-black transition-all uppercase tracking-wider cursor-pointer shadow-[2px_2px_0px_0px_#161514]",
+                "flex-1 py-2 rounded-xl border text-xs font-black transition-all uppercase tracking-wider cursor-pointer shadow-xs active:translate-y-0.5",
                 type === t
-                  ? "bg-[#161514] text-white"
-                  : "bg-white text-[#161514]/70 hover:bg-[#FAF8F5]"
+                  ? "bg-[#161514] dark:bg-[#FAF8F5] text-white dark:text-[#161514] border-[#161514] dark:border-[#FAF8F5]"
+                  : "bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] border-[#E8E5DF] dark:border-[#2A2724] hover:bg-[#FAF8F5] dark:hover:bg-[#252321]"
               )}
             >
               {t === "expense" ? "Expense Envelope" : "Income Source"}
@@ -162,7 +162,7 @@ export function CategoryFormModal({
 
         {/* Category Name */}
         <div className="space-y-1">
-          <label htmlFor="cat-name" className="text-[10px] font-black uppercase tracking-wider text-[#161514]">
+          <label htmlFor="cat-name" className="text-[10px] font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5]">
             Category Name *
           </label>
           <input
@@ -172,14 +172,14 @@ export function CategoryFormModal({
             onChange={(e) => setName(e.target.value)}
             placeholder="e.g. Groceries, Entertainment, Rent..."
             required
-            className="w-full neo-input text-xs sm:text-sm font-bold"
+            className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-3.5 py-2.5 text-base font-bold text-[#161514] dark:text-[#FAF8F5] shadow-xs focus:outline-none focus:border-[#161514] dark:focus:border-white"
           />
         </div>
 
         {/* Monthly Budget Cap */}
         {type === "expense" && (
           <div className="space-y-1">
-            <label htmlFor="cat-budget" className="text-[10px] font-black uppercase tracking-wider text-[#161514]">
+            <label htmlFor="cat-budget" className="text-[10px] font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5]">
               Monthly Allocation Cap ({currencySymbol})
             </label>
             <input
@@ -189,17 +189,17 @@ export function CategoryFormModal({
               value={monthlyBudget}
               onChange={(e) => setMonthlyBudget(e.target.value)}
               placeholder="0 (no limit)"
-              className="w-full neo-input text-xs sm:text-sm font-bold"
+              className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-3.5 py-2.5 text-base font-bold text-[#161514] dark:text-[#FAF8F5] shadow-xs focus:outline-none focus:border-[#161514] dark:focus:border-white"
             />
           </div>
         )}
 
         {/* Icon Picker Grid */}
         <div className="space-y-1.5">
-          <label className="text-[10px] font-black uppercase tracking-wider text-[#161514]">
+          <label className="text-[10px] font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5]">
             Select Icon
           </label>
-          <div className="grid grid-cols-6 sm:grid-cols-8 gap-1.5 bg-[#FAF8F5] p-2.5 rounded-xl border-2 border-[#161514]">
+          <div className="grid grid-cols-6 sm:grid-cols-8 gap-1.5 bg-[#FAF8F5] dark:bg-[#1C1A18] p-2.5 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs">
             {PRESET_ICONS.map((presetIcon) => (
               <button
                 key={presetIcon}
@@ -211,12 +211,12 @@ export function CategoryFormModal({
                 className={cn(
                   "p-2 rounded-xl flex items-center justify-center transition-all cursor-pointer border",
                   icon === presetIcon
-                    ? "bg-[#CEF431] border-[#161514] scale-105 shadow-[1.5px_1.5px_0px_0px_#161514]"
-                    : "bg-white border-transparent hover:bg-white hover:border-[#161514]/40"
+                    ? "bg-[#CEF431] border-[#161514] dark:border-[#CEF431] scale-105 shadow-xs"
+                    : "bg-white dark:bg-[#252321] border-transparent hover:border-[#E8E5DF] dark:hover:border-[#2A2724]"
                 )}
                 title={presetIcon}
               >
-                <CategoryIcon name={presetIcon} className="size-4 text-[#161514]" />
+                <CategoryIcon name={presetIcon} className="size-4 text-[#161514] dark:text-[#FAF8F5]" />
               </button>
             ))}
           </div>
@@ -224,7 +224,7 @@ export function CategoryFormModal({
 
         {/* Color Palette Picker */}
         <div className="space-y-1.5">
-          <label className="text-[10px] font-black uppercase tracking-wider text-[#161514]">
+          <label className="text-[10px] font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5]">
             Theme Color
           </label>
           <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
@@ -237,9 +237,9 @@ export function CategoryFormModal({
                   setColor(c.value);
                 }}
                 className={cn(
-                  "w-7 h-7 rounded-full border-2 border-[#161514] shrink-0 transition-all cursor-pointer shadow-[1px_1px_0px_0px_#161514]",
+                  "w-7 h-7 rounded-full border border-[#161514] dark:border-white/20 shrink-0 transition-all cursor-pointer shadow-xs",
                   c.bg,
-                  color === c.value && "scale-110 ring-2 ring-[#161514]"
+                  color === c.value && "scale-110 ring-2 ring-[#161514] dark:ring-white"
                 )}
                 title={c.label}
               />
@@ -254,7 +254,7 @@ export function CategoryFormModal({
               type="button"
               disabled={isDeleting}
               onClick={handleDelete}
-              className="p-3 rounded-xl bg-rose-100 hover:bg-rose-200 text-rose-700 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
+              className="p-3 rounded-xl bg-rose-100 dark:bg-rose-950/40 hover:bg-rose-200 dark:hover:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-800/50 shadow-xs active:translate-y-0.5 transition-all cursor-pointer"
               title="Delete Category"
             >
               <Trash2 className="size-4" />
@@ -264,9 +264,9 @@ export function CategoryFormModal({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="flex-1 bg-[#CEF431] hover:bg-[#bde422] text-[#161514] font-black text-xs uppercase tracking-wider rounded-xl py-3 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all disabled:opacity-50"
+            className="flex-1 bg-[#CEF431] hover:bg-[#bde422] text-[#161514] font-black text-xs uppercase tracking-wider rounded-xl py-3 border border-[#161514] shadow-xs active:translate-y-0.5 cursor-pointer transition-all disabled:opacity-50"
           >
-            {isSubmitting ? "Saving…" : isEditing ? "Save Envelope" : "Create Envelope ✨"}
+            {isSubmitting ? "Saving…" : isEditing ? "Save Envelope" : "Create Envelope"}
           </button>
         </div>
       </form>

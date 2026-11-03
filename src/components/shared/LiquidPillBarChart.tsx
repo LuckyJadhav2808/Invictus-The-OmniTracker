@@ -72,23 +72,23 @@ export function LiquidPillBarChart({
   return (
     <div
       className={cn(
-        "bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] sm:shadow-[5px_5px_0px_0px_#161514] text-[#161514] transition-all duration-300 space-y-5",
+        "bg-white dark:bg-[#1C1A18] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border-[2.5px] border-[#161514] dark:border-[#383531] shadow-[4px_4px_0px_0px_#161514] sm:shadow-[5px_5px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#000000] text-[#161514] dark:text-[#FAF8F5] transition-all duration-300 space-y-5",
         className
       )}
     >
       {/* 1. Executive Header Row */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b-2 border-[#161514]/15">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b-2 border-[#161514]/15 dark:border-[#383531]">
         <div className="space-y-1">
           <div className="flex items-center gap-2 flex-wrap">
             {/* Active Streak Badge */}
-            <span className="bg-amber-300 text-[#161514] text-[10px] font-heading font-black px-2.5 py-1 rounded-full border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] uppercase flex items-center gap-1">
+            <span className="bg-amber-300 text-[#161514] text-[10px] font-heading font-black px-2.5 py-1 rounded-full border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] uppercase flex items-center gap-1">
               <Flame className="h-3.5 w-3.5 text-rose-600 fill-rose-600" />
               {streakDays}-Day Active Streak
             </span>
 
             {/* Streak Freeze Token Badge */}
             <span
-              className="bg-sky-200 text-sky-950 text-[10px] font-heading font-black px-2.5 py-1 rounded-full border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] uppercase flex items-center gap-1"
+              className="bg-sky-200 text-sky-950 text-[10px] font-heading font-black px-2.5 py-1 rounded-full border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] uppercase flex items-center gap-1"
               title="Duolingo-Style Streak Freeze Protection Tokens Available"
             >
               <span>🛡️</span>
@@ -96,14 +96,14 @@ export function LiquidPillBarChart({
             </span>
 
             {/* Verified Tracking Badge */}
-            <span className="bg-[#CEF431] text-[#161514] text-[10px] font-heading font-black px-2.5 py-1 rounded-full border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] uppercase flex items-center gap-1">
+            <span className="bg-[#CEF431] text-[#161514] text-[10px] font-heading font-black px-2.5 py-1 rounded-full border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] uppercase flex items-center gap-1">
               <ShieldCheck className="h-3.5 w-3.5 text-emerald-700" />
               Active Tracking
             </span>
           </div>
 
           <h2
-            className="text-xl sm:text-2xl font-black tracking-tight text-[#161514] pt-1 uppercase"
+            className="text-xl sm:text-2xl font-black tracking-tight text-[#161514] dark:text-[#FAF8F5] pt-1 uppercase"
             style={{ fontFamily: "var(--font-heading)" }}
           >
             {title}
@@ -114,7 +114,7 @@ export function LiquidPillBarChart({
         <button
           type="button"
           onClick={handleCalendarClick}
-          className="h-10 px-3.5 rounded-xl bg-[#FAF8F5] hover:bg-[#CEF431] border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex items-center gap-1.5 font-heading font-black text-xs cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all self-start sm:self-auto"
+          className="h-10 px-3.5 rounded-xl bg-[#FAF8F5] dark:bg-[#252321] hover:bg-[#CEF431] dark:hover:bg-[#CEF431] text-[#161514] dark:text-[#FAF8F5] dark:hover:text-[#161514] border-2 border-[#161514] dark:border-[#383531] shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] flex items-center gap-1.5 font-heading font-black text-xs cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all self-start sm:self-auto"
           title="Filter Active Date Range"
         >
           <Calendar className="h-4 w-4 stroke-[2.5]" />
@@ -125,21 +125,21 @@ export function LiquidPillBarChart({
       {/* 2. 3 Core Metric Pillar Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {/* Pillar 1: Habit Consistency */}
-        <div className="bg-[#FAF8F5] rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-2">
+        <div className="bg-[#FAF8F5] dark:bg-[#252321] rounded-2xl p-4 border-2 border-[#161514] dark:border-[#383531] shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-heading font-black uppercase text-[#161514]/70 flex items-center gap-1">
+            <span className="text-[10px] font-heading font-black uppercase text-[#161514]/70 dark:text-[#FAF8F5]/70 flex items-center gap-1">
               <Target className="h-3.5 w-3.5 text-emerald-600" /> Habit Consistency
             </span>
-            <span className="text-xs font-heading font-black text-emerald-700 bg-[#03D26F]/25 px-2 py-0.5 rounded-lg border border-[#161514]">
+            <span className="text-xs font-heading font-black text-emerald-700 dark:text-[#03D26F] bg-[#03D26F]/25 px-2 py-0.5 rounded-lg border border-[#161514] dark:border-[#383531]">
               {avgCompletionPct}%
             </span>
           </div>
           <div className="flex items-baseline justify-between">
-            <span className="font-heading text-xl font-black text-[#161514]">{completedHabitsStr} Habits</span>
-            <span className="text-[10px] font-bold text-[#161514]/60">Completed</span>
+            <span className="font-heading text-xl font-black text-[#161514] dark:text-[#FAF8F5]">{completedHabitsStr} Habits</span>
+            <span className="text-[10px] font-bold text-[#161514]/60 dark:text-[#FAF8F5]/60">Completed</span>
           </div>
           {/* Progress Bar */}
-          <div className="w-full h-2.5 bg-white rounded-full border border-[#161514] p-0.5 overflow-hidden">
+          <div className="w-full h-2.5 bg-white dark:bg-[#1C1A18] rounded-full border border-[#161514] dark:border-[#383531] p-0.5 overflow-hidden">
             <div
               className="h-full bg-[#03D26F] rounded-full transition-all duration-500"
               style={{ width: `${Math.max(5, avgCompletionPct)}%` }}
@@ -148,21 +148,21 @@ export function LiquidPillBarChart({
         </div>
 
         {/* Pillar 2: Study Target Flow */}
-        <div className="bg-[#FAF8F5] rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-2">
+        <div className="bg-[#FAF8F5] dark:bg-[#252321] rounded-2xl p-4 border-2 border-[#161514] dark:border-[#383531] shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-heading font-black uppercase text-[#161514]/70 flex items-center gap-1">
+            <span className="text-[10px] font-heading font-black uppercase text-[#161514]/70 dark:text-[#FAF8F5]/70 flex items-center gap-1">
               <BookOpen className="h-3.5 w-3.5 text-blue-600" /> Study Time
             </span>
-            <span className="text-xs font-heading font-black text-blue-700 bg-blue-100 px-2 py-0.5 rounded-lg border border-[#161514]">
+            <span className="text-xs font-heading font-black text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-950/60 px-2 py-0.5 rounded-lg border border-[#161514] dark:border-[#383531]">
               {studyHours}h
             </span>
           </div>
           <div className="flex items-baseline justify-between">
-            <span className="font-heading text-xl font-black text-[#161514]">{studyHours} Hours</span>
-            <span className="text-[10px] font-bold text-[#161514]/60">Logged</span>
+            <span className="font-heading text-xl font-black text-[#161514] dark:text-[#FAF8F5]">{studyHours} Hours</span>
+            <span className="text-[10px] font-bold text-[#161514]/60 dark:text-[#FAF8F5]/60">Logged</span>
           </div>
           {/* Progress Bar */}
-          <div className="w-full h-2.5 bg-white rounded-full border border-[#161514] p-0.5 overflow-hidden">
+          <div className="w-full h-2.5 bg-white dark:bg-[#1C1A18] rounded-full border border-[#161514] dark:border-[#383531] p-0.5 overflow-hidden">
             <div
               className="h-full bg-[#38BDF8] rounded-full transition-all duration-500"
               style={{ width: `${Math.min(100, Math.max(10, parseFloat(studyHours) * 10))}%` }}
@@ -171,29 +171,29 @@ export function LiquidPillBarChart({
         </div>
 
         {/* Pillar 3: Financial Health Status */}
-        <div className="bg-[#FAF8F5] rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-2">
+        <div className="bg-[#FAF8F5] dark:bg-[#252321] rounded-2xl p-4 border-2 border-[#161514] dark:border-[#383531] shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-heading font-black uppercase text-[#161514]/70 flex items-center gap-1">
+            <span className="text-[10px] font-heading font-black uppercase text-[#161514]/70 dark:text-[#FAF8F5]/70 flex items-center gap-1">
               <DollarSign className="h-3.5 w-3.5 text-amber-600" /> Budget Pacing
             </span>
-            <span className="text-xs font-heading font-black text-amber-900 bg-amber-200 px-2 py-0.5 rounded-lg border border-[#161514]">
+            <span className="text-xs font-heading font-black text-amber-900 dark:text-amber-300 bg-amber-200 dark:bg-amber-950/60 px-2 py-0.5 rounded-lg border border-[#161514] dark:border-[#383531]">
               On Track 🟢
             </span>
           </div>
           <div className="flex items-baseline justify-between">
-            <span className="font-heading text-xl font-black text-[#161514]">Healthy</span>
-            <span className="text-[10px] font-bold text-[#161514]/60">Pacing</span>
+            <span className="font-heading text-xl font-black text-[#161514] dark:text-[#FAF8F5]">Healthy</span>
+            <span className="text-[10px] font-bold text-[#161514]/60 dark:text-[#FAF8F5]/60">Pacing</span>
           </div>
           {/* Progress Bar */}
-          <div className="w-full h-2.5 bg-white rounded-full border border-[#161514] p-0.5 overflow-hidden">
+          <div className="w-full h-2.5 bg-white dark:bg-[#1C1A18] rounded-full border border-[#161514] dark:border-[#383531] p-0.5 overflow-hidden">
             <div className="h-full bg-[#CEF431] rounded-full w-[78%] transition-all duration-500" />
           </div>
         </div>
       </div>
 
       {/* 3. 7-Day Milestone Circle Badges Strip */}
-      <div className="bg-[#FAF8F5] rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-2.5">
-        <span className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514]/70 flex items-center gap-1.5">
+      <div className="bg-[#FAF8F5] dark:bg-[#252321] rounded-2xl p-4 border-2 border-[#161514] dark:border-[#383531] shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] space-y-2.5">
+        <span className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514]/70 dark:text-[#FAF8F5]/70 flex items-center gap-1.5">
           <Zap className="h-3.5 w-3.5 text-amber-500 fill-amber-500" /> 7-Day Summary
         </span>
 
@@ -208,14 +208,14 @@ export function LiquidPillBarChart({
                 {/* Milestone Badge Node */}
                 <div
                   className={cn(
-                    "h-10 w-10 sm:h-12 sm:w-12 rounded-2xl border-2 border-[#161514] flex items-center justify-center font-heading font-black text-xs sm:text-sm transition-all select-none",
+                    "h-10 w-10 sm:h-12 sm:w-12 rounded-2xl border-2 border-[#161514] dark:border-[#383531] flex items-center justify-center font-heading font-black text-xs sm:text-sm transition-all select-none",
                     isToday
-                      ? "bg-[#CEF431] text-[#161514] shadow-[3px_3px_0px_0px_#161514] scale-105"
+                      ? "bg-[#CEF431] text-[#161514] shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] scale-105"
                       : isCompleted
-                      ? "bg-[#03D26F] text-white shadow-[2px_2px_0px_0px_#161514]"
+                      ? "bg-[#03D26F] text-white shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]"
                       : isFrozen
-                      ? "bg-sky-400 text-[#161514] shadow-[2px_2px_0px_0px_#161514]"
-                      : "bg-white text-[#161514]/40"
+                      ? "bg-sky-400 text-[#161514] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]"
+                      : "bg-white dark:bg-[#1C1A18] text-[#161514]/40 dark:text-[#FAF8F5]/40"
                   )}
                   title={isFrozen ? `Protected by Streak Freeze 🧊` : `${day.label}: ${day.value || `${Math.round(day.percentage)}%`}`}
                 >
@@ -226,14 +226,14 @@ export function LiquidPillBarChart({
                   ) : isToday ? (
                     <span className="text-xs sm:text-sm">👑</span>
                   ) : (
-                    <span className="text-xs text-[#161514]/30">•</span>
+                    <span className="text-xs text-[#161514]/30 dark:text-[#FAF8F5]/30">•</span>
                   )}
                 </div>
 
                 {/* Day Label */}
                 <span className={cn(
                   "text-[10px] font-heading font-black uppercase tracking-tight block",
-                  isToday ? "text-[#161514] underline font-black" : "text-[#161514]/70"
+                  isToday ? "text-[#161514] dark:text-[#CEF431] underline font-black" : "text-[#161514]/70 dark:text-[#FAF8F5]/70"
                 )}>
                   {day.label}
                 </span>

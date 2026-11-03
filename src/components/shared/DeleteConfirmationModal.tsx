@@ -29,26 +29,23 @@ export function DeleteConfirmationModal({
       title={title}
       description={description}
     >
-      <div className="space-y-4 pt-2">
+      <div className="space-y-4 pt-1">
         {/* Warning Badge Card */}
-        <div className="p-3.5 rounded-2xl bg-rose-50 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center gap-3">
-          <div className="size-10 rounded-xl bg-rose-200 border-2 border-[#161514] flex items-center justify-center shrink-0 shadow-[1.5px_1.5px_0px_0px_#161514]">
-            <AlertTriangle className="size-5 text-rose-800 stroke-[2.5]" />
+        <div className="p-3 rounded-xl bg-rose-50/60 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/40 flex items-center gap-3">
+          <div className="size-9 rounded-lg bg-rose-100 dark:bg-rose-900/30 border border-rose-200 dark:border-rose-800/40 flex items-center justify-center shrink-0">
+            <AlertTriangle className="size-4 text-rose-600 dark:text-rose-400 stroke-[1.75]" />
           </div>
           <div>
-            <h4
-              className="text-xs font-heading font-black text-rose-950 uppercase tracking-wider"
-              style={{ fontFamily: "var(--font-heading)" }}
-            >
+            <h4 className="text-xs font-semibold text-rose-950 dark:text-rose-200">
               Cautionary Action
             </h4>
-            <p className="text-[11px] font-bold text-rose-900/80 mt-0.5 leading-snug">
-              This goal will be archived and removed from your active routines.
+            <p className="text-[11px] text-rose-800/80 dark:text-rose-300/80 mt-0.5 leading-snug">
+              This item will be archived and removed from your active views.
             </p>
           </div>
         </div>
 
-        {/* 44px WCAG AA Compliant Ergonomic Action Buttons */}
+        {/* Ergonomic Action Buttons */}
         <div className="flex gap-2.5 pt-1">
           <button
             type="button"
@@ -56,7 +53,7 @@ export function DeleteConfirmationModal({
               soundFX.playPop();
               onOpenChange(false);
             }}
-            className="flex-1 min-h-[46px] bg-white text-[#161514] border-2 border-[#161514] rounded-xl font-heading font-black text-xs uppercase tracking-wider shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-slate-50 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer transition-all flex items-center justify-center"
+            className="flex-1 min-h-[42px] bg-white dark:bg-[#161514] hover:bg-[#F1EFEA] dark:hover:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#2A2724] rounded-lg font-medium text-xs shadow-xs transition-colors cursor-pointer flex items-center justify-center"
           >
             Cancel
           </button>
@@ -67,7 +64,7 @@ export function DeleteConfirmationModal({
               onConfirm();
               onOpenChange(false);
             }}
-            className="flex-1 min-h-[46px] bg-[#FF4343] hover:bg-[#e03838] text-white border-2 border-[#161514] rounded-xl font-heading font-black text-xs uppercase tracking-wider shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer transition-all flex items-center justify-center"
+            className="flex-1 min-h-[42px] bg-rose-600 hover:bg-rose-700 dark:bg-rose-600 dark:hover:bg-rose-500 text-white rounded-lg font-medium text-xs shadow-xs transition-colors cursor-pointer flex items-center justify-center"
           >
             {confirmLabel}
           </button>

@@ -1,37 +1,37 @@
 "use client";
 
 import React from "react";
-import { Utensils, Flame, Sparkles, Apple } from "lucide-react";
+import { Utensils, Apple } from "lucide-react";
 import { MealTracker } from "@/components/goals/MealTracker";
 
 export default function NutritionPage() {
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      {/* 1. Dedicated Macro Forge Hero Header */}
-      <div className="bg-white border-2 border-[#161514] rounded-2xl p-4 sm:p-6 shadow-[4px_4px_0px_0px_#161514] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* 1. Harmonized Macro & Fuel Header */}
+      <div className="bg-white dark:bg-[#161514] border border-[#E8E5DF] dark:border-[#2A2724] rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="bg-[#CEF431] text-[#161514] text-[10px] font-mono font-black px-2 py-0.5 rounded-full border border-[#161514] uppercase">
-              The Macro Forge
+            <span className="bg-[#03D26F]/15 text-[#047857] dark:text-[#03D26F] text-[10px] font-mono font-semibold px-2.5 py-0.5 rounded-full border border-[#03D26F]/30">
+              Nutrition & Fuel
             </span>
-            <span className="text-[10px] font-mono font-bold text-[#161514]/70">
-              NUTRITION & METABOLIC OS
+            <span className="text-[10px] font-mono text-[#6E6B65] dark:text-[#9E9A90]">
+              Macro & Caloric Balance
             </span>
           </div>
 
-          <h1 className="text-xl sm:text-2xl font-heading font-black text-[#161514] tracking-tight flex items-center gap-2">
-            <Utensils className="size-6 text-[#161514] stroke-[2.5]" />
+          <h1 className="text-xl sm:text-2xl font-heading font-bold text-[#161514] dark:text-white tracking-tight flex items-center gap-2.5">
+            <Utensils className="size-5 text-[#161514] dark:text-white stroke-[2]" />
             <span>Diet, Calories & Macro Discipline</span>
           </h1>
 
-          <p className="text-xs font-medium text-[#161514]/70 max-w-xl">
-            Track daily calories, hit your protein goals, and log meals across 1,000+ curated dishes.
+          <p className="text-xs font-normal text-[#6E6B65] dark:text-[#9E9A90] max-w-xl">
+            Track daily calories, hit target protein ratios, and log meals across curated dishes or custom foods.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#FAF8F5] border-2 border-[#161514] shadow-[2px_2px_0px_#161514] shrink-0 font-mono text-xs font-black text-[#161514]">
-          <Apple className="size-4 text-emerald-600" />
-          <span>FUEL THE WARRIOR</span>
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] shrink-0 font-mono text-xs font-medium text-[#161514] dark:text-white shadow-xs">
+          <Apple className="size-3.5 text-emerald-600 dark:text-[#03D26F]" />
+          <span>Daily Macro Discipline</span>
         </div>
       </div>
 

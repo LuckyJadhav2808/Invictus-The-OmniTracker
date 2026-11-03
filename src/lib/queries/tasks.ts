@@ -122,7 +122,7 @@ export function useCreateTask() {
       const userId = getActiveUserId(user);
       queryClient.setQueryData<TaskItem[]>(["tasks", userId], (old = []) => [task, ...old]);
       queryClient.setQueryData<TaskItem[]>(["tasks"], (old = []) => [task, ...old]);
-      toast.success("Task Created! 📋⚡", { description: `"${task.title}" added to your task space.` });
+      toast.success("Task Created", { description: `"${task.title}" added to #${task.projectTag || "Dev"}.` });
     },
   });
 }
@@ -175,7 +175,11 @@ export function useUpdateTask() {
       queryClient.setQueryData<TaskItem[]>(["tasks"], (old = []) =>
         old.map((t) => (t.id === updatedTask.id ? updatedTask : t))
       );
-      toast.success("Task Updated! ✏️", { description: `"${updatedTask.title}" updated successfully.` });
+      if (updatedTask.status === "completed") {
+        toast.success("Task Completed", { description: `"${updatedTask.title}" marked as done!` });
+      } else {
+        toast.success("Task Updated", { description: `"${updatedTask.title}" updated successfully.` });
+      }
     },
   });
 }
@@ -189,6 +193,7 @@ export function useDeleteTask() {
     mutationFn: async (taskId: string) => {
       const userId = getActiveUserId(user);
       const existing = getLocalTasks();
+      const taskToDelete = existing.find((t) => t.id === taskId);
       const filtered = existing.filter((t) => t.id !== taskId);
       saveLocalTasks(filtered);
 
@@ -202,9 +207,9 @@ export function useDeleteTask() {
         }
       }
 
-      return taskId;
+      return { taskId, task: taskToDelete };
     },
-    onSuccess: (taskId) => {
+    onSuccess: ({ taskId, task }) => {
       const userId = getActiveUserId(user);
       queryClient.setQueryData<TaskItem[]>(["tasks", userId], (old = []) =>
         old.filter((t) => t.id !== taskId)
@@ -212,7 +217,35 @@ export function useDeleteTask() {
       queryClient.setQueryData<TaskItem[]>(["tasks"], (old = []) =>
         old.filter((t) => t.id !== taskId)
       );
-      toast.info("Task Deleted 🗑️");
+      toast("Task Deleted", {
+        description: task ? `"${task.title}" removed from workflow.` : "Item removed from workflow.",
+        action: task
+          ? {
+              label: "Undo",
+              onClick: async () => {
+                const current = getLocalTasks();
+                const restored = [task, ...current];
+                saveLocalTasks(restored);
+                queryClient.setQueryData<TaskItem[]>(["tasks", userId], (old = []) => [task, ...old]);
+                queryClient.setQueryData<TaskItem[]>(["tasks"], (old = []) => [task, ...old]);
+                if (!isGuestMode(user)) {
+                  try {
+                    await fetch("/api/tasks", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify(task),
+                    });
+                  } catch (e) {
+                    console.warn("Undo sync warning:", e);
+                  }
+                }
+                toast.success("Task Restored", {
+                  description: `"${task.title}" restored to active workflow.`,
+                });
+              },
+            }
+          : undefined,
+      });
     },
   });
 }

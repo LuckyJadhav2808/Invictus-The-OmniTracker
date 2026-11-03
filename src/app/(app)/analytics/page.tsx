@@ -18,9 +18,9 @@ import { useAuth } from "@/components/shared/AuthProvider";
 function NeobrutalistTooltip({ active, payload, label, unit = "" }: any) {
   if (!active || !payload || !payload.length) return null;
   return (
-    <div className="bg-[#FAF8F5] border-2 border-[#161514] rounded-xl p-2.5 shadow-[3px_3px_0px_#161514] text-xs font-heading space-y-1.5 z-40 select-none min-w-[120px]">
+    <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#383531] rounded-xl p-2.5 shadow-[3px_3px_0px_#161514] dark:shadow-[3px_3px_0px_#000000] text-xs font-heading space-y-1.5 z-40 select-none min-w-[120px]">
       {label && (
-        <p className="font-heading font-black text-[#161514] text-[11px] uppercase tracking-wider border-b-2 border-[#161514]/15 pb-1">
+        <p className="font-heading font-black text-[#161514] dark:text-[#FAF8F5] text-[11px] uppercase tracking-wider border-b-2 border-[#161514]/15 dark:border-[#FAF8F5]/15 pb-1">
           {label}
         </p>
       )}
@@ -29,11 +29,11 @@ function NeobrutalistTooltip({ active, payload, label, unit = "" }: any) {
           const color = item.color || item.fill || item.stroke || "#161514";
           return (
             <div key={idx} className="flex items-center justify-between gap-3 text-[11px] font-bold">
-              <span className="flex items-center gap-1.5 text-[#161514]">
-                <span className="size-2 rounded-full border border-[#161514] shrink-0" style={{ backgroundColor: color }} />
+              <span className="flex items-center gap-1.5 text-[#161514] dark:text-[#FAF8F5]">
+                <span className="size-2 rounded-full border border-[#161514] dark:border-[#383531] shrink-0" style={{ backgroundColor: color }} />
                 <span>{item.name}:</span>
               </span>
-              <span className="font-mono font-black text-[#161514]">
+              <span className="font-mono font-black text-[#161514] dark:text-[#FAF8F5]">
                 {item.value}
                 {unit}
               </span>
@@ -166,42 +166,42 @@ export default function AnalyticsHubPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-cream-bg p-4 md:p-8 space-y-6">
+    <div className="min-h-screen bg-cream-bg dark:bg-[#121110] p-4 md:p-8 space-y-6">
       <div className="max-w-5xl mx-auto space-y-6">
         {/* Clean Neobrutalist Analytics Header Card */}
-        <div className="neo-card p-5 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="neo-card p-5 bg-white dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#383531] shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#000000] rounded-3xl flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-heading font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border-2 border-[#161514] bg-[#7DD3FC] text-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center gap-1">
+              <span className="text-[10px] font-heading font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border-2 border-[#161514] dark:border-[#383531] bg-[#7DD3FC] dark:bg-[#0284C7] text-[#161514] dark:text-white shadow-[1.5px_1.5px_0px_0px_#161514] dark:shadow-[1.5px_1.5px_0px_0px_#000000] flex items-center gap-1">
                 <BarChart2 className="size-3 stroke-[2.5]" />
                 <span>Analytics & Insights</span>
               </span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-heading font-black text-[#161514] tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-heading font-black text-[#161514] dark:text-[#FAF8F5] tracking-tight">
               Life Momentum Hub
             </h1>
-            <p className="text-xs font-medium text-[#161514]/70 max-w-lg">
+            <p className="text-xs font-medium text-[#161514]/70 dark:text-[#FAF8F5]/70 max-w-lg">
               Cross-module tracking metrics, habit consistency, study volume, and financial performance.
             </p>
           </div>
 
           {/* Quick Metrics */}
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            <div className="px-3 py-2 rounded-xl border-2 border-[#161514] bg-[#FAF8F5] shadow-[2px_2px_0px_0px_#161514] text-center min-w-[70px]">
-              <span className="text-[9px] font-heading font-black uppercase text-[#161514]/60 block leading-tight">Habits</span>
-              <span className="text-sm font-heading font-black text-[#161514]">{totalHabits}</span>
+            <div className="px-3 py-2 rounded-xl border-2 border-[#161514] dark:border-[#383531] bg-[#FAF8F5] dark:bg-[#252321] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] text-center min-w-[70px]">
+              <span className="text-[9px] font-heading font-black uppercase text-[#161514]/60 dark:text-[#FAF8F5]/60 block leading-tight">Habits</span>
+              <span className="text-sm font-heading font-black text-[#161514] dark:text-[#FAF8F5]">{totalHabits}</span>
             </div>
-            <div className="px-3 py-2 rounded-xl border-2 border-[#161514] bg-purple-50 shadow-[2px_2px_0px_0px_#161514] text-center min-w-[70px]">
-              <span className="text-[9px] font-heading font-black uppercase text-purple-700 block leading-tight">Studied</span>
-              <span className="text-sm font-heading font-black text-[#161514] flex items-center justify-center gap-1">
-                <Clock className="size-3 text-purple-700" />
+            <div className="px-3 py-2 rounded-xl border-2 border-[#161514] dark:border-[#383531] bg-purple-50 dark:bg-purple-950/40 shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] text-center min-w-[70px]">
+              <span className="text-[9px] font-heading font-black uppercase text-purple-700 dark:text-purple-300 block leading-tight">Studied</span>
+              <span className="text-sm font-heading font-black text-[#161514] dark:text-[#FAF8F5] flex items-center justify-center gap-1">
+                <Clock className="size-3 text-purple-700 dark:text-purple-400" />
                 {totalStudyHours}h
               </span>
             </div>
-            <div className="px-3 py-2 rounded-xl border-2 border-[#161514] bg-emerald-50 shadow-[2px_2px_0px_0px_#161514] text-center min-w-[70px]">
-              <span className="text-[9px] font-heading font-black uppercase text-emerald-800 block leading-tight">Savings</span>
-              <span className="text-sm font-heading font-black text-emerald-950 flex items-center justify-center gap-1">
-                <Wallet className="size-3 text-emerald-700" />
+            <div className="px-3 py-2 rounded-xl border-2 border-[#161514] dark:border-[#383531] bg-emerald-50 dark:bg-emerald-950/40 shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] text-center min-w-[70px]">
+              <span className="text-[9px] font-heading font-black uppercase text-emerald-800 dark:text-emerald-300 block leading-tight">Savings</span>
+              <span className="text-sm font-heading font-black text-emerald-950 dark:text-emerald-200 flex items-center justify-center gap-1">
+                <Wallet className="size-3 text-emerald-700 dark:text-emerald-400" />
                 {currencySymbol}{netBalance.toLocaleString()}
               </span>
             </div>
@@ -210,31 +210,31 @@ export default function AnalyticsHubPage() {
 
         {/* Tab Controls */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="bg-white rounded-2xl sm:rounded-3xl p-1.5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex w-full max-w-[560px] mb-6 gap-1.5 overflow-x-auto no-scrollbar">
+          <TabsList className="bg-white dark:bg-[#1C1A18] rounded-2xl sm:rounded-3xl p-1.5 border-2 border-[#161514] dark:border-[#383531] shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] flex w-full max-w-[560px] mb-6 gap-1.5 overflow-x-auto no-scrollbar">
             <TabsTrigger
               value="goals"
-              className="flex-1 rounded-xl sm:rounded-2xl text-xs font-heading font-extrabold py-2 uppercase tracking-wider border-2 border-transparent transition-all cursor-pointer data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:border-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center justify-center gap-1.5"
+              className="flex-1 rounded-xl sm:rounded-2xl text-xs font-heading font-extrabold py-2 uppercase tracking-wider border-2 border-transparent transition-all cursor-pointer text-[#161514] dark:text-[#FAF8F5] data-[state=active]:bg-[#161514] dark:data-[state=active]:bg-[#CEF431] data-[state=active]:text-white dark:data-[state=active]:text-[#161514] data-[state=active]:border-[#161514] dark:data-[state=active]:border-[#CEF431] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#161514] dark:data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#000000] flex items-center justify-center gap-1.5"
             >
               <Flame className="size-3.5" />
               <span>Goals</span>
             </TabsTrigger>
             <TabsTrigger
               value="study"
-              className="flex-1 rounded-xl sm:rounded-2xl text-xs font-heading font-extrabold py-2 uppercase tracking-wider border-2 border-transparent transition-all cursor-pointer data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:border-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center justify-center gap-1.5"
+              className="flex-1 rounded-xl sm:rounded-2xl text-xs font-heading font-extrabold py-2 uppercase tracking-wider border-2 border-transparent transition-all cursor-pointer text-[#161514] dark:text-[#FAF8F5] data-[state=active]:bg-[#161514] dark:data-[state=active]:bg-[#CEF431] data-[state=active]:text-white dark:data-[state=active]:text-[#161514] data-[state=active]:border-[#161514] dark:data-[state=active]:border-[#CEF431] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#161514] dark:data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#000000] flex items-center justify-center gap-1.5"
             >
               <BookOpen className="size-3.5" />
               <span>Study</span>
             </TabsTrigger>
             <TabsTrigger
               value="money"
-              className="flex-1 rounded-xl sm:rounded-2xl text-xs font-heading font-extrabold py-2 uppercase tracking-wider border-2 border-transparent transition-all cursor-pointer data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:border-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center justify-center gap-1.5"
+              className="flex-1 rounded-xl sm:rounded-2xl text-xs font-heading font-extrabold py-2 uppercase tracking-wider border-2 border-transparent transition-all cursor-pointer text-[#161514] dark:text-[#FAF8F5] data-[state=active]:bg-[#161514] dark:data-[state=active]:bg-[#CEF431] data-[state=active]:text-white dark:data-[state=active]:text-[#161514] data-[state=active]:border-[#161514] dark:data-[state=active]:border-[#CEF431] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#161514] dark:data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#000000] flex items-center justify-center gap-1.5"
             >
               <Wallet className="size-3.5" />
               <span>Money</span>
             </TabsTrigger>
             <TabsTrigger
               value="matrix"
-              className="flex-1 rounded-xl sm:rounded-2xl text-xs font-heading font-extrabold py-2 uppercase tracking-wider border-2 border-transparent transition-all cursor-pointer data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:border-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center justify-center gap-1.5"
+              className="flex-1 rounded-xl sm:rounded-2xl text-xs font-heading font-extrabold py-2 uppercase tracking-wider border-2 border-transparent transition-all cursor-pointer text-[#161514] dark:text-[#FAF8F5] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:border-[#161514] dark:data-[state=active]:border-[#CEF431] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#161514] dark:data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#000000] flex items-center justify-center gap-1.5"
             >
               <Calendar className="size-3.5" />
               <span>Matrix</span>
@@ -244,47 +244,47 @@ export default function AnalyticsHubPage() {
           {/* Goals Tab */}
           <TabsContent id="goals-analytics" value="goals" className="space-y-6 scroll-mt-24">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="bg-white rounded-2xl p-4 sm:p-5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] flex items-center gap-3.5 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all">
-                <div className="h-11 w-11 rounded-xl bg-amber-400 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center text-[#161514] shrink-0">
+              <div className="bg-white dark:bg-[#1C1A18] rounded-2xl p-4 sm:p-5 border-[2.5px] border-[#161514] dark:border-[#383531] shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#000000] flex items-center gap-3.5 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all">
+                <div className="h-11 w-11 rounded-xl bg-amber-400 border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] flex items-center justify-center text-[#161514] shrink-0">
                   <Flame className="h-5 w-5 fill-[#161514]" />
                 </div>
                 <div>
-                  <h5 className="text-[10px] font-black text-[#161514]/70 uppercase tracking-wider">Active Streak</h5>
-                  <p className="text-xl font-black text-[#161514] mt-0.5 font-heading">{maxStreak} days</p>
+                  <h5 className="text-[10px] font-black text-[#161514]/70 dark:text-[#FAF8F5]/70 uppercase tracking-wider">Active Streak</h5>
+                  <p className="text-xl font-black text-[#161514] dark:text-[#FAF8F5] mt-0.5 font-heading">{maxStreak} days</p>
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl p-4 sm:p-5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] flex items-center gap-3.5 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all">
-                <div className="h-11 w-11 rounded-xl bg-[#03D26F] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center text-[#161514] shrink-0">
+              <div className="bg-white dark:bg-[#1C1A18] rounded-2xl p-4 sm:p-5 border-[2.5px] border-[#161514] dark:border-[#383531] shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#000000] flex items-center gap-3.5 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all">
+                <div className="h-11 w-11 rounded-xl bg-[#03D26F] border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] flex items-center justify-center text-[#161514] shrink-0">
                   <Trophy className="h-5 w-5 stroke-[2.5]" />
                 </div>
                 <div>
-                  <h5 className="text-[10px] font-black text-[#161514]/70 uppercase tracking-wider">Record Streak</h5>
-                  <p className="text-xl font-black text-[#161514] mt-0.5 font-heading">{longestStreakOverall} days</p>
+                  <h5 className="text-[10px] font-black text-[#161514]/70 dark:text-[#FAF8F5]/70 uppercase tracking-wider">Record Streak</h5>
+                  <p className="text-xl font-black text-[#161514] dark:text-[#FAF8F5] mt-0.5 font-heading">{longestStreakOverall} days</p>
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl p-4 sm:p-5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] flex items-center gap-3.5 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all">
-                <div className="h-11 w-11 rounded-xl bg-[#C084FC] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center text-[#161514] shrink-0">
+              <div className="bg-white dark:bg-[#1C1A18] rounded-2xl p-4 sm:p-5 border-[2.5px] border-[#161514] dark:border-[#383531] shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#000000] flex items-center gap-3.5 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all">
+                <div className="h-11 w-11 rounded-xl bg-[#C084FC] border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] flex items-center justify-center text-[#161514] shrink-0">
                   <Calendar className="h-5 w-5 stroke-[2.5]" />
                 </div>
                 <div>
-                  <h5 className="text-[10px] font-black text-[#161514]/70 uppercase tracking-wider">Active Habits</h5>
-                  <p className="text-xl font-black text-[#161514] mt-0.5 font-heading">{totalHabits}</p>
+                  <h5 className="text-[10px] font-black text-[#161514]/70 dark:text-[#FAF8F5]/70 uppercase tracking-wider">Active Habits</h5>
+                  <p className="text-xl font-black text-[#161514] dark:text-[#FAF8F5] mt-0.5 font-heading">{totalHabits}</p>
                 </div>
               </div>
             </div>
 
             {habitsChartData.length > 0 ? (
-              <div className="bg-white rounded-3xl p-5 sm:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
-                <h3 className="font-black text-xs sm:text-sm text-[#161514] uppercase tracking-wider font-heading">
+              <div className="bg-white dark:bg-[#1C1A18] rounded-3xl p-5 sm:p-6 border-[2.5px] border-[#161514] dark:border-[#383531] shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#000000] space-y-4">
+                <h3 className="font-black text-xs sm:text-sm text-[#161514] dark:text-[#FAF8F5] uppercase tracking-wider font-heading">
                   Streaks comparison per habit
                 </h3>
                 <div className="h-64 w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={habitsChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                      <XAxis dataKey="name" stroke="#161514" fontSize={11} fontWeight={700} tickLine={false} axisLine={{ stroke: "#161514", strokeWidth: 2 }} />
-                      <YAxis stroke="#161514" fontSize={11} fontWeight={700} tickLine={false} axisLine={{ stroke: "#161514", strokeWidth: 2 }} />
+                      <XAxis dataKey="name" stroke="#888888" fontSize={11} fontWeight={700} tickLine={false} axisLine={{ stroke: "#888888", strokeWidth: 1.5 }} />
+                      <YAxis stroke="#888888" fontSize={11} fontWeight={700} tickLine={false} axisLine={{ stroke: "#888888", strokeWidth: 1.5 }} />
                       <Tooltip content={<NeobrutalistTooltip unit=" days" />} />
                       <Legend />
                       <Bar dataKey="Streak" fill="#F59E0B" stroke="#161514" strokeWidth={1.5} radius={[6, 6, 0, 0]} />
@@ -294,21 +294,21 @@ export default function AnalyticsHubPage() {
                 </div>
               </div>
             ) : (
-              <div className="bg-white rounded-3xl p-8 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] text-center space-y-3">
-                <div className="size-12 rounded-2xl bg-amber-100 border-2 border-[#161514] shadow-[2px_2px_0px_#161514] flex items-center justify-center mx-auto text-xl">
+              <div className="bg-white dark:bg-[#1C1A18] rounded-3xl p-8 border-[2.5px] border-[#161514] dark:border-[#383531] shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#000000] text-center space-y-3">
+                <div className="size-12 rounded-2xl bg-amber-100 dark:bg-amber-950/60 border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_#161514] dark:shadow-[2px_2px_0px_#000000] flex items-center justify-center mx-auto text-xl">
                   🔥
                 </div>
                 <div className="space-y-1 max-w-sm mx-auto">
-                  <h4 className="font-heading font-black text-sm text-[#161514] uppercase tracking-wide">
+                  <h4 className="font-heading font-black text-sm text-[#161514] dark:text-[#FAF8F5] uppercase tracking-wide">
                     No Habit Streaks Recorded Yet
                   </h4>
-                  <p className="text-xs text-[#161514]/70 font-medium">
+                  <p className="text-xs text-[#161514]/70 dark:text-[#FAF8F5]/70 font-medium">
                     Check off your daily habits in the Today Cockpit or Goals Space to illuminate your streak consistency matrix.
                   </p>
                 </div>
                 <Link
                   href="/goals"
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#03D26F] hover:bg-[#02b861] text-[#161514] font-heading font-black text-xs border-2 border-[#161514] shadow-[2px_2px_0px_#161514] active:translate-y-0.5 transition-all"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#03D26F] hover:bg-[#02b861] text-[#161514] font-heading font-black text-xs border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_#161514] dark:shadow-[2px_2px_0px_#000000] active:translate-y-0.5 transition-all"
                 >
                   <span>Open Habits Hub</span>
                   <span>→</span>
@@ -320,36 +320,36 @@ export default function AnalyticsHubPage() {
           {/* Study Tab */}
           <TabsContent id="study-analytics" value="study" className="space-y-6 scroll-mt-24">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="bg-white rounded-2xl p-4 sm:p-5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] flex items-center gap-3.5 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all">
-                <div className="h-11 w-11 rounded-xl bg-orange-400 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center text-[#161514] shrink-0">
+              <div className="bg-white dark:bg-[#1C1A18] rounded-2xl p-4 sm:p-5 border-[2.5px] border-[#161514] dark:border-[#383531] shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#000000] flex items-center gap-3.5 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all">
+                <div className="h-11 w-11 rounded-xl bg-orange-400 border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] flex items-center justify-center text-[#161514] shrink-0">
                   <Clock className="h-5 w-5 stroke-[2.5]" />
                 </div>
                 <div>
-                  <h5 className="text-[10px] font-black text-[#161514]/70 uppercase tracking-wider">Total Hours</h5>
-                  <p className="text-xl font-black text-[#161514] mt-0.5 font-heading">{totalStudyHours}h</p>
+                  <h5 className="text-[10px] font-black text-[#161514]/70 dark:text-[#FAF8F5]/70 uppercase tracking-wider">Total Hours</h5>
+                  <p className="text-xl font-black text-[#161514] dark:text-[#FAF8F5] mt-0.5 font-heading">{totalStudyHours}h</p>
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl p-4 sm:p-5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] flex items-center gap-3.5 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all">
-                <div className="h-11 w-11 rounded-xl bg-[#CEF431] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center text-[#161514] shrink-0">
+              <div className="bg-white dark:bg-[#1C1A18] rounded-2xl p-4 sm:p-5 border-[2.5px] border-[#161514] dark:border-[#383531] shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#000000] flex items-center gap-3.5 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all">
+                <div className="h-11 w-11 rounded-xl bg-[#CEF431] border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] flex items-center justify-center text-[#161514] shrink-0">
                   <Award className="h-5 w-5 stroke-[2.5]" />
                 </div>
                 <div>
-                  <h5 className="text-[10px] font-black text-[#161514]/70 uppercase tracking-wider">Subjects Tracking</h5>
-                  <p className="text-xl font-black text-[#161514] mt-0.5 font-heading">{subjects.length}</p>
+                  <h5 className="text-[10px] font-black text-[#161514]/70 dark:text-[#FAF8F5]/70 uppercase tracking-wider">Subjects Tracking</h5>
+                  <p className="text-xl font-black text-[#161514] dark:text-[#FAF8F5] mt-0.5 font-heading">{subjects.length}</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-3xl p-5 sm:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
-              <h3 className="font-black text-xs sm:text-sm text-[#161514] uppercase tracking-wider font-heading">
+            <div className="bg-white dark:bg-[#1C1A18] rounded-3xl p-5 sm:p-6 border-[2.5px] border-[#161514] dark:border-[#383531] shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#000000] space-y-4">
+              <h3 className="font-black text-xs sm:text-sm text-[#161514] dark:text-[#FAF8F5] uppercase tracking-wider font-heading">
                 Daily Focus Hours Trend
               </h3>
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={studyBarData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <XAxis dataKey="name" stroke="#161514" fontSize={11} fontWeight={700} tickLine={false} axisLine={{ stroke: "#161514", strokeWidth: 2 }} />
-                    <YAxis stroke="#161514" fontSize={11} fontWeight={700} tickLine={false} axisLine={{ stroke: "#161514", strokeWidth: 2 }} tickFormatter={(v) => `${v}h`} />
+                    <XAxis dataKey="name" stroke="#888888" fontSize={11} fontWeight={700} tickLine={false} axisLine={{ stroke: "#888888", strokeWidth: 1.5 }} />
+                    <YAxis stroke="#888888" fontSize={11} fontWeight={700} tickLine={false} axisLine={{ stroke: "#888888", strokeWidth: 1.5 }} tickFormatter={(v) => `${v}h`} />
                     <Tooltip content={<NeobrutalistTooltip unit="h" />} />
                     <Bar dataKey="hours" fill="#FB923C" stroke="#161514" strokeWidth={1.5} radius={[6, 6, 0, 0]} />
                   </BarChart>
@@ -358,15 +358,15 @@ export default function AnalyticsHubPage() {
             </div>
 
             {testTrendData.length > 0 ? (
-              <div className="bg-white rounded-3xl p-5 sm:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
-                <h3 className="font-black text-xs sm:text-sm text-[#161514] uppercase tracking-wider font-heading">
+              <div className="bg-white dark:bg-[#1C1A18] rounded-3xl p-5 sm:p-6 border-[2.5px] border-[#161514] dark:border-[#383531] shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#000000] space-y-4">
+                <h3 className="font-black text-xs sm:text-sm text-[#161514] dark:text-[#FAF8F5] uppercase tracking-wider font-heading">
                   Mock Score Trends (%)
                 </h3>
                 <div className="h-64 w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={testTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                      <XAxis dataKey="name" stroke="#161514" fontSize={11} fontWeight={700} tickLine={false} axisLine={{ stroke: "#161514", strokeWidth: 2 }} />
-                      <YAxis stroke="#161514" fontSize={11} fontWeight={700} tickLine={false} axisLine={{ stroke: "#161514", strokeWidth: 2 }} domain={[0, 100]} />
+                      <XAxis dataKey="name" stroke="#888888" fontSize={11} fontWeight={700} tickLine={false} axisLine={{ stroke: "#888888", strokeWidth: 1.5 }} />
+                      <YAxis stroke="#888888" fontSize={11} fontWeight={700} tickLine={false} axisLine={{ stroke: "#888888", strokeWidth: 1.5 }} domain={[0, 100]} />
                       <Tooltip content={<NeobrutalistTooltip unit="%" />} />
                       <Line type="monotone" dataKey="score" stroke="#F59E0B" strokeWidth={3.5} dot={{ r: 5, fill: "#F59E0B", stroke: "#161514", strokeWidth: 2 }} />
                     </LineChart>
@@ -374,21 +374,21 @@ export default function AnalyticsHubPage() {
                 </div>
               </div>
             ) : (
-              <div className="bg-white rounded-3xl p-8 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] text-center space-y-3">
-                <div className="size-12 rounded-2xl bg-purple-100 border-2 border-[#161514] shadow-[2px_2px_0px_#161514] flex items-center justify-center mx-auto text-xl">
+              <div className="bg-white dark:bg-[#1C1A18] rounded-3xl p-8 border-[2.5px] border-[#161514] dark:border-[#383531] shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#000000] text-center space-y-3">
+                <div className="size-12 rounded-2xl bg-purple-100 dark:bg-purple-950/60 border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_#161514] dark:shadow-[2px_2px_0px_#000000] flex items-center justify-center mx-auto text-xl">
                   📊
                 </div>
                 <div className="space-y-1 max-w-sm mx-auto">
-                  <h4 className="font-heading font-black text-sm text-[#161514] uppercase tracking-wide">
+                  <h4 className="font-heading font-black text-sm text-[#161514] dark:text-[#FAF8F5] uppercase tracking-wide">
                     No Mock Test Scores Yet
                   </h4>
-                  <p className="text-xs text-[#161514]/70 font-medium">
+                  <p className="text-xs text-[#161514]/70 dark:text-[#FAF8F5]/70 font-medium">
                     Log your mock exams and revision test percentages to unlock your score trajectory line chart.
                   </p>
                 </div>
                 <Link
                   href="/study?tab=tests"
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#C084FC] hover:bg-[#ad6ef7] text-[#161514] font-heading font-black text-xs border-2 border-[#161514] shadow-[2px_2px_0px_#161514] active:translate-y-0.5 transition-all"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#C084FC] hover:bg-[#ad6ef7] text-[#161514] font-heading font-black text-xs border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_#161514] dark:shadow-[2px_2px_0px_#000000] active:translate-y-0.5 transition-all"
                 >
                   <span>Log First Mock Test</span>
                   <span>→</span>
@@ -400,30 +400,30 @@ export default function AnalyticsHubPage() {
           {/* Money Tab */}
           <TabsContent id="money-analytics" value="money" className="space-y-6 scroll-mt-24">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="bg-white rounded-2xl p-4 sm:p-5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] flex items-center gap-3.5 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all">
-                <div className="h-11 w-11 rounded-xl bg-[#03D26F] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center text-[#161514] shrink-0">
+              <div className="bg-white dark:bg-[#1C1A18] rounded-2xl p-4 sm:p-5 border-[2.5px] border-[#161514] dark:border-[#383531] shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#000000] flex items-center gap-3.5 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all">
+                <div className="h-11 w-11 rounded-xl bg-[#03D26F] border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] flex items-center justify-center text-[#161514] shrink-0">
                   <Wallet className="h-5 w-5 stroke-[2.5]" />
                 </div>
                 <div>
-                  <h5 className="text-[10px] font-black text-[#161514]/70 uppercase tracking-wider">Total Income</h5>
+                  <h5 className="text-[10px] font-black text-[#161514]/70 dark:text-[#FAF8F5]/70 uppercase tracking-wider">Total Income</h5>
                   <p className="text-xl font-black text-[#03D26F] mt-0.5 font-heading">{currencySymbol}{totalIncome.toLocaleString()}</p>
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl p-4 sm:p-5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] flex items-center gap-3.5 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all">
-                <div className="h-11 w-11 rounded-xl bg-rose-400 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center text-[#161514] shrink-0">
+              <div className="bg-white dark:bg-[#1C1A18] rounded-2xl p-4 sm:p-5 border-[2.5px] border-[#161514] dark:border-[#383531] shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#000000] flex items-center gap-3.5 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all">
+                <div className="h-11 w-11 rounded-xl bg-rose-400 border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] flex items-center justify-center text-[#161514] shrink-0">
                   <Wallet className="h-5 w-5 stroke-[2.5]" />
                 </div>
                 <div>
-                  <h5 className="text-[10px] font-black text-[#161514]/70 uppercase tracking-wider">Total Expense</h5>
-                  <p className="text-xl font-black text-rose-600 mt-0.5 font-heading">{currencySymbol}{totalExpense.toLocaleString()}</p>
+                  <h5 className="text-[10px] font-black text-[#161514]/70 dark:text-[#FAF8F5]/70 uppercase tracking-wider">Total Expense</h5>
+                  <p className="text-xl font-black text-rose-600 dark:text-rose-400 mt-0.5 font-heading">{currencySymbol}{totalExpense.toLocaleString()}</p>
                 </div>
               </div>
             </div>
 
             {expensePieData.length > 0 ? (
-              <div className="bg-white rounded-3xl p-5 sm:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
-                <h3 className="font-black text-xs sm:text-sm text-[#161514] uppercase tracking-wider font-heading">
+              <div className="bg-white dark:bg-[#1C1A18] rounded-3xl p-5 sm:p-6 border-[2.5px] border-[#161514] dark:border-[#383531] shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#000000] space-y-4">
+                <h3 className="font-black text-xs sm:text-sm text-[#161514] dark:text-[#FAF8F5] uppercase tracking-wider font-heading">
                   Expense Share per Category
                 </h3>
                 <div className="h-64 w-full flex items-center justify-center">
@@ -451,21 +451,21 @@ export default function AnalyticsHubPage() {
                 </div>
               </div>
             ) : (
-              <div className="bg-white rounded-3xl p-8 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] text-center space-y-3">
-                <div className="size-12 rounded-2xl bg-emerald-100 border-2 border-[#161514] shadow-[2px_2px_0px_#161514] flex items-center justify-center mx-auto text-xl">
+              <div className="bg-white dark:bg-[#1C1A18] rounded-3xl p-8 border-[2.5px] border-[#161514] dark:border-[#383531] shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#000000] text-center space-y-3">
+                <div className="size-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_#161514] dark:shadow-[2px_2px_0px_#000000] flex items-center justify-center mx-auto text-xl">
                   💰
                 </div>
                 <div className="space-y-1 max-w-sm mx-auto">
-                  <h4 className="font-heading font-black text-sm text-[#161514] uppercase tracking-wide">
+                  <h4 className="font-heading font-black text-sm text-[#161514] dark:text-[#FAF8F5] uppercase tracking-wide">
                     No Expenses Recorded This Month
                   </h4>
-                  <p className="text-xs text-[#161514]/70 font-medium">
+                  <p className="text-xs text-[#161514]/70 dark:text-[#FAF8F5]/70 font-medium">
                     Log expenses into category envelopes to see your spend distribution pie chart and cashflow comparison.
                   </p>
                 </div>
                 <Link
                   href="/money?action=add_tx"
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#CEF431] hover:bg-[#b8dc22] text-[#161514] font-heading font-black text-xs border-2 border-[#161514] shadow-[2px_2px_0px_#161514] active:translate-y-0.5 transition-all"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#CEF431] hover:bg-[#b8dc22] text-[#161514] font-heading font-black text-xs border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_#161514] dark:shadow-[2px_2px_0px_#000000] active:translate-y-0.5 transition-all"
                 >
                   <span>Log First Expense</span>
                   <span>→</span>
@@ -473,15 +473,15 @@ export default function AnalyticsHubPage() {
               </div>
             )}
 
-            <div className="bg-white rounded-3xl p-5 sm:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
-              <h3 className="font-black text-xs sm:text-sm text-[#161514] uppercase tracking-wider font-heading">
+            <div className="bg-white dark:bg-[#1C1A18] rounded-3xl p-5 sm:p-6 border-[2.5px] border-[#161514] dark:border-[#383531] shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#000000] space-y-4">
+              <h3 className="font-black text-xs sm:text-sm text-[#161514] dark:text-[#FAF8F5] uppercase tracking-wider font-heading">
                 Income vs Expense Bar
               </h3>
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={moneyBarData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <XAxis dataKey="name" stroke="#161514" fontSize={11} fontWeight={700} tickLine={false} axisLine={{ stroke: "#161514", strokeWidth: 2 }} />
-                    <YAxis stroke="#161514" fontSize={11} fontWeight={700} tickLine={false} axisLine={{ stroke: "#161514", strokeWidth: 2 }} />
+                    <XAxis dataKey="name" stroke="#888888" fontSize={11} fontWeight={700} tickLine={false} axisLine={{ stroke: "#888888", strokeWidth: 1.5 }} />
+                    <YAxis stroke="#888888" fontSize={11} fontWeight={700} tickLine={false} axisLine={{ stroke: "#888888", strokeWidth: 1.5 }} />
                     <Tooltip content={<NeobrutalistTooltip unit="" />} />
                     <Legend />
                     <Bar dataKey="Income" fill="#03D26F" stroke="#161514" strokeWidth={1.5} radius={[6, 6, 0, 0]} />

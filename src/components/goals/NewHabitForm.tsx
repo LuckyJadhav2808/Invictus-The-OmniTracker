@@ -9,7 +9,7 @@ import * as LucideIcons from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { soundFX } from "@/components/shared/SoundFX";
-import { Sparkles, Clock, Target, Calendar } from "lucide-react";
+import { Sparkles, Clock, Target, Calendar, Sun, Moon } from "lucide-react";
 import { HabitCompanionSprite } from "@/components/mascot/HabitCompanionSprite";
 
 const ICONS = [
@@ -58,10 +58,10 @@ const TEMPLATE_SHORTCUTS = [
 ];
 
 const TIME_PRESETS = [
-  { label: "🌅 Morning", time: "08:00 AM" },
-  { label: "☀️ Noon", time: "12:00 PM" },
-  { label: "🌆 Evening", time: "07:00 PM" },
-  { label: "🌙 Night", time: "10:00 PM" },
+  { label: "Morning", time: "08:00 AM", icon: Sun },
+  { label: "Noon", time: "12:00 PM", icon: Clock },
+  { label: "Evening", time: "07:00 PM", icon: Clock },
+  { label: "Night", time: "10:00 PM", icon: Moon },
 ];
 
 interface NewHabitFormProps {
@@ -177,7 +177,7 @@ export function NewHabitForm({
     console.error("Habit Form Validation Error:", formErrors);
     soundFX.playPop();
     if (formErrors.title) {
-      toast.error("Please enter a habit title 📝");
+      toast.error("Please enter a habit title");
     } else {
       toast.error("Please check the required fields");
     }
@@ -187,8 +187,8 @@ export function NewHabitForm({
     <form onSubmit={handleSubmit(handleFormSubmit, handleFormError)} className="space-y-4 pt-1">
       {/* 1-Tap Quick Routine Template Chips */}
       {!initialValues && (
-        <div className="space-y-1.5">
-          <span className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514]/70 flex items-center gap-1">
+        <div className="space-y-1.5 pb-1">
+          <span className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514]/70 dark:text-[#A8A29E] flex items-center gap-1">
             <Sparkles className="size-3 text-amber-500 stroke-[2.5]" />
             <span>Instant Routine Presets</span>
           </span>
@@ -198,7 +198,7 @@ export function NewHabitForm({
                 key={tpl.title}
                 type="button"
                 onClick={() => applyTemplate(tpl)}
-                className="shrink-0 text-xs font-bold px-3 py-1.5 rounded-xl bg-white hover:bg-amber-50/80 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center gap-1.5 text-[#161514] select-none"
+                className="shrink-0 text-xs font-bold px-3 py-1.5 rounded-xl bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs active:scale-95 transition-all cursor-pointer flex items-center gap-1.5 text-[#161514] dark:text-[#FAF8F5] select-none"
               >
                 <span>{tpl.title}</span>
               </button>
@@ -217,7 +217,7 @@ export function NewHabitForm({
       {/* Habit Title Input (16px font to prevent mobile auto-zoom) */}
       <div className="space-y-1.5">
         <label
-          className="text-xs font-heading font-black uppercase tracking-wider text-[#161514] flex items-center gap-1"
+          className="text-xs font-heading font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1"
           style={{ fontFamily: "var(--font-heading)" }}
         >
           <Target className="size-3.5 stroke-[2.5] text-amber-500" />
@@ -227,7 +227,7 @@ export function NewHabitForm({
           {...register("title")}
           type="text"
           placeholder="e.g. Read 15 pages, Drink Water, Gym…"
-          className="w-full rounded-xl border-2 border-[#161514] bg-white py-2.5 px-3.5 text-base font-bold text-[#161514] outline-none focus:bg-[#FFF9EA] shadow-[2px_2px_0px_0px_#161514] focus:shadow-[3px_3px_0px_0px_#161514] transition-all placeholder:text-[#161514]/40"
+          className="w-full rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] bg-white dark:bg-[#1C1A18] py-2.5 px-3.5 text-base font-bold text-[#161514] dark:text-[#FAF8F5] outline-none focus:border-[#161514] dark:focus:border-[#FAF8F5] shadow-xs transition-all placeholder:text-[#6B6B6B]/40 dark:placeholder:text-[#A8A29E]/40"
           required
         />
         {errors.title?.message && (
@@ -238,7 +238,7 @@ export function NewHabitForm({
       {/* Reminder Time Picker with Ergonomic Quick Chips */}
       <div className="space-y-2">
         <label
-          className="text-xs font-heading font-black uppercase tracking-wider text-[#161514] flex items-center gap-1"
+          className="text-xs font-heading font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1"
           style={{ fontFamily: "var(--font-heading)" }}
         >
           <Clock className="size-3.5 stroke-[2.5] text-sky-600" />
@@ -249,6 +249,7 @@ export function NewHabitForm({
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
           {TIME_PRESETS.map((preset) => {
             const isMatch = reminderTime === preset.time;
+            const PresetIcon = preset.icon;
             return (
               <button
                 key={preset.label}
@@ -258,12 +259,13 @@ export function NewHabitForm({
                   setValue("reminderTime", preset.time);
                 }}
                 className={cn(
-                  "min-h-[38px] py-1.5 px-2 rounded-xl text-xs font-bold border-2 border-[#161514] transition-all cursor-pointer flex items-center justify-center text-center",
+                  "min-h-[38px] py-1.5 px-2 rounded-xl text-xs font-bold border transition-all cursor-pointer flex items-center justify-center gap-1.5 text-center shadow-xs",
                   isMatch
-                    ? "bg-[#CEF431] text-[#161514] font-black shadow-[2px_2px_0px_0px_#161514]"
-                    : "bg-white hover:bg-slate-50 text-[#161514]/80 shadow-[1px_1px_0px_0px_#161514]"
+                    ? "bg-[#161514] dark:bg-[#FAF8F5] text-white dark:text-[#161514] font-black border-[#161514] dark:border-[#FAF8F5]"
+                    : "bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] text-[#161514]/80 dark:text-[#A8A29E] border-[#E8E5DF] dark:border-[#2A2724]"
                 )}
               >
+                <PresetIcon className="size-3 stroke-[2.5]" />
                 <span>{preset.label}</span>
               </button>
             );
@@ -275,19 +277,19 @@ export function NewHabitForm({
           {...register("reminderTime")}
           type="text"
           placeholder="Or custom: e.g. 08:30 AM or 21:00"
-          className="w-full rounded-xl border-2 border-[#161514] bg-white py-2 px-3 text-base font-bold text-[#161514] outline-none focus:bg-[#FFF9EA] shadow-[2px_2px_0px_0px_#161514] transition-all placeholder:text-[#161514]/40 mt-1"
+          className="w-full rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] bg-white dark:bg-[#1C1A18] py-2 px-3 text-base font-bold text-[#161514] dark:text-[#FAF8F5] outline-none focus:border-[#161514] dark:focus:border-[#FAF8F5] shadow-xs transition-all placeholder:text-[#6B6B6B]/40 dark:placeholder:text-[#A8A29E]/40 mt-1"
         />
       </div>
 
       {/* Icon Picker (44px touch targets) */}
       <div className="space-y-1.5">
         <label
-          className="text-xs font-heading font-black uppercase tracking-wider text-[#161514]"
+          className="text-xs font-heading font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5]"
           style={{ fontFamily: "var(--font-heading)" }}
         >
           Choose Icon
         </label>
-        <div className="grid grid-cols-5 gap-2 bg-[#FAF8F5] p-2.5 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514]">
+        <div className="grid grid-cols-5 gap-2 bg-[#FAF8F5] dark:bg-[#1C1A18] p-2.5 rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs">
           {ICONS.map((iconName) => {
             const IconComponent = (LucideIcons as any)[iconName] || LucideIcons.HelpCircle;
             const isSelected = selectedIcon === iconName;
@@ -300,10 +302,10 @@ export function NewHabitForm({
                   setSelectedIcon(iconName);
                 }}
                 className={cn(
-                  "p-2 min-h-[44px] min-w-[44px] rounded-xl flex items-center justify-center border-2 transition-all cursor-pointer",
+                  "p-2 min-h-[44px] min-w-[44px] rounded-xl flex items-center justify-center border transition-all cursor-pointer",
                   isSelected
-                    ? "bg-[#CEF431] border-[#161514] text-[#161514] shadow-[2px_2px_0px_0px_#161514] scale-105"
-                    : "border-transparent text-[#161514]/80 hover:bg-white"
+                    ? "bg-[#CEF431] border-[#161514] text-[#161514] shadow-xs scale-105"
+                    : "border-transparent text-[#161514]/80 dark:text-[#FAF8F5]/80 hover:bg-white dark:hover:bg-[#252321]"
                 )}
                 title={iconName}
               >
@@ -317,7 +319,7 @@ export function NewHabitForm({
       {/* Theme Color Picker */}
       <div className="space-y-1.5">
         <label
-          className="text-xs font-heading font-black uppercase tracking-wider text-[#161514]"
+          className="text-xs font-heading font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5]"
           style={{ fontFamily: "var(--font-heading)" }}
         >
           Theme Color
@@ -334,9 +336,9 @@ export function NewHabitForm({
                   setSelectedColor(c.name);
                 }}
                 className={cn(
-                  "min-h-[44px] min-w-[44px] size-11 rounded-xl transition-all flex items-center justify-center border-2 border-[#161514] cursor-pointer shadow-[2px_2px_0px_0px_#161514]",
+                  "min-h-[44px] min-w-[44px] size-11 rounded-xl transition-all flex items-center justify-center border border-black/20 dark:border-white/20 cursor-pointer shadow-xs",
                   c.bg,
-                  isSelected && "ring-2 ring-[#161514] scale-105 shadow-[3px_3px_0px_0px_#161514]"
+                  isSelected && "ring-2 ring-[#161514] dark:ring-[#FAF8F5] ring-offset-2 dark:ring-offset-[#161514] scale-105"
                 )}
                 title={`Theme: ${c.name}`}
               />
@@ -348,7 +350,7 @@ export function NewHabitForm({
       {/* Frequency Type Selection */}
       <div className="space-y-1.5">
         <label
-          className="text-xs font-heading font-black uppercase tracking-wider text-[#161514] flex items-center gap-1"
+          className="text-xs font-heading font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1"
           style={{ fontFamily: "var(--font-heading)" }}
         >
           <Calendar className="size-3.5 stroke-[2.5] text-emerald-600" />
@@ -368,10 +370,10 @@ export function NewHabitForm({
                 setValue("frequency.type", type.id as any);
               }}
               className={cn(
-                "min-h-[44px] py-2 rounded-xl border-2 border-[#161514] text-xs font-heading font-black transition-all cursor-pointer shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
+                "min-h-[44px] py-2 rounded-xl border text-xs font-heading font-black transition-all cursor-pointer shadow-xs active:scale-95",
                 frequencyType === type.id
-                  ? "bg-[#CEF431] text-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514]"
-                  : "bg-white text-[#161514]/80 hover:bg-[#FAF8F5]"
+                  ? "bg-[#161514] dark:bg-[#FAF8F5] text-white dark:text-[#161514] border-[#161514] dark:border-[#FAF8F5]"
+                  : "bg-white dark:bg-[#1C1A18] text-[#161514]/80 dark:text-[#A8A29E] border-[#E8E5DF] dark:border-[#2A2724] hover:bg-[#FAF8F5] dark:hover:bg-[#252321]"
               )}
             >
               {type.label}
@@ -384,7 +386,7 @@ export function NewHabitForm({
       {frequencyType === "customDays" && (
         <div className="space-y-1.5">
           <label
-            className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514]"
+            className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5]"
             style={{ fontFamily: "var(--font-heading)" }}
           >
             Select Active Days
@@ -398,10 +400,10 @@ export function NewHabitForm({
                   type="button"
                   onClick={() => toggleDay(day.value)}
                   className={cn(
-                    "min-h-[44px] min-w-[44px] size-11 rounded-xl border-2 border-[#161514] text-xs font-black transition-all flex items-center justify-center cursor-pointer shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
+                    "min-h-[44px] min-w-[44px] size-11 rounded-xl border text-xs font-black transition-all flex items-center justify-center cursor-pointer shadow-xs active:scale-95",
                     isSelected
-                      ? "bg-[#CEF431] text-[#161514]"
-                      : "bg-white text-[#161514]/70 hover:bg-[#FAF8F5]"
+                      ? "bg-[#CEF431] text-[#161514] border-[#161514]"
+                      : "bg-white dark:bg-[#1C1A18] text-[#161514]/70 dark:text-[#A8A29E] border-[#E8E5DF] dark:border-[#2A2724] hover:bg-[#FAF8F5] dark:hover:bg-[#252321]"
                   )}
                   title={day.full}
                 >
@@ -414,15 +416,15 @@ export function NewHabitForm({
       )}
 
       {/* Numeric Goal Target Toggle */}
-      <div className="flex items-center justify-between p-3 rounded-2xl border-2 border-[#161514] bg-[#FAF8F5] shadow-[2px_2px_0px_0px_#161514]">
+      <div className="flex items-center justify-between p-3 rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] bg-[#FAF8F5] dark:bg-[#1C1A18] shadow-xs">
         <div>
           <p
-            className="text-xs font-heading font-black text-[#161514]"
+            className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5]"
             style={{ fontFamily: "var(--font-heading)" }}
           >
             Numeric Goal Metric (Optional)
           </p>
-          <p className="text-[10px] font-bold text-[#161514]/70 leading-tight">
+          <p className="text-[10px] font-bold text-[#6B6B6B] dark:text-[#A8A29E] leading-tight">
             Track quantitative amounts (e.g. 50 pages, 30 mins)
           </p>
         </div>
@@ -433,14 +435,14 @@ export function NewHabitForm({
             setValue("isGoalStyle", !isGoalStyle);
           }}
           className={cn(
-            "h-7 w-12 rounded-full transition-all relative border-2 border-[#161514] cursor-pointer shadow-[1px_1px_0px_0px_#161514]",
-            isGoalStyle ? "bg-[#CEF431]" : "bg-gray-200"
+            "h-7 w-12 rounded-full transition-all relative border border-[#E8E5DF] dark:border-[#2A2724] cursor-pointer shadow-xs",
+            isGoalStyle ? "bg-[#03D26F]" : "bg-gray-200 dark:bg-stone-700"
           )}
         >
           <div
             className={cn(
-              "absolute top-0.5 h-5 w-5 rounded-full border border-[#161514] shadow transition-all",
-              isGoalStyle ? "left-6 bg-[#161514]" : "left-0.5 bg-white"
+              "absolute top-0.5 h-5 w-5 rounded-full border border-black/10 shadow transition-all",
+              isGoalStyle ? "left-6 bg-white" : "left-0.5 bg-white"
             )}
           />
         </button>
@@ -451,7 +453,7 @@ export function NewHabitForm({
         <div className="grid grid-cols-2 gap-3 pt-0.5">
           <div className="space-y-1">
             <label
-              className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514]"
+              className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5]"
               style={{ fontFamily: "var(--font-heading)" }}
             >
               Target Value
@@ -460,12 +462,12 @@ export function NewHabitForm({
               {...register("goalTarget")}
               type="number"
               placeholder="e.g. 15"
-              className="w-full rounded-xl border-2 border-[#161514] bg-white py-2 px-3 text-base font-bold outline-none focus:bg-[#FFF9EA] text-[#161514] shadow-[2px_2px_0px_0px_#161514]"
+              className="w-full rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] bg-white dark:bg-[#1C1A18] py-2 px-3 text-base font-bold outline-none focus:border-[#161514] dark:focus:border-[#FAF8F5] text-[#161514] dark:text-[#FAF8F5] shadow-xs"
             />
           </div>
           <div className="space-y-1">
             <label
-              className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514]"
+              className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5]"
               style={{ fontFamily: "var(--font-heading)" }}
             >
               Unit
@@ -474,22 +476,22 @@ export function NewHabitForm({
               {...register("goalUnit")}
               type="text"
               placeholder="e.g. pages, mins, km"
-              className="w-full rounded-xl border-2 border-[#161514] bg-white py-2 px-3 text-base font-bold outline-none focus:bg-[#FFF9EA] text-[#161514] shadow-[2px_2px_0px_0px_#161514]"
+              className="w-full rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] bg-white dark:bg-[#1C1A18] py-2 px-3 text-base font-bold outline-none focus:border-[#161514] dark:focus:border-[#FAF8F5] text-[#161514] dark:text-[#FAF8F5] shadow-xs"
             />
           </div>
         </div>
       )}
 
       {/* Streak Freeze Protection Toggle */}
-      <div className="flex items-center justify-between p-3 rounded-2xl border-2 border-[#161514] bg-[#FAF8F5] shadow-[2px_2px_0px_0px_#161514]">
+      <div className="flex items-center justify-between p-3 rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] bg-[#FAF8F5] dark:bg-[#1C1A18] shadow-xs">
         <div>
           <p
-            className="text-xs font-heading font-black text-[#161514]"
+            className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5]"
             style={{ fontFamily: "var(--font-heading)" }}
           >
             Streak Freeze Protection
           </p>
-          <p className="text-[10px] font-bold text-[#161514]/70 leading-tight">
+          <p className="text-[10px] font-bold text-[#6B6B6B] dark:text-[#A8A29E] leading-tight">
             Allow 1 grace skip day without breaking streak
           </p>
         </div>
@@ -500,14 +502,14 @@ export function NewHabitForm({
             setValue("allowGraceSkip", !allowGraceSkip);
           }}
           className={cn(
-            "h-7 w-12 rounded-full transition-all relative border-2 border-[#161514] cursor-pointer shadow-[1px_1px_0px_0px_#161514]",
-            allowGraceSkip ? "bg-sky-400" : "bg-gray-200"
+            "h-7 w-12 rounded-full transition-all relative border border-[#E8E5DF] dark:border-[#2A2724] cursor-pointer shadow-xs",
+            allowGraceSkip ? "bg-sky-400" : "bg-gray-200 dark:bg-stone-700"
           )}
         >
           <div
             className={cn(
-              "absolute top-0.5 h-5 w-5 rounded-full border border-[#161514] shadow transition-all",
-              allowGraceSkip ? "left-6 bg-[#161514]" : "left-0.5 bg-white"
+              "absolute top-0.5 h-5 w-5 rounded-full border border-black/10 shadow transition-all",
+              allowGraceSkip ? "left-6 bg-white" : "left-0.5 bg-white"
             )}
           />
         </button>
@@ -517,9 +519,9 @@ export function NewHabitForm({
       <Button
         type="submit"
         disabled={loading}
-        className="w-full min-h-[48px] bg-[#03D26F] hover:bg-[#02b861] text-[#161514] font-heading font-black text-sm rounded-xl py-3 mt-3 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none cursor-pointer transition-all uppercase tracking-wider"
+        className="w-full min-h-[48px] bg-[#161514] hover:bg-[#252321] dark:bg-[#FAF8F5] dark:hover:bg-[#E8E5DF] text-white dark:text-[#161514] font-heading font-black text-sm rounded-xl py-3 mt-3 shadow-xs hover:-translate-y-0.5 active:translate-y-0 cursor-pointer transition-all uppercase tracking-wider"
       >
-        {loading ? "Saving…" : initialValues ? "Update Habit 🌟" : "Create Habit 💪"}
+        {loading ? "Saving…" : initialValues ? "Update habit" : "Create habit"}
       </Button>
     </form>
   );

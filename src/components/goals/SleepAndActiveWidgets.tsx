@@ -86,135 +86,138 @@ export function SleepAndActiveWidgets() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
       {/* Sleep Tracker Card */}
-      <div className="bg-white rounded-2xl sm:rounded-3xl p-5 md:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
+      <div className="bg-white dark:bg-[#1C1A18] rounded-xl p-5 border border-[#E8E5DF] dark:border-[#383531] space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="h-10 w-10 rounded-xl bg-indigo-200 border-2 border-[#161514] text-[#161514] flex items-center justify-center font-black shadow-[2px_2px_0px_0px_#161514]">
-              <Moon className="h-5 w-5 stroke-[2.5]" />
+            <div className="size-8 rounded-lg bg-[#F1EFEA] dark:bg-[#252321] flex items-center justify-center text-[#161514] dark:text-[#FAF8F5] shrink-0">
+              <Moon className="size-4 stroke-[1.5]" />
             </div>
             <div>
-              <h4 className="text-sm font-heading font-black text-[#161514] tracking-tight">Sleep Tracker</h4>
-              <p className="text-[10px] text-[#161514]/80 font-bold">Last night's sleep analysis</p>
+              <h4 className="text-[15px] font-sans font-semibold text-[#161514] dark:text-[#FAF8F5] tracking-tight">Sleep tracker</h4>
+              <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E]">Last night's sleep analysis</p>
             </div>
           </div>
           <button
             onClick={() => setIsEditingSleep(!isEditingSleep)}
-            className="text-[10px] font-heading font-black text-[#161514] bg-[#CEF431] hover:bg-[#D8F74E] px-3.5 py-1.5 rounded-xl cursor-pointer transition-all border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none flex items-center gap-1 uppercase tracking-wider"
+            className="text-xs font-medium text-[#161514] dark:text-[#FAF8F5] bg-white dark:bg-[#252321] hover:bg-[#F5F3EF] dark:hover:bg-[#2e2b28] px-3 py-1.5 rounded-lg cursor-pointer transition-colors border border-[#E8E5DF] dark:border-[#383531] flex items-center gap-1"
           >
-            {isEditingSleep ? "Done" : <><Plus className="h-3.5 w-3.5 stroke-[3]" /> Log Sleep</>}
+            {isEditingSleep ? "Done" : <><Plus className="size-3.5 stroke-[1.5]" /> Log sleep</>}
           </button>
         </div>
 
         {isEditingSleep ? (
-          <div className="space-y-3 bg-[#FFF9EA] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514]">
-            <div className="grid grid-cols-3 gap-2 text-xs font-bold">
+          <div className="space-y-3 bg-[#FAF8F5] dark:bg-[#161514] p-3.5 rounded-lg border border-[#E8E5DF] dark:border-[#383531]">
+            <div className="grid grid-cols-3 gap-2 text-xs font-medium">
               <div>
-                <label className="text-[9px] uppercase tracking-wider text-[#161514]/70 font-heading font-black">Hours</label>
+                <label className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E] block mb-1">Hours</label>
                 <input
                   type="number"
                   value={sleepHours || ""}
                   placeholder="e.g. 7"
                   onChange={(e) => saveSleepLog(Number(e.target.value), sleepMinutes, sleepScore)}
-                  className="w-full bg-white rounded-xl p-2 border-2 border-[#161514] font-black text-[#161514] focus:bg-[#FFF9EA] outline-none"
+                  className="w-full bg-white dark:bg-[#252321] rounded-lg p-2 border border-[#E8E5DF] dark:border-[#383531] font-medium text-xs text-[#161514] dark:text-[#FAF8F5] focus:border-[#161514] dark:focus:border-[#CEF431] outline-none"
                 />
               </div>
               <div>
-                <label className="text-[9px] uppercase tracking-wider text-[#161514]/70 font-heading font-black">Minutes</label>
+                <label className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E] block mb-1">Minutes</label>
                 <input
                   type="number"
                   value={sleepMinutes || ""}
                   placeholder="e.g. 30"
                   onChange={(e) => saveSleepLog(sleepHours, Number(e.target.value), sleepScore)}
-                  className="w-full bg-white rounded-xl p-2 border-2 border-[#161514] font-black text-[#161514] focus:bg-[#FFF9EA] outline-none"
+                  className="w-full bg-white dark:bg-[#252321] rounded-lg p-2 border border-[#E8E5DF] dark:border-[#383531] font-medium text-xs text-[#161514] dark:text-[#FAF8F5] focus:border-[#161514] dark:focus:border-[#CEF431] outline-none"
                 />
               </div>
               <div>
-                <label className="text-[9px] uppercase tracking-wider text-[#161514]/70 font-heading font-black">Score (0-100)</label>
+                <label className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E] block mb-1">Score (0-100)</label>
                 <input
                   type="number"
                   value={sleepScore || ""}
                   placeholder="e.g. 85"
                   onChange={(e) => saveSleepLog(sleepHours, sleepMinutes, Number(e.target.value))}
-                  className="w-full bg-white rounded-xl p-2 border-2 border-[#161514] font-black text-[#161514] focus:bg-[#FFF9EA] outline-none"
+                  className="w-full bg-white dark:bg-[#252321] rounded-lg p-2 border border-[#E8E5DF] dark:border-[#383531] font-medium text-xs text-[#161514] dark:text-[#FAF8F5] focus:border-[#161514] dark:focus:border-[#CEF431] outline-none"
                 />
               </div>
             </div>
             {hasLoggedSleep && (
               <button
                 onClick={clearSleepLog}
-                className="text-[10px] text-rose-600 font-heading font-black hover:underline flex items-center gap-1 cursor-pointer pt-1"
+                className="text-xs text-rose-600 hover:underline flex items-center gap-1 cursor-pointer pt-1 font-medium"
               >
-                <Trash2 className="h-3 w-3 stroke-[2.5]" /> Clear Sleep Entry
+                <Trash2 className="size-3 stroke-[1.5]" /> Clear Sleep Entry
               </button>
             )}
           </div>
         ) : !hasLoggedSleep ? (
           /* Empty Encouragement State */
-          <div className="bg-[#FFF9EA] rounded-2xl p-4 border-2 border-dashed border-[#161514] text-center space-y-2 shadow-[2px_2px_0px_0px_#161514]">
-            <p className="text-xs font-heading font-black text-[#161514]">No sleep logged for today yet! 😴</p>
-            <p className="text-[10px] text-[#161514]/80 font-bold">
-              Click <span className="font-black text-amber-900">'Log Sleep'</span> above to capture your rest hours & recovery score.
+          <div className="bg-[#FAF8F5] dark:bg-[#161514] rounded-lg p-4 border border-dashed border-[#E8E5DF] dark:border-[#383531] text-center space-y-1.5">
+            <div className="size-7 rounded-md bg-white dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#383531] flex items-center justify-center mx-auto text-[#6B6B6B] dark:text-[#A8A29E]">
+              <Moon className="size-3.5 stroke-[1.5]" />
+            </div>
+            <p className="text-xs font-sans font-medium text-[#161514] dark:text-[#FAF8F5]">No sleep logged for today yet</p>
+            <p className="text-[11px] text-[#6B6B6B] dark:text-[#A8A29E]">
+              Click <span className="font-semibold text-[#161514] dark:text-[#FAF8F5]">'Log sleep'</span> above to capture rest hours and recovery score.
             </p>
           </div>
         ) : (
           <div className="space-y-3">
             <div className="flex items-baseline justify-between">
               <div>
-                <span className="font-heading text-2xl font-black text-[#161514]">
-                  {sleepHours}<span className="text-xs font-bold text-[#161514]/70">h </span>
-                  {sleepMinutes}<span className="text-xs font-bold text-[#161514]/70">m</span>
+                <span className="font-mono text-2xl font-semibold text-[#161514] dark:text-[#FAF8F5]">
+                  {sleepHours}<span className="text-xs font-normal text-[#6B6B6B] dark:text-[#A8A29E]">h </span>
+                  {sleepMinutes}<span className="text-xs font-normal text-[#6B6B6B] dark:text-[#A8A29E]">m</span>
                 </span>
-                <span className="text-[10px] text-[#161514]/70 block font-bold">Last logged rest duration</span>
+                <span className="text-[11px] text-[#6B6B6B] dark:text-[#A8A29E] block">Last logged rest duration</span>
               </div>
-              <div className="flex items-center gap-1.5 bg-indigo-200 border-2 border-[#161514] px-3 py-1 rounded-xl shadow-[2px_2px_0px_0px_#161514]">
-                <Sparkles className="h-3.5 w-3.5 text-[#161514] stroke-[2.5]" />
-                <span className="text-xs font-heading font-black text-[#161514]">Score: {sleepScore || 80}/100</span>
+              <div className="flex items-center gap-1.5 bg-[#DCFAE5] dark:bg-[#03D26F]/20 border border-[#03D26F]/30 px-2.5 py-1 rounded-md text-[#04250e] dark:text-[#03D26F]">
+                <Sparkles className="size-3 stroke-[1.5]" />
+                <span className="text-xs font-mono font-medium">Score: {sleepScore || 80}/100</span>
               </div>
             </div>
 
             {/* Sleep Stages Multi-Segment Bar */}
             <div className="space-y-1.5">
-              <div className="flex justify-between text-[10px] font-heading font-black text-[#161514]">
+              <div className="flex justify-between text-xs font-medium text-[#161514] dark:text-[#FAF8F5]">
                 <span>Sleep Stage Breakdown</span>
-                <span className="text-indigo-800 font-black">Good Recovery</span>
+                <span className="text-[#047857] dark:text-[#03D26F] text-[11px]">Good Recovery</span>
               </div>
-              <div className="h-3.5 w-full bg-white rounded-full overflow-hidden flex gap-0.5 p-0.5 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514]">
+              <div className="h-2 w-full bg-[#E8E5DF] dark:bg-[#383531] rounded-full overflow-hidden flex gap-0.5">
                 <div className="h-full bg-amber-400 rounded-l-full" style={{ width: "10%" }} title="Awake: 30m" />
                 <div className="h-full bg-indigo-400" style={{ width: "25%" }} title="REM: 1h 30m" />
                 <div className="h-full bg-sky-400" style={{ width: "45%" }} title="Light: 3h 30m" />
                 <div className="h-full bg-indigo-700 rounded-r-full" style={{ width: "20%" }} title="Deep: 1h 15m" />
               </div>
-              <div className="flex justify-between text-[9px] font-heading font-black text-[#161514] pt-0.5">
-                <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-amber-400 border border-[#161514]" /> Awake (10%)</span>
-                <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-indigo-400 border border-[#161514]" /> REM (25%)</span>
-                <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-sky-400 border border-[#161514]" /> Light (45%)</span>
-                <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-indigo-700 border border-[#161514]" /> Deep (20%)</span>
+              <div className="flex justify-between text-[10px] text-[#6B6B6B] dark:text-[#A8A29E] pt-0.5 font-mono">
+                <span className="flex items-center gap-1"><span className="size-1.5 rounded-full bg-amber-400" /> Awake (10%)</span>
+                <span className="flex items-center gap-1"><span className="size-1.5 rounded-full bg-indigo-400" /> REM (25%)</span>
+                <span className="flex items-center gap-1"><span className="size-1.5 rounded-full bg-sky-400" /> Light (45%)</span>
+                <span className="flex items-center gap-1"><span className="size-1.5 rounded-full bg-indigo-700" /> Deep (20%)</span>
               </div>
             </div>
 
-            {/* 💤 DATASET ENGINE: CIRCADIAN RHYTHM ENERGY & FOCUS PREDICTOR */}
+            {/* CIRCADIAN RHYTHM ENERGY & FOCUS PREDICTOR */}
             {(() => {
               const circadian = predictCircadianProductivity(sleepHours + sleepMinutes / 60);
               return (
-                <div className="bg-[#161514] text-white rounded-2xl p-3.5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-2.5">
+                <div className="bg-[#161514] dark:bg-[#121110] text-white rounded-xl p-3 border border-[#161514] dark:border-[#383531] space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-heading font-black uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
-                      <Brain className="h-3.5 w-3.5 text-amber-300" /> Energy & Focus Window
+                    <span className="text-[10px] font-mono text-amber-300 flex items-center gap-1.5">
+                      <Brain className="size-3 text-amber-300" /> Energy & Focus Window
                     </span>
-                    <span className="text-[9px] font-heading font-black bg-[#CEF431] border border-[#161514] px-2 py-0.5 rounded-full text-[#161514]">
+                    <span className="text-[10px] font-mono font-medium bg-[#03D26F] px-2 py-0.5 rounded text-white">
                       {circadian.focusRating} • {circadian.energyScore}%
                     </span>
                   </div>
-                  <p className="text-xs font-bold leading-relaxed text-slate-200">
+                  <p className="text-xs font-normal leading-relaxed text-zinc-300">
                     {circadian.recommendation}
                   </p>
-                  <div className="grid grid-cols-2 gap-2 pt-1 border-t border-slate-700/50 text-[10px]">
-                    <div className="flex items-center gap-1.5 text-amber-300 font-bold">
-                      <Zap className="h-3 w-3" />
+                  <div className="grid grid-cols-2 gap-2 pt-1 border-t border-zinc-800 text-[10px]">
+                    <div className="flex items-center gap-1.5 text-amber-300 font-mono">
+                      <Zap className="size-3" />
                       <span>Peak: {circadian.peakFocusWindow}</span>
                     </div>
-                    <div className="flex items-center gap-1.5 text-rose-300 font-bold">
-                      <Coffee className="h-3 w-3" />
+                    <div className="flex items-center gap-1.5 text-rose-300 font-mono">
+                      <Coffee className="size-3" />
                       <span>Cutoff: {circadian.caffeineCutoff}</span>
                     </div>
                   </div>
@@ -226,108 +229,111 @@ export function SleepAndActiveWidgets() {
       </div>
 
       {/* Active Time & Calories Burnt Card */}
-      <div className="bg-white rounded-2xl sm:rounded-3xl p-5 md:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
+      <div className="bg-white dark:bg-[#1C1A18] rounded-xl p-5 border border-[#E8E5DF] dark:border-[#383531] space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="h-10 w-10 rounded-xl bg-rose-300 border-2 border-[#161514] text-[#161514] flex items-center justify-center font-black shadow-[2px_2px_0px_0px_#161514]">
-              <Activity className="h-5 w-5 stroke-[2.5]" />
+            <div className="size-8 rounded-lg bg-[#F1EFEA] dark:bg-[#252321] flex items-center justify-center text-[#161514] dark:text-[#FAF8F5] shrink-0">
+              <Activity className="size-4 stroke-[1.5]" />
             </div>
             <div>
-              <h4 className="text-sm font-heading font-black text-[#161514] tracking-tight">Active Time & Calories</h4>
-              <p className="text-[10px] text-[#161514]/80 font-bold">Daily movement status</p>
+              <h4 className="text-[15px] font-sans font-semibold text-[#161514] dark:text-[#FAF8F5] tracking-tight">Active time & calories</h4>
+              <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E]">Daily movement status</p>
             </div>
           </div>
           <button
             onClick={() => setIsEditingActive(!isEditingActive)}
-            className="text-[10px] font-heading font-black text-[#161514] bg-[#CEF431] hover:bg-[#D8F74E] px-3.5 py-1.5 rounded-xl cursor-pointer transition-all border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none flex items-center gap-1 uppercase tracking-wider"
+            className="text-xs font-medium text-[#161514] dark:text-[#FAF8F5] bg-white dark:bg-[#252321] hover:bg-[#F5F3EF] dark:hover:bg-[#2e2b28] px-3 py-1.5 rounded-lg cursor-pointer transition-colors border border-[#E8E5DF] dark:border-[#383531] flex items-center gap-1"
           >
-            {isEditingActive ? "Done" : <><Plus className="h-3.5 w-3.5 stroke-[3]" /> Log Active</>}
+            {isEditingActive ? "Done" : <><Plus className="size-3.5 stroke-[1.5]" /> Log active</>}
           </button>
         </div>
 
         {isEditingActive ? (
-          <div className="space-y-3 bg-[#FFF9EA] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514]">
-            <div className="grid grid-cols-3 gap-2 text-xs font-bold">
+          <div className="space-y-3 bg-[#FAF8F5] dark:bg-[#161514] p-3.5 rounded-lg border border-[#E8E5DF] dark:border-[#383531]">
+            <div className="grid grid-cols-3 gap-2 text-xs font-medium">
               <div>
-                <label className="text-[9px] uppercase tracking-wider text-[#161514]/70 font-heading font-black">Active Mins</label>
+                <label className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E] block mb-1">Active Mins</label>
                 <input
                   type="number"
                   value={activeMins || ""}
                   placeholder="e.g. 45"
                   onChange={(e) => saveActiveLog(Number(e.target.value), activeTarget, caloriesBurnt, distanceKm)}
-                  className="w-full bg-white rounded-xl p-2 border-2 border-[#161514] font-black text-[#161514] focus:bg-[#FFF9EA] outline-none"
+                  className="w-full bg-white dark:bg-[#252321] rounded-lg p-2 border border-[#E8E5DF] dark:border-[#383531] font-medium text-xs text-[#161514] dark:text-[#FAF8F5] focus:border-[#161514] dark:focus:border-[#CEF431] outline-none"
                 />
               </div>
               <div>
-                <label className="text-[9px] uppercase tracking-wider text-[#161514]/70 font-heading font-black">Calories (kcal)</label>
+                <label className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E] block mb-1">Calories (kcal)</label>
                 <input
                   type="number"
                   value={caloriesBurnt || ""}
                   placeholder="e.g. 350"
                   onChange={(e) => saveActiveLog(activeMins, activeTarget, Number(e.target.value), distanceKm)}
-                  className="w-full bg-white rounded-xl p-2 border-2 border-[#161514] font-black text-[#161514] focus:bg-[#FFF9EA] outline-none"
+                  className="w-full bg-white dark:bg-[#252321] rounded-lg p-2 border border-[#E8E5DF] dark:border-[#383531] font-medium text-xs text-[#161514] dark:text-[#FAF8F5] focus:border-[#161514] dark:focus:border-[#CEF431] outline-none"
                 />
               </div>
               <div>
-                <label className="text-[9px] uppercase tracking-wider text-[#161514]/70 font-heading font-black">Distance (km)</label>
+                <label className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E] block mb-1">Distance (km)</label>
                 <input
                   type="text"
                   value={distanceKm || ""}
                   placeholder="e.g. 2.5"
                   onChange={(e) => saveActiveLog(activeMins, activeTarget, caloriesBurnt, e.target.value)}
-                  className="w-full bg-white rounded-xl p-2 border-2 border-[#161514] font-black text-[#161514] focus:bg-[#FFF9EA] outline-none"
+                  className="w-full bg-white dark:bg-[#252321] rounded-lg p-2 border border-[#E8E5DF] dark:border-[#383531] font-medium text-xs text-[#161514] dark:text-[#FAF8F5] focus:border-[#161514] dark:focus:border-[#CEF431] outline-none"
                 />
               </div>
             </div>
             {hasLoggedActive && (
               <button
                 onClick={clearActiveLog}
-                className="text-[10px] text-rose-600 font-heading font-black hover:underline flex items-center gap-1 cursor-pointer pt-1"
+                className="text-xs text-rose-600 hover:underline flex items-center gap-1 cursor-pointer pt-1 font-medium"
               >
-                <Trash2 className="h-3 w-3 stroke-[2.5]" /> Clear Active Entry
+                <Trash2 className="size-3 stroke-[1.5]" /> Clear Active Entry
               </button>
             )}
           </div>
         ) : !hasLoggedActive ? (
           /* Empty Encouragement State */
-          <div className="bg-[#FFF9EA] rounded-2xl p-4 border-2 border-dashed border-[#161514] text-center space-y-2 shadow-[2px_2px_0px_0px_#161514]">
-            <p className="text-xs font-heading font-black text-[#161514]">No active movement logged today! 🏃</p>
-            <p className="text-[10px] text-[#161514]/80 font-bold">
-              Click <span className="font-black text-amber-900">'Log Active'</span> above to record your workout minutes & calories burnt.
+          <div className="bg-[#FAF8F5] dark:bg-[#161514] rounded-lg p-4 border border-dashed border-[#E8E5DF] dark:border-[#383531] text-center space-y-1.5">
+            <div className="size-7 rounded-md bg-white dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#383531] flex items-center justify-center mx-auto text-[#6B6B6B] dark:text-[#A8A29E]">
+              <Activity className="size-3.5 stroke-[1.5]" />
+            </div>
+            <p className="text-xs font-sans font-medium text-[#161514] dark:text-[#FAF8F5]">No active movement logged today</p>
+            <p className="text-[11px] text-[#6B6B6B] dark:text-[#A8A29E]">
+              Click <span className="font-semibold text-[#161514] dark:text-[#FAF8F5]">'Log active'</span> above to record workout minutes and calories burnt.
             </p>
           </div>
         ) : (
           <div className="space-y-3">
             <div className="space-y-1.5">
               <div className="flex justify-between items-baseline">
-                <span className="font-heading text-2xl font-black text-[#161514]">
-                  {activeMins} <span className="text-xs text-[#161514]/70 font-bold">/ {activeTarget || 60} mins</span>
+                <span className="font-mono text-2xl font-semibold text-[#161514] dark:text-[#FAF8F5]">
+                  {activeMins} <span className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] font-normal">/ {activeTarget || 60} mins</span>
                 </span>
-                <span className="text-xs font-heading font-black text-[#161514] bg-rose-200 px-2.5 py-0.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514]">
+                <span className="text-xs font-mono font-medium text-[#04250e] dark:text-[#03D26F] bg-[#DCFAE5] dark:bg-[#03D26F]/20 px-2 py-0.5 rounded border border-[#03D26F]/30">
                   {Math.round((activeMins / (activeTarget || 60)) * 100)}% Reached
                 </span>
               </div>
-              <div className="h-3.5 w-full bg-white rounded-full overflow-hidden p-0.5 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514]">
+              <div className="h-1.5 w-full bg-[#E8E5DF] dark:bg-[#383531] rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-rose-400 rounded-full transition-all duration-500"
+                  className="h-full bg-rose-500 rounded-full transition-all duration-500"
                   style={{ width: `${Math.min(100, (activeMins / (activeTarget || 60)) * 100)}%` }}
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-2.5 pt-1">
-              <div className="bg-amber-100 p-3 rounded-2xl border-2 border-[#161514] flex items-center gap-2 shadow-[3px_3px_0px_0px_#161514]">
-                <Flame className="h-5 w-5 text-amber-600 fill-amber-500 stroke-[2.5]" />
+              <div className="bg-[#FAF8F5] dark:bg-[#161514] p-3 rounded-lg border border-[#E8E5DF] dark:border-[#383531] flex items-center gap-2.5">
+                <Flame className="size-4 text-orange-500 fill-orange-500 shrink-0" />
                 <div>
-                  <span className="text-[9px] font-heading font-black text-[#161514] block uppercase tracking-wider">Calories</span>
-                  <span className="font-heading text-xs font-black text-[#161514] block">{caloriesBurnt} kcal</span>
+                  <span className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E] block">Calories</span>
+                  <span className="text-xs font-mono font-semibold text-[#161514] dark:text-[#FAF8F5] block tabular-nums">{caloriesBurnt} kcal</span>
                 </div>
               </div>
-              <div className="bg-sky-100 p-3 rounded-2xl border-2 border-[#161514] flex items-center gap-2 shadow-[3px_3px_0px_0px_#161514]">
-                <Clock className="h-5 w-5 text-sky-600 stroke-[2.5]" />
+              <div className="bg-[#FAF8F5] dark:bg-[#161514] p-3 rounded-lg border border-[#E8E5DF] dark:border-[#383531] flex items-center gap-2.5">
+                <Clock className="size-4 text-sky-600 dark:text-sky-400 stroke-[1.5] shrink-0" />
                 <div>
-                  <span className="text-[9px] font-heading font-black text-[#161514] block uppercase tracking-wider">Distance</span>
-                  <span className="font-heading text-xs font-black text-[#161514] block">{distanceKm} km</span>
+                  <span className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E] block">Distance</span>
+                  <span className="text-xs font-mono font-semibold text-[#161514] dark:text-[#FAF8F5] block tabular-nums">{distanceKm} km</span>
                 </div>
               </div>
             </div>

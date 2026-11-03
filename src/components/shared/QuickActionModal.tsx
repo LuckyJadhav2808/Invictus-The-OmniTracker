@@ -249,19 +249,18 @@ export function QuickActionModal() {
 
   const modalBody = (
     <div className="space-y-4">
-      {/* Neobrutalist Tab Switcher */}
-      <div className="grid grid-cols-2 gap-2 p-1 bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)]">
+      {/* Segmented Tab Switcher */}
+      <div className="grid grid-cols-2 gap-1 p-1 bg-[#F1EFEA] dark:bg-[#252321] rounded-xl border border-[#E8E5DF] dark:border-[#383531]">
         <button
           type="button"
           onClick={() => setActiveTab("expense")}
           className={cn(
-            "py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer",
+            "py-1.5 px-3 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1.5 cursor-pointer",
             activeTab === "expense"
-              ? "bg-[#CEF431] text-[#161514] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)]"
-              : "text-[#161514]/70 hover:text-[#161514]"
+              ? "bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#383531] shadow-xs font-semibold"
+              : "text-[#8C8882] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5]"
           )}
         >
-          <span>💰</span>
           <span>Quick Expense</span>
         </button>
 
@@ -269,13 +268,12 @@ export function QuickActionModal() {
           type="button"
           onClick={() => setActiveTab("habits")}
           className={cn(
-            "py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer",
+            "py-1.5 px-3 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1.5 cursor-pointer",
             activeTab === "habits"
-              ? "bg-[#CEF431] text-[#161514] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)]"
-              : "text-[#161514]/70 hover:text-[#161514]"
+              ? "bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#383531] shadow-xs font-semibold"
+              : "text-[#8C8882] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5]"
           )}
         >
-          <span>🔥</span>
           <span>Check Habits ({habits.length})</span>
         </button>
       </div>
@@ -284,28 +282,28 @@ export function QuickActionModal() {
         /* Quick Expense Form */
         <form onSubmit={handleExpenseSubmit} className="space-y-4 pt-1">
           {sessionLoggedCount > 0 && (
-            <div className="p-2.5 bg-emerald-50 rounded-2xl border-2 border-emerald-700 text-emerald-950 text-xs font-black flex items-center justify-between shadow-[2px_2px_0px_0px_rgba(4,120,87,1)] animate-in fade-in duration-200">
+            <div className="p-2.5 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-200 dark:border-emerald-800 text-emerald-950 dark:text-emerald-300 text-xs font-medium flex items-center justify-between animate-in fade-in duration-200">
               <span className="flex items-center gap-2">
-                <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-ping" />
+                <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span>{sessionLoggedCount} {sessionLoggedCount === 1 ? "expense" : "expenses"} logged</span>
               </span>
               <button
                 type="button"
                 onClick={handleClose}
-                className="text-[10px] uppercase font-black px-2.5 py-1 bg-emerald-200 hover:bg-emerald-300 text-emerald-950 rounded-xl border-1.5 border-emerald-800 shadow-[1px_1px_0px_0px_rgba(4,120,87,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all"
+                className="text-[11px] font-medium px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/60 hover:bg-emerald-200 dark:hover:bg-emerald-800 text-emerald-950 dark:text-emerald-200 rounded-md border border-emerald-300 dark:border-emerald-700 transition-colors cursor-pointer"
               >
-                Done & Close
+                Done
               </button>
             </div>
           )}
 
-          {/* Big Currency Amount Input */}
+          {/* Currency Amount Input */}
           <div className="space-y-1.5">
-            <label className="text-[10px] font-black uppercase tracking-wider text-[#161514]/80">
+            <label className="text-[11px] font-medium text-[#8C8882] dark:text-[#A8A29E]">
               Amount (₹) *
             </label>
             <div className="relative flex items-center">
-              <span className="absolute left-4 text-2xl sm:text-3xl font-black text-[#161514] select-none">
+              <span className="absolute left-3.5 text-2xl font-mono font-bold text-[#161514] dark:text-[#CEF431] select-none">
                 ₹
               </span>
               <input
@@ -316,7 +314,7 @@ export function QuickActionModal() {
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 placeholder="0"
-                className="w-full bg-[#FAF8F5] rounded-2xl border-2 sm:border-[2.5px] border-[#161514] pl-10 pr-4 py-3 sm:py-3.5 text-2xl sm:text-3xl font-black text-[#161514] outline-none shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] focus:bg-amber-50/50 transition-all placeholder:text-[#161514]/25"
+                className="w-full bg-[#FAF8F5] dark:bg-[#121110] rounded-xl border border-[#E8E5DF] dark:border-[#383531] pl-9 pr-4 py-2.5 text-2xl font-mono font-bold text-[#161514] dark:text-[#FAF8F5] outline-none shadow-xs focus:border-[#161514] dark:focus:border-[#CEF431] focus:bg-white dark:focus:bg-[#1C1A18] transition-all placeholder:text-[#161514]/25 dark:placeholder:text-[#FAF8F5]/30"
                 required
               />
             </div>
@@ -332,7 +330,7 @@ export function QuickActionModal() {
                   const current = parseFloat(amount) || 0;
                   setAmount(String(current + val));
                 }}
-                className="px-2.5 py-1 bg-white hover:bg-amber-200 text-[#161514] font-black text-[11px] rounded-xl border-1.5 border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer shrink-0"
+                className="px-2.5 py-1 bg-white dark:bg-[#252321] hover:bg-[#F1EFEA] dark:hover:bg-[#2A2724] text-[#161514] dark:text-[#FAF8F5] font-mono font-medium text-xs rounded-md border border-[#E8E5DF] dark:border-[#383531] shadow-xs transition-colors cursor-pointer shrink-0"
               >
                 +₹{val}
               </button>
@@ -341,10 +339,10 @@ export function QuickActionModal() {
 
           {/* Category Selector Grid */}
           <div className="space-y-1.5">
-            <label className="text-[10px] font-black uppercase tracking-wider text-[#161514]/80">
+            <label className="text-[11px] font-medium text-[#8C8882] dark:text-[#A8A29E]">
               Category
             </label>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-4 gap-1.5">
               {DEFAULT_CATEGORIES.map((cat) => {
                 const isSelected = categoryId === cat.id;
                 return (
@@ -353,14 +351,14 @@ export function QuickActionModal() {
                     type="button"
                     onClick={() => setCategoryId(cat.id)}
                     className={cn(
-                      "p-2 rounded-2xl border-2 border-[#161514] flex flex-col items-center justify-center gap-1 transition-all cursor-pointer",
+                      "p-2 rounded-xl border flex flex-col items-center justify-center gap-1 transition-colors cursor-pointer",
                       isSelected
-                        ? "bg-[#CEF431] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)] scale-[1.03]"
-                        : "bg-white hover:bg-[#FAF8F5] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] opacity-85"
+                        ? "bg-[#161514] dark:bg-[#CEF431] text-white dark:text-[#161514] border-[#161514] dark:border-[#CEF431] shadow-xs"
+                        : "bg-white dark:bg-[#252321] hover:bg-[#FAF8F5] dark:hover:bg-[#2A2724] text-[#161514] dark:text-[#FAF8F5] border-[#E8E5DF] dark:border-[#383531]"
                     )}
                   >
-                    <span className="text-base">{cat.icon}</span>
-                    <span className="text-[10px] font-black text-[#161514] truncate w-full text-center">
+                    <span className="text-sm">{cat.icon}</span>
+                    <span className="text-[10px] font-medium truncate w-full text-center">
                       {cat.name}
                     </span>
                   </button>
@@ -371,7 +369,7 @@ export function QuickActionModal() {
 
           {/* Note / Merchant Input with Auto-Categorization */}
           <div className="space-y-1.5">
-            <label className="text-[10px] font-black uppercase tracking-wider text-[#161514]/80">
+            <label className="text-[11px] font-medium text-[#8C8882] dark:text-[#A8A29E]">
               Note / Merchant (Optional)
             </label>
             <input
@@ -379,13 +377,13 @@ export function QuickActionModal() {
               value={note}
               onChange={(e) => handleNoteChange(e.target.value)}
               placeholder="e.g. Swiggy, Metro, Grocery, Coffee"
-              className="w-full bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] px-3.5 py-2 text-xs sm:text-sm font-bold text-[#161514] outline-none shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] focus:bg-amber-50/50 transition-all placeholder:text-[#161514]/40"
+              className="w-full bg-[#FAF8F5] dark:bg-[#121110] rounded-xl border border-[#E8E5DF] dark:border-[#383531] px-3.5 py-2 text-xs sm:text-sm font-medium text-[#161514] dark:text-[#FAF8F5] outline-none shadow-xs focus:border-[#161514] dark:focus:border-[#CEF431] focus:bg-white dark:focus:bg-[#1C1A18] transition-all placeholder:text-[#8C8882] dark:placeholder:text-[#A8A29E]/60"
             />
           </div>
 
           {/* Payment Method Selector */}
           <div className="space-y-1.5">
-            <label className="text-[10px] font-black uppercase tracking-wider text-[#161514]/80">
+            <label className="text-[11px] font-medium text-[#8C8882] dark:text-[#A8A29E]">
               Payment Mode
             </label>
             <div className="grid grid-cols-3 gap-2">
@@ -395,10 +393,10 @@ export function QuickActionModal() {
                   type="button"
                   onClick={() => setPaymentMethod(pm.id)}
                   className={cn(
-                    "py-2 rounded-xl border-2 border-[#161514] text-[11px] font-black transition-all cursor-pointer shadow-[1px_1px_0px_0px_rgba(22,21,20,1)]",
+                    "py-1.5 rounded-lg border text-xs font-medium transition-colors cursor-pointer shadow-xs",
                     paymentMethod === pm.id
-                      ? "bg-amber-300 text-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] scale-[1.02]"
-                      : "bg-white text-[#161514]/80 hover:bg-[#FAF8F5]"
+                      ? "bg-[#161514] dark:bg-[#CEF431] text-white dark:text-[#161514] border-[#161514] dark:border-[#CEF431]"
+                      : "bg-white dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] border-[#E8E5DF] dark:border-[#383531] hover:bg-[#FAF8F5] dark:hover:bg-[#2A2724]"
                   )}
                 >
                   {pm.label}
@@ -407,14 +405,14 @@ export function QuickActionModal() {
             </div>
           </div>
 
-          {/* Big Tactile Submit Buttons */}
+          {/* Tactile Submit Buttons */}
           <div className="flex items-center gap-2 pt-1">
             <button
               type="submit"
               disabled={addTransactionMutation.isPending}
-              className="flex-1 bg-[#CEF431] hover:bg-[#b8dd25] text-[#161514] font-black text-sm rounded-2xl py-3.5 border-2 sm:border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all uppercase tracking-wider flex items-center justify-center gap-2"
+              className="flex-1 bg-[#161514] dark:bg-[#CEF431] hover:bg-neutral-800 dark:hover:bg-[#b5da28] text-white dark:text-[#161514] font-medium text-xs rounded-xl py-3 shadow-xs cursor-pointer transition-colors flex items-center justify-center gap-2 font-heading font-black"
             >
-              <Zap className="h-4 w-4 fill-current" />
+              <Zap className="size-3.5 stroke-[1.75]" />
               <span>
                 {addTransactionMutation.isPending
                   ? "Logging..."
@@ -432,10 +430,10 @@ export function QuickActionModal() {
               <button
                 type="button"
                 onClick={handleClose}
-                className="px-4 bg-white hover:bg-[#FAF8F5] text-[#161514] font-black text-sm rounded-2xl py-3.5 border-2 sm:border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all uppercase tracking-wider flex items-center justify-center gap-1.5"
+                className="px-4 bg-white dark:bg-[#252321] hover:bg-[#FAF8F5] dark:hover:bg-[#2A2724] text-[#161514] dark:text-[#FAF8F5] font-medium text-xs rounded-xl py-3 border border-[#E8E5DF] dark:border-[#383531] shadow-xs cursor-pointer transition-colors flex items-center justify-center gap-1.5"
                 title="Finished logging"
               >
-                <Check className="h-4 w-4 stroke-[3]" />
+                <Check className="size-3.5 stroke-[2]" />
                 <span>Done</span>
               </button>
             )}
@@ -445,21 +443,21 @@ export function QuickActionModal() {
         /* Quick Habits Checklist */
         <div className="space-y-2.5 pt-1">
           <div className="flex items-center justify-between px-1">
-            <span className="text-[10px] font-black uppercase tracking-wider text-[#161514]/70">
+            <span className="text-[11px] font-medium text-[#8C8882] dark:text-[#A8A29E]">
               Today's Active Habits
             </span>
-            <span className="text-[10px] font-black bg-[#CEF431] text-[#161514] px-2 py-0.5 rounded-full border border-[#161514]">
+            <span className="text-[10px] font-mono font-medium bg-[#F1EFEA] dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] px-2 py-0.5 rounded border border-[#E8E5DF] dark:border-[#383531]">
               {habits.filter((h) => isHabitCompleted(h.id)).length}/{habits.length} Done
             </span>
           </div>
 
           {habits.length === 0 ? (
-            <div className="p-6 text-center bg-[#FAF8F5] rounded-2xl border-2 border-dashed border-[#161514] space-y-1">
-              <p className="text-xs font-black text-[#161514]">No habits created yet 🌱</p>
-              <p className="text-[10px] text-[#161514]/70 font-medium">Head to Goals Space to add your first habit!</p>
+            <div className="p-6 text-center bg-[#FAF8F5] dark:bg-[#121110] rounded-xl border border-dashed border-[#E8E5DF] dark:border-[#383531] space-y-1">
+              <p className="text-xs font-medium text-[#161514] dark:text-[#FAF8F5]">No habits created yet</p>
+              <p className="text-[11px] text-[#8C8882] dark:text-[#A8A29E]">Head to Goals Space to add your first habit!</p>
             </div>
           ) : (
-            <div className="space-y-2 max-h-[50vh] overflow-y-auto pr-1 no-scrollbar">
+            <div className="space-y-1.5 max-h-[50vh] overflow-y-auto pr-1 no-scrollbar">
               {habits.map((habit) => {
                 const isDone = isHabitCompleted(habit.id);
                 const habitStreak = streaks[habit.id];
@@ -469,35 +467,35 @@ export function QuickActionModal() {
                     key={habit.id}
                     onClick={() => handleToggleHabit(habit.id, isDone)}
                     className={cn(
-                      "p-3 rounded-2xl border-2 border-[#161514] flex items-center justify-between gap-3 cursor-pointer transition-all shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5",
+                      "p-2.5 rounded-xl border flex items-center justify-between gap-3 cursor-pointer transition-colors shadow-xs",
                       isDone
-                        ? "bg-[#03D26F]/25 text-[#161514]"
-                        : "bg-white text-[#161514] hover:bg-[#FAF8F5]"
+                        ? "bg-[#FAF8F5] dark:bg-[#161514] text-[#8C8882] dark:text-[#A8A29E] border-[#E8E5DF] dark:border-[#383531]"
+                        : "bg-white dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] border-[#E8E5DF] dark:border-[#383531] hover:bg-[#FAF8F5] dark:hover:bg-[#2A2724]"
                     )}
                   >
-                    <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex items-center gap-2.5 min-w-0">
                       <div
                         className={cn(
-                          "h-8 w-8 rounded-xl border-2 border-[#161514] flex items-center justify-center font-black text-sm shrink-0 transition-all shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)]",
-                          isDone ? "bg-[#03D26F] text-[#161514]" : "bg-white"
+                          "size-6 rounded-md border flex items-center justify-center font-bold text-xs shrink-0 transition-colors",
+                          isDone ? "bg-[#03D26F] text-white border-[#03D26F]" : "bg-white dark:bg-[#1C1A18] border-[#E8E5DF] dark:border-[#383531]"
                         )}
                       >
-                        {isDone ? <Check className="h-4 w-4 stroke-[3]" /> : null}
+                        {isDone ? <Check className="size-3.5 stroke-[2.5]" /> : null}
                       </div>
 
                       <div className="min-w-0">
-                        <span className={cn("text-xs font-black block truncate", isDone && "line-through opacity-70")}>
+                        <span className={cn("text-xs font-medium block truncate", isDone && "line-through opacity-70")}>
                           {habit.title}
                         </span>
                         {habitStreak?.currentStreak ? (
-                          <span className="text-[9px] font-black text-amber-600 flex items-center gap-0.5 mt-0.5">
+                          <span className="text-[10px] font-medium text-amber-600 dark:text-amber-400 flex items-center gap-0.5 mt-0.5">
                             🔥 {habitStreak.currentStreak} day streak
                           </span>
                         ) : null}
                       </div>
                     </div>
 
-                    <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-lg border border-[#161514] bg-amber-200 text-[#161514] shrink-0">
+                    <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded border border-[#E8E5DF] dark:border-[#383531] bg-[#F1EFEA] dark:bg-[#1C1A18] text-[#8C8882] dark:text-[#A8A29E] shrink-0">
                       {habit.frequency?.type || "DAILY"}
                     </span>
                   </div>
@@ -515,19 +513,19 @@ export function QuickActionModal() {
       <Dialog open={isOpen} onOpenChange={(open) => { if (!open) handleClose(); else setIsOpen(true); }}>
         <DialogContent
           showCloseButton={false}
-          className="sm:max-w-[480px] bg-white rounded-3xl p-0 border-2.5 border-[#161514] shadow-[6px_6px_0px_0px_rgba(22,21,20,1)] overflow-hidden"
+          className="sm:max-w-[480px] bg-white dark:bg-[#1C1A18] rounded-2xl p-0 border border-[#E8E5DF] dark:border-[#383531] shadow-2xl overflow-hidden"
         >
           {/* Header */}
-          <div className="px-5 pt-5 pb-3 border-b-2 border-[#161514]/20 bg-[#FAF8F5] flex items-center justify-between">
+          <div className="px-5 pt-4 pb-3 border-b border-[#E8E5DF] dark:border-[#383531] bg-white dark:bg-[#1C1A18] flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="p-1.5 rounded-xl bg-[#CEF431] border-1.5 border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] text-xs">
+              <span className="p-1 rounded-lg bg-[#F1EFEA] dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#383531] text-xs">
                 ⚡
               </span>
               <div>
-                <DialogTitle className="text-base font-black text-[#161514] uppercase tracking-tight">
+                <DialogTitle className="text-sm font-semibold text-[#161514] dark:text-[#FAF8F5] tracking-tight">
                   Instant Quick Input
                 </DialogTitle>
-                <p className="text-[10px] font-bold text-[#161514]/70">
+                <p className="text-[10px] text-[#8C8882] dark:text-[#A8A29E]">
                   Shortcut & Gesture Quick Logger
                 </p>
               </div>
@@ -536,10 +534,10 @@ export function QuickActionModal() {
             <button
               type="button"
               onClick={handleClose}
-              className="p-1.5 rounded-xl bg-rose-100 hover:bg-rose-300 text-[#161514] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
+              className="size-7 rounded-full bg-[#F1EFEA] dark:bg-[#252321] hover:bg-[#E8E5DF] dark:hover:bg-[#383531] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#383531] flex items-center justify-center transition-colors cursor-pointer"
               title="Close modal"
             >
-              <X className="h-4 w-4 stroke-[3]" />
+              <X className="size-3.5 stroke-[2]" />
             </button>
           </div>
 
@@ -554,21 +552,21 @@ export function QuickActionModal() {
       <SheetContent
         side="bottom"
         showCloseButton={false}
-        className="bg-white rounded-t-3xl px-5 pb-[calc(2.5rem+env(safe-area-inset-bottom))] pt-3 border-t-2.5 border-x-2.5 border-[#161514] shadow-[0px_-6px_0px_0px_rgba(22,21,20,1)] outline-none max-h-[90vh] overflow-y-auto z-[150]"
+        className="bg-white dark:bg-[#1C1A18] rounded-t-2xl px-5 pb-[calc(2.5rem+env(safe-area-inset-bottom))] pt-3 border-t border-x border-[#E8E5DF] dark:border-[#383531] shadow-2xl outline-none max-h-[90vh] overflow-y-auto z-[150]"
       >
-        <div className="mx-auto w-12 h-1.5 rounded-full bg-[#161514] mb-3" />
+        <div className="mx-auto w-10 h-1 rounded-full bg-[#E8E5DF] dark:bg-[#383531] mb-3" />
         
         {/* Header */}
-        <div className="flex items-center justify-between pb-3 mb-2 border-b-2 border-[#161514]/20">
+        <div className="flex items-center justify-between pb-3 mb-2 border-b border-[#E8E5DF] dark:border-[#383531]">
           <div className="flex items-center gap-2">
-            <span className="p-1.5 rounded-xl bg-[#CEF431] border-1.5 border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] text-xs">
+            <span className="p-1 rounded-lg bg-[#F1EFEA] dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#383531] text-xs">
               ⚡
             </span>
             <div>
-              <SheetTitle className="text-base font-black text-[#161514] uppercase tracking-tight">
+              <SheetTitle className="text-sm font-semibold text-[#161514] dark:text-[#FAF8F5] tracking-tight">
                 Instant Quick Input
               </SheetTitle>
-              <p className="text-[10px] font-bold text-[#161514]/70">
+              <p className="text-[10px] text-[#8C8882] dark:text-[#A8A29E]">
                 Back-Tap & Shortcut Logger
               </p>
             </div>
@@ -577,10 +575,10 @@ export function QuickActionModal() {
           <button
             type="button"
             onClick={handleClose}
-            className="p-1.5 rounded-xl bg-rose-100 hover:bg-rose-300 text-[#161514] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
+            className="size-7 rounded-full bg-[#F1EFEA] dark:bg-[#252321] hover:bg-[#E8E5DF] dark:hover:bg-[#383531] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#383531] flex items-center justify-center transition-colors cursor-pointer"
             title="Close popup"
           >
-            <X className="h-4 w-4 stroke-[3]" />
+            <X className="size-3.5 stroke-[2]" />
           </button>
         </div>
 

@@ -28,34 +28,33 @@ export function ResponsiveFormContainer({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
-        className="w-[94vw] sm:max-w-[520px] max-h-[88vh] flex flex-col bg-white rounded-3xl p-0 border-2 sm:border-[2.5px] border-[#161514] shadow-[6px_6px_0px_0px_#161514] overflow-hidden"
+        className="w-[94vw] sm:max-w-[520px] max-h-[88vh] flex flex-col bg-white dark:bg-[#161514] rounded-2xl p-0 border border-[#E8E5DF] dark:border-[#2A2724] shadow-2xl overflow-hidden text-[#161514] dark:text-[#FAF8F5]"
       >
-        <DialogHeader className="shrink-0 px-5 sm:px-6 pt-5 pb-3 border-b-2 border-[#161514]/20 bg-[#FAF8F5] relative">
+        <DialogHeader className="shrink-0 px-5 sm:px-6 pt-4 pb-3.5 border-b border-[#E8E5DF] dark:border-[#2A2724] bg-white dark:bg-[#161514] relative">
           <div className="pr-10">
             <DialogTitle
-              className="text-lg sm:text-xl font-black text-[#161514] tracking-tight"
-              style={{ fontFamily: "var(--font-heading)" }}
+              className="text-base sm:text-lg font-heading font-black text-[#161514] dark:text-[#FAF8F5] tracking-tight"
             >
               {title}
             </DialogTitle>
             {description && (
-              <DialogDescription className="text-xs font-bold text-[#161514]/70 mt-0.5 line-clamp-2">
+              <DialogDescription className="text-xs font-normal text-[#8C8882] dark:text-[#FAF8F5]/60 mt-0.5 line-clamp-2">
                 {description}
               </DialogDescription>
             )}
           </div>
 
-          {/* Unified Neobrutalist Close Button */}
+          {/* Minimalist Tactile Close Button */}
           <button
             type="button"
             onClick={() => onOpenChange(false)}
-            className="absolute top-4 right-4 bg-rose-100 hover:bg-rose-200 text-[#161514] p-1.5 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
+            className="absolute top-3.5 right-4 size-7 rounded-full bg-[#F1EFEA] dark:bg-[#252220] hover:bg-[#E8E5DF] dark:hover:bg-[#2e2a28] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#2A2724] flex items-center justify-center transition-colors cursor-pointer"
             title="Close modal"
           >
-            <X className="h-4 w-4 stroke-[3]" />
+            <X className="size-3.5 stroke-[2]" />
           </button>
         </DialogHeader>
-        <div className="flex-1 overflow-y-auto px-5 sm:px-6 py-4 scrollbar-thin">
+        <div className="flex-1 overflow-y-auto px-5 sm:px-6 py-4 scrollbar-thin bg-white dark:bg-[#161514]">
           {children}
         </div>
       </DialogContent>

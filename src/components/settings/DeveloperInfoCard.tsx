@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Mail, Copy, Check, ExternalLink, Code2, Sparkles, Heart, ShieldCheck, GraduationCap } from "lucide-react";
+import { Mail, Copy, Check, ExternalLink, Code2, Sparkles, Heart, ShieldCheck, GraduationCap, Terminal } from "lucide-react";
 import { toast } from "sonner";
 import { APP_VERSION_CONFIG } from "@/config/version";
 
@@ -39,16 +39,43 @@ export const DeveloperInfoCard: React.FC<DeveloperInfoCardProps> = ({ className 
     }
   };
 
+  const handleCopyVersionDump = async () => {
+    try {
+      const res = await fetch("/api/version/dump");
+      let dumpObj: any = null;
+      if (res.ok) {
+        dumpObj = await res.json();
+      } else {
+        dumpObj = {
+          application: "Invictus Life OS",
+          version: developer.version,
+          buildNumber: developer.buildNumber,
+          timestamp: new Date().toISOString(),
+        };
+      }
+      if (typeof navigator !== "undefined" && navigator.clipboard) {
+        await navigator.clipboard.writeText(JSON.stringify(dumpObj, null, 2));
+        toast.success("Version dump telemetry copied! 📋", {
+          description: `v${dumpObj.version} • Build ${dumpObj.buildNumber}`,
+        });
+      } else {
+        toast.info(`Version: v${dumpObj.version}`);
+      }
+    } catch {
+      toast.error("Failed to copy version dump");
+    }
+  };
+
   return (
     <div
       data-testid="developer-info-card"
-      className={`w-full bg-white rounded-3xl p-5 sm:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4 ${className}`}
+      className={`w-full bg-white dark:bg-[#161514] rounded-3xl p-5 sm:p-6 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-4 ${className}`}
     >
       {/* Header section with Badge & Version */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3.5">
           <div className="relative">
-            <div className="h-12 w-12 rounded-2xl bg-[#CEF431] border-2 border-[#161514] flex items-center justify-center text-[#161514] shadow-[2px_2px_0px_0px_#161514] font-black text-lg font-heading">
+            <div className="h-12 w-12 rounded-2xl bg-[#CEF431] border border-[#161514] flex items-center justify-center text-[#161514] shadow-[2px_2px_0px_0px_#161514] font-black text-lg font-heading">
               LJ
             </div>
             <div
@@ -61,51 +88,60 @@ export const DeveloperInfoCard: React.FC<DeveloperInfoCardProps> = ({ className 
 
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <h4 className="font-black text-base text-[#161514] tracking-tight font-heading">
+              <h4 className="font-black text-base text-[#161514] dark:text-[#FAF8F5] tracking-tight font-heading">
                 {developer.name}
               </h4>
               <span className="bg-[#161514] text-[#CEF431] text-[9px] font-black uppercase px-2 py-0.5 rounded-full border border-[#161514]">
                 {developer.role}
               </span>
             </div>
-            <p className="text-[11px] text-[#161514]/70 font-bold tracking-tight mt-0.5">
+            <p className="text-[11px] text-[#161514]/70 dark:text-[#FAF8F5]/60 font-bold tracking-tight mt-0.5">
               Creator of Invictus OS • Vibe-Coded with Relentless Passion
             </p>
           </div>
         </div>
 
-        {/* Version Badge */}
-        <div className="flex items-center gap-2 self-start sm:self-auto">
-          <span className="bg-[#FAF8F5] text-[#161514] font-mono text-[10px] font-black px-2.5 py-1 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center gap-1.5">
+        {/* Version Badge & Dump Action */}
+        <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
+          <span className="bg-[#FAF8F5] dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] font-mono text-[10px] font-black px-2.5 py-1 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex items-center gap-1.5">
             <ShieldCheck className="h-3.5 w-3.5 text-[#03D26F] stroke-[2.5]" />
             v{developer.version} (Build {developer.buildNumber})
           </span>
+          <button
+            type="button"
+            onClick={handleCopyVersionDump}
+            className="bg-[#CEF431] hover:bg-[#bce028] text-[#161514] font-mono text-[10px] font-black px-2.5 py-1 rounded-xl border border-[#161514] shadow-xs hover:-translate-y-0.5 active:translate-y-0 cursor-pointer transition-all flex items-center gap-1"
+            title="Dump & copy full version telemetry JSON"
+          >
+            <Terminal className="h-3 w-3 stroke-[2.5]" />
+            <span>Dump Telemetry</span>
+          </button>
         </div>
       </div>
 
       {/* Philosophy Callout Slip */}
-      <div className="bg-[#FAF8F5] rounded-2xl p-3.5 border-2 border-[#161514] flex items-start gap-2.5">
+      <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-2xl p-3.5 border border-[#E8E5DF] dark:border-[#2A2724] flex items-start gap-2.5">
         <Heart className="h-4 w-4 text-red-500 fill-red-500 shrink-0 mt-0.5" />
-        <p className="text-xs font-semibold text-[#161514] leading-relaxed">
+        <p className="text-xs font-semibold text-[#161514] dark:text-[#FAF8F5]/90 leading-relaxed">
           &ldquo;Invictus was born out of a desire for a single, uncompromising life operating system that unites finances, biomechanics, study telemetry, and daily discipline without cloud bloat.&rdquo;
         </p>
       </div>
 
       {/* Academic & Engineering Background Slip */}
-      <div className="bg-[#FAF8F5] rounded-2xl p-3.5 border-2 border-[#161514] flex items-center gap-3">
-        <div className="h-10 w-10 rounded-xl bg-amber-400 border-2 border-[#161514] flex items-center justify-center shrink-0 shadow-[1.5px_1.5px_0px_0px_#161514]">
+      <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-2xl p-3.5 border border-[#E8E5DF] dark:border-[#2A2724] flex items-center gap-3">
+        <div className="h-10 w-10 rounded-xl bg-amber-400 border border-[#161514] flex items-center justify-center shrink-0 shadow-[1.5px_1.5px_0px_0px_#161514]">
           <GraduationCap className="h-5 w-5 text-[#161514] stroke-[2.5]" />
         </div>
         <div className="min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h5 className="font-heading font-black text-xs sm:text-sm text-[#161514] tracking-tight">
+            <h5 className="font-heading font-black text-xs sm:text-sm text-[#161514] dark:text-[#FAF8F5] tracking-tight">
               3rd Year • Computer Engineering
             </h5>
             <span className="bg-[#CEF431] text-[#161514] text-[9px] font-mono font-black uppercase px-2 py-0.5 rounded-full border border-[#161514]">
               SCOE
             </span>
           </div>
-          <p className="text-[11px] text-[#161514]/75 font-bold tracking-tight truncate mt-0.5">
+          <p className="text-[11px] text-[#161514]/75 dark:text-[#FAF8F5]/60 font-bold tracking-tight truncate mt-0.5">
             Sinhgad College of Engineering, Vadgaon (Bk)
           </p>
         </div>
@@ -119,7 +155,7 @@ export const DeveloperInfoCard: React.FC<DeveloperInfoCardProps> = ({ className 
           target="_blank"
           rel="noopener noreferrer"
           data-testid="developer-github-link"
-          className="w-full bg-[#161514] hover:bg-[#2a2725] text-white font-black text-xs uppercase tracking-wider py-3 px-3 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center justify-center gap-2 text-center"
+          className="w-full bg-[#161514] dark:bg-white text-white dark:text-[#161514] hover:bg-[#2a2725] dark:hover:bg-neutral-100 font-black text-xs uppercase tracking-wider py-3 px-3 rounded-2xl border border-[#161514] dark:border-white shadow-xs hover:-translate-y-0.5 active:translate-y-0 cursor-pointer transition-all flex items-center justify-center gap-2 text-center"
         >
           <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
             <path
@@ -136,7 +172,7 @@ export const DeveloperInfoCard: React.FC<DeveloperInfoCardProps> = ({ className 
         <a
           href={`mailto:${developer.email}`}
           data-testid="developer-email-link"
-          className="w-full bg-white hover:bg-[#FAF8F5] text-[#161514] font-black text-xs uppercase tracking-wider py-3 px-3 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center justify-center gap-2 text-center"
+          className="w-full bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#252220] text-[#161514] dark:text-[#FAF8F5] font-black text-xs uppercase tracking-wider py-3 px-3 rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs hover:-translate-y-0.5 active:translate-y-0 cursor-pointer transition-all flex items-center justify-center gap-2 text-center"
         >
           <Mail className="h-4 w-4 stroke-[2.5]" />
           <span>Email</span>
@@ -148,7 +184,7 @@ export const DeveloperInfoCard: React.FC<DeveloperInfoCardProps> = ({ className 
           type="button"
           onClick={handleCopyEmail}
           data-testid="developer-copy-email-btn"
-          className="w-full bg-[#CEF431] hover:bg-[#bce028] text-[#161514] font-black text-xs uppercase tracking-wider py-3 px-3 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all flex items-center justify-center gap-2 text-center"
+          className="w-full bg-[#CEF431] hover:bg-[#bce028] text-[#161514] font-black text-xs uppercase tracking-wider py-3 px-3 rounded-2xl border border-[#161514] shadow-xs hover:-translate-y-0.5 active:translate-y-0 cursor-pointer transition-all flex items-center justify-center gap-2 text-center"
           title="Copy email address to clipboard"
         >
           {copied ? (
@@ -166,9 +202,9 @@ export const DeveloperInfoCard: React.FC<DeveloperInfoCardProps> = ({ className 
       </div>
 
       {/* Repository Open Source Footer Pill */}
-      <div className="pt-2 border-t-2 border-[#161514]/10 flex items-center justify-between text-[11px] font-bold text-[#161514]/80">
+      <div className="pt-2 border-t border-[#E8E5DF] dark:border-[#2A2724] flex items-center justify-between text-[11px] font-bold text-[#161514]/80 dark:text-[#FAF8F5]/70">
         <span className="flex items-center gap-1.5 font-mono">
-          <Code2 className="h-3.5 w-3.5 stroke-[2.5] text-[#161514]" />
+          <Code2 className="h-3.5 w-3.5 stroke-[2.5] text-[#161514] dark:text-[#FAF8F5]" />
           <span>LuckyJadhav2808 / Invictus</span>
         </span>
 
@@ -176,7 +212,7 @@ export const DeveloperInfoCard: React.FC<DeveloperInfoCardProps> = ({ className 
           href={developer.repoUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="underline font-black hover:text-[#161514] flex items-center gap-1"
+          className="underline font-black hover:text-[#161514] dark:hover:text-white flex items-center gap-1"
         >
           <span>Source Code</span>
           <ExternalLink className="h-2.5 w-2.5 stroke-[2.5]" />

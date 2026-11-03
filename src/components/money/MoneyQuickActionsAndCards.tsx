@@ -127,7 +127,7 @@ export function CategoryIcon({
 }
 
 export const renderCategoryEmoji = (icon: string | undefined): string => {
-  return icon || "💳";
+  return icon || "";
 };
 
 // Subtle semantic indicator accent for envelope edge
@@ -215,11 +215,11 @@ export function MoneyQuickActionsAndCards({
       {/* Category Wallets Header with Move, Send, Bulk, New Category & Hide Balance Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
         <div className="flex items-center gap-2 flex-wrap">
-          <h3 className="text-xs font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5 font-heading">
-            <Wallet className="size-3.5 text-[#161514] stroke-[2.2]" />
+          <h3 className="text-[15px] font-sans font-semibold text-[#161514] dark:text-[#FAF8F5] tracking-tight flex items-center gap-1.5">
+            <Wallet className="size-3.5 stroke-[1.5]" />
             <span>Category Wallets</span>
           </h3>
-          <span className="text-[10px] font-black text-[#161514] bg-[#FAF8F5] px-2 py-0.5 rounded-md border border-[#161514]/30 font-mono shadow-[1px_1px_0px_0px_#161514]">
+          <span className="text-xs font-mono font-medium text-[#161514] dark:text-[#FAF8F5] bg-[#F1EFEA] dark:bg-[#252321] px-2 py-0.5 rounded-md border border-[#E8E5DF] dark:border-[#383531]">
             {categories.length} {categories.length === 1 ? "wallet" : "wallets"}
           </span>
 
@@ -227,17 +227,17 @@ export function MoneyQuickActionsAndCards({
           <button
             type="button"
             onClick={toggleHideBalance}
-            className="p-1 rounded-md bg-white hover:bg-[#FAF8F5] text-[#161514] border border-[#161514] shadow-[1px_1px_0px_0px_#161514] cursor-pointer transition-all active:translate-y-0.5"
+            className="p-1 rounded-md bg-white dark:bg-[#252321] hover:bg-[#F5F3EF] dark:hover:bg-[#2e2b28] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#383531] cursor-pointer transition-colors"
             title={isHideBalance ? "Show balances" : "Hide balances"}
           >
-            {isHideBalance ? <EyeOff className="h-3 w-3 stroke-[2.2]" /> : <Eye className="h-3 w-3 stroke-[2.2]" />}
+            {isHideBalance ? <EyeOff className="size-3 stroke-[1.5]" /> : <Eye className="size-3 stroke-[1.5]" />}
           </button>
 
           {selectedCategoryId && selectedCategoryId !== "all" && (
             <button
               type="button"
               onClick={() => onSelectCategory?.("all")}
-              className="text-[10px] font-black font-mono text-[#161514] bg-[#CEF431] px-2 py-0.5 rounded-md border border-[#161514] shadow-[1px_1px_0px_0px_#161514] cursor-pointer hover:bg-rose-200 transition-all"
+              className="text-[10px] font-mono font-medium text-[#161514] dark:text-[#FAF8F5] bg-[#F1EFEA] dark:bg-[#252321] px-2 py-0.5 rounded-md border border-[#E8E5DF] dark:border-[#383531] cursor-pointer hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-700 dark:hover:text-rose-400 transition-colors"
               title="Clear category filter"
             >
               Filtered ✕
@@ -251,10 +251,10 @@ export function MoneyQuickActionsAndCards({
             <button
               type="button"
               onClick={onMoveMoney}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-[#FAF8F5] text-[#161514] text-xs font-black uppercase tracking-wider transition-all cursor-pointer border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none shrink-0 min-h-[36px]"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#252321] hover:bg-[#F5F3EF] dark:hover:bg-[#2e2b28] text-[#161514] dark:text-[#FAF8F5] text-xs font-medium transition-colors cursor-pointer border border-[#E8E5DF] dark:border-[#383531] shrink-0 min-h-[34px]"
               title="Transfer funds between category wallets"
             >
-              <ArrowRightLeft className="h-3.5 w-3.5 stroke-[2.2]" />
+              <ArrowRightLeft className="size-3.5 stroke-[1.5]" />
               <span>Move</span>
             </button>
           )}
@@ -263,10 +263,10 @@ export function MoneyQuickActionsAndCards({
             <button
               type="button"
               onClick={onSendMoney}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-[#FAF8F5] text-[#161514] text-xs font-black uppercase tracking-wider transition-all cursor-pointer border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none shrink-0 min-h-[36px]"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#252321] hover:bg-[#F5F3EF] dark:hover:bg-[#2e2b28] text-[#161514] dark:text-[#FAF8F5] text-xs font-medium transition-colors cursor-pointer border border-[#E8E5DF] dark:border-[#383531] shrink-0 min-h-[34px]"
               title="Record an instant payout or payment to a recipient"
             >
-              <Send className="h-3.5 w-3.5 stroke-[2.2]" />
+              <Send className="size-3.5 stroke-[1.5]" />
               <span>Send</span>
             </button>
           )}
@@ -275,10 +275,10 @@ export function MoneyQuickActionsAndCards({
             <button
               type="button"
               onClick={onBulkAddExpense}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-[#FAF8F5] text-[#161514] text-xs font-black uppercase tracking-wider transition-all cursor-pointer border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none shrink-0 min-h-[36px]"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#252321] hover:bg-[#F5F3EF] dark:hover:bg-[#2e2b28] text-[#161514] dark:text-[#FAF8F5] text-xs font-medium transition-colors cursor-pointer border border-[#E8E5DF] dark:border-[#383531] shrink-0 min-h-[34px]"
               title="Bulk Expense Logger & Offline OCR Scanner"
             >
-              <Camera className="h-3.5 w-3.5 stroke-[2.2]" />
+              <Camera className="size-3.5 stroke-[1.5]" />
               <span>Bulk</span>
             </button>
           )}
@@ -287,10 +287,10 @@ export function MoneyQuickActionsAndCards({
             <button
               type="button"
               onClick={onAddCategory}
-              className="text-xs font-black text-[#161514] bg-[#CEF431] hover:bg-[#bde422] px-3 py-1.5 rounded-xl cursor-pointer transition-all flex items-center gap-1.5 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] whitespace-nowrap shrink-0 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none uppercase tracking-wider min-h-[36px]"
+              className="text-xs font-medium text-white dark:text-[#161514] bg-[#161514] dark:bg-[#CEF431] hover:bg-[#2A2826] dark:hover:bg-[#d6f64d] px-3 py-1.5 rounded-lg cursor-pointer transition-colors flex items-center gap-1.5 border border-[#161514] dark:border-[#CEF431] whitespace-nowrap shrink-0 min-h-[34px]"
               title="Create new category envelope"
             >
-              <Plus className="h-3.5 w-3.5 stroke-[3]" />
+              <Plus className="size-3.5 stroke-[2]" />
               <span>+ Category</span>
             </button>
           )}
@@ -298,15 +298,15 @@ export function MoneyQuickActionsAndCards({
       </div>
 
       {categories.length === 0 ? (
-        <div className="bg-white rounded-2xl p-6 sm:p-8 border-2 border-[#161514] text-center space-y-3 shadow-[3px_3px_0px_0px_#161514]">
-          <div className="size-11 rounded-xl bg-[#FAF8F5] text-[#161514] border-2 border-[#161514] flex items-center justify-center mx-auto shadow-[1px_1px_0px_0px_#161514]">
-            <Layers className="size-5 stroke-[2]" />
+        <div className="bg-white dark:bg-[#1C1A18] rounded-xl p-6 sm:p-8 border border-[#E8E5DF] dark:border-[#383531] text-center space-y-3">
+          <div className="size-10 rounded-lg bg-[#F1EFEA] dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] flex items-center justify-center mx-auto">
+            <Layers className="size-5 stroke-[1.5]" />
           </div>
           <div>
-            <h4 className="text-sm font-black text-[#161514] font-heading uppercase tracking-wide">
+            <h4 className="text-[13px] font-sans font-semibold text-[#161514] dark:text-[#FAF8F5] tracking-tight">
               No Category Wallets Configured
             </h4>
-            <p className="text-xs text-[#161514]/70 font-medium max-w-sm mx-auto mt-1">
+            <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] max-w-sm mx-auto mt-1">
               Organize your ledger with category wallets like Groceries, Transport, Bills, or Dining.
             </p>
           </div>
@@ -314,15 +314,15 @@ export function MoneyQuickActionsAndCards({
             <button
               type="button"
               onClick={onAddCategory}
-              className="px-4 py-2 rounded-xl bg-[#CEF431] hover:bg-[#bde422] text-[#161514] text-xs font-black uppercase tracking-wider transition-all cursor-pointer inline-flex items-center gap-1.5 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5"
+              className="px-3.5 py-1.5 rounded-lg bg-[#161514] dark:bg-[#CEF431] hover:bg-[#2A2826] dark:hover:bg-[#d6f64d] text-white dark:text-[#161514] text-xs font-medium transition-colors cursor-pointer inline-flex items-center gap-1.5 border border-[#161514] dark:border-[#CEF431]"
             >
-              <Plus className="h-3.5 w-3.5 stroke-[3]" />
+              <Plus className="size-3.5 stroke-[2]" />
               <span>Create Your First Wallet</span>
             </button>
           )}
         </div>
       ) : (
-        <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory no-scrollbar px-1 py-2 -my-1">
+        <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory no-scrollbar px-1 py-1 -my-1">
           {categories.map((cat, idx) => {
             const isSelected = selectedCategoryId === cat.id;
             const accentColor = getCategoryAccent(cat);
@@ -338,46 +338,45 @@ export function MoneyQuickActionsAndCards({
                   onSelectCategory?.(isSelected ? "all" : cat.id);
                 }}
                 className={cn(
-                  "w-[210px] sm:w-[230px] shrink-0 snap-start relative group cursor-pointer transition-all duration-150 ease-out",
-                  isSelected ? "-translate-y-0.5" : "hover:-translate-y-0.5"
+                  "w-[210px] sm:w-[230px] shrink-0 snap-start relative group cursor-pointer transition-all duration-150 ease-out"
                 )}
               >
                 {/* Unslopped Tactile Card Envelope */}
                 <div
                   className={cn(
-                    "rounded-2xl p-3 border-2 border-[#161514] space-y-2 transition-all relative overflow-hidden",
+                    "rounded-xl p-3.5 border space-y-2 transition-all relative overflow-hidden",
                     isSelected
-                      ? "bg-[#CEF431] text-[#161514] shadow-[3px_3px_0px_0px_#161514]"
-                      : "bg-white text-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:shadow-[3px_3px_0px_0px_#161514]"
+                      ? "bg-[#F1EFEA] dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] border-[#161514] dark:border-[#CEF431]"
+                      : "bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] border-[#E8E5DF] dark:border-[#383531] hover:bg-[#FAF8F5] dark:hover:bg-[#252321]"
                   )}
                 >
                   {/* Subtle 3px Category Accent Rim */}
                   <div
-                    className="absolute top-0 left-0 right-0 h-1"
-                    style={{ backgroundColor: isSelected ? "#161514" : accentColor }}
+                    className="absolute top-0 left-0 right-0 h-0.5"
+                    style={{ backgroundColor: accentColor }}
                   />
 
                   {/* Header Row: Category Icon & Badges */}
                   <div className="flex items-center justify-between gap-1.5 pt-0.5">
                     <div
                       className={cn(
-                        "size-7 rounded-lg border-2 flex items-center justify-center shrink-0 shadow-[1px_1px_0px_0px_#161514]",
+                        "size-7 rounded-lg flex items-center justify-center shrink-0",
                         isSelected
-                          ? "bg-[#161514] text-white border-[#161514]"
-                          : "bg-[#FAF8F5] text-[#161514] border-[#161514]"
+                          ? "bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#383531]"
+                          : "bg-[#F1EFEA] dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5]"
                       )}
                     >
-                      <CategoryIcon name={cat.icon} className="size-3.5" />
+                      <CategoryIcon name={cat.icon} className="size-3.5 stroke-[1.5]" />
                     </div>
 
                     <div className="flex items-center gap-1 shrink-0">
                       {isSelected ? (
-                        <span className="text-[9px] font-black uppercase bg-[#161514] text-white px-1.5 py-0.5 rounded border border-[#161514] flex items-center gap-1 font-mono">
-                          <Check className="size-2.5 stroke-[3]" />
+                        <span className="text-[10px] font-mono font-medium bg-[#161514] dark:bg-[#CEF431] text-white dark:text-[#161514] px-1.5 py-0.5 rounded flex items-center gap-1">
+                          <Check className="size-2.5 stroke-[2]" />
                           <span>Active</span>
                         </span>
                       ) : (
-                        <span className="text-[9px] font-mono font-bold uppercase text-[#161514]/70 bg-[#FAF8F5] px-1.5 py-0.5 rounded border border-[#161514]/30">
+                        <span className="text-[10px] font-mono font-medium text-[#6B6B6B] dark:text-[#A8A29E] bg-[#F1EFEA] dark:bg-[#252321] px-1.5 py-0.5 rounded border border-[#E8E5DF] dark:border-[#383531]">
                           {cat.type === "income" ? "Income" : "Expense"}
                         </span>
                       )}
@@ -391,20 +390,20 @@ export function MoneyQuickActionsAndCards({
                           <button
                             type="button"
                             onClick={() => onEditCategory(cat)}
-                            className="text-[#161514]/70 hover:text-[#161514] p-0.5 cursor-pointer"
+                            className="text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5] p-0.5 cursor-pointer"
                             title="Edit wallet"
                           >
-                            <Edit3 className="size-3 stroke-[2.2]" />
+                            <Edit3 className="size-3 stroke-[1.5]" />
                           </button>
                         )}
                         {onDeleteCategory && (
                           <button
                             type="button"
                             onClick={() => onDeleteCategory(cat.id)}
-                            className="text-[#161514]/70 hover:text-rose-600 p-0.5 cursor-pointer"
+                            className="text-[#6B6B6B] dark:text-[#A8A29E] hover:text-rose-600 dark:hover:text-rose-400 p-0.5 cursor-pointer"
                             title="Delete wallet"
                           >
-                            <Trash2 className="size-3 stroke-[2.2]" />
+                            <Trash2 className="size-3 stroke-[1.5]" />
                           </button>
                         )}
                       </div>
@@ -413,18 +412,18 @@ export function MoneyQuickActionsAndCards({
 
                   {/* Title on its own line: NEVER TRUNCATES AWKWARDLY */}
                   <div className="pt-0.5">
-                    <span className="text-xs font-black tracking-tight text-[#161514] line-clamp-1 font-heading block">
+                    <span className="text-xs font-semibold tracking-tight text-[#161514] dark:text-[#FAF8F5] line-clamp-1 block">
                       {cat.name}
                     </span>
                   </div>
 
                   {/* Body: Spent vs Budget Cap */}
-                  <div className="grid grid-cols-2 gap-2 pt-1 border-t border-[#161514]/10">
+                  <div className="grid grid-cols-2 gap-2 pt-1 border-t border-[#E8E5DF] dark:border-[#383531]">
                     <div className="min-w-0">
-                      <span className="text-[8px] font-bold uppercase text-[#161514]/60 block tracking-wider truncate">
+                      <span className="text-[9px] font-medium text-[#6B6B6B] dark:text-[#A8A29E] block tracking-tight truncate">
                         Spent
                       </span>
-                      <span className="text-sm font-black block tracking-tight font-mono tabular-nums truncate mt-0.5">
+                      <span className="text-sm font-semibold block tracking-tight font-mono tabular-nums truncate mt-0.5">
                         {isHideBalance
                           ? "••••"
                           : `${currencySymbol}${cat.amount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`}
@@ -432,15 +431,15 @@ export function MoneyQuickActionsAndCards({
                     </div>
 
                     <div className="text-right min-w-0">
-                      <span className="text-[8px] font-bold uppercase text-[#161514]/60 block tracking-wider truncate">
+                      <span className="text-[9px] font-medium text-[#6B6B6B] dark:text-[#A8A29E] block tracking-tight truncate">
                         Cap
                       </span>
                       {budgetCap > 0 ? (
-                        <span className="text-xs font-bold text-[#161514]/80 font-mono tabular-nums block truncate mt-0.5">
+                        <span className="text-xs font-medium text-[#6B6B6B] dark:text-[#A8A29E] font-mono tabular-nums block truncate mt-0.5">
                           {currencySymbol}{budgetCap.toLocaleString()}
                         </span>
                       ) : (
-                        <span className="text-[9px] font-bold text-[#161514]/40 font-mono block truncate mt-0.5">
+                        <span className="text-[10px] text-[#A8A29E] dark:text-[#6B6B6B] font-mono block truncate mt-0.5">
                           No Cap
                         </span>
                       )}
@@ -450,7 +449,7 @@ export function MoneyQuickActionsAndCards({
                   {/* Progress Meter if Budget Cap exists */}
                   {budgetCap > 0 && (
                     <div className="space-y-0.5 pt-0.5">
-                      <div className="w-full bg-[#161514]/10 rounded-full h-1.5 overflow-hidden border border-[#161514]/20 p-0.2">
+                      <div className="w-full bg-[#F1EFEA] dark:bg-[#383531] rounded-full h-1 overflow-hidden">
                         <div
                           className={cn(
                             "h-full rounded-full transition-all duration-300",
@@ -458,16 +457,14 @@ export function MoneyQuickActionsAndCards({
                               ? "bg-rose-500"
                               : percentSpent > 80
                               ? "bg-amber-400"
-                              : isSelected
-                              ? "bg-[#161514]"
                               : "bg-[#03D26F]"
                           )}
                           style={{ width: `${percentSpent}%` }}
                         />
                       </div>
-                      <div className="flex items-center justify-between text-[7.5px] font-mono font-bold text-[#161514]/70 uppercase">
+                      <div className="flex items-center justify-between text-[8px] font-mono font-medium text-[#6B6B6B] dark:text-[#A8A29E]">
                         <span>{percentSpent}% Used</span>
-                        {isOverBudget && <span className="text-rose-700 font-black">Over</span>}
+                        {isOverBudget && <span className="text-rose-600 dark:text-rose-400 font-semibold">Over</span>}
                       </div>
                     </div>
                   )}

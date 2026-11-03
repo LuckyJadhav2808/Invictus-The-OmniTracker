@@ -68,11 +68,11 @@ export function WaterTracker({
 
   // Commentary based on hydration tier
   const getCommentary = () => {
-    if (percentage === 0) return { title: "Desert Mode", desc: "Prime the engine with your first glass!" };
-    if (percentage < 35) return { title: "Cellular Awakening", desc: "Hydration climbing. Keep the flow going." };
-    if (percentage < 70) return { title: "Optimal Velocity", desc: "Over halfway! Focus and energy sustained." };
-    if (percentage < 100) return { title: "Final Stretch", desc: "Almost ironclad. Lock in the daily target!" };
-    return { title: "Hydrated Gladiator 🌊", desc: "Target crushed! Peak cognitive & muscular state." };
+    if (percentage === 0) return { title: "Desert Mode", desc: "Prime hydration with your first glass" };
+    if (percentage < 35) return { title: "Cellular Awakening", desc: "Hydration climbing. Keep the flow going" };
+    if (percentage < 70) return { title: "Optimal Velocity", desc: "Over halfway. Focus and energy sustained" };
+    if (percentage < 100) return { title: "Final Stretch", desc: "Almost ironclad. Lock in the daily target" };
+    return { title: "Hydrated Peak", desc: "Target achieved. Optimal cognitive and physical state." };
   };
 
   const commentary = getCommentary();
@@ -91,7 +91,7 @@ export function WaterTracker({
     const rect = e.currentTarget.getBoundingClientRect();
     const newTag: SplashTag = {
       id: Date.now() + Math.random(),
-      text: delta > 0 ? `+${delta}ml 💧` : `${delta}ml`,
+      text: delta > 0 ? `+${delta}ml` : `${delta}ml`,
       x: rect.width / 2,
       y: 0,
     };
@@ -104,7 +104,7 @@ export function WaterTracker({
 
     if (localAmount + delta >= dailyTarget && localAmount < dailyTarget) {
       soundFX.playCompleteChime();
-      toast.success("Daily Hydration Goal Achieved! 🌊 Champion!");
+      toast.success("Daily hydration target achieved! Well done.");
     }
   };
 
@@ -129,21 +129,18 @@ export function WaterTracker({
   };
 
   return (
-    <div className="bg-white rounded-3xl p-5 sm:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-5 relative overflow-hidden">
+    <div className="bg-white dark:bg-[#1C1A18] rounded-xl p-5 border border-[#E8E5DF] dark:border-[#383531] space-y-4 relative overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="size-9 rounded-xl bg-sky-100 border-2 border-[#161514] flex items-center justify-center shadow-[1.5px_1.5px_0px_0px_#161514]">
-            <Droplets className="size-5 text-sky-600 stroke-[2.5]" />
+          <div className="size-8 rounded-lg bg-[#F1EFEA] dark:bg-[#252321] flex items-center justify-center text-sky-600 dark:text-sky-400">
+            <Droplets className="size-4 stroke-[1.5]" />
           </div>
           <div>
-            <h3
-              className="text-sm font-heading font-black text-[#161514] uppercase tracking-wider leading-none"
-              style={{ fontFamily: "var(--font-heading)" }}
-            >
-              Water Intake
+            <h3 className="text-[15px] font-sans font-semibold text-[#161514] dark:text-[#FAF8F5] tracking-tight leading-none">
+              Water intake
             </h3>
-            <span className="text-[10px] font-bold text-[#161514]/70">
+            <span className="text-xs font-mono text-[#6B6B6B] dark:text-[#A8A29E] mt-0.5 block">
               {localAmount} ml / {dailyTarget} ml ({percentage}%)
             </span>
           </div>
@@ -155,42 +152,42 @@ export function WaterTracker({
             soundFX.playPop();
             setIsEditOpen(true);
           }}
-          className="size-9 rounded-xl border-2 border-[#161514] bg-white hover:bg-sky-50 text-[#161514] flex items-center justify-center shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
+          className="size-8 rounded-lg border border-[#E8E5DF] dark:border-[#383531] bg-white dark:bg-[#252321] hover:bg-[#F5F3EF] dark:hover:bg-[#2e2b28] text-[#161514] dark:text-[#FAF8F5] flex items-center justify-center transition-colors cursor-pointer"
           title="Adjust Target or Volume"
         >
-          <Settings2 className="size-4 stroke-[2.5]" />
+          <Settings2 className="size-3.5 stroke-[1.5]" />
         </button>
       </div>
 
       {/* Main Hydration Visualizer: Tumbler + Info */}
       <div className="flex items-center gap-3.5 sm:gap-4.5">
-        {/* Left Column: Neobrutalist Living Tumbler Vessel */}
+        {/* Left Column: Refined Living Tumbler Vessel */}
         <div className="shrink-0 flex flex-col items-center">
           <div
             onClick={() => {
               soundFX.playPop();
               setIsEditOpen(true);
             }}
-            className="relative w-20 sm:w-24 h-40 sm:h-44 rounded-2xl border-[2.5px] border-[#161514] bg-[#F0F9FF] shadow-[3px_3px_0px_0px_#161514] overflow-hidden cursor-pointer group select-none flex flex-col justify-end"
+            className="relative w-20 sm:w-24 h-40 sm:h-44 rounded-xl border border-[#E8E5DF] dark:border-[#383531] bg-[#F0F9FF] dark:bg-[#082032] overflow-hidden cursor-pointer group select-none flex flex-col justify-end"
             title="Click to manually set volume"
           >
             {/* Measurement Graduations */}
-            <div className="absolute inset-y-0 right-2 w-3 flex flex-col justify-between py-3 pointer-events-none z-20 opacity-40">
-              <div className="border-t-2 border-[#161514] w-2.5 ml-auto" />
-              <div className="border-t border-[#161514] w-1.5 ml-auto" />
-              <div className="border-t-2 border-[#161514] w-2.5 ml-auto" />
-              <div className="border-t border-[#161514] w-1.5 ml-auto" />
-              <div className="border-t-2 border-[#161514] w-2.5 ml-auto" />
+            <div className="absolute inset-y-0 right-2 w-3 flex flex-col justify-between py-3 pointer-events-none z-20 opacity-30">
+              <div className="border-t border-[#161514] dark:border-[#FAF8F5] w-2.5 ml-auto" />
+              <div className="border-t border-[#161514] dark:border-[#FAF8F5] w-1.5 ml-auto" />
+              <div className="border-t border-[#161514] dark:border-[#FAF8F5] w-2.5 ml-auto" />
+              <div className="border-t border-[#161514] dark:border-[#FAF8F5] w-1.5 ml-auto" />
+              <div className="border-t border-[#161514] dark:border-[#FAF8F5] w-2.5 ml-auto" />
             </div>
 
             {/* Empty State Prompt if 0ml */}
             {localAmount <= 0 && (
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10 px-2 text-center">
                 <Droplets className="size-5 text-sky-400/60 mb-1 stroke-[2]" />
-                <span className="text-[10px] font-black uppercase text-[#161514]/40 tracking-wider">
+                <span className="text-[10px] font-bold text-[#161514]/50 dark:text-[#FAF8F5]/50">
                   Empty
                 </span>
-                <span className="text-[8px] font-bold text-[#161514]/30">
+                <span className="text-[8px] font-medium text-[#161514]/40 dark:text-[#FAF8F5]/40">
                   Tap + below
                 </span>
               </div>
@@ -232,11 +229,11 @@ export function WaterTracker({
 
             {/* Center Volume Floating Badge */}
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-30">
-              <div className="bg-white/95 backdrop-blur-xs px-2.5 py-1 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] text-center">
-                <span className="text-sm sm:text-base font-heading font-black text-[#161514] block leading-none">
+              <div className="bg-white/95 dark:bg-[#161514]/95 backdrop-blur-xs px-2.5 py-1 rounded-lg border border-[#E8E5DF] dark:border-[#383531] shadow-xs text-center">
+                <span className="text-sm sm:text-base font-sans font-semibold text-[#161514] dark:text-[#FAF8F5] block leading-none font-mono tabular-nums">
                   {localAmount}
                 </span>
-                <span className="text-[9px] font-black uppercase text-sky-700 tracking-wider block mt-0.5">
+                <span className="text-[9px] font-medium text-sky-700 dark:text-sky-400 block mt-0.5">
                   ml
                 </span>
               </div>
@@ -244,7 +241,7 @@ export function WaterTracker({
 
             {/* Hover tooltip hint */}
             <div className="absolute inset-x-0 bottom-1 text-center opacity-0 group-hover:opacity-100 transition-opacity z-40 pointer-events-none">
-              <span className="text-[8px] font-black uppercase bg-[#161514] text-white px-1.5 py-0.5 rounded-md">
+              <span className="text-[8px] font-medium bg-[#161514] text-white px-1.5 py-0.5 rounded">
                 Edit
               </span>
             </div>
@@ -256,26 +253,23 @@ export function WaterTracker({
           {/* Status Box */}
           <div
             className={cn(
-              "p-2.5 sm:p-3 rounded-2xl border-2 border-[#161514] transition-all",
+              "p-2.5 rounded-lg border transition-colors",
               isGoalMet
-                ? "bg-[#CEF431] shadow-[2px_2px_0px_0px_#161514]"
-                : "bg-[#FAF8F5] shadow-[2px_2px_0px_0px_#161514]"
+                ? "bg-[#DCFAE5] dark:bg-[#03D26F]/20 border-[#03D26F]/30 text-[#04250e] dark:text-[#03D26F]"
+                : "bg-[#F1EFEA] dark:bg-[#252321] border-[#E8E5DF] dark:border-[#383531] text-[#161514] dark:text-[#FAF8F5]"
             )}
           >
             <div className="flex items-center gap-1.5">
               {isGoalMet ? (
-                <Award className="size-4 shrink-0 text-[#161514] stroke-[2.5]" />
+                <Award className="size-3.5 shrink-0 text-[#047857] dark:text-[#03D26F] stroke-[1.5]" />
               ) : (
-                <Sparkles className="size-4 shrink-0 text-sky-600 stroke-[2.5]" />
+                <Sparkles className="size-3.5 shrink-0 text-sky-600 dark:text-sky-400 stroke-[1.5]" />
               )}
-              <h4
-                className="text-xs font-heading font-black text-[#161514] uppercase tracking-wider truncate"
-                style={{ fontFamily: "var(--font-heading)" }}
-              >
+              <h4 className="text-xs font-sans font-semibold truncate">
                 {commentary.title}
               </h4>
             </div>
-            <p className="text-[11px] font-bold text-[#161514]/80 mt-0.5 leading-snug line-clamp-2">
+            <p className="text-[11px] text-[#6B6B6B] dark:text-[#A8A29E] mt-0.5 leading-snug line-clamp-2">
               {commentary.desc}
             </p>
           </div>
@@ -285,13 +279,13 @@ export function WaterTracker({
             <button
               type="button"
               onClick={(e) => handleQuickAdd(250, e)}
-              className="min-h-[46px] py-1.5 px-1 bg-sky-100 hover:bg-sky-200 border-2 border-[#161514] rounded-xl text-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all flex flex-col items-center justify-center cursor-pointer select-none"
+              className="min-h-[44px] py-1.5 px-1 bg-white dark:bg-[#252321] hover:bg-[#F5F3EF] dark:hover:bg-[#2e2b28] border border-[#E8E5DF] dark:border-[#383531] rounded-lg text-[#161514] dark:text-[#FAF8F5] transition-colors flex flex-col items-center justify-center cursor-pointer select-none active:translate-y-px"
             >
-              <span className="text-xs font-heading font-black tracking-tight flex items-center gap-0.5">
-                <Plus className="size-3 stroke-[3]" />
+              <span className="text-xs font-mono font-medium tracking-tight flex items-center gap-0.5 tabular-nums text-[#161514] dark:text-[#FAF8F5]">
+                <Plus className="size-2.5 stroke-[2]" />
                 250ml
               </span>
-              <span className="text-[10px] font-black uppercase text-sky-800 tracking-wider">
+              <span className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E]">
                 Glass
               </span>
             </button>
@@ -299,13 +293,13 @@ export function WaterTracker({
             <button
               type="button"
               onClick={(e) => handleQuickAdd(500, e)}
-              className="min-h-[46px] py-1.5 px-1 bg-sky-200 hover:bg-sky-300 border-2 border-[#161514] rounded-xl text-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all flex flex-col items-center justify-center cursor-pointer select-none"
+              className="min-h-[44px] py-1.5 px-1 bg-white dark:bg-[#252321] hover:bg-[#F5F3EF] dark:hover:bg-[#2e2b28] border border-[#E8E5DF] dark:border-[#383531] rounded-lg text-[#161514] dark:text-[#FAF8F5] transition-colors flex flex-col items-center justify-center cursor-pointer select-none active:translate-y-px"
             >
-              <span className="text-xs font-heading font-black tracking-tight flex items-center gap-0.5">
-                <Plus className="size-3 stroke-[3]" />
+              <span className="text-xs font-mono font-medium tracking-tight flex items-center gap-0.5 tabular-nums text-[#161514] dark:text-[#FAF8F5]">
+                <Plus className="size-2.5 stroke-[2]" />
                 500ml
               </span>
-              <span className="text-[10px] font-black uppercase text-sky-800 tracking-wider">
+              <span className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E]">
                 Bottle
               </span>
             </button>
@@ -313,13 +307,13 @@ export function WaterTracker({
             <button
               type="button"
               onClick={(e) => handleQuickAdd(750, e)}
-              className="min-h-[46px] py-1.5 px-1 bg-sky-300 hover:bg-sky-400 border-2 border-[#161514] rounded-xl text-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all flex flex-col items-center justify-center cursor-pointer select-none"
+              className="min-h-[44px] py-1.5 px-1 bg-white dark:bg-[#252321] hover:bg-[#F5F3EF] dark:hover:bg-[#2e2b28] border border-[#E8E5DF] dark:border-[#383531] rounded-lg text-[#161514] dark:text-[#FAF8F5] transition-colors flex flex-col items-center justify-center cursor-pointer select-none active:translate-y-px"
             >
-              <span className="text-xs font-heading font-black tracking-tight flex items-center gap-0.5">
-                <Plus className="size-3 stroke-[3]" />
+              <span className="text-xs font-mono font-medium tracking-tight flex items-center gap-0.5 tabular-nums text-[#161514] dark:text-[#FAF8F5]">
+                <Plus className="size-2.5 stroke-[2]" />
                 750ml
               </span>
-              <span className="text-[10px] font-black uppercase text-sky-900 tracking-wider">
+              <span className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E]">
                 Shaker
               </span>
             </button>
@@ -328,13 +322,13 @@ export function WaterTracker({
               type="button"
               onClick={(e) => handleQuickAdd(-250, e)}
               disabled={localAmount <= 0}
-              className="min-h-[46px] py-1.5 px-1 bg-rose-50 hover:bg-rose-100 disabled:opacity-40 border-2 border-[#161514] rounded-xl text-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all flex flex-col items-center justify-center cursor-pointer select-none"
+              className="min-h-[44px] py-1.5 px-1 bg-white dark:bg-[#252321] hover:bg-[#F5F3EF] dark:hover:bg-[#2e2b28] disabled:opacity-40 border border-[#E8E5DF] dark:border-[#383531] rounded-lg text-[#6B6B6B] dark:text-[#A8A29E] hover:text-rose-600 dark:hover:text-rose-400 transition-colors flex flex-col items-center justify-center cursor-pointer select-none active:translate-y-px"
             >
-              <span className="text-xs font-heading font-black tracking-tight flex items-center gap-0.5 text-rose-900">
-                <Minus className="size-3 stroke-[3]" />
+              <span className="text-xs font-mono font-medium tracking-tight flex items-center gap-0.5 font-mono tabular-nums">
+                <Minus className="size-2.5 stroke-[2]" />
                 250ml
               </span>
-              <span className="text-[10px] font-black uppercase text-rose-800 tracking-wider">
+              <span className="text-[10px] text-[#6B6B6B]">
                 Undo
               </span>
             </button>
@@ -361,7 +355,7 @@ export function WaterTracker({
       >
         <form onSubmit={handleSaveSettings} className="space-y-4 pt-1">
           <div>
-            <label className="block text-xs font-heading font-black text-[#161514] uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5] uppercase tracking-wider mb-1.5">
               Water Logged Today (ml)
             </label>
             <input
@@ -370,12 +364,12 @@ export function WaterTracker({
               step="50"
               value={customInput}
               onChange={(e) => setCustomInput(e.target.value)}
-              className="w-full text-base font-bold bg-[#FAF8F5] border-2 border-[#161514] rounded-xl px-3.5 py-2.5 text-[#161514] shadow-[2px_2px_0px_0px_#161514] focus:outline-none focus:ring-2 focus:ring-[#161514]"
+              className="w-full text-base font-bold bg-[#FAF8F5] dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#383531] rounded-xl px-3.5 py-2.5 text-[#161514] dark:text-[#FAF8F5] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] focus:outline-none focus:ring-2 focus:ring-[#161514] dark:focus:ring-[#CEF431]"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-heading font-black text-[#161514] uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5] uppercase tracking-wider mb-1.5">
               Daily Target Goal (ml)
             </label>
             <input
@@ -384,13 +378,13 @@ export function WaterTracker({
               step="250"
               value={targetInput}
               onChange={(e) => setTargetInput(e.target.value)}
-              className="w-full text-base font-bold bg-[#FAF8F5] border-2 border-[#161514] rounded-xl px-3.5 py-2.5 text-[#161514] shadow-[2px_2px_0px_0px_#161514] focus:outline-none focus:ring-2 focus:ring-[#161514]"
+              className="w-full text-base font-bold bg-[#FAF8F5] dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#383531] rounded-xl px-3.5 py-2.5 text-[#161514] dark:text-[#FAF8F5] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] focus:outline-none focus:ring-2 focus:ring-[#161514] dark:focus:ring-[#CEF431]"
             />
           </div>
 
           {/* Quick Presets for Target */}
           <div className="space-y-1">
-            <span className="text-[11px] font-bold text-[#161514]/70">Recommended Targets:</span>
+            <span className="text-[11px] font-bold text-[#161514]/70 dark:text-[#FAF8F5]/70">Recommended Targets:</span>
             <div className="flex gap-2">
               {[1500, 2000, 2500, 3000].map((t) => (
                 <button
@@ -401,10 +395,10 @@ export function WaterTracker({
                     setTargetInput(String(t));
                   }}
                   className={cn(
-                    "text-xs font-bold px-2.5 py-1 rounded-lg border-2 border-[#161514] cursor-pointer transition-all",
+                    "text-xs font-bold px-2.5 py-1 rounded-lg border-2 border-[#161514] dark:border-[#383531] cursor-pointer transition-all",
                     targetInput === String(t)
-                      ? "bg-[#03D26F] font-black shadow-[1.5px_1.5px_0px_0px_#161514]"
-                      : "bg-white hover:bg-slate-100 shadow-[1px_1px_0px_0px_#161514]"
+                      ? "bg-[#03D26F] text-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_#161514] dark:shadow-[1.5px_1.5px_0px_0px_#000000]"
+                      : "bg-white dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] hover:bg-slate-100 dark:hover:bg-[#2e2b28] shadow-[1px_1px_0px_0px_#161514] dark:shadow-[1px_1px_0px_0px_#000000]"
                   )}
                 >
                   {(t / 1000).toFixed(1)}L
@@ -417,13 +411,13 @@ export function WaterTracker({
             <button
               type="button"
               onClick={() => setIsEditOpen(false)}
-              className="flex-1 min-h-[44px] bg-white hover:bg-slate-100 border-2 border-[#161514] rounded-xl text-xs font-heading font-black text-[#161514] shadow-[2px_2px_0px_0px_#161514] cursor-pointer"
+              className="flex-1 min-h-[44px] bg-white dark:bg-[#252321] hover:bg-slate-100 dark:hover:bg-[#2e2b28] border-2 border-[#161514] dark:border-[#383531] rounded-xl text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 min-h-[44px] bg-[#03D26F] hover:bg-[#02b861] border-2 border-[#161514] rounded-xl text-xs font-heading font-black text-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer"
+              className="flex-1 min-h-[44px] bg-[#03D26F] hover:bg-[#02b861] border-2 border-[#161514] dark:border-[#383531] rounded-xl text-xs font-heading font-black text-[#161514] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer"
             >
               Save Hydration
             </button>

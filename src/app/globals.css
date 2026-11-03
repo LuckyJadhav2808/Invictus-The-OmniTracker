@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Caveat:wght@600;700;800&family=Permanent+Marker&family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Caveat:wght@600;700;800&family=Permanent+Marker&family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -24,17 +24,38 @@
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
   
-  /* Master Shadow Tokens (Strict zero-blur hard ink shadows) */
-  --shadow-neo-sm: 2px 2px 0px 0px #161514;
-  --shadow-neo-md: 3px 3px 0px 0px #161514;
-  --shadow-neo-lg: 5px 5px 0px 0px #161514;
-  --shadow-neo-xl: 6px 6px 0px 0px #161514;
-  --shadow-neo-pop: 3px 3px 0px 0px #161514;
+  /* Production Semantic Elevation Tokens */
+  --shadow-xs: 0 1px 2px 0 rgba(22, 21, 20, 0.05);
+  --shadow-sm: 0 1px 3px 0 rgba(22, 21, 20, 0.08);
+  --shadow-md: 0 4px 6px -1px rgba(22, 21, 20, 0.08);
+  --shadow-lg: 0 10px 15px -3px rgba(22, 21, 20, 0.08);
+  --shadow-xl: 0 20px 25px -5px rgba(22, 21, 20, 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgba(22, 21, 20, 0.25);
+  --shadow-overlay: 0 25px 50px -12px rgba(22, 21, 20, 0.25);
+  
+  /* Tactile Physical Artefact Shadow (Preserved exclusively for Scratchpad & Thermal Receipt) */
+  --shadow-neo-tactile: 2.5px 2.5px 0px 0px #161514;
+  --shadow-neo-sm: 1.5px 1.5px 0px 0px #161514;
+  --shadow-neo-md: 2.5px 2.5px 0px 0px #161514;
+  --shadow-neo-lg: 4px 4px 0px 0px #161514;
+  --shadow-neo-xl: 5px 5px 0px 0px #161514;
+  --shadow-neo-pop: 2.5px 2.5px 0px 0px #161514;
+  
+  /* Universal Semantic Tokens */
+  --color-canvas: #FAF8F5;
+  --color-surface: #FFFFFF;
+  --color-surface-recessed: #F1EFEA;
+  --color-surface-hover: #F5F3EF;
+  --color-hairline: #E8E5DF;
+  --color-accent-emerald: #03D26F;
+  --color-accent-amethyst: #8B5CF6;
+  --color-accent-amber: #F59E0B;
+  --color-accent-rose: #F43F5E;
   
   /* Master Palette Spectrum */
   --color-malachite: #03D26F;
   --color-cyprus: #014651;
-  --color-aqua-haze: #FBF9F5;
+  --color-aqua-haze: #FAF8F5;
   --color-starship: #CEF431;
   --color-cod-gray: #161514;
   
@@ -43,7 +64,7 @@
   --color-electric-lavender: #C084FC;
 
   /* Utility Mappings */
-  --color-cream-bg: #FBF9F5;
+  --color-cream-bg: #FAF8F5;
   --color-amber-400: #F59E0B;
   --color-amber-500: #F59E0B;
   --color-amber-600: #D97706;
@@ -91,34 +112,34 @@
 :root {
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-heading: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-geist-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-geist-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
   --font-doodle: 'Architects Daughter', 'Caveat', cursive, sans-serif;
   --font-marker: 'Permanent Marker', 'Space Grotesk', cursive, sans-serif;
   --font-hand: 'Caveat', cursive, sans-serif;
-  /* Master Clean Production Neobrutalist Theme Variables */
-  --background: #FBF9F5;
+  /* Master Clean Production Theme Variables */
+  --background: #FAF8F5;
   --foreground: #161514;
   --card: #FFFFFF;
   --card-foreground: #161514;
   --popover: #FFFFFF;
   --popover-foreground: #161514;
-  --primary: #CEF431;
-  --primary-foreground: #161514;
-  --secondary: #03D26F;
+  --primary: #161514;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F1EFEA;
   --secondary-foreground: #161514;
   --muted: #F1EFEA;
-  --muted-foreground: #64748B;
-  --accent: #C084FC;
-  --accent-foreground: #161514;
+  --muted-foreground: #8C8882;
+  --accent: #03D26F;
+  --accent-foreground: #FFFFFF;
   --destructive: #EF4444;
   --destructive-foreground: #FFFFFF;
-  --border: #161514;
-  --input: #161514;
+  --border: #E8E5DF;
+  --input: #E8E5DF;
   --ring: #161514;
   --radius: 16px;
 
   /* Master Token Aliases */
-  --cream-bg: #FBF9F5;
+  --cream-bg: #FAF8F5;
   --amber-400: #F59E0B;
   --amber-500: #F59E0B;
   --amber-600: #D97706;
@@ -148,25 +169,33 @@
 }
 
 .dark {
-  --background: #141413;
-  --foreground: #F5F5F3;
-  --card: #1C1C1B;
-  --card-foreground: #F5F5F3;
-  --popover: #1C1C1B;
-  --popover-foreground: #F5F5F3;
-  --primary: #CEF431;
-  --primary-foreground: #161514;
-  --secondary: #03D26F;
-  --secondary-foreground: #161514;
-  --muted: #272726;
-  --muted-foreground: #94A3B8;
-  --accent: #C084FC;
-  --accent-foreground: #161514;
+  --background: #121110;
+  --foreground: #FAF8F5;
+  --card: #1C1A18;
+  --card-foreground: #FAF8F5;
+  --popover: #1C1A18;
+  --popover-foreground: #FAF8F5;
+  --primary: #FAF8F5;
+  --primary-foreground: #121110;
+  --secondary: #252321;
+  --secondary-foreground: #FAF8F5;
+  --muted: #252321;
+  --muted-foreground: #A8A29E;
+  --accent: #03D26F;
+  --accent-foreground: #FFFFFF;
   --destructive: #EF4444;
   --destructive-foreground: #FFFFFF;
-  --border: #3A3A38;
-  --input: #3A3A38;
-  --ring: #CEF431;
+  --border: #2A2724;
+  --input: #2A2724;
+  --ring: #FAF8F5;
+
+  --cream-bg: #121110;
+  --navy-900: #FAF8F5;
+  --navy-950: #FAF8F5;
+  --navy-600: #94A3B8;
+  --navy-700: #CBD5E1;
+  --navy-800: #E2E8F0;
+  --white: #1C1A18;
 }
 
 @keyframes playfulAssemble {
@@ -234,6 +263,95 @@
   box-shadow: 3px 3px 0px 0px #161514 !important;
 }
 
+/* Dark Mode Hard Shadows (Pure Black Tactile Depth) */
+.dark .shadow-neo-sm {
+  box-shadow: 2px 2px 0px 0px #000000 !important;
+}
+
+.dark .shadow-neo-md {
+  box-shadow: 3px 3px 0px 0px #000000 !important;
+}
+
+.dark .shadow-neo-lg {
+  box-shadow: 5px 5px 0px 0px #000000 !important;
+}
+
+.dark .shadow-neo-xl {
+  box-shadow: 6px 6px 0px 0px #000000 !important;
+}
+
+.dark .shadow-neo-pop {
+  box-shadow: 3px 3px 0px 0px #000000 !important;
+}
+
+/* Dark Mode Architectural Grid & Halftone Backgrounds */
+.dark .bg-graph-grid {
+  background-image: 
+    linear-gradient(to right, rgba(250, 248, 245, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(250, 248, 245, 0.04) 1px, transparent 1px);
+}
+
+.dark .bg-halftone-dots {
+  background-image: radial-gradient(rgba(250, 248, 245, 0.06) 1.5px, transparent 1.5px);
+}
+
+/* Master 7-Step Typographic Hierarchy */
+.type-display {
+  font-family: var(--font-heading), sans-serif;
+  font-weight: 900;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+
+.type-h1 {
+  font-family: var(--font-heading), sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.type-h2 {
+  font-family: var(--font-heading), sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+}
+
+.type-h3 {
+  font-family: var(--font-heading), sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+}
+
+.type-body {
+  font-family: var(--font-sans), sans-serif;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.type-caption {
+  font-family: var(--font-sans), sans-serif;
+  font-weight: 500;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.type-mono-badge {
+  font-family: var(--font-geist-mono), monospace;
+  font-weight: 700;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.type-tabular {
+  font-family: var(--font-geist-mono), monospace;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
 /* Master Neobrutalism System Utility Classes with Cod Gray (#161514) Ink Borders & Hard Shadows */
 .neo-card {
   background-color: #ffffff;
@@ -293,6 +411,49 @@
   cursor: not-allowed;
   transform: none;
   box-shadow: 1px 1px 0px 0px #161514;
+}
+
+/* Dark Mode Neobrutalist Cards & Buttons (Obsidian Ink Surfaces + Pure Black Depth) */
+.dark .neo-card {
+  background-color: #1C1A18;
+  border-color: #383531;
+  box-shadow: 3px 3px 0px 0px #000000;
+}
+
+.dark .neo-card:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0px 0px #000000;
+}
+
+.dark .neo-card-flat {
+  background-color: #1C1A18;
+  border-color: #383531;
+  box-shadow: 3px 3px 0px 0px #000000;
+}
+
+.dark .neo-btn,
+.dark .neo-button {
+  background-color: #1C1A18;
+  color: #FAF8F5;
+  border-color: #383531;
+  box-shadow: 3px 3px 0px 0px #000000;
+}
+
+.dark .neo-btn:hover,
+.dark .neo-button:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0px 0px #000000;
+}
+
+.dark .neo-btn:active,
+.dark .neo-button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px 0px #000000;
+}
+
+.dark .neo-btn:disabled,
+.dark .neo-button:disabled {
+  box-shadow: 1px 1px 0px 0px #000000;
 }
 
 .neo-btn-primary {

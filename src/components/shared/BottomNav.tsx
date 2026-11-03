@@ -58,35 +58,30 @@ function BottomNavContent() {
       icon: SunMedium,
       label: "Today",
       value: "today",
-      activeColor: "bg-[#CEF431] text-[#161514] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]",
     },
     {
       href: "/goals",
       icon: CheckSquare,
       label: "Habits",
       value: "life",
-      activeColor: "bg-[#03D26F] text-[#161514] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]",
     },
     {
       href: "/study",
       icon: GraduationCap,
       label: "Study",
       value: "study",
-      activeColor: "bg-[#C084FC] text-[#161514] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]",
     },
     {
       href: "/tasks",
       icon: Kanban,
       label: "Tasks",
       value: "tasks",
-      activeColor: "bg-[#F59E0B] text-[#161514] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]",
     },
     {
       href: "/money",
       icon: Wallet,
       label: "Money",
       value: "money",
-      activeColor: "bg-[#03D26F] text-[#161514] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]",
     },
   ];
 
@@ -109,7 +104,7 @@ function BottomNavContent() {
     <nav
       aria-label="Mobile Primary Navigation"
       className={cn(
-        "fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom,0px))] left-1/2 -translate-x-1/2 w-[94%] max-w-[420px] h-[60px] bg-[#161514] border-2 border-[#161514] rounded-2xl px-2 flex items-center justify-between shadow-[3px_3px_0px_0px_#161514] z-40 lg:hidden transition-all duration-200 transform",
+        "fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom,0px))] left-1/2 -translate-x-1/2 w-[94%] max-w-[420px] h-[58px] bg-[#161514]/92 dark:bg-[#1C1A18]/95 backdrop-blur-2xl border border-white/10 dark:border-white/15 rounded-2xl px-1.5 flex items-center justify-between shadow-2xl z-40 lg:hidden transition-all duration-200 transform",
         isModalOpen ? "translate-y-28 opacity-0 pointer-events-none" : "translate-y-0 opacity-100"
       )}
     >
@@ -146,26 +141,29 @@ function BottomNavContent() {
               }
             }}
             className={cn(
-              "flex flex-col items-center justify-center py-1 px-1.5 rounded-xl cursor-pointer flex-1 mx-0.5 transition-all duration-150 active:scale-95 select-none",
+              "flex flex-col items-center justify-center py-1.5 px-1.5 rounded-xl cursor-pointer flex-1 mx-0.5 transition-all duration-150 active:scale-95 select-none relative",
               isActive
-                ? cn(item.activeColor)
-                : "bg-transparent text-white/70 border-2 border-transparent hover:text-white hover:bg-white/10"
+                ? "bg-white/15 dark:bg-white/10 text-white shadow-xs font-bold"
+                : "bg-transparent text-white/60 hover:text-white/90"
             )}
           >
             <Icon
               className={cn(
-                "size-4.5 stroke-[2.4]",
-                isActive ? "text-[#161514]" : "text-white/80"
+                "size-4 stroke-[2]",
+                isActive ? "text-white" : "text-white/70"
               )}
             />
             <span
               className={cn(
-                "font-heading font-extrabold text-[10px] tracking-tight uppercase mt-0.5 leading-none",
-                isActive ? "text-[#161514]" : "text-white/70"
+                "text-[10px] font-medium tracking-tight mt-0.5 leading-none",
+                isActive ? "text-white font-bold" : "text-white/70"
               )}
             >
               {item.label}
             </span>
+            {isActive && (
+              <span className="absolute bottom-0.5 size-1 rounded-full bg-[#CEF431]" />
+            )}
           </Link>
         );
       })}

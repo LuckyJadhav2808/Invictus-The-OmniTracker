@@ -503,7 +503,7 @@ export function HumanMuscleAnatomy({
     <div className={cn("flex flex-col items-center select-none", className)}>
       {/* Orientation View Switcher (Front ↔ Back) */}
       {showViewToggle && !sideBySide && (
-        <div className="flex items-center gap-1.5 p-1 bg-[#FAF8F5] border-2 border-[#161514] rounded-xl shadow-[2px_2px_0px_0px_#161514] mb-3">
+        <div className="flex items-center gap-1 p-0.5 bg-[#F1EFEA] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] rounded-xl mb-3">
           <button
             type="button"
             onClick={() => {
@@ -511,10 +511,10 @@ export function HumanMuscleAnatomy({
               soundFX.playPop();
             }}
             className={cn(
-              "px-3 py-1 rounded-lg font-heading font-black text-xs uppercase tracking-wider transition-all cursor-pointer",
+              "px-3 py-1 rounded-lg font-medium text-xs transition-all cursor-pointer",
               activeView === "front"
-                ? "bg-[#161514] text-[#CEF431] shadow-[1px_1px_0px_0px_#161514]"
-                : "bg-transparent text-[#161514]/70 hover:text-[#161514]"
+                ? "bg-white dark:bg-[#2A2724] text-[#161514] dark:text-white shadow-xs"
+                : "bg-transparent text-[#6E6B65] dark:text-[#9E9A90] hover:text-[#161514]"
             )}
           >
             Anterior (Front)
@@ -526,10 +526,10 @@ export function HumanMuscleAnatomy({
               soundFX.playPop();
             }}
             className={cn(
-              "px-3 py-1 rounded-lg font-heading font-black text-xs uppercase tracking-wider transition-all cursor-pointer",
+              "px-3 py-1 rounded-lg font-medium text-xs transition-all cursor-pointer",
               activeView === "back"
-                ? "bg-[#161514] text-[#CEF431] shadow-[1px_1px_0px_0px_#161514]"
-                : "bg-transparent text-[#161514]/70 hover:text-[#161514]"
+                ? "bg-white dark:bg-[#2A2724] text-[#161514] dark:text-white shadow-xs"
+                : "bg-transparent text-[#6E6B65] dark:text-[#9E9A90] hover:text-[#161514]"
             )}
           >
             Posterior (Back)
@@ -541,24 +541,24 @@ export function HumanMuscleAnatomy({
       {sideBySide ? (
         <div className="grid grid-cols-2 gap-4 w-full justify-items-center">
           <div className="flex flex-col items-center">
-            <span className="text-[10px] font-heading font-black uppercase text-[#161514]/60 mb-1">
+            <span className="text-[10px] font-mono text-[#6E6B65] dark:text-[#9E9A90] mb-1">
               Front View
             </span>
-            <div className={cn("relative p-2 bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514]", sizeClasses)}>
+            <div className={cn("relative p-2 bg-[#FAF8F5] dark:bg-[#161514] rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-none", sizeClasses)}>
               {renderFrontBody()}
             </div>
           </div>
           <div className="flex flex-col items-center">
-            <span className="text-[10px] font-heading font-black uppercase text-[#161514]/60 mb-1">
+            <span className="text-[10px] font-mono text-[#6E6B65] dark:text-[#9E9A90] mb-1">
               Back View
             </span>
-            <div className={cn("relative p-2 bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514]", sizeClasses)}>
+            <div className={cn("relative p-2 bg-[#FAF8F5] dark:bg-[#161514] rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-none", sizeClasses)}>
               {renderBackBody()}
             </div>
           </div>
         </div>
       ) : (
-        <div className={cn("relative p-2 bg-[#FAF8F5] rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex items-center justify-center", sizeClasses)}>
+        <div className={cn("relative p-2 bg-[#FAF8F5] dark:bg-[#161514] rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-none flex items-center justify-center", sizeClasses)}>
           {activeView === "front" ? renderFrontBody() : renderBackBody()}
 
           {/* Quick Flip Button Floating Overlay */}
@@ -570,9 +570,9 @@ export function HumanMuscleAnatomy({
                 soundFX.playPop();
               }}
               title="Flip to opposite view"
-              className="absolute bottom-2.5 right-2.5 size-7 rounded-lg bg-white border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center justify-center text-[#161514] hover:bg-amber-100 transition-all cursor-pointer active:translate-y-0.5"
+              className="absolute bottom-2.5 right-2.5 size-7 rounded-lg bg-white dark:bg-[#23201D] border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex items-center justify-center text-[#161514] dark:text-white hover:bg-[#F1EFEA] dark:hover:bg-white/5 transition-all cursor-pointer active:scale-95"
             >
-              <RotateCw className="size-3.5 stroke-[2.5]" />
+              <RotateCw className="size-3.5 stroke-[2]" />
             </button>
           )}
         </div>
@@ -582,19 +582,19 @@ export function HumanMuscleAnatomy({
       {interactive && (
         <div className="h-7 mt-2 flex items-center justify-center overflow-hidden">
           {hoveredMuscle ? (
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-[#161514] text-white text-[10px] font-heading font-black uppercase tracking-wider shadow-[1px_1px_0px_0px_#161514] animate-in fade-in zoom-in-95 duration-150">
+            <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#161514] text-white text-[11px] font-medium shadow-xs animate-in fade-in zoom-in-95 duration-150">
               <span>{MUSCLE_REGISTRY[hoveredMuscle as MuscleGroup]?.name || hoveredMuscle}</span>
               <span className="text-white/60 font-mono text-[9px] hidden sm:inline">
                 ({MUSCLE_REGISTRY[hoveredMuscle as MuscleGroup]?.latinName})
               </span>
             </span>
           ) : selectedMuscle ? (
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-[#FAF8F5] text-[#161514] border-2 border-[#161514] text-[10px] font-heading font-black uppercase tracking-wider shadow-[1px_1px_0px_0px_#161514] animate-in fade-in duration-150">
+            <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-white border border-[#E8E5DF] dark:border-[#2A2724] text-[11px] font-medium shadow-xs animate-in fade-in duration-150">
               <span>Selected: {MUSCLE_REGISTRY[selectedMuscle as MuscleGroup]?.name || selectedMuscle}</span>
             </span>
           ) : (
-            <span className="text-[10px] font-heading font-extrabold uppercase text-[#161514]/40 tracking-wider">
-              Hover or tap a muscle
+            <span className="text-[11px] font-normal text-[#6E6B65] dark:text-[#9E9A90]">
+              Hover or tap a muscle to inspect
             </span>
           )}
         </div>
@@ -602,25 +602,25 @@ export function HumanMuscleAnatomy({
 
       {/* Legend Chips */}
       {showLegend && (
-        <div className="flex flex-wrap items-center justify-center gap-2 mt-3 pt-2 border-t border-[#161514]/10 text-[10px] font-heading font-black uppercase text-[#161514]">
-          <div className="flex items-center gap-1.5 bg-white px-2 py-0.5 rounded-md border border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
+        <div className="flex flex-wrap items-center justify-center gap-2 mt-3 pt-2.5 border-t border-[#E8E5DF] dark:border-[#2A2724] text-xs text-[#161514] dark:text-white">
+          <div className="flex items-center gap-1.5 bg-white dark:bg-[#1C1A18] px-2.5 py-1 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs">
             <span
               className={cn(
-                "size-2.5 rounded-full border border-[#161514]",
+                "size-2 rounded-full",
                 primaryColor === "emerald" ? "bg-[#03D26F]" : "bg-[#FF4757]"
               )}
             />
-            <span>Primary Target</span>
+            <span className="text-xs font-normal">Primary Target</span>
           </div>
 
-          <div className="flex items-center gap-1.5 bg-white px-2 py-0.5 rounded-md border border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
-            <span className="size-2.5 rounded-full bg-[#F59E0B] border border-[#161514]" />
-            <span>Secondary Assist</span>
+          <div className="flex items-center gap-1.5 bg-white dark:bg-[#1C1A18] px-2.5 py-1 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs">
+            <span className="size-2 rounded-full bg-[#F59E0B]" />
+            <span className="text-xs font-normal">Secondary Assist</span>
           </div>
 
-          <div className="flex items-center gap-1.5 bg-white px-2 py-0.5 rounded-md border border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
-            <span className="size-2.5 rounded-full bg-[#E8E3D7] border border-[#161514]" />
-            <span>Rested</span>
+          <div className="flex items-center gap-1.5 bg-white dark:bg-[#1C1A18] px-2.5 py-1 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs">
+            <span className="size-2 rounded-full bg-[#E8E3D7]" />
+            <span className="text-xs font-normal text-[#6E6B65] dark:text-[#9E9A90]">Rested</span>
           </div>
         </div>
       )}

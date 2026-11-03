@@ -118,7 +118,7 @@ export function SendMoneyModal({
       <form onSubmit={handleSubmit} className="space-y-4 pt-1">
         {/* Recipient / Payee */}
         <div className="space-y-1">
-          <label htmlFor="send-recipient" className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514] block">
+          <label htmlFor="send-recipient" className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5]/80 block">
             Recipient / Payee Name *
           </label>
           <input
@@ -128,17 +128,17 @@ export function SendMoneyModal({
             value={recipient}
             onChange={(e) => setRecipient(e.target.value)}
             placeholder="e.g. Swiggy, Gym, Landlord, Rahul, Amazon..."
-            className="w-full px-4 py-2.5 bg-white rounded-2xl border-2 border-[#161514] text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
+            className="w-full px-4 py-2.5 bg-white dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] text-base sm:text-sm font-medium text-[#161514] dark:text-[#FAF8F5] placeholder:text-[#161514]/40 dark:placeholder:text-[#FAF8F5]/30 shadow-xs focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
           />
         </div>
 
         {/* Amount Input */}
         <div className="space-y-2">
-          <label htmlFor="send-amount" className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514] block">
+          <label htmlFor="send-amount" className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5]/80 block">
             Amount ({currencySymbol}) *
           </label>
           <div className="relative">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-black text-[#161514] font-heading">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-black text-[#161514] dark:text-[#FAF8F5] font-heading">
               {currencySymbol}
             </span>
             <input
@@ -150,7 +150,7 @@ export function SendMoneyModal({
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0.00"
-              className="w-full pl-10 pr-4 py-3 bg-white rounded-2xl border-2 border-[#161514] text-xl font-black text-[#161514] font-heading shadow-[3px_3px_0px_0px_#161514] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
+              className="w-full pl-10 pr-4 py-3 bg-white dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] text-xl font-black text-[#161514] dark:text-[#FAF8F5] font-heading shadow-xs focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
             />
           </div>
 
@@ -161,7 +161,7 @@ export function SendMoneyModal({
                 key={amt}
                 type="button"
                 onClick={() => handleAddAmount(amt)}
-                className="px-2.5 py-1 rounded-xl bg-white hover:bg-[#CEF431] border-2 border-[#161514] text-[11px] font-black text-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer font-heading"
+                className="px-2.5 py-1 rounded-lg bg-white dark:bg-[#1C1A18] hover:bg-[#CEF431] dark:hover:bg-[#CEF431] hover:text-[#161514] dark:hover:text-[#161514] border border-[#E8E5DF] dark:border-[#2A2724] text-[11px] font-bold text-[#161514] dark:text-[#FAF8F5] shadow-xs hover:-translate-y-0.5 active:translate-y-0 active:shadow-none transition-all cursor-pointer font-heading"
               >
                 +{currencySymbol}{amt.toLocaleString()}
               </button>
@@ -170,7 +170,7 @@ export function SendMoneyModal({
               <button
                 type="button"
                 onClick={() => setAmount("")}
-                className="px-2.5 py-1 rounded-xl bg-[#FAF8F5] hover:bg-rose-100 border-2 border-[#161514] text-[10px] font-black text-rose-700 shadow-[1.5px_1.5px_0px_0px_#161514] transition-all cursor-pointer"
+                className="px-2.5 py-1 rounded-lg bg-[#FAF8F5] dark:bg-[#252321] hover:bg-rose-100 dark:hover:bg-rose-950/40 border border-[#E8E5DF] dark:border-[#2A2724] text-[10px] font-bold text-rose-700 dark:text-rose-400 shadow-xs transition-all cursor-pointer"
               >
                 Clear
               </button>
@@ -180,7 +180,7 @@ export function SendMoneyModal({
 
         {/* Category Wallet Selector */}
         <div className="space-y-1">
-          <label className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514] block">
+          <label className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5]/80 block">
             Category Wallet / Envelope *
           </label>
           <NeobrutalistSelect
@@ -193,7 +193,7 @@ export function SendMoneyModal({
 
         {/* Payment Method Chips */}
         <div className="space-y-1.5">
-          <label className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514] block">
+          <label className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5]/80 block">
             Payment Method
           </label>
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
@@ -209,13 +209,13 @@ export function SendMoneyModal({
                     setPaymentMethod(pm.id);
                   }}
                   className={cn(
-                    "flex flex-col items-center justify-center py-2 px-1 rounded-xl border-2 border-[#161514] transition-all cursor-pointer text-center gap-1",
+                    "flex flex-col items-center justify-center py-2 px-1 rounded-xl border transition-all cursor-pointer text-center gap-1 shadow-xs",
                     isSelected
-                      ? "bg-[#03D26F] text-[#161514] shadow-[2px_2px_0px_0px_#161514] -translate-y-0.5 font-black"
-                      : "bg-white text-[#161514]/70 hover:bg-[#FAF8F5] shadow-[1px_1px_0px_0px_#161514] font-bold"
+                      ? "bg-[#03D26F] text-[#161514] border-[#03D26F] -translate-y-0.5 font-black"
+                      : "bg-white dark:bg-[#1C1A18] text-[#161514]/70 dark:text-[#FAF8F5]/70 hover:bg-[#FAF8F5] dark:hover:bg-[#252321] border-[#E8E5DF] dark:border-[#2A2724] font-medium"
                   )}
                 >
-                  <IconComp className="size-4 shrink-0 text-[#161514]" />
+                  <IconComp className={cn("size-4 shrink-0", isSelected ? "text-[#161514]" : "text-[#161514]/70 dark:text-[#FAF8F5]/70")} />
                   <span className="text-[10px] truncate max-w-full font-heading">{pm.label}</span>
                 </button>
               );
@@ -225,7 +225,7 @@ export function SendMoneyModal({
 
         {/* Optional Note */}
         <div className="space-y-1">
-          <label htmlFor="send-note" className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514] block">
+          <label htmlFor="send-note" className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5]/80 block">
             Note / Purpose (Optional)
           </label>
           <input
@@ -234,7 +234,7 @@ export function SendMoneyModal({
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="e.g. Month end split, Groceries, Dinner"
-            className="w-full px-4 py-2.5 bg-white rounded-2xl border-2 border-[#161514] text-xs sm:text-sm font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514] focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
+            className="w-full px-4 py-2.5 bg-white dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] text-base sm:text-sm font-medium text-[#161514] dark:text-[#FAF8F5] placeholder:text-[#161514]/40 dark:placeholder:text-[#FAF8F5]/30 shadow-xs focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
           />
         </div>
 
@@ -242,7 +242,7 @@ export function SendMoneyModal({
         <button
           type="submit"
           disabled={isSubmitting || !recipient.trim() || !amount || Number(amount) <= 0}
-          className="w-full py-3 px-4 rounded-2xl bg-[#03D26F] hover:bg-[#02B861] text-[#161514] font-black text-sm uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+          className="w-full py-3 px-4 rounded-xl bg-[#03D26F] hover:bg-[#02B861] text-[#161514] font-black text-sm uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2 border border-[#03D26F] shadow-xs hover:-translate-y-0.5 active:translate-y-0 active:shadow-none disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
         >
           {isSubmitting ? (
             <>

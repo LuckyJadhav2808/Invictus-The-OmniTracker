@@ -19,6 +19,7 @@ import {
 import { useUIStore } from "@/store/ui-store";
 import { cn } from "@/lib/utils";
 import { InvictusLogo } from "@/components/shared/InvictusLogo";
+import { ThemeToggle } from "@/components/shared/ThemeToggle";
 
 function SidebarContent() {
   const pathname = usePathname();
@@ -33,35 +34,35 @@ function SidebarContent() {
       label: "Today Overview",
       icon: SunMedium,
       value: "today",
-      activeBg: "bg-[#CEF431] text-[#161514] border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514]",
+      accent: "bg-[#03D26F]",
     },
     {
       href: "/goals",
       label: "Habits & Health",
       icon: CheckSquare,
       value: "life",
-      activeBg: "bg-[#03D26F] text-[#161514] border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514]",
+      accent: "bg-[#03D26F]",
     },
     {
       href: "/study",
       label: "Study & Exams",
       icon: GraduationCap,
       value: "study",
-      activeBg: "bg-[#C084FC] text-[#161514] border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514]",
+      accent: "bg-[#8B5CF6]",
     },
     {
       href: "/tasks",
       label: "Tasks & Projects",
       icon: Kanban,
       value: "tasks",
-      activeBg: "bg-[#F59E0B] text-[#161514] border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514]",
+      accent: "bg-[#F59E0B]",
     },
     {
       href: "/money",
       label: "Money & Ledger",
       icon: Wallet,
       value: "money",
-      activeBg: "bg-[#03D26F] text-[#161514] border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514]",
+      accent: "bg-[#03D26F]",
     },
   ];
 
@@ -83,19 +84,19 @@ function SidebarContent() {
     user?.role === "admin";
 
   return (
-    <aside className="hidden lg:flex flex-col w-64 bg-white border-r-2 border-[#161514] h-screen sticky top-0 p-5 justify-between select-none shadow-[3px_0px_0px_0px_#161514] z-20">
+    <aside className="hidden lg:flex flex-col w-64 bg-[#FAF8F5] dark:bg-[#161514] border-r border-[#E8E5DF] dark:border-[#2A2724] h-screen sticky top-0 p-4 justify-between select-none shadow-none z-20 transition-colors">
       <div className="space-y-6">
         {/* Brand Logo */}
-        <div className="px-1 py-1">
+        <div className="px-1.5 py-1">
           <InvictusLogo size="md" variant="full" href="/today" />
         </div>
 
         {/* Primary Navigation Spaces */}
-        <div className="space-y-2">
-          <span className="font-heading font-black text-[10px] uppercase tracking-wider text-[#161514]/60 px-3 block">
+        <div className="space-y-1.5">
+          <span className="text-[10px] font-heading font-black uppercase text-[#A8A29E] dark:text-[#8C8882] px-3 pt-1 block tracking-wider">
             Core Spaces
           </span>
-          <nav className="space-y-1.5">
+          <nav className="space-y-1">
             {primaryNavItems.map((item) => {
               const isActive =
                 item.href === "/today"
@@ -119,13 +120,29 @@ function SidebarContent() {
                     }
                   }}
                   className={cn(
-                    "flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-heading font-bold transition-all duration-100 cursor-pointer select-none border-2",
+                    "flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-colors cursor-pointer select-none border relative group",
                     isActive
-                      ? item.activeBg
-                      : "text-[#161514]/85 border-transparent hover:text-[#161514] hover:bg-[#F1EFEA] hover:border-[#161514] hover:shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+                      ? "bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] border-[#E8E5DF] dark:border-[#2A2724] shadow-xs font-semibold"
+                      : "text-[#6B6B6B] dark:text-[#A8A29E] border-transparent hover:text-[#161514] dark:hover:text-[#FAF8F5] hover:bg-[#F1EFEA] dark:hover:bg-[#252321]"
                   )}
                 >
-                  <Icon className="size-4.5 stroke-[2.2]" />
+                  {isActive && (
+                    <span
+                      aria-hidden="true"
+                      className={cn(
+                        "absolute left-1 top-2 bottom-2 w-1 rounded-full",
+                        item.accent
+                      )}
+                    />
+                  )}
+                  <Icon
+                    className={cn(
+                      "size-4 stroke-[1.75] transition-colors",
+                      isActive
+                        ? "text-[#161514] dark:text-[#FAF8F5]"
+                        : "text-[#8C8882] dark:text-[#78716C] group-hover:text-[#161514] dark:group-hover:text-[#FAF8F5]"
+                    )}
+                  />
                   <span>{item.label}</span>
                 </Link>
               );
@@ -134,11 +151,11 @@ function SidebarContent() {
         </div>
 
         {/* Secondary Navigation */}
-        <div className="space-y-2 pt-2 border-t border-[#161514]/15">
-          <span className="font-heading font-black text-[10px] uppercase tracking-wider text-[#161514]/60 px-3 block">
+        <div className="space-y-1.5 pt-2 border-t border-[#E8E5DF] dark:border-[#2A2724]">
+          <span className="text-[10px] font-heading font-black uppercase text-[#A8A29E] dark:text-[#8C8882] px-3 pt-1 block tracking-wider">
             Tools & System
           </span>
-          <nav className="space-y-1.5">
+          <nav className="space-y-1">
             {secondaryNavItems.map((item) => {
               const isActive = pathname.startsWith(item.href);
               const Icon = item.icon;
@@ -148,13 +165,20 @@ function SidebarContent() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-heading font-bold transition-all duration-100 cursor-pointer select-none border-2",
+                    "flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-colors cursor-pointer select-none border",
                     isActive
-                      ? "bg-white text-[#161514] border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514]"
-                      : "text-[#161514]/75 border-transparent hover:text-[#161514] hover:bg-[#F1EFEA] hover:border-[#161514]/40"
+                      ? "bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] border-[#E8E5DF] dark:border-[#2A2724] shadow-xs font-semibold"
+                      : "text-[#6B6B6B] dark:text-[#A8A29E] border-transparent hover:text-[#161514] dark:hover:text-[#FAF8F5] hover:bg-[#F1EFEA] dark:hover:bg-[#252321]"
                   )}
                 >
-                  <Icon className="size-4 stroke-[2]" />
+                  <Icon
+                    className={cn(
+                      "size-4 stroke-[1.75]",
+                      isActive
+                        ? "text-[#161514] dark:text-[#FAF8F5]"
+                        : "text-[#8C8882] dark:text-[#78716C]"
+                    )}
+                  />
                   <span>{item.label}</span>
                 </Link>
               );
@@ -164,13 +188,13 @@ function SidebarContent() {
               <Link
                 href="/admin"
                 className={cn(
-                  "flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-heading font-bold transition-all duration-100 cursor-pointer select-none border-2",
+                  "flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-colors cursor-pointer select-none border",
                   pathname.startsWith("/admin")
-                    ? "bg-amber-300 text-[#161514] border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514]"
-                    : "text-amber-800 border-transparent hover:bg-amber-50 hover:border-amber-400"
+                    ? "bg-amber-50 dark:bg-amber-950/30 text-amber-900 dark:text-amber-300 border-amber-200 dark:border-amber-900/40 shadow-xs font-semibold"
+                    : "text-amber-800 dark:text-amber-400 border-transparent hover:bg-amber-50/70 dark:hover:bg-amber-950/20"
                 )}
               >
-                <ShieldCheck className="size-4 stroke-[2.2]" />
+                <ShieldCheck className="size-4 stroke-[1.75]" />
                 <span>Admin Console</span>
               </Link>
             )}
@@ -178,29 +202,37 @@ function SidebarContent() {
         </div>
       </div>
 
-      {/* User profile card & logout */}
-      <div className="pt-4 border-t border-[#161514]/15 space-y-2">
+      {/* User profile card & theme controls */}
+      <div className="pt-3 border-t border-[#E8E5DF] dark:border-[#2A2724] space-y-2">
+        {/* Quick Theme Switch Row */}
+        <div className="flex items-center justify-between px-2.5 py-1.5 rounded-xl bg-white dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs">
+          <span className="text-[10.5px] font-mono font-bold tracking-wider uppercase text-[#8C8882] dark:text-[#A8A29E]">
+            THEME MODE
+          </span>
+          <ThemeToggle size="sm" />
+        </div>
+
         <Link
           href="/profile"
           className={cn(
-            "flex items-center gap-3 p-2.5 rounded-xl border-2 border-[#161514] transition-all duration-100 select-none shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
+            "flex items-center gap-2.5 p-2 rounded-xl border transition-colors select-none",
             pathname.startsWith("/profile")
-              ? "bg-[#CEF431] text-[#161514]"
-              : "bg-white text-[#161514] hover:bg-[#F1EFEA]"
+              ? "bg-white dark:bg-[#1C1A18] border-[#E8E5DF] dark:border-[#2A2724] shadow-xs"
+              : "bg-transparent border-transparent hover:bg-white dark:hover:bg-[#1C1A18] hover:border-[#E8E5DF] dark:hover:border-[#2A2724]"
           )}
         >
-          <div className="size-8 rounded-lg bg-[#161514] text-white flex items-center justify-center font-black text-xs shrink-0 border border-[#161514]">
+          <div className="size-7 rounded-lg bg-[#161514] dark:bg-[#FAF8F5] text-white dark:text-[#161514] flex items-center justify-center font-bold text-xs shrink-0">
             {user?.displayName ? (
               user.displayName.charAt(0).toUpperCase()
             ) : (
-              <User className="size-4" />
+              <User className="size-3.5 stroke-[1.75]" />
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-heading text-xs font-bold truncate leading-tight text-[#161514]">
+            <p className="text-xs font-medium truncate leading-tight text-[#161514] dark:text-[#FAF8F5]">
               {user?.displayName || "Invictus User"}
             </p>
-            <p className="text-[10px] text-[#161514]/65 truncate font-mono">
+            <p className="text-[10px] text-[#8C8882] dark:text-[#A8A29E] truncate font-mono">
               {user?.email || "Local Guest"}
             </p>
           </div>
@@ -211,9 +243,9 @@ function SidebarContent() {
             await signOut();
             router.push("/login");
           }}
-          className="w-full flex items-center justify-center gap-2 py-1.5 px-3 rounded-lg text-xs font-bold text-red-600 hover:bg-red-50 border border-transparent hover:border-red-300 transition-colors cursor-pointer"
+          className="w-full flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg text-xs font-medium text-[#8C8882] dark:text-[#A8A29E] hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50/80 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
         >
-          <LogOut className="size-3.5" />
+          <LogOut className="size-3.5 stroke-[1.75]" />
           <span>Sign Out</span>
         </button>
       </div>

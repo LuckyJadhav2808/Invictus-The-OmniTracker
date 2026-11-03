@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import * as LucideIcons from "lucide-react";
 import { type Habit, type Streak } from "@/types";
-import { Flame, CheckCircle, Circle, Edit3, Trash2, Sparkles, Zap } from "lucide-react";
+import { Flame, Check, CheckCircle, Circle, Edit3, Trash2, Sparkles, Zap, Clock, Moon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
 
@@ -55,10 +55,10 @@ export function HabitCard({
     if (days >= 21) {
       return {
         label: "Mythic Plasma",
-        bg: "bg-gradient-to-r from-cyan-300 to-blue-400 text-[#161514]",
-        border: "border-cyan-600",
-        flameColor: "fill-cyan-500 text-blue-950",
-        glow: "animate-pulse",
+        bg: "bg-cyan-300 text-[#161514]",
+        border: "border-[#161514]",
+        flameColor: "fill-cyan-800 text-[#161514]",
+        glow: "",
       };
     }
     if (days >= 8) {
@@ -109,51 +109,43 @@ export function HabitCard({
     <div
       onClick={onClick}
       className={cn(
-        "relative bg-white border-[2.5px] border-[#161514] rounded-2xl p-4 flex items-center justify-between",
-        "shadow-[3.5px_3.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_#161514]",
-        "transition-all cursor-pointer select-none group overflow-hidden",
-        isCompletedToday && "bg-[#F0FDF4]/90 border-[#161514]",
-        isAnimating && "scale-[0.98]"
+        "relative bg-white dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#383531] rounded-xl p-3.5 sm:p-4 flex items-center justify-between",
+        "transition-colors cursor-pointer select-none group overflow-hidden hover:bg-[#FAF8F5] dark:hover:bg-[#252321]",
+        isCompletedToday && "bg-[#F9FAF9] dark:bg-[#181615] opacity-85",
+        isAnimating && "scale-[0.99]"
       )}
     >
       {/* Floating Sparkle Particles on check */}
       {showSparkles && (
         <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-20">
-          <div className="animate-ping flex items-center gap-1 bg-[#CEF431] text-[#161514] border-2 border-[#161514] px-2.5 py-0.5 rounded-full font-heading font-black text-xs shadow-[2px_2px_0px_0px_#161514]">
-            <Sparkles className="size-3.5 fill-current" />
-            <span>REP COMPLETE!</span>
+          <div className="animate-ping flex items-center gap-1 bg-[#161514] dark:bg-[#FAF8F5] text-white dark:text-[#161514] px-2.5 py-0.5 rounded-md font-mono text-xs shadow-sm">
+            <Sparkles className="size-3.5 text-[#03D26F] fill-current" />
+            <span>Rep completed</span>
           </div>
         </div>
       )}
 
       {/* Habit Details */}
-      <div className="flex items-center gap-3.5 flex-1 min-w-0 pr-2">
+      <div className="flex items-center gap-3 flex-1 min-w-0 pr-2">
         {/* Habit Category Icon */}
-        <div
-          className={cn(
-            "size-12 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center shrink-0",
-            colors.bg,
-            colors.text
-          )}
-        >
-          <IconComponent className="size-6 stroke-[2.5]" />
+        <div className="size-10 rounded-lg bg-[#F1EFEA] dark:bg-[#252321] flex items-center justify-center shrink-0 text-[#161514] dark:text-[#FAF8F5]">
+          <IconComponent className="size-5 stroke-[1.5]" />
         </div>
 
         {/* Title, Frequency & Evolving Streak Flame */}
         <div className="flex-1 min-w-0">
           <h4
             className={cn(
-              "font-heading font-black text-sm text-[#161514] truncate leading-tight transition-all",
-              isCompletedToday && "line-through opacity-60"
+              "font-sans font-medium text-sm text-[#161514] dark:text-[#FAF8F5] truncate leading-tight transition-colors",
+              isCompletedToday && "line-through text-[#6B6B6B] dark:text-[#A8A29E]"
             )}
-            style={{ fontFamily: "var(--font-heading)" }}
           >
             {habit.title}
           </h4>
 
           <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
             {/* Frequency Badge */}
-            <span className="text-[9px] font-heading font-black text-[#161514] uppercase tracking-wider bg-white px-2 py-0.5 rounded-full border border-[#161514]">
+            <span className="text-[10px] font-mono text-[#6B6B6B] dark:text-[#A8A29E] bg-[#F1EFEA] dark:bg-[#252321] px-2 py-0.5 rounded border border-[#E8E5DF] dark:border-[#383531]">
               {habit.frequency?.type === "daily"
                 ? "Daily"
                 : habit.frequency?.type === "weekly"
@@ -163,31 +155,29 @@ export function HabitCard({
 
             {/* Rest Day Badge */}
             {isRestDay && !isCompletedToday && (
-              <span className="text-[9px] font-heading font-black text-amber-900 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-500 shadow-[1px_1px_0px_0px_#161514]">
-                💤 Rest Day
+              <span className="text-[10px] font-mono text-[#6B6B6B] dark:text-[#A8A29E] bg-[#FAF8F5] dark:bg-[#161514] px-2 py-0.5 rounded border border-[#E8E5DF] dark:border-[#383531] flex items-center gap-1">
+                <Moon className="size-2.5 stroke-[1.5]" />
+                <span>Rest Day</span>
               </span>
             )}
 
             {/* Reminder Time Badge */}
             {habit.reminderTime && (
-              <span className="text-[9px] font-heading font-bold text-[#161514]/70 bg-white px-2 py-0.5 rounded-full border border-[#161514]/30">
-                ⏰ {habit.reminderTime}
+              <span className="text-[10px] font-mono text-[#6B6B6B] dark:text-[#A8A29E] bg-white dark:bg-[#252321] px-2 py-0.5 rounded border border-[#E8E5DF] dark:border-[#383531] flex items-center gap-1">
+                <Clock className="size-2.5 stroke-[1.5]" />
+                <span>{habit.reminderTime}</span>
               </span>
             )}
 
             {/* Evolving Streak Flame Badge */}
             {currentStreak > 0 && (
               <div
-                className={cn(
-                  "flex items-center gap-1 px-2.5 py-0.5 rounded-full font-heading font-black text-[9px] border border-[#161514] shadow-[1px_1px_0px_0px_#161514]",
-                  streakTier.bg,
-                  streakTier.glow
-                )}
+                className="flex items-center gap-1 px-2 py-0.5 rounded font-mono text-[10px] border border-[#E8E5DF] dark:border-[#78350F]/40 bg-[#FFFBEB] dark:bg-[#78350F]/20 text-[#92400E] dark:text-[#FDE68A]"
                 title={`${currentStreak} days • ${streakTier.label}`}
               >
-                <Flame className={cn("size-3", streakTier.flameColor)} />
-                <span>
-                  {currentStreak}d {currentStreak >= 21 ? "🔥 MYTHIC" : "streak"}
+                <Flame className="size-2.5 fill-orange-500 text-orange-500" />
+                <span className="tabular-nums">
+                  {currentStreak}d streak
                 </span>
               </div>
             )}
@@ -195,7 +185,7 @@ export function HabitCard({
         </div>
       </div>
 
-      {/* Action Buttons (All min 44x44px touch targets) */}
+      {/* Action Buttons (All min 40x40px touch targets) */}
       <div className="flex items-center gap-1.5 shrink-0">
         {/* Edit Button */}
         {onEdit && (
@@ -206,11 +196,11 @@ export function HabitCard({
               onEdit();
             }}
             type="button"
-            className="min-w-[44px] min-h-[44px] size-11 rounded-xl border-2 border-[#161514] bg-white hover:bg-amber-100 text-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all flex items-center justify-center cursor-pointer"
+            className="min-w-[38px] min-h-[38px] size-9 rounded-lg border border-[#E8E5DF] dark:border-[#383531] bg-white dark:bg-[#252321] hover:bg-[#F5F3EF] dark:hover:bg-[#2e2b28] text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5] transition-colors flex items-center justify-center cursor-pointer"
             title="Edit Habit"
             aria-label="Edit Habit"
           >
-            <Edit3 className="size-4 stroke-[2.5]" />
+            <Edit3 className="size-3.5 stroke-[1.5]" />
           </button>
         )}
 
@@ -223,31 +213,30 @@ export function HabitCard({
               onDelete();
             }}
             type="button"
-            className="min-w-[44px] min-h-[44px] size-11 rounded-xl border-2 border-[#161514] bg-white hover:bg-rose-100 text-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all flex items-center justify-center cursor-pointer"
+            className="min-w-[38px] min-h-[38px] size-9 rounded-lg border border-[#E8E5DF] dark:border-[#383531] bg-white dark:bg-[#252321] hover:bg-rose-50 dark:hover:bg-rose-950/30 text-[#6B6B6B] dark:text-[#A8A29E] hover:text-rose-600 dark:hover:text-rose-400 transition-colors flex items-center justify-center cursor-pointer"
             title="Delete Habit"
             aria-label="Delete Habit"
           >
-            <Trash2 className="size-4 stroke-[2.5]" />
+            <Trash2 className="size-3.5 stroke-[1.5]" />
           </button>
         )}
 
-        {/* Complete Checkbox Toggle (Giant 44x44px satisfying tactile pop) */}
+        {/* Complete Checkbox Toggle */}
         <button
           onClick={handleToggleClick}
           type="button"
           aria-label={isCompletedToday ? "Mark Incomplete" : "Mark Complete"}
           className={cn(
-            "min-w-[44px] min-h-[44px] size-11 rounded-xl border-[2.5px] border-[#161514] flex items-center justify-center transition-all cursor-pointer",
-            "shadow-[2.5px_2.5px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
+            "min-w-[38px] min-h-[38px] size-9 rounded-lg border flex items-center justify-center transition-colors cursor-pointer active:translate-y-px",
             isCompletedToday
-              ? "bg-[#03D26F] text-[#161514] hover:bg-[#02b861]"
-              : "bg-white text-[#161514] hover:bg-[#FFF9EA]"
+              ? "bg-[#03D26F] border-[#03D26F] text-white"
+              : "bg-white dark:bg-[#252321] border-[#D1D5DB] dark:border-[#4B5563] hover:bg-[#F1EFEA] dark:hover:bg-[#2e2b28] text-[#D1D5DB] dark:text-[#4B5563]"
           )}
         >
           {isCompletedToday ? (
-            <CheckCircle className="size-6 fill-[#161514] text-white stroke-[2]" />
+            <Check className="size-4.5 stroke-[2.5]" />
           ) : (
-            <Circle className="size-6 stroke-[2.5] text-[#161514]" />
+            <Circle className="size-4.5 stroke-[1.5]" />
           )}
         </button>
       </div>

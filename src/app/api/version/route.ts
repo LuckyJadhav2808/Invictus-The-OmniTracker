@@ -4,6 +4,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { AppRelease } from "@/models/AppRelease";
 import fs from "node:fs";
 import path from "node:path";
+import crypto from "node:crypto";
 
 export const dynamic = "force-dynamic";
 
@@ -33,13 +34,23 @@ export async function GET(request: Request) {
       await connectToDatabase();
       const releaseDoc = await AppRelease.findOne({ isActive: true }).sort({ buildNumber: -1 });
       if (releaseDoc) {
-        latestVersion = releaseDoc.version;
-        buildNumber = releaseDoc.buildNumber;
-        releaseTitle = `Invictus v${releaseDoc.version}`;
-        if (releaseDoc.changelog?.length) {
-          releaseNotes = releaseDoc.changelog;
+        const staticIsNewerOrEqual = compareSemver(APP_VERSION_CONFIG.version, releaseDoc.version) >= 0;
+        if (staticIsNewerOrEqual) {
+          latestVersion = APP_VERSION_CONFIG.version;
+          buildNumber = Math.max(APP_VERSION_CONFIG.buildNumber, releaseDoc.buildNumber || 0);
+          releaseTitle = `Invictus v${latestVersion}`;
+          releaseNotes = APP_VERSION_CONFIG.changelog;
+          publishedAt = APP_VERSION_CONFIG.releaseDate;
+        } else {
+          latestVersion = releaseDoc.version;
+          buildNumber = releaseDoc.buildNumber;
+          releaseTitle = `Invictus v${releaseDoc.version}`;
+          if (releaseDoc.changelog?.length) {
+            releaseNotes = releaseDoc.changelog;
+          }
+          publishedAt = releaseDoc.releaseDate;
         }
-        publishedAt = releaseDoc.releaseDate;
+
         apkDownloadUrl = releaseDoc.apkDownloadUrl || "/api/download/android";
         apkSha256 = releaseDoc.apkSha256 || "";
         apkSizeBytes = releaseDoc.apkSizeBytes || 0;
@@ -60,9 +71,29 @@ export async function GET(request: Request) {
       }
       if (!apkSizeBytes) {
         try {
-          apkSizeBytes = fs.statSync(localApkPath).size;
+          const stat = fs.statSync(localApkPath);
+          apkSizeBytes = stat.size;
         } catch {}
       }
+      if (!apkSha256) {
+        try {
+          const fileBuf = fs.readFileSync(localApkPath);
+          apkSha256 = crypto.createHash("sha256").update(fileBuf).digest("hex");
+        } catch {}
+      }
+    }
+
+    // Check version.json if sha256 still empty
+    if (!apkSha256) {
+      try {
+        const versionJsonPath = path.join(process.cwd(), "public", "version.json");
+        if (fs.existsSync(versionJsonPath)) {
+          const vData = JSON.parse(fs.readFileSync(versionJsonPath, "utf8"));
+          if (vData.apk?.sha256) {
+            apkSha256 = vData.apk.sha256;
+          }
+        }
+      } catch {}
     }
 
     // 3. Resolve absolute server origin for native mobile bridges (Guarantees protocol)
@@ -80,11 +111,22 @@ export async function GET(request: Request) {
         ? latestVersion
         : APP_VERSION_CONFIG.version;
 
+    if (effectiveTargetVersion === APP_VERSION_CONFIG.version) {
+      buildNumber = Math.max(buildNumber, APP_VERSION_CONFIG.buildNumber);
+      releaseTitle = `Invictus v${APP_VERSION_CONFIG.version}`;
+      releaseNotes = APP_VERSION_CONFIG.changelog;
+    }
+
     // If local file is missing on this server instance (e.g. Vercel serverless), point directly to the exact target release APK
     if (!localFileExists && (!apkDownloadUrl || apkDownloadUrl.includes("/downloads/Invictus.apk"))) {
       apkDownloadUrl = `https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v${effectiveTargetVersion}/Invictus.apk`;
     } else if (apkDownloadUrl && apkDownloadUrl.startsWith("/")) {
       apkDownloadUrl = `${serverOrigin}${apkDownloadUrl}`;
+    }
+
+    // Guard against localhost origin being passed to native Android devices
+    if (apkDownloadUrl.includes("localhost") || apkDownloadUrl.includes("127.0.0.1")) {
+      apkDownloadUrl = apkDownloadUrl.replace(/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/, "https://invictus-the-omni-tracker.vercel.app");
     }
 
     const hasUpdate = compareSemver(effectiveTargetVersion, clientInstalledVersion) > 0;
@@ -107,6 +149,7 @@ export async function GET(request: Request) {
       apkSizeBytes,
       otaBundleUrl,
       publishedAt,
+      versionDumpUrl: "/api/version/dump",
       provider: "in-app-manifest",
     });
   } catch (error) {

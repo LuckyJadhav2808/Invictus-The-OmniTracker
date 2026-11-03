@@ -112,7 +112,7 @@ public class SafeSpendWidgetProvider extends AppWidgetProvider {
                     // 1. Hero Stat: Amount Left to Spend Today (Daily Limit Left)
                     if (dailyBudgetTarget > 0) {
                         if (isOverDailyBudget && overDailyAmount > 0) {
-                            heroLabel = hasCustomCap ? "⚠️ LIMIT EXCEEDED" : "⚠️ PACE EXCEEDED";
+                            heroLabel = hasCustomCap ? "LIMIT EXCEEDED" : "PACE EXCEEDED";
                             heroAmount = "-" + currency + formatter.format((long) Math.round(overDailyAmount));
                             heroAmountColor = Color.parseColor("#D92D20"); // High-visibility alert red
                             allowanceBadgeText = "Spent " + currency + formatter.format((long) Math.round(todayExpense)) + " of " + currency + formatter.format((long) Math.round(dailyBudgetTarget)) + (hasCustomCap ? " cap" : " pace");
@@ -153,15 +153,15 @@ public class SafeSpendWidgetProvider extends AppWidgetProvider {
             }
 
             // Bind Top Header & Finances
-            views.setTextViewText(R.id.widget_title, "⚡ INVICTUS DAILY");
+            views.setTextViewText(R.id.widget_title, "INVICTUS");
             views.setTextViewText(R.id.widget_date_chip, dateChip);
             views.setTextViewText(R.id.widget_hero_label, heroLabel);
             views.setTextViewText(R.id.widget_safe_amount, heroAmount);
             views.setTextColor(R.id.widget_safe_amount, heroAmountColor);
             views.setTextViewText(R.id.widget_today_badge, allowanceBadgeText);
             views.setTextColor(R.id.widget_today_badge, allowanceBadgeColor);
-            views.setTextViewText(R.id.widget_upi_left, "📱 UPI: " + upiLeft);
-            views.setTextViewText(R.id.widget_cash_left, "💵 Cash: " + cashLeft);
+            views.setTextViewText(R.id.widget_upi_left, "UPI: " + upiLeft);
+            views.setTextViewText(R.id.widget_cash_left, "Cash: " + cashLeft);
 
             // Bind Habits Checklist
             if (habitsTotal > 0 && habitsArray != null && habitsArray.length() > 0) {
@@ -170,7 +170,7 @@ public class SafeSpendWidgetProvider extends AppWidgetProvider {
 
                 String progressText = habitsCompleted + "/" + habitsTotal + " DONE";
                 if (habitsCompleted == habitsTotal) {
-                    progressText = "ALL DONE 🎉";
+                    progressText = "ALL DONE";
                 }
                 views.setTextViewText(R.id.widget_habits_progress, progressText);
                 views.setTextColor(R.id.widget_habits_progress, habitsCompleted == habitsTotal 
@@ -194,7 +194,7 @@ public class SafeSpendWidgetProvider extends AppWidgetProvider {
 
                         if (s1 > 0) {
                             views.setViewVisibility(R.id.widget_habit_1_streak, View.VISIBLE);
-                            views.setTextViewText(R.id.widget_habit_1_streak, "🔥 " + s1 + "d");
+                            views.setTextViewText(R.id.widget_habit_1_streak, s1 + "d");
                         } else {
                             views.setViewVisibility(R.id.widget_habit_1_streak, View.GONE);
                         }
@@ -222,7 +222,7 @@ public class SafeSpendWidgetProvider extends AppWidgetProvider {
 
                         if (s2 > 0) {
                             views.setViewVisibility(R.id.widget_habit_2_streak, View.VISIBLE);
-                            views.setTextViewText(R.id.widget_habit_2_streak, "🔥 " + s2 + "d");
+                            views.setTextViewText(R.id.widget_habit_2_streak, s2 + "d");
                         } else {
                             views.setViewVisibility(R.id.widget_habit_2_streak, View.GONE);
                         }
@@ -250,7 +250,7 @@ public class SafeSpendWidgetProvider extends AppWidgetProvider {
 
                         if (s3 > 0) {
                             views.setViewVisibility(R.id.widget_habit_3_streak, View.VISIBLE);
-                            views.setTextViewText(R.id.widget_habit_3_streak, "🔥 " + s3 + "d");
+                            views.setTextViewText(R.id.widget_habit_3_streak, s3 + "d");
                         } else {
                             views.setViewVisibility(R.id.widget_habit_3_streak, View.GONE);
                         }

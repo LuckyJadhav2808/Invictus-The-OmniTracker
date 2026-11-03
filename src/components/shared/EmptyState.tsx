@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { type LucideIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface EmptyStateProps {
   title: string;
@@ -11,6 +11,7 @@ interface EmptyStateProps {
   onCtaClick?: () => void;
   iconBgClass?: string;
   iconColorClass?: string;
+  className?: string;
 }
 
 export function EmptyState({
@@ -19,23 +20,38 @@ export function EmptyState({
   Icon,
   ctaText,
   onCtaClick,
-  iconBgClass = "bg-amber-300",
-  iconColorClass = "text-navy-950",
+  iconBgClass = "bg-[#CEF431]",
+  iconColorClass = "text-[#161514]",
+  className,
 }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center text-center p-8 bg-white rounded-3xl border-2 border-navy-950 shadow-[4px_4px_0px_0px_rgba(31,36,48,1)] space-y-4 my-4">
-      <div className={`h-14 w-14 rounded-2xl border-2 border-navy-950 shadow-[2px_2px_0px_0px_rgba(31,36,48,1)] ${iconBgClass} flex items-center justify-center`}>
-        <Icon className={`h-7 w-7 ${iconColorClass} stroke-[2.5]`} />
+    <div
+      className={cn(
+        "flex flex-col items-center justify-center text-center p-8 bg-white dark:bg-[#1C1A18] rounded-3xl border-2 border-[#161514] dark:border-[#383531] shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#000000] space-y-4 my-4 transition-colors select-none",
+        className
+      )}
+    >
+      <div
+        className={cn(
+          "size-14 rounded-2xl border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] flex items-center justify-center transition-transform hover:scale-105",
+          iconBgClass
+        )}
+      >
+        <Icon className={cn("size-7 stroke-[2.5]", iconColorClass)} />
       </div>
       <div className="space-y-1.5 max-w-sm">
-        <h4 className="font-black text-base text-navy-950 tracking-tight" style={{ fontFamily: "var(--font-heading)" }}>{title}</h4>
-        <p className="text-xs font-bold text-navy-700 leading-relaxed">{description}</p>
+        <h4 className="font-heading font-black text-base text-[#161514] dark:text-[#FAF8F5] tracking-tight">
+          {title}
+        </h4>
+        <p className="text-xs font-medium text-[#6B6B6B] dark:text-[#A8A29E] leading-relaxed">
+          {description}
+        </p>
       </div>
       {ctaText && onCtaClick && (
         <button
           type="button"
           onClick={onCtaClick}
-          className="rounded-2xl bg-amber-400 text-navy-950 font-black hover:bg-amber-500 text-xs px-5 py-2.5 border-2 border-navy-950 shadow-[3px_3px_0px_0px_rgba(31,36,48,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_rgba(31,36,48,1)] transition-all cursor-pointer"
+          className="rounded-2xl bg-[#CEF431] text-[#161514] font-heading font-black text-xs px-5 py-2.5 border-2 border-[#161514] dark:border-[#383531] shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
         >
           {ctaText}
         </button>

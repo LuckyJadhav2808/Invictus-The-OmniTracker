@@ -3,9 +3,10 @@
 import React, { useMemo, useState } from "react";
 import { type Transaction, type Category } from "@/types";
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend, BarChart, Bar, XAxis, YAxis } from "recharts";
-import { TrendingUp, Plus, Calendar, BarChart2, Smartphone, Banknote, CreditCard, Store, PieChart as PieChartIcon } from "lucide-react";
+import { TrendingUp, Plus, Calendar, BarChart2, Smartphone, Banknote, CreditCard, Store, PieChart as PieChartIcon, Sparkles, ShieldCheck, ArrowUpRight } from "lucide-react";
 import { format, subMonths, parseISO } from "date-fns";
 import { cn } from "@/lib/utils";
+import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
 
 interface AnalyticsTabViewProps {
   transactions: Transaction[];
@@ -17,8 +18,8 @@ interface AnalyticsTabViewProps {
 
 // 4-token semantic palette aligned with Invictus neobrutalism
 const PALETTE = [
-  "#CEF431", // Electric lime
   "#03D26F", // Malachite emerald
+  "#CEF431", // Electric lime
   "#C084FC", // Lavender
   "#161514", // Obsidian
   "#64748B", // Slate
@@ -197,28 +198,64 @@ export function AnalyticsTabView({
     return arr.sort((a, b) => b.total - a.total).slice(0, 5);
   }, [scopedTransactions]);
 
+  // Zero-confusion empty state
   if (transactions.length === 0) {
     return (
-      <div className="bg-[#FAF8F5] rounded-3xl p-8 sm:p-12 border-2 border-[#161514] shadow-[4px_4px_0px_0px_#161514] text-center space-y-4">
-        <div className="size-14 rounded-2xl bg-[#CEF431] border-2 border-[#161514] mx-auto flex items-center justify-center shadow-[2px_2px_0px_0px_#161514]">
-          <TrendingUp className="size-7 text-[#161514]" />
-        </div>
-        <div className="space-y-1">
-          <h3 className="text-base sm:text-lg font-black uppercase text-[#161514] font-heading">
-            No Telemetry Data Yet
+      <div className="bg-white dark:bg-[#161514] rounded-2xl p-6 sm:p-8 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-6 transition-colors">
+        <div className="max-w-md mx-auto text-center space-y-2">
+          <div className="size-12 rounded-2xl bg-[#F1EFEA] dark:bg-[#22201D] mx-auto flex items-center justify-center text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#2A2724]">
+            <TrendingUp className="size-6 stroke-[1.5]" />
+          </div>
+          <h3 className="text-base font-semibold text-[#161514] dark:text-[#FAF8F5] tracking-tight">
+            Financial Intelligence & Telemetry
           </h3>
-          <p className="text-xs text-[#161514]/70 max-w-sm mx-auto font-medium">
-            Start logging your digital UPI or physical cash transactions to generate deep financial analytics.
+          <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] leading-relaxed">
+            Invictus automatically tracks your cashflows, computes savings rate velocity, and audits your digital UPI vs cash leakage once transactions are logged.
           </p>
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={onOpenAddTransaction}
+              className="inline-flex items-center gap-2 bg-[#161514] hover:bg-[#2A2826] text-white dark:bg-[#FAF8F5] dark:text-[#161514] dark:hover:bg-[#E8E5DF] font-medium text-xs px-4 py-2 rounded-xl border border-[#161514] dark:border-white transition-colors cursor-pointer shadow-xs"
+            >
+              <Plus className="size-3.5 stroke-[2]" />
+              <span>Log First Expense</span>
+            </button>
+          </div>
         </div>
-        <button
-          type="button"
-          onClick={onOpenAddTransaction}
-          className="inline-flex items-center gap-2 bg-[#CEF431] hover:bg-[#bde422] text-[#161514] font-black text-xs uppercase px-4 py-2.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
-        >
-          <Plus className="size-4 stroke-[3]" />
-          <span>Log First Expense</span>
-        </button>
+
+        {/* Feature Preview Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4 border-t border-[#E8E5DF] dark:border-[#2A2724]">
+          <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] p-4 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] space-y-1.5">
+            <span className="text-xs font-semibold text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5">
+              <PieChartIcon className="size-3.5 text-[#03D26F] stroke-[1.5]" />
+              <span>Category Share Donut</span>
+            </span>
+            <p className="text-[11px] text-[#6B6B6B] dark:text-[#A8A29E] leading-snug">
+              Visual breakdown of where your monthly budget goes across dining, transit, rent, and shopping.
+            </p>
+          </div>
+
+          <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] p-4 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] space-y-1.5">
+            <span className="text-xs font-semibold text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5">
+              <Smartphone className="size-3.5 text-[#38BDF8] stroke-[1.5]" />
+              <span>Dual Channel Audit</span>
+            </span>
+            <p className="text-[11px] text-[#6B6B6B] dark:text-[#A8A29E] leading-snug">
+              Tracks digital UPI vs physical cash till spend separately so offline pocket money never leaks unnoticed.
+            </p>
+          </div>
+
+          <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] p-4 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] space-y-1.5">
+            <span className="text-xs font-semibold text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5">
+              <BarChart2 className="size-3.5 text-[#C084FC] stroke-[1.5]" />
+              <span>6-Month Rolling Velocity</span>
+            </span>
+            <p className="text-[11px] text-[#6B6B6B] dark:text-[#A8A29E] leading-snug">
+              Tracks month-over-month income vs outflow bars and calculates your true monthly savings rate.
+            </p>
+          </div>
+        </div>
       </div>
     );
   }
@@ -226,69 +263,71 @@ export function AnalyticsTabView({
   return (
     <div className="space-y-6">
       {/* Analytics Month Scope Selector & Executive KPI Strip */}
-      <div className="bg-[#FAF8F5] p-3.5 sm:p-4 rounded-3xl border-2 border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-3">
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
-          <div className="flex items-center gap-2">
-            <span className="size-8 rounded-xl bg-white border-2 border-[#161514] flex items-center justify-center shadow-[1px_1px_0px_0px_#161514] shrink-0">
-              <TrendingUp className="size-4 text-[#161514]" />
+      <div className="bg-white dark:bg-[#161514] p-5 rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-4 transition-colors">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <span className="size-9 rounded-xl bg-[#F1EFEA] dark:bg-[#22201D] flex items-center justify-center text-[#161514] dark:text-[#FAF8F5] shrink-0 border border-[#E8E5DF] dark:border-[#2A2724]">
+              <TrendingUp className="size-4.5 stroke-[1.5]" />
             </span>
             <div>
-              <h3 className="font-black text-sm uppercase tracking-wider text-[#161514] font-heading">
+              <h3 className="font-semibold text-[15px] text-[#161514] dark:text-[#FAF8F5] tracking-tight">
                 Financial Telemetry Analytics
               </h3>
-              <p className="text-[10px] text-[#161514]/60 font-bold">
+              <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E]">
                 {selectedMonth === "all" ? "Viewing all-time aggregate cashflow" : `Telemetry filtered to ${availableMonths.find(m => m.key === selectedMonth)?.label || selectedMonth}`}
               </p>
             </div>
           </div>
 
           {/* Month Selector Dropdown */}
-          <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] self-start sm:self-auto">
-            <Calendar className="size-3.5 text-[#161514]/70 shrink-0" />
-            <select
+          <div className="w-auto min-w-[170px] self-start sm:self-auto">
+            <NeobrutalistSelect
+              size="sm"
               value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-              className="bg-transparent text-[11px] font-black uppercase text-[#161514] focus:outline-none cursor-pointer"
-            >
-              <option value="all">All Time (All Months)</option>
-              {availableMonths.map((m) => (
-                <option key={m.key} value={m.key}>
-                  {m.label} {m.isCurrent ? "• Current" : ""}
-                </option>
-              ))}
-            </select>
+              onChange={setSelectedMonth}
+              options={[
+                { value: "all", label: "All Time (All Months)", icon: "Calendar" },
+                ...availableMonths.map((m) => ({
+                  value: m.key,
+                  label: m.label,
+                  badge: m.isCurrent ? "Current" : undefined,
+                  icon: "Calendar",
+                })),
+              ]}
+              placeholder="Select month"
+            />
           </div>
         </div>
 
         {/* Executive KPI Strip */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 border-t border-[#161514]/10">
-          <div className="bg-white p-2.5 rounded-xl border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
-            <span className="text-[9px] font-bold uppercase tracking-wider text-[#03D26F] block font-mono">Total Inflow</span>
-            <span className="text-sm sm:text-base font-black text-[#03D26F] font-mono tabular-nums mt-0.5 block">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-3 border-t border-[#E8E5DF] dark:border-[#2A2724]">
+          <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] p-3.5 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724]">
+            <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 block">Total Inflow</span>
+            <span className="text-sm sm:text-base font-semibold text-emerald-600 dark:text-emerald-400 font-mono tabular-nums mt-0.5 block">
               +{currencySymbol}{monthMetrics.income.toLocaleString()}
             </span>
           </div>
 
-          <div className="bg-white p-2.5 rounded-xl border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
-            <span className="text-[9px] font-bold uppercase tracking-wider text-rose-700 block font-mono">Total Outflow</span>
-            <span className="text-sm sm:text-base font-black text-rose-700 font-mono tabular-nums mt-0.5 block">
+          <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] p-3.5 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724]">
+            <span className="text-[10px] font-medium text-rose-600 dark:text-rose-400 block">Total Outflow</span>
+            <span className="text-sm sm:text-base font-semibold text-rose-600 dark:text-rose-400 font-mono tabular-nums mt-0.5 block">
               -{currencySymbol}{monthMetrics.expense.toLocaleString()}
             </span>
           </div>
 
-          <div className="bg-white p-2.5 rounded-xl border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
-            <span className="text-[9px] font-bold uppercase tracking-wider text-[#161514]/60 block font-mono">Net Cashflow</span>
+          <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] p-3.5 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724]">
+            <span className="text-[10px] font-medium text-[#6B6B6B] dark:text-[#A8A29E] block">Net Cashflow</span>
             <span className={cn(
-              "text-sm sm:text-base font-black font-mono tabular-nums mt-0.5 block",
-              monthMetrics.net >= 0 ? "text-[#03D26F]" : "text-rose-700"
+              "text-sm sm:text-base font-semibold font-mono tabular-nums mt-0.5 block",
+              monthMetrics.net >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
             )}>
               {monthMetrics.net >= 0 ? `+${currencySymbol}${monthMetrics.net.toLocaleString()}` : `-${currencySymbol}${Math.abs(monthMetrics.net).toLocaleString()}`}
             </span>
           </div>
 
-          <div className="bg-white p-2.5 rounded-xl border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
-            <span className="text-[9px] font-bold uppercase tracking-wider text-[#161514]/60 block font-mono">Savings Rate</span>
-            <span className="text-sm sm:text-base font-black text-[#161514] font-mono tabular-nums mt-0.5 block">
+          <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] p-3.5 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724]">
+            <span className="text-[10px] font-medium text-[#6B6B6B] dark:text-[#A8A29E] block">Savings Rate</span>
+            <span className="text-sm sm:text-base font-semibold text-[#161514] dark:text-[#FAF8F5] font-mono tabular-nums mt-0.5 block">
               {monthMetrics.savingsRate}%
             </span>
           </div>
@@ -297,12 +336,12 @@ export function AnalyticsTabView({
 
       {/* Expense Categories Share Donut */}
       {expensePieData.length > 0 && (
-        <div className="bg-white rounded-3xl p-5 sm:p-6 border-2 border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-3">
-          <div className="flex items-center gap-2">
-            <span className="size-8 rounded-xl bg-[#FAF8F5] border-2 border-[#161514] flex items-center justify-center shadow-[1px_1px_0px_0px_#161514] shrink-0">
-              <PieChartIcon className="size-4 text-[#161514]" />
+        <div className="bg-white dark:bg-[#161514] rounded-2xl p-5 sm:p-6 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-3 transition-colors">
+          <div className="flex items-center gap-2.5">
+            <span className="size-8 rounded-lg bg-[#F1EFEA] dark:bg-[#22201D] flex items-center justify-center text-[#161514] dark:text-[#FAF8F5] shrink-0 border border-[#E8E5DF] dark:border-[#2A2724]">
+              <PieChartIcon className="size-4 stroke-[1.5]" />
             </span>
-            <h3 className="font-black text-sm uppercase tracking-wider text-[#161514] font-heading">
+            <h3 className="font-semibold text-[15px] text-[#161514] dark:text-[#FAF8F5] tracking-tight">
               Expense Categories Share
             </h3>
           </div>
@@ -319,7 +358,7 @@ export function AnalyticsTabView({
                   dataKey="value"
                 >
                   {expensePieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} stroke="#161514" strokeWidth={2} />
+                    <Cell key={`cell-${index}`} fill={entry.color} stroke="transparent" />
                   ))}
                 </Pie>
                 <Tooltip formatter={(v) => [`${currencySymbol}${Number(v).toLocaleString()}`, "Spend"]} />
@@ -331,23 +370,23 @@ export function AnalyticsTabView({
       )}
 
       {/* 6-Month Income vs Expenses Comparison */}
-      <div className="bg-white rounded-3xl p-5 sm:p-6 border-2 border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-3">
-        <div className="flex items-center gap-2">
-          <span className="size-8 rounded-xl bg-[#FAF8F5] border-2 border-[#161514] flex items-center justify-center shadow-[1px_1px_0px_0px_#161514] shrink-0">
-            <BarChart2 className="size-4 text-[#161514]" />
+      <div className="bg-white dark:bg-[#161514] rounded-2xl p-5 sm:p-6 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-3 transition-colors">
+        <div className="flex items-center gap-2.5">
+          <span className="size-8 rounded-lg bg-[#F1EFEA] dark:bg-[#22201D] flex items-center justify-center text-[#161514] dark:text-[#FAF8F5] shrink-0 border border-[#E8E5DF] dark:border-[#2A2724]">
+            <BarChart2 className="size-4 stroke-[1.5]" />
           </span>
-          <h3 className="font-black text-sm uppercase tracking-wider text-[#161514] font-heading">
+          <h3 className="font-semibold text-[15px] text-[#161514] dark:text-[#FAF8F5] tracking-tight">
             Income vs Expenses (Past 6 Months)
           </h3>
         </div>
         <div className="h-64 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={barChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <XAxis dataKey="name" stroke="#161514" fontSize={10} fontWeight={800} tickLine={false} axisLine={false} />
+              <XAxis dataKey="name" stroke="#888888" fontSize={11} fontWeight={500} tickLine={false} axisLine={false} />
               <YAxis
-                stroke="#161514"
-                fontSize={10}
-                fontWeight={800}
+                stroke="#888888"
+                fontSize={11}
+                fontWeight={500}
                 tickLine={false}
                 axisLine={false}
                 tickFormatter={(v) => `${currencySymbol}${v}`}
@@ -356,49 +395,50 @@ export function AnalyticsTabView({
                 formatter={(v) => [`${currencySymbol}${Number(v).toLocaleString()}`]}
                 contentStyle={{
                   borderRadius: "12px",
-                  border: "2px solid #161514",
-                  boxShadow: "3px 3px 0px 0px #161514",
-                  fontWeight: "bold",
+                  border: "1px solid #E8E5DF",
+                  backgroundColor: "#FFFFFF",
+                  boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.05)",
+                  fontSize: "12px",
                 }}
               />
               <Legend />
-              <Bar dataKey="Income" fill="#03D26F" stroke="#161514" strokeWidth={2} radius={[6, 6, 0, 0]} />
-              <Bar dataKey="Expense" fill="#E11D48" stroke="#161514" strokeWidth={2} radius={[6, 6, 0, 0]} />
+              <Bar dataKey="Income" fill="#03D26F" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="Expense" fill="#E11D48" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
       </div>
 
       {/* Spending Channels Total Outflow */}
-      <div className="bg-[#FAF8F5] rounded-3xl p-5 border-2 border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-3">
-        <span className="text-xs font-black uppercase tracking-wider text-[#161514] block font-heading">
+      <div className="bg-white dark:bg-[#161514] rounded-2xl p-5 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-3 transition-colors">
+        <span className="text-[15px] font-semibold text-[#161514] dark:text-[#FAF8F5] tracking-tight block">
           Spending Channels Total Outflow
         </span>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div className="bg-white p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514]">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#161514]/60 flex items-center gap-1.5 font-mono">
-              <Smartphone className="size-3 text-[#161514]" />
+          <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] p-3.5 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724]">
+            <span className="text-xs font-medium text-[#6B6B6B] dark:text-[#A8A29E] flex items-center gap-1.5">
+              <Smartphone className="size-3.5 stroke-[1.5] text-[#161514] dark:text-[#FAF8F5]" />
               <span>UPI & Online</span>
             </span>
-            <span className="text-lg font-black text-[#161514] font-mono tabular-nums mt-0.5 block">
+            <span className="text-lg font-semibold text-[#161514] dark:text-[#FAF8F5] font-mono tabular-nums mt-1 block">
               {currencySymbol}{channelData.upi.toLocaleString()}
             </span>
           </div>
-          <div className="bg-white p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514]">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#161514]/60 flex items-center gap-1.5 font-mono">
-              <Banknote className="size-3 text-[#161514]" />
+          <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] p-3.5 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724]">
+            <span className="text-xs font-medium text-[#6B6B6B] dark:text-[#A8A29E] flex items-center gap-1.5">
+              <Banknote className="size-3.5 stroke-[1.5] text-[#161514] dark:text-[#FAF8F5]" />
               <span>Physical Cash</span>
             </span>
-            <span className="text-lg font-black text-[#161514] font-mono tabular-nums mt-0.5 block">
+            <span className="text-lg font-semibold text-[#161514] dark:text-[#FAF8F5] font-mono tabular-nums mt-1 block">
               {currencySymbol}{channelData.cash.toLocaleString()}
             </span>
           </div>
-          <div className="bg-white p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514]">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#161514]/60 flex items-center gap-1.5 font-mono">
-              <CreditCard className="size-3 text-[#161514]" />
+          <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] p-3.5 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724]">
+            <span className="text-xs font-medium text-[#6B6B6B] dark:text-[#A8A29E] flex items-center gap-1.5">
+              <CreditCard className="size-3.5 stroke-[1.5] text-[#161514] dark:text-[#FAF8F5]" />
               <span>Cards / Transfer</span>
             </span>
-            <span className="text-lg font-black text-[#161514] font-mono tabular-nums mt-0.5 block">
+            <span className="text-lg font-semibold text-[#161514] dark:text-[#FAF8F5] font-mono tabular-nums mt-1 block">
               {currencySymbol}{channelData.other.toLocaleString()}
             </span>
           </div>
@@ -407,17 +447,17 @@ export function AnalyticsTabView({
 
       {/* Top Merchants Leaderboard */}
       {topMerchantsData.length > 0 && (
-        <div className="bg-white rounded-3xl p-5 sm:p-6 border-2 border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-3">
+        <div className="bg-white dark:bg-[#161514] rounded-2xl p-5 sm:p-6 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-3 transition-colors">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="size-8 rounded-xl bg-[#FAF8F5] border-2 border-[#161514] flex items-center justify-center shadow-[1px_1px_0px_0px_#161514] shrink-0">
-                <Store className="size-4 text-[#161514]" />
+            <div className="flex items-center gap-2.5">
+              <span className="size-8 rounded-lg bg-[#F1EFEA] dark:bg-[#22201D] flex items-center justify-center text-[#161514] dark:text-[#FAF8F5] shrink-0 border border-[#E8E5DF] dark:border-[#2A2724]">
+                <Store className="size-4 stroke-[1.5]" />
               </span>
-              <h3 className="font-black text-sm uppercase tracking-wider text-[#161514] font-heading">
+              <h3 className="font-semibold text-[15px] text-[#161514] dark:text-[#FAF8F5] tracking-tight">
                 Top Merchants Outflow
               </h3>
             </div>
-            <span className="text-[10px] font-bold text-[#161514]/60 uppercase font-mono">
+            <span className="text-xs font-mono text-[#6B6B6B] dark:text-[#A8A29E]">
               By Spend Volume
             </span>
           </div>
@@ -428,23 +468,23 @@ export function AnalyticsTabView({
               return (
                 <div
                   key={m.name}
-                  className="bg-[#FAF8F5] p-3 rounded-2xl border-2 border-[#161514] flex items-center justify-between gap-3 shadow-[1.5px_1.5px_0px_0px_#161514]"
+                  className="bg-[#FAF8F5] dark:bg-[#1C1A18] p-3 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] flex items-center justify-between gap-3"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="size-6 rounded-lg bg-[#CEF431] border-2 border-[#161514] flex items-center justify-center font-black text-xs shrink-0 font-mono">
+                    <div className="size-6 rounded-md bg-[#F1EFEA] dark:bg-[#22201D] flex items-center justify-center font-semibold text-xs text-[#161514] dark:text-[#FAF8F5] shrink-0 font-mono border border-[#E8E5DF] dark:border-[#2A2724]">
                       #{idx + 1}
                     </div>
                     <div className="min-w-0">
-                      <span className="text-xs font-bold text-[#161514] truncate block">
+                      <span className="text-xs font-medium text-[#161514] dark:text-[#FAF8F5] truncate block">
                         {m.name}
                       </span>
-                      <span className="text-[10px] text-[#161514]/60 font-mono font-medium block">
+                      <span className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E] font-mono block">
                         {m.count} {m.count === 1 ? "transaction" : "transactions"} • {pct}% of outflows
                       </span>
                     </div>
                   </div>
 
-                  <span className="text-sm font-black text-[#161514] font-mono tabular-nums shrink-0">
+                  <span className="text-sm font-semibold text-[#161514] dark:text-[#FAF8F5] font-mono tabular-nums shrink-0">
                     {currencySymbol}{m.total.toLocaleString()}
                   </span>
                 </div>

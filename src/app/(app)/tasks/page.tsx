@@ -12,6 +12,7 @@ import { TaskItem } from "@/types";
 import { CheckSquare, LayoutGrid, List, Flame, Plus, Clock, CheckCircle2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { TasksCockpitSkeleton } from "@/components/shared/NeobrutalistSkeleton";
 
 export default function TasksPage() {
   const { data: tasks = [], isLoading } = useTasks();
@@ -72,46 +73,50 @@ export default function TasksPage() {
     return true;
   });
 
+  if (isLoading) {
+    return <TasksCockpitSkeleton />;
+  }
+
   return (
-    <div className="min-h-screen bg-cream-bg p-4 md:p-8 space-y-6">
+    <div className="min-h-screen bg-[#FAF8F5] dark:bg-[#161514] p-4 md:p-8 space-y-6 text-[#161514] dark:text-[#FAF8F5]">
       <div className="max-w-6xl mx-auto space-y-6">
         
         {/* Clean Neobrutalist Tasks Header Card */}
-        <div className="neo-card p-5 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="p-5 bg-white dark:bg-[#1C1A18] rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-heading font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border-2 border-[#161514] bg-[#F59E0B] text-white shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center gap-1">
+              <span className="text-[10px] font-heading font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border border-amber-500/40 bg-amber-500/15 text-amber-800 dark:text-amber-300 flex items-center gap-1">
                 <CheckSquare className="size-3 stroke-[2.5]" />
                 <span>Tasks & Projects</span>
               </span>
-              <span className="text-[10px] font-heading font-black text-[#161514]/70">
+              <span className="text-[10px] font-heading font-black text-[#161514]/70 dark:text-[#FAF8F5]/70">
                 {completedTasks}/{totalTasks} Completed
               </span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-heading font-black text-[#161514] tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-heading font-black text-[#161514] dark:text-[#FAF8F5] tracking-tight">
               Tasks & Workflows
             </h1>
-            <p className="text-xs font-medium text-[#161514]/70 max-w-lg">
+            <p className="text-xs font-medium text-[#161514]/70 dark:text-[#FAF8F5]/70 max-w-lg">
               Organize tasks into Kanban pipelines, priority checklists, and Eisenhower matrices.
             </p>
           </div>
 
           {/* Quick Metrics & Action */}
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            <div className="px-3 py-2 rounded-xl border-2 border-[#161514] bg-[#FAF8F5] shadow-[2px_2px_0px_0px_#161514] text-center min-w-[65px]">
-              <span className="text-[9px] font-heading font-black uppercase text-[#161514]/60 block leading-tight">Total</span>
-              <span className="text-sm font-heading font-black text-[#161514]">{totalTasks}</span>
+            <div className="px-3 py-2 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] bg-[#FAF8F5] dark:bg-[#252321] shadow-xs text-center min-w-[65px]">
+              <span className="text-[9px] font-heading font-black uppercase text-[#161514]/60 dark:text-[#FAF8F5]/60 block leading-tight">Total</span>
+              <span className="text-sm font-heading font-black text-[#161514] dark:text-[#FAF8F5]">{totalTasks}</span>
             </div>
-            <div className="px-3 py-2 rounded-xl border-2 border-[#161514] bg-amber-50 shadow-[2px_2px_0px_0px_#161514] text-center min-w-[65px]">
-              <span className="text-[9px] font-heading font-black uppercase text-amber-700 block leading-tight">Active</span>
-              <span className="text-sm font-heading font-black text-[#161514] flex items-center justify-center gap-1">
-                <Clock className="size-3 text-amber-700" />
+            <div className="px-3 py-2 rounded-xl border border-amber-500/30 bg-amber-500/10 dark:bg-amber-950/20 shadow-xs text-center min-w-[65px]">
+              <span className="text-[9px] font-heading font-black uppercase text-amber-700 dark:text-amber-400 block leading-tight">Active</span>
+              <span className="text-sm font-heading font-black text-amber-800 dark:text-amber-300 flex items-center justify-center gap-1">
+                <Clock className="size-3 text-amber-600 dark:text-amber-400" />
                 {inProgressTasks}
               </span>
             </div>
-            <div className="px-3 py-2 rounded-xl border-2 border-[#161514] bg-rose-50 shadow-[2px_2px_0px_0px_#161514] text-center min-w-[65px]">
-              <span className="text-[9px] font-heading font-black uppercase text-rose-700 block leading-tight">Urgent</span>
-              <span className="text-sm font-heading font-black text-rose-700 flex items-center justify-center gap-1">
+            <div className="px-3 py-2 rounded-xl border border-rose-500/30 bg-rose-500/10 dark:bg-rose-950/20 shadow-xs text-center min-w-[65px]">
+              <span className="text-[9px] font-heading font-black uppercase text-rose-700 dark:text-rose-400 block leading-tight">Urgent</span>
+              <span className="text-sm font-heading font-black text-rose-700 dark:text-rose-400 flex items-center justify-center gap-1">
                 <AlertCircle className="size-3" />
                 {p1UrgentTasks}
               </span>
@@ -121,7 +126,7 @@ export default function TasksPage() {
                 setTaskToEdit(null);
                 setIsCreateModalOpen(true);
               }}
-              className="bg-[#CEF431] hover:bg-[#D8F74E] text-[#161514] font-heading font-black text-xs px-3.5 py-2.5 h-auto rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center gap-1.5"
+              className="bg-[#CEF431] hover:bg-[#bce028] text-[#161514] font-heading font-black text-xs px-3.5 py-2.5 h-auto rounded-xl border border-[#CEF431] shadow-xs hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center gap-1.5 cursor-pointer"
             >
               <Plus className="size-4 stroke-[3]" />
               <span>New Task</span>
@@ -142,7 +147,7 @@ export default function TasksPage() {
         </div>
 
         {/* View Switcher & Status Filter Bar */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-3 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514]">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white dark:bg-[#1C1A18] p-3 rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs">
           {/* View Tabs */}
           <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
             {[
@@ -158,10 +163,10 @@ export default function TasksPage() {
                   type="button"
                   onClick={() => setActiveTab(tb.id as any)}
                   className={cn(
-                    "px-3.5 py-2 rounded-xl text-xs font-heading font-extrabold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 border-2",
+                    "px-3.5 py-2 rounded-xl text-xs font-heading font-extrabold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 border shadow-xs",
                     isActive
-                      ? "bg-[#03D26F] text-[#161514] border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]"
-                      : "bg-[#FAF8F5] text-[#161514]/70 border-transparent hover:border-[#161514]/20 hover:text-[#161514]"
+                      ? "bg-[#03D26F] text-[#161514] border-[#03D26F] -translate-y-0.5"
+                      : "bg-[#FAF8F5] dark:bg-[#252321] text-[#161514]/70 dark:text-[#FAF8F5]/70 border-[#E8E5DF] dark:border-[#2A2724] hover:bg-[#F1EFEA] dark:hover:bg-[#2F2C29]"
                   )}
                 >
                   <Icon className="h-3.5 w-3.5 stroke-[2.2]" />
@@ -172,7 +177,7 @@ export default function TasksPage() {
           </div>
 
           {/* Quick Filter Pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1 sm:pt-0 border-t sm:border-t-0 border-[#161514]/10">
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1 sm:pt-0 border-t sm:border-t-0 border-[#E8E5DF] dark:border-[#2A2724]">
             {["All", "To Do", "In Progress", "P1 Urgent", "Completed"].map((filter) => {
               const isSelected = activeFilter === filter;
               return (
@@ -181,10 +186,10 @@ export default function TasksPage() {
                   type="button"
                   onClick={() => setActiveFilter(filter)}
                   className={cn(
-                    "px-2.5 py-1 rounded-lg text-[10px] font-heading font-black border-2 transition-all cursor-pointer shrink-0",
+                    "px-2.5 py-1 rounded-lg text-[10px] font-heading font-bold border transition-all cursor-pointer shrink-0 shadow-xs",
                     isSelected
-                      ? "bg-[#161514] text-white border-[#161514] shadow-[1px_1px_0px_0px_#161514]"
-                      : "bg-white text-[#161514]/70 border-[#161514]/20 hover:border-[#161514] hover:text-[#161514]"
+                      ? "bg-[#161514] dark:bg-[#FAF8F5] text-white dark:text-[#161514] border-[#161514] dark:border-[#FAF8F5]"
+                      : "bg-white dark:bg-[#1C1A18] text-[#161514]/70 dark:text-[#FAF8F5]/70 border-[#E8E5DF] dark:border-[#2A2724] hover:bg-[#FAF8F5] dark:hover:bg-[#252321]"
                   )}
                 >
                   {filter}

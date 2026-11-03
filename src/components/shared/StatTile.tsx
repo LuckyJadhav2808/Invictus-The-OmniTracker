@@ -33,15 +33,15 @@ export function StatTile({
       className={cn(
         bgClass,
         textColorClass,
-        "rounded-2xl p-4 text-left border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_0px_#161514] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all duration-150 flex flex-col justify-between h-[126px] w-full cursor-pointer select-none group",
+        "rounded-2xl p-4 text-left border-[2.5px] border-[#161514] dark:border-[#383531] shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#000000] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_0px_#161514] dark:hover:shadow-[6px_6px_0px_0px_#000000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all duration-150 flex flex-col justify-between h-[126px] w-full cursor-pointer select-none group",
         className
       )}
     >
       <div className="flex items-center justify-between w-full">
-        <span className="font-heading font-black text-[11px] uppercase tracking-wider text-[#161514]/80 truncate pr-2">
+        <span className="font-heading font-black text-[11px] uppercase tracking-wider opacity-80 truncate pr-2">
           {label}
         </span>
-        <div className="shrink-0 bg-white/40 p-1 rounded-full border border-[#161514]/40">
+        <div className="shrink-0 bg-white/40 dark:bg-black/40 p-1 rounded-full border border-current/30">
           <ProgressRing
             percentage={percentage}
             size={22}
@@ -51,7 +51,7 @@ export function StatTile({
           />
         </div>
       </div>
-      <span className="font-heading text-2xl sm:text-3xl font-black mt-2 leading-none tracking-tight text-[#161514]">
+      <span className="font-heading text-2xl sm:text-3xl font-black mt-2 leading-none tracking-tight">
         {value}
       </span>
     </button>

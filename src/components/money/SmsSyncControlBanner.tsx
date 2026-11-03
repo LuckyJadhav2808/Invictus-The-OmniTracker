@@ -212,16 +212,16 @@ export function SmsSyncControlBanner({
     <>
       {/* 1. Frictionless Native Permission Banner (Shows only if on native Android without permission) */}
       {isNative && hasSmsPermission === false && (
-        <div className="bg-[#FAF8F5] border-2 border-[#161514] rounded-2xl p-4 shadow-[4px_4px_0px_0px_#161514] mb-4 space-y-3 animate-in fade-in slide-in-from-top-2 duration-150">
+        <div className="bg-white dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#383531] rounded-xl p-4 mb-4 space-y-3 animate-in fade-in slide-in-from-top-2 duration-150">
           <div className="flex items-start gap-3">
-            <div className="size-9 rounded-xl bg-[#CEF431] border-2 border-[#161514] flex items-center justify-center shadow-[1px_1px_0px_0px_#161514] shrink-0">
-              <Smartphone className="size-5 text-[#161514]" />
+            <div className="size-8 rounded-lg bg-[#F1EFEA] dark:bg-[#252321] flex items-center justify-center text-[#161514] dark:text-[#CEF431] shrink-0 border border-[#E8E5DF] dark:border-[#383531]">
+              <Smartphone className="size-4 stroke-[1.5]" />
             </div>
             <div className="min-w-0">
-              <h4 className="text-sm font-black uppercase text-[#161514] font-heading">
+              <h4 className="text-[13px] font-sans font-semibold text-[#161514] dark:text-[#FAF8F5] tracking-tight">
                 Enable Automatic Bank SMS Tracking
               </h4>
-              <p className="text-xs text-[#161514]/75 font-medium mt-0.5">
+              <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] mt-0.5 leading-relaxed">
                 Invictus automatically captures your daily bank transactions locally on your phone.
                 Zero personal messages, chats, or OTPs are ever read or uploaded.
               </p>
@@ -232,19 +232,19 @@ export function SmsSyncControlBanner({
             <button
               type="button"
               onClick={handleRequestPermission}
-              className="px-4 py-2 rounded-xl border-2 border-[#161514] bg-[#CEF431] text-[#161514] font-black text-xs uppercase hover:bg-[#bfe627] shadow-[2px_2px_0px_0px_#161514] active:translate-y-0.5 transition-all cursor-pointer flex items-center gap-1.5"
+              className="px-3.5 py-1.5 rounded-lg bg-[#161514] dark:bg-[#CEF431] hover:bg-[#2A2826] dark:hover:bg-[#b5da28] text-white dark:text-[#161514] font-medium text-xs transition-colors cursor-pointer flex items-center gap-1.5 font-heading font-black"
             >
-              <Smartphone className="size-3.5" />
-              <span>Allow SMS Access (Android Dialog)</span>
+              <Smartphone className="size-3.5 stroke-[1.5]" />
+              <span>Allow SMS Access</span>
             </button>
 
             {permissionDeniedPermanently && (
               <button
                 type="button"
                 onClick={handleOpenAppSettings}
-                className="px-3.5 py-2 rounded-xl border-2 border-[#161514] bg-[#FFFFFF] text-[#161514] font-black text-xs uppercase hover:bg-zinc-100 shadow-[2px_2px_0px_0px_#161514] active:translate-y-0.5 transition-all cursor-pointer flex items-center gap-1.5"
+                className="px-3 py-1.5 rounded-lg border border-[#E8E5DF] dark:border-[#383531] bg-white dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] hover:bg-[#F5F3EF] dark:hover:bg-[#2A2724] font-medium text-xs transition-colors cursor-pointer flex items-center gap-1.5"
               >
-                <ExternalLink className="size-3.5" />
+                <ExternalLink className="size-3.5 stroke-[1.5]" />
                 <span>Open App Settings</span>
               </button>
             )}
@@ -253,24 +253,24 @@ export function SmsSyncControlBanner({
       )}
 
       {/* 2. Main SMS Telemetry & Action Banner */}
-      <div className="bg-[#FAF8F5] border-2 border-[#161514] rounded-2xl p-3 sm:p-3.5 shadow-[3px_3px_0px_0px_#161514] mb-4">
+      <div className="bg-white dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] rounded-xl p-3.5 mb-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 w-full">
           {/* Left Side: Telemetry Info */}
           <div className="flex items-start sm:items-center gap-2.5 min-w-0 flex-1">
-            <div className="size-8 rounded-xl bg-[#CEF431] border-2 border-[#161514] flex items-center justify-center shadow-[1px_1px_0px_0px_#161514] shrink-0 mt-0.5 sm:mt-0">
-              <Smartphone className="size-4 text-[#161514]" />
+            <div className="size-8 rounded-lg bg-[#F1EFEA] dark:bg-[#252321] flex items-center justify-center text-[#161514] dark:text-[#CEF431] shrink-0 mt-0.5 sm:mt-0 border border-[#E8E5DF] dark:border-[#383531]">
+              <Smartphone className="size-4 stroke-[1.5]" />
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-xs font-black uppercase text-[#161514] font-heading">
+                <span className="text-[13px] font-sans font-semibold text-[#161514] dark:text-[#FAF8F5] tracking-tight">
                   {isNative ? "Bank SMS Auto-Sync" : "Local SMS Engine"}
                 </span>
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-400 shrink-0">
-                  <ShieldCheck className="size-3" />
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#DCFAE5] dark:bg-[#03D26F]/20 text-[#047857] dark:text-[#03D26F] border border-[#03D26F]/30 shrink-0">
+                  <ShieldCheck className="size-3 stroke-[1.5]" />
                   <span>On-Device</span>
                 </span>
               </div>
-              <p className="text-[11px] text-[#161514]/75 font-medium leading-relaxed break-words whitespace-normal mt-0.5">
+              <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] leading-relaxed break-words whitespace-normal mt-0.5">
                 {isNative
                   ? (autoSyncEnabled ? `Auto-fetch active. Last scan: ${lastSyncText || "Never"}` : "Auto-fetch off. Tap 'Scan Inbox' to sync on demand.")
                   : "Air-gapped on-device regex. Configure learned rules in Settings."}
@@ -286,17 +286,17 @@ export function SmsSyncControlBanner({
                 type="button"
                 onClick={handleToggleAutoSync}
                 className={cn(
-                  "px-3 py-1.5 rounded-xl border-2 border-[#161514] font-black text-xs uppercase shadow-[2px_2px_0px_0px_#161514] active:translate-y-0.5 transition-all cursor-pointer whitespace-nowrap shrink-0 flex items-center gap-1.5",
+                  "px-2.5 py-1.5 rounded-lg border text-xs font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0 flex items-center gap-1.5",
                   autoSyncEnabled
-                    ? "bg-[#CEF431] text-[#161514]"
-                    : "bg-[#FFFFFF] text-[#161514]/65 hover:bg-[#FAF8F5]"
+                    ? "bg-[#161514] dark:bg-[#CEF431] text-white dark:text-[#161514] border-[#161514] dark:border-[#CEF431]"
+                    : "bg-white dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] border-[#E8E5DF] dark:border-[#383531] hover:bg-[#F5F3EF] dark:hover:bg-[#2A2724]"
                 )}
                 title="Toggle automatic bank SMS scanning on launch (Default: Off)"
               >
                 <span>Auto-Fetch:</span>
                 <span className={cn(
                   "px-1.5 py-0.2 rounded text-[10px] font-mono",
-                  autoSyncEnabled ? "bg-[#161514] text-[#CEF431]" : "bg-zinc-200 text-zinc-700"
+                  autoSyncEnabled ? "bg-white/20 dark:bg-black/20 text-white dark:text-[#161514]" : "bg-[#F1EFEA] dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5]"
                 )}>
                   {autoSyncEnabled ? "ON" : "OFF"}
                 </span>
@@ -307,7 +307,7 @@ export function SmsSyncControlBanner({
             <button
               type="button"
               onClick={onOpenCashModal}
-              className="px-3 py-1.5 rounded-xl border-2 border-[#161514] bg-[#FFFFFF] text-[#161514] font-black text-xs uppercase hover:bg-[#FAF8F5] shadow-[2px_2px_0px_0px_#161514] active:translate-y-0.5 transition-all cursor-pointer whitespace-nowrap shrink-0"
+              className="px-2.5 py-1.5 rounded-lg border border-[#E8E5DF] dark:border-[#383531] bg-white dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] font-medium text-xs hover:bg-[#F5F3EF] dark:hover:bg-[#2A2724] transition-colors cursor-pointer whitespace-nowrap shrink-0"
             >
               + Log Cash
             </button>
@@ -320,10 +320,10 @@ export function SmsSyncControlBanner({
                   soundFX.play("pop");
                   setIsDateFilterOpen(true);
                 }}
-                className="px-3 py-1.5 rounded-xl border-2 border-[#161514] bg-[#FFFFFF] text-[#161514] font-black text-xs uppercase hover:bg-zinc-50 shadow-[2px_2px_0px_0px_#161514] active:translate-y-0.5 transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 shrink-0"
+                className="px-2.5 py-1.5 rounded-lg border border-[#E8E5DF] dark:border-[#383531] bg-white dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] font-medium text-xs hover:bg-[#F5F3EF] dark:hover:bg-[#2A2724] transition-colors cursor-pointer whitespace-nowrap flex items-center gap-1.5 shrink-0"
                 title="Filter & scan SMS by date (Today, Yesterday, Custom)"
               >
-                <Calendar className="size-3.5 text-[#161514]" />
+                <Calendar className="size-3.5 stroke-[1.5]" />
                 <span>Filter Dates</span>
               </button>
             )}
@@ -335,11 +335,11 @@ export function SmsSyncControlBanner({
                 disabled={isSyncing}
                 onClick={handleSyncNow}
                 className={cn(
-                  "min-w-[124px] px-3.5 py-1.5 rounded-xl border-2 border-[#161514] font-black text-xs uppercase flex items-center justify-center gap-1.5 shadow-[2px_2px_0px_0px_#161514] active:translate-y-0.5 transition-all cursor-pointer whitespace-nowrap shrink-0",
-                  isSyncing ? "bg-zinc-200 text-zinc-500 cursor-not-allowed" : "bg-[#CEF431] text-[#161514] hover:bg-[#bfe627]"
+                  "min-w-[110px] px-3 py-1.5 rounded-lg font-medium text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap shrink-0",
+                  isSyncing ? "bg-[#F1EFEA] dark:bg-[#252321] text-[#6B6B6B] dark:text-[#A8A29E] cursor-not-allowed border border-[#E8E5DF] dark:border-[#383531]" : "bg-[#161514] dark:bg-[#CEF431] hover:bg-[#2A2826] dark:hover:bg-[#b5da28] text-white dark:text-[#161514] border border-[#161514] dark:border-[#CEF431] font-heading font-black"
                 )}
               >
-                <RefreshCw className={cn("size-3.5 shrink-0", isSyncing && "animate-spin")} />
+                <RefreshCw className={cn("size-3.5 stroke-[1.5] shrink-0", isSyncing && "animate-spin")} />
                 <span>{isSyncing ? "Scanning..." : "Scan Inbox"}</span>
               </button>
             )}
@@ -347,10 +347,10 @@ export function SmsSyncControlBanner({
             {/* Discrete Shortcut to Settings > Bank SMS */}
             <Link
               href="/settings#bank-sms"
-              className="size-8 rounded-xl border-2 border-[#161514] bg-[#FFFFFF] text-[#161514] hover:bg-[#FAF8F5] flex items-center justify-center shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-y-0.5 transition-all shrink-0 cursor-pointer"
+              className="size-8 rounded-lg border border-[#E8E5DF] dark:border-[#383531] bg-white dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] hover:bg-[#F5F3EF] dark:hover:bg-[#2A2724] flex items-center justify-center transition-colors shrink-0 cursor-pointer"
               title="Configure Bank SMS Rules & Parser Sandbox in Settings"
             >
-              <Sliders className="size-3.5 text-[#161514]" />
+              <Sliders className="size-3.5 stroke-[1.5]" />
             </Link>
           </div>
         </div>

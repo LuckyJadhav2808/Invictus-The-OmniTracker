@@ -20,14 +20,14 @@ export default function ProfilePage() {
         {/* Profile Header */}
         <div className="flex items-center justify-between">
           <h1
-            className="text-2xl md:text-3xl font-black text-[#161514] tracking-tight uppercase font-heading"
+            className="text-2xl md:text-3xl font-black text-[#161514] dark:text-[#FAF8F5] tracking-tight uppercase font-heading"
           >
             USER PROFILE & ENGINE
           </h1>
           <button
             type="button"
             onClick={() => setIsUpdateModalOpen(true)}
-            className="bg-[#CEF431] hover:bg-[#bce022] text-[#161514] text-xs font-black uppercase px-3.5 py-1.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center gap-1.5 cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+            className="bg-[#CEF431] hover:bg-[#bce022] text-[#161514] text-xs font-black uppercase px-3.5 py-1.5 rounded-xl border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] flex items-center gap-1.5 cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
           >
             <Sparkles className="h-3.5 w-3.5 stroke-[2.5]" />
             <span>v{APP_VERSION_CONFIG.version}</span>
@@ -35,18 +35,18 @@ export default function ProfilePage() {
         </div>
 
         {/* User Info Card */}
-        <div id="user-profile-card" className="bg-white rounded-3xl p-5 sm:p-6 border-[2.5px] border-[#161514] shadow-[5px_5px_0px_0px_#161514] space-y-5 scroll-mt-24">
+        <div id="user-profile-card" className="bg-white dark:bg-[#1C1A18] rounded-3xl p-5 sm:p-6 border-[2.5px] border-[#161514] dark:border-[#383531] shadow-[5px_5px_0px_0px_#161514] dark:shadow-[5px_5px_0px_0px_#000000] space-y-5 scroll-mt-24">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-4">
-              <div className="h-16 w-16 rounded-2xl bg-amber-400 border-2 border-[#161514] flex items-center justify-center shadow-[2px_2px_0px_0px_#161514] shrink-0">
+              <div className="h-16 w-16 rounded-2xl bg-amber-400 border-2 border-[#161514] dark:border-[#383531] flex items-center justify-center shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] shrink-0">
                 <User className="h-8 w-8 text-[#161514] stroke-[2.5]" />
               </div>
               <div>
-                <p className="font-black text-lg text-[#161514] tracking-tight font-heading">
+                <p className="font-black text-lg text-[#161514] dark:text-[#FAF8F5] tracking-tight font-heading">
                   {user?.displayName || "Invictus Explorer"}
                 </p>
-                <p className="text-[#161514]/70 text-xs font-bold">{user?.email}</p>
-                <span className="inline-block mt-1.5 bg-emerald-100 text-emerald-900 border-2 border-[#161514] text-[9px] font-black px-2 py-0.5 rounded-lg shadow-[1px_1px_0px_0px_#161514]">
+                <p className="text-[#161514]/70 dark:text-[#FAF8F5]/70 text-xs font-bold">{user?.email}</p>
+                <span className="inline-block mt-1.5 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-300 border-2 border-[#161514] dark:border-emerald-800 text-[9px] font-black px-2 py-0.5 rounded-lg shadow-[1px_1px_0px_0px_#161514]">
                   Active Session
                 </span>
               </div>
@@ -55,7 +55,7 @@ export default function ProfilePage() {
             <button
               type="button"
               onClick={() => setIsUpdateModalOpen(true)}
-              className="p-2.5 rounded-2xl bg-[#FAF8F5] hover:bg-[#FFF9EA] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-[#161514] text-xs font-black flex items-center gap-1.5 cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all shrink-0"
+              className="p-2.5 rounded-2xl bg-[#FAF8F5] dark:bg-[#252321] hover:bg-[#FFF9EA] dark:hover:bg-[#2A2724] border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] text-[#161514] dark:text-[#FAF8F5] text-xs font-black flex items-center gap-1.5 cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all shrink-0"
               title="Check for updates"
             >
               <RefreshCw className="h-4 w-4" />
@@ -70,12 +70,12 @@ export default function ProfilePage() {
         </div>
 
         {/* Prominent Settings Discovery Hero Card */}
-        <div id="settings-discovery-card" className="bg-[#CEF431] rounded-3xl p-6 border-[2.5px] border-[#161514] shadow-[5px_5px_0px_0px_#161514] space-y-4 scroll-mt-24">
+        <div id="settings-discovery-card" className="bg-[#CEF431] rounded-3xl p-6 border-[2.5px] border-[#161514] dark:border-[#383531] shadow-[5px_5px_0px_0px_#161514] dark:shadow-[5px_5px_0px_0px_#000000] space-y-4 scroll-mt-24">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <span className="bg-white text-[#161514] px-3 py-1 rounded-xl text-xs font-black border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] uppercase tracking-wider flex items-center gap-1.5 whitespace-nowrap shrink-0 self-start sm:self-auto">
+            <span className="bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] px-3 py-1 rounded-xl text-xs font-black border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] uppercase tracking-wider flex items-center gap-1.5 whitespace-nowrap shrink-0 self-start sm:self-auto">
               <Sparkles className="h-4 w-4" /> 11 Settings Categories Available
             </span>
-            <span className="text-xs font-black text-[#161514] bg-white/90 px-2.5 py-1 rounded-lg border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514] whitespace-nowrap shrink-0 self-start sm:self-auto">
+            <span className="text-xs font-black text-[#161514] dark:text-[#FAF8F5] bg-white/90 dark:bg-[#1C1A18]/90 px-2.5 py-1 rounded-lg border-2 border-[#161514] dark:border-[#383531] shadow-[1px_1px_0px_0px_#161514] dark:shadow-[1px_1px_0px_0px_#000000] whitespace-nowrap shrink-0 self-start sm:self-auto">
               FULL CONTROL
             </span>
           </div>
@@ -103,7 +103,7 @@ export default function ProfilePage() {
             ].map((badge, idx) => (
               <span
                 key={idx}
-                className="bg-white text-[#161514] text-[10px] font-black px-2.5 py-1 rounded-xl border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514] flex items-center gap-1.5"
+                className="bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] text-[10px] font-black px-2.5 py-1 rounded-xl border-2 border-[#161514] dark:border-[#383531] shadow-[1px_1px_0px_0px_#161514] dark:shadow-[1px_1px_0px_0px_#000000] flex items-center gap-1.5"
               >
                 <badge.Icon className="h-3 w-3 stroke-[2.5]" />
                 <span>{badge.label}</span>
@@ -115,7 +115,7 @@ export default function ProfilePage() {
           <div className="pt-2">
             <Link
               href="/settings"
-              className="w-full bg-[#161514] hover:bg-[#2a2725] text-white font-black text-xs uppercase tracking-widest py-3.5 px-5 rounded-2xl border-2 border-[#161514] shadow-[3.5px_3.5px_0px_0px_#161514] flex items-center justify-center gap-2 transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer"
+              className="w-full bg-[#161514] hover:bg-[#2a2725] text-white font-black text-xs uppercase tracking-widest py-3.5 px-5 rounded-2xl border-2 border-[#161514] dark:border-[#383531] shadow-[3.5px_3.5px_0px_0px_#161514] dark:shadow-[3.5px_3.5px_0px_0px_#000000] flex items-center justify-center gap-2 transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer"
             >
               <Settings className="h-4 w-4 stroke-[2.5]" />
               <span>OPEN SETTINGS CONTROL CENTER</span>
@@ -129,7 +129,7 @@ export default function ProfilePage() {
           <button
             type="button"
             onClick={signOut}
-            className="w-full bg-white hover:bg-rose-50 text-rose-700 font-black text-xs uppercase tracking-wider py-3.5 px-5 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex items-center justify-center gap-2 transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer"
+            className="w-full bg-white dark:bg-[#1C1A18] hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-700 dark:text-rose-400 font-black text-xs uppercase tracking-wider py-3.5 px-5 rounded-2xl border-2 border-[#161514] dark:border-[#383531] shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] flex items-center justify-center gap-2 transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer"
           >
             <LogOut className="h-4 w-4 stroke-[2.5]" />
             <span>Sign Out of Account</span>

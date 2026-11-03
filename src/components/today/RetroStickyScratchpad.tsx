@@ -363,7 +363,7 @@ export function RetroStickyScratchpad({
   return (
     <div
       className={cn(
-        "relative bg-[#FEF9C3] rounded-2xl border-2 border-[#161514] p-3.5 sm:p-4 shadow-[3px_3px_0px_0px_#161514]",
+        "relative bg-[#FEF9C3] rounded-2xl border-2 border-[#161514] p-3.5 sm:p-4 shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000]",
         "transition-all duration-200 select-text flex flex-col justify-between",
         isCollapsed ? "min-h-0" : "min-h-[260px] sm:-rotate-1 hover:rotate-0",
         className

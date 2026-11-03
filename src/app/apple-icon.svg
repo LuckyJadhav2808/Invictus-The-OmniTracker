@@ -1,30 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
-  <!-- Invictus Monolith ("I" Pillar of Strength) for Apple Touch Icon -->
+  <defs>
+    <linearGradient id="invictus-stem-apple" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#CEF431" />
+      <stop offset="100%" stop-color="#03D26F" />
+    </linearGradient>
+  </defs>
+  <!-- Full bleed square for Apple iOS touch icon (iOS automatically clips with its squircle mask) -->
   <rect width="512" height="512" fill="#161514" />
   
   <g id="icon" transform="translate(256, 256)">
-    <!-- Top Horizontal Pediment -->
-    <path
-      d="M -110 -150 L 110 -150 L 80 -95 L -80 -95 Z"
-      fill="#FAF8F5"
-    />
+    <!-- Top Crown Pediment (Cream Architectural Plate) -->
+    <path d="M -130 -160 L 130 -160 L 96 -96 L -96 -96 Z" fill="#FAF8F5" />
     
-    <!-- Central Monolithic Stem (Electric Volt) -->
-    <path
-      d="M -45 -80 L 45 -80 L 45 80 L -45 80 Z"
-      fill="#CEF431"
-    />
+    <!-- Central Monolithic Stem (Vibrant Electric Lime into Malachite Emerald) -->
+    <path d="M -56 -78 L 56 -78 L 56 78 L -56 78 Z" fill="url(#invictus-stem-apple)" />
     
-    <!-- Bottom Horizontal Base Pedestal -->
-    <path
-      d="M -80 95 L 80 95 L 110 150 L -110 150 Z"
-      fill="#FAF8F5"
-    />
+    <!-- Ascending Victory Chevron (Negative Space / Ink Arrow) -->
+    <path d="M 0 -44 L 38 12 L 18 12 L 0 -12 L -18 12 L -38 12 Z" fill="#161514" />
     
-    <!-- Inner Upward Chevron Arrow Cutout -->
-    <polygon
-      points="0,-50 30,10 0,-10 -30,10"
-      fill="#161514"
-    />
+    <!-- Bottom Base Pedestal (Balanced Foundation) -->
+    <path d="M -96 96 L 96 96 L 130 160 L -130 160 Z" fill="#FAF8F5" />
   </g>
 </svg>

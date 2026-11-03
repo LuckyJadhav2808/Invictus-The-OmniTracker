@@ -3,7 +3,7 @@
     android:shape="rectangle">
     <solid android:color="@color/widget_card_bg" />
     <stroke
-        android:width="1.5dp"
-        android:color="@color/widget_border" />
-    <corners android:radius="12dp" />
+        android:width="1dp"
+        android:color="@color/widget_border_subtle" />
+    <corners android:radius="14dp" />
 </shape>

@@ -32,6 +32,7 @@ import {
   Check,
   ShieldCheck,
   Zap,
+  Moon,
 } from "lucide-react";
 import Link from "next/link";
 import { format, subDays, eachDayOfInterval, isSameDay, getDay } from "date-fns";
@@ -167,7 +168,7 @@ export default function HabitDetailPage({
       if (targetState) {
         soundFX.playPop();
         soundFX.vibrate(20);
-        toast.success("Habit checked for today! Keep the flame alive 🔥");
+        toast.success("Habit checked for today. Keep the flame alive.");
       } else {
         toast.success("Habit unchecked for today");
       }
@@ -206,20 +207,20 @@ export default function HabitDetailPage({
         <div className="flex items-center justify-between">
           <Link
             href="/goals"
-            className="text-[#161514] bg-[#FAF8F5] hover:bg-white flex items-center gap-1.5 text-xs font-black px-3 py-1.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+            className="text-[#161514] dark:text-[#FAF8F5] bg-[#FAF8F5] dark:bg-[#1C1A18] hover:bg-white dark:hover:bg-[#252321] flex items-center gap-1.5 text-xs font-black px-3 py-1.5 rounded-xl border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
           >
             <ArrowLeft className="h-4 w-4 stroke-[2.5]" /> Back to Goals
           </Link>
           <div className="flex gap-2">
             <button
               onClick={() => setIsEditOpen(true)}
-              className="rounded-xl border-2 border-[#161514] text-[#161514] bg-[#CEF431] hover:bg-[#bce023] font-black text-xs px-3 py-1.5 shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center gap-1.5"
+              className="rounded-xl border-2 border-[#161514] dark:border-[#383531] text-[#161514] bg-[#CEF431] hover:bg-[#bce023] font-black text-xs px-3 py-1.5 shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center gap-1.5"
             >
               <Edit3 className="h-3.5 w-3.5" /> Edit
             </button>
             <button
               onClick={() => setIsDeleteOpen(true)}
-              className="rounded-xl border-2 border-[#161514] text-rose-800 bg-rose-100 hover:bg-rose-200 font-black text-xs px-3 py-1.5 shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center gap-1.5"
+              className="rounded-xl border-2 border-[#161514] dark:border-[#383531] text-rose-800 dark:text-rose-300 bg-rose-100 dark:bg-rose-950/40 hover:bg-rose-200 font-black text-xs px-3 py-1.5 shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center gap-1.5"
             >
               <Trash2 className="h-3.5 w-3.5" /> Delete
             </button>
@@ -227,7 +228,7 @@ export default function HabitDetailPage({
         </div>
 
         {/* Habit Hero Overview Card */}
-        <div className="bg-white rounded-2xl p-6 border-2 border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-5">
+        <div className="bg-white dark:bg-[#1C1A18] rounded-2xl p-6 border-2 border-[#161514] dark:border-[#383531] shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#000000] space-y-5">
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-2">
               <div className="flex items-center gap-2 flex-wrap">
@@ -239,23 +240,23 @@ export default function HabitDetailPage({
                 >
                   {archetypeConfig.label}
                 </span>
-                <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border border-[#161514] bg-amber-300 text-[#161514]">
+                <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border border-[#161514] dark:border-[#383531] bg-amber-300 text-[#161514]">
                   {habit.frequency?.type || "DAILY"}
                 </span>
                 {habit.reminderTime && (
-                  <span className="text-[10px] font-black px-2 py-0.5 rounded-md border border-[#161514] bg-zinc-100 text-[#161514] flex items-center gap-1">
+                  <span className="text-[10px] font-black px-2 py-0.5 rounded-md border border-[#161514] dark:border-[#383531] bg-zinc-100 dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1">
                     <Clock className="size-3" />
                     {habit.reminderTime}
                   </span>
                 )}
               </div>
               <h1
-                className="text-2xl sm:text-3xl font-black text-[#161514] leading-tight"
+                className="text-2xl sm:text-3xl font-black text-[#161514] dark:text-[#FAF8F5] leading-tight"
                 style={{ fontFamily: "var(--font-heading)" }}
               >
                 {habit.title}
               </h1>
-              <p className="text-xs font-bold text-[#161514]/70">
+              <p className="text-xs font-bold text-[#161514]/70 dark:text-[#FAF8F5]/70">
                 {archetypeConfig.quip}
               </p>
             </div>
@@ -274,21 +275,21 @@ export default function HabitDetailPage({
           <div
             onClick={handleToggleToday}
             className={cn(
-              "rounded-2xl p-4 border-2 border-[#161514] flex items-center justify-between gap-4 cursor-pointer transition-all shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none select-none",
+              "rounded-2xl p-4 border-2 border-[#161514] dark:border-[#383531] flex items-center justify-between gap-4 cursor-pointer transition-all shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none select-none",
               isTodayCompleted
                 ? "bg-[#03D26F] text-[#161514]"
                 : isTodayRestDay
-                ? "bg-zinc-100 text-[#161514] border-dashed"
-                : "bg-[#FAF8F5] text-[#161514] hover:bg-amber-100/60"
+                ? "bg-zinc-100 dark:bg-zinc-900 text-[#161514] dark:text-[#FAF8F5] border-dashed"
+                : "bg-[#FAF8F5] dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] hover:bg-amber-100/60 dark:hover:bg-[#2A2826]"
             )}
           >
             <div className="flex items-center gap-3">
               <div
                 className={cn(
-                  "size-9 rounded-xl border-2 border-[#161514] flex items-center justify-center text-base font-black transition-all shadow-[1.5px_1.5px_0px_0px_#161514]",
+                  "size-9 rounded-xl border-2 border-[#161514] dark:border-[#383531] flex items-center justify-center text-base font-black transition-all shadow-[1.5px_1.5px_0px_0px_#161514] dark:shadow-[1.5px_1.5px_0px_0px_#000000]",
                   isTodayCompleted
                     ? "bg-[#161514] text-[#03D26F]"
-                    : "bg-white text-[#161514]"
+                    : "bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5]"
                 )}
               >
                 {isTodayCompleted ? <Check className="size-5 stroke-[3]" /> : ""}
@@ -306,8 +307,9 @@ export default function HabitDetailPage({
                       : "Check-in For Today"}
                   </span>
                   {isTodayRestDay && (
-                    <span className="text-[9px] font-black uppercase bg-zinc-200 text-zinc-700 px-1.5 py-0.2 rounded border border-[#161514]">
-                      💤 Rest
+                    <span className="text-[9px] font-bold bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 px-1.5 py-0.5 rounded-md border border-[#161514] dark:border-[#383531] flex items-center gap-1">
+                      <Moon className="size-2.5 stroke-[2.5]" />
+                      <span>Rest</span>
                     </span>
                   )}
                 </div>
@@ -321,59 +323,59 @@ export default function HabitDetailPage({
               </div>
             </div>
 
-            <span className="text-xs font-black px-2.5 py-1 rounded-xl border-2 border-[#161514] bg-white text-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] shrink-0">
+            <span className="text-xs font-black px-2.5 py-1 rounded-xl border-2 border-[#161514] dark:border-[#383531] bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] shadow-[1.5px_1.5px_0px_0px_#161514] dark:shadow-[1.5px_1.5px_0px_0px_#000000] shrink-0">
               {isTodayCompleted ? "Done ✓" : "Log +"}
             </span>
           </div>
 
           {/* Stats 4-Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="bg-[#FAF8F5] rounded-xl p-3 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex flex-col items-center justify-center text-center">
+            <div className="bg-[#FAF8F5] dark:bg-[#252321] rounded-xl p-3 border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] flex flex-col items-center justify-center text-center">
               <Flame className="size-5 text-rose-600 fill-rose-600" />
-              <span className="text-[9px] font-black text-[#161514]/70 uppercase tracking-wider mt-1">
+              <span className="text-[9px] font-black text-[#161514]/70 dark:text-[#FAF8F5]/70 uppercase tracking-wider mt-1">
                 Streak
               </span>
               <span
-                className="text-xl font-black text-[#161514] mt-0.5"
+                className="text-xl font-black text-[#161514] dark:text-[#FAF8F5] mt-0.5"
                 style={{ fontFamily: "var(--font-heading)" }}
               >
                 {streak?.currentStreak || 0}d
               </span>
             </div>
 
-            <div className="bg-[#FAF8F5] rounded-xl p-3 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex flex-col items-center justify-center text-center">
+            <div className="bg-[#FAF8F5] dark:bg-[#252321] rounded-xl p-3 border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] flex flex-col items-center justify-center text-center">
               <Award className="size-5 text-amber-500" />
-              <span className="text-[9px] font-black text-[#161514]/70 uppercase tracking-wider mt-1">
+              <span className="text-[9px] font-black text-[#161514]/70 dark:text-[#FAF8F5]/70 uppercase tracking-wider mt-1">
                 Best Streak
               </span>
               <span
-                className="text-xl font-black text-[#161514] mt-0.5"
+                className="text-xl font-black text-[#161514] dark:text-[#FAF8F5] mt-0.5"
                 style={{ fontFamily: "var(--font-heading)" }}
               >
                 {streak?.longestStreak || 0}d
               </span>
             </div>
 
-            <div className="bg-[#FAF8F5] rounded-xl p-3 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex flex-col items-center justify-center text-center">
+            <div className="bg-[#FAF8F5] dark:bg-[#252321] rounded-xl p-3 border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] flex flex-col items-center justify-center text-center">
               <Zap className="size-5 text-emerald-600" />
-              <span className="text-[9px] font-black text-[#161514]/70 uppercase tracking-wider mt-1">
+              <span className="text-[9px] font-black text-[#161514]/70 dark:text-[#FAF8F5]/70 uppercase tracking-wider mt-1">
                 30D Rate
               </span>
               <span
-                className="text-xl font-black text-[#161514] mt-0.5"
+                className="text-xl font-black text-[#161514] dark:text-[#FAF8F5] mt-0.5"
                 style={{ fontFamily: "var(--font-heading)" }}
               >
                 {stats30.completionRate}%
               </span>
             </div>
 
-            <div className="bg-[#FAF8F5] rounded-xl p-3 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex flex-col items-center justify-center text-center">
+            <div className="bg-[#FAF8F5] dark:bg-[#252321] rounded-xl p-3 border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] flex flex-col items-center justify-center text-center">
               <CheckCircle2 className="size-5 text-sky-600" />
-              <span className="text-[9px] font-black text-[#161514]/70 uppercase tracking-wider mt-1">
+              <span className="text-[9px] font-black text-[#161514]/70 dark:text-[#FAF8F5]/70 uppercase tracking-wider mt-1">
                 Total Check-ins
               </span>
               <span
-                className="text-xl font-black text-[#161514] mt-0.5"
+                className="text-xl font-black text-[#161514] dark:text-[#FAF8F5] mt-0.5"
                 style={{ fontFamily: "var(--font-heading)" }}
               >
                 {stats30.completedCount}
@@ -383,18 +385,18 @@ export default function HabitDetailPage({
         </div>
 
         {/* 30-Day Heatmap Card */}
-        <div className="bg-white rounded-2xl p-6 border-2 border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
+        <div className="bg-white dark:bg-[#1C1A18] rounded-2xl p-6 border-2 border-[#161514] dark:border-[#383531] shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#000000] space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Calendar className="size-4 text-[#161514]" />
+              <Calendar className="size-4 text-[#161514] dark:text-[#FAF8F5]" />
               <h2
-                className="text-xs font-black uppercase tracking-wider text-[#161514]"
+                className="text-xs font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5]"
                 style={{ fontFamily: "var(--font-heading)" }}
               >
                 30-Day Consistency Heatmap
               </h2>
             </div>
-            <span className="text-[10px] font-black uppercase text-[#161514]/70">
+            <span className="text-[10px] font-black uppercase text-[#161514]/70 dark:text-[#FAF8F5]/70">
               {stats30.completedCount} / {stats30.scheduledCount} Scheduled Done
             </span>
           </div>
@@ -416,13 +418,13 @@ export default function HabitDetailPage({
                     isDone ? "Completed" : isRest ? "Rest Day" : "Missed"
                   }`}
                   className={cn(
-                    "flex flex-col items-center justify-center p-1.5 rounded-xl border-2 border-[#161514] transition-all text-center",
+                    "flex flex-col items-center justify-center p-1.5 rounded-xl border-2 border-[#161514] dark:border-[#383531] transition-all text-center",
                     isDone
-                      ? "bg-[#03D26F] text-[#161514] shadow-[2px_2px_0px_0px_#161514]"
+                      ? "bg-[#03D26F] text-[#161514] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]"
                       : isRest
-                      ? "bg-zinc-100 text-zinc-400 border-dashed"
-                      : "bg-[#FAF8F5] text-[#161514]/70 shadow-[1px_1px_0px_0px_#161514]",
-                    isToday && "ring-2 ring-[#161514] ring-offset-1 font-black"
+                      ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-400 border-dashed"
+                      : "bg-[#FAF8F5] dark:bg-[#252321] text-[#161514]/70 dark:text-[#FAF8F5]/70 shadow-[1px_1px_0px_0px_#161514] dark:shadow-[1px_1px_0px_0px_#000000]",
+                    isToday && "ring-2 ring-[#161514] dark:ring-[#CEF431] ring-offset-1 font-black"
                   )}
                 >
                   <span className="text-[8px] font-black uppercase">
@@ -431,8 +433,8 @@ export default function HabitDetailPage({
                   <span className="text-[11px] font-black mt-0.5">
                     {format(d, "d")}
                   </span>
-                  <span className="text-[9px] mt-0.5">
-                    {isDone ? "✓" : isRest ? "💤" : "·"}
+                  <span className="text-[9px] mt-0.5 flex items-center justify-center">
+                    {isDone ? "✓" : isRest ? <Moon className="size-2.5 stroke-[2.5]" /> : "·"}
                   </span>
                 </div>
               );
@@ -440,28 +442,28 @@ export default function HabitDetailPage({
           </div>
 
           {/* Legend */}
-          <div className="flex items-center justify-between text-[9px] font-black uppercase tracking-wider text-[#161514]/70 pt-2 border-t border-[#161514]/10 flex-wrap gap-2">
+          <div className="flex items-center justify-between text-[9px] font-black uppercase tracking-wider text-[#161514]/70 dark:text-[#FAF8F5]/70 pt-2 border-t border-[#161514]/10 dark:border-[#FAF8F5]/10 flex-wrap gap-2">
             <div className="flex items-center gap-1.5">
-              <span className="size-3 rounded-md bg-[#03D26F] border border-[#161514]" />
+              <span className="size-3 rounded-md bg-[#03D26F] border border-[#161514] dark:border-[#383531]" />
               <span>Completed</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="size-3 rounded-md bg-zinc-100 border border-[#161514] border-dashed" />
+              <span className="size-3 rounded-md bg-zinc-100 dark:bg-zinc-800 border border-[#161514] dark:border-[#383531] border-dashed" />
               <span>Rest Day</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="size-3 rounded-md bg-[#FAF8F5] border border-[#161514]" />
+              <span className="size-3 rounded-md bg-[#FAF8F5] dark:bg-[#252321] border border-[#161514] dark:border-[#383531]" />
               <span>Pending / Missed</span>
             </div>
           </div>
         </div>
 
         {/* Schedule & Rules Card */}
-        <div className="bg-white rounded-2xl p-6 border-2 border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-4">
+        <div className="bg-white dark:bg-[#1C1A18] rounded-2xl p-6 border-2 border-[#161514] dark:border-[#383531] shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#000000] space-y-4">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="size-4 text-[#161514]" />
+            <ShieldCheck className="size-4 text-[#161514] dark:text-[#FAF8F5]" />
             <h2
-              className="text-xs font-black uppercase tracking-wider text-[#161514]"
+              className="text-xs font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5]"
               style={{ fontFamily: "var(--font-heading)" }}
             >
               Frequency & Schedule Rules
@@ -469,16 +471,16 @@ export default function HabitDetailPage({
           </div>
 
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 rounded-xl bg-[#FAF8F5] border-2 border-[#161514]">
-              <span className="text-xs font-black text-[#161514]">Frequency Mode</span>
-              <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-lg border border-[#161514] bg-[#CEF431] text-[#161514]">
+            <div className="flex items-center justify-between p-3 rounded-xl bg-[#FAF8F5] dark:bg-[#252321] border-2 border-[#161514] dark:border-[#383531]">
+              <span className="text-xs font-black text-[#161514] dark:text-[#FAF8F5]">Frequency Mode</span>
+              <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-lg border border-[#161514] dark:border-[#383531] bg-[#CEF431] text-[#161514]">
                 {habit.frequency?.type || "DAILY"}
               </span>
             </div>
 
             {habit.frequency?.type === "customDays" && (
-              <div className="p-3 rounded-xl bg-[#FAF8F5] border-2 border-[#161514] space-y-2">
-                <span className="text-xs font-black text-[#161514] block">
+              <div className="p-3 rounded-xl bg-[#FAF8F5] dark:bg-[#252321] border-2 border-[#161514] dark:border-[#383531] space-y-2">
+                <span className="text-xs font-black text-[#161514] dark:text-[#FAF8F5] block">
                   Scheduled Days of Week
                 </span>
                 <div className="grid grid-cols-7 gap-1">
@@ -490,10 +492,10 @@ export default function HabitDetailPage({
                       <div
                         key={dayName}
                         className={cn(
-                          "py-1.5 rounded-lg border-2 border-[#161514] text-center text-[10px] font-black transition-all",
+                          "py-1.5 rounded-lg border-2 border-[#161514] dark:border-[#383531] text-center text-[10px] font-black transition-all",
                           isScheduled
-                            ? "bg-[#03D26F] text-[#161514] shadow-[1px_1px_0px_0px_#161514]"
-                            : "bg-zinc-100 text-zinc-400 border-dashed"
+                            ? "bg-[#03D26F] text-[#161514] shadow-[1px_1px_0px_0px_#161514] dark:shadow-[1px_1px_0px_0px_#000000]"
+                            : "bg-zinc-100 dark:bg-zinc-800 text-zinc-400 border-dashed"
                         )}
                       >
                         {dayName}
@@ -504,16 +506,16 @@ export default function HabitDetailPage({
               </div>
             )}
 
-            <div className="flex items-center justify-between p-3 rounded-xl bg-[#FAF8F5] border-2 border-[#161514]">
-              <span className="text-xs font-black text-[#161514]">Daily Reminder</span>
-              <span className="text-xs font-bold text-[#161514]">
+            <div className="flex items-center justify-between p-3 rounded-xl bg-[#FAF8F5] dark:bg-[#252321] border-2 border-[#161514] dark:border-[#383531]">
+              <span className="text-xs font-black text-[#161514] dark:text-[#FAF8F5]">Daily Reminder</span>
+              <span className="text-xs font-bold text-[#161514] dark:text-[#FAF8F5]">
                 {habit.reminderTime ? `⏰ ${habit.reminderTime}` : "None set"}
               </span>
             </div>
 
-            <div className="flex items-center justify-between p-3 rounded-xl bg-[#FAF8F5] border-2 border-[#161514]">
-              <span className="text-xs font-black text-[#161514]">Grace Skip Shield</span>
-              <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-lg border border-[#161514] bg-white text-[#161514]">
+            <div className="flex items-center justify-between p-3 rounded-xl bg-[#FAF8F5] dark:bg-[#252321] border-2 border-[#161514] dark:border-[#383531]">
+              <span className="text-xs font-black text-[#161514] dark:text-[#FAF8F5]">Grace Skip Shield</span>
+              <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-lg border border-[#161514] dark:border-[#383531] bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5]">
                 {habit.allowGraceSkip ? "Enabled" : "Standard"}
               </span>
             </div>

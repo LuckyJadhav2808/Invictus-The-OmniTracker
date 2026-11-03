@@ -64,32 +64,32 @@ export function StudySprintWidget({
     <div
       id="study-section"
       className={cn(
-        "bg-white border border-[#E8E5DF] p-5 rounded-xl flex flex-col justify-between space-y-4",
+        "bg-white dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] p-5 rounded-xl flex flex-col justify-between space-y-4",
         className
       )}
     >
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-[#E8E5DF] pb-3">
+      <div className="flex items-center justify-between border-b border-[#E8E5DF] dark:border-[#383531] pb-3">
         <div className="flex items-center gap-2">
-          <div className="size-7 rounded-lg bg-[#F1EFEA] flex items-center justify-center text-[#161514]">
+          <div className="size-7 rounded-lg bg-[#F1EFEA] dark:bg-[#252321] flex items-center justify-center text-[#161514] dark:text-[#C084FC] border border-[#E8E5DF] dark:border-[#383531]">
             <GraduationCap className="size-3.5 stroke-[1.5]" />
           </div>
-          <h2 className="font-sans font-semibold text-[15px] text-[#161514] tracking-tight">
+          <h2 className="font-sans font-semibold text-[15px] text-[#161514] dark:text-[#FAF8F5] tracking-tight">
             Study Focus
           </h2>
         </div>
         <div className="text-right">
-          <span className="text-xs font-mono font-medium text-[#161514] tabular-nums">
+          <span className="text-xs font-mono font-medium text-[#161514] dark:text-[#FAF8F5] tabular-nums">
             {todayStudyHours}h / 4.0h
           </span>
-          <span className="block text-xs text-[#6B6B6B] tabular-nums">
+          <span className="block text-xs text-[#6B6B6B] dark:text-[#A8A29E] tabular-nums">
             {studyCompletionPercent}% daily goal
           </span>
         </div>
       </div>
 
       {/* Target Progress Bar */}
-      <div className="w-full bg-[#E8E5DF] rounded-full h-1.5 overflow-hidden">
+      <div className="w-full bg-[#E8E5DF] dark:bg-[#383531] rounded-full h-1.5 overflow-hidden">
         <div
           className="bg-[#03D26F] h-full transition-all duration-300"
           style={{ width: `${studyCompletionPercent}%` }}
@@ -97,17 +97,17 @@ export function StudySprintWidget({
       </div>
 
       {/* Stopwatch Tactical Card (One Craft Moment) */}
-      <div className="flex-1 p-4 sm:p-5 rounded-xl bg-[#FBF9F5] border border-[#E8E5DF] text-center flex flex-col justify-between space-y-3">
+      <div className="flex-1 p-4 sm:p-5 rounded-xl bg-[#FBF9F5] dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#383531] text-center flex flex-col justify-between space-y-3">
         {/* Step 1: Compact Subject & Topic Configuration Row (Context First) */}
-        <div className="grid grid-cols-2 gap-2 text-left pb-2.5 border-b border-[#E8E5DF]">
+        <div className="grid grid-cols-2 gap-2 text-left pb-2.5 border-b border-[#E8E5DF] dark:border-[#383531]">
           <div>
-            <label className="text-[11px] font-medium text-[#6B6B6B] block mb-1">
+            <label className="text-[11px] font-medium text-[#6B6B6B] dark:text-[#A8A29E] block mb-1">
               Subject
             </label>
             <select
               value={selectedSubjectId}
               onChange={(e) => onChangeSubject(e.target.value)}
-              className="w-full text-xs font-normal px-2.5 py-1.5 min-h-[36px] rounded-lg border border-[#E8E5DF] bg-white text-[#161514] outline-none cursor-pointer focus:border-[#161514]"
+              className="w-full text-xs font-normal px-2.5 py-1.5 min-h-[36px] rounded-lg border border-[#E8E5DF] dark:border-[#383531] bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] outline-none cursor-pointer focus:border-[#161514] dark:focus:border-[#FAF8F5]"
             >
               <option value="">General Focus</option>
               {subjects.map((sub) => (
@@ -119,14 +119,14 @@ export function StudySprintWidget({
           </div>
 
           <div>
-            <label className="text-[11px] font-medium text-[#6B6B6B] block mb-1">
+            <label className="text-[11px] font-medium text-[#6B6B6B] dark:text-[#A8A29E] block mb-1">
               Topic
             </label>
             <select
               value={selectedTopicId}
               onChange={(e) => onChangeTopic(e.target.value)}
               disabled={!selectedSubjectId}
-              className="w-full text-xs font-normal px-2.5 py-1.5 min-h-[36px] rounded-lg border border-[#E8E5DF] bg-white text-[#161514] outline-none cursor-pointer focus:border-[#161514] disabled:opacity-50"
+              className="w-full text-xs font-normal px-2.5 py-1.5 min-h-[36px] rounded-lg border border-[#E8E5DF] dark:border-[#383531] bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] outline-none cursor-pointer focus:border-[#161514] dark:focus:border-[#FAF8F5] disabled:opacity-50"
             >
               <option value="">Current Topic</option>
               {filteredTopics.map((top) => (
@@ -140,7 +140,7 @@ export function StudySprintWidget({
 
         {/* Step 2: Big Stopwatch Display */}
         <div className="my-auto py-2">
-          <div className="font-mono font-bold text-3xl sm:text-4xl lg:text-5xl tracking-widest text-[#161514] tabular-nums">
+          <div className="font-mono font-bold text-3xl sm:text-4xl lg:text-5xl tracking-widest text-[#161514] dark:text-[#FAF8F5] tabular-nums">
             {formatTimer(stopwatchSeconds)}
           </div>
         </div>
@@ -153,7 +153,7 @@ export function StudySprintWidget({
               'flex-1 min-h-[40px] font-medium text-xs rounded-lg active:translate-y-px transition-colors cursor-pointer',
               isTimerRunning
                 ? 'bg-amber-500 hover:bg-amber-600 text-white'
-                : 'bg-[#161514] hover:bg-[#252321] text-white'
+                : 'bg-[#161514] dark:bg-[#CEF431] hover:bg-[#252321] dark:hover:bg-[#b5da28] text-white dark:text-[#161514] font-heading font-black'
             )}
           >
             {isTimerRunning ? (
@@ -186,7 +186,7 @@ export function StudySprintWidget({
                 size="icon"
                 onClick={onResetTimer}
                 aria-label="Reset Timer"
-                className="min-h-[40px] min-w-[40px] border border-[#E8E5DF] bg-white hover:bg-[#F5F3EF] rounded-lg text-[#161514] active:translate-y-px transition-colors cursor-pointer flex items-center justify-center"
+                className="min-h-[40px] min-w-[40px] border border-[#E8E5DF] dark:border-[#383531] bg-white dark:bg-[#1C1A18] hover:bg-[#F5F3EF] dark:hover:bg-[#2A2724] rounded-lg text-[#161514] dark:text-[#FAF8F5] active:translate-y-px transition-colors cursor-pointer flex items-center justify-center"
               >
                 <RotateCcw className="size-3.5" />
               </Button>

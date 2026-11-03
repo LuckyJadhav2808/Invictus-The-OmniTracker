@@ -6,6 +6,7 @@ import { AdaptiveDrawerDialog } from "@/components/shared/AdaptiveDrawerDialog";
 import { soundFX } from "@/components/shared/SoundFX";
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
 import { TemplatePack } from "@/components/shared/TemplateSelectionModal";
+import { MEAL_TEMPLATE_PACKS } from "@/lib/templates-data";
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
 import { NutritionChoiceModal, MEAL_TYPES, MealTypeOption } from "@/components/goals/NutritionChoiceModal";
 import { Button } from "@/components/ui/button";
@@ -174,21 +175,40 @@ export function MealTracker() {
 
   // Apply Template Pack
   const handleApplyMealPack = (pack: TemplatePack) => {
+    const mealTypes: MealTypeOption[] = ["Breakfast", "Lunch", "Snack", "Dinner"];
+    const defaultTimes = ["08:30 AM", "01:30 PM", "05:00 PM", "08:30 PM"];
+
     pack.items.forEach((item, idx) => {
+      let calories = 500;
+      let protein = 35;
+      let carbs = 45;
+      let fat = 15;
+
+      if (item.desc) {
+        const calMatch = item.desc.match(/(\d+)\s*kcal/i);
+        const pMatch = item.desc.match(/(\d+)g\s*Protein/i);
+        if (calMatch) calories = Number(calMatch[1]);
+        if (pMatch) protein = Number(pMatch[1]);
+        carbs = Math.max(10, Math.round((calories * 0.4) / 4));
+        fat = Math.max(5, Math.round((calories * 0.25) / 9));
+      }
+
       addMealMutation.mutate({
-        dateStr: todayStr,
-        mealName: item.title,
-        mealType: idx === 0 ? "Breakfast" : idx === 1 ? "Lunch" : "Snack",
-        calories: 500,
-        protein: 40,
-        carbs: 45,
-        fat: 15,
-        mealTime: "12:00 PM",
+        date: todayStr,
+        name: item.title,
+        mealType: mealTypes[idx % mealTypes.length],
+        calories,
+        protein,
+        carbs,
+        fat,
+        time: defaultTimes[idx % defaultTimes.length],
         completed: false,
       });
     });
     setIsChoiceOpen(false);
-    toast.success(`Applied ${pack.name} to today's diet!`);
+    soundFX.playPop();
+    soundFX.vibrate(20);
+    toast.success(`Applied ${pack.name} to today's diet! 🥗`);
   };
 
   const handleUpdateMealSubmit = async (e: React.FormEvent) => {
@@ -243,29 +263,29 @@ export function MealTracker() {
   };
 
   return (
-    <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] sm:shadow-[5px_5px_0px_0px_#161514] space-y-5">
+    <div className="bg-white dark:bg-[#161514] rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-5">
       {/* ─── STAGE 1: DAILY CALORIC & MACRO TELEMETRY COCKPIT ─── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b-2 border-[#161514]/15">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#E8E5DF] dark:border-[#2A2724]">
         <div className="flex items-center gap-3">
-          <div className="size-12 rounded-2xl bg-[#03D26F] border-2 border-[#161514] text-[#161514] flex items-center justify-center font-black shadow-[2px_2px_0px_0px_#161514] shrink-0">
-            <Utensils className="size-6 stroke-[2.5]" />
+          <div className="size-11 rounded-2xl bg-[#03D26F]/10 border border-[#03D26F]/20 text-[#047857] dark:text-[#03D26F] flex items-center justify-center font-black shadow-xs shrink-0">
+            <Utensils className="size-5 stroke-[2.2]" />
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="text-lg font-heading font-black text-[#161514] tracking-wider uppercase">
+              <h3 className="text-base sm:text-lg font-heading font-black text-[#161514] dark:text-stone-100 tracking-wider uppercase">
                 THE MACRO FORGE
               </h3>
-              <span className="neo-badge bg-[#03D26F] text-[#161514] text-[9.5px] font-black border border-[#161514]">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-[#03D26F]/15 text-[#047857] dark:text-[#03D26F] border border-[#03D26F]/30">
                 METABOLIC OS
               </span>
             </div>
-            <p className="text-[11px] text-[#161514]/80 font-bold mt-0.5 flex items-center gap-2 flex-wrap">
+            <p className="text-[11px] text-[#6B6B6B] dark:text-[#A8A29E] font-medium mt-0.5 flex items-center gap-2 flex-wrap">
               <span>
-                Today&apos;s Intake: <strong className="text-emerald-800 font-black">{totalCalories} / {targets.calories} kcal</strong>
+                Today&apos;s Intake: <strong className="text-emerald-700 dark:text-emerald-400 font-bold">{totalCalories} / {targets.calories} kcal</strong>
               </span>
               <span>•</span>
               <span>
-                Protein Target: <strong className="text-[#161514] font-black">{totalProtein} / {targets.protein}g</strong>
+                Protein Target: <strong className="text-[#161514] dark:text-stone-200 font-bold">{totalProtein} / {targets.protein}g</strong>
               </span>
             </p>
           </div>
@@ -277,9 +297,9 @@ export function MealTracker() {
             setIsTargetsOpen(true);
             soundFX.playPop();
           }}
-          className="text-[10px] font-heading font-black text-[#161514] bg-amber-300 hover:bg-amber-400 px-3.5 py-1.5 rounded-xl cursor-pointer transition-all border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-y-0.5 flex items-center gap-1.5 self-start sm:self-auto"
+          className="text-[11px] font-heading font-black text-[#161514] dark:text-stone-200 bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] px-3.5 py-1.5 rounded-xl cursor-pointer transition-all border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs hover:-translate-y-0.5 flex items-center gap-1.5 self-start sm:self-auto"
         >
-          <Target className="size-3.5 stroke-[2.5]" />
+          <Target className="size-3.5 stroke-[2.2]" />
           <span>Edit Macro Goals</span>
         </button>
       </div>
@@ -287,15 +307,15 @@ export function MealTracker() {
       {/* 4 Macro Gauges Bento Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
         {/* Calories Card */}
-        <div className="bg-[#FAF8F5] rounded-2xl p-3 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-1.5">
-          <div className="flex items-center justify-between text-[10px] font-heading font-black uppercase text-[#161514]/70">
+        <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl p-3 border border-[#E8E5DF] dark:border-[#2A2724] space-y-1.5 shadow-none">
+          <div className="flex items-center justify-between text-[10px] font-mono font-bold uppercase text-[#6B6B6B] dark:text-[#A8A29E]">
             <span>Calories</span>
-            <span>{Math.round((totalCalories / targets.calories) * 100)}%</span>
+            <span className="text-[#161514] dark:text-stone-200 font-black">{Math.round((totalCalories / targets.calories) * 100)}%</span>
           </div>
-          <div className="text-base font-heading font-black text-[#161514] font-mono">
-            {totalCalories} <span className="text-[10px] text-[#161514]/60">/ {targets.calories} kcal</span>
+          <div className="text-base font-heading font-black text-[#161514] dark:text-stone-100 font-mono">
+            {totalCalories} <span className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E] font-normal">/ {targets.calories} kcal</span>
           </div>
-          <div className="h-2 w-full bg-white rounded-full border border-[#161514] overflow-hidden p-0.5">
+          <div className="h-1.5 w-full bg-[#E8E5DF] dark:bg-[#2A2724] rounded-full overflow-hidden">
             <div
               className="h-full bg-rose-500 rounded-full transition-all duration-300"
               style={{ width: `${Math.min(100, (totalCalories / targets.calories) * 100)}%` }}
@@ -304,15 +324,15 @@ export function MealTracker() {
         </div>
 
         {/* Protein Card */}
-        <div className="bg-[#ECFDF5] rounded-2xl p-3 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-1.5">
-          <div className="flex items-center justify-between text-[10px] font-heading font-black uppercase text-emerald-800">
+        <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl p-3 border border-[#E8E5DF] dark:border-[#2A2724] space-y-1.5 shadow-none">
+          <div className="flex items-center justify-between text-[10px] font-mono font-bold uppercase text-emerald-700 dark:text-emerald-400">
             <span>Protein</span>
-            <span>{Math.round((totalProtein / targets.protein) * 100)}%</span>
+            <span className="font-black">{Math.round((totalProtein / targets.protein) * 100)}%</span>
           </div>
-          <div className="text-base font-heading font-black text-[#161514] font-mono">
-            {totalProtein} <span className="text-[10px] text-[#161514]/60">/ {targets.protein}g</span>
+          <div className="text-base font-heading font-black text-[#161514] dark:text-stone-100 font-mono">
+            {totalProtein} <span className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E] font-normal">/ {targets.protein}g</span>
           </div>
-          <div className="h-2 w-full bg-white rounded-full border border-[#161514] overflow-hidden p-0.5">
+          <div className="h-1.5 w-full bg-[#E8E5DF] dark:bg-[#2A2724] rounded-full overflow-hidden">
             <div
               className="h-full bg-[#03D26F] rounded-full transition-all duration-300"
               style={{ width: `${Math.min(100, (totalProtein / targets.protein) * 100)}%` }}
@@ -321,15 +341,15 @@ export function MealTracker() {
         </div>
 
         {/* Carbs Card */}
-        <div className="bg-[#FFF9EA] rounded-2xl p-3 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-1.5">
-          <div className="flex items-center justify-between text-[10px] font-heading font-black uppercase text-amber-800">
+        <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl p-3 border border-[#E8E5DF] dark:border-[#2A2724] space-y-1.5 shadow-none">
+          <div className="flex items-center justify-between text-[10px] font-mono font-bold uppercase text-amber-700 dark:text-amber-400">
             <span>Carbs</span>
-            <span>{Math.round((totalCarbs / targets.carbs) * 100)}%</span>
+            <span className="font-black">{Math.round((totalCarbs / targets.carbs) * 100)}%</span>
           </div>
-          <div className="text-base font-heading font-black text-[#161514] font-mono">
-            {totalCarbs} <span className="text-[10px] text-[#161514]/60">/ {targets.carbs}g</span>
+          <div className="text-base font-heading font-black text-[#161514] dark:text-stone-100 font-mono">
+            {totalCarbs} <span className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E] font-normal">/ {targets.carbs}g</span>
           </div>
-          <div className="h-2 w-full bg-white rounded-full border border-[#161514] overflow-hidden p-0.5">
+          <div className="h-1.5 w-full bg-[#E8E5DF] dark:bg-[#2A2724] rounded-full overflow-hidden">
             <div
               className="h-full bg-amber-400 rounded-full transition-all duration-300"
               style={{ width: `${Math.min(100, (totalCarbs / targets.carbs) * 100)}%` }}
@@ -338,15 +358,15 @@ export function MealTracker() {
         </div>
 
         {/* Fat Card */}
-        <div className="bg-[#FFF1F2] rounded-2xl p-3 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-1.5">
-          <div className="flex items-center justify-between text-[10px] font-heading font-black uppercase text-rose-800">
+        <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl p-3 border border-[#E8E5DF] dark:border-[#2A2724] space-y-1.5 shadow-none">
+          <div className="flex items-center justify-between text-[10px] font-mono font-bold uppercase text-sky-700 dark:text-sky-400">
             <span>Fat</span>
-            <span>{Math.round((totalFat / targets.fat) * 100)}%</span>
+            <span className="font-black">{Math.round((totalFat / targets.fat) * 100)}%</span>
           </div>
-          <div className="text-base font-heading font-black text-[#161514] font-mono">
-            {totalFat} <span className="text-[10px] text-[#161514]/60">/ {targets.fat}g</span>
+          <div className="text-base font-heading font-black text-[#161514] dark:text-stone-100 font-mono">
+            {totalFat} <span className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E] font-normal">/ {targets.fat}g</span>
           </div>
-          <div className="h-2 w-full bg-white rounded-full border border-[#161514] overflow-hidden p-0.5">
+          <div className="h-1.5 w-full bg-[#E8E5DF] dark:bg-[#2A2724] rounded-full overflow-hidden">
             <div
               className="h-full bg-sky-400 rounded-full transition-all duration-300"
               style={{ width: `${Math.min(100, (totalFat / targets.fat) * 100)}%` }}
@@ -356,25 +376,25 @@ export function MealTracker() {
       </div>
 
       {/* ─── STAGE 2: VISUAL MACRO FUEL DISTRIBUTION BAR ─── */}
-      <div className="bg-[#FAF8F5] rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-3">
+      <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl p-3.5 border border-[#E8E5DF] dark:border-[#2A2724] space-y-2.5 shadow-none">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-2">
             <span className="text-sm">⚡</span>
-            <span className="text-xs font-heading font-black text-[#161514] uppercase tracking-wider">
+            <span className="text-xs font-heading font-black text-[#161514] dark:text-stone-100 uppercase tracking-wider">
               Caloric Ratio Breakdown:
             </span>
           </div>
-          <div className="text-xs font-mono font-bold text-[#161514] flex items-center gap-2 flex-wrap">
-            <span className="text-emerald-800">🟢 {proteinPct}% Protein</span>
+          <div className="text-xs font-mono font-bold text-[#161514] dark:text-stone-200 flex items-center gap-2 flex-wrap">
+            <span className="text-emerald-700 dark:text-emerald-400">🟢 {proteinPct}% Protein</span>
             <span>•</span>
-            <span className="text-amber-700">🟡 {carbsPct}% Carbs</span>
+            <span className="text-amber-700 dark:text-amber-400">🟡 {carbsPct}% Carbs</span>
             <span>•</span>
-            <span className="text-sky-700">🔵 {fatPct}% Fat</span>
+            <span className="text-sky-700 dark:text-sky-400">🔵 {fatPct}% Fat</span>
           </div>
         </div>
 
         {/* Proportional Segmented Bar */}
-        <div className="h-3.5 w-full bg-white rounded-full border-2 border-[#161514] overflow-hidden flex shadow-[1px_1px_0px_0px_#161514]">
+        <div className="h-2.5 w-full bg-[#E8E5DF] dark:bg-[#2A2724] rounded-full overflow-hidden flex">
           <div
             className="h-full bg-[#03D26F] transition-all duration-300"
             style={{ width: `${totalCalories > 0 ? proteinPct : 33}%` }}
@@ -393,19 +413,19 @@ export function MealTracker() {
         </div>
 
         {/* Motivational Metabolic Status Badge */}
-        <div className="flex items-center justify-between text-[11px] font-bold text-[#161514]/75 pt-0.5">
+        <div className="flex items-center justify-between text-[11px] font-medium text-[#6B6B6B] dark:text-[#A8A29E] pt-0.5">
           <span>
             {totalProtein >= targets.protein ? (
-              <span className="text-emerald-700 font-black">
+              <span className="text-emerald-700 dark:text-emerald-400 font-bold">
                 🔥 ANABOLIC OPTIMIZED: {totalProtein}g/{targets.protein}g Protein Target Conquered!
               </span>
             ) : (
               <span>
-                Need <strong>{targets.protein - totalProtein}g</strong> more protein to conquer today&apos;s target.
+                Need <strong className="text-[#161514] dark:text-stone-200 font-bold">{targets.protein - totalProtein}g</strong> more protein to conquer today&apos;s target.
               </span>
             )}
           </span>
-          <span className="font-mono text-[10px] text-[#161514]/60">
+          <span className="font-mono text-[10px]">
             {totalCalories <= targets.calories
               ? `${targets.calories - totalCalories} kcal buffer left`
               : `${totalCalories - targets.calories} kcal surplus`}
@@ -413,47 +433,137 @@ export function MealTracker() {
         </div>
       </div>
 
-      {/* ─── STAGE 3: IN BETWEEN: IMMERSIVE FOOD CHOICE ACTION BAR (ZERO OVERFLOW) ─── */}
-      <div className="bg-cream-bg/60 rounded-2xl p-3.5 sm:p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex flex-col sm:flex-row sm:items-center justify-between gap-3 w-full min-w-0">
+      {/* ─── STAGE 3: FOOD CHOICE ACTION BAR ─── */}
+      <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl p-3 sm:p-3.5 border border-[#E8E5DF] dark:border-[#2A2724] flex flex-col sm:flex-row sm:items-center justify-between gap-3 w-full min-w-0 shadow-none">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-heading font-black text-[#161514]">
+            <span className="text-xs sm:text-sm font-heading font-black text-[#161514] dark:text-stone-100">
               Today&apos;s Consumed Meals
             </span>
-            <span className="bg-[#161514] text-white text-[10px] font-mono font-black px-2 py-0.5 rounded-full">
+            <span className="bg-[#161514] dark:bg-stone-800 text-white text-[10px] font-mono font-bold px-2 py-0.5 rounded-full">
               {meals.length} Logged
             </span>
           </div>
-          <p className="text-[11px] font-bold text-[#161514]/65 mt-0.5">
-            Tap &apos;+ Log Fuel / Meal&apos; to pick from 1,000+ dishes or create custom meal recipes.
+          <p className="text-[11px] text-[#6B6B6B] dark:text-[#A8A29E] mt-0.5">
+            Log your dishes from the 1,000+ vault or create custom meal recipes.
           </p>
         </div>
 
-        {/* Action Buttons Container with flex-wrap ensuring ZERO OVERFLOW */}
-        <div className="flex flex-wrap items-center justify-end gap-2 shrink min-w-0 w-full sm:w-auto">
+        <div className="flex items-center justify-end gap-2 shrink-0">
           <button
             type="button"
             onClick={() => {
               setIsChoiceOpen(true);
               soundFX.playPop();
             }}
-            className="bg-[#03D26F] hover:bg-[#02b861] text-[#161514] font-heading font-black rounded-xl py-2 px-4 text-xs border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none cursor-pointer flex items-center gap-1.5 transition-all whitespace-nowrap"
+            className="bg-[#161514] hover:bg-[#2A2724] dark:bg-white dark:hover:bg-stone-200 text-white dark:text-[#161514] font-heading font-black rounded-xl py-2 px-3.5 text-xs border border-[#161514] dark:border-white shadow-xs hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center gap-1.5 transition-all whitespace-nowrap"
           >
-            <Plus className="size-3.5 stroke-[3]" />
-            <span>Log Fuel / Meal</span>
+            <Plus className="size-3.5 stroke-[2.5]" />
+            <span>+ Log Fuel / Meal</span>
           </button>
         </div>
       </div>
 
       {/* ─── STAGE 4: TODAY'S CONSUMED MEALS STREAM ─── */}
       {isLoading ? (
-        <div className="h-24 animate-pulse bg-cream-bg/60 rounded-2xl border-2 border-[#161514]" />
+        <div className="h-24 animate-pulse bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724]" />
       ) : meals.length === 0 ? (
-        <div className="bg-[#FFF9EA] rounded-2xl p-6 border-2 border-dashed border-[#161514] text-center space-y-2 shadow-[2px_2px_0px_0px_#161514]">
-          <p className="text-xs font-heading font-black text-[#161514]">No meals logged for today yet! 🥗</p>
-          <p className="text-[10px] text-[#161514]/80 font-bold max-w-sm mx-auto">
-            Log your breakfast, lunch, pre/post workout meals, and dinner to keep your metabolic engine running strong.
-          </p>
+        /* ─── ZERO-CONFUSION FIRST-RUN ONBOARDING COCKPIT ─── */
+        <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-2xl p-5 sm:p-6 border border-[#E8E5DF] dark:border-[#2A2724] space-y-4 shadow-none">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="size-2 rounded-full bg-[#03D26F] animate-pulse" />
+                <h4 className="text-sm font-heading font-black text-[#161514] dark:text-stone-100 uppercase tracking-wider">
+                  Start Today&apos;s Nutrition Log 🥗
+                </h4>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border border-emerald-500/20 font-bold">
+                  1-TAP SETUP
+                </span>
+              </div>
+              <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] max-w-lg leading-relaxed">
+                Track what you eat to hit your daily {targets.calories} kcal &amp; {targets.protein}g protein targets. Pick a proven diet pack or quickly log your first meal.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setIsChoiceOpen(true);
+                soundFX.playPop();
+              }}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#161514] text-white hover:bg-[#2A2724] dark:bg-white dark:text-[#161514] dark:hover:bg-stone-200 text-xs font-heading font-black shadow-xs cursor-pointer transition-all self-start sm:self-auto shrink-0"
+            >
+              <Sparkles className="size-3.5 text-[#03D26F]" />
+              <span>Browse 1,000+ Dish Vault</span>
+            </button>
+          </div>
+
+          {/* 1-Tap Curated Meal Packs Grid */}
+          <div className="space-y-2 pt-1">
+            <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6B6B6B] dark:text-[#A8A29E]">
+              Quick-Load Battle-Tested Meal Plans
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              {MEAL_TEMPLATE_PACKS.map((pack) => (
+                <button
+                  key={pack.id}
+                  type="button"
+                  onClick={() => handleApplyMealPack(pack)}
+                  className="text-left p-3.5 rounded-xl bg-white dark:bg-[#161514] border border-[#E8E5DF] dark:border-[#2A2724] hover:border-[#161514]/40 dark:hover:border-stone-500 hover:shadow-xs transition-all cursor-pointer group flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-1 mb-1.5">
+                      <span className="text-base">{pack.icon === "Target" ? "🎯" : pack.icon === "Sparkles" ? "⚡" : "🥗"}</span>
+                      <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-[#FAF8F5] dark:bg-[#252321] text-[#161514] dark:text-stone-300 border border-[#E8E5DF] dark:border-[#2A2724]">
+                        {pack.badge}
+                      </span>
+                    </div>
+                    <h5 className="font-heading font-black text-xs text-[#161514] dark:text-stone-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
+                      {pack.name}
+                    </h5>
+                    <p className="text-[11px] text-[#6B6B6B] dark:text-[#A8A29E] mt-1 line-clamp-2 leading-snug">
+                      {pack.tagline}
+                    </p>
+                  </div>
+                  <div className="mt-3 pt-2 border-t border-[#E8E5DF]/60 dark:border-[#2A2724] flex items-center justify-between text-[10px] font-bold text-[#161514] dark:text-stone-200">
+                    <span className="font-mono text-[9px] text-[#6B6B6B] dark:text-[#A8A29E]">{pack.items.length} meals</span>
+                    <span className="group-hover:translate-x-0.5 transition-transform text-emerald-800 dark:text-emerald-400 font-black">Load Plan ➔</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 1-Tap Quick Add Row for standard meals */}
+          <div className="pt-2 border-t border-[#E8E5DF] dark:border-[#2A2724] flex items-center gap-2 flex-wrap">
+            <span className="text-[10px] font-mono font-bold text-[#6B6B6B] dark:text-[#A8A29E] uppercase mr-1">
+              Or quick log:
+            </span>
+            {[
+              { label: "🍳 Breakfast", type: "Breakfast" as MealTypeOption, name: "Morning Breakfast", cal: 450, p: 25, c: 45, f: 12 },
+              { label: "🍱 Lunch", type: "Lunch" as MealTypeOption, name: "Lunch Bowl", cal: 650, p: 40, c: 65, f: 18 },
+              { label: "🥪 Snack / Shake", type: "Snack" as MealTypeOption, name: "Protein Shake", cal: 280, p: 30, c: 15, f: 4 },
+              { label: "🍲 Dinner", type: "Dinner" as MealTypeOption, name: "Nutritious Dinner", cal: 600, p: 45, c: 50, f: 16 },
+            ].map((quick) => (
+              <button
+                key={quick.type}
+                type="button"
+                onClick={() => {
+                  handleAddCustomMeal({
+                    name: quick.name,
+                    mealType: quick.type,
+                    calories: quick.cal,
+                    protein: quick.p,
+                    carbs: quick.c,
+                    fat: quick.f,
+                  });
+                }}
+                className="text-[10px] font-mono font-bold px-2.5 py-1 rounded-lg bg-white dark:bg-[#161514] border border-[#E8E5DF] dark:border-[#2A2724] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] text-[#161514] dark:text-stone-200 shadow-none hover:shadow-xs transition-all cursor-pointer"
+              >
+                + {quick.label}
+              </button>
+            ))}
+          </div>
         </div>
       ) : (
         <div className="space-y-2.5">
@@ -474,8 +584,8 @@ export function MealTracker() {
               <div
                 key={m.id}
                 className={cn(
-                  "bg-white rounded-2xl p-3 sm:p-3.5 border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] transition-all",
-                  m.completed && "bg-[#F0FDF4]"
+                  "bg-white dark:bg-[#1C1A18] rounded-xl p-3 sm:p-3.5 border border-[#E8E5DF] dark:border-[#2A2724] shadow-none hover:border-[#161514]/30 dark:hover:border-stone-500 transition-all",
+                  m.completed && "bg-[#ECFDF5]/50 dark:bg-[#03D26F]/10 border-[#03D26F]/30"
                 )}
               >
                 <div className="flex items-center justify-between gap-3">
@@ -485,35 +595,41 @@ export function MealTracker() {
                       type="button"
                       onClick={() => handleToggleMeal(m)}
                       className={cn(
-                        "size-8 rounded-xl border-2 border-[#161514] flex items-center justify-center cursor-pointer shadow-[1.5px_1.5px_0px_#161514] active:translate-y-0.5 transition-all shrink-0",
-                        m.completed ? "bg-[#03D26F] text-[#161514]" : "bg-white hover:bg-[#FAF8F5]"
+                        "size-7 rounded-lg border flex items-center justify-center cursor-pointer transition-all shrink-0",
+                        m.completed
+                          ? "bg-[#03D26F] text-[#161514] border-[#03D26F]"
+                          : "bg-[#FAF8F5] dark:bg-[#252321] border-[#E8E5DF] dark:border-[#2A2724] hover:border-[#161514]/40"
                       )}
                       title={m.completed ? "Mark meal incomplete" : "Mark meal consumed"}
                     >
-                      {m.completed ? "✓" : <Circle className="size-4 text-[#161514]/40" />}
+                      {m.completed ? (
+                        <CheckCircle2 className="size-4 stroke-[2.5]" />
+                      ) : (
+                        <Circle className="size-3.5 text-[#161514]/40 dark:text-stone-400" />
+                      )}
                     </button>
 
                     {/* Meal Info */}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="text-sm">{mealEmoji}</span>
-                        <h5 className="font-heading font-black text-xs sm:text-sm text-[#161514] truncate">
+                        <h5 className="font-heading font-black text-xs sm:text-sm text-[#161514] dark:text-stone-100 truncate">
                           {m.name}
                         </h5>
-                        <span className="neo-badge bg-[#ECFDF5] text-emerald-800 text-[8.5px]">
+                        <span className="px-1.5 py-0.5 rounded text-[8.5px] font-mono font-bold bg-[#FAF8F5] dark:bg-[#252321] text-[#161514] dark:text-stone-300 border border-[#E8E5DF] dark:border-[#2A2724]">
                           {m.mealType}
                         </span>
                         {m.time && (
-                          <span className="text-[9px] font-mono font-bold text-[#161514]/60">
+                          <span className="text-[9px] font-mono text-[#6B6B6B] dark:text-[#A8A29E]">
                             ({m.time})
                           </span>
                         )}
                       </div>
 
-                      <div className="flex items-center gap-2 mt-1 text-[10px] font-bold text-[#161514]/75 flex-wrap">
-                        <span className="text-rose-700 font-black">🔥 {m.calories} kcal</span>
+                      <div className="flex items-center gap-2 mt-1 text-[10px] font-medium text-[#6B6B6B] dark:text-[#A8A29E] flex-wrap">
+                        <span className="text-rose-600 dark:text-rose-400 font-bold">🔥 {m.calories} kcal</span>
                         <span>•</span>
-                        <span className="text-emerald-800 font-black">{m.protein}g Protein</span>
+                        <span className="text-emerald-700 dark:text-emerald-400 font-bold">{m.protein}g Protein</span>
                         <span>•</span>
                         <span>{m.carbs}g Carbs</span>
                         <span>•</span>
@@ -536,7 +652,7 @@ export function MealTracker() {
                         setEditFat(String(m.fat || 0));
                         setEditTime(m.time || "");
                       }}
-                      className="size-7 rounded-lg border border-[#161514] bg-[#FAF8F5] hover:bg-amber-100 flex items-center justify-center text-[#161514] cursor-pointer shadow-[1px_1px_0px_#161514]"
+                      className="size-7 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] bg-[#FAF8F5] dark:bg-[#252321] hover:bg-[#E8E5DF] dark:hover:bg-[#2A2724] flex items-center justify-center text-[#161514] dark:text-stone-300 cursor-pointer shadow-none transition-colors"
                       title="Edit meal"
                     >
                       <Edit3 className="size-3" />
@@ -544,7 +660,7 @@ export function MealTracker() {
                     <button
                       type="button"
                       onClick={() => setDeleteMealId(m.id)}
-                      className="size-7 rounded-lg border border-[#161514] bg-[#FAF8F5] hover:bg-rose-100 flex items-center justify-center text-[#161514] hover:text-rose-600 cursor-pointer shadow-[1px_1px_0px_#161514]"
+                      className="size-7 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] bg-[#FAF8F5] dark:bg-[#252321] hover:bg-rose-100 dark:hover:bg-rose-950/40 flex items-center justify-center text-[#161514] dark:text-stone-300 hover:text-rose-600 cursor-pointer shadow-none transition-colors"
                       title="Delete meal"
                     >
                       <Trash2 className="size-3" />
@@ -576,7 +692,7 @@ export function MealTracker() {
       >
         <form onSubmit={handleSaveTargets} className="space-y-3.5 pt-1">
           <div className="space-y-1">
-            <label className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514]">
+            <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#161514] dark:text-stone-200">
               Daily Calorie Target (kcal)
             </label>
             <input
@@ -585,14 +701,14 @@ export function MealTracker() {
               inputMode="numeric"
               value={targetCaloriesInput}
               onChange={(e) => setTargetCaloriesInput(e.target.value)}
-              className="w-full bg-white rounded-xl border-2 border-[#161514] px-3.5 py-2 text-xs font-mono font-black text-[#161514] shadow-[2px_2px_0px_#161514] outline-none"
+              className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-3.5 py-2 text-xs font-mono font-bold text-[#161514] dark:text-stone-100 outline-none focus:border-[#161514] dark:focus:border-white shadow-none"
               required
             />
           </div>
 
           <div className="grid grid-cols-3 gap-2.5">
             <div className="space-y-1">
-              <label className="text-[9px] font-heading font-black uppercase text-emerald-800">
+              <label className="text-[9px] font-mono font-bold uppercase text-emerald-700 dark:text-emerald-400">
                 Protein (g)
               </label>
               <input
@@ -601,13 +717,13 @@ export function MealTracker() {
                 inputMode="numeric"
                 value={targetProteinInput}
                 onChange={(e) => setTargetProteinInput(e.target.value)}
-                className="w-full bg-white rounded-xl border-2 border-[#161514] px-3 py-2 text-xs font-mono font-black text-[#161514] shadow-[1.5px_1.5px_0px_#161514] outline-none"
+                className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-3 py-2 text-xs font-mono font-bold text-[#161514] dark:text-stone-100 outline-none focus:border-[#161514] dark:focus:border-white shadow-none"
                 required
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-[9px] font-heading font-black uppercase text-amber-800">
+              <label className="text-[9px] font-mono font-bold uppercase text-amber-700 dark:text-amber-400">
                 Carbs (g)
               </label>
               <input
@@ -616,13 +732,13 @@ export function MealTracker() {
                 inputMode="numeric"
                 value={targetCarbsInput}
                 onChange={(e) => setTargetCarbsInput(e.target.value)}
-                className="w-full bg-white rounded-xl border-2 border-[#161514] px-3 py-2 text-xs font-mono font-black text-[#161514] shadow-[1.5px_1.5px_0px_#161514] outline-none"
+                className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-3 py-2 text-xs font-mono font-bold text-[#161514] dark:text-stone-100 outline-none focus:border-[#161514] dark:focus:border-white shadow-none"
                 required
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-[9px] font-heading font-black uppercase text-rose-800">
+              <label className="text-[9px] font-mono font-bold uppercase text-sky-700 dark:text-sky-400">
                 Fat (g)
               </label>
               <input
@@ -631,7 +747,7 @@ export function MealTracker() {
                 inputMode="numeric"
                 value={targetFatInput}
                 onChange={(e) => setTargetFatInput(e.target.value)}
-                className="w-full bg-white rounded-xl border-2 border-[#161514] px-3 py-2 text-xs font-mono font-black text-[#161514] shadow-[1.5px_1.5px_0px_#161514] outline-none"
+                className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-3 py-2 text-xs font-mono font-bold text-[#161514] dark:text-stone-100 outline-none focus:border-[#161514] dark:focus:border-white shadow-none"
                 required
               />
             </div>
@@ -639,7 +755,7 @@ export function MealTracker() {
 
           <Button
             type="submit"
-            className="w-full min-h-[46px] bg-[#03D26F] hover:bg-[#02b861] text-[#161514] font-heading font-black text-xs uppercase tracking-wider rounded-xl py-3 border-2 border-[#161514] shadow-[3px_3px_0px_#161514] cursor-pointer mt-2"
+            className="w-full min-h-[44px] bg-[#161514] hover:bg-[#2A2724] dark:bg-white dark:text-[#161514] dark:hover:bg-stone-200 text-white font-heading font-black text-xs uppercase tracking-wider rounded-xl py-2.5 border border-[#161514] dark:border-white shadow-xs cursor-pointer mt-2"
           >
             Save Target Goals ➔
           </Button>
@@ -657,21 +773,21 @@ export function MealTracker() {
       >
         <form onSubmit={handleUpdateMealSubmit} className="space-y-4 pt-1">
           <div className="space-y-1.5">
-            <label className="text-xs font-heading font-black uppercase tracking-wider text-[#161514]">
+            <label className="text-xs font-mono font-bold uppercase tracking-wider text-[#161514] dark:text-stone-200">
               Meal / Dish Name *
             </label>
             <input
               type="text"
               value={editMealName}
               onChange={(e) => setEditMealName(e.target.value)}
-              className="w-full bg-white rounded-xl border-2 border-[#161514] px-4 py-2.5 text-base font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514] focus:outline-none focus:ring-2 focus:ring-[#161514]"
+              className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-3.5 py-2.5 text-xs font-bold text-[#161514] dark:text-stone-100 shadow-none focus:border-[#161514] dark:focus:border-white outline-none"
               required
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-xs font-heading font-black uppercase tracking-wider text-[#161514]">
+              <label className="text-xs font-mono font-bold uppercase tracking-wider text-[#161514] dark:text-stone-200">
                 Meal Type
               </label>
               <NeobrutalistSelect
@@ -685,53 +801,53 @@ export function MealTracker() {
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-heading font-black uppercase tracking-wider text-[#161514]">
+              <label className="text-xs font-mono font-bold uppercase tracking-wider text-[#161514] dark:text-stone-200">
                 Time
               </label>
               <input
                 type="text"
                 value={editTime}
                 onChange={(e) => setEditTime(e.target.value)}
-                className="w-full bg-white rounded-xl border-2 border-[#161514] px-4 py-2.5 text-base font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514] focus:outline-none focus:ring-2 focus:ring-[#161514]"
+                className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-3.5 py-2 text-xs font-bold text-[#161514] dark:text-stone-100 shadow-none focus:border-[#161514] dark:focus:border-white outline-none"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
             <div className="space-y-1">
-              <label className="text-[10px] font-heading font-black text-[#161514] uppercase">Calories</label>
+              <label className="text-[10px] font-mono font-bold text-[#161514] dark:text-stone-200 uppercase">Calories</label>
               <input
                 type="number"
                 value={editCalories}
                 onChange={(e) => setEditCalories(e.target.value)}
-                className="w-full bg-white rounded-xl border-2 border-[#161514] px-3 py-2 text-base font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514]"
+                className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-3 py-2 text-xs font-mono font-bold text-[#161514] dark:text-stone-100 shadow-none focus:border-[#161514] dark:focus:border-white outline-none"
               />
             </div>
             <div className="space-y-1">
-              <label className="text-[10px] font-heading font-black text-[#161514] uppercase">Protein (g)</label>
+              <label className="text-[10px] font-mono font-bold text-emerald-700 dark:text-emerald-400 uppercase">Protein (g)</label>
               <input
                 type="number"
                 value={editProtein}
                 onChange={(e) => setEditProtein(e.target.value)}
-                className="w-full bg-white rounded-xl border-2 border-[#161514] px-3 py-2 text-base font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514]"
+                className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-3 py-2 text-xs font-mono font-bold text-[#161514] dark:text-stone-100 shadow-none focus:border-[#161514] dark:focus:border-white outline-none"
               />
             </div>
             <div className="space-y-1">
-              <label className="text-[10px] font-heading font-black text-[#161514] uppercase">Carbs (g)</label>
+              <label className="text-[10px] font-mono font-bold text-amber-700 dark:text-amber-400 uppercase">Carbs (g)</label>
               <input
                 type="number"
                 value={editCarbs}
                 onChange={(e) => setEditCarbs(e.target.value)}
-                className="w-full bg-white rounded-xl border-2 border-[#161514] px-3 py-2 text-base font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514]"
+                className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-3 py-2 text-xs font-mono font-bold text-[#161514] dark:text-stone-100 shadow-none focus:border-[#161514] dark:focus:border-white outline-none"
               />
             </div>
             <div className="space-y-1">
-              <label className="text-[10px] font-heading font-black text-[#161514] uppercase">Fat (g)</label>
+              <label className="text-[10px] font-mono font-bold text-sky-700 dark:text-sky-400 uppercase">Fat (g)</label>
               <input
                 type="number"
                 value={editFat}
                 onChange={(e) => setEditFat(e.target.value)}
-                className="w-full bg-white rounded-xl border-2 border-[#161514] px-3 py-2 text-base font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514]"
+                className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-3 py-2 text-xs font-mono font-bold text-[#161514] dark:text-stone-100 shadow-none focus:border-[#161514] dark:focus:border-white outline-none"
               />
             </div>
           </div>
@@ -739,7 +855,7 @@ export function MealTracker() {
           <Button
             type="submit"
             disabled={updateMealMutation.isPending}
-            className="w-full min-h-[48px] bg-[#03D26F] hover:bg-[#02b861] text-[#161514] font-heading font-black text-sm rounded-xl py-3 mt-3 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none cursor-pointer transition-all uppercase tracking-wider"
+            className="w-full min-h-[44px] bg-[#161514] hover:bg-[#2A2724] dark:bg-white dark:text-[#161514] dark:hover:bg-stone-200 text-white font-heading font-black text-xs rounded-xl py-2.5 mt-3 border border-[#161514] dark:border-white shadow-xs hover:-translate-y-0.5 active:translate-y-0 cursor-pointer transition-all uppercase tracking-wider"
           >
             Save Changes
           </Button>

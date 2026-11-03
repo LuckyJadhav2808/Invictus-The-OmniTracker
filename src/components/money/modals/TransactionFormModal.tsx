@@ -36,6 +36,13 @@ interface TransactionFormModalProps {
 
 const QUICK_INCREMENTS = [50, 100, 200, 500, 1000, 2000];
 
+const STARTER_QUICK_PRESETS = [
+  { name: "Chai & Snack", amount: 30 },
+  { name: "Campus Lunch", amount: 150 },
+  { name: "Metro / Auto", amount: 50 },
+  { name: "Groceries", amount: 350 },
+];
+
 export function TransactionFormModal({
   open,
   onOpenChange,
@@ -245,12 +252,12 @@ export function TransactionFormModal({
                   setCategoryId(nextCats[0]?.id || "");
                 }}
                 className={cn(
-                  "flex-1 py-2.5 rounded-xl border-2 border-[#161514] text-xs font-black transition-all uppercase tracking-wider cursor-pointer shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
+                  "flex-1 py-2.5 rounded-xl border text-xs font-black transition-all uppercase tracking-wider cursor-pointer shadow-xs active:translate-y-0.5",
                   type === t
                     ? t === "income"
-                      ? "bg-[#03D26F] text-[#161514]"
-                      : "bg-[#161514] text-white"
-                    : "bg-white text-[#161514]/70 hover:bg-[#FAF8F5]"
+                      ? "bg-[#03D26F] text-[#161514] border-[#03D26F]"
+                      : "bg-[#161514] dark:bg-[#FAF8F5] text-white dark:text-[#161514] border-[#161514] dark:border-[#FAF8F5]"
+                    : "bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] border-[#E8E5DF] dark:border-[#2A2724] hover:bg-[#FAF8F5] dark:hover:bg-[#252321]"
                 )}
               >
                 <span className="flex items-center justify-center gap-1.5">
@@ -265,13 +272,41 @@ export function TransactionFormModal({
             ))}
           </div>
 
+          {/* ⚡ ZERO-CONFUSION: 1-Tap Quick Starters (Visible on blank entry) */}
+          {!isEditing && !amount && (
+            <div className="space-y-1">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#161514]/60 dark:text-[#A8A29E] block">
+                Quick Starters (1-Tap Fill) ⚡
+              </span>
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+                {STARTER_QUICK_PRESETS.map((p) => (
+                  <button
+                    key={p.name}
+                    type="button"
+                    onClick={() => {
+                      soundFX.playPop();
+                      setAmount(String(p.amount));
+                      handleNoteChange(p.name);
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] text-[10.5px] font-bold border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs shrink-0 cursor-pointer transition-all active:scale-95"
+                  >
+                    <span>{p.name}</span>{" "}
+                    <span className="text-emerald-600 dark:text-emerald-400 font-mono font-bold">
+                      {currencySymbol}{p.amount}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* ⚡ HERO AMOUNT DISPLAY WITH ADDITIVE CHIPS */}
-          <div className="space-y-2 bg-[#FAF8F5] p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514]">
-            <label htmlFor="tx-hero-amount" className="text-[10px] font-black uppercase tracking-wider text-[#161514] block">
+          <div className="space-y-2 bg-[#FAF8F5] dark:bg-[#1C1A18] p-3 rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs">
+            <label htmlFor="tx-hero-amount" className="text-[10px] font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] block">
               Amount ({currencySymbol}) *
             </label>
             <div className="relative flex items-center">
-              <span className="absolute left-3.5 text-2xl font-black text-[#161514]/60 pointer-events-none font-heading">
+              <span className="absolute left-3.5 text-2xl font-black text-[#161514]/60 dark:text-[#FAF8F5]/60 pointer-events-none font-heading">
                 {currencySymbol}
               </span>
               <input
@@ -283,7 +318,7 @@ export function TransactionFormModal({
                 placeholder="0.00"
                 autoFocus={!isEditing}
                 required
-                className="w-full bg-white pl-9 pr-4 py-2.5 text-2xl sm:text-3xl font-black text-[#161514] rounded-xl border-2 border-[#161514] shadow-[inset_0_2px_4px_rgba(0,0,0,0.06)] focus:outline-none focus:ring-2 focus:ring-[#CEF431] font-heading tracking-tight"
+                className="w-full bg-white dark:bg-[#252321] pl-9 pr-4 py-2.5 text-2xl sm:text-3xl font-black text-[#161514] dark:text-[#FAF8F5] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs focus:outline-none focus:border-[#161514] dark:focus:border-white font-heading tracking-tight"
               />
             </div>
 
@@ -294,7 +329,7 @@ export function TransactionFormModal({
                   key={inc}
                   type="button"
                   onClick={() => handleQuickIncrement(inc)}
-                  className="px-2.5 py-1 rounded-lg bg-white hover:bg-[#CEF431] text-[#161514] text-[10px] font-black border border-[#161514] shadow-[1px_1px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all shrink-0 cursor-pointer"
+                  className="px-2.5 py-1 rounded-lg bg-white dark:bg-[#252321] hover:bg-[#CEF431] dark:hover:bg-[#CEF431] text-[#161514] dark:text-[#FAF8F5] hover:text-[#161514] text-[10px] font-black border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs active:translate-y-0.5 transition-all shrink-0 cursor-pointer"
                 >
                   +{inc}
                 </button>
@@ -306,10 +341,10 @@ export function TransactionFormModal({
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <label className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514]">
+                <label className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5]">
                   Category *
                 </label>
-                <span className="text-[10px] font-mono text-[#161514]/60">
+                <span className="text-[10px] font-mono text-[#161514]/60 dark:text-[#A8A29E]">
                   ({filteredCategories.length} available)
                 </span>
               </div>
@@ -317,7 +352,7 @@ export function TransactionFormModal({
                 <button
                   type="button"
                   onClick={() => setShowAllCategories(!showAllCategories)}
-                  className="text-[9px] font-black uppercase text-navy-700 hover:underline cursor-pointer border-none bg-transparent"
+                  className="text-[9px] font-black uppercase text-[#161514] dark:text-[#FAF8F5] hover:underline cursor-pointer border-none bg-transparent"
                 >
                   {showAllCategories ? "Show Tiles" : "Search All ▾"}
                 </button>
@@ -338,13 +373,13 @@ export function TransactionFormModal({
                         setMatchedCategoryName(null);
                       }}
                       className={cn(
-                        "p-2 rounded-xl border-2 border-[#161514] text-center transition-all cursor-pointer flex flex-col items-center gap-1.5 shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
+                        "p-2 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center gap-1.5 shadow-xs active:translate-y-0.5",
                         isSelected
-                          ? "bg-[#CEF431] text-[#161514] ring-2 ring-[#161514]"
-                          : "bg-white text-[#161514]/80 hover:bg-[#FAF8F5]"
+                          ? "bg-[#CEF431] text-[#161514] border-[#161514] dark:border-[#CEF431] font-black"
+                          : "bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] border-[#E8E5DF] dark:border-[#2A2724] hover:bg-[#FAF8F5] dark:hover:bg-[#252321]"
                       )}
                     >
-                      <CategoryIcon name={cat.icon} className="size-4 sm:size-5 text-[#161514]" />
+                      <CategoryIcon name={cat.icon} className="size-4 sm:size-5 text-[#161514] dark:text-[#FAF8F5]" />
                       <span className="text-[9.5px] font-black uppercase tracking-tight truncate w-full">
                         {cat.name}
                       </span>
@@ -360,10 +395,10 @@ export function TransactionFormModal({
                       soundFX.playPop();
                       onOpenAddCategory();
                     }}
-                    className="p-2 rounded-xl border-2 border-dashed border-[#161514] bg-[#FAF8F5] hover:bg-[#FEF08A] text-[#161514] text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+                    className="p-2 rounded-xl border border-dashed border-[#E8E5DF] dark:border-[#2A2724] bg-[#FAF8F5] dark:bg-[#1C1A18] hover:bg-[#FEF08A] dark:hover:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 shadow-xs active:translate-y-0.5"
                     title="Create a new custom category"
                   >
-                    <Plus className="size-4 stroke-[3] text-[#161514]" />
+                    <Plus className="size-4 stroke-[3] text-[#161514] dark:text-[#FAF8F5]" />
                     <span className="text-[9px] font-black uppercase tracking-tight">
                       + New
                     </span>
@@ -392,13 +427,13 @@ export function TransactionFormModal({
             {/* Payment Method */}
             <div className="space-y-1">
               <div className="flex items-center justify-between">
-                <label className="text-[10px] font-black uppercase tracking-wider text-[#161514]">
+                <label className="text-[10px] font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5]">
                   Mode *
                 </label>
                 <button
                   type="button"
                   onClick={() => setShowMorePaymentMethods(!showMorePaymentMethods)}
-                  className="text-[9px] font-black uppercase text-[#161514] hover:underline cursor-pointer border-none bg-transparent"
+                  className="text-[9px] font-black uppercase text-[#161514] dark:text-[#FAF8F5] hover:underline cursor-pointer border-none bg-transparent"
                 >
                   {showMorePaymentMethods ? "Simple" : "More ▾"}
                 </button>
@@ -413,10 +448,10 @@ export function TransactionFormModal({
                       setPaymentMethod("upi");
                     }}
                     className={cn(
-                      "py-2 px-2 rounded-xl border-2 border-[#161514] text-xs font-black transition-all flex items-center justify-center gap-1.5 shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer",
+                      "py-2 px-2 rounded-xl border text-xs font-black transition-all flex items-center justify-center gap-1.5 shadow-xs active:translate-y-0.5 cursor-pointer",
                       paymentMethod !== "cash"
-                        ? "bg-[#03D26F] text-[#161514]"
-                        : "bg-white text-[#161514]/70 hover:bg-[#FAF8F5]"
+                        ? "bg-[#03D26F] text-[#161514] border-[#03D26F]"
+                        : "bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] border-[#E8E5DF] dark:border-[#2A2724] hover:bg-[#FAF8F5] dark:hover:bg-[#252321]"
                     )}
                   >
                     <Smartphone className="size-3.5 stroke-[2.5]" />
@@ -430,10 +465,10 @@ export function TransactionFormModal({
                       setPaymentMethod("cash");
                     }}
                     className={cn(
-                      "py-2 px-2 rounded-xl border-2 border-[#161514] text-xs font-black transition-all flex items-center justify-center gap-1.5 shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer",
+                      "py-2 px-2 rounded-xl border text-xs font-black transition-all flex items-center justify-center gap-1.5 shadow-xs active:translate-y-0.5 cursor-pointer",
                       paymentMethod === "cash"
-                        ? "bg-amber-400 text-[#161514]"
-                        : "bg-white text-[#161514]/70 hover:bg-[#FAF8F5]"
+                        ? "bg-amber-400 text-[#161514] border-amber-400"
+                        : "bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] border-[#E8E5DF] dark:border-[#2A2724] hover:bg-[#FAF8F5] dark:hover:bg-[#252321]"
                     )}
                   >
                     <Banknote className="size-3.5 stroke-[2.5]" />
@@ -456,7 +491,7 @@ export function TransactionFormModal({
 
             {/* Custom Neobrutalist Date Picker Trigger */}
             <div className="space-y-1">
-              <label className="text-[10px] font-black uppercase tracking-wider text-[#161514]">
+              <label className="text-[10px] font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5]">
                 Date *
               </label>
               <button
@@ -465,14 +500,14 @@ export function TransactionFormModal({
                   soundFX.playPop();
                   setIsDatePickerOpen(true);
                 }}
-                className="w-full neo-input flex items-center justify-between py-2 px-2.5 text-xs font-heading font-black cursor-pointer hover:bg-[#FAF8F5] transition-colors"
+                className="w-full bg-white dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] flex items-center justify-between py-2 px-2.5 text-xs font-heading font-black cursor-pointer hover:bg-[#FAF8F5] dark:hover:bg-[#252321] transition-colors shadow-xs"
                 title="Open calendar picker"
               >
-                <span className="flex items-center gap-1.5 truncate">
-                  <Calendar className="size-3.5 text-[#161514] shrink-0" />
+                <span className="flex items-center gap-1.5 truncate text-[#161514] dark:text-[#FAF8F5]">
+                  <Calendar className="size-3.5 text-[#161514] dark:text-[#FAF8F5] shrink-0" />
                   <span className="truncate">{formattedDateLabel}</span>
                 </span>
-                <span className="text-[9px] font-mono font-bold text-[#161514]/60 bg-[#FAF8F5] border border-[#161514]/30 rounded px-1 shrink-0">
+                <span className="text-[9px] font-mono font-bold text-[#161514]/60 dark:text-[#A8A29E] bg-[#FAF8F5] dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#2A2724] rounded px-1 shrink-0">
                   Pick ▾
                 </span>
               </button>
@@ -482,11 +517,11 @@ export function TransactionFormModal({
           {/* 📝 Note / Merchant Description with Auto-Suggest */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <label htmlFor="tx-notes" className="text-[10px] font-black uppercase tracking-wider text-[#161514]">
+              <label htmlFor="tx-notes" className="text-[10px] font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5]">
                 Note / Merchant (Optional)
               </label>
               {matchedCategoryName && (
-                <div className="flex items-center gap-1 px-2 py-0.5 bg-[#CEF431] border border-[#161514] rounded-md shadow-[1px_1px_0px_0px_#161514] animate-in fade-in zoom-in-95 duration-150">
+                <div className="flex items-center gap-1 px-2 py-0.5 bg-[#CEF431] border border-[#161514] rounded-md shadow-xs animate-in fade-in zoom-in-95 duration-150">
                   <Sparkles className="size-2.5 text-[#161514] stroke-[3]" />
                   <span className="font-doodle text-[10px] font-bold text-[#161514]">
                     Auto-matched: {matchedCategoryName}
@@ -500,7 +535,7 @@ export function TransactionFormModal({
               value={note}
               onChange={(e) => handleNoteChange(e.target.value)}
               placeholder="e.g. Swiggy biryani, momos, metro, chai, stationary..."
-              className="w-full neo-input text-xs sm:text-sm font-bold"
+              className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-3.5 py-2.5 text-base font-bold text-[#161514] dark:text-[#FAF8F5] shadow-xs focus:outline-none focus:border-[#161514] dark:focus:border-white"
             />
           </div>
 
@@ -511,7 +546,7 @@ export function TransactionFormModal({
                 type="button"
                 disabled={isDeleting}
                 onClick={handleDelete}
-                className="p-3 rounded-xl bg-rose-100 hover:bg-rose-200 text-rose-700 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
+                className="p-3 rounded-xl bg-rose-100 dark:bg-rose-950/40 hover:bg-rose-200 dark:hover:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-800/50 shadow-xs active:translate-y-0.5 transition-all cursor-pointer"
                 title="Delete Transaction"
               >
                 <Trash2 className="size-4" />
@@ -521,7 +556,7 @@ export function TransactionFormModal({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 bg-[#CEF431] hover:bg-[#bde422] text-[#161514] font-black text-xs uppercase tracking-wider rounded-xl py-3 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all disabled:opacity-50"
+              className="flex-1 bg-[#CEF431] hover:bg-[#bde422] text-[#161514] font-black text-xs uppercase tracking-wider rounded-xl py-3 border border-[#161514] shadow-xs active:translate-y-0.5 cursor-pointer transition-all disabled:opacity-50"
             >
               {isSubmitting ? "Saving…" : isEditing ? "Save Changes" : "Log Record"}
             </button>

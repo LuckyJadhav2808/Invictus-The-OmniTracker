@@ -17,24 +17,24 @@ export function isNativeApp(): boolean {
 export const NOTIFICATION_CHANNELS: Channel[] = [
   {
     id: "invictus_habits",
-    name: "Habit Streaks & Discipline",
-    description: "Alerts to keep your daily habit streaks glowing",
+    name: "Daily Habit Check-in",
+    description: "Scheduled alerts to check off daily habits and protect streaks",
     importance: 5,
     visibility: 1,
     vibration: true,
   },
   {
     id: "invictus_finance",
-    name: "Daily Expense Tracker",
-    description: "Reminders to log daily expenses and track spending",
+    name: "Daily Expense Review",
+    description: "Reminders to log daily expenses and calibrate safe spend pace",
     importance: 5,
     visibility: 1,
     vibration: true,
   },
   {
     id: "invictus_study",
-    name: "Study & Revision Goals",
-    description: "Reminders to log study hours and PYQs",
+    name: "Study & Revision Log",
+    description: "Reminders to log study sessions and PYQs solved",
     importance: 5,
     visibility: 1,
     vibration: true,
@@ -42,15 +42,15 @@ export const NOTIFICATION_CHANNELS: Channel[] = [
   {
     id: "invictus_exam",
     name: "Exam Targets & Milestones",
-    description: "Milestones and countdown target reviews",
+    description: "Milestone reviews and target exam syllabus countdowns",
     importance: 5,
     visibility: 1,
     vibration: true,
   },
   {
     id: "invictus_alerts",
-    name: "Instant Alerts & Reminders",
-    description: "Immediate reminders, system tests and notifications",
+    name: "System Alerts & Reminders",
+    description: "System notifications, priority alerts, and test alarms",
     importance: 5,
     visibility: 1,
     vibration: true,
@@ -167,7 +167,7 @@ export async function requestNativeNotificationPermissions(
         if (typeof window !== "undefined") {
           localStorage.setItem(NATIVE_PERMISSION_TOAST_KEY, "true");
         }
-        toast.success("Native Alarm Permissions Granted! 🔔");
+        toast.success("Native alarm permissions granted");
       }
       return true;
     } else {
@@ -181,7 +181,7 @@ export async function requestNativeNotificationPermissions(
     const msg = err?.message || "";
     if (msg.includes("not implemented")) {
       if (!options.silent) {
-        toast.error("Hardware alarm bridge requires the new app build. Please update your APK! 📲");
+        toast.error("Hardware alarm bridge requires the latest app update.");
       }
     }
     return false;
@@ -235,8 +235,8 @@ export async function sendTestNativeAlarm(): Promise<boolean> {
       notifications: [
         {
           id: 999,
-          title: "🔔 Test Native Hardware Alarm",
-          body: "Your native alarms are active and will wake your lock screen at your scheduled times!",
+          title: "Invictus System Alert",
+          body: "Hardware alarm active. Notifications will wake your lock screen at scheduled times.",
           schedule: { at: new Date(Date.now() + 1000) },
           channelId: "invictus_alerts",
           smallIcon: "ic_stat_icon",
@@ -245,17 +245,17 @@ export async function sendTestNativeAlarm(): Promise<boolean> {
         },
       ],
     });
-    toast.success("Test alarm dispatched to status bar! 📲");
+    toast.success("Test alarm dispatched to status bar");
     return true;
   } catch (e: any) {
     console.error("Test native alarm failed:", e);
     const msg = e?.message || "";
     if (msg.includes("not implemented")) {
-      toast.error("Hardware alarm module needs the new app build! Install the latest APK update. 📲");
+      toast.error("Hardware alarm module requires the latest app build.");
       if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
         try {
-          new Notification("🔔 Test Notification (Web Fallback)", {
-            body: "Test alert triggered! Please install the new APK update to activate native lockscreen alarms.",
+          new Notification("Test Notification (Web Fallback)", {
+            body: "Test alert triggered. Install the APK update to activate hardware-level lockscreen alarms.",
           });
         } catch {}
       }
@@ -334,8 +334,8 @@ export async function scheduleAllNativeAlarms(
         notificationsToSchedule.push({
           id: 101,
           channelId: "invictus_habits",
-          title: "🔥 Keep Your Habit Streaks Glowing!",
-          body: "Don't lose your streak! Check off today's habits in Life Space.",
+          title: "Daily Habit Check-in",
+          body: "Review your scheduled habits and lock in today's streaks.",
           schedule: {
             on: {
               hour: parsed.hour,
@@ -357,8 +357,8 @@ export async function scheduleAllNativeAlarms(
         notificationsToSchedule.push({
           id: 102,
           channelId: "invictus_finance",
-          title: "💰 Time to Log Today's Expenses!",
-          body: "Keep your budget on track. Log your spending & income in Money Space.",
+          title: "Daily Expense Log",
+          body: "Record today's spending to calibrate your remaining safe spend pace.",
           schedule: {
             on: {
               hour: parsed.hour,
@@ -380,8 +380,8 @@ export async function scheduleAllNativeAlarms(
         notificationsToSchedule.push({
           id: 103,
           channelId: "invictus_study",
-          title: "📚 Study Session & PYQ Check-in!",
-          body: "Log your study hours and PYQs solved today in Study Space.",
+          title: "Study & PYQ Review",
+          body: "Log completed focus hours and solved past-year questions.",
           schedule: {
             on: {
               hour: parsed.hour,
@@ -403,8 +403,8 @@ export async function scheduleAllNativeAlarms(
         notificationsToSchedule.push({
           id: 104,
           channelId: "invictus_exam",
-          title: "⚡ Review Today's Exam Syllabus Targets!",
-          body: "Stay ahead of your target date. Review study topics in Study Space.",
+          title: "Exam Syllabus Targets",
+          body: "Review today's target topics and countdown milestones.",
           schedule: {
             on: {
               hour: parsed.hour,
@@ -424,7 +424,9 @@ export async function scheduleAllNativeAlarms(
         notifications: notificationsToSchedule,
       });
       if (!options.silent) {
-        toast.success(`Scheduled ${notificationsToSchedule.length} Native Alarms! ⏰ (Guaranteed lockscreen wake)`);
+        toast.success(`Scheduled ${notificationsToSchedule.length} daily hardware alarms`, {
+          description: "Lockscreen alerts synchronized",
+        });
       }
     }
 
@@ -434,7 +436,7 @@ export async function scheduleAllNativeAlarms(
     const msg = err?.message || "";
     if (msg.includes("not implemented")) {
       if (!options.silent) {
-        toast.error("Native alarms will activate as soon as you install the latest app update! 📲");
+        toast.error("Hardware alarms will activate with the latest app update.");
       }
     } else {
       if (!options.silent) {

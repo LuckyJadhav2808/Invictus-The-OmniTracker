@@ -8,13 +8,12 @@ import {
   CloudOff,
   RefreshCw,
   CheckCircle2,
-  AlertTriangle,
   Zap,
   Clock,
   Database,
   HardDrive,
   Layers,
-  ArrowRight,
+  ShieldCheck,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
@@ -71,30 +70,30 @@ export function CloudSyncDrawer({ open, onOpenChange }: CloudSyncDrawerProps) {
       <div className="space-y-4 pt-1">
         {/* Status Hero Card */}
         <div
-          className={`rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] transition-all ${
+          className={`rounded-2xl p-4 border shadow-xs transition-colors ${
             isOnline && serverStatus === "connected"
-              ? "bg-[#FAF8F5]"
+              ? "bg-[#FAF8F5] dark:bg-[#1C1A18] border-[#E8E5DF] dark:border-[#2A2724]"
               : isOnline && serverStatus === "degraded"
-              ? "bg-amber-50"
-              : "bg-rose-50"
+              ? "bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900/40"
+              : "bg-rose-50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900/40"
           }`}
         >
           <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 min-w-0">
               <div
-                className={`h-11 w-11 rounded-xl border-2 border-[#161514] flex items-center justify-center text-xl shadow-[1.5px_1.5px_0px_0px_#161514] ${
+                className={`h-11 w-11 rounded-xl border flex items-center justify-center text-xl shadow-xs shrink-0 ${
                   isOnline && serverStatus === "connected"
-                    ? "bg-[#CEF431]"
+                    ? "bg-[#CEF431] text-[#161514] border-[#CEF431]"
                     : isOnline
-                    ? "bg-amber-300"
-                    : "bg-rose-300"
+                    ? "bg-amber-300 text-[#161514] border-amber-300"
+                    : "bg-rose-300 text-[#161514] border-rose-300"
                 }`}
               >
                 {isOnline ? <Cloud className="w-5 h-5 stroke-[2.5]" /> : <CloudOff className="w-5 h-5 stroke-[2.5]" />}
               </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="font-black text-sm text-[#161514] font-heading">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="font-black text-sm text-[#161514] dark:text-[#FAF8F5] font-heading">
                     {isOnline && serverStatus === "connected"
                       ? "Cloud Connected"
                       : isOnline
@@ -102,20 +101,20 @@ export function CloudSyncDrawer({ open, onOpenChange }: CloudSyncDrawerProps) {
                       : "Offline Local Mode"}
                   </h3>
                   <span
-                    className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full border border-[#161514] ${
+                    className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full border shadow-xs ${
                       isOnline && serverStatus === "connected"
-                        ? "bg-[#CEF431] text-[#161514]"
+                        ? "bg-[#CEF431] text-[#161514] border-[#CEF431]"
                         : isOnline
-                        ? "bg-amber-400 text-[#161514]"
-                        : "bg-rose-400 text-white"
+                        ? "bg-amber-400 text-[#161514] border-amber-400"
+                        : "bg-rose-400 text-white border-rose-400"
                     }`}
                   >
                     {isOnline && serverStatus === "connected" ? "Live Atlas" : isOnline ? "Degraded" : "Offline"}
                   </span>
                 </div>
-                <p className="text-[11px] text-[#161514]/70 font-semibold pt-0.5 flex items-center gap-1">
-                  <Zap className="w-3 h-3 text-amber-500" />
-                  <span>
+                <p className="text-[11px] text-[#161514]/70 dark:text-[#FAF8F5]/70 font-semibold pt-0.5 flex items-center gap-1">
+                  <Zap className="w-3 h-3 text-amber-500 shrink-0" />
+                  <span className="truncate">
                     {isOnline && dbLatencyMs !== null
                       ? `${dbLatencyMs} ms latency to database`
                       : isOnline
@@ -131,7 +130,7 @@ export function CloudSyncDrawer({ open, onOpenChange }: CloudSyncDrawerProps) {
               onClick={handlePingHealth}
               disabled={pinging || !isOnline}
               title="Measure ping latency to MongoDB Atlas"
-              className="px-2.5 py-1.5 rounded-xl bg-white hover:bg-amber-50 border-2 border-[#161514] text-[#161514] text-[10px] font-black shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              className="px-2.5 py-1.5 rounded-xl bg-white dark:bg-[#252321] hover:bg-amber-50 dark:hover:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] text-[#161514] dark:text-[#FAF8F5] text-[10px] font-black shadow-xs hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 shrink-0"
             >
               <Zap className={`h-3 w-3 ${pinging ? "animate-spin text-amber-500" : ""}`} />
               <span>{pinging ? "Pinging…" : "Ping"}</span>
@@ -139,47 +138,55 @@ export function CloudSyncDrawer({ open, onOpenChange }: CloudSyncDrawerProps) {
           </div>
         </div>
 
+        {/* First-Time User Clarity Note */}
+        <div className="bg-emerald-500/10 dark:bg-emerald-950/20 border border-emerald-500/20 dark:border-emerald-800/30 rounded-xl p-3 flex items-start gap-2.5">
+          <ShieldCheck className="size-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+          <p className="text-[11px] text-[#161514]/80 dark:text-[#FAF8F5]/80 font-medium leading-relaxed">
+            <strong className="font-black text-[#161514] dark:text-[#FAF8F5]">Offline-First Guarantee:</strong> Your habits, study logs, and ledger entries are always saved immediately to your local encrypted device cache. When connected, changes automatically sync to your private cloud vault.
+          </p>
+        </div>
+
         {/* Telemetry Metrics Grid */}
         <div className="grid grid-cols-2 gap-2.5 text-left">
-          <div className="bg-white p-3 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514]">
-            <div className="flex items-center gap-1.5 text-[10px] font-black uppercase text-[#8C8479]">
+          <div className="bg-white dark:bg-[#1C1A18] p-3 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs transition-colors">
+            <div className="flex items-center gap-1.5 text-[10px] font-black uppercase text-[#8C8479] dark:text-[#A8A29E]">
               <Layers className="w-3.5 h-3.5" />
               <span>Pending Queue</span>
             </div>
-            <div className="text-lg font-black text-[#161514] mt-1 font-heading">
+            <div className="text-lg font-black text-[#161514] dark:text-[#FAF8F5] mt-1 font-heading">
               {pendingCount}{" "}
-              <span className="text-[11px] font-bold text-[#8C8479]">
+              <span className="text-[11px] font-bold text-[#8C8479] dark:text-[#A8A29E]">
                 {pendingCount === 1 ? "action" : "actions"}
               </span>
             </div>
           </div>
 
-          <div className="bg-white p-3 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514]">
-            <div className="flex items-center gap-1.5 text-[10px] font-black uppercase text-[#8C8479]">
+          <div className="bg-white dark:bg-[#1C1A18] p-3 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs transition-colors">
+            <div className="flex items-center gap-1.5 text-[10px] font-black uppercase text-[#8C8479] dark:text-[#A8A29E]">
               <Clock className="w-3.5 h-3.5" />
               <span>Last Synchronized</span>
             </div>
-            <div className="text-xs font-black text-[#161514] mt-1.5 truncate">
+            <div className="text-xs font-black text-[#161514] dark:text-[#FAF8F5] mt-1.5 truncate">
               {formattedLastSync}
             </div>
           </div>
 
-          <div className="bg-white p-3 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514]">
-            <div className="flex items-center gap-1.5 text-[10px] font-black uppercase text-[#8C8479]">
+          <div className="bg-white dark:bg-[#1C1A18] p-3 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs transition-colors">
+            <div className="flex items-center gap-1.5 text-[10px] font-black uppercase text-[#8C8479] dark:text-[#A8A29E]">
               <Database className="w-3.5 h-3.5" />
               <span>Cloud Engine</span>
             </div>
-            <div className="text-xs font-black text-[#161514] mt-1">
+            <div className="text-xs font-black text-[#161514] dark:text-[#FAF8F5] mt-1">
               MongoDB Atlas M0
             </div>
           </div>
 
-          <div className="bg-white p-3 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514]">
-            <div className="flex items-center gap-1.5 text-[10px] font-black uppercase text-[#8C8479]">
+          <div className="bg-white dark:bg-[#1C1A18] p-3 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs transition-colors">
+            <div className="flex items-center gap-1.5 text-[10px] font-black uppercase text-[#8C8479] dark:text-[#A8A29E]">
               <HardDrive className="w-3.5 h-3.5" />
               <span>Client Vault</span>
             </div>
-            <div className="text-xs font-black text-[#161514] mt-1">
+            <div className="text-xs font-black text-[#161514] dark:text-[#FAF8F5] mt-1">
               IndexedDB Secure
             </div>
           </div>
@@ -188,41 +195,41 @@ export function CloudSyncDrawer({ open, onOpenChange }: CloudSyncDrawerProps) {
         {/* Pending Actions Inspection List */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <h4 className="text-[10px] font-black uppercase tracking-widest text-[#161514] flex items-center gap-1.5 font-heading">
+            <h4 className="text-[10px] font-black uppercase tracking-widest text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5 font-heading">
               <span>Sync Queue Inspection</span>
             </h4>
-            <span className="text-[10px] font-bold text-[#8C8479]">
+            <span className="text-[10px] font-bold text-[#8C8479] dark:text-[#A8A29E]">
               {pendingCount > 0 ? `${pendingCount} waiting` : "Clean ledger"}
             </span>
           </div>
 
           {queueJobs && queueJobs.length > 0 ? (
-            <div className="bg-white rounded-xl p-3 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] space-y-2 max-h-40 overflow-y-auto">
+            <div className="bg-white dark:bg-[#1C1A18] rounded-xl p-3 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-2 max-h-40 overflow-y-auto">
               {queueJobs.map((job) => (
                 <div
                   key={job.id}
-                  className="flex items-center justify-between text-xs p-2 rounded-lg bg-[#FAF8F5] border border-[#161514]/20"
+                  className="flex items-center justify-between text-xs p-2 rounded-lg bg-[#FAF8F5] dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#2A2724]"
                 >
                   <div className="min-w-0 pr-2">
-                    <p className="font-bold text-[#161514] truncate">{job.label || job.endpoint}</p>
-                    <p className="text-[10px] text-[#8C8479] font-mono uppercase">
+                    <p className="font-bold text-[#161514] dark:text-[#FAF8F5] truncate">{job.label || job.endpoint}</p>
+                    <p className="text-[10px] text-[#8C8479] dark:text-[#A8A29E] font-mono uppercase">
                       {job.method} • {job.type || "record"}
                     </p>
                   </div>
-                  <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-amber-200 text-amber-900 border border-amber-300">
+                  <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-amber-200 dark:bg-amber-900/60 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-800">
                     Queued
                   </span>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-xl p-4 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-emerald-100 border border-[#161514] flex items-center justify-center text-emerald-700">
+            <div className="bg-white dark:bg-[#1C1A18] rounded-xl p-4 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex items-center gap-3 transition-colors">
+              <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 flex items-center justify-center text-emerald-700 dark:text-emerald-300 shrink-0">
                 <CheckCircle2 className="w-5 h-5 stroke-[2.5]" />
               </div>
               <div className="text-xs">
-                <p className="font-black text-[#161514]">All records are 100% in sync</p>
-                <p className="text-[11px] text-[#8C8479] font-medium">
+                <p className="font-black text-[#161514] dark:text-[#FAF8F5]">All records are 100% in sync</p>
+                <p className="text-[11px] text-[#8C8479] dark:text-[#A8A29E] font-medium">
                   Zero pending mutations waiting in local queue.
                 </p>
               </div>
@@ -236,7 +243,7 @@ export function CloudSyncDrawer({ open, onOpenChange }: CloudSyncDrawerProps) {
             type="button"
             onClick={handleManualSync}
             disabled={isSyncing || !isOnline}
-            className="w-full py-3 rounded-2xl bg-[#CEF431] hover:bg-[#bce022] text-[#161514] font-black text-xs uppercase tracking-wider border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            className="w-full py-3 rounded-xl bg-[#CEF431] hover:bg-[#bce022] text-[#161514] font-black text-xs uppercase tracking-wider border border-[#CEF431] shadow-xs hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
           >
             <RefreshCw className={`h-4 w-4 ${isSyncing ? "animate-spin" : ""}`} />
             <span>{isSyncing ? "Flushing Offline Queue..." : "Sync Cloud Ledger Now"}</span>

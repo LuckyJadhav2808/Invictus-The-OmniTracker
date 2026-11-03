@@ -28,6 +28,7 @@ import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormConta
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
 import { NeobrutalistDateTimePickerModal } from "@/components/shared/NeobrutalistDateTimePickerModal";
 import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface DebtTrackerProps {
   currencySymbol?: string;
@@ -97,8 +98,8 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
 
       toast.success(
         debtType === "lent"
-          ? `Record saved! ${personName} owes you ${currencySymbol}${amount} 🟢`
-          : `Record saved! You owe ${personName} ${currencySymbol}${amount} 🔴`
+          ? `Record saved: ${personName} owes you ${currencySymbol}${amount}`
+          : `Record saved: You owe ${personName} ${currencySymbol}${amount}`
       );
 
       // Reset Form
@@ -167,22 +168,19 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
   };
 
   return (
-    <div className="bg-white rounded-3xl p-5 sm:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] text-[#161514] transition-all space-y-5">
+    <div className="bg-white dark:bg-[#161514] rounded-2xl p-5 border border-[#E8E5DF] dark:border-[#2A2724] text-[#161514] dark:text-[#FAF8F5] transition-all space-y-5 my-4 shadow-xs">
       {/* 1. Header Row */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b-[2.5px] border-[#161514]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#E8E5DF] dark:border-[#2A2724]">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="bg-sky-300 text-[#161514] text-[10px] font-black px-2.5 py-1 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] uppercase flex items-center gap-1">
-              <HandCoins className="h-3.5 w-3.5" /> Debt Ledger
+            <span className="bg-[#F1EFEA] dark:bg-[#22201D] text-[#161514] dark:text-[#FAF8F5] text-xs font-medium px-2.5 py-0.5 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] flex items-center gap-1.5">
+              <HandCoins className="size-3.5 stroke-[1.5]" /> Debt Ledger
             </span>
-            <span className="bg-[#CEF431] text-[#161514] text-[10px] font-black px-2.5 py-1 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] uppercase">
+            <span className="bg-[#F1EFEA] dark:bg-[#22201D] text-[#161514] dark:text-[#FAF8F5] text-xs font-mono font-medium px-2 py-0.5 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724]">
               {pendingDebts.length} Pending
             </span>
           </div>
-          <h2
-            className="text-xl sm:text-2xl font-black tracking-tight text-[#161514] uppercase pt-0.5"
-            style={{ fontFamily: "var(--font-heading)" }}
-          >
+          <h2 className="text-lg sm:text-xl font-semibold tracking-tight text-[#161514] dark:text-[#FAF8F5] pt-0.5 font-sans">
             Lent & Borrowed Money
           </h2>
         </div>
@@ -190,9 +188,9 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
         <button
           type="button"
           onClick={() => setIsAddModalOpen(true)}
-          className="h-10 px-4 rounded-xl bg-[#CEF431] hover:bg-[#b8dd22] border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] font-black text-xs uppercase tracking-wider cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all flex items-center gap-1.5 self-start sm:self-auto"
+          className="h-9 px-3.5 rounded-xl bg-[#161514] hover:bg-[#2A2826] text-white dark:bg-[#FAF8F5] dark:text-[#161514] dark:hover:bg-[#E8E5DF] font-medium text-xs cursor-pointer transition-colors flex items-center gap-1.5 self-start sm:self-auto border border-[#161514] dark:border-white shadow-xs"
         >
-          <Plus className="h-4 w-4 stroke-[3]" />
+          <Plus className="size-3.5 stroke-[2]" />
           <span>Add Loan or IOU</span>
         </button>
       </div>
@@ -200,80 +198,79 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
       {/* 2. KPI Summary Box */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {/* Card 1: Total Lent */}
-        <div className="bg-[#FAF8F5] rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-1">
-          <span className="text-[10px] font-black uppercase text-[#161514]/70 flex items-center gap-1">
-            <ArrowUpRight className="h-3.5 w-3.5 text-emerald-600 stroke-[2.5]" /> You Lent (Receivable)
+        <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl p-4 border border-[#E8E5DF] dark:border-[#2A2724] space-y-1">
+          <span className="text-xs font-medium text-[#6B6B6B] dark:text-[#A8A29E] flex items-center gap-1">
+            <ArrowUpRight className="size-3.5 text-emerald-600 stroke-[1.5]" /> You Lent (Receivable)
           </span>
-          <div className="text-xl font-black text-emerald-600" style={{ fontFamily: "var(--font-heading)" }}>
+          <div className="text-lg sm:text-xl font-semibold text-emerald-600 font-mono tabular-nums">
             +{currencySymbol}{totalLent.toLocaleString(undefined, { minimumFractionDigits: 2 })}
           </div>
-          <p className="text-[10px] font-bold text-[#161514]/60">Money friends owe you</p>
+          <p className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E]">Money friends owe you</p>
         </div>
 
         {/* Card 2: Total Borrowed */}
-        <div className="bg-[#FAF8F5] rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-1">
-          <span className="text-[10px] font-black uppercase text-[#161514]/70 flex items-center gap-1">
-            <ArrowDownLeft className="h-3.5 w-3.5 text-rose-600 stroke-[2.5]" /> You Borrowed (Payable)
+        <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl p-4 border border-[#E8E5DF] dark:border-[#2A2724] space-y-1">
+          <span className="text-xs font-medium text-[#6B6B6B] dark:text-[#A8A29E] flex items-center gap-1">
+            <ArrowDownLeft className="size-3.5 text-rose-600 stroke-[1.5]" /> You Borrowed (Payable)
           </span>
-          <div className="text-xl font-black text-rose-600" style={{ fontFamily: "var(--font-heading)" }}>
+          <div className="text-lg sm:text-xl font-semibold text-rose-600 font-mono tabular-nums">
             -{currencySymbol}{totalBorrowed.toLocaleString(undefined, { minimumFractionDigits: 2 })}
           </div>
-          <p className="text-[10px] font-bold text-[#161514]/60">Money you owe to others</p>
+          <p className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E]">Money you owe to others</p>
         </div>
 
         {/* Card 3: Net Balance */}
-        <div
-          className={`rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-1 ${
-            netBalance >= 0 ? "bg-[#CEF431]" : "bg-rose-200"
-          }`}
-        >
-          <span className="text-[10px] font-black uppercase text-[#161514] flex items-center gap-1">
+        <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl p-4 border border-[#E8E5DF] dark:border-[#2A2724] space-y-1">
+          <span className="text-xs font-medium text-[#6B6B6B] dark:text-[#A8A29E] flex items-center gap-1">
             ⚖️ Net Position
           </span>
-          <div className="text-xl font-black text-[#161514]" style={{ fontFamily: "var(--font-heading)" }}>
+          <div className={cn("text-lg sm:text-xl font-semibold font-mono tabular-nums", netBalance >= 0 ? "text-emerald-600" : "text-rose-600")}>
             {netBalance >= 0 ? "+" : ""}{currencySymbol}{netBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
           </div>
-          <p className="text-[10px] font-black uppercase text-[#161514]">
-            {netBalance >= 0 ? "Net Receivable 🟢" : "Net Owed 🔴"}
+          <p className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E]">
+            {netBalance >= 0 ? "Net Receivable" : "Net Owed"}
           </p>
         </div>
       </div>
 
       {/* 3. Filter Controls Strip */}
-      <div className="flex items-center justify-between gap-2 pt-1 border-t-2 border-[#161514]/10">
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+      <div className="flex items-center justify-between gap-2 pt-1 border-t border-[#E8E5DF] dark:border-[#2A2724]">
+        <div className="flex items-center gap-1 bg-[#F1EFEA] dark:bg-[#1C1A18] p-1 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] overflow-x-auto no-scrollbar">
           <button
             type="button"
             onClick={() => setFilterStatus("pending")}
-            className={`px-3 py-1.5 rounded-xl text-xs font-black border-2 border-[#161514] transition-all cursor-pointer whitespace-nowrap shrink-0 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
+            className={cn(
+              "px-3 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0",
               filterStatus === "pending"
-                ? "bg-[#CEF431] shadow-[2px_2px_0px_0px_#161514]"
-                : "bg-[#FAF8F5] text-[#161514]/70 hover:bg-white shadow-[1px_1px_0px_0px_#161514]"
-            }`}
+                ? "bg-white dark:bg-[#2A2724] text-[#161514] dark:text-[#FAF8F5] shadow-xs font-semibold"
+                : "text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5]"
+            )}
           >
-            Pending ⏳ ({pendingDebts.length})
+            Pending ({pendingDebts.length})
           </button>
           <button
             type="button"
             onClick={() => setFilterStatus("all")}
-            className={`px-3 py-1.5 rounded-xl text-xs font-black border-2 border-[#161514] transition-all cursor-pointer whitespace-nowrap shrink-0 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
+            className={cn(
+              "px-3 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0",
               filterStatus === "all"
-                ? "bg-amber-300 shadow-[2px_2px_0px_0px_#161514]"
-                : "bg-[#FAF8F5] text-[#161514]/70 hover:bg-white shadow-[1px_1px_0px_0px_#161514]"
-            }`}
+                ? "bg-white dark:bg-[#2A2724] text-[#161514] dark:text-[#FAF8F5] shadow-xs font-semibold"
+                : "text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5]"
+            )}
           >
             All Records ({debts.length})
           </button>
           <button
             type="button"
             onClick={() => setFilterStatus("settled")}
-            className={`px-3 py-1.5 rounded-xl text-xs font-black border-2 border-[#161514] transition-all cursor-pointer whitespace-nowrap shrink-0 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
+            className={cn(
+              "px-3 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer whitespace-nowrap shrink-0",
               filterStatus === "settled"
-                ? "bg-emerald-300 shadow-[2px_2px_0px_0px_#161514]"
-                : "bg-[#FAF8F5] text-[#161514]/70 hover:bg-white shadow-[1px_1px_0px_0px_#161514]"
-            }`}
+                ? "bg-white dark:bg-[#2A2724] text-[#161514] dark:text-[#FAF8F5] shadow-xs font-semibold"
+                : "text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5]"
+            )}
           >
-            Settled ✅ ({debts.filter((d) => d.status === "settled").length})
+            Settled ({debts.filter((d) => d.status === "settled").length})
           </button>
         </div>
       </div>
@@ -281,13 +278,13 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
       {/* 4. Debt Records List */}
       <div className="space-y-2.5">
         {filteredDebts.length === 0 ? (
-          <div className="text-center py-8 bg-[#FAF8F5] rounded-2xl border-2 border-dashed border-[#161514]/30 space-y-2">
-            <UserCheck className="h-8 w-8 mx-auto text-[#161514]/40" />
-            <h4 className="font-black text-sm text-[#161514]">No Debt Records Found</h4>
-            <p className="text-xs text-[#161514]/60 max-w-xs mx-auto font-medium">
+          <div className="text-center py-8 bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-dashed border-[#E8E5DF] dark:border-[#2A2724] space-y-2">
+            <UserCheck className="size-8 mx-auto text-[#6B6B6B] dark:text-[#A8A29E]" />
+            <h4 className="font-semibold text-sm text-[#161514] dark:text-[#FAF8F5]">No Debt Records Found</h4>
+            <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] max-w-xs mx-auto">
               {filterStatus === "pending"
                 ? "Awesome! You have no pending debts or money owed."
-                : "Tap '+ Record Lent / Borrowed' above to start tracking loans."}
+                : "Tap '+ Add Loan or IOU' above to start tracking loans."}
             </p>
           </div>
         ) : (
@@ -302,60 +299,67 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
             return (
               <div
                 key={d.id}
-                className={`p-3.5 sm:p-4 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-2.5 transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 ${
-                  isSettled ? "bg-[#FAF8F5] opacity-75" : "bg-white"
-                }`}
+                className={cn(
+                  "p-3.5 sm:p-4 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] space-y-2.5 transition-colors",
+                  isSettled
+                    ? "bg-[#FAF8F5]/60 dark:bg-[#161514]/60 opacity-75"
+                    : "bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#22201D]"
+                )}
               >
-                {/* Responsive Debt Card Layout (No horizontal overlap on mobile) */}
+                {/* Responsive Debt Card Layout */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   {/* Left: Avatar & Name Details */}
                   <div className="flex items-center gap-2.5 min-w-0">
                     <div
-                      className={`h-10 w-10 shrink-0 rounded-xl border-2 border-[#161514] flex items-center justify-center font-black text-xs shadow-[2px_2px_0px_0px_#161514] ${
-                        isLent ? "bg-emerald-200 text-emerald-950" : "bg-rose-200 text-rose-950"
-                      }`}
+                      className={cn(
+                        "size-9 shrink-0 rounded-lg flex items-center justify-center font-semibold text-xs font-mono",
+                        isLent
+                          ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/40"
+                          : "bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800/40"
+                      )}
                     >
                       {d.personName.slice(0, 2).toUpperCase()}
                     </div>
 
                     <div className="min-w-0 flex-1 space-y-0.5">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <h4 className="font-black text-sm text-[#161514] truncate leading-tight">{d.personName}</h4>
+                        <h4 className="font-semibold text-sm text-[#161514] dark:text-[#FAF8F5] truncate leading-tight">{d.personName}</h4>
                         <span
-                          className={`text-[9px] font-black px-1.5 py-0.5 rounded-md border border-[#161514] uppercase shrink-0 shadow-[1px_1px_0px_0px_#161514] ${
+                          className={cn(
+                            "text-[10px] font-medium px-1.5 py-0.5 rounded border uppercase shrink-0 font-mono",
                             isLent
-                              ? "bg-emerald-100 text-emerald-900"
-                              : "bg-rose-100 text-rose-900"
-                          }`}
+                              ? "bg-[#DCFAE5] dark:bg-emerald-950/40 border-[#03D26F]/30 dark:border-emerald-800 text-[#047857] dark:text-emerald-400"
+                              : "bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-400"
+                          )}
                         >
-                          {isLent ? "LENT 🟢" : "BORROWED 🔴"}
+                          {isLent ? "Lent" : "Borrowed"}
                         </span>
                         {isSettled && (
-                          <span className="text-[9px] font-black bg-emerald-300 text-emerald-950 px-1.5 py-0.5 rounded-md border border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
-                            SETTLED ✅
+                          <span className="text-[10px] font-medium bg-[#F1EFEA] dark:bg-[#2A2724] text-[#161514] dark:text-[#FAF8F5] px-1.5 py-0.5 rounded border border-[#E8E5DF] dark:border-[#383531]">
+                            Settled
                           </span>
                         )}
                       </div>
 
-                      <p className="text-xs text-[#161514]/70 font-bold truncate">
+                      <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] truncate">
                         {d.note || (isLent ? "Money lent to friend" : "Borrowed money")}
                       </p>
                     </div>
                   </div>
 
                   {/* Right/Bottom: Amount & Actions */}
-                  <div className="flex items-center justify-between sm:justify-end gap-3 pt-1.5 sm:pt-0 border-t border-[#161514]/10 sm:border-t-0">
+                  <div className="flex items-center justify-between sm:justify-end gap-3 pt-1.5 sm:pt-0 border-t border-[#E8E5DF] dark:border-[#2A2724] sm:border-t-0">
                     <div className="text-left sm:text-right">
                       <div
-                        className={`font-black text-base sm:text-lg leading-tight ${
-                          isLent ? "text-emerald-600" : "text-rose-600"
-                        }`}
-                        style={{ fontFamily: "var(--font-heading)" }}
+                        className={cn(
+                          "font-semibold text-base sm:text-lg leading-tight font-mono tabular-nums",
+                          isLent ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
+                        )}
                       >
                         {isLent ? "+" : "-"}{currencySymbol}
                         {d.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                       </div>
-                      <span className="text-[9px] text-[#161514]/50 font-bold block">
+                      <span className="text-[10px] text-[#A8A29E] font-mono block">
                         {d.createdAt ? d.createdAt.split("T")[0] : ""}
                       </span>
                     </div>
@@ -371,9 +375,9 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
                                 ? `Hey ${d.personName}! Just a friendly reminder about the ${currencySymbol}${d.amount} split${d.note ? ` for "${d.note}"` : ""}${d.dueDate ? ` due on ${d.dueDate}` : ""}. Thanks!`
                                 : `Hey ${d.personName}! Reminding myself to pay back the ${currencySymbol}${d.amount}${d.note ? ` for "${d.note}"` : ""}. Settling up soon!`;
                               navigator.clipboard.writeText(msg);
-                              toast.success(`Reminder text for ${d.personName} copied to clipboard! 📋`);
+                              toast.success(`Reminder text for ${d.personName} copied to clipboard`);
                             }}
-                            className="h-8 w-8 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-950 font-black border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center justify-center cursor-pointer transition-all active:translate-x-0.5 active:translate-y-0.5"
+                            className="size-8 rounded-lg bg-white dark:bg-[#22201D] hover:bg-[#F5F3EF] dark:hover:bg-[#2A2724] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#2A2724] flex items-center justify-center cursor-pointer transition-colors shadow-xs"
                             title="Copy Reminder Text for WhatsApp/SMS"
                           >
                             <span className="text-xs">💬</span>
@@ -385,10 +389,10 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
                               setSettlingDebt(d);
                               setAutoLogTx(true);
                             }}
-                            className="h-8 px-2.5 rounded-xl bg-[#03D26F] hover:bg-emerald-400 text-white font-black text-xs border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center gap-1 cursor-pointer transition-all active:translate-x-0.5 active:translate-y-0.5"
+                            className="h-8 px-2.5 rounded-lg bg-[#161514] hover:bg-[#2A2826] text-white dark:bg-[#FAF8F5] dark:text-[#161514] dark:hover:bg-[#E8E5DF] font-medium text-xs border border-[#161514] dark:border-white flex items-center gap-1 cursor-pointer transition-colors shadow-xs"
                             title="Mark Paid & Settle Up"
                           >
-                            <CheckCircle2 className="h-3.5 w-3.5 stroke-[2.5]" />
+                            <CheckCircle2 className="size-3.5 stroke-[2]" />
                             <span>Settle</span>
                           </button>
                         </>
@@ -397,10 +401,10 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
                       <button
                         type="button"
                         onClick={() => setDeletingDebtId(d.id)}
-                        className="h-8 w-8 rounded-xl bg-white hover:bg-rose-100 text-rose-600 font-bold border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center justify-center cursor-pointer transition-all active:translate-x-0.5 active:translate-y-0.5"
+                        className="size-8 rounded-lg bg-white dark:bg-[#22201D] hover:bg-rose-50 dark:hover:bg-rose-950/30 text-rose-600 dark:text-rose-400 border border-[#E8E5DF] dark:border-[#2A2724] flex items-center justify-center cursor-pointer transition-colors"
                         title="Delete record"
                       >
-                        <Trash2 className="h-3.5 w-3.5 stroke-[2.5]" />
+                        <Trash2 className="size-3.5 stroke-[1.5]" />
                       </button>
                     </div>
                   </div>
@@ -410,32 +414,32 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
                 {d.dueDate && !isSettled && (
                   <div className="pt-0.5">
                     {isOverdue ? (
-                      <div className="w-full px-2.5 py-1.5 rounded-xl bg-rose-200 text-rose-950 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-[10px] font-black flex items-center justify-between gap-2 animate-pulse">
+                      <div className="w-full px-2.5 py-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800/40 text-xs font-medium flex items-center justify-between gap-2">
                         <span className="flex items-center gap-1.5 truncate">
-                          <AlertCircle className="h-3.5 w-3.5 stroke-[2.5] shrink-0" />
-                          <span>OVERDUE PAYMENT</span>
+                          <AlertCircle className="size-3.5 stroke-[1.5] shrink-0" />
+                          <span>Overdue payment</span>
                         </span>
-                        <span className="shrink-0 bg-white px-2 py-0.5 rounded-md border border-[#161514] font-black">
+                        <span className="shrink-0 bg-white dark:bg-[#1C1A18] px-2 py-0.5 rounded border border-rose-200 dark:border-rose-800 font-mono text-[10px]">
                           Due: {d.dueDate}
                         </span>
                       </div>
                     ) : isDueToday ? (
-                      <div className="w-full px-2.5 py-1.5 rounded-xl bg-[#CEF431] text-[#161514] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-[10px] font-black flex items-center justify-between gap-2">
+                      <div className="w-full px-2.5 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-400 border border-amber-200 dark:border-amber-800/40 text-xs font-medium flex items-center justify-between gap-2">
                         <span className="flex items-center gap-1.5 truncate">
-                          <Calendar className="h-3.5 w-3.5 stroke-[2.5] shrink-0" />
-                          <span>PAYMENT DUE TODAY!</span>
+                          <Calendar className="size-3.5 stroke-[1.5] shrink-0" />
+                          <span>Payment due today</span>
                         </span>
-                        <span className="shrink-0 bg-white px-2 py-0.5 rounded-md border border-[#161514] font-black">
+                        <span className="shrink-0 bg-white dark:bg-[#1C1A18] px-2 py-0.5 rounded border border-amber-200 dark:border-amber-800 font-mono text-[10px]">
                           {d.dueDate}
                         </span>
                       </div>
                     ) : (
-                      <div className="w-full px-2.5 py-1 rounded-xl bg-[#FAF8F5] text-[#161514]/80 border-2 border-[#161514]/30 text-[10px] font-bold flex items-center justify-between gap-2">
+                      <div className="w-full px-2.5 py-1 rounded-lg bg-[#F1EFEA] dark:bg-[#22201D] text-[#6B6B6B] dark:text-[#A8A29E] border border-[#E8E5DF] dark:border-[#2A2724] text-xs flex items-center justify-between gap-2">
                         <span className="flex items-center gap-1.5 truncate">
-                          <Calendar className="h-3.5 w-3.5 stroke-[2.5] text-[#161514]/60 shrink-0" />
-                          <span>Target Due Date</span>
+                          <Calendar className="size-3.5 stroke-[1.5] text-[#6B6B6B] dark:text-[#A8A29E] shrink-0" />
+                          <span>Target due date</span>
                         </span>
-                        <span className="shrink-0 font-black">{d.dueDate}</span>
+                        <span className="shrink-0 font-mono text-[10px]">{d.dueDate}</span>
                       </div>
                     )}
                   </div>
@@ -456,30 +460,30 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
         <form onSubmit={handleAddSubmit} className="space-y-4 pt-2">
           {/* Debt Type Selector */}
           <div className="space-y-1">
-            <label className="text-xs font-black uppercase text-[#161514]">Record Type</label>
+            <label className="text-[11px] font-semibold text-[#161514] dark:text-[#FAF8F5]">Record Type</label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => setDebtType("lent")}
-                className={`py-2.5 px-3 rounded-xl font-black text-xs border-2 border-[#161514] transition-all flex items-center justify-center gap-1.5 cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
+                className={`py-2 px-3 rounded-xl font-medium text-xs border transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                   debtType === "lent"
-                    ? "bg-[#03D26F] text-white shadow-[2px_2px_0px_0px_#161514]"
-                    : "bg-[#FAF8F5] text-[#161514]/70 hover:bg-white"
+                    ? "bg-[#161514] text-white dark:bg-[#FAF8F5] dark:text-[#161514] border-[#161514] dark:border-white shadow-xs"
+                    : "bg-[#FAF8F5] dark:bg-[#1C1A18] text-[#6B6B6B] dark:text-[#A8A29E] border-[#E8E5DF] dark:border-[#2A2724] hover:bg-white dark:hover:bg-[#22201D]"
                 }`}
               >
-                <ArrowUpRight className="h-4 w-4 stroke-[3] shrink-0" />
+                <ArrowUpRight className="h-4 w-4 stroke-[2] shrink-0" />
                 <span>You Lent (Receivable)</span>
               </button>
               <button
                 type="button"
                 onClick={() => setDebtType("borrowed")}
-                className={`py-2.5 px-3 rounded-xl font-black text-xs border-2 border-[#161514] transition-all flex items-center justify-center gap-1.5 cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
+                className={`py-2 px-3 rounded-xl font-medium text-xs border transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                   debtType === "borrowed"
-                    ? "bg-[#E11D48] text-white shadow-[2px_2px_0px_0px_#161514]"
-                    : "bg-[#FAF8F5] text-[#161514]/70 hover:bg-white"
+                    ? "bg-[#161514] text-white dark:bg-[#FAF8F5] dark:text-[#161514] border-[#161514] dark:border-white shadow-xs"
+                    : "bg-[#FAF8F5] dark:bg-[#1C1A18] text-[#6B6B6B] dark:text-[#A8A29E] border-[#E8E5DF] dark:border-[#2A2724] hover:bg-white dark:hover:bg-[#22201D]"
                 }`}
               >
-                <ArrowDownLeft className="h-4 w-4 stroke-[3] shrink-0" />
+                <ArrowDownLeft className="h-4 w-4 stroke-[2] shrink-0" />
                 <span>You Borrowed (Payable)</span>
               </button>
             </div>
@@ -487,20 +491,20 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
 
           {/* Person Name */}
           <div className="space-y-1">
-            <label className="text-xs font-black uppercase text-[#161514]">Person Name *</label>
+            <label className="text-[11px] font-semibold text-[#161514] dark:text-[#FAF8F5]">Person Name *</label>
             <input
               type="text"
               required
               placeholder="e.g. Rahul Sharma, Priya, Alex"
               value={personName}
               onChange={(e) => setPersonName(e.target.value)}
-              className="w-full h-11 px-3 rounded-xl bg-[#FAF8F5] border-2 border-[#161514] font-bold text-sm text-[#161514] focus:bg-[#FFF9EA] focus:shadow-[2px_2px_0px_0px_#161514] focus:outline-none transition-all"
+              className="w-full h-10 px-3 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] font-medium text-xs text-[#161514] dark:text-[#FAF8F5] focus:outline-none focus:border-[#161514] dark:focus:border-white transition-all"
             />
           </div>
 
           {/* Amount */}
           <div className="space-y-1">
-            <label className="text-xs font-black uppercase text-[#161514]">Amount ({currencySymbol}) *</label>
+            <label className="text-[11px] font-semibold text-[#161514] dark:text-[#FAF8F5]">Amount ({currencySymbol}) *</label>
             <input
               type="number"
               step="0.01"
@@ -508,29 +512,29 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
               placeholder="e.g. 1500"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="w-full h-11 px-3 rounded-xl bg-[#FAF8F5] border-2 border-[#161514] font-bold text-sm text-[#161514] focus:bg-[#FFF9EA] focus:shadow-[2px_2px_0px_0px_#161514] focus:outline-none transition-all"
+              className="w-full h-10 px-3 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] font-medium text-xs text-[#161514] dark:text-[#FAF8F5] focus:outline-none focus:border-[#161514] dark:focus:border-white transition-all"
             />
           </div>
 
           {/* Due Date */}
           <div className="space-y-1">
-            <label className="text-xs font-black uppercase text-[#161514]">Due Date (Optional)</label>
+            <label className="text-[11px] font-semibold text-[#161514] dark:text-[#FAF8F5]">Due Date (Optional)</label>
             <button
               type="button"
               onClick={() => setIsDueDatePickerOpen(true)}
-              className="w-full h-11 px-3 rounded-xl bg-[#FAF8F5] border-2 border-[#161514] font-bold text-sm text-[#161514] flex items-center justify-between hover:bg-white transition-all cursor-pointer shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none text-left"
+              className="w-full h-10 px-3 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] font-medium text-xs text-[#161514] dark:text-[#FAF8F5] flex items-center justify-between hover:bg-white dark:hover:bg-[#22201D] transition-all cursor-pointer text-left"
             >
-              <span className={dueDate ? "text-[#161514] font-black" : "text-[#161514]/50"}>
+              <span className={dueDate ? "text-[#161514] dark:text-[#FAF8F5] font-semibold" : "text-[#6B6B6B] dark:text-[#A8A29E]"}>
                 {dueDate ? format(new Date(dueDate), "EEE, d MMM yyyy") : "Select Due Date..."}
               </span>
-              <Calendar className="h-4 w-4 text-[#161514]/60 stroke-[2.5]" />
+              <Calendar className="h-4 w-4 text-[#6B6B6B] dark:text-[#A8A29E] stroke-[1.5]" />
             </button>
             {dueDate && (
               <div className="flex justify-end pt-1">
                 <button
                   type="button"
                   onClick={() => setDueDate("")}
-                  className="text-[11px] font-black text-rose-600 hover:underline cursor-pointer"
+                  className="text-[11px] font-medium text-rose-600 dark:text-rose-400 hover:underline cursor-pointer"
                 >
                   Clear Date
                 </button>
@@ -540,13 +544,13 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
 
           {/* Note */}
           <div className="space-y-1">
-            <label className="text-xs font-black uppercase text-[#161514]">Reason / Note (Optional)</label>
+            <label className="text-[11px] font-semibold text-[#161514] dark:text-[#FAF8F5]">Reason / Note (Optional)</label>
             <input
               type="text"
               placeholder="e.g. Dinner split, Rent share, Concert ticket"
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              className="w-full h-11 px-3 rounded-xl bg-[#FAF8F5] border-2 border-[#161514] font-bold text-sm text-[#161514] focus:bg-[#FFF9EA] focus:shadow-[2px_2px_0px_0px_#161514] focus:outline-none transition-all"
+              className="w-full h-10 px-3 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] font-medium text-xs text-[#161514] dark:text-[#FAF8F5] focus:outline-none focus:border-[#161514] dark:focus:border-white transition-all"
             />
           </div>
 
@@ -554,14 +558,14 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
             <button
               type="button"
               onClick={() => setIsAddModalOpen(false)}
-              className="flex-1 h-11 rounded-xl bg-[#FAF8F5] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:bg-white hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none font-black text-xs uppercase cursor-pointer transition-all"
+              className="flex-1 h-10 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] text-[#161514] dark:text-[#FAF8F5] hover:bg-white dark:hover:bg-[#22201D] font-medium text-xs cursor-pointer transition-all"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={addDebtMutation.isPending}
-              className="flex-1 h-11 rounded-xl bg-[#CEF431] hover:bg-[#b8dd22] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none font-black text-xs uppercase cursor-pointer transition-all"
+              className="flex-1 h-10 rounded-xl bg-[#161514] hover:bg-[#2A2826] text-white dark:bg-[#FAF8F5] dark:text-[#161514] dark:hover:bg-[#E8E5DF] font-medium text-xs border border-[#161514] dark:border-white shadow-xs cursor-pointer transition-all"
             >
               {addDebtMutation.isPending ? "Saving..." : "Save Record"}
             </button>
@@ -575,33 +579,33 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
         onOpenChange={(open) => {
           if (!open) setSettlingDebt(null);
         }}
-        title="Settle Up Debt Record 🎉"
+        title="Settle Up Debt Record"
         description={`Mark payment settled with ${settlingDebt?.personName}`}
       >
         <div className="space-y-4 pt-2">
-          <div className="p-3.5 rounded-2xl bg-[#FAF8F5] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] space-y-1 text-center">
-            <div className="text-xs font-bold text-[#161514]/70">
+          <div className="p-4 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] space-y-1 text-center">
+            <div className="text-xs font-medium text-[#6B6B6B] dark:text-[#A8A29E]">
               {settlingDebt?.type === "lent" ? "You received payment from" : "You paid back"}
             </div>
-            <div className="text-xl font-black text-[#161514]">{settlingDebt?.personName}</div>
-            <div className="text-2xl font-black text-emerald-600" style={{ fontFamily: "var(--font-heading)" }}>
+            <div className="text-lg font-semibold text-[#161514] dark:text-[#FAF8F5]">{settlingDebt?.personName}</div>
+            <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 font-mono">
               {currencySymbol}{settlingDebt?.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
             </div>
           </div>
 
           {/* Auto-Log Transaction Checkbox */}
-          <label className="flex items-center gap-3 p-3 rounded-xl bg-[#FAF8F5] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] cursor-pointer hover:bg-white transition-all">
+          <label className="flex items-center gap-3 p-3 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] cursor-pointer hover:bg-white dark:hover:bg-[#22201D] transition-all">
             <input
               type="checkbox"
               checked={autoLogTx}
               onChange={(e) => setAutoLogTx(e.target.checked)}
-              className="h-4 w-4 rounded border-2 border-[#161514] text-[#CEF431] focus:ring-0"
+              className="h-4 w-4 rounded border-[#E8E5DF] text-[#161514] focus:ring-0"
             />
             <div className="text-xs">
-              <span className="font-black text-[#161514] block">
+              <span className="font-semibold text-[#161514] dark:text-[#FAF8F5] block">
                 Auto-log to Financial Ledger
               </span>
-              <span className="text-[#161514]/70 font-medium">
+              <span className="text-[#6B6B6B] dark:text-[#A8A29E]">
                 {settlingDebt?.type === "lent"
                   ? "Automatically log as Income in main Cashflow"
                   : "Automatically log as Expense in main Cashflow"}
@@ -613,7 +617,7 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
             <button
               type="button"
               onClick={() => setSettlingDebt(null)}
-              className="flex-1 h-11 rounded-xl bg-[#FAF8F5] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:bg-white hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none font-black text-xs uppercase cursor-pointer transition-all"
+              className="flex-1 h-10 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] text-[#161514] dark:text-[#FAF8F5] hover:bg-white dark:hover:bg-[#22201D] font-medium text-xs cursor-pointer transition-all"
             >
               Cancel
             </button>
@@ -621,9 +625,9 @@ export function DebtTracker({ currencySymbol = "₹" }: DebtTrackerProps) {
               type="button"
               onClick={handleConfirmSettle}
               disabled={settleDebtMutation.isPending}
-              className="flex-1 h-11 rounded-xl bg-[#03D26F] hover:bg-emerald-400 text-white border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none font-black text-xs uppercase cursor-pointer transition-all"
+              className="flex-1 h-10 rounded-xl bg-[#161514] hover:bg-[#2A2826] text-white dark:bg-[#FAF8F5] dark:text-[#161514] dark:hover:bg-[#E8E5DF] font-medium text-xs border border-[#161514] dark:border-white shadow-xs cursor-pointer transition-all"
             >
-              {settleDebtMutation.isPending ? "Settling..." : "Confirm Settlement ✅"}
+              {settleDebtMutation.isPending ? "Settling..." : "Confirm Settlement"}
             </button>
           </div>
         </div>

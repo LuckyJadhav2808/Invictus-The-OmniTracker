@@ -630,26 +630,24 @@ export function GymRoutineTracker() {
   };
 
   return (
-    <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] sm:shadow-[5px_5px_0px_0px_#161514] space-y-5">
+    <div className="bg-white dark:bg-[#161514] rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-5">
       {/* Tracker Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b-2 border-[#161514]/15">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#E8E5DF] dark:border-[#2A2724]">
         <div className="flex items-center gap-3">
-          <div className="h-12 w-12 rounded-2xl bg-amber-400 border-2 border-[#161514] flex items-center justify-center text-[#161514] shadow-[2px_2px_0px_0px_#161514] shrink-0">
-            <Dumbbell className="h-6 w-6 stroke-[2.5]" />
+          <div className="size-10 rounded-xl bg-[#03D26F]/10 border border-[#03D26F]/20 text-[#047857] dark:text-[#03D26F] flex items-center justify-center shrink-0">
+            <Dumbbell className="size-5 stroke-[2]" />
           </div>
           <div>
-            <h3
-              className="text-lg font-heading font-black text-[#161514] tracking-wider uppercase"
-            >
-              GYM ROUTINE & SPLITS
+            <h3 className="text-base sm:text-lg font-heading font-bold text-[#161514] dark:text-white tracking-tight">
+              Gym Routine & Splits
             </h3>
-            <p className="text-[11px] text-[#161514]/80 font-bold mt-0.5 flex items-center gap-2 flex-wrap">
+            <p className="text-xs text-[#6E6B65] dark:text-[#9E9A90] font-normal mt-0.5 flex items-center gap-2 flex-wrap">
               <span>
-                Logged sets: <strong className="text-rose-600 font-black">{totalCompletedSets} / {totalSets} sets</strong>
+                Logged sets: <strong className="text-[#161514] dark:text-white font-semibold font-mono">{totalCompletedSets} / {totalSets} sets</strong>
               </span>
-              <span className="neo-badge bg-[#EAF4F4] text-[#014651]">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#03D26F] animate-pulse" />
-                {getFriendlyWeekLabel()} (Auto-Rollover)
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#03D26F]/10 text-[#047857] dark:text-[#03D26F] text-[10px] font-mono border border-[#03D26F]/20">
+                <span className="size-1.5 rounded-full bg-[#03D26F] animate-pulse" />
+                {getFriendlyWeekLabel()}
               </span>
             </p>
           </div>
@@ -659,10 +657,10 @@ export function GymRoutineTracker() {
           {totalSets > 0 && (
             <button
               onClick={handleResetWeeklyTicks}
-              className="text-[10px] font-heading font-black text-[#161514] bg-sky-100 hover:bg-sky-200 px-3 py-1.5 rounded-xl cursor-pointer transition-all border border-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+              className="text-xs font-medium text-[#161514] dark:text-white bg-[#F1EFEA] hover:bg-[#E8E5DF] dark:bg-[#23201D] dark:hover:bg-[#2A2724] px-3 py-1.5 rounded-xl cursor-pointer transition-all border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs active:scale-95"
               title="Uncheck all sets to re-log without losing weights/reps"
             >
-              🔄 Reset Sets
+              Reset Sets
             </button>
           )}
           <button
@@ -670,15 +668,15 @@ export function GymRoutineTracker() {
               setRoutineTitleInput(currentRoutine?.routineTitle || defaultRoutineTitles[selectedDay]);
               setIsRoutineTitleOpen(true);
             }}
-            className="text-[10px] font-heading font-black text-[#161514] bg-amber-300 hover:bg-amber-400 px-3.5 py-1.5 rounded-xl cursor-pointer transition-all border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none flex items-center gap-1"
+            className="text-xs font-medium text-[#161514] dark:text-white bg-white hover:bg-[#F1EFEA] dark:bg-[#1C1A18] px-3.5 py-1.5 rounded-xl cursor-pointer transition-all border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs hover:border-[#161514]/30 flex items-center gap-1.5 active:scale-95"
           >
-            <Edit3 className="h-3 w-3 stroke-[2.5]" /> Split Title
+            <Edit3 className="size-3.5 stroke-[2]" /> Split Title
           </button>
         </div>
       </div>
 
       {/* Day Split Selector Bar (Monday - Sunday) */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1.5 no-scrollbar">
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1.5 no-scrollbar">
         {DAYS_OF_WEEK.map((day) => {
           const isSelected = selectedDay === day;
           const isToday = currentDayName === day;
@@ -690,18 +688,18 @@ export function GymRoutineTracker() {
               key={day}
               onClick={() => setSelectedDay(day)}
               className={cn(
-                "px-3.5 py-2 rounded-xl text-xs font-heading font-black transition-all cursor-pointer flex items-center gap-1.5 shrink-0 border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none select-none",
+                "px-3.5 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 shrink-0 border select-none active:scale-95",
                 isSelected
-                  ? "bg-[#03D26F] text-[#161514] shadow-[3px_3px_0px_0px_#161514]"
-                  : "bg-white text-[#161514] hover:bg-amber-100"
+                  ? "border-[#161514] dark:border-white bg-[#161514] text-white dark:bg-white dark:text-[#161514] shadow-xs"
+                  : "border-[#E8E5DF] dark:border-[#2A2724] bg-white dark:bg-[#1C1A18] text-[#6E6B65] dark:text-[#9E9A90] hover:text-[#161514] hover:bg-[#F1EFEA] dark:hover:bg-white/5"
               )}
             >
               <span>{day.slice(0, 3)}</span>
               {isToday && (
-                <span className="h-2 w-2 rounded-full bg-rose-600 border border-[#161514] animate-pulse" title="Today" />
+                <span className="size-1.5 rounded-full bg-rose-500 animate-pulse" title="Today" />
               )}
               {hasExercises && !isToday && (
-                <span className="h-2 w-2 rounded-full bg-[#CEF431] border border-[#161514]" />
+                <span className="size-1.5 rounded-full bg-[#03D26F]" />
               )}
             </button>
           );
@@ -709,10 +707,10 @@ export function GymRoutineTracker() {
       </div>
 
       {/* Rest Duration Presets Bar */}
-      <div className="bg-[#FAF8F5] border-2 border-[#161514] rounded-2xl p-3 shadow-[2.5px_2.5px_0px_0px_#161514] flex items-center justify-between gap-2 flex-wrap">
+      <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] rounded-2xl p-3 shadow-none flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center gap-2">
-          <Timer className="size-4 text-[#161514] stroke-[2.5]" />
-          <span className="text-xs font-heading font-black text-[#161514] uppercase tracking-wider">
+          <Timer className="size-4 text-[#161514] dark:text-white stroke-[2]" />
+          <span className="text-xs font-medium text-[#161514] dark:text-white">
             Auto Rest Duration:
           </span>
         </div>
@@ -727,10 +725,10 @@ export function GymRoutineTracker() {
                 toast.success(`Default rest timer set to ${sec}s`);
               }}
               className={cn(
-                "text-[10px] font-heading font-black px-2.5 py-1 rounded-lg border-2 border-[#161514] transition-all cursor-pointer",
+                "text-xs font-mono font-medium px-2.5 py-1 rounded-lg border transition-all cursor-pointer active:scale-95",
                 restDuration === sec
-                  ? "bg-[#CEF431] text-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]"
-                  : "bg-white text-[#161514]/70 hover:bg-[#FFF9EA]"
+                  ? "border-[#161514] dark:border-white bg-[#161514] text-white dark:bg-white dark:text-[#161514] shadow-xs"
+                  : "border-[#E8E5DF] dark:border-[#2A2724] bg-white dark:bg-[#23201D] text-[#6E6B65] dark:text-[#9E9A90] hover:text-[#161514]"
               )}
             >
               {sec}s
@@ -740,26 +738,26 @@ export function GymRoutineTracker() {
       </div>
 
       {/* Stage 1 Sub-Banner: Routine Split Title & Telemetry Progress */}
-      <div className="bg-[#FAF8F5] border-2 border-[#161514] rounded-2xl p-4 shadow-[3px_3px_0px_0px_#161514] space-y-3">
+      <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] rounded-2xl p-4 shadow-none space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <span className="text-[9.5px] font-heading font-black uppercase tracking-widest text-[#161514]/70 block">
+            <span className="text-[10px] font-mono text-[#6E6B65] dark:text-[#9E9A90] block">
               {selectedDay} Workout Split
             </span>
-            <h4 className="text-base sm:text-lg font-heading font-black text-[#161514] mt-0.5 leading-snug break-words">
+            <h4 className="text-base sm:text-lg font-heading font-bold text-[#161514] dark:text-white mt-0.5 leading-snug break-words">
               {currentRoutine?.routineTitle || defaultRoutineTitles[selectedDay]}
             </h4>
           </div>
 
           {/* Quick Telemetry Chips */}
           <div className="flex items-center gap-2 flex-wrap">
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white border-2 border-[#161514] shadow-[1.5px_1.5px_0px_#161514] text-xs font-mono font-black text-[#161514]">
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white dark:bg-[#23201D] border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs text-xs font-mono font-medium text-[#161514] dark:text-white">
               <Flame className="size-3.5 fill-rose-500 text-rose-600" />
               <span>{splitAnatomy.primary.length + splitAnatomy.secondary.length} Focus Areas</span>
             </div>
             {isTimerRunning && (
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-[#C084FC] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_#161514] text-xs font-mono font-black text-[#161514] animate-pulse">
-                <Timer className="size-3.5 text-[#161514]" />
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-[#161514] text-white border border-white/10 shadow-xs text-xs font-mono font-medium animate-pulse">
+                <Timer className="size-3.5 text-white/80" />
                 <span>REST: {gymRest.secondsLeft}s</span>
               </div>
             )}
@@ -768,13 +766,13 @@ export function GymRoutineTracker() {
 
         {/* Sets Progress Bar */}
         <div className="space-y-1.5 pt-1">
-          <div className="flex items-center justify-between text-xs font-mono font-bold text-[#161514]">
+          <div className="flex items-center justify-between text-xs font-mono text-[#6E6B65] dark:text-[#9E9A90]">
             <span>Workout Completion</span>
-            <span>
+            <span className="text-[#161514] dark:text-white font-medium">
               {totalSets > 0 ? Math.round((totalCompletedSets / totalSets) * 100) : 0}% Complete ({totalCompletedSets}/{totalSets} sets)
             </span>
           </div>
-          <div className="h-2.5 w-full bg-white rounded-full border-2 border-[#161514] overflow-hidden p-0.5 shadow-[1px_1px_0px_0px_#161514]">
+          <div className="h-2 w-full bg-[#E8E5DF] dark:bg-[#2A2724] rounded-full overflow-hidden p-0.5">
             <div
               className="h-full bg-[#03D26F] rounded-full transition-all duration-300"
               style={{ width: `${totalSets > 0 ? (totalCompletedSets / totalSets) * 100 : 0}%` }}
@@ -784,20 +782,20 @@ export function GymRoutineTracker() {
       </div>
 
       {/* ─── STAGE 2: TARGET MUSCLE BODY SVG STAGE (EMBEDDED IN PAGE) ─── */}
-      <div className="bg-white border-2 border-[#161514] rounded-2xl p-4 sm:p-5 shadow-[4px_4px_0px_0px_#161514] space-y-3.5">
-        <div className="flex items-center justify-between gap-3 pb-2 border-b-2 border-[#161514]/15 flex-wrap">
+      <div className="bg-white dark:bg-[#161514] border border-[#E8E5DF] dark:border-[#2A2724] rounded-2xl p-4 sm:p-5 shadow-xs space-y-3.5">
+        <div className="flex items-center justify-between gap-3 pb-2 border-b border-[#E8E5DF] dark:border-[#2A2724] flex-wrap">
           <div className="flex items-center gap-2.5">
-            <div className="size-9 rounded-xl bg-[#CEF431] border-2 border-[#161514] flex items-center justify-center text-sm font-black shadow-[1.5px_1.5px_0px_#161514]">
+            <div className="size-9 rounded-xl bg-[#03D26F]/10 border border-[#03D26F]/20 text-[#047857] dark:text-[#03D26F] flex items-center justify-center text-sm font-semibold shrink-0">
               🧬
             </div>
             <div>
-              <h4 className="font-heading font-black text-sm text-[#161514] leading-tight flex items-center gap-2">
+              <h4 className="font-heading font-bold text-sm text-[#161514] dark:text-white leading-tight flex items-center gap-2">
                 <span>Target Muscle Anatomy & Activation</span>
-                <span className="text-[9px] font-mono font-bold bg-[#161514] text-[#CEF431] px-1.5 py-0.5 rounded border border-[#161514]">
-                  REAL-TIME
+                <span className="text-[10px] font-mono font-semibold bg-[#03D26F]/15 text-[#047857] dark:text-[#03D26F] px-2 py-0.5 rounded-full border border-[#03D26F]/30">
+                  Real-time
                 </span>
               </h4>
-              <p className="text-[11px] font-bold text-[#161514]/65">
+              <p className="text-xs text-[#6E6B65] dark:text-[#9E9A90]">
                 {splitAnatomy.primary.length + splitAnatomy.secondary.length > 0
                   ? `${splitAnatomy.primary.length + splitAnatomy.secondary.length} muscle groups illuminated in today's split`
                   : "No movements logged yet for today. Add exercises below to illuminate your anatomical heatmap!"}
@@ -808,16 +806,16 @@ export function GymRoutineTracker() {
           <button
             type="button"
             onClick={() => setIsAnatomyExpanded(!isAnatomyExpanded)}
-            className="text-xs font-heading font-black px-3 py-1.5 rounded-xl border-2 border-[#161514] bg-[#FAF8F5] hover:bg-amber-100 shadow-[1.5px_1.5px_0px_#161514] cursor-pointer transition-all flex items-center gap-1.5 active:translate-y-0.5"
+            className="text-xs font-medium px-3 py-1.5 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] bg-[#FAF8F5] dark:bg-[#1C1A18] hover:bg-[#F1EFEA] text-[#161514] dark:text-white shadow-xs cursor-pointer transition-all flex items-center gap-1.5 active:scale-95"
           >
             {isAnatomyExpanded ? (
               <>
-                <ChevronUp className="size-3.5 stroke-[2.5]" />
+                <ChevronUp className="size-3.5 stroke-[2]" />
                 <span>Hide Anatomy</span>
               </>
             ) : (
               <>
-                <ChevronDown className="size-3.5 stroke-[2.5]" />
+                <ChevronDown className="size-3.5 stroke-[2]" />
                 <span>Inspect Anatomy ({splitAnatomy.primary.length + splitAnatomy.secondary.length})</span>
               </>
             )}
@@ -827,7 +825,7 @@ export function GymRoutineTracker() {
         {/* Embedded Body Model */}
         {isAnatomyExpanded && (
           <div className="space-y-3 pt-1 animate-in fade-in duration-200">
-            <div className="flex justify-center py-2 bg-[#FAF8F5] rounded-xl border-2 border-[#161514]/20 shadow-inner">
+            <div className="flex justify-center py-2 bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724]">
               <HumanMuscleAnatomy
                 highlightedMuscles={splitAnatomy}
                 size="md"
@@ -838,10 +836,10 @@ export function GymRoutineTracker() {
             </div>
 
             {/* Focus Area Badges Strip */}
-            <div className="bg-[#FAF8F5] p-3 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] space-y-2">
-              <div className="flex items-center justify-between text-[11px] font-heading font-black text-[#161514]">
-                <span className="uppercase">Active Split Focus Areas:</span>
-                <span className="text-[#047857]">
+            <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] p-3 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] space-y-2">
+              <div className="flex items-center justify-between text-xs font-medium text-[#161514] dark:text-white">
+                <span>Active Split Focus Areas:</span>
+                <span className="text-[#047857] dark:text-[#03D26F] font-mono text-[11px]">
                   {splitAnatomy.primary.length} Primary &bull; {splitAnatomy.secondary.length} Secondary
                 </span>
               </div>
@@ -849,7 +847,7 @@ export function GymRoutineTracker() {
                 {splitAnatomy.primary.map((m) => (
                   <span
                     key={m}
-                    className="px-2.5 py-1 rounded-lg bg-rose-100 text-rose-900 border-2 border-[#161514] text-[10px] font-black uppercase shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center gap-1"
+                    className="px-2.5 py-1 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800/40 text-xs font-medium flex items-center gap-1.5"
                   >
                     <Flame className="size-3 fill-rose-500 text-rose-600" />
                     <span>{m}</span>
@@ -858,14 +856,14 @@ export function GymRoutineTracker() {
                 {splitAnatomy.secondary.map((m) => (
                   <span
                     key={m}
-                    className="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-900 border-2 border-[#161514] text-[10px] font-black uppercase shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center gap-1"
+                    className="px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/40 text-xs font-medium flex items-center gap-1.5"
                   >
                     <Sparkles className="size-3 text-amber-600" />
                     <span>{m}</span>
                   </span>
                 ))}
                 {splitAnatomy.primary.length === 0 && splitAnatomy.secondary.length === 0 && (
-                  <span className="text-[11px] font-bold text-[#161514]/50 italic">
+                  <span className="text-xs text-[#6E6B65] dark:text-[#9E9A90] italic">
                     Add movements in Stage 3 below to light up muscle activation.
                   </span>
                 )}
@@ -876,18 +874,18 @@ export function GymRoutineTracker() {
       </div>
 
       {/* ─── STAGE 3: IN BETWEEN: IMMERSIVE MOVEMENT CHOICE & ACTION BAR ─── */}
-      <div className="bg-cream-bg/60 rounded-2xl p-3.5 sm:p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex flex-col sm:flex-row sm:items-center justify-between gap-3 w-full min-w-0">
+      <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-2xl p-3.5 sm:p-4 border border-[#E8E5DF] dark:border-[#2A2724] shadow-none flex flex-col sm:flex-row sm:items-center justify-between gap-3 w-full min-w-0">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-heading font-black text-[#161514]">
+            <span className="text-sm font-heading font-bold text-[#161514] dark:text-white">
               {selectedDay} Movements
             </span>
-            <span className="bg-[#161514] text-white text-[10px] font-mono font-black px-2 py-0.5 rounded-full">
+            <span className="bg-[#161514] dark:bg-white text-white dark:text-[#161514] text-[10px] font-mono font-medium px-2 py-0.5 rounded-full">
               {currentExercises.length} Exercises
             </span>
           </div>
-          <p className="text-[11px] font-bold text-[#161514]/65 mt-0.5">
-            Log sets, weights, and reps below. Tap '+ Add Movement' to choose from 4,300+ DB or custom exercises.
+          <p className="text-xs text-[#6E6B65] dark:text-[#9E9A90] mt-0.5">
+            Log sets, weights, and reps below. Tap '+ Add Movement' to choose from 4,300+ exercises or pick a proven split.
           </p>
         </div>
 
@@ -897,17 +895,17 @@ export function GymRoutineTracker() {
             <button
               type="button"
               onClick={toggleAllCollapse}
-              className="bg-white hover:bg-cream-bg text-[#161514] font-heading font-black rounded-xl py-2 px-3 text-xs border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] cursor-pointer transition-all flex items-center gap-1 active:translate-y-0.5 whitespace-nowrap"
+              className="bg-white dark:bg-[#23201D] hover:bg-[#F1EFEA] text-[#161514] dark:text-white font-medium rounded-xl py-2 px-3 text-xs border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs cursor-pointer transition-all flex items-center gap-1 active:scale-95 whitespace-nowrap"
               title={isAllCollapsed ? "Expand all exercises" : "Collapse all exercises"}
             >
               {isAllCollapsed ? (
                 <>
-                  <ChevronDown className="h-3.5 w-3.5 stroke-[2.5]" />
+                  <ChevronDown className="size-3.5 stroke-[2]" />
                   <span>Expand All</span>
                 </>
               ) : (
                 <>
-                  <ChevronUp className="h-3.5 w-3.5 stroke-[2.5]" />
+                  <ChevronUp className="size-3.5 stroke-[2]" />
                   <span>Collapse</span>
                 </>
               )}
@@ -919,9 +917,9 @@ export function GymRoutineTracker() {
               setIsChoiceOpen(true);
               soundFX.playPop();
             }}
-            className="bg-[#CEF431] hover:bg-[#D8F74E] text-[#161514] font-heading font-black rounded-xl py-2 px-4 text-xs border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none cursor-pointer flex items-center gap-1.5 transition-all whitespace-nowrap"
+            className="bg-[#161514] hover:bg-[#2A2724] dark:bg-white dark:hover:bg-white/90 text-white dark:text-[#161514] font-medium rounded-xl py-2 px-4 text-xs shadow-xs cursor-pointer flex items-center gap-1.5 transition-all whitespace-nowrap active:scale-95"
           >
-            <Plus className="h-3.5 w-3.5 stroke-[3]" />
+            <Plus className="size-3.5 stroke-[2.5]" />
             <span>Add Movement</span>
           </button>
         </div>
@@ -929,13 +927,61 @@ export function GymRoutineTracker() {
 
       {/* Exercise & Machine Cards List */}
       {isLoading ? (
-        <div className="h-24 animate-pulse bg-cream-bg/30 rounded-2xl" />
+        <div className="h-24 animate-pulse bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724]" />
       ) : currentExercises.length === 0 ? (
-        <div className="bg-cream-bg/30 rounded-2xl p-6 border border-dashed border-border text-center space-y-2">
-          <p className="text-xs font-black text-navy-900">No exercises scheduled for {selectedDay}! 🏋️‍♂️</p>
-          <p className="text-[10px] text-navy-600 font-medium max-w-sm mx-auto">
-            Click '+ Add Exercise' above to log target machines (e.g. Lat Pulldown, Bench Press, Cable Flyes) and track sets & reps.
-          </p>
+        <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-2xl p-6 border border-[#E8E5DF] dark:border-[#2A2724] text-center space-y-4">
+          <div className="size-12 rounded-2xl bg-[#03D26F]/10 border border-[#03D26F]/20 text-[#047857] dark:text-[#03D26F] flex items-center justify-center mx-auto">
+            <Dumbbell className="size-6 stroke-[1.8]" />
+          </div>
+          <div className="space-y-1">
+            <h4 className="font-heading font-bold text-base text-[#161514] dark:text-white">
+              No workout scheduled for {selectedDay} yet
+            </h4>
+            <p className="text-xs text-[#6E6B65] dark:text-[#9E9A90] max-w-md mx-auto">
+              Start your session in seconds. Apply a battle-tested routine preset in one tap or select movements from our 4,300+ exercise library.
+            </p>
+          </div>
+
+          {/* 1-Tap Split Presets */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 max-w-xl mx-auto pt-1">
+            {GYM_TEMPLATE_PACKS.slice(0, 3).map((pack) => (
+              <button
+                key={pack.id}
+                type="button"
+                onClick={() => {
+                  handleApplyGymPack(pack);
+                  soundFX.playPop();
+                }}
+                className="p-3 rounded-xl bg-white dark:bg-[#23201D] border border-[#E8E5DF] dark:border-[#2A2724] hover:border-[#161514] dark:hover:border-white/30 transition-all text-left shadow-xs cursor-pointer group"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-[#161514] dark:text-white group-hover:text-[#047857] dark:group-hover:text-[#03D26F] transition-colors">
+                    {pack.name}
+                  </span>
+                  <span className="text-[10px] font-mono text-[#6E6B65] dark:text-[#9E9A90]">
+                    {pack.items.length} moves
+                  </span>
+                </div>
+                <p className="text-[10px] text-[#6E6B65] dark:text-[#9E9A90] mt-1 line-clamp-1">
+                  {pack.tagline}
+                </p>
+              </button>
+            ))}
+          </div>
+
+          <div className="pt-2 flex items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setIsChoiceOpen(true);
+                soundFX.playPop();
+              }}
+              className="px-4 py-2 rounded-xl bg-[#161514] text-white font-medium text-xs shadow-xs hover:bg-[#2A2724] transition-all cursor-pointer flex items-center gap-1.5 active:scale-95"
+            >
+              <Plus className="size-3.5" />
+              <span>Browse 4,300+ Exercise Library</span>
+            </button>
+          </div>
         </div>
       ) : (
         <div className="space-y-3 pb-2">
@@ -950,8 +996,8 @@ export function GymRoutineTracker() {
                 <div
                   key={ex.id}
                   className={cn(
-                    "bg-cream-bg/60 hover:bg-cream-bg rounded-2xl p-3.5 border-2 border-[#161514] transition-all shadow-[2px_2px_0px_0px_#161514] cursor-pointer select-none",
-                    isCompleted && "bg-emerald-50/80 border-[#161514]"
+                    "bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#23201D] rounded-2xl p-3.5 border border-[#E8E5DF] dark:border-[#2A2724] transition-all shadow-none cursor-pointer select-none",
+                    isCompleted && "bg-emerald-50/50 dark:bg-emerald-950/20 border-[#03D26F]/30"
                   )}
                   onClick={() => toggleCollapse(ex.id)}
                 >
@@ -961,14 +1007,16 @@ export function GymRoutineTracker() {
                       <div className="flex items-start gap-2.5 min-w-0 flex-1">
                         <div
                           className={cn(
-                            "h-8 w-8 rounded-xl border-2 border-[#161514] flex items-center justify-center text-sm shrink-0 font-black shadow-[1.5px_1.5px_0px_0px_#161514] mt-0.5",
-                            isCompleted ? "bg-[#03D26F] text-[#161514]" : "bg-amber-300 text-[#161514]"
+                            "size-8 rounded-xl border flex items-center justify-center text-sm shrink-0 font-medium mt-0.5",
+                            isCompleted
+                              ? "bg-[#03D26F]/15 border-[#03D26F]/30 text-[#047857] dark:text-[#03D26F]"
+                              : "bg-[#F1EFEA] dark:bg-[#23201D] border-[#E8E5DF] dark:border-[#2A2724] text-[#161514] dark:text-white"
                           )}
                         >
                           {isCompleted ? "✓" : "🏋️"}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <h5 className="font-black text-xs sm:text-sm text-[#161514] leading-snug break-words">
+                          <h5 className="font-semibold text-xs sm:text-sm text-[#161514] dark:text-white leading-snug break-words">
                             {ex.name}
                           </h5>
                         </div>
@@ -976,26 +1024,26 @@ export function GymRoutineTracker() {
 
                       <div className="flex items-center gap-1.5 shrink-0 pt-0.5">
                         <div
-                          className="h-6 w-6 rounded-lg border-2 border-[#161514] flex items-center justify-center text-[#161514] bg-white shadow-[1px_1px_0px_0px_#161514]"
+                          className="size-6 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] flex items-center justify-center text-[#6E6B65] dark:text-[#9E9A90] bg-white dark:bg-[#23201D]"
                           title="Expand exercise"
                         >
-                          <ChevronDown className="h-3.5 w-3.5 stroke-[2.5]" />
+                          <ChevronDown className="size-3.5 stroke-[2]" />
                         </div>
                       </div>
                     </div>
 
                     {/* Bottom Row: Muscle & Equipment Pills + Progress Badge + Form Guide */}
-                    <div className="flex items-center justify-between gap-2 pt-2 border-t border-[#161514]/10 flex-wrap">
+                    <div className="flex items-center justify-between gap-2 pt-2 border-t border-[#E8E5DF]/60 dark:border-[#2A2724] flex-wrap">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-[8.5px] font-black uppercase px-2 py-0.5 rounded-md bg-rose-100 text-rose-800 border-2 border-[#161514]">
+                        <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded-md bg-rose-50 text-rose-800 dark:bg-rose-950/40 dark:text-rose-300 border border-rose-200 dark:border-rose-800/40">
                           {ex.targetMuscle || "General"}
                         </span>
                         {ex.machineName && (
-                          <span className="text-[9.5px] font-bold text-[#161514]/70">
+                          <span className="text-[10px] font-normal text-[#6E6B65] dark:text-[#9E9A90]">
                             • {ex.machineName}
                           </span>
                         )}
-                        <span className="text-[9.5px] font-black text-[#161514]/60">
+                        <span className="text-[10px] font-mono text-[#6E6B65] dark:text-[#9E9A90]">
                           • {totalCount} Sets
                         </span>
                       </div>
@@ -1003,8 +1051,10 @@ export function GymRoutineTracker() {
                       <div className="flex items-center gap-1.5 shrink-0 ml-auto">
                         <span
                           className={cn(
-                            "text-[9.5px] font-black px-2 py-0.5 rounded-md border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514]",
-                            isCompleted ? "bg-[#03D26F] text-[#161514]" : "bg-white text-[#161514]"
+                            "text-[10px] font-mono font-medium px-2 py-0.5 rounded-md border",
+                            isCompleted
+                              ? "bg-[#03D26F]/15 text-[#047857] dark:text-[#03D26F] border-[#03D26F]/30"
+                              : "bg-[#FAF8F5] dark:bg-[#23201D] text-[#161514] dark:text-white border-[#E8E5DF] dark:border-[#2A2724]"
                           )}
                         >
                           {completedCount} / {totalCount} Done
@@ -1016,10 +1066,10 @@ export function GymRoutineTracker() {
                             e.stopPropagation();
                             setSelectedGuideExercise(ex);
                           }}
-                          className="px-2 py-0.5 rounded-md bg-amber-300 hover:bg-amber-400 text-[#161514] text-[9.5px] font-black border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514] flex items-center gap-1 cursor-pointer transition-all active:translate-y-0.5 shrink-0"
+                          className="px-2 py-0.5 rounded-md bg-[#FAF8F5] dark:bg-[#23201D] hover:bg-[#F1EFEA] text-[#161514] dark:text-white text-[10px] font-medium border border-[#E8E5DF] dark:border-[#2A2724] flex items-center gap-1 cursor-pointer transition-all active:scale-95 shrink-0"
                           title="Form Guide"
                         >
-                          <Eye className="h-3 w-3 stroke-[2.5]" />
+                          <Eye className="size-3 stroke-[2]" />
                           <span>Guide</span>
                         </button>
                       </div>
@@ -1033,8 +1083,8 @@ export function GymRoutineTracker() {
               <div
                 key={ex.id}
                 className={cn(
-                  "bg-cream-bg/40 rounded-2xl p-4 border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] space-y-3 transition-all",
-                  isCompleted && "bg-emerald-50/40 border-[#161514]"
+                  "bg-white dark:bg-[#1C1A18] rounded-2xl p-4 border border-[#E8E5DF] dark:border-[#2A2724] shadow-none space-y-3.5 transition-all",
+                  isCompleted && "bg-emerald-50/40 dark:bg-emerald-950/20 border-[#03D26F]/30"
                 )}
               >
                 {/* Exercise Header */}
@@ -1046,7 +1096,7 @@ export function GymRoutineTracker() {
                       className="cursor-pointer select-none min-w-0 flex-1"
                       title="Click to collapse"
                     >
-                      <h5 className="font-black text-sm sm:text-base text-[#161514] leading-snug break-words">
+                      <h5 className="font-semibold text-sm sm:text-base text-[#161514] dark:text-white leading-snug break-words">
                         {ex.name}
                       </h5>
                     </div>
@@ -1060,25 +1110,25 @@ export function GymRoutineTracker() {
                           setEditExTarget(ex.targetMuscle || "Chest");
                           setEditExNotes(ex.notes || "");
                         }}
-                        className="p-1.5 rounded-lg bg-white hover:bg-amber-100 border-2 border-[#161514] text-[#161514] shadow-[1px_1px_0px_0px_#161514] cursor-pointer transition-all active:translate-y-0.5"
+                        className="size-7 rounded-lg bg-white dark:bg-[#23201D] hover:bg-[#F1EFEA] border border-[#E8E5DF] dark:border-[#2A2724] text-[#6E6B65] hover:text-[#161514] shadow-xs cursor-pointer transition-all flex items-center justify-center active:scale-95"
                         title="Edit exercise"
                       >
-                        <Edit3 className="h-3 w-3" />
+                        <Edit3 className="size-3.5" />
                       </button>
                       <button
                         onClick={() => setDeleteExId(ex.id)}
-                        className="p-1.5 rounded-lg bg-white hover:bg-rose-100 border-2 border-[#161514] text-rose-600 shadow-[1px_1px_0px_0px_#161514] cursor-pointer transition-all active:translate-y-0.5"
+                        className="size-7 rounded-lg bg-white dark:bg-[#23201D] hover:bg-rose-50 border border-[#E8E5DF] dark:border-[#2A2724] text-[#6E6B65] hover:text-rose-600 shadow-xs cursor-pointer transition-all flex items-center justify-center active:scale-95"
                         title="Delete exercise"
                       >
-                        <Trash2 className="h-3 w-3" />
+                        <Trash2 className="size-3.5" />
                       </button>
                       <button
                         type="button"
                         onClick={() => toggleCollapse(ex.id)}
-                        className="p-1.5 rounded-lg bg-white hover:bg-amber-100 border-2 border-[#161514] text-[#161514] shadow-[1px_1px_0px_0px_#161514] cursor-pointer transition-all active:translate-y-0.5"
+                        className="size-7 rounded-lg bg-white dark:bg-[#23201D] hover:bg-[#F1EFEA] border border-[#E8E5DF] dark:border-[#2A2724] text-[#6E6B65] hover:text-[#161514] shadow-xs cursor-pointer transition-all flex items-center justify-center active:scale-95"
                         title="Collapse exercise"
                       >
-                        <ChevronUp className="h-3 w-3 stroke-[2.5]" />
+                        <ChevronUp className="size-3.5 stroke-[2]" />
                       </button>
                     </div>
                   </div>
@@ -1086,12 +1136,12 @@ export function GymRoutineTracker() {
                   {/* Sub-line: Muscle Tag + Machine + Form Guide Button + Progressive Overload Ghost Target */}
                   <div className="flex items-center justify-between gap-2 flex-wrap pt-0.5">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-md bg-rose-100 text-rose-800 border-2 border-[#161514]">
+                      <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded-md bg-rose-50 text-rose-800 dark:bg-rose-950/40 dark:text-rose-300 border border-rose-200 dark:border-rose-800/40">
                         {ex.targetMuscle || "General"}
                       </span>
                       {ex.machineName && (
-                        <span className="text-[10px] font-bold text-[#161514]/70 flex items-center gap-1">
-                          <Layers className="h-3 w-3 text-rose-500" /> {ex.machineName}
+                        <span className="text-xs text-[#6E6B65] dark:text-[#9E9A90] flex items-center gap-1">
+                          <Layers className="size-3 text-[#6E6B65]" /> {ex.machineName}
                         </span>
                       )}
                       {(() => {
@@ -1099,7 +1149,7 @@ export function GymRoutineTracker() {
                         return (
                           <span
                             title="Hevy Progressive Overload Target"
-                            className="text-[9px] font-mono font-bold text-[#161514] bg-amber-50 px-2 py-0.5 rounded-md border border-[#161514] shadow-[1px_1px_0px_0px_#161514] flex items-center gap-1"
+                            className="text-[10px] font-mono text-[#6E6B65] dark:text-[#9E9A90] bg-[#FAF8F5] dark:bg-[#23201D] px-2 py-0.5 rounded-md border border-[#E8E5DF] dark:border-[#2A2724] flex items-center gap-1"
                           >
                             <Flame className="size-2.5 text-orange-500 fill-orange-400" />
                             <span>{ghost.isFromPreviousSession ? `Prev: ${ghost.weight}kg × ${ghost.reps}` : `Target: ${ghost.weight}kg × ${ghost.reps}`}</span>
@@ -1111,37 +1161,37 @@ export function GymRoutineTracker() {
                     <button
                       type="button"
                       onClick={() => setSelectedGuideExercise(ex)}
-                      className="px-2.5 py-1 rounded-lg bg-amber-300 hover:bg-amber-400 text-[#161514] font-black text-[10px] border-2 border-[#161514] shadow-[1px_1px_0px_0px_#161514] flex items-center gap-1 cursor-pointer transition-all active:translate-y-0.5 shrink-0"
+                      className="px-2.5 py-1 rounded-lg bg-[#FAF8F5] dark:bg-[#23201D] hover:bg-[#F1EFEA] text-[#161514] dark:text-white font-medium text-xs border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex items-center gap-1.5 cursor-pointer transition-all active:scale-95 shrink-0"
                       title="View execution form guide, muscle activation & posture"
                     >
-                      <Eye className="h-3 w-3 stroke-[2.5]" />
+                      <Eye className="size-3 stroke-[2]" />
                       <span>Form Guide</span>
                     </button>
                   </div>
                 </div>
 
                 {/* Sets Table */}
-                <div className="bg-white rounded-xl border-2 border-[#161514] overflow-hidden text-xs shadow-[2px_2px_0px_0px_#161514]">
-                  <div className="grid grid-cols-4 gap-2 px-3 py-2 bg-[#FAF8F5] font-black text-[10px] text-[#161514] uppercase tracking-wider text-center border-b-2 border-[#161514]">
+                <div className="bg-white dark:bg-[#161514] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] overflow-hidden text-xs shadow-none">
+                  <div className="grid grid-cols-4 gap-2 px-3 py-2 bg-[#FAF8F5] dark:bg-[#1C1A18] font-mono text-[10px] text-[#6E6B65] dark:text-[#9E9A90] uppercase tracking-wider text-center border-b border-[#E8E5DF] dark:border-[#2A2724]">
                     <span>Set</span>
                     <span>Weight (kg)</span>
                     <span>Reps</span>
                     <span>Done</span>
                   </div>
 
-                  <div className="divide-y divide-[#161514]/10">
+                  <div className="divide-y divide-[#E8E5DF]/60 dark:divide-[#2A2724]">
                     {(ex.sets || []).map((st: any, idx: number) => {
                       const ghost = getPreviousSetGhost(ex, idx);
                       return (
                         <div key={st.id || idx} className="grid grid-cols-4 gap-2 px-3 py-2.5 items-center text-center">
-                          <span className="font-heading font-black text-[#161514] text-xs">Set {st.setNumber}</span>
+                          <span className="font-mono font-medium text-[#161514] dark:text-white text-xs">Set {st.setNumber}</span>
                           <div className="flex justify-center">
                             <input
                               type="number"
                               value={st.weight === 0 ? "" : st.weight}
                               placeholder={String(ghost.weight)}
                               onChange={(e) => handleSetChange(ex.id, idx, "weight", e.target.value === "" ? 0 : Number(e.target.value))}
-                              className="w-full max-w-[64px] bg-[#FAF8F5] border-2 border-[#161514] rounded-xl py-1.5 px-1 text-center font-heading font-black text-[#161514] placeholder:text-[#161514]/35 placeholder:font-normal text-base sm:text-xs outline-none focus:bg-[#FFF9EA] shadow-[1.5px_1.5px_0px_0px_#161514] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-all"
+                              className="w-full max-w-[64px] bg-[#FAF8F5] dark:bg-[#23201D] border border-[#E8E5DF] dark:border-[#2A2724] rounded-xl py-1.5 px-1 text-center font-mono font-medium text-[#161514] dark:text-white placeholder:text-[#6E6B65]/40 text-base sm:text-xs outline-none focus:border-[#161514] dark:focus:border-white shadow-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-all"
                               min={0}
                             />
                           </div>
@@ -1151,7 +1201,7 @@ export function GymRoutineTracker() {
                               value={st.reps === 0 ? "" : st.reps}
                               placeholder={String(ghost.reps)}
                               onChange={(e) => handleSetChange(ex.id, idx, "reps", e.target.value === "" ? 0 : Number(e.target.value))}
-                              className="w-full max-w-[64px] bg-[#FAF8F5] border-2 border-[#161514] rounded-xl py-1.5 px-1 text-center font-heading font-black text-[#161514] placeholder:text-[#161514]/35 placeholder:font-normal text-base sm:text-xs outline-none focus:bg-[#FFF9EA] shadow-[1.5px_1.5px_0px_0px_#161514] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-all"
+                              className="w-full max-w-[64px] bg-[#FAF8F5] dark:bg-[#23201D] border border-[#E8E5DF] dark:border-[#2A2724] rounded-xl py-1.5 px-1 text-center font-mono font-medium text-[#161514] dark:text-white placeholder:text-[#6E6B65]/40 text-base sm:text-xs outline-none focus:border-[#161514] dark:focus:border-white shadow-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-all"
                               min={1}
                             />
                           </div>
@@ -1160,18 +1210,17 @@ export function GymRoutineTracker() {
                             type="button"
                             onClick={() => handleSetChange(ex.id, idx, "completed", !st.completed)}
                             className={cn(
-                              "min-w-[44px] min-h-[44px] size-11 rounded-xl border-2 border-[#161514] flex items-center justify-center cursor-pointer transition-all",
-                              "shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
+                              "size-9 rounded-xl border flex items-center justify-center cursor-pointer transition-all shadow-xs active:scale-95",
                               st.completed
-                                ? "bg-[#03D26F] text-[#161514]"
-                                : "bg-white text-[#161514]/40 hover:bg-[#FFF9EA] hover:text-[#161514]"
+                                ? "bg-[#03D26F] border-[#03D26F] text-white shadow-xs"
+                                : "bg-white dark:bg-[#23201D] border-[#E8E5DF] dark:border-[#2A2724] text-[#6E6B65] hover:text-[#161514] hover:bg-[#FAF8F5]"
                             )}
                             title={st.completed ? "Mark incomplete" : "Mark completed (Starts Rest Timer)"}
                           >
                             {st.completed ? (
-                              <CheckCircle2 className="size-6 stroke-[2.2] fill-[#161514] text-white" />
+                              <CheckCircle2 className="size-5 stroke-[2] text-white" />
                             ) : (
-                              <Circle className="size-6 stroke-[2.5]" />
+                              <Circle className="size-5 stroke-[2]" />
                             )}
                           </button>
                         </div>
@@ -1187,34 +1236,34 @@ export function GymRoutineTracker() {
                     <button
                       type="button"
                       onClick={() => handleAddSet(ex.id)}
-                      className="font-bold text-[11px] text-rose-700 bg-rose-50 hover:bg-rose-100 px-3 py-1 rounded-full cursor-pointer transition-colors border border-rose-200 flex items-center gap-1 shrink-0 whitespace-nowrap active:scale-95"
+                      className="font-medium text-xs text-[#047857] dark:text-[#03D26F] bg-[#03D26F]/10 hover:bg-[#03D26F]/20 px-3 py-1 rounded-full cursor-pointer transition-colors border border-[#03D26F]/20 flex items-center gap-1 shrink-0 whitespace-nowrap active:scale-95"
                     >
-                      <Plus className="h-3 w-3 stroke-[2.5]" />
+                      <Plus className="size-3 stroke-[2]" />
                       <span>Add Set</span>
                     </button>
                     {ex.sets && ex.sets.length > 1 && (
                       <button
                         type="button"
                         onClick={() => handleRemoveSet(ex.id)}
-                        className="font-bold text-[11px] text-[#161514]/60 hover:text-rose-600 bg-cream-bg px-3 py-1 rounded-full cursor-pointer transition-colors border border-[#161514]/10 shrink-0 whitespace-nowrap active:scale-95"
+                        className="font-medium text-xs text-[#6E6B65] hover:text-rose-600 bg-[#F1EFEA] hover:bg-rose-50 px-3 py-1 rounded-full cursor-pointer transition-colors border border-[#E8E5DF] shrink-0 whitespace-nowrap active:scale-95"
                       >
                         Remove Set
                       </button>
                     )}
                   </div>
 
-                  <span className="text-[10px] font-extrabold text-[#161514]/60 uppercase tracking-wider">
+                  <span className="text-[10px] font-mono text-[#6E6B65] dark:text-[#9E9A90]">
                     {completedCount} / {totalCount} Done
                   </span>
                 </div>
 
-                {/* Form Cue / Notes Banner (Zero Clipping, Dedicated Full-Width Callout) */}
+                {/* Form Cue / Notes Banner */}
                 {ex.notes && (
-                  <div className="bg-amber-50/90 rounded-xl p-2.5 border border-amber-200/90 flex items-start gap-2 shadow-[1px_1px_0px_0px_rgba(245,158,11,0.15)]">
-                    <span className="text-[9px] font-black uppercase tracking-wider bg-amber-400 text-[#161514] px-1.5 py-0.5 rounded border-2 border-[#161514] shrink-0 mt-0.5">
+                  <div className="bg-[#FAF8F5] dark:bg-[#23201D] rounded-xl p-2.5 border border-[#E8E5DF] dark:border-[#2A2724] flex items-start gap-2 text-xs">
+                    <span className="text-[10px] font-mono font-semibold bg-[#161514] text-white px-1.5 py-0.5 rounded shrink-0 mt-0.5">
                       CUE
                     </span>
-                    <p className="text-navy-900 text-[11px] font-bold leading-relaxed break-words flex-1">
+                    <p className="text-[#6E6B65] dark:text-[#9E9A90] text-xs leading-relaxed break-words flex-1">
                       {ex.notes}
                     </p>
                   </div>
@@ -1246,20 +1295,20 @@ export function GymRoutineTracker() {
       >
         <form onSubmit={handleSaveRoutineTitle} className="space-y-4 pt-2">
           <div className="space-y-1.5">
-            <label className="text-xs font-heading font-black uppercase tracking-wider text-[#161514]">Routine Title</label>
+            <label className="text-xs font-heading font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5]">Routine Title</label>
             <input
               type="text"
               placeholder="e.g. Chest & Triceps Focus, Leg Day Blitz"
               value={routineTitleInput}
               onChange={(e) => setRoutineTitleInput(e.target.value)}
-              className="w-full bg-white rounded-xl border-2 border-[#161514] px-4 py-2.5 text-base font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514] focus:outline-none focus:ring-2 focus:ring-[#161514]"
+              className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-4 py-2.5 text-base font-bold text-[#161514] dark:text-[#FAF8F5] shadow-xs focus:outline-none focus:ring-1 focus:ring-[#161514] dark:focus:ring-white"
               required
             />
           </div>
           <Button
             type="submit"
             disabled={updateRoutineMutation.isPending || addRoutineMutation.isPending}
-            className="w-full min-h-[48px] bg-rose-500 hover:bg-rose-600 text-white font-heading font-black text-sm rounded-xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] cursor-pointer"
+            className="w-full min-h-[48px] bg-[#161514] hover:bg-[#252321] dark:bg-[#FAF8F5] dark:hover:bg-[#E8E5DF] text-[#FAF8F5] dark:text-[#161514] font-heading font-black text-sm rounded-xl py-3 mt-2 border border-[#161514] dark:border-[#FAF8F5] shadow-xs cursor-pointer active:translate-y-0.5 transition-all"
           >
             Save Routine Title
           </Button>
@@ -1277,37 +1326,37 @@ export function GymRoutineTracker() {
       >
         <form onSubmit={handleUpdateExercise} className="space-y-4 pt-1">
           <div className="space-y-1.5">
-            <label className="text-xs font-heading font-black uppercase tracking-wider text-[#161514]">
+            <label className="text-xs font-heading font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5]">
               Exercise Name
             </label>
             <input
               type="text"
               value={editExName}
               onChange={(e) => setEditExName(e.target.value)}
-              className="w-full bg-white rounded-xl border-2 border-[#161514] px-4 py-2.5 text-base font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514] focus:outline-none focus:ring-2 focus:ring-[#161514]"
+              className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-4 py-2.5 text-base font-bold text-[#161514] dark:text-[#FAF8F5] shadow-xs focus:outline-none focus:ring-1 focus:ring-[#161514] dark:focus:ring-white"
               required
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-xs font-heading font-black uppercase tracking-wider text-[#161514]">
+              <label className="text-xs font-heading font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5]">
                 Machine / Equipment
               </label>
               <input
                 type="text"
                 value={editExMachine}
                 onChange={(e) => setEditExMachine(e.target.value)}
-                className="w-full bg-white rounded-xl border-2 border-[#161514] px-4 py-2.5 text-base font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514] focus:outline-none focus:ring-2 focus:ring-[#161514]"
+                className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-4 py-2.5 text-base font-bold text-[#161514] dark:text-[#FAF8F5] shadow-xs focus:outline-none focus:ring-1 focus:ring-[#161514] dark:focus:ring-white"
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-heading font-black uppercase tracking-wider text-[#161514]">
+              <label className="text-xs font-heading font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5]">
                 Target Muscle
               </label>
               <select
                 value={editExTarget}
                 onChange={(e) => setEditExTarget(e.target.value)}
-                className="w-full bg-white rounded-xl border-2 border-[#161514] px-4 py-2.5 text-base font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514] focus:outline-none focus:ring-2 focus:ring-[#161514]"
+                className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-4 py-2.5 text-base font-bold text-[#161514] dark:text-[#FAF8F5] shadow-xs focus:outline-none focus:ring-1 focus:ring-[#161514] dark:focus:ring-white"
               >
                 {["Chest", "Back", "Shoulders", "Biceps", "Triceps", "Legs", "Abs/Core", "Cardio"].map((m) => (
                   <option key={m} value={m}>
@@ -1319,7 +1368,7 @@ export function GymRoutineTracker() {
           </div>
           <Button
             type="submit"
-            className="w-full min-h-[48px] bg-rose-500 hover:bg-rose-600 text-white font-heading font-black text-sm rounded-xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] cursor-pointer"
+            className="w-full min-h-[48px] bg-[#161514] hover:bg-[#252321] dark:bg-[#FAF8F5] dark:hover:bg-[#E8E5DF] text-[#FAF8F5] dark:text-[#161514] font-heading font-black text-sm rounded-xl py-3 mt-2 border border-[#161514] dark:border-[#FAF8F5] shadow-xs cursor-pointer active:translate-y-0.5 transition-all"
           >
             Save Changes
           </Button>
@@ -1366,15 +1415,15 @@ export function GymRoutineTracker() {
             />
           </div>
 
-          <div className="bg-[#FAF8F5] p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-left text-xs space-y-1.5">
-            <span className="font-heading font-black uppercase text-[#161514] block">
+          <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] p-3 rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs text-left text-xs space-y-1.5">
+            <span className="font-heading font-black uppercase text-[#161514] dark:text-[#FAF8F5] block">
               Active Focus Areas ({splitAnatomy.primary.length} Muscle Groups)
             </span>
             <div className="flex flex-wrap gap-1.5 pt-1">
               {splitAnatomy.primary.map((m) => (
                 <span
                   key={m}
-                  className="px-2 py-0.5 rounded-md bg-rose-100 text-rose-900 border border-[#161514] text-[10px] font-black uppercase shadow-[1px_1px_0px_0px_#161514]"
+                  className="px-2 py-0.5 rounded-md bg-rose-100 dark:bg-rose-950/40 text-rose-900 dark:text-rose-200 border border-rose-300 dark:border-rose-800/50 text-[10px] font-black uppercase shadow-xs"
                 >
                   🔥 {m}
                 </span>
@@ -1382,7 +1431,7 @@ export function GymRoutineTracker() {
               {splitAnatomy.secondary.map((m) => (
                 <span
                   key={m}
-                  className="px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 border border-[#161514] text-[10px] font-black uppercase shadow-[1px_1px_0px_0px_#161514]"
+                  className="px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-800/50 text-[10px] font-black uppercase shadow-xs"
                 >
                   ⚡ {m}
                 </span>

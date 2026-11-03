@@ -22,6 +22,8 @@ import java.net.URL;
 @CapacitorPlugin(name = "AppUpdateBridge")
 public class AppUpdateBridgePlugin extends Plugin {
 
+    private static final String APP_USER_AGENT = "Invictus-App-Updater/1.0 (Android; " + Build.MODEL + "; SDK " + Build.VERSION.SDK_INT + ")";
+
     @PluginMethod
     public void canInstallPackages(PluginCall call) {
         JSObject ret = new JSObject();
@@ -64,6 +66,12 @@ public class AppUpdateBridgePlugin extends Plugin {
         }
 
         downloadUrl = downloadUrl.trim();
+
+        // Guard against localhost / 127.0.0.1 on native Android devices
+        if (downloadUrl.contains("localhost") || downloadUrl.contains("127.0.0.1")) {
+            downloadUrl = downloadUrl.replaceAll("^https?://(localhost|127\\.0\\.0\\.1)(:\\d+)?", "https://invictus-the-omni-tracker.vercel.app");
+        }
+
         // Defensive Protocol Repair: Auto-prepend HTTPS domain if relative path is passed
         if (!downloadUrl.startsWith("http://") && !downloadUrl.startsWith("https://")) {
             String baseOrigin = "https://invictus-the-omni-tracker.vercel.app";
@@ -88,17 +96,19 @@ public class AppUpdateBridgePlugin extends Plugin {
 
                 URL url = new URL(finalDownloadUrl);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setConnectTimeout(15000);
-                connection.setReadTimeout(30000);
+                connection.setConnectTimeout(25000);
+                connection.setReadTimeout(60000);
+                connection.setRequestProperty("User-Agent", APP_USER_AGENT);
+                connection.setRequestProperty("Accept", "*/*");
                 connection.setRequestProperty("Accept-Encoding", "identity");
                 connection.connect();
 
                 int responseCode = connection.getResponseCode();
-                // Handle multi-hop 301 / 302 redirects (e.g. GitHub Releases redirect to AWS S3)
+                // Handle multi-hop 301 / 302 / 307 / 308 redirects (e.g. GitHub Releases redirect to AWS S3/Cloudflare CDN)
                 int redirectCount = 0;
                 while ((responseCode == HttpURLConnection.HTTP_MOVED_TEMP || 
                         responseCode == HttpURLConnection.HTTP_MOVED_PERM || 
-                        responseCode == 307 || responseCode == 308) && redirectCount < 5) {
+                        responseCode == 307 || responseCode == 308) && redirectCount < 7) {
                     String redirectUrl = connection.getHeaderField("Location");
                     connection.disconnect();
                     if (redirectUrl != null && !redirectUrl.isEmpty()) {
@@ -107,8 +117,10 @@ public class AppUpdateBridgePlugin extends Plugin {
                         }
                         url = new URL(redirectUrl);
                         connection = (HttpURLConnection) url.openConnection();
-                        connection.setConnectTimeout(15000);
-                        connection.setReadTimeout(30000);
+                        connection.setConnectTimeout(25000);
+                        connection.setReadTimeout(60000);
+                        connection.setRequestProperty("User-Agent", APP_USER_AGENT);
+                        connection.setRequestProperty("Accept", "*/*");
                         connection.setRequestProperty("Accept-Encoding", "identity");
                         connection.connect();
                         responseCode = connection.getResponseCode();
@@ -117,7 +129,8 @@ public class AppUpdateBridgePlugin extends Plugin {
                 }
 
                 if (responseCode != HttpURLConnection.HTTP_OK) {
-                    call.reject("APK download server returned HTTP " + responseCode);
+                    String errorMsg = "APK download server returned HTTP " + responseCode + " (" + connection.getResponseMessage() + ")";
+                    call.reject(errorMsg);
                     return;
                 }
 

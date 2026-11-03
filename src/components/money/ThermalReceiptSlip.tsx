@@ -458,7 +458,7 @@ export function ThermalReceiptSlip({
             type="button"
             disabled={isDuplicating}
             onClick={handleDuplicate}
-            className="bg-white hover:bg-[#FAF8F5] text-[#161514] font-black text-[11px] uppercase tracking-wider py-2.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center gap-1 cursor-pointer active:translate-y-0.5 disabled:opacity-50"
+            className="bg-white dark:bg-[#252321] hover:bg-[#FAF8F5] dark:hover:bg-[#2A2724] text-[#161514] dark:text-[#FAF8F5] font-black text-[11px] uppercase tracking-wider py-2.5 rounded-xl border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] flex items-center justify-center gap-1 cursor-pointer active:translate-y-0.5 disabled:opacity-50"
             title="Duplicate with today's date"
           >
             <Copy className="size-3.5" />
@@ -471,7 +471,7 @@ export function ThermalReceiptSlip({
               if (onClose) onClose();
               onEdit(transaction);
             }}
-            className="bg-white hover:bg-[#FAF8F5] text-[#161514] font-black text-[11px] uppercase tracking-wider py-2.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center gap-1 cursor-pointer active:translate-y-0.5"
+            className="bg-white dark:bg-[#252321] hover:bg-[#FAF8F5] dark:hover:bg-[#2A2724] text-[#161514] dark:text-[#FAF8F5] font-black text-[11px] uppercase tracking-wider py-2.5 rounded-xl border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] flex items-center justify-center gap-1 cursor-pointer active:translate-y-0.5"
           >
             <Edit2 className="size-3.5" />
             <span>Edit</span>
@@ -481,7 +481,7 @@ export function ThermalReceiptSlip({
             type="button"
             disabled={isDeleting}
             onClick={handleDelete}
-            className="bg-rose-100 hover:bg-rose-200 text-rose-700 font-black text-[11px] uppercase tracking-wider py-2.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center gap-1 cursor-pointer active:translate-y-0.5 disabled:opacity-50"
+            className="bg-rose-100 dark:bg-rose-950/60 hover:bg-rose-200 dark:hover:bg-rose-900/80 text-rose-700 dark:text-rose-300 font-black text-[11px] uppercase tracking-wider py-2.5 rounded-xl border-2 border-[#161514] dark:border-rose-900 shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] flex items-center justify-center gap-1 cursor-pointer active:translate-y-0.5 disabled:opacity-50"
           >
             <Trash2 className="size-3.5" />
             <span>{isDeleting ? "…" : "Delete"}</span>

@@ -130,15 +130,15 @@ export function LearnedMerchantDictionaryModal({
       title="Learned Merchant Dictionary"
       description="Categorize-once rules. Daily transactions from these merchants are categorized automatically in 0ms."
     >
-      <div className="flex flex-col h-[70vh] sm:h-[620px] max-h-[80vh] text-[#161514] overflow-hidden">
+      <div className="flex flex-col h-[70vh] sm:h-[620px] max-h-[80vh] text-[#161514] dark:text-[#FAF8F5] overflow-hidden">
         {/* Top Summary Bar */}
-        <div className="shrink-0 px-5 pt-3 pb-2 bg-[#FAF8F5] border-b-2 border-[#161514]/15">
-          <div className="flex items-center justify-between text-xs font-mono font-bold text-[#161514]/70 mb-2">
+        <div className="shrink-0 px-5 pt-3 pb-2.5 bg-[#FAF8F5] dark:bg-[#1C1A18] border-b border-[#E8E5DF] dark:border-[#2A2724]">
+          <div className="flex items-center justify-between text-xs font-mono font-bold text-[#161514]/70 dark:text-[#FAF8F5]/70 mb-2">
             <span className="flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-[#CEF431]" fill="#CEF431" />
+              <Sparkles className="w-3.5 h-3.5 text-[#03D26F]" fill="#03D26F" />
               <span>{stats.total} Active Rules</span>
             </span>
-            <span className="bg-[#CEF431]/40 px-2 py-0.5 rounded-full border border-[#161514]/20 text-[#161514]">
+            <span className="bg-[#CEF431]/20 dark:bg-[#CEF431]/10 px-2 py-0.5 rounded-full border border-[#CEF431]/40 text-[#161514] dark:text-[#FAF8F5]">
               {stats.userLearned} Custom Learned
             </span>
             <span>{stats.totalHits} Total Hits</span>
@@ -154,7 +154,7 @@ export function LearnedMerchantDictionaryModal({
               placeholder="Merchant (e.g. Ramesh Chai, D-Mart)"
               value={newMerchant}
               onChange={(e) => setNewMerchant(e.target.value)}
-              className="flex-1 min-w-[160px] h-9 px-3 text-xs sm:text-sm font-bold bg-white border-2 border-[#161514] rounded-xl shadow-[2px_2px_0px_0px_#161514] focus:outline-none focus:ring-1 focus:ring-[#161514]"
+              className="flex-1 min-w-[160px] h-9 px-3 text-xs sm:text-sm font-medium bg-white dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#2A2724] text-[#161514] dark:text-[#FAF8F5] placeholder:text-[#161514]/40 dark:placeholder:text-[#FAF8F5]/30 rounded-xl shadow-xs focus:outline-none focus:ring-1 focus:ring-[#CEF431]"
             />
             <div className="w-44">
               <NeobrutalistSelect
@@ -172,7 +172,7 @@ export function LearnedMerchantDictionaryModal({
             <button
               type="submit"
               disabled={!newMerchant.trim() || saveMutation.isPending}
-              className="h-9 px-3 flex items-center justify-center gap-1 text-xs font-black bg-[#CEF431] text-[#161514] border-2 border-[#161514] rounded-xl shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all disabled:opacity-50 cursor-pointer"
+              className="h-9 px-3.5 flex items-center justify-center gap-1 text-xs font-black bg-[#CEF431] text-[#161514] border border-[#CEF431] rounded-xl shadow-xs active:translate-y-0.5 hover:-translate-y-0.5 transition-all disabled:opacity-50 cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5 stroke-[3]" />
               <span>Add</span>
@@ -181,23 +181,23 @@ export function LearnedMerchantDictionaryModal({
         </div>
 
         {/* Search Bar */}
-        <div className="shrink-0 px-5 py-2.5 bg-white border-b-2 border-[#161514]/10">
+        <div className="shrink-0 px-5 py-2.5 bg-white dark:bg-[#1C1A18] border-b border-[#E8E5DF] dark:border-[#2A2724]">
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-2.5 text-[#161514]/50" />
+            <Search className="w-4 h-4 absolute left-3 top-2.5 text-[#161514]/40 dark:text-[#FAF8F5]/40" />
             <input
               type="text"
               placeholder="Search merchants, patterns, or categories..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 text-xs sm:text-sm font-semibold bg-[#FAF8F5] border-2 border-[#161514]/30 rounded-xl focus:border-[#161514] focus:outline-none"
+              className="w-full pl-9 pr-3 py-1.5 text-xs sm:text-sm font-medium bg-[#FAF8F5] dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#2A2724] text-[#161514] dark:text-[#FAF8F5] placeholder:text-[#161514]/40 dark:placeholder:text-[#FAF8F5]/30 rounded-xl focus:border-[#CEF431] focus:outline-none shadow-xs"
             />
           </div>
         </div>
 
         {/* Scrollable Rules List */}
-        <div className="flex-1 overflow-y-auto px-5 py-3 space-y-2 bg-[#FAF8F5]/50">
+        <div className="flex-1 overflow-y-auto px-5 py-3 space-y-2 bg-[#FAF8F5]/50 dark:bg-[#161514]">
           {filteredRules.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center text-[#161514]/60">
+            <div className="flex flex-col items-center justify-center py-12 text-center text-[#161514]/60 dark:text-[#FAF8F5]/60">
               <Tag className="w-8 h-8 mb-2 stroke-[1.5]" />
               <p className="text-sm font-bold">No merchant rules found</p>
               <p className="text-xs font-mono mt-1">
@@ -212,34 +212,32 @@ export function LearnedMerchantDictionaryModal({
                 <div
                   key={rule.merchantPattern}
                   className={cn(
-                    "p-3 rounded-2xl border-2 border-[#161514] bg-white transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2.5",
-                    rule.isUserDefined
-                      ? "shadow-[3px_3px_0px_0px_#161514]"
-                      : "shadow-[2px_2px_0px_0px_#161514]/50 opacity-90"
+                    "p-3 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] bg-white dark:bg-[#1C1A18] transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-xs",
+                    !rule.isUserDefined && "opacity-90"
                   )}
                 >
                   {/* Left: Merchant Info */}
                   <div className="flex items-start sm:items-center gap-2.5 min-w-0">
-                    <div className="w-8 h-8 shrink-0 rounded-xl bg-[#FAF8F5] border-2 border-[#161514] flex items-center justify-center text-sm font-bold">
+                    <div className="w-8 h-8 shrink-0 rounded-lg bg-[#FAF8F5] dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#2A2724] flex items-center justify-center text-sm font-bold text-[#161514] dark:text-[#FAF8F5]">
                       {rule.displayName.charAt(0).toUpperCase()}
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-black truncate">{rule.displayName}</span>
+                        <span className="text-sm font-black truncate text-[#161514] dark:text-[#FAF8F5]">{rule.displayName}</span>
                         {rule.isUserDefined ? (
-                          <span className="px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider bg-[#CEF431] border border-[#161514] rounded-md">
+                          <span className="px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider bg-[#CEF431]/20 dark:bg-[#CEF431]/10 border border-[#CEF431]/40 text-[#161514] dark:text-[#FAF8F5] rounded-md">
                             Learned
                           </span>
                         ) : (
-                          <span className="px-1.5 py-0.5 text-[10px] font-bold text-[#161514]/60 bg-stone-100 border border-[#161514]/20 rounded-md">
+                          <span className="px-1.5 py-0.5 text-[10px] font-bold text-[#161514]/60 dark:text-[#FAF8F5]/60 bg-stone-100 dark:bg-stone-800 border border-[#E8E5DF] dark:border-[#2A2724] rounded-md">
                             System
                           </span>
                         )}
                       </div>
-                      <div className="text-[11px] font-mono text-[#161514]/60 flex items-center gap-2 mt-0.5">
+                      <div className="text-[11px] font-mono text-[#161514]/60 dark:text-[#FAF8F5]/60 flex items-center gap-2 mt-0.5">
                         <span>Pattern: "{rule.merchantPattern}"</span>
                         {rule.matchCount > 0 && (
-                          <span className="font-bold text-[#161514]">
+                          <span className="font-bold text-[#161514] dark:text-[#FAF8F5]">
                             • {rule.matchCount} {rule.matchCount === 1 ? "hit" : "hits"}
                           </span>
                         )}
@@ -268,7 +266,7 @@ export function LearnedMerchantDictionaryModal({
                         <button
                           type="button"
                           onClick={() => setEditingMerchant(null)}
-                          className="h-8 px-2 text-xs font-bold border border-[#161514] rounded-lg hover:bg-stone-100 cursor-pointer"
+                          className="h-8 px-2.5 text-xs font-bold border border-[#E8E5DF] dark:border-[#2A2724] bg-white dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 cursor-pointer shadow-xs"
                         >
                           Done
                         </button>
@@ -276,17 +274,17 @@ export function LearnedMerchantDictionaryModal({
                     ) : (
                       <button
                         onClick={() => setEditingMerchant(rule.merchantPattern)}
-                        className="px-2.5 py-1 text-xs font-black bg-[#FAF8F5] border-2 border-[#161514] rounded-xl hover:bg-stone-100 transition-colors flex items-center gap-1.5"
+                        className="px-2.5 py-1 text-xs font-bold bg-[#FAF8F5] dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#2A2724] text-[#161514] dark:text-[#FAF8F5] rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors flex items-center gap-1.5 shadow-xs"
                         title="Click to reassign category"
                       >
                         <span>{rule.categoryName}</span>
-                        <RefreshCw className="w-3 h-3 text-[#161514]/50" />
+                        <RefreshCw className="w-3 h-3 text-[#161514]/50 dark:text-[#FAF8F5]/50" />
                       </button>
                     )}
 
                     <button
                       onClick={() => handleDeleteRule(rule.merchantPattern)}
-                      className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors border border-transparent hover:border-rose-200"
+                      className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg transition-colors border border-transparent hover:border-rose-200 dark:hover:border-rose-900"
                       title={rule.isUserDefined ? "Delete rule" : "Reset rule to default"}
                     >
                       <Trash2 className="w-4 h-4 stroke-[2]" />

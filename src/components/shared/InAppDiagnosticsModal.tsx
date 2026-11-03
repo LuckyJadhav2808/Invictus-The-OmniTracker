@@ -128,13 +128,13 @@ export function InAppDiagnosticsModal({ open, onOpenChange }: InAppDiagnosticsMo
       <div className="space-y-5 py-2">
         {/* Metric Cards Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="bg-[#FAF8F5] p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex flex-col items-center justify-center text-center">
-            <span className="text-[9px] font-black uppercase tracking-wider text-[#161514]/70">
+          <div className="bg-[#FAF8F5] dark:bg-[#252321] p-3 rounded-2xl border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] flex flex-col items-center justify-center text-center">
+            <span className="text-[9px] font-black uppercase tracking-wider text-[#161514]/70 dark:text-[#FAF8F5]/70">
               API Ping Latency
             </span>
             <div className="flex items-center gap-1 mt-1">
               <Zap className="size-3.5 text-amber-500 fill-amber-500" />
-              <span className="text-base font-black text-[#161514]">
+              <span className="text-base font-black text-[#161514] dark:text-[#FAF8F5]">
                 {pingLatency === null
                   ? "..."
                   : pingLatency === -1
@@ -144,35 +144,35 @@ export function InAppDiagnosticsModal({ open, onOpenChange }: InAppDiagnosticsMo
             </div>
           </div>
 
-          <div className="bg-[#FAF8F5] p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex flex-col items-center justify-center text-center">
-            <span className="text-[9px] font-black uppercase tracking-wider text-[#161514]/70">
+          <div className="bg-[#FAF8F5] dark:bg-[#252321] p-3 rounded-2xl border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] flex flex-col items-center justify-center text-center">
+            <span className="text-[9px] font-black uppercase tracking-wider text-[#161514]/70 dark:text-[#FAF8F5]/70">
               Offline Queue
             </span>
             <div className="flex items-center gap-1 mt-1">
-              <Database className="size-3.5 text-sky-600" />
-              <span className="text-base font-black text-[#161514]">{pendingCount}</span>
+              <Database className="size-3.5 text-sky-600 dark:text-sky-400" />
+              <span className="text-base font-black text-[#161514] dark:text-[#FAF8F5]">{pendingCount}</span>
             </div>
           </div>
 
-          <div className="bg-[#FAF8F5] p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex flex-col items-center justify-center text-center">
-            <span className="text-[9px] font-black uppercase tracking-wider text-[#161514]/70">
+          <div className="bg-[#FAF8F5] dark:bg-[#252321] p-3 rounded-2xl border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] flex flex-col items-center justify-center text-center">
+            <span className="text-[9px] font-black uppercase tracking-wider text-[#161514]/70 dark:text-[#FAF8F5]/70">
               Local Schema
             </span>
             <div className="flex items-center gap-1 mt-1">
-              <ShieldCheck className="size-3.5 text-emerald-600" />
-              <span className="text-base font-black text-[#161514]">
+              <ShieldCheck className="size-3.5 text-emerald-600 dark:text-emerald-400" />
+              <span className="text-base font-black text-[#161514] dark:text-[#FAF8F5]">
                 v{currentSchema}/{CURRENT_TARGET_SCHEMA_VERSION}
               </span>
             </div>
           </div>
 
-          <div className="bg-[#FAF8F5] p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex flex-col items-center justify-center text-center">
-            <span className="text-[9px] font-black uppercase tracking-wider text-[#161514]/70">
+          <div className="bg-[#FAF8F5] dark:bg-[#252321] p-3 rounded-2xl border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] flex flex-col items-center justify-center text-center">
+            <span className="text-[9px] font-black uppercase tracking-wider text-[#161514]/70 dark:text-[#FAF8F5]/70">
               Boot Watchdog
             </span>
             <div className="flex items-center gap-1 mt-1">
-              <Activity className="size-3.5 text-[#161514]" />
-              <span className="text-xs font-black text-[#161514]">
+              <Activity className="size-3.5 text-[#161514] dark:text-[#FAF8F5]" />
+              <span className="text-xs font-black text-[#161514] dark:text-[#FAF8F5]">
                 {safeStatus.isSafeMode ? "Safe Mode" : "Healthy (0)"}
               </span>
             </div>
@@ -180,30 +180,30 @@ export function InAppDiagnosticsModal({ open, onOpenChange }: InAppDiagnosticsMo
         </div>
 
         {/* Feature Flags Active Snapshot */}
-        <div className="bg-white rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-2">
+        <div className="bg-white dark:bg-[#1C1A18] rounded-2xl p-4 border-2 border-[#161514] dark:border-[#383531] shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-black uppercase tracking-wider text-[#161514]">
+            <span className="text-[10px] font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5]">
               Runtime Feature Flags (Edge Evaluated)
             </span>
             <span className="text-[9px] font-black uppercase bg-[#CEF431] text-[#161514] px-2 py-0.5 rounded-full border border-[#161514]">
               {Object.keys(flags).length} Active
             </span>
           </div>
-          <div className="grid grid-cols-2 gap-2 text-[10px] font-bold text-[#161514]/80">
+          <div className="grid grid-cols-2 gap-2 text-[10px] font-bold text-[#161514]/80 dark:text-[#FAF8F5]/80">
             {Object.entries(flags).map(([key, val]) => (
               <div
                 key={key}
-                className="flex items-center justify-between p-2 rounded-xl bg-[#FAF8F5] border border-[#161514]/30"
+                className="flex items-center justify-between p-2 rounded-xl bg-[#FAF8F5] dark:bg-[#252321] border border-[#161514]/30 dark:border-[#383531]"
               >
                 <span className="truncate pr-1">{key}</span>
                 <span
                   className={cn(
                     "text-[8px] font-black uppercase px-1.5 py-0.5 rounded border shrink-0",
                     val === true
-                      ? "bg-emerald-100 text-emerald-900 border-emerald-600"
+                      ? "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-300 border-emerald-600"
                       : val === false
-                      ? "bg-zinc-200 text-zinc-700 border-zinc-400"
-                      : "bg-amber-100 text-amber-900 border-amber-600"
+                      ? "bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-zinc-400"
+                      : "bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 border-amber-600"
                   )}
                 >
                   {String(val)}
@@ -218,7 +218,7 @@ export function InAppDiagnosticsModal({ open, onOpenChange }: InAppDiagnosticsMo
           <button
             type="button"
             onClick={handleRunMigrations}
-            className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-[#FAF8F5] hover:bg-white text-[#161514] font-black text-[10px] uppercase border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] cursor-pointer active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+            className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-[#FAF8F5] dark:bg-[#252321] hover:bg-white dark:hover:bg-[#2A2724] text-[#161514] dark:text-[#FAF8F5] font-black text-[10px] uppercase border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] cursor-pointer active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
           >
             <ShieldCheck className="size-3.5" />
             <span>Check Migrations</span>
@@ -228,7 +228,7 @@ export function InAppDiagnosticsModal({ open, onOpenChange }: InAppDiagnosticsMo
             type="button"
             onClick={handleClearMutations}
             disabled={pendingCount === 0}
-            className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-[#FAF8F5] hover:bg-rose-50 text-rose-700 font-black text-[10px] uppercase border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] cursor-pointer disabled:opacity-50 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+            className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-[#FAF8F5] dark:bg-[#252321] hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-700 dark:text-rose-400 font-black text-[10px] uppercase border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] cursor-pointer disabled:opacity-50 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
           >
             <Trash2 className="size-3.5" />
             <span>Flush Queue ({pendingCount})</span>
@@ -237,7 +237,7 @@ export function InAppDiagnosticsModal({ open, onOpenChange }: InAppDiagnosticsMo
           <button
             type="button"
             onClick={handleExportPackage}
-            className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-[#CEF431] hover:bg-[#bce023] text-[#161514] font-black text-[10px] uppercase border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] cursor-pointer active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+            className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-[#CEF431] hover:bg-[#bce023] text-[#161514] font-black text-[10px] uppercase border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] cursor-pointer active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all font-heading"
           >
             <Download className="size-3.5" />
             <span>Export Diagnostics</span>
@@ -245,16 +245,16 @@ export function InAppDiagnosticsModal({ open, onOpenChange }: InAppDiagnosticsMo
         </div>
 
         {/* Circular Diagnostic Logs Stream */}
-        <div className="bg-white rounded-2xl p-4 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] space-y-2">
+        <div className="bg-white dark:bg-[#1C1A18] rounded-2xl p-4 border-2 border-[#161514] dark:border-[#383531] shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-black uppercase tracking-wider text-[#161514] flex items-center gap-1">
+            <span className="text-[10px] font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1">
               <Terminal className="size-3" />
               <span>Diagnostic Event Stream (Last 40)</span>
             </span>
             <button
               type="button"
               onClick={() => diagnosticLogger.clear()}
-              className="text-[9px] font-black uppercase text-[#161514]/60 hover:text-[#161514] underline"
+              className="text-[9px] font-black uppercase text-[#161514]/60 dark:text-[#FAF8F5]/60 hover:text-[#161514] dark:hover:text-[#FAF8F5] underline"
             >
               Clear Logs
             </button>
@@ -262,12 +262,12 @@ export function InAppDiagnosticsModal({ open, onOpenChange }: InAppDiagnosticsMo
 
           <div className="max-h-52 overflow-y-auto space-y-1.5 pr-1 font-mono text-[10px]">
             {entries.length === 0 ? (
-              <p className="text-[#161514]/50 py-4 text-center">No diagnostic events logged yet.</p>
+              <p className="text-[#161514]/50 dark:text-[#FAF8F5]/50 py-4 text-center">No diagnostic events logged yet.</p>
             ) : (
               entries.map((entry) => (
                 <div
                   key={entry.id}
-                  className="p-2 rounded-lg bg-[#FAF8F5] border border-[#161514]/20 flex items-start justify-between gap-2 leading-tight"
+                  className="p-2 rounded-lg bg-[#FAF8F5] dark:bg-[#252321] border border-[#161514]/20 dark:border-[#383531] flex items-start justify-between gap-2 leading-tight"
                 >
                   <div className="space-y-0.5 min-w-0">
                     <div className="flex items-center gap-1.5 flex-wrap">
@@ -275,21 +275,21 @@ export function InAppDiagnosticsModal({ open, onOpenChange }: InAppDiagnosticsMo
                         className={cn(
                           "px-1.5 py-0.2 rounded text-[8px] font-black uppercase border",
                           entry.level === "error"
-                            ? "bg-rose-100 text-rose-800 border-rose-500"
+                            ? "bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border-rose-500"
                             : entry.level === "warn"
-                            ? "bg-amber-100 text-amber-800 border-amber-500"
+                            ? "bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-amber-500"
                             : entry.level === "system"
-                            ? "bg-indigo-100 text-indigo-800 border-indigo-500"
-                            : "bg-emerald-100 text-emerald-800 border-emerald-500"
+                            ? "bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-300 border-indigo-500"
+                            : "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border-emerald-500"
                         )}
                       >
                         {entry.tag}
                       </span>
-                      <span className="text-[9px] text-[#161514]/50">
+                      <span className="text-[9px] text-[#161514]/50 dark:text-[#FAF8F5]/50">
                         {new Date(entry.timestamp).toLocaleTimeString()}
                       </span>
                     </div>
-                    <p className="text-[#161514] break-all">{entry.message}</p>
+                    <p className="text-[#161514] dark:text-[#FAF8F5] break-all">{entry.message}</p>
                   </div>
                 </div>
               ))

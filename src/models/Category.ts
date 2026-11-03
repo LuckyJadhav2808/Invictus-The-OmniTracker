@@ -20,7 +20,7 @@ const CategorySchema = new Schema<ICategory>(
     userId: { type: String, required: true, index: true },
     name: { type: String, required: true },
     color: { type: String, default: "amber" },
-    icon: { type: String, default: "💳" },
+    icon: { type: String, default: "Wallet" },
     type: { type: String, enum: ["income", "expense"], required: true },
     monthlyBudget: { type: Number, default: 0 },
     budgetLimit: { type: Number },

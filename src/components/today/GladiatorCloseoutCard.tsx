@@ -107,31 +107,31 @@ export function GladiatorCloseoutCard({
   return (
     <div
       className={cn(
-        "bg-[#FAF8F5] border-2 border-[#161514] rounded-2xl p-4 sm:p-6 shadow-[4px_4px_0px_0px_#161514] space-y-4 select-none",
+        "bg-[#FAF8F5] dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#383531] rounded-2xl p-4 sm:p-6 shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#000000] space-y-4 select-none",
         className
       )}
       role="region"
       aria-label="Gladiator Night Closeout Ritual"
     >
       {/* 1. Header Bar: Thermal Receipt Slip Identity */}
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-dashed border-[#161514]/20 pb-3">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-dashed border-[#161514]/20 dark:border-[#FAF8F5]/20 pb-3">
         <div className="flex items-center gap-2">
-          <div className="size-8 rounded-lg bg-[#CEF431] border-2 border-[#161514] flex items-center justify-center shadow-[1px_1px_0px_#161514]">
+          <div className="size-8 rounded-lg bg-[#CEF431] border-2 border-[#161514] dark:border-[#383531] flex items-center justify-center shadow-[1px_1px_0px_#161514] dark:shadow-[1px_1px_0px_#000000]">
             <Award className="size-4 text-[#161514]" />
           </div>
           <div>
-            <h3 className="font-heading font-black text-xs sm:text-sm text-[#161514] uppercase tracking-wider">
+            <h3 className="font-heading font-black text-xs sm:text-sm text-[#161514] dark:text-[#FAF8F5] uppercase tracking-wider">
               Gladiator Night Closeout Ritual
             </h3>
-            <p className="text-[11px] font-mono text-[#161514]/70">
+            <p className="text-[11px] font-mono text-[#161514]/70 dark:text-[#FAF8F5]/70">
               {isToday ? "Today's Ledger Archival" : `Ledger for ${selectedDate}`}
             </p>
           </div>
         </div>
 
         {/* Telemetry Conquest Badge */}
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border-2 border-[#161514] shadow-[1.5px_1.5px_0px_#161514] font-mono font-black text-xs text-[#161514]">
-          <Zap className="size-3 fill-[#161514] text-[#161514]" />
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white dark:bg-[#252321] border-2 border-[#161514] dark:border-[#383531] shadow-[1.5px_1.5px_0px_#161514] dark:shadow-[1.5px_1.5px_0px_#000000] font-mono font-black text-xs text-[#161514] dark:text-[#FAF8F5]">
+          <Zap className="size-3 fill-[#161514] dark:fill-[#CEF431] text-[#161514] dark:text-[#CEF431]" />
           <span className="tabular-nums">{metrics.overallScore}%</span>
           <span className="text-[10px] uppercase">Conquered</span>
         </div>
@@ -140,53 +140,53 @@ export function GladiatorCloseoutCard({
       {/* 2. Tri-Pillar Telemetry Summary */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
         {/* Habits */}
-        <div className="bg-white border-2 border-[#161514] rounded-xl p-3 shadow-[1.5px_1.5px_0px_#161514] space-y-1">
-          <div className="flex items-center justify-between text-xs font-mono font-bold text-[#161514]">
+        <div className="bg-white dark:bg-[#252321] border-2 border-[#161514] dark:border-[#383531] rounded-xl p-3 shadow-[1.5px_1.5px_0px_#161514] dark:shadow-[1.5px_1.5px_0px_#000000] space-y-1">
+          <div className="flex items-center justify-between text-xs font-mono font-bold text-[#161514] dark:text-[#FAF8F5]">
             <span className="flex items-center gap-1">
               <CheckCircle2 className="size-3.5 text-[#03D26F]" />
               <span>Habits</span>
             </span>
             <span className="text-[#03D26F] font-black tabular-nums">{metrics.habitPercent}%</span>
           </div>
-          <p className="text-xs font-heading font-black text-[#161514]">
+          <p className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5]">
             <span className="font-mono tabular-nums">{metrics.completedHabitsCount}/{metrics.totalHabitsCount}</span> Conquered
           </p>
         </div>
 
         {/* Study Sprint */}
-        <div className="bg-white border-2 border-[#161514] rounded-xl p-3 shadow-[1.5px_1.5px_0px_#161514] space-y-1">
-          <div className="flex items-center justify-between text-xs font-mono font-bold text-[#161514]">
+        <div className="bg-white dark:bg-[#252321] border-2 border-[#161514] dark:border-[#383531] rounded-xl p-3 shadow-[1.5px_1.5px_0px_#161514] dark:shadow-[1.5px_1.5px_0px_#000000] space-y-1">
+          <div className="flex items-center justify-between text-xs font-mono font-bold text-[#161514] dark:text-[#FAF8F5]">
             <span className="flex items-center gap-1">
               <GraduationCap className="size-3.5 text-[#C084FC]" />
               <span>Study Focus</span>
             </span>
             <span className="text-[#C084FC] font-black tabular-nums">{metrics.studyPercent}%</span>
           </div>
-          <p className="text-xs font-heading font-black text-[#161514]">
+          <p className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5]">
             <span className="font-mono tabular-nums">{metrics.studyHoursFormatted} / {metrics.studyTargetHoursFormatted}</span> Logged
           </p>
         </div>
 
         {/* Budget Defense */}
-        <div className="bg-white border-2 border-[#161514] rounded-xl p-3 shadow-[1.5px_1.5px_0px_#161514] space-y-1">
-          <div className="flex items-center justify-between text-xs font-mono font-bold text-[#161514]">
+        <div className="bg-white dark:bg-[#252321] border-2 border-[#161514] dark:border-[#383531] rounded-xl p-3 shadow-[1.5px_1.5px_0px_#161514] dark:shadow-[1.5px_1.5px_0px_#000000] space-y-1">
+          <div className="flex items-center justify-between text-xs font-mono font-bold text-[#161514] dark:text-[#FAF8F5]">
             <span className="flex items-center gap-1">
-              <Wallet className="size-3.5 text-amber-600" />
+              <Wallet className="size-3.5 text-amber-600 dark:text-amber-400" />
               <span>Safe Reserve</span>
             </span>
-            <span className="text-emerald-600 font-black tabular-nums">{metrics.budgetPercent}%</span>
+            <span className="text-emerald-600 dark:text-emerald-400 font-black tabular-nums">{metrics.budgetPercent}%</span>
           </div>
-          <p className="text-xs font-heading font-black text-[#161514]">
+          <p className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5]">
             <span className="font-mono tabular-nums">{currencySymbol}{metrics.remainingSafeToSpend.toLocaleString()}</span> Safe Left
           </p>
         </div>
       </div>
 
       {/* 3. Integrated Daily Mindset & Evening Pulse (Things 3 Benchmark) */}
-      <div className="bg-white border-2 border-[#161514] rounded-xl p-3.5 shadow-[2px_2px_0px_#161514] space-y-3">
-        <div className="flex items-center justify-between border-b border-[#161514]/10 pb-2">
-          <div className="flex items-center gap-1.5 font-heading font-black text-xs text-[#161514] uppercase tracking-wide">
-            <Sparkles className="size-3.5 text-[#161514]" />
+      <div className="bg-white dark:bg-[#252321] border-2 border-[#161514] dark:border-[#383531] rounded-xl p-3.5 shadow-[2px_2px_0px_#161514] dark:shadow-[2px_2px_0px_#000000] space-y-3">
+        <div className="flex items-center justify-between border-b border-[#161514]/10 dark:border-[#FAF8F5]/10 pb-2">
+          <div className="flex items-center gap-1.5 font-heading font-black text-xs text-[#161514] dark:text-[#FAF8F5] uppercase tracking-wide">
+            <Sparkles className="size-3.5 text-[#161514] dark:text-[#CEF431]" />
             <span>Daily Mindset & Evening Pulse</span>
           </div>
         </div>
@@ -203,15 +203,15 @@ export function GladiatorCloseoutCard({
                 type="button"
                 onClick={() => handleMoodSelect(m.id)}
                 className={cn(
-                  "p-2 rounded-lg border-2 border-[#161514] flex flex-col items-center justify-center gap-1 transition-all cursor-pointer active:scale-95",
+                  "p-2 rounded-lg border-2 border-[#161514] dark:border-[#383531] flex flex-col items-center justify-center gap-1 transition-all cursor-pointer active:scale-95",
                   isSelected
-                    ? "bg-[#161514] text-white shadow-[2px_2px_0px_#161514] scale-[1.02]"
-                    : "bg-[#FAF8F5] text-[#161514] opacity-75 hover:opacity-100 hover:bg-white shadow-[1px_1px_0px_#161514]"
+                    ? "bg-[#161514] dark:bg-[#FAF8F5] text-white dark:text-[#161514] shadow-[2px_2px_0px_#161514] dark:shadow-[2px_2px_0px_#000000] scale-[1.02]"
+                    : "bg-[#FAF8F5] dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] opacity-75 hover:opacity-100 hover:bg-white dark:hover:bg-[#2A2826] shadow-[1px_1px_0px_#161514] dark:shadow-[1px_1px_0px_#000000]"
                 )}
                 title={`Mark mood: ${m.label}`}
               >
-                <Icon className={cn("size-4", isSelected ? "text-[#CEF431]" : "text-[#161514]")} />
-                <span className={cn("text-[10px] font-heading font-black", isSelected ? "text-white" : "text-[#161514]")}>
+                <Icon className={cn("size-4", isSelected ? "text-[#CEF431] dark:text-[#161514]" : "text-[#161514] dark:text-[#FAF8F5]")} />
+                <span className={cn("text-[10px] font-heading font-black", isSelected ? "text-white dark:text-[#161514]" : "text-[#161514] dark:text-[#FAF8F5]")}>
                   {m.label}
                 </span>
               </button>
@@ -231,13 +231,13 @@ export function GladiatorCloseoutCard({
               }
             }}
             placeholder="One-line victory note or closing reflection..."
-            className="flex-1 bg-[#FAF8F5] border border-[#161514]/30 rounded-lg px-2.5 py-1.5 text-xs text-[#161514] font-medium placeholder:text-[#161514]/40 focus:outline-none focus:border-[#161514]"
+            className="flex-1 bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#161514]/30 dark:border-[#FAF8F5]/30 rounded-lg px-2.5 py-1.5 text-xs text-[#161514] dark:text-[#FAF8F5] font-medium placeholder:text-[#161514]/40 dark:placeholder:text-[#FAF8F5]/40 focus:outline-none focus:border-[#161514] dark:focus:border-[#CEF431]"
           />
           <button
             type="button"
             onClick={() => onSaveMood?.()}
             disabled={isSavingMood}
-            className="px-3 py-1.5 bg-[#161514] text-white rounded-lg text-xs font-heading font-black hover:bg-[#2a2826] active:scale-95 transition-all disabled:opacity-50 cursor-pointer shrink-0 flex items-center gap-1"
+            className="px-3 py-1.5 bg-[#161514] dark:bg-[#CEF431] text-white dark:text-[#161514] rounded-lg text-xs font-heading font-black hover:bg-[#2a2826] dark:hover:bg-[#d6f64d] active:scale-95 transition-all disabled:opacity-50 cursor-pointer shrink-0 flex items-center gap-1"
           >
             <Send className="size-3" />
             <span>{isSavingMood ? "Saving..." : "Save"}</span>
@@ -248,7 +248,7 @@ export function GladiatorCloseoutCard({
       {/* 4. 1-Tap Seal & Archival Ritual Button / Wax Stamp Badge */}
       <div className="pt-1">
         {sealStatus.isSealed ? (
-          <div className="bg-[#161514] text-white border-2 border-[#161514] rounded-xl p-3.5 shadow-[3px_3px_0px_#161514] flex items-center justify-between gap-3">
+          <div className="bg-[#161514] dark:bg-[#121110] text-white border-2 border-[#161514] dark:border-[#383531] rounded-xl p-3.5 shadow-[3px_3px_0px_#161514] dark:shadow-[3px_3px_0px_#000000] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
               <div className="size-8 rounded-lg bg-[#03D26F] text-[#161514] flex items-center justify-center font-black text-sm shrink-0 border border-white">
                 <ShieldCheck className="size-5 stroke-[2.5]" />
@@ -276,7 +276,7 @@ export function GladiatorCloseoutCard({
           <button
             type="button"
             onClick={handleSealDay}
-            className="w-full bg-[#CEF431] hover:bg-[#D8F74E] text-[#161514] border-2 border-[#161514] rounded-xl p-3 sm:p-3.5 shadow-[3px_3px_0px_#161514] active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer group"
+            className="w-full bg-[#CEF431] hover:bg-[#D8F74E] text-[#161514] border-2 border-[#161514] dark:border-[#CEF431] rounded-xl p-3 sm:p-3.5 shadow-[3px_3px_0px_#161514] dark:shadow-[3px_3px_0px_#000000] active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer group"
           >
             <Lock className="size-4 stroke-[2.5] group-hover:scale-110 transition-transform" />
             <span className="font-heading font-black text-xs sm:text-sm uppercase tracking-wider">
@@ -288,10 +288,10 @@ export function GladiatorCloseoutCard({
       </div>
 
       {/* 5. Tomorrow Battle Preview (Things 3 Benchmark) */}
-      <div className="bg-white/80 border border-[#161514]/15 rounded-xl p-3 flex flex-wrap items-center justify-between gap-2 text-xs">
-        <div className="flex items-center gap-2 font-mono text-[#161514]/80">
-          <span className="font-bold text-[#161514] flex items-center gap-1.5">
-            <Moon className="size-3.5 text-[#161514]" />
+      <div className="bg-white/80 dark:bg-[#252321]/80 border border-[#161514]/15 dark:border-[#FAF8F5]/15 rounded-xl p-3 flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div className="flex items-center gap-2 font-mono text-[#161514]/80 dark:text-[#FAF8F5]/80">
+          <span className="font-bold text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5">
+            <Moon className="size-3.5 text-[#161514] dark:text-[#C084FC]" />
             <span>Tomorrow&apos;s Horizon:</span>
           </span>
           <span className="tabular-nums">{tomorrowPendingTasksCount} tasks queued</span>

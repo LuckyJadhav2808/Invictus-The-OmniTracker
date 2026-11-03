@@ -36,6 +36,7 @@ import { format } from "date-fns";
 import Link from "next/link";
 import { getSubrouteInfo } from "@/lib/page-flow/page-flow-resolver";
 import { DynamicIslandDock } from "@/components/shared/DynamicIslandDock";
+import { ThemeToggle } from "@/components/shared/ThemeToggle";
 export { getSubrouteInfo };
 
 export function SpaceHeader() {
@@ -157,20 +158,20 @@ export function SpaceHeader() {
   const subrouteInfo = getSubrouteInfo(pathname);
 
   return (
-    <header className="sticky top-0 z-30 w-full bg-[#FBF9F5]/90 backdrop-blur-md border-b-2 border-[#161514] select-none">
+    <header className="sticky top-0 z-30 w-full bg-white/80 dark:bg-[#161514]/85 backdrop-blur-md border-b border-[#E8E5DF] dark:border-[#2A2724] select-none transition-colors">
       {/* Optional Announcement Banner */}
       {announcement && announcement.message && !dismissedAnn && (
-        <div className="bg-[#CEF431] text-[#161514] px-4 py-2 text-xs font-bold border-b-2 border-[#161514] flex items-center justify-between">
+        <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] px-4 py-2 text-xs font-medium border-b border-[#E8E5DF] dark:border-[#2A2724] flex items-center justify-between transition-colors">
           <div className="flex items-center gap-2 max-w-4xl mx-auto flex-1 min-w-0">
-            <Megaphone className="size-4 shrink-0 stroke-[2.5]" />
+            <Megaphone className="size-4 shrink-0 stroke-[1.75] text-[#8C8882] dark:text-[#A8A29E]" />
             <span className="truncate">{announcement.message}</span>
           </div>
           <button
             onClick={() => setDismissedAnn(true)}
-            className="p-1 hover:bg-[#161514]/10 rounded-md transition-colors"
+            className="p-1 hover:bg-[#E8E5DF] dark:hover:bg-[#252321] rounded-md transition-colors text-[#161514] dark:text-[#FAF8F5]"
             aria-label="Dismiss announcement"
           >
-            <X className="size-3.5 stroke-[2.5]" />
+            <X className="size-3.5 stroke-[1.75]" />
           </button>
         </div>
       )}
@@ -190,11 +191,11 @@ export function SpaceHeader() {
                   router.push(subrouteInfo.parentHref);
                 }
               }}
-              className="h-8 sm:h-9 px-2 sm:px-2.5 rounded-lg border-2 border-[#161514] bg-white hover:bg-[#FAF8F5] active:translate-y-0.5 shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center gap-1.5 text-xs font-heading font-black text-[#161514] cursor-pointer transition-all shrink-0"
+              className="h-8 px-2 sm:px-2.5 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] bg-white dark:bg-[#1C1A18] hover:bg-[#F1EFEA] dark:hover:bg-[#252321] flex items-center gap-1.5 text-xs font-medium text-[#161514] dark:text-[#FAF8F5] cursor-pointer transition-colors shrink-0 shadow-xs"
               aria-label={`Back to ${subrouteInfo.parentLabel}`}
               title={`Back to ${subrouteInfo.parentLabel}`}
             >
-              <ArrowLeft className="size-4 stroke-[3]" />
+              <ArrowLeft className="size-4 stroke-[1.75]" />
               <span className="hidden sm:inline">{subrouteInfo.parentLabel}</span>
               <span className="sm:hidden text-[11px]">Back</span>
             </button>
@@ -204,20 +205,15 @@ export function SpaceHeader() {
             </div>
           )}
 
-          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
-            <div
-              className={cn(
-                "size-8 rounded-lg border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center justify-center shrink-0",
-                space.accentColor
-              )}
-            >
-              <Icon className="size-4 stroke-[2.5]" />
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="size-8 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] bg-[#F1EFEA] dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] flex items-center justify-center shrink-0 shadow-xs transition-colors">
+              <Icon className="size-4 stroke-[1.75]" />
             </div>
             <div className="min-w-0">
-              <h1 className="font-heading font-black text-sm lg:text-base leading-none text-[#161514] tracking-tight truncate">
+              <h1 className="font-heading font-bold text-sm lg:text-[15px] leading-tight text-[#161514] dark:text-[#FAF8F5] tracking-tight truncate">
                 {space.title}
               </h1>
-              <p className="hidden sm:block text-[11px] font-semibold text-[#161514]/65 leading-tight mt-0.5 truncate">
+              <p className="hidden sm:block text-[11px] font-medium text-[#8C8882] dark:text-[#A8A29E] leading-tight mt-0.5 truncate">
                 {space.subtitle}
               </p>
             </div>
@@ -230,10 +226,10 @@ export function SpaceHeader() {
         </div>
 
         {/* Right: Actions, Date, Sync & User Profile */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-2 sm:gap-2.5">
           {/* Date Indicator (Tablet & Desktop) */}
-          <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] text-xs font-heading font-extrabold text-[#161514]">
-            <Calendar className="size-3.5 stroke-[2.5]" />
+          <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#F1EFEA] dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#2A2724] text-xs font-mono font-medium text-[#161514] dark:text-[#FAF8F5] transition-colors">
+            <Calendar className="size-3.5 stroke-[1.75] text-[#8C8882] dark:text-[#A8A29E]" />
             <span>{todayFormatted}</span>
           </div>
 
@@ -242,35 +238,35 @@ export function SpaceHeader() {
             type="button"
             onClick={() => setIsSyncDrawerOpen(true)}
             className={cn(
-              "flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[10px] font-black border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer",
+              "flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-mono font-medium border shadow-xs transition-colors cursor-pointer",
               !isOnline
-                ? "bg-rose-100 text-rose-950"
+                ? "bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border-rose-200 dark:border-rose-900"
                 : isSyncing
-                ? "bg-amber-100 text-amber-950"
+                ? "bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-900"
                 : pendingCount > 0
-                ? "bg-amber-200 text-amber-950"
-                : "bg-emerald-100 text-emerald-950"
+                ? "bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-900"
+                : "bg-[#F1EFEA] dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] border-[#E8E5DF] dark:border-[#2A2724] hover:bg-white dark:hover:bg-[#1C1A18]"
             )}
             title="Inspect Cloud Data Sync & Database Latency"
           >
             {!isOnline ? (
               <>
-                <WifiOff className="size-3 text-rose-600 shrink-0" />
+                <WifiOff className="size-3 text-rose-600 dark:text-rose-400 shrink-0" />
                 <span className="hidden sm:inline">Offline {pendingCount > 0 ? `(${pendingCount})` : ""}</span>
               </>
             ) : isSyncing ? (
               <>
-                <RefreshCw className="size-3 animate-spin text-amber-600 shrink-0" />
+                <RefreshCw className="size-3 animate-spin text-amber-600 dark:text-amber-400 shrink-0" />
                 <span className="hidden sm:inline">Syncing...</span>
               </>
             ) : pendingCount > 0 ? (
               <>
-                <span className="size-2 rounded-full bg-amber-500 animate-pulse shrink-0" />
+                <span className="size-1.5 rounded-full bg-amber-500 animate-pulse shrink-0" />
                 <span className="hidden sm:inline">{pendingCount} Queued</span>
               </>
             ) : (
               <>
-                <span className="size-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                <span className="size-1.5 rounded-full bg-emerald-500 shrink-0" />
                 <span className="hidden sm:inline">Synced</span>
               </>
             )}
@@ -280,10 +276,14 @@ export function SpaceHeader() {
           <button
             onClick={() => setIsReminderModalOpen(true)}
             aria-label="Manage Reminders"
-            className="size-9 rounded-lg bg-white border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center hover:bg-[#F1EFEA] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
+            className="size-8 rounded-lg bg-white dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] hover:bg-[#F1EFEA] dark:hover:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] flex items-center justify-center transition-colors shadow-xs cursor-pointer"
+            title="Manage Reminders & Push Alerts"
           >
-            <Bell className="size-4 stroke-[2.2] text-[#161514]" />
+            <Bell className="size-3.5 stroke-[1.75]" />
           </button>
+
+          {/* Neobrutalist Theme Toggle (Light / Dark) */}
+          <ThemeToggle />
 
           {/* User Profile Avatar Dropdown */}
           <div className="relative">
@@ -291,19 +291,19 @@ export function SpaceHeader() {
               onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
               aria-label="User Menu"
               aria-expanded={isProfileMenuOpen}
-              className="flex items-center gap-2 p-1 pl-1.5 sm:px-2 py-1 bg-white border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] rounded-xl hover:bg-[#F1EFEA] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
+              className="flex items-center gap-1.5 p-1 pl-1.5 sm:px-2 py-1 bg-white dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] rounded-lg hover:bg-[#F1EFEA] dark:hover:bg-[#252321] transition-colors shadow-xs cursor-pointer text-[#161514] dark:text-[#FAF8F5]"
             >
-              <div className="size-7 rounded-lg bg-[#161514] text-white flex items-center justify-center font-black text-xs shrink-0">
+              <div className="size-6 rounded-md bg-[#161514] dark:bg-[#FAF8F5] text-white dark:text-[#161514] flex items-center justify-center font-bold text-xs shrink-0">
                 {user?.displayName ? (
                   user.displayName.charAt(0).toUpperCase()
                 ) : (
-                  <User className="size-3.5 stroke-[2.5]" />
+                  <User className="size-3 stroke-[2]" />
                 )}
               </div>
-              <span className="hidden sm:inline-block font-heading font-extrabold text-xs max-w-[90px] truncate text-[#161514]">
+              <span className="hidden sm:inline-block text-xs font-medium max-w-[90px] truncate text-[#161514] dark:text-[#FAF8F5]">
                 {user?.displayName || "Account"}
               </span>
-              <ChevronDown className="size-3.5 stroke-[2.5] text-[#161514]/70" />
+              <ChevronDown className="size-3 stroke-[2] text-[#8C8882] dark:text-[#A8A29E]" />
             </button>
 
             {/* Dropdown Menu Modal */}
@@ -313,12 +313,12 @@ export function SpaceHeader() {
                   className="fixed inset-0 z-40"
                   onClick={() => setIsProfileMenuOpen(false)}
                 />
-                <div className="absolute right-0 mt-2 w-56 bg-white border-2 border-[#161514] shadow-[4px_4px_0px_0px_#161514] rounded-xl py-2 z-50 animate-in fade-in-50 zoom-in-95">
-                  <div className="px-3 py-2 border-b border-[#161514]/15">
-                    <p className="font-heading font-extrabold text-xs text-[#161514] truncate">
+                <div className="absolute right-0 mt-1.5 w-56 bg-white dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] shadow-xl rounded-xl py-1 z-50 animate-in fade-in-50 zoom-in-95">
+                  <div className="px-3 py-2 border-b border-[#E8E5DF] dark:border-[#2A2724]">
+                    <p className="text-xs font-medium text-[#161514] dark:text-[#FAF8F5] truncate">
                       {user?.displayName || "Invictus User"}
                     </p>
-                    <p className="text-[10px] text-[#161514]/60 truncate font-mono">
+                    <p className="text-[10px] text-[#8C8882] dark:text-[#A8A29E] truncate font-mono">
                       {user?.email || "Local Guest"}
                     </p>
                   </div>
@@ -327,27 +327,27 @@ export function SpaceHeader() {
                     <Link
                       href="/profile"
                       onClick={() => setIsProfileMenuOpen(false)}
-                      className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-[#161514] hover:bg-[#F1EFEA] transition-colors"
+                      className="flex items-center gap-2.5 px-3 py-1.5 text-xs font-medium text-[#161514] dark:text-[#FAF8F5] hover:bg-[#F1EFEA] dark:hover:bg-[#252321] transition-colors"
                     >
-                      <User className="size-4 stroke-[2]" />
+                      <User className="size-3.5 stroke-[1.75] text-[#8C8882] dark:text-[#A8A29E]" />
                       <span>Profile & Activity</span>
                     </Link>
 
                     <Link
                       href="/settings"
                       onClick={() => setIsProfileMenuOpen(false)}
-                      className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-[#161514] hover:bg-[#F1EFEA] transition-colors"
+                      className="flex items-center gap-2.5 px-3 py-1.5 text-xs font-medium text-[#161514] dark:text-[#FAF8F5] hover:bg-[#F1EFEA] dark:hover:bg-[#252321] transition-colors"
                     >
-                      <Settings className="size-4 stroke-[2]" />
+                      <Settings className="size-3.5 stroke-[1.75] text-[#8C8882] dark:text-[#A8A29E]" />
                       <span>Settings & Backups</span>
                     </Link>
 
                     <Link
                       href="/analytics"
                       onClick={() => setIsProfileMenuOpen(false)}
-                      className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-[#161514] hover:bg-[#F1EFEA] transition-colors"
+                      className="flex items-center gap-2.5 px-3 py-1.5 text-xs font-medium text-[#161514] dark:text-[#FAF8F5] hover:bg-[#F1EFEA] dark:hover:bg-[#252321] transition-colors"
                     >
-                      <BarChart2 className="size-4 stroke-[2]" />
+                      <BarChart2 className="size-3.5 stroke-[1.75] text-[#8C8882] dark:text-[#A8A29E]" />
                       <span>Analytics Hub</span>
                     </Link>
 
@@ -356,24 +356,24 @@ export function SpaceHeader() {
                       <Link
                         href="/admin"
                         onClick={() => setIsProfileMenuOpen(false)}
-                        className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 transition-colors"
+                        className="flex items-center gap-2.5 px-3 py-1.5 text-xs font-medium text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors"
                       >
-                        <ShieldCheck className="size-4 stroke-[2.2]" />
+                        <ShieldCheck className="size-3.5 stroke-[1.75]" />
                         <span>Admin Console</span>
                       </Link>
                     )}
                   </div>
 
-                  <div className="pt-1 border-t border-[#161514]/15">
+                  <div className="pt-1 border-t border-[#E8E5DF] dark:border-[#2A2724]">
                     <button
                       onClick={async () => {
                         setIsProfileMenuOpen(false);
                         await signOut();
                         router.push("/login");
                       }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50 transition-colors cursor-pointer text-left"
+                      className="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50/80 dark:hover:bg-rose-950/30 transition-colors cursor-pointer text-left"
                     >
-                      <LogOut className="size-4 stroke-[2]" />
+                      <LogOut className="size-3.5 stroke-[1.75]" />
                       <span>Sign Out</span>
                     </button>
                   </div>

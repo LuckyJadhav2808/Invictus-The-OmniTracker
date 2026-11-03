@@ -30,22 +30,30 @@ export function InvictusLogo({
   const logoGraphic = (
     <div
       className={cn(
-        "relative rounded-xl flex items-center justify-center border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)] overflow-hidden shrink-0 transition-transform duration-200 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5",
-        currentSize.icon,
-        "bg-[#161514]"
+        "relative rounded-xl flex items-center justify-center bg-[#161514] overflow-hidden shrink-0 shadow-xs border border-[#161514]/20 transition-transform duration-150 hover:scale-105 active:scale-95",
+        currentSize.icon
       )}
     >
-      {/* Invictus Monolith Brand Mark */}
-      <svg viewBox="0 0 100 100" className="w-full h-full p-1.5" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <g transform="translate(50, 50)">
-          {/* Top Horizontal Pediment */}
-          <path d="M -24 -32 L 24 -32 L 18 -20 L -18 -20 Z" fill="#FAF8F5" />
-          {/* Central Monolithic Stem */}
-          <path d="M -10 -17 L 10 -17 L 10 17 L -10 17 Z" fill="#CEF431" />
-          {/* Bottom Horizontal Base Pedestal */}
-          <path d="M -18 20 L 18 20 L 24 32 L -24 32 Z" fill="#FAF8F5" />
-          {/* Inner Upward Chevron Arrow Cutout */}
-          <polygon points="0,-11 6.5,2 0,-2 -6.5,2" fill="#161514" />
+      {/* Invictus Sovereign Monolith Brand Mark */}
+      <svg viewBox="0 0 512 512" className="w-full h-full p-1" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="logo-stem" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#CEF431" />
+            <stop offset="100%" stopColor="#03D26F" />
+          </linearGradient>
+        </defs>
+        <g id="icon" transform="translate(256, 256)">
+          {/* Top Crown Pediment (Cream Architectural Plate) */}
+          <path d="M -130 -160 L 130 -160 L 96 -96 L -96 -96 Z" fill="#FAF8F5" />
+          
+          {/* Central Monolithic Stem (Electric Lime to Malachite Emerald) */}
+          <path d="M -56 -78 L 56 -78 L 56 78 L -56 78 Z" fill="url(#logo-stem)" />
+          
+          {/* Ascending Victory Chevron (Negative Space / Ink Arrow) */}
+          <path d="M 0 -44 L 38 12 L 18 12 L 0 -12 L -18 12 L -38 12 Z" fill="#161514" />
+          
+          {/* Bottom Base Pedestal (Balanced Foundation) */}
+          <path d="M -96 96 L 96 96 L 130 160 L -130 160 Z" fill="#FAF8F5" />
         </g>
       </svg>
     </div>
@@ -80,9 +88,7 @@ export function InvictusLogo({
         </div>
         <span
           className={cn(
-            "font-black tracking-[0.2em] uppercase rounded-lg mt-1 w-fit border-1.5 border-[#161514] shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] hidden xs:inline-block",
-            currentSize.badge,
-            "bg-[#CEF431] text-[#161514]"
+            "font-mono font-medium tracking-widest uppercase rounded px-1.5 py-0.5 mt-0.5 w-fit border border-[#E8E5DF] bg-[#F1EFEA] text-[#8C8882] text-[9px] hidden xs:inline-block"
           )}
         >
           OMNITRACKER

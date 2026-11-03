@@ -2,7 +2,6 @@
 
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import {
   LogIn,
@@ -14,22 +13,18 @@ import {
   Lock,
   User,
   CheckCircle2,
-  Shield,
+  ShieldCheck,
   Zap,
   Flame,
   Wallet,
   Sparkles,
   ArrowRight,
+  Shield,
+  Layers,
 } from "lucide-react";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { InvictusLogo } from "@/components/shared/InvictusLogo";
-import { DoodleInvictusTitle } from "@/components/auth/DoodleInvictusTitle";
-import {
-  DoodleArrow,
-  DoodleStickyNote,
-  DoodleStamp,
-  AuthBackgroundDoodles,
-} from "@/components/auth/AuthDoodles";
+import { cn } from "@/lib/utils";
 
 function LoginForm() {
   const router = useRouter();
@@ -58,11 +53,7 @@ function LoginForm() {
       if (activeTab === "login") {
         const loggedUser = await login(email.trim(), password);
         toast.success(`Welcome back, ${loggedUser.displayName || "Champion"}!`);
-        if (!loggedUser.onboarded) {
-          router.push("/onboarding");
-        } else {
-          router.push("/today");
-        }
+        router.push("/today");
       } else {
         if (password.length < 4) {
           toast.error("Password must be at least 4 characters long.");
@@ -71,7 +62,7 @@ function LoginForm() {
         }
         const newUser = await signup(email.trim(), password, name.trim());
         toast.success(`Account created successfully! Welcome, ${newUser.displayName}!`);
-        router.push("/onboarding");
+        router.push("/today");
       }
     } catch (error: unknown) {
       const message =
@@ -84,185 +75,201 @@ function LoginForm() {
 
   const handleGuestLogin = () => {
     enterGuestMode("Guest Explorer");
-    toast.success("Exploring as Offline Guest! 🚀✨");
+    toast.success("Welcome, Explorer! Exploring Invictus in offline mode 🚀");
     router.push("/today");
   };
 
+  const handleFillDemo = () => {
+    setEmail("alex@invictus.app");
+    setPassword("invictus2026");
+    if (activeTab === "signup") {
+      setName("Alex Morgan");
+    }
+    toast.info("Demo credentials populated! Click Submit to enter. ⚡");
+  };
+
   return (
-    <div className="relative w-full max-w-5xl mx-auto py-4 sm:py-8 md:py-10 px-4 flex flex-col lg:grid lg:grid-cols-12 gap-8 lg:gap-12 items-center justify-center">
-      {/* Background Hand-Drawn Sketch Annotations */}
-      <AuthBackgroundDoodles />
-
-      {/* Brand Header & Value Proposition (Desktop: Left Column, Mobile: Top + Bottom) */}
-      <div className="lg:col-span-6 space-y-5 text-center lg:text-left z-10 w-full flex flex-col items-center lg:items-start">
-        {/* Brand Mascot + Letter-by-Letter Handwritten Doodle Title */}
-        <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-2.5 sm:gap-4">
-          <div className="relative flex items-center gap-2">
-            <InvictusLogo size="lg" variant="icon-only" href="/" className="shrink-0" />
-            <div className="inline-flex sm:hidden font-doodle text-[11px] font-bold text-[#161514] bg-[#CEF431] border-1.5 border-[#161514] rounded-md px-2 py-0.5 shadow-[1px_1px_0px_0px_#161514] -rotate-2">
-              <span>Ready to crush it? ⚡</span>
-            </div>
-          </div>
-          <div className="flex flex-col items-center lg:items-start">
-            <DoodleInvictusTitle size="lg" showReplay={true} showSubtitle={true} />
-          </div>
-        </div>
-
-        {/* Catchy Editorial Heading & Subtext */}
-        <div className="space-y-1.5 max-w-md mx-auto lg:mx-0">
-          <h1 className="font-heading font-black text-xl sm:text-2xl md:text-3xl text-[#161514] tracking-tight leading-snug">
-            Personal life, study & money.
-          </h1>
-          <div className="inline-block px-2.5 py-0.5 bg-[#FEF08A] border-1.5 border-[#161514] rounded shadow-[1.5px_1.5px_0px_0px_#161514] -rotate-1">
-            <span className="font-doodle text-xs sm:text-sm font-bold text-[#161514]">
-              ~ All together in one focused cockpit 🎯
+    <div className="relative w-full max-w-5xl mx-auto py-4 sm:py-6 lg:py-10 px-4 flex flex-col md:grid md:grid-cols-12 gap-6 md:gap-8 lg:gap-12 items-center justify-center">
+      {/* ─── LEFT COLUMN: BRAND STORY & 4-PILLAR OS TELEMETRY ─── */}
+      <div className="md:col-span-6 lg:col-span-7 space-y-5 text-center md:text-left z-10 w-full flex flex-col items-center md:items-start order-2 md:order-1">
+        {/* Brand Header */}
+        <div className="space-y-2.5">
+          <div className="flex items-center justify-center md:justify-start gap-2.5">
+            <InvictusLogo size="md" variant="full" href="/" />
+            <span className="bg-[#FAF8F5] dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] text-[10px] font-mono font-medium px-2 py-0.5 rounded-full border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs">
+              v1.7.8 • Offline-First OS
             </span>
           </div>
-          <p className="text-xs sm:text-sm font-medium text-[#161514]/75 leading-relaxed pt-1 hidden sm:block">
-            A tactile Neobrutalist OmniTracker designed for relentless daily execution,
-            zero cognitive clutter, and complete local privacy.
-          </p>
-        </div>
 
-        {/* Feature Highlights Grid with Doodle Accents (Shown on desktop, or below on mobile) */}
-        <div className="hidden lg:grid grid-cols-2 gap-2.5 max-w-md w-full pt-1">
-          <div className="p-2.5 bg-white border-2 border-[#161514] rounded-xl shadow-[2px_2px_0px_0px_#161514] flex items-center gap-2.5 transition-transform hover:-translate-y-0.5">
-            <div className="size-7 rounded-lg bg-[#CEF431] border-2 border-[#161514] flex items-center justify-center shrink-0">
-              <CheckCircle2 className="size-4 text-[#161514] stroke-[2.5]" />
-            </div>
-            <div className="flex flex-col text-left">
-              <span className="font-heading font-extrabold text-xs text-[#161514]">Habits & Streaks</span>
-              <span className="font-doodle text-[10px] text-[#161514]/65">chain unbreakable ⚡</span>
-            </div>
-          </div>
-
-          <div className="p-2.5 bg-white border-2 border-[#161514] rounded-xl shadow-[2px_2px_0px_0px_#161514] flex items-center gap-2.5 transition-transform hover:-translate-y-0.5">
-            <div className="size-7 rounded-lg bg-[#C084FC] border-2 border-[#161514] flex items-center justify-center shrink-0">
-              <Zap className="size-4 text-[#161514] stroke-[2.5]" />
-            </div>
-            <div className="flex flex-col text-left">
-              <span className="font-heading font-extrabold text-xs text-[#161514]">Exams & Syllabus</span>
-              <span className="font-doodle text-[10px] text-[#161514]/65">100% syllabus prep 📚</span>
-            </div>
-          </div>
-
-          <div className="p-2.5 bg-white border-2 border-[#161514] rounded-xl shadow-[2px_2px_0px_0px_#161514] flex items-center gap-2.5 transition-transform hover:-translate-y-0.5">
-            <div className="size-7 rounded-lg bg-[#F59E0B] border-2 border-[#161514] flex items-center justify-center shrink-0">
-              <Flame className="size-4 text-[#161514] stroke-[2.5]" />
-            </div>
-            <div className="flex flex-col text-left">
-              <span className="font-heading font-extrabold text-xs text-[#161514]">Daily Priority</span>
-              <span className="font-doodle text-[10px] text-[#161514]/65">crush daily targets 🔥</span>
-            </div>
-          </div>
-
-          <div className="p-2.5 bg-white border-2 border-[#161514] rounded-xl shadow-[2px_2px_0px_0px_#161514] flex items-center gap-2.5 transition-transform hover:-translate-y-0.5">
-            <div className="size-7 rounded-lg bg-[#03D26F] border-2 border-[#161514] flex items-center justify-center shrink-0">
-              <Wallet className="size-4 text-[#161514] stroke-[2.5]" />
-            </div>
-            <div className="flex flex-col text-left">
-              <span className="font-heading font-extrabold text-xs text-[#161514]">Cash & Budgets</span>
-              <span className="font-doodle text-[10px] text-[#161514]/65">zero financial leaks 💰</span>
-            </div>
+          <div className="space-y-1.5 max-w-md mx-auto md:mx-0">
+            <h1 className="font-heading font-black text-2xl sm:text-3xl lg:text-4xl text-[#161514] dark:text-[#FAF8F5] tracking-tight leading-tight">
+              Life, study & money.
+              <span className="block text-[#6B6B6B] dark:text-[#A8A29E] text-xl sm:text-2xl font-semibold">
+                In one focused cockpit.
+              </span>
+            </h1>
+            <p className="text-xs sm:text-sm font-medium text-[#6B6B6B] dark:text-[#A8A29E] leading-relaxed pt-0.5">
+              A high-precision operating system designed for relentless daily execution,
+              unbreakable habits, exam mastery, and zero financial leaks.
+            </p>
           </div>
         </div>
 
-        {/* Real Tactile Sticky Note with Hand-Drawn Washi Tape (Desktop) */}
-        <div className="hidden lg:block max-w-md w-full pt-1">
-          <DoodleStickyNote
-            title="AGENT INTEL NOTE"
-            content="Invictus is built offline-first. Your private journal, syllabus tracking, and expense logs stay encrypted on this device."
-            footer="— Zero ads • Zero spyware • Pure flow state 🚀"
-            color="yellow"
-            rot="-1deg"
-          />
+        {/* 4 Pillars Interactive Telemetry Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-w-md w-full pt-0.5">
+          {/* Pillar 1: Today */}
+          <div className="p-3 bg-white dark:bg-[#161514] border border-[#E8E5DF] dark:border-[#2A2724] rounded-xl shadow-xs flex items-center gap-2.5 transition-all hover:border-[#161514] dark:hover:border-white">
+            <div className="size-8 rounded-lg bg-[#CEF431] dark:bg-[#22201D] text-[#161514] dark:text-[#CEF431] flex items-center justify-center shrink-0 border border-[#161514]/10 dark:border-[#2A2724]">
+              <CheckCircle2 className="size-4 stroke-[2]" />
+            </div>
+            <div className="flex flex-col text-left min-w-0">
+              <span className="font-sans font-semibold text-xs text-[#161514] dark:text-[#FAF8F5] truncate">Daily Execution</span>
+              <span className="font-mono text-[10px] text-[#6B6B6B] dark:text-[#A8A29E]">Timeblocks & Live Dock</span>
+            </div>
+          </div>
+
+          {/* Pillar 2: Habits */}
+          <div className="p-3 bg-white dark:bg-[#161514] border border-[#E8E5DF] dark:border-[#2A2724] rounded-xl shadow-xs flex items-center gap-2.5 transition-all hover:border-[#161514] dark:hover:border-white">
+            <div className="size-8 rounded-lg bg-[#03D26F] dark:bg-[#153424] text-[#161514] dark:text-[#03D26F] flex items-center justify-center shrink-0 border border-[#161514]/10 dark:border-[#2A2724]">
+              <Flame className="size-4 stroke-[2]" />
+            </div>
+            <div className="flex flex-col text-left min-w-0">
+              <span className="font-sans font-semibold text-xs text-[#161514] dark:text-[#FAF8F5] truncate">Habits & Gym</span>
+              <span className="font-mono text-[10px] text-[#6B6B6B] dark:text-[#A8A29E]">Anatomy & Macros</span>
+            </div>
+          </div>
+
+          {/* Pillar 3: Study */}
+          <div className="p-3 bg-white dark:bg-[#161514] border border-[#E8E5DF] dark:border-[#2A2724] rounded-xl shadow-xs flex items-center gap-2.5 transition-all hover:border-[#161514] dark:hover:border-white">
+            <div className="size-8 rounded-lg bg-[#C084FC] dark:bg-[#2D1B42] text-[#161514] dark:text-[#C084FC] flex items-center justify-center shrink-0 border border-[#161514]/10 dark:border-[#2A2724]">
+              <Zap className="size-4 stroke-[2]" />
+            </div>
+            <div className="flex flex-col text-left min-w-0">
+              <span className="font-sans font-semibold text-xs text-[#161514] dark:text-[#FAF8F5] truncate">Exams & Syllabus</span>
+              <span className="font-mono text-[10px] text-[#6B6B6B] dark:text-[#A8A29E]">Spaced Repetition</span>
+            </div>
+          </div>
+
+          {/* Pillar 4: Money */}
+          <div className="p-3 bg-white dark:bg-[#161514] border border-[#E8E5DF] dark:border-[#2A2724] rounded-xl shadow-xs flex items-center gap-2.5 transition-all hover:border-[#161514] dark:hover:border-white">
+            <div className="size-8 rounded-lg bg-[#F59E0B] dark:bg-[#38260D] text-[#161514] dark:text-[#F59E0B] flex items-center justify-center shrink-0 border border-[#161514]/10 dark:border-[#2A2724]">
+              <Wallet className="size-4 stroke-[2]" />
+            </div>
+            <div className="flex flex-col text-left min-w-0">
+              <span className="font-sans font-semibold text-xs text-[#161514] dark:text-[#FAF8F5] truncate">Cashflow Ledger</span>
+              <span className="font-mono text-[10px] text-[#6B6B6B] dark:text-[#A8A29E]">UPI & Cash Till</span>
+            </div>
+          </div>
         </div>
 
-        {/* Directional Doodle Arrow pointing towards login form on desktop */}
-        <div className="hidden lg:flex items-center justify-end max-w-md w-full pt-1 pr-4">
-          <DoodleArrow
-            direction="curved-up-right"
-            label="Claim your cockpit ➔"
-            color="#FF4F17"
-          />
+        {/* Air-gap Privacy Assurance Box */}
+        <div className="max-w-md w-full p-3 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] flex items-start gap-2.5 text-left">
+          <ShieldCheck className="size-4 text-emerald-600 dark:text-emerald-400 stroke-[1.8] shrink-0 mt-0.5" />
+          <div className="space-y-0.5">
+            <span className="text-xs font-semibold text-[#161514] dark:text-[#FAF8F5] block">
+              100% Private & Air-Gapped
+            </span>
+            <p className="text-[11px] text-[#6B6B6B] dark:text-[#A8A29E] leading-relaxed">
+              Your journals, syllabus masteries, and financial receipts remain encrypted on this device. Zero ads, zero trackers, and zero cloud surveillance.
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Right Column: Unified Neobrutalist Auth Card with Doodle Accents */}
-      <div className="lg:col-span-6 w-full max-w-md mx-auto z-10 relative">
-        {/* Playful Floating Stamp Badge */}
-        <div className="absolute -top-3.5 right-4 sm:right-6 z-20 pointer-events-none">
-          <DoodleStamp
-            text="AGENT ENTRY"
-            subtext="VAULT ACCESS"
-            variant="lime"
-            rot="2.5deg"
-          />
-        </div>
+      {/* ─── RIGHT COLUMN: UNIFIED FRICTIONLESS AUTH COCKPIT ─── */}
+      <div className="md:col-span-6 lg:col-span-5 w-full max-w-md mx-auto z-10 relative order-1 md:order-2">
+        <div className="bg-white dark:bg-[#161514] rounded-2xl p-5 sm:p-7 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-5 transition-colors">
+          {/* ZERO-CONFUSION 1-TAP GUEST ON-RAMP */}
+          <div className="p-4 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] space-y-2.5">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5">
+                <Compass className="size-4 stroke-[1.8] text-emerald-600 dark:text-emerald-400" />
+                <span>Instant Evaluation Mode</span>
+              </span>
+              <span className="bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 text-[10px] font-mono px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
+                1-Tap Ready
+              </span>
+            </div>
+            <p className="text-[11px] text-[#6B6B6B] dark:text-[#A8A29E] leading-relaxed">
+              Test all workspaces, gym routines, and ledger envelopes immediately without creating an account.
+            </p>
+            <button
+              type="button"
+              onClick={handleGuestLogin}
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#161514] hover:bg-[#2A2826] text-white dark:bg-[#FAF8F5] dark:text-[#161514] dark:hover:bg-[#E8E5DF] text-xs font-semibold transition-colors cursor-pointer shadow-xs"
+            >
+              <Compass className="size-3.5 stroke-[2]" />
+              <span>Explore as Offline Guest (No Account)</span>
+              <ArrowRight className="size-3.5 stroke-[2]" />
+            </button>
+          </div>
 
-        <div className="neo-card p-5 sm:p-8 bg-white border-2 border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-5 sm:space-y-6 relative overflow-visible">
-          {/* Dual Tabs Switcher */}
-          <div className="grid grid-cols-2 p-1 bg-[#F1EFEA] border-2 border-[#161514] rounded-xl gap-1">
+          {/* Calm Divider */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-[#E8E5DF] dark:border-[#2A2724]" />
+            </div>
+            <div className="relative flex justify-center text-[10px] uppercase font-mono font-medium">
+              <span className="bg-white dark:bg-[#161514] px-2.5 text-[#6B6B6B] dark:text-[#A8A29E]">
+                or sign in to synced vault
+              </span>
+            </div>
+          </div>
+
+          {/* Segmented Dual Tabs Switcher */}
+          <div className="grid grid-cols-2 p-1 bg-[#F1EFEA] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] rounded-xl gap-1">
             <button
               type="button"
               onClick={() => setActiveTab("login")}
-              className={`py-2 text-xs font-heading font-extrabold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+              className={cn(
+                "py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5",
                 activeTab === "login"
-                  ? "bg-[#CEF431] text-[#161514] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]"
-                  : "text-[#161514]/70 hover:text-[#161514]"
-              }`}
+                  ? "bg-white dark:bg-[#2A2724] text-[#161514] dark:text-[#FAF8F5] shadow-xs"
+                  : "text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5]"
+              )}
             >
-              <LogIn className="size-3.5" />
+              <LogIn className="size-3.5 stroke-[1.8]" />
               <span>Sign In</span>
             </button>
             <button
               type="button"
               onClick={() => setActiveTab("signup")}
-              className={`py-2 text-xs font-heading font-extrabold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+              className={cn(
+                "py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5",
                 activeTab === "signup"
-                  ? "bg-[#03D26F] text-[#161514] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]"
-                  : "text-[#161514]/70 hover:text-[#161514]"
-              }`}
+                  ? "bg-white dark:bg-[#2A2724] text-[#161514] dark:text-[#FAF8F5] shadow-xs"
+                  : "text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5]"
+              )}
             >
-              <UserPlus className="size-3.5" />
+              <UserPlus className="size-3.5 stroke-[1.8]" />
               <span>Create Account</span>
             </button>
           </div>
 
-          {/* Form */}
-          <form onSubmit={handleEmailSubmit} className="space-y-4">
+          {/* Form Controls */}
+          <form onSubmit={handleEmailSubmit} className="space-y-3.5">
             {activeTab === "signup" && (
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-heading font-extrabold text-[#161514] flex items-center gap-1.5">
-                    <User className="size-3.5" />
-                    <span>Full Name</span>
-                  </label>
-                  <span className="font-doodle text-[11px] text-[#161514]/60 font-semibold">
-                    codename or name 🏷️
-                  </span>
-                </div>
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5">
+                  <User className="size-3.5 stroke-[1.8] text-[#6B6B6B] dark:text-[#A8A29E]" />
+                  <span>Full Name</span>
+                </label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Alex Morgan"
                   required
-                  className="w-full neo-input"
+                  className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-3.5 py-2 text-xs font-medium text-[#161514] dark:text-[#FAF8F5] placeholder:text-[#A8A29E] focus:outline-none focus:border-[#161514] dark:focus:border-white transition-all"
                 />
               </div>
             )}
 
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-heading font-extrabold text-[#161514] flex items-center gap-1.5">
-                  <Mail className="size-3.5" />
-                  <span>Email Address</span>
-                </label>
-                <span className="font-doodle text-[11px] text-[#FF4F17] font-bold">
-                  write here ✍️
-                </span>
-              </div>
+            <div className="space-y-1">
+              <label className="text-[11px] font-semibold text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5">
+                <Mail className="size-3.5 stroke-[1.8] text-[#6B6B6B] dark:text-[#A8A29E]" />
+                <span>Email Address</span>
+              </label>
               <input
                 type="email"
                 inputMode="email"
@@ -270,20 +277,15 @@ function LoginForm() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 required
-                className="w-full neo-input"
+                className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-3.5 py-2 text-xs font-medium text-[#161514] dark:text-[#FAF8F5] placeholder:text-[#A8A29E] focus:outline-none focus:border-[#161514] dark:focus:border-white transition-all"
               />
             </div>
 
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-heading font-extrabold text-[#161514] flex items-center gap-1.5">
-                  <Lock className="size-3.5" />
-                  <span>Password</span>
-                </label>
-                <span className="font-doodle text-[11px] text-[#03D26F] font-bold">
-                  secret key 🔑
-                </span>
-              </div>
+            <div className="space-y-1">
+              <label className="text-[11px] font-semibold text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5">
+                <Lock className="size-3.5 stroke-[1.8] text-[#6B6B6B] dark:text-[#A8A29E]" />
+                <span>Password</span>
+              </label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -291,113 +293,56 @@ function LoginForm() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder={activeTab === "signup" ? "At least 4 characters" : "Your password"}
                   required
-                  className="w-full neo-input pr-10"
+                  className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-3.5 py-2 text-xs font-medium text-[#161514] dark:text-[#FAF8F5] placeholder:text-[#A8A29E] focus:outline-none focus:border-[#161514] dark:focus:border-white transition-all pr-10"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-[#161514]/60 hover:text-[#161514] cursor-pointer"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5] cursor-pointer"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
-                  {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                  {showPassword ? <EyeOff className="size-3.5 stroke-[1.8]" /> : <Eye className="size-3.5 stroke-[1.8]" />}
                 </button>
               </div>
             </div>
 
-            <Button
+            <button
               type="submit"
               disabled={loading}
-              className={`w-full py-2.5 font-black text-sm uppercase tracking-wider ${
-                activeTab === "signup" ? "bg-[#03D26F] hover:bg-[#10E57E]" : "bg-[#CEF431] hover:bg-[#D8F74E]"
-              }`}
+              className="w-full py-2.5 rounded-xl bg-[#161514] hover:bg-[#2A2826] text-white dark:bg-[#FAF8F5] dark:text-[#161514] dark:hover:bg-[#E8E5DF] font-semibold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shadow-xs mt-1"
             >
               {loading ? (
                 <span className="flex items-center gap-2">
-                  <span className="size-4 rounded-full border-2 border-[#161514] border-t-transparent animate-spin" />
-                  <span>Processing...</span>
+                  <span className="size-3.5 rounded-full border-2 border-white dark:border-[#161514] border-t-transparent animate-spin" />
+                  <span>Authenticating...</span>
                 </span>
               ) : activeTab === "login" ? (
                 <span className="flex items-center gap-2">
-                  <LogIn className="size-4" />
+                  <LogIn className="size-3.5 stroke-[2]" />
                   <span>Enter Vault</span>
                 </span>
               ) : (
                 <span className="flex items-center gap-2">
-                  <UserPlus className="size-4" />
+                  <UserPlus className="size-3.5 stroke-[2]" />
                   <span>Create My Vault</span>
                 </span>
               )}
-            </Button>
+            </button>
           </form>
 
-          {/* Divider with Doodle Label */}
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t-2 border-dashed border-[#161514]/20" />
-            </div>
-            <div className="relative flex justify-center text-[10px] uppercase font-mono font-bold">
-              <span className="bg-white px-2.5 text-[#161514]/60">or instant guest access</span>
-            </div>
-          </div>
-
-          {/* Sandbox & Guest Access with Sketched Doodle Pointer */}
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-center -mb-0.5">
-              <DoodleArrow
-                direction="curved-down-right"
-                label="Just testing? Jump right in! ↷"
-                color="#161514"
-              />
-            </div>
+          {/* Quick Demo Fill Helper */}
+          <div className="pt-1 flex items-center justify-between text-[11px] text-[#6B6B6B] dark:text-[#A8A29E] border-t border-[#E8E5DF] dark:border-[#2A2724]">
+            <span>Testing the app?</span>
             <button
               type="button"
-              onClick={handleGuestLogin}
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border-2 border-dashed border-[#161514] bg-[#F1EFEA] hover:bg-[#E5E2D8] text-xs font-heading font-black text-[#161514] transition-all cursor-pointer shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none min-h-[44px]"
+              onClick={handleFillDemo}
+              className="text-[11px] font-mono font-medium text-[#161514] dark:text-[#FAF8F5] hover:underline cursor-pointer flex items-center gap-1"
             >
-              <Compass className="size-4 stroke-[2.2] text-[#FF4F17]" />
-              <span>Explore as Offline Guest (No Account)</span>
+              <Sparkles className="size-3 text-[#F59E0B]" />
+              <span>Fill Demo Credentials</span>
             </button>
           </div>
-
-          {/* Reassurance Badge */}
-          <div className="pt-1 flex items-center justify-center gap-2 text-[11px] font-doodle font-bold text-[#161514]/70">
-            <Shield className="size-3.5 text-emerald-600 stroke-[2.5]" />
-            <span>100% offline-first • zero telemetry lock-in</span>
-          </div>
         </div>
-      </div>
-
-      {/* Mobile-Only Feature Highlights and Sticky Note below Auth Card */}
-      <div className="lg:hidden w-full max-w-md mx-auto space-y-4 pt-2 z-10">
-        <div className="grid grid-cols-2 gap-2">
-          <div className="p-2.5 bg-white border-2 border-[#161514] rounded-xl shadow-[2px_2px_0px_0px_#161514] flex items-center gap-2">
-            <div className="size-6 rounded-lg bg-[#CEF431] border-2 border-[#161514] flex items-center justify-center shrink-0">
-              <CheckCircle2 className="size-3.5 text-[#161514] stroke-[2.5]" />
-            </div>
-            <div className="flex flex-col text-left">
-              <span className="font-heading font-extrabold text-[11px] text-[#161514]">Habits & Streaks</span>
-              <span className="font-doodle text-[9px] text-[#161514]/65">unbreakable ⚡</span>
-            </div>
-          </div>
-
-          <div className="p-2.5 bg-white border-2 border-[#161514] rounded-xl shadow-[2px_2px_0px_0px_#161514] flex items-center gap-2">
-            <div className="size-6 rounded-lg bg-[#C084FC] border-2 border-[#161514] flex items-center justify-center shrink-0">
-              <Zap className="size-3.5 text-[#161514] stroke-[2.5]" />
-            </div>
-            <div className="flex flex-col text-left">
-              <span className="font-heading font-extrabold text-[11px] text-[#161514]">Exams & Syllabus</span>
-              <span className="font-doodle text-[9px] text-[#161514]/65">100% prep 📚</span>
-            </div>
-          </div>
-        </div>
-
-        <DoodleStickyNote
-          title="AGENT INTEL NOTE"
-          content="Invictus runs offline-first. Your private habits, syllabus & money logs stay on this phone."
-          footer="— Pure flow state 🚀"
-          color="yellow"
-          rot="-1deg"
-        />
       </div>
     </div>
   );
@@ -407,8 +352,8 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#FBF9F5] flex items-center justify-center p-4">
-          <div className="h-8 w-8 rounded-full border-2 border-[#161514] border-t-transparent animate-spin" />
+        <div className="min-h-screen bg-[#FAF8F5] dark:bg-[#0D0C0B] flex items-center justify-center p-4">
+          <div className="h-8 w-8 rounded-full border-2 border-[#161514] dark:border-white border-t-transparent animate-spin" />
         </div>
       }
     >

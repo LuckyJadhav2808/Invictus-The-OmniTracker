@@ -194,14 +194,13 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
             }
           }}
           className={cn(
-            "group h-9 px-3 py-1 rounded-full border-2 border-[#161514] flex items-center gap-2 cursor-pointer",
-            "shadow-[2px_2px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_#161514]",
-            "hover:-translate-y-0.5 transition-all duration-200 shrink-0",
+            "group h-8 px-3 py-1 rounded-full border flex items-center gap-2 cursor-pointer shadow-xs",
+            "hover:border-[#161514]/20 dark:hover:border-white/20 transition-all duration-200 shrink-0",
             currentMode === "gym_rest"
-              ? "bg-[#CEF431] text-[#161514]"
+              ? "bg-[#161514] text-white border-neutral-700"
               : currentMode === "pomodoro"
-              ? "bg-[#C084FC] text-[#161514]"
-              : "bg-[#FAF8F5] text-[#161514]"
+              ? "bg-[#161514] text-white border-neutral-700"
+              : "bg-[#F1EFEA] dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] border-[#E8E5DF] dark:border-[#383531]"
           )}
         >
           {/* Gym Rest Pill */}
@@ -209,25 +208,25 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
             <>
               <div className="flex items-center gap-1.5">
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-500 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-600" />
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500" />
                 </span>
-                <Dumbbell className="size-3.5 stroke-[2.5]" />
+                <Dumbbell className="size-3.5 stroke-[1.75]" />
               </div>
 
               <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-black uppercase tracking-wider">
+                <span className="text-[10px] font-medium text-white/70 uppercase tracking-wider">
                   Rest:
                 </span>
-                <span className="font-mono text-xs font-black tracking-tight">
+                <span className="font-mono text-xs font-semibold tracking-tight text-white">
                   {formatTime(gymRest.secondsLeft)}
                 </span>
               </div>
 
               {/* Mini progress bar inside pill */}
-              <div className="w-8 h-1.5 bg-[#161514]/20 rounded-full overflow-hidden hidden xs:block">
+              <div className="w-8 h-1 bg-white/20 rounded-full overflow-hidden hidden xs:block">
                 <div
-                  className="h-full bg-[#161514] transition-all duration-500"
+                  className="h-full bg-[#03D26F] transition-all duration-500"
                   style={{
                     width: `${Math.min(
                       100,
@@ -244,17 +243,17 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
             <>
               <div className="flex items-center gap-1.5">
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600" />
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-purple-500" />
                 </span>
-                <BookOpen className="size-3.5 stroke-[2.5]" />
+                <BookOpen className="size-3.5 stroke-[1.75]" />
               </div>
 
               <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-black uppercase tracking-wider truncate max-w-[80px] sm:max-w-[120px]">
+                <span className="text-[10px] font-medium text-white/70 uppercase tracking-wider truncate max-w-[80px] sm:max-w-[120px]">
                   {pomodoro.subjectName}:
                 </span>
-                <span className="font-mono text-xs font-black tracking-tight">
+                <span className="font-mono text-xs font-semibold tracking-tight text-white">
                   {formatTime(pomodoro.secondsLeft)}
                 </span>
               </div>
@@ -265,23 +264,23 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
           {currentMode === "ambient" && (
             <>
               <div className="flex items-center gap-1.5">
-                <span className="size-1.5 rounded-full bg-[#03D26F] animate-pulse" />
-                <Wallet className="size-3 stroke-[2.5] text-[#161514]" />
+                <span className="size-1.5 rounded-full bg-[#03D26F]" />
+                <Wallet className="size-3.5 stroke-[1.75] text-[#161514] dark:text-[#FAF8F5]" />
               </div>
 
-              <span className="text-[11px] font-black tracking-tight flex items-center gap-1">
-                <span>
+              <span className="text-xs font-medium tracking-tight flex items-center gap-1">
+                <span className="font-semibold text-[#161514] dark:text-[#FAF8F5]">
                   {ambient.currencySymbol}
                   {Math.round(ambient.dailyCashLeft || 0).toLocaleString()}
                 </span>
-                <span className="text-[#161514]/60 font-semibold text-[9px]">left today</span>
+                <span className="text-[#8C8882] dark:text-[#A8A29E] text-[10px]">left</span>
               </span>
 
               {ambient.totalHabits > 0 && (
                 <>
-                  <span className="text-[#161514]/30 font-bold">•</span>
-                  <div className="flex items-center gap-1 text-[11px] font-black">
-                    <Flame className="size-3 stroke-[2.5] text-amber-500 fill-amber-400" />
+                  <span className="text-[#8C8882]/40 dark:text-[#A8A29E]/40 font-bold">•</span>
+                  <div className="flex items-center gap-1 text-xs font-medium text-[#161514] dark:text-[#FAF8F5]">
+                    <Flame className="size-3 stroke-[1.75] text-amber-500 fill-amber-400" />
                     <span>
                       {ambient.habitsCompleted}/{ambient.totalHabits}
                     </span>
@@ -298,15 +297,15 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
                   dismissAmbient();
                   toast.info("Ambient dock minimized until your next workout or study session.");
                 }}
-                className="size-4 rounded-full hover:bg-[#161514]/15 flex items-center justify-center text-[#161514]/40 hover:text-[#161514] transition-colors ml-0.5 cursor-pointer"
+                className="size-4 rounded-full hover:bg-[#E8E5DF] dark:hover:bg-[#383531] flex items-center justify-center text-[#8C8882] hover:text-[#161514] dark:hover:text-[#FAF8F5] transition-colors ml-0.5 cursor-pointer"
                 title="Dismiss ambient pill"
               >
-                <X className="size-2.5 stroke-[3]" />
+                <X className="size-2.5 stroke-[2]" />
               </button>
             </>
           )}
 
-          <ChevronUp className="size-3 stroke-[3] rotate-180 opacity-60 group-hover:opacity-100 transition-opacity ml-0.5" />
+          <ChevronUp className="size-3 stroke-[2] rotate-180 opacity-50 group-hover:opacity-100 transition-opacity ml-0.5" />
         </div>
       )}
 
@@ -314,43 +313,34 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
       {isExpanded && (
         <div
           className={cn(
-            "bg-[#FAF8F5] rounded-3xl border-[2.5px] border-[#161514] shadow-[5px_5px_0px_0px_#161514] p-4 sm:p-5 space-y-3.5 animate-in fade-in-0 zoom-in-95 duration-200 z-50",
+            "bg-white dark:bg-[#1C1A18] rounded-2xl border border-[#E8E5DF] dark:border-[#383531] shadow-2xl p-4 sm:p-5 space-y-3.5 animate-in fade-in-0 zoom-in-95 duration-200 z-50",
             variant === "header"
               ? "absolute top-full mt-2 left-1/2 -translate-x-1/2 w-[390px] max-w-[92vw]"
               : "fixed bottom-20 left-1/2 -translate-x-1/2 w-[calc(100vw-28px)] max-w-md"
           )}
         >
           {/* Header Bar */}
-          <div className="flex items-center justify-between border-b-2 border-[#161514]/15 pb-2.5">
+          <div className="flex items-center justify-between border-b border-[#E8E5DF] dark:border-[#383531] pb-2.5">
             <div className="flex items-center gap-2">
-              <span
-                className={cn(
-                  "p-1.5 rounded-xl border border-[#161514] shadow-[1px_1px_0px_0px_#161514]",
-                  currentMode === "gym_rest"
-                    ? "bg-[#CEF431]"
-                    : currentMode === "pomodoro"
-                    ? "bg-[#C084FC]"
-                    : "bg-[#03D26F]"
-                )}
-              >
+              <span className="p-1.5 rounded-lg border border-[#E8E5DF] dark:border-[#383531] bg-[#F1EFEA] dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] shadow-xs">
                 {currentMode === "gym_rest" ? (
-                  <Dumbbell className="size-4 stroke-[2.5]" />
+                  <Dumbbell className="size-4 stroke-[1.75]" />
                 ) : currentMode === "pomodoro" ? (
-                  <BookOpen className="size-4 stroke-[2.5]" />
+                  <BookOpen className="size-4 stroke-[1.75]" />
                 ) : (
-                  <Sparkles className="size-4 stroke-[2.5]" />
+                  <Sparkles className="size-4 stroke-[1.75]" />
                 )}
               </span>
 
               <div>
-                <h4 className="text-xs font-black uppercase tracking-wider text-[#161514] font-heading">
+                <h4 className="text-xs font-semibold text-[#161514] dark:text-[#FAF8F5] tracking-tight">
                   {currentMode === "gym_rest"
                     ? "Gladiator Rest HUD"
                     : currentMode === "pomodoro"
                     ? "Pomodoro Deep Work"
                     : "Invictus Telemetry Dock"}
                 </h4>
-                <p className="text-[10px] font-bold text-[#161514]/60">
+                <p className="text-[10px] text-[#8C8882] dark:text-[#A8A29E]">
                   {currentMode === "gym_rest"
                     ? gymRest.exerciseName || "Active Set Recovery"
                     : currentMode === "pomodoro"
@@ -366,22 +356,22 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
                 soundFX.playPop();
                 setIsExpanded(false);
               }}
-              className="bg-white hover:bg-rose-100 text-[#161514] p-1.5 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
+              className="bg-[#F1EFEA] dark:bg-[#252321] hover:bg-[#E8E5DF] dark:hover:bg-[#383531] text-[#161514] dark:text-[#FAF8F5] p-1.5 rounded-lg border border-[#E8E5DF] dark:border-[#383531] shadow-xs transition-colors cursor-pointer"
               title="Collapse Dock"
             >
-              <ChevronUp className="size-3.5 stroke-[3]" />
+              <ChevronUp className="size-3.5 stroke-[2]" />
             </button>
           </div>
 
           {/* ================= GYM REST EXPANDED CONTENT ================= */}
           {currentMode === "gym_rest" && (
             <div className="space-y-3">
-              <div className="bg-white rounded-2xl border-2 border-[#161514] p-3 text-center shadow-[2px_2px_0px_0px_#161514]">
+              <div className="bg-[#FAF8F5] dark:bg-[#121110] rounded-xl border border-[#E8E5DF] dark:border-[#383531] p-3 text-center">
                 <div className="flex items-center justify-center gap-2">
                   <span
                     className={cn(
-                      "font-mono text-4xl sm:text-5xl font-black tracking-tight",
-                      gymRest.secondsLeft <= 5 ? "text-rose-600 animate-pulse" : "text-[#161514]"
+                      "font-mono text-4xl sm:text-5xl font-bold tracking-tight",
+                      gymRest.secondsLeft <= 5 ? "text-rose-600 animate-pulse" : "text-[#161514] dark:text-[#FAF8F5]"
                     )}
                   >
                     {formatTime(gymRest.secondsLeft)}
@@ -389,11 +379,11 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
                 </div>
 
                 {/* Progress track */}
-                <div className="w-full h-2.5 bg-[#F1EFEA] border border-[#161514] rounded-full overflow-hidden mt-2.5">
+                <div className="w-full h-2 bg-[#E8E5DF] dark:bg-[#383531] rounded-full overflow-hidden mt-2.5">
                   <div
                     className={cn(
                       "h-full transition-all duration-500",
-                      gymRest.secondsLeft <= 5 ? "bg-rose-500" : "bg-[#CEF431]"
+                      gymRest.secondsLeft <= 5 ? "bg-rose-500" : "bg-[#03D26F]"
                     )}
                     style={{
                       width: `${Math.min(
@@ -414,7 +404,7 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
                     soundFX.playPop();
                     addGymRestSeconds(-15);
                   }}
-                  className="bg-white hover:bg-[#FFF9EA] text-[#161514] py-2 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] font-black text-xs cursor-pointer active:translate-y-0.5"
+                  className="bg-white dark:bg-[#252321] hover:bg-[#F1EFEA] dark:hover:bg-[#2A2724] text-[#161514] dark:text-[#FAF8F5] py-2 rounded-lg border border-[#E8E5DF] dark:border-[#383531] font-medium text-xs cursor-pointer shadow-xs transition-colors"
                 >
                   -15s
                 </button>
@@ -426,7 +416,7 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
                     soundFX.playPop();
                     addGymRestSeconds(30);
                   }}
-                  className="bg-[#CEF431] hover:bg-[#D8F74E] text-[#161514] py-2 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] font-black text-xs cursor-pointer active:translate-y-0.5"
+                  className="bg-[#F1EFEA] dark:bg-[#252321] hover:bg-[#E8E5DF] dark:hover:bg-[#383531] text-[#161514] dark:text-[#FAF8F5] py-2 rounded-lg border border-[#E8E5DF] dark:border-[#383531] font-medium text-xs cursor-pointer shadow-xs transition-colors"
                 >
                   +30s
                 </button>
@@ -438,7 +428,7 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
                     soundFX.playPop();
                     togglePauseGymRest();
                   }}
-                  className="bg-white hover:bg-[#FFF9EA] text-[#161514] py-2 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] font-black text-xs flex items-center justify-center cursor-pointer active:translate-y-0.5"
+                  className="bg-white dark:bg-[#252321] hover:bg-[#F1EFEA] dark:hover:bg-[#2A2724] text-[#161514] dark:text-[#FAF8F5] py-2 rounded-lg border border-[#E8E5DF] dark:border-[#383531] font-medium text-xs flex items-center justify-center cursor-pointer shadow-xs transition-colors"
                 >
                   {gymRest.isPaused ? (
                     <Play className="size-3.5 fill-current" />
@@ -454,7 +444,7 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
                     soundFX.playPop();
                     stopGymRest();
                   }}
-                  className="bg-rose-100 hover:bg-rose-200 text-rose-700 py-2 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] font-black text-xs cursor-pointer active:translate-y-0.5"
+                  className="bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 py-2 rounded-lg border border-rose-200 dark:border-rose-900 font-medium text-xs cursor-pointer transition-colors"
                 >
                   Skip
                 </button>
@@ -468,10 +458,10 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
                   setIsExpanded(false);
                   router.push("/goals/gym");
                 }}
-                className="w-full bg-[#161514] hover:bg-black text-white font-black text-[11px] uppercase tracking-wider py-2.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center gap-1.5 cursor-pointer"
+                className="w-full bg-[#161514] dark:bg-[#CEF431] hover:bg-neutral-800 dark:hover:bg-[#b8dc2d] text-white dark:text-[#161514] font-medium text-xs py-2.5 rounded-lg shadow-xs flex items-center justify-center gap-1.5 cursor-pointer transition-colors font-heading font-black"
               >
                 <span>Jump to Workout Routine</span>
-                <ArrowUpRight className="size-3.5" />
+                <ArrowUpRight className="size-3.5 stroke-[1.75]" />
               </button>
             </div>
           )}
@@ -479,16 +469,16 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
           {/* ================= POMODORO EXPANDED CONTENT ================= */}
           {currentMode === "pomodoro" && (
             <div className="space-y-3">
-              <div className="bg-white rounded-2xl border-2 border-[#161514] p-3 text-center shadow-[2px_2px_0px_0px_#161514]">
-                <span className="font-mono text-4xl sm:text-5xl font-black tracking-tight text-[#161514]">
+              <div className="bg-[#FAF8F5] dark:bg-[#121110] rounded-xl border border-[#E8E5DF] dark:border-[#383531] p-3 text-center">
+                <span className="font-mono text-4xl sm:text-5xl font-bold tracking-tight text-[#161514] dark:text-[#FAF8F5]">
                   {formatTime(pomodoro.secondsLeft)}
                 </span>
 
-                <div className="w-full h-2.5 bg-[#F1EFEA] border border-[#161514] rounded-full overflow-hidden mt-2.5">
+                <div className="w-full h-2 bg-[#E8E5DF] dark:bg-[#383531] rounded-full overflow-hidden mt-2.5">
                   <div
                     className={cn(
-                      "h-full bg-[#C084FC] transition-all duration-500",
-                      pomodoro.phase === "focus" ? "bg-[#C084FC]" : "bg-[#03D26F]"
+                      "h-full transition-all duration-500",
+                      pomodoro.phase === "focus" ? "bg-purple-600 dark:bg-[#C084FC]" : "bg-[#03D26F]"
                     )}
                     style={{
                       width: `${Math.min(
@@ -507,7 +497,7 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
                     soundFX.playPop();
                     togglePausePomodoro();
                   }}
-                  className="bg-white hover:bg-[#FFF9EA] text-[#161514] py-2 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] font-black text-xs flex items-center justify-center gap-1 cursor-pointer"
+                  className="bg-white dark:bg-[#252321] hover:bg-[#F1EFEA] dark:hover:bg-[#2A2724] text-[#161514] dark:text-[#FAF8F5] py-2 rounded-lg border border-[#E8E5DF] dark:border-[#383531] font-medium text-xs flex items-center justify-center gap-1 cursor-pointer shadow-xs transition-colors"
                 >
                   {pomodoro.isPaused ? (
                     <>
@@ -528,7 +518,7 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
                     soundFX.playPop();
                     addPomodoroMinutes(5);
                   }}
-                  className="bg-[#C084FC] hover:bg-[#A855F7] text-[#161514] py-2 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] font-black text-xs cursor-pointer"
+                  className="bg-[#F1EFEA] dark:bg-[#252321] hover:bg-[#E8E5DF] dark:hover:bg-[#383531] text-[#161514] dark:text-[#FAF8F5] py-2 rounded-lg border border-[#E8E5DF] dark:border-[#383531] font-medium text-xs cursor-pointer shadow-xs transition-colors"
                 >
                   +5 Mins
                 </button>
@@ -539,7 +529,7 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
                     soundFX.playPop();
                     stopPomodoro();
                   }}
-                  className="bg-rose-100 hover:bg-rose-200 text-rose-700 py-2 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] font-black text-xs cursor-pointer"
+                  className="bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 py-2 rounded-lg border border-rose-200 dark:border-rose-900 font-medium text-xs cursor-pointer transition-colors"
                 >
                   End
                 </button>
@@ -552,10 +542,10 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
                   setIsExpanded(false);
                   router.push("/study");
                 }}
-                className="w-full bg-[#161514] hover:bg-black text-white font-black text-[11px] uppercase tracking-wider py-2.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center gap-1.5 cursor-pointer"
+                className="w-full bg-[#161514] dark:bg-[#C084FC] hover:bg-neutral-800 dark:hover:bg-[#a855f7] text-white dark:text-[#161514] font-medium text-xs py-2.5 rounded-lg shadow-xs flex items-center justify-center gap-1.5 cursor-pointer transition-colors font-heading font-black"
               >
                 <span>Jump to Study Space</span>
-                <ArrowUpRight className="size-3.5" />
+                <ArrowUpRight className="size-3.5 stroke-[1.75]" />
               </button>
             </div>
           )}
@@ -565,27 +555,27 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-2.5">
                 {/* Daily Cash Left Card */}
-                <div className="bg-[#E8F5E9] p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514]">
-                  <span className="text-[10px] font-black uppercase text-[#1B5E20] block">
+                <div className="bg-[#FAF8F5] dark:bg-[#252321] p-3 rounded-xl border border-[#E8E5DF] dark:border-[#383531]">
+                  <span className="text-[10px] font-medium text-[#8C8882] dark:text-[#A8A29E] uppercase tracking-wider block">
                     Daily Cash Left
                   </span>
-                  <span className="text-xl sm:text-2xl font-black font-heading text-[#161514] block mt-0.5">
+                  <span className="text-xl font-bold font-sans text-[#161514] dark:text-[#FAF8F5] block mt-0.5">
                     {ambient.currencySymbol}
                     {Math.round(ambient.dailyCashLeft || 0).toLocaleString()}
                   </span>
-                  <span className="text-[9px] font-bold text-[#1B5E20]/80">Safe to spend</span>
+                  <span className="text-[10px] text-[#8C8882] dark:text-[#A8A29E]">Safe to spend</span>
                 </div>
 
                 {/* Habit Streak Card */}
-                <div className="bg-[#FEF3C7] p-3 rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514]">
-                  <span className="text-[10px] font-black uppercase text-amber-800 block">
+                <div className="bg-[#FAF8F5] dark:bg-[#252321] p-3 rounded-xl border border-[#E8E5DF] dark:border-[#383531]">
+                  <span className="text-[10px] font-medium text-[#8C8882] dark:text-[#A8A29E] uppercase tracking-wider block">
                     Today&apos;s Habits
                   </span>
-                  <span className="text-xl sm:text-2xl font-black font-heading text-[#161514] block mt-0.5">
+                  <span className="text-xl font-bold font-sans text-[#161514] dark:text-[#FAF8F5] block mt-0.5">
                     {ambient.habitsCompleted}/{ambient.totalHabits}
                   </span>
-                  <span className="text-[9px] font-bold text-amber-800/80 flex items-center gap-1">
-                    <Flame className="size-2.5 fill-amber-500 text-amber-600" />
+                  <span className="text-[10px] text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                    <Flame className="size-3 fill-amber-500 text-amber-600" />
                     <span>{ambient.activeStreak} day streak</span>
                   </span>
                 </div>
@@ -600,9 +590,9 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
                     setIsExpanded(false);
                     startPomodoro(25, "Deep Focus", "focus");
                   }}
-                  className="bg-[#C084FC] hover:bg-[#A855F7] text-[#161514] font-black text-[11px] uppercase tracking-wider py-2.5 px-3 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center gap-1.5 cursor-pointer active:translate-y-0.5"
+                  className="bg-white dark:bg-[#252321] hover:bg-[#F1EFEA] dark:hover:bg-[#2A2724] text-[#161514] dark:text-[#FAF8F5] font-medium text-xs py-2 px-3 rounded-lg border border-[#E8E5DF] dark:border-[#383531] shadow-xs flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
                 >
-                  <Clock className="size-3.5 stroke-[2.5]" />
+                  <Clock className="size-3.5 stroke-[1.75]" />
                   <span>25m Focus</span>
                 </button>
 
@@ -613,9 +603,9 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
                     setIsExpanded(false);
                     router.push("/money");
                   }}
-                  className="bg-[#CEF431] hover:bg-[#bde422] text-[#161514] font-black text-[11px] uppercase tracking-wider py-2.5 px-3 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center justify-center gap-1.5 cursor-pointer active:translate-y-0.5"
+                  className="bg-[#161514] dark:bg-[#CEF431] hover:bg-neutral-800 dark:hover:bg-[#b8dc2d] text-white dark:text-[#161514] font-medium text-xs py-2 px-3 rounded-lg shadow-xs flex items-center justify-center gap-1.5 cursor-pointer transition-colors font-heading font-black"
                 >
-                  <Wallet className="size-3.5 stroke-[2.5]" />
+                  <Wallet className="size-3.5 stroke-[1.75]" />
                   <span>Money Space</span>
                 </button>
               </div>

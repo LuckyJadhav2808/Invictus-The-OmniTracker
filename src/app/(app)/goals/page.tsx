@@ -26,7 +26,7 @@ import { WeeklyOverviewWidget } from "@/components/goals/WeeklyOverviewWidget";
 import { WeeklyVelocityAndHabitMatrix } from "@/components/goals/WeeklyVelocityAndHabitMatrix";
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { InvictusLoadingScreen } from "@/components/shared/InvictusLoadingScreen";
+import { HabitsCockpitSkeleton, HabitsListSkeleton } from "@/components/shared/NeobrutalistSkeleton";
 import { AdaptiveDrawerDialog } from "@/components/shared/AdaptiveDrawerDialog";
 import { soundFX } from "@/components/shared/SoundFX";
 import { TemplatePack } from "@/components/shared/TemplateSelectionModal";
@@ -48,6 +48,11 @@ import {
   Info,
   Volume2,
   VolumeX,
+  Trophy,
+  Clock,
+  Check,
+  Bot,
+  RefreshCw,
 } from "lucide-react";
 import { format, getDay } from "date-fns";
 import { toast } from "sonner";
@@ -117,23 +122,24 @@ function GoalsPageContent() {
         soundFX.playBotChirp("salute");
       } catch {}
 
+      // 🛡️ Harmonized Streak Shield Toast
       toast.custom(
         () => (
-          <div className="bg-[#FAF8F5] border-2 border-[#161514] p-3.5 rounded-xl shadow-[3px_3px_0px_0px_#161514] flex items-center gap-3 w-full max-w-sm">
-            <div className="size-9 rounded-lg bg-[#03D26F] border-2 border-[#161514] flex items-center justify-center shrink-0 shadow-[1px_1px_0px_#161514]">
-              <ShieldCheck className="size-5 text-[#161514] stroke-[2.5]" />
+          <div className="bg-white dark:bg-[#161514] border border-[#E8E5DF] dark:border-[#2A2724] p-3.5 rounded-xl shadow-md flex items-center gap-3 w-full max-w-sm">
+            <div className="size-8 rounded-lg bg-[#DCFAE5] dark:bg-[#03D26F]/20 flex items-center justify-center shrink-0">
+              <ShieldCheck className="size-4 text-[#047857] dark:text-[#03D26F] stroke-[1.5]" />
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5">
-                <span className="font-heading font-black text-xs text-[#161514] uppercase tracking-wide">
-                  Streak Shield Deployed!
+                <span className="font-semibold text-xs text-[#161514] dark:text-[#FAF8F5]">
+                  Streak Shield Protected
                 </span>
-                <span className="bg-[#CEF431] text-[#161514] font-black text-[9px] px-1.5 py-0.5 rounded border border-[#161514]">
-                  SAVED
+                <span className="bg-[#DCFAE5] dark:bg-[#03D26F]/20 text-[#04250e] dark:text-[#03D26F] font-medium text-xs px-1.5 py-0.5 rounded">
+                  Saved
                 </span>
               </div>
-              <p className="text-[11px] text-[#161514]/80 font-medium leading-tight mt-0.5">
-                Protected {datesList} while you were away. Flame preserved! ({streakFreeze.tokensAvailable}/2 tokens left)
+              <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] leading-tight mt-0.5">
+                Protected {datesList} while you were away ({streakFreeze.tokensAvailable}/2 tokens left).
               </p>
             </div>
           </div>
@@ -183,7 +189,7 @@ function GoalsPageContent() {
         age: formattedAge,
         weight: formattedWeight,
       });
-      toast.success("Health stats updated! 🎯");
+      toast.success("Health stats updated");
       setIsProfileOpen(false);
     } catch {
       toast.error("Failed to update profile stats");
@@ -211,7 +217,7 @@ function GoalsPageContent() {
         reminderTime: item.desc || "",
       });
     });
-    toast.success(`Applied '${pack.name}' protocol! 🚀`);
+    toast.success(`Applied '${pack.name}' protocol`);
     setIsChoiceOpen(false);
   };
 
@@ -228,7 +234,7 @@ function GoalsPageContent() {
         goalTarget: preset.goalTarget,
         goalUnit: preset.goalUnit,
       });
-      toast.success(`Added '${preset.title}' to routines! ✨`);
+      toast.success(`Added '${preset.title}' to routines`);
     } catch {
       toast.error("Failed to add preset habit");
     }
@@ -247,7 +253,7 @@ function GoalsPageContent() {
         goalTarget: custom.goalTarget,
         goalUnit: custom.goalUnit,
       });
-      toast.success(`Created habit '${custom.title}'! 🎯`);
+      toast.success(`Created habit '${custom.title}'`);
     } catch {
       toast.error("Failed to create habit");
     }
@@ -274,7 +280,7 @@ function GoalsPageContent() {
         allowGraceSkip: false,
         isGoalStyle: false,
       });
-      toast.success(`Added habit: ${suggested.title}! 🎉`);
+      toast.success(`Added habit: ${suggested.title}`);
     } catch {
       toast.error("Failed to add suggested habit");
     }
@@ -283,7 +289,7 @@ function GoalsPageContent() {
   const handleAddHabit = async (data: any) => {
     try {
       await addHabitMutation.mutateAsync(data);
-      toast.success("Habit created! Let's get to work 💪");
+      toast.success("Habit created");
       setIsAddOpen(false);
     } catch (err: any) {
       toast.error(err?.message || "Failed to create habit");
@@ -297,7 +303,7 @@ function GoalsPageContent() {
         date: selectedDate,
         completed,
       });
-      toast.success(completed ? "Checked! Good job! 🎉" : "Removed check");
+      toast.success(completed ? "Habit checked" : "Removed check");
     } catch {
       toast.error("Failed to update habit log");
     }
@@ -351,35 +357,49 @@ function GoalsPageContent() {
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* 1. Habits & Wellness Cockpit Header Card */}
-      <div className="bg-white border-2 border-[#161514] rounded-2xl p-5 shadow-[4px_4px_0px_0px_#161514] flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#383531] rounded-xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-heading font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border-2 border-[#161514] bg-[#03D26F] text-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]">
+            <span className="text-xs font-medium px-2 py-0.5 rounded-md bg-[#F1EFEA] dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#383531]">
               Habits & Wellness
             </span>
-            <span className="text-[10px] font-heading font-black text-[#161514]/70">
+            <span className="text-xs font-mono text-[#6B6B6B] dark:text-[#A8A29E]">
               Lvl {achievements.userLevel} • {achievements.totalXP} XP
             </span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-heading font-black text-[#161514] tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-sans font-semibold text-[#161514] dark:text-[#FAF8F5] tracking-tight">
             Habits & Routines
           </h1>
-          <p className="text-xs font-medium text-[#161514]/70 max-w-lg">
+          <p className="text-xs font-normal text-[#6B6B6B] dark:text-[#A8A29E] max-w-lg">
             Build daily consistency, conquer streaks, and maintain holistic vitality.
           </p>
         </div>
 
         {/* Quick Metrics & Actions */}
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-          <div className="px-3 py-2 rounded-xl border-2 border-[#161514] bg-[#FAF8F5] shadow-[2px_2px_0px_0px_#161514] text-center min-w-[70px]">
-            <span className="text-[9px] font-heading font-black uppercase text-[#161514]/60 block leading-tight">Habits</span>
-            <span className="text-sm font-heading font-black text-[#161514]">{totalHabits}</span>
-          </div>
-          <div className="px-3 py-2 rounded-xl border-2 border-[#161514] bg-amber-50 shadow-[2px_2px_0px_0px_#161514] text-center min-w-[70px]">
-            <span className="text-[9px] font-heading font-black uppercase text-amber-700 block leading-tight">Best Streak</span>
-            <span className="text-sm font-heading font-black text-[#161514] flex items-center justify-center gap-1">
-              <Flame className="size-3.5 fill-rose-500 text-rose-500" />
-              {longestStreakValue}d
+        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+          <button
+            type="button"
+            onClick={() => setIsShieldInfoOpen(true)}
+            className={cn(
+              "px-2.5 py-1.5 rounded-lg border border-[#E8E5DF] dark:border-[#383531] text-xs font-mono font-medium flex items-center gap-1.5 transition-colors cursor-pointer",
+              streakFreeze.tokensAvailable > 0
+                ? "bg-[#F1EFEA] dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] hover:bg-[#E8E5DF] dark:hover:bg-[#2e2b28]"
+                : "bg-amber-50 dark:bg-amber-950/30 text-amber-900 dark:text-amber-200 hover:bg-amber-100"
+            )}
+            title="Streak shield protection details"
+          >
+            <ShieldCheck className="size-3.5 stroke-[1.5] text-[#161514] dark:text-[#FAF8F5]" />
+            <span>
+              {streakFreeze.tokensAvailable > 0
+                ? `${streakFreeze.tokensAvailable}/2 Shielded`
+                : "0/2 Shields"}
+            </span>
+          </button>
+
+          <div className="px-2.5 py-1.5 rounded-lg border border-[#E8E5DF] dark:border-[#78350F]/40 bg-[#FFFBEB] dark:bg-[#78350F]/20 text-[#92400E] dark:text-[#FDE68A] text-center flex items-center gap-1.5">
+            <Flame className="size-3.5 fill-orange-500 text-orange-500" />
+            <span className="text-xs font-mono font-medium tabular-nums">
+              {longestStreakValue}d streak
             </span>
           </div>
 
@@ -389,13 +409,13 @@ function GoalsPageContent() {
             onClick={() => {
               const nextMuted = soundFX.toggleMute();
               setSoundMuted(nextMuted);
-              toast.info(nextMuted ? "Tactile audio muted" : "Tactile audio active 🔊");
+              toast.info(nextMuted ? "Tactile audio muted" : "Tactile audio active");
             }}
-            className="size-10 rounded-xl border-2 border-[#161514] bg-white hover:bg-[#FFF9EA] text-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all flex items-center justify-center cursor-pointer shrink-0"
+            className="size-9 rounded-lg border border-[#E8E5DF] dark:border-[#383531] bg-white dark:bg-[#252321] hover:bg-[#F5F3EF] dark:hover:bg-[#2e2b28] text-[#161514] dark:text-[#FAF8F5] transition-colors flex items-center justify-center cursor-pointer shrink-0"
             title={soundMuted ? "Unmute tactile sounds" : "Mute tactile sounds"}
             aria-label="Toggle sound"
           >
-            {soundMuted ? <VolumeX className="size-4 stroke-[2.5]" /> : <Volume2 className="size-4 stroke-[2.5]" />}
+            {soundMuted ? <VolumeX className="size-3.5 stroke-[1.5]" /> : <Volume2 className="size-3.5 stroke-[1.5]" />}
           </button>
 
           <Button
@@ -403,9 +423,9 @@ function GoalsPageContent() {
               soundFX.playPop();
               setIsChoiceOpen(true);
             }}
-            className="bg-[#CEF431] hover:bg-[#D8F74E] text-[#161514] font-heading font-black text-xs px-3.5 py-2.5 h-auto rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] flex items-center gap-1.5 cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+            className="bg-[#161514] dark:bg-[#CEF431] hover:bg-[#2A2826] dark:hover:bg-[#d6f64d] text-white dark:text-[#161514] font-medium text-xs px-3.5 py-2 h-auto rounded-lg border border-[#161514] dark:border-[#CEF431] flex items-center gap-1.5 cursor-pointer transition-colors"
           >
-            <Plus className="size-4 stroke-[3]" />
+            <Plus className="size-3.5 stroke-[2]" />
             <span>New Habit</span>
           </Button>
 
@@ -413,12 +433,12 @@ function GoalsPageContent() {
           <VixPixelCompanion
             gear="fitness"
             state={isAllDueCompleted || longestStreakValue >= 3 ? "fire" : "idle"}
-            size={42}
+            size={36}
             onClick={() => {
               soundFX.playPop();
               setIsChoiceOpen(true);
             }}
-            title={isAllDueCompleted ? "Vix: All daily habits conquered today! 🏆" : "Vix: Fitness Companion (Click for Habit Vault)"}
+            title={isAllDueCompleted ? "Vix: All daily habits conquered today!" : "Vix: Fitness companion (Click for Habit Vault)"}
           />
         </div>
       </div>
@@ -426,127 +446,69 @@ function GoalsPageContent() {
       {/* 2. Proactive Reminder Banner */}
       <ProactiveReminderBanner space="goals" />
 
-      {/* 3. Autonomous Streak Freeze Shield Card */}
-      <div
-        onClick={() => setIsShieldInfoOpen(true)}
-        className="bg-white rounded-xl p-3 border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] flex items-center justify-between gap-2.5 cursor-pointer hover:bg-[#FAF8F5] transition-colors group"
-      >
-        <div className="flex items-center gap-2.5 min-w-0">
-          <div
-            className={cn(
-              "size-8 shrink-0 rounded-lg border-2 border-[#161514] flex items-center justify-center text-[#161514] shadow-[1px_1px_0px_0px_#161514] transition-transform group-hover:scale-105",
-              streakFreeze.tokensAvailable > 0 ? "bg-[#03D26F]" : "bg-amber-100"
-            )}
-          >
-            {streakFreeze.tokensAvailable > 0 ? (
-              <ShieldCheck className="size-4 stroke-[2.5]" />
-            ) : (
-              <ShieldAlert className="size-4 stroke-[2.5]" />
-            )}
-          </div>
-          <div className="min-w-0">
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <h4 className="font-heading font-black text-xs text-[#161514] uppercase tracking-tight truncate">
-                Autonomous Streak Shield
-              </h4>
-              <span
-                className={cn(
-                  "text-[#161514] font-heading font-black text-[9px] px-1.5 py-0.5 rounded-md border border-[#161514] shrink-0",
-                  streakFreeze.tokensAvailable > 0 ? "bg-[#CEF431]" : "bg-amber-200"
-                )}
-              >
-                {streakFreeze.tokensAvailable > 0
-                  ? `${streakFreeze.tokensAvailable}/2 Armed`
-                  : "0/2 Depleted"}
-              </span>
-              {streakFreeze.frozenDates && streakFreeze.frozenDates.length > 0 && (
-                <span className="bg-cyan-100 text-[#161514] font-heading font-bold text-[8.5px] px-1.5 py-0.5 rounded-md border border-[#161514] shrink-0 hidden sm:inline-block">
-                  {streakFreeze.frozenDates.length} Shielded
-                </span>
-              )}
-            </div>
-            <p className="text-[10px] text-[#161514]/70 font-medium truncate pt-0.5">
-              {streakFreeze.tokensAvailable > 0
-                ? "Auto-deploys if you miss a scheduled day. Flame preserved."
-                : "0 shields remaining. Refills automatically on the 1st."}
-            </p>
-          </div>
-        </div>
-
-        <div className="shrink-0 flex items-center gap-1.5">
-          <span className="text-[10px] font-heading font-black text-[#161514] bg-[#FAF8F5] group-hover:bg-[#CEF431] px-2 py-1 rounded-lg border border-[#161514] flex items-center gap-1 shadow-[1px_1px_0px_0px_#161514] transition-colors">
-            <Info className="size-3 stroke-[2.5]" />
-            <span className="hidden sm:inline">Details</span>
-          </span>
-        </div>
-      </div>
-
-      {/* 4. Weekly Overview Widget */}
+      {/* 3. Weekly Overview Widget */}
       <WeeklyOverviewWidget />
 
-      {/* 5. Weekly Velocity & Activity Matrix */}
-      <WeeklyVelocityAndHabitMatrix />
-
-      {/* 6. Responsive 2-Column Grid: Habits Checklist + Hydration & Health Stats */}
+      {/* 4. Primary Hero Workspace: Habits Checklist + Hydration */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 my-4">
         {/* Left Column (2 cols on lg): Habits Checklist */}
         <div id="habits-section" className="lg:col-span-2 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5" style={{ fontFamily: "var(--font-heading)" }}>
+            <h3 className="text-[15px] font-sans font-semibold text-[#161514] dark:text-[#FAF8F5] flex items-center gap-2">
               <Sparkles className="size-3.5 text-[#03D26F]" />
-              <span>Active Habit Streaks</span>
-              <span className="bg-[#CEF431] text-[#161514] text-[10px] px-2 py-0.5 rounded-full border-2 border-[#161514] font-black shadow-[1px_1px_0px_0px_#161514]">
+              <span>Active habit streaks</span>
+              <span className="bg-[#F1EFEA] dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] text-xs px-2 py-0.5 rounded-md border border-[#E8E5DF] dark:border-[#383531] font-mono font-medium">
                 {habits.length}
               </span>
             </h3>
             <button
               type="button"
               onClick={() => setIsChoiceOpen(true)}
-              className="text-[10px] font-black uppercase tracking-wider text-[#161514] bg-[#CEF431] border-2 border-[#161514] px-2.5 py-1 rounded-xl shadow-[2px_2px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
+              className="text-xs font-medium text-[#161514] dark:text-[#FAF8F5] bg-white dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#383531] hover:bg-[#F5F3EF] dark:hover:bg-[#2e2b28] px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
             >
-              + New Habit
+              + New habit
             </button>
           </div>
 
           {/* Daily Victory Celebration HUD */}
           {isAllDueCompleted && habits.length > 0 && (
-            <div className="bg-[#CEF431] border-2 border-[#161514] rounded-2xl p-4 shadow-[4px_4px_0px_0px_#161514] flex items-center justify-between gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="bg-[#DCFAE5] dark:bg-[#03D26F]/20 border border-[#03D26F]/30 rounded-xl p-4 flex items-center justify-between gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
               <div className="flex items-center gap-3">
-                <div className="size-10 rounded-xl bg-white border-2 border-[#161514] flex items-center justify-center text-xl shadow-[2px_2px_0px_0px_#161514] shrink-0">
-                  👑
+                <div className="size-9 rounded-lg bg-white dark:bg-[#1C1A18] border border-[#03D26F]/40 flex items-center justify-center text-[#047857] dark:text-[#03D26F] shrink-0">
+                  <Trophy className="size-4.5 stroke-[1.5]" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-black uppercase tracking-wider text-[#161514]" style={{ fontFamily: "var(--font-heading)" }}>
-                      Daily Conquered! 100% Complete
+                    <span className="text-xs font-semibold tracking-tight text-[#04250e] dark:text-[#DCFAE5]">
+                      Daily conquered • 100% complete
                     </span>
-                    <span className="bg-[#161514] text-[#CEF431] text-[9px] font-black px-2 py-0.5 rounded-full uppercase">
-                      All Due Done
+                    <span className="bg-[#03D26F] text-white text-[10px] font-mono font-medium px-2 py-0.5 rounded-full">
+                      All due done
                     </span>
                   </div>
-                  <p className="text-[11px] font-bold text-[#161514]/80 mt-0.5">
+                  <p className="text-xs text-[#047857] dark:text-[#A7F3D0] mt-0.5">
                     Vix is ecstatic! Every single habit scheduled for today has been checked off. Take a bow.
                   </p>
                 </div>
               </div>
               <div className="hidden sm:flex shrink-0">
-                <VixPixelCompanion gear="fitness" state="celebrate" size={48} title="Daily Conquered!" />
+                <VixPixelCompanion gear="fitness" state="celebrate" size={40} title="Daily conquered!" />
               </div>
             </div>
           )}
 
           {/* Quick Filter Bar */}
           {habits.length > 0 && (
-            <div className="flex flex-wrap items-center justify-between gap-2 bg-white border-2 border-[#161514] rounded-2xl p-2.5 shadow-[3px_3px_0px_0px_#161514]">
-              <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-0.5">
+            <div className="flex flex-wrap items-center justify-between gap-2 bg-white dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#383531] rounded-xl p-2.5">
+              <div className="flex items-center gap-1 p-0.5 bg-[#F1EFEA] dark:bg-[#161514] border border-[#E8E5DF] dark:border-[#383531] rounded-lg">
                 <button
                   type="button"
                   onClick={() => setHabitStatusFilter("all")}
                   className={cn(
-                    "px-2.5 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider border-2 border-[#161514] transition-all cursor-pointer",
+                    "px-2.5 py-1 text-xs font-medium rounded capitalize transition-colors cursor-pointer",
                     habitStatusFilter === "all"
-                      ? "bg-[#161514] text-white shadow-[2px_2px_0px_0px_#CEF431]"
-                      : "bg-[#FAF8F5] text-[#161514] hover:bg-amber-100 shadow-[1px_1px_0px_0px_#161514]"
+                      ? "bg-white dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] shadow-sm font-semibold"
+                      : "text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5]"
                   )}
                 >
                   All ({habits.length})
@@ -555,16 +517,16 @@ function GoalsPageContent() {
                   type="button"
                   onClick={() => setHabitStatusFilter("pending")}
                   className={cn(
-                    "px-2.5 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider border-2 border-[#161514] transition-all cursor-pointer flex items-center gap-1",
+                    "px-2.5 py-1 text-xs font-medium rounded capitalize transition-colors cursor-pointer flex items-center gap-1",
                     habitStatusFilter === "pending"
-                      ? "bg-[#161514] text-white shadow-[2px_2px_0px_0px_#CEF431]"
-                      : "bg-[#FAF8F5] text-[#161514] hover:bg-amber-100 shadow-[1px_1px_0px_0px_#161514]"
+                      ? "bg-white dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] shadow-sm font-semibold"
+                      : "text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5]"
                   )}
                 >
-                  <span>Due Today</span>
+                  <span>Due today</span>
                   <span className={cn(
-                    "px-1.5 py-0.2 rounded-full text-[9px] font-black border",
-                    pendingTodayHabits.length > 0 ? "bg-amber-300 text-[#161514] border-[#161514]" : "bg-zinc-200 text-zinc-600 border-zinc-400"
+                    "px-1.5 py-0.2 rounded text-[10px] font-mono font-medium",
+                    pendingTodayHabits.length > 0 ? "bg-amber-100 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200" : "bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
                   )}>
                     {pendingTodayHabits.length}
                   </span>
@@ -573,39 +535,35 @@ function GoalsPageContent() {
                   type="button"
                   onClick={() => setHabitStatusFilter("completed")}
                   className={cn(
-                    "px-2.5 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider border-2 border-[#161514] transition-all cursor-pointer flex items-center gap-1",
+                    "px-2.5 py-1 text-xs font-medium rounded capitalize transition-colors cursor-pointer flex items-center gap-1",
                     habitStatusFilter === "completed"
-                      ? "bg-[#161514] text-white shadow-[2px_2px_0px_0px_#03D26F]"
-                      : "bg-[#FAF8F5] text-[#161514] hover:bg-emerald-50 shadow-[1px_1px_0px_0px_#161514]"
+                      ? "bg-white dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] shadow-sm font-semibold"
+                      : "text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5]"
                   )}
                 >
                   <span>Completed</span>
-                  <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black border bg-[#03D26F] text-[#161514] border-[#161514]">
+                  <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-medium bg-[#DCFAE5] dark:bg-[#03D26F]/20 text-[#04250e] dark:text-[#03D26F]">
                     {completedTodayHabits.length}
                   </span>
                 </button>
               </div>
 
               {/* Daily Momentum Progress Pill */}
-              <div className="flex items-center gap-2 px-2.5 py-1 bg-[#FAF8F5] border-2 border-[#161514] rounded-xl text-[10px] font-black text-[#161514]">
-                <span className="text-[9px] uppercase tracking-wider text-[#161514]/70">Today</span>
-                <div className="w-16 h-2 bg-zinc-200 rounded-full border border-[#161514] overflow-hidden">
+              <div className="flex items-center gap-2 px-2.5 py-1 bg-[#F1EFEA] dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#383531] rounded-lg text-xs font-medium text-[#161514] dark:text-[#FAF8F5]">
+                <span className="text-xs text-[#6B6B6B] dark:text-[#A8A29E]">Today</span>
+                <div className="w-16 h-1.5 bg-[#E8E5DF] dark:bg-[#383531] rounded-full overflow-hidden">
                   <div
                     className="h-full bg-[#03D26F] transition-all duration-300"
                     style={{ width: `${dailyCompletionPercent}%` }}
                   />
                 </div>
-                <span className="text-[10px] font-black text-[#161514]">{dailyCompletionPercent}%</span>
+                <span className="text-xs font-mono font-medium tabular-nums">{dailyCompletionPercent}%</span>
               </div>
             </div>
           )}
 
           {habitsLoading ? (
-            <div className="space-y-3">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-white rounded-2xl border-2 border-[#161514] p-4 h-16 animate-pulse shadow-[3px_3px_0px_0px_#161514]" />
-              ))}
-            </div>
+            <HabitsListSkeleton count={3} />
           ) : habits.length === 0 ? (
             <EmptyState
               title="Ready to build a new habit?"
@@ -615,9 +573,9 @@ function GoalsPageContent() {
               onCtaClick={() => setIsChoiceOpen(true)}
             />
           ) : displayedHabits.length === 0 ? (
-            <div className="bg-white rounded-2xl border-2 border-[#161514] p-8 text-center space-y-2 shadow-[3px_3px_0px_0px_#161514]">
-              <div className="text-2xl">🎯</div>
-              <h4 className="text-sm font-black text-[#161514]">
+            <div className="bg-white dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#383531] p-8 text-center space-y-2">
+              <Target className="size-8 text-[#6B6B6B]/40 dark:text-[#A8A29E]/40 stroke-[1.5] mx-auto" />
+              <h4 className="text-sm font-sans font-semibold text-[#161514] dark:text-[#FAF8F5]">
                 {habitStatusFilter === "pending"
                   ? "No habits left due today! You're all caught up."
                   : habitStatusFilter === "completed"
@@ -628,7 +586,7 @@ function GoalsPageContent() {
                 <button
                   type="button"
                   onClick={() => setHabitStatusFilter("all")}
-                  className="text-[11px] font-black uppercase text-[#161514] underline cursor-pointer"
+                  className="text-xs font-medium text-[#161514] dark:text-[#FAF8F5] underline cursor-pointer hover:text-[#03D26F]"
                 >
                   Show all habits
                 </button>
@@ -646,9 +604,9 @@ function GoalsPageContent() {
                     <div
                       key={habit.id}
                       className={cn(
-                        "bg-white rounded-2xl p-3 border-2 border-[#161514] flex items-center justify-between transition-all cursor-pointer shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5",
-                        isDone && "bg-emerald-50/70 opacity-90",
-                        isRest && "bg-zinc-50 border-dashed opacity-80"
+                        "bg-white dark:bg-[#1C1A18] rounded-xl p-3 border border-[#E8E5DF] dark:border-[#383531] flex items-center justify-between transition-colors cursor-pointer hover:bg-[#FAF8F5] dark:hover:bg-[#252321]",
+                        isDone && "bg-[#F9FAF9] dark:bg-[#181615] opacity-80",
+                        isRest && "bg-[#FAF8F5] dark:bg-[#181615] border-dashed opacity-80"
                       )}
                       onClick={() => router.push(`/goals/${habit.id}`)}
                     >
@@ -660,38 +618,41 @@ function GoalsPageContent() {
                             handleToggleLog(habit.id, !isDone);
                           }}
                           className={cn(
-                            "h-8 w-8 rounded-xl border-2 border-[#161514] flex items-center justify-center font-black text-sm transition-all cursor-pointer shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
-                            isDone ? "bg-[#03D26F] text-[#161514]" : "bg-white hover:bg-amber-100"
+                            "size-7 rounded-md border flex items-center justify-center shrink-0 transition-colors cursor-pointer",
+                            isDone ? "bg-[#03D26F] border-[#03D26F] text-white" : "bg-white dark:bg-[#252321] border-[#D1D5DB] dark:border-[#4B5563] hover:bg-[#F1EFEA] dark:hover:bg-[#2e2b28]"
                           )}
                         >
-                          {isDone ? "✓" : ""}
+                          {isDone ? <Check className="size-3.5 stroke-[2.5]" /> : null}
                         </button>
                         <div>
                           <div className="flex items-center gap-1.5">
-                            <h4 className={cn("font-black text-xs text-[#161514]", isDone && "line-through text-[#161514]/50")}>
+                            <h4 className={cn("font-sans font-medium text-xs text-[#161514] dark:text-[#FAF8F5]", isDone && "line-through text-[#6B6B6B] dark:text-[#A8A29E]")}>
                               {habit.title}
                             </h4>
                             {isRest && (
-                              <span className="text-[8px] font-black uppercase px-1.5 py-0.2 rounded border border-[#161514] bg-zinc-200 text-zinc-700">
-                                💤 Rest
+                              <span className="text-[9px] font-medium px-1.5 py-0.2 rounded border border-[#E8E5DF] dark:border-[#383531] bg-[#F1EFEA] dark:bg-[#252321] text-[#6B6B6B] dark:text-[#A8A29E] flex items-center gap-0.5">
+                                <Moon className="size-2 stroke-[1.5]" />
+                                <span>Rest</span>
                               </span>
                             )}
                           </div>
                           {habitStreak?.currentStreak ? (
-                            <span className="text-[9px] font-black text-amber-700 flex items-center gap-0.5 mt-0.5">
-                              🔥 {habitStreak.currentStreak} day streak
+                            <span className="text-[10px] font-mono text-[#92400E] dark:text-[#FDE68A] flex items-center gap-1 mt-0.5">
+                              <Flame className="size-2.5 fill-orange-500 text-orange-500" />
+                              <span>{habitStreak.currentStreak}d streak</span>
                             </span>
                           ) : null}
                         </div>
                       </div>
                       <div className="flex items-center gap-1.5">
                         {habit.reminderTime && (
-                          <span className="text-[9px] font-black px-1.5 py-0.5 rounded-lg border border-[#161514] bg-white text-[#161514]">
-                            ⏰ {habit.reminderTime}
+                          <span className="text-[10px] font-mono text-[#6B6B6B] dark:text-[#A8A29E] px-1.5 py-0.5 rounded border border-[#E8E5DF] dark:border-[#383531] bg-white dark:bg-[#252321] flex items-center gap-1">
+                            <Clock className="size-2.5 stroke-[1.5]" />
+                            <span>{habit.reminderTime}</span>
                           </span>
                         )}
-                        <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-lg border-2 border-[#161514] bg-amber-300 text-[#161514] shadow-[1px_1px_0px_0px_#161514]">
-                          {habit.frequency?.type || "DAILY"}
+                        <span className="text-[10px] font-medium px-2 py-0.5 rounded-md border border-[#E8E5DF] dark:border-[#383531] bg-[#F1EFEA] dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5]">
+                          {habit.frequency?.type || "Daily"}
                         </span>
                       </div>
                     </div>
@@ -721,22 +682,22 @@ function GoalsPageContent() {
 
           {/* Suggestions Carousel */}
           <div className="space-y-2 pt-2">
-            <h4 className="text-[10px] font-black uppercase tracking-widest text-[#161514]/70" style={{ fontFamily: "var(--font-heading)" }}>Suggested Routines</h4>
+            <h4 className="text-xs font-sans font-semibold text-[#161514] dark:text-[#FAF8F5]">Suggested routines</h4>
             <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none select-none -mx-4 px-4 md:-mx-0 md:px-0">
               {SUGGESTED_HABITS.map((suggested) => (
                 <div
                   key={suggested.title}
-                  className="flex-shrink-0 w-[200px] bg-white rounded-2xl p-3 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex items-center justify-between gap-2 hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all"
+                  className="flex-shrink-0 w-[200px] bg-white dark:bg-[#1C1A18] rounded-xl p-3 border border-[#E8E5DF] dark:border-[#383531] flex items-center justify-between gap-2 hover:bg-[#FAF8F5] dark:hover:bg-[#252321] transition-colors"
                 >
                   <div className="min-w-0">
-                    <span className="text-[10px] font-black text-[#161514] block truncate">{suggested.title}</span>
-                    <span className="text-[8px] text-[#161514]/70 font-bold block truncate">{suggested.desc}</span>
+                    <span className="text-xs font-sans font-medium text-[#161514] dark:text-[#FAF8F5] block truncate">{suggested.title}</span>
+                    <span className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E] block truncate">{suggested.desc}</span>
                   </div>
                   <button
                     onClick={() => handleAddSuggested(suggested)}
-                    className="bg-amber-400 hover:bg-amber-500 text-[#161514] p-1.5 rounded-xl border-2 border-[#161514] cursor-pointer transition-all shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none outline-none flex-shrink-0"
+                    className="size-7 rounded-lg bg-[#F1EFEA] dark:bg-[#252321] hover:bg-[#E8E5DF] dark:hover:bg-[#2e2b28] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#383531] flex items-center justify-center cursor-pointer transition-colors shrink-0"
                   >
-                    <Plus className="h-3 w-3 stroke-[3]" />
+                    <Plus className="size-3.5 stroke-[2]" />
                   </button>
                 </div>
               ))}
@@ -760,46 +721,39 @@ function GoalsPageContent() {
             }}
           />
 
-          {/* Health & Weight Profile Card */}
-          <div className="bg-white rounded-2xl p-5 border-[2.5px] border-[#161514] shadow-[4px_4px_0px_0px_#161514] space-y-3">
-            <div className="flex items-center justify-between">
-              <h4 className="text-[10px] font-black uppercase tracking-widest text-[#161514] flex items-center gap-1.5" style={{ fontFamily: "var(--font-heading)" }}>
-                <Activity className="size-3.5 text-emerald-600" />
-                <span>Body & Health Stats</span>
-              </h4>
-              <button
-                type="button"
-                onClick={updateProfileStat}
-                className="px-2.5 py-1 rounded-xl bg-[#CEF431] hover:bg-[#bce023] text-[#161514] border-2 border-[#161514] font-black text-[10px] transition-all cursor-pointer shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none flex items-center gap-1"
-              >
-                <Edit3 className="size-3" />
-                <span>Edit Stats</span>
-              </button>
-            </div>
-            
-            <div className="grid grid-cols-3 gap-2 pt-1">
-              <div className="bg-[#FAF8F5] p-2 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-center">
-                <span className="text-[8px] font-black uppercase text-[#161514]/60 block">Weight</span>
-                <span className="text-xs font-black text-[#161514] block mt-0.5">{userProfile.weight || "68 kg"}</span>
+          {/* Health & Weight Telemetry Capsule */}
+          <div className="bg-white dark:bg-[#1C1A18] rounded-xl p-3.5 border border-[#E8E5DF] dark:border-[#383531] flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="size-8 rounded-lg bg-[#F1EFEA] dark:bg-[#252321] flex items-center justify-center text-[#161514] dark:text-[#FAF8F5] shrink-0">
+                <Activity className="size-4 text-[#047857] dark:text-[#03D26F] stroke-[1.5]" />
               </div>
-              <div className="bg-[#FAF8F5] p-2 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-center">
-                <span className="text-[8px] font-black uppercase text-[#161514]/60 block">Age</span>
-                <span className="text-xs font-black text-[#161514] block mt-0.5">{userProfile.age || "24 Yrs"}</span>
-              </div>
-              <div className="bg-[#FAF8F5] p-2 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] text-center">
-                <span className="text-[8px] font-black uppercase text-[#161514]/60 block">Gender</span>
-                <span className="text-xs font-black text-[#161514] block mt-0.5">{userProfile.gender || "Female"}</span>
+              <div className="min-w-0">
+                <span className="text-[10px] font-medium text-[#6B6B6B] dark:text-[#A8A29E] block leading-tight">Body profile</span>
+                <span className="text-xs font-sans font-semibold text-[#161514] dark:text-[#FAF8F5] font-mono tabular-nums truncate block">
+                  {userProfile.weight || "68 kg"} • {userProfile.age || "24 Yrs"}
+                </span>
               </div>
             </div>
+            <button
+              type="button"
+              onClick={updateProfileStat}
+              className="px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#252321] hover:bg-[#F5F3EF] dark:hover:bg-[#2e2b28] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#383531] font-medium text-xs transition-colors cursor-pointer flex items-center gap-1.5 shrink-0"
+            >
+              <Edit3 className="size-3 stroke-[1.5]" />
+              <span>Edit stats</span>
+            </button>
           </div>
         </div>
       </div>
 
-      {/* 7. Sleep, Energy & Mood Journal Section */}
+      {/* 5. Deep Consistency & Habit Analytics Dock */}
+      <WeeklyVelocityAndHabitMatrix />
+
+      {/* 6. Recovery & Daily Reflections Section */}
       <div id="mood-section" className="space-y-4 pt-2">
-        <h3 className="text-xs font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5" style={{ fontFamily: "var(--font-heading)" }}>
-          <Moon className="size-3.5 text-indigo-600" />
-          <span>Sleep, Energy & Mood Journal</span>
+        <h3 className="text-[15px] font-sans font-semibold text-[#161514] dark:text-[#FAF8F5] flex items-center gap-2">
+          <Moon className="size-3.5 text-indigo-600 dark:text-indigo-400 stroke-[1.5]" />
+          <span>Recovery & daily reflections</span>
         </h3>
         <SleepAndActiveWidgets />
         <MoodJournalWidget dateStr={selectedDate} />
@@ -834,7 +788,7 @@ function GoalsPageContent() {
       >
         <form onSubmit={handleProfileSubmit} className="space-y-4 pt-1">
           <div className="space-y-1.5">
-            <label className="text-xs font-heading font-black uppercase tracking-wider text-[#161514]">Gender</label>
+            <label className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5]">Gender</label>
             <div className="grid grid-cols-2 gap-2">
               {["Female", "Male", "Non-binary", "Prefer not to say"].map((g) => (
                 <button
@@ -845,10 +799,10 @@ function GoalsPageContent() {
                     setProfileForm({ ...profileForm, gender: g });
                   }}
                   className={cn(
-                    "min-h-[44px] py-2.5 px-3 rounded-xl text-xs font-heading font-black border-2 border-[#161514] transition-all cursor-pointer",
+                    "min-h-[44px] py-2.5 px-3 rounded-xl text-xs font-heading font-black border transition-all cursor-pointer shadow-xs",
                     profileForm.gender === g
-                      ? "bg-[#CEF431] text-[#161514] shadow-[2px_2px_0px_0px_#161514]"
-                      : "bg-[#FAF8F5] text-[#161514]/70 hover:bg-white"
+                      ? "bg-[#161514] dark:bg-[#FAF8F5] text-white dark:text-[#161514] border-[#161514] dark:border-[#FAF8F5]"
+                      : "bg-white dark:bg-[#1C1A18] text-[#161514]/70 dark:text-[#A8A29E] border-[#E8E5DF] dark:border-[#2A2724] hover:bg-[#FAF8F5] dark:hover:bg-[#252321]"
                   )}
                 >
                   {g}
@@ -858,20 +812,20 @@ function GoalsPageContent() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-heading font-black uppercase tracking-wider text-[#161514]">Age (Years)</label>
+            <label className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5]">Age (Years)</label>
             <input
               type="number"
               min={1}
               max={120}
               value={ageVal}
               onChange={(e) => setAgeVal(e.target.value)}
-              className="w-full bg-white rounded-xl border-2 border-[#161514] px-4 py-2.5 text-base font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514] focus:outline-none focus:ring-2 focus:ring-[#161514]"
+              className="w-full bg-white dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-4 py-2.5 text-base font-bold text-[#161514] dark:text-[#FAF8F5] shadow-xs outline-none focus:border-[#161514] dark:focus:border-[#FAF8F5]"
               placeholder="Enter your age"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-heading font-black uppercase tracking-wider text-[#161514]">Current Weight</label>
+            <label className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5]">Current Weight</label>
             <div className="flex gap-2">
               <input
                 type="number"
@@ -883,11 +837,11 @@ function GoalsPageContent() {
                   setWeightVal(e.target.value);
                   setProfileForm({ ...profileForm, weight: `${e.target.value} ${weightUnit}` });
                 }}
-                className="flex-1 bg-white rounded-xl border-2 border-[#161514] px-4 py-2.5 text-base font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514] focus:outline-none focus:ring-2 focus:ring-[#161514]"
+                className="flex-1 bg-white dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-4 py-2.5 text-base font-bold text-[#161514] dark:text-[#FAF8F5] shadow-xs outline-none focus:border-[#161514] dark:focus:border-[#FAF8F5]"
                 placeholder="Enter weight"
                 required
               />
-              <div className="flex rounded-xl border-2 border-[#161514] overflow-hidden shadow-[2px_2px_0px_0px_#161514]">
+              <div className="flex rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] overflow-hidden shadow-xs">
                 {["kg", "lbs"].map((u) => (
                   <button
                     key={u}
@@ -900,8 +854,8 @@ function GoalsPageContent() {
                     className={cn(
                       "min-w-[44px] min-h-[44px] px-4 py-2.5 text-xs font-heading font-black transition-all cursor-pointer flex items-center justify-center",
                       weightUnit === u
-                        ? "bg-[#CEF431] text-[#161514]"
-                        : "bg-[#FAF8F5] text-[#161514]/70 hover:bg-white"
+                        ? "bg-[#161514] dark:bg-[#FAF8F5] text-white dark:text-[#161514]"
+                        : "bg-white dark:bg-[#1C1A18] text-[#161514]/70 dark:text-[#A8A29E] hover:bg-[#FAF8F5] dark:hover:bg-[#252321]"
                     )}
                   >
                     {u}
@@ -913,9 +867,9 @@ function GoalsPageContent() {
 
           <Button
             type="submit"
-            className="w-full min-h-[48px] bg-[#CEF431] hover:bg-[#bce023] text-[#161514] font-heading font-black rounded-xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none cursor-pointer transition-all uppercase tracking-wider"
+            className="w-full min-h-[48px] bg-[#161514] hover:bg-[#252321] dark:bg-[#FAF8F5] dark:hover:bg-[#E8E5DF] text-white dark:text-[#161514] font-heading font-black rounded-xl py-3 mt-2 shadow-xs cursor-pointer transition-all"
           >
-            Save Profile Stats
+            Save profile stats
           </Button>
         </form>
       </AdaptiveDrawerDialog>
@@ -939,7 +893,7 @@ function GoalsPageContent() {
                 title: editHabitTitle,
                 reminderTime: editHabitDesc,
               });
-              toast.success("Habit updated! 🌟");
+              toast.success("Habit updated");
               setEditingHabit(null);
             }
           }}
@@ -952,28 +906,28 @@ function GoalsPageContent() {
           />
 
           <div className="space-y-1.5">
-            <label className="text-xs font-heading font-black uppercase tracking-wider text-[#161514]">
+            <label className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5]">
               Habit Title *
             </label>
             <input
               type="text"
               value={editHabitTitle}
               onChange={(e) => setEditHabitTitle(e.target.value)}
-              className="w-full bg-white rounded-xl border-2 border-[#161514] px-4 py-2.5 text-base font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514] focus:outline-none focus:ring-2 focus:ring-[#161514]"
+              className="w-full bg-white dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-4 py-2.5 text-base font-bold text-[#161514] dark:text-[#FAF8F5] shadow-xs outline-none focus:border-[#161514] dark:focus:border-[#FAF8F5]"
               required
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-heading font-black uppercase tracking-wider text-[#161514]">
+            <label className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5]">
               Reminder Time
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
               {[
-                { label: "🌅 Morning", time: "08:00 AM" },
-                { label: "☀️ Noon", time: "12:00 PM" },
-                { label: "🌆 Evening", time: "07:00 PM" },
-                { label: "🌙 Night", time: "10:00 PM" },
+                { label: "Morning", time: "08:00 AM" },
+                { label: "Noon", time: "12:00 PM" },
+                { label: "Evening", time: "07:00 PM" },
+                { label: "Night", time: "10:00 PM" },
               ].map((preset) => (
                 <button
                   key={preset.label}
@@ -983,10 +937,10 @@ function GoalsPageContent() {
                     setEditHabitDesc(preset.time);
                   }}
                   className={cn(
-                    "min-h-[38px] py-1.5 px-2 rounded-xl text-xs font-bold border-2 border-[#161514] transition-all cursor-pointer flex items-center justify-center text-center",
+                    "min-h-[38px] py-1.5 px-2 rounded-xl text-xs font-bold border transition-all cursor-pointer flex items-center justify-center text-center shadow-xs",
                     editHabitDesc === preset.time
-                      ? "bg-[#CEF431] text-[#161514] font-black shadow-[2px_2px_0px_0px_#161514]"
-                      : "bg-white hover:bg-slate-50 text-[#161514]/80 shadow-[1px_1px_0px_0px_#161514]"
+                      ? "bg-[#161514] dark:bg-[#FAF8F5] text-white dark:text-[#161514] font-black border-[#161514] dark:border-[#FAF8F5]"
+                      : "bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] text-[#161514]/80 dark:text-[#A8A29E] border-[#E8E5DF] dark:border-[#2A2724]"
                   )}
                 >
                   <span>{preset.label}</span>
@@ -998,16 +952,16 @@ function GoalsPageContent() {
               placeholder="Or custom: e.g. 08:00 AM"
               value={editHabitDesc}
               onChange={(e) => setEditHabitDesc(e.target.value)}
-              className="w-full bg-white rounded-xl border-2 border-[#161514] px-4 py-2 text-base font-bold text-[#161514] shadow-[2px_2px_0px_0px_#161514] focus:outline-none focus:ring-2 focus:ring-[#161514] mt-1"
+              className="w-full bg-white dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-4 py-2 text-base font-bold text-[#161514] dark:text-[#FAF8F5] shadow-xs outline-none focus:border-[#161514] dark:focus:border-[#FAF8F5] mt-1"
             />
           </div>
 
           <Button
             type="submit"
             disabled={updateHabitMutation.isPending}
-            className="w-full min-h-[48px] bg-[#03D26F] hover:bg-[#02b861] text-[#161514] font-heading font-black rounded-xl py-3 mt-2 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none cursor-pointer transition-all uppercase tracking-wider"
+            className="w-full min-h-[48px] bg-[#161514] hover:bg-[#252321] dark:bg-[#FAF8F5] dark:hover:bg-[#E8E5DF] text-white dark:text-[#161514] font-heading font-black rounded-xl py-3 mt-2 shadow-xs cursor-pointer transition-all"
           >
-            {updateHabitMutation.isPending ? "Saving…" : "Save Changes"}
+            {updateHabitMutation.isPending ? "Saving…" : "Save changes"}
           </Button>
         </form>
       </AdaptiveDrawerDialog>
@@ -1041,58 +995,66 @@ function GoalsPageContent() {
         description="Streaks & Habitica Benchmark Protection Subsystem"
       >
         <div className="p-4 sm:p-5 space-y-4">
-          <div className="p-3.5 rounded-xl border-2 border-[#161514] bg-[#FAF8F5] shadow-[2px_2px_0px_#161514] flex items-start gap-3">
-            <div className="size-10 rounded-lg bg-[#03D26F] border-2 border-[#161514] flex items-center justify-center shrink-0 shadow-[1px_1px_0px_#161514]">
-              <ShieldCheck className="size-5 text-[#161514] stroke-[2.5]" />
+          <div className="p-3.5 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] bg-[#FAF8F5] dark:bg-[#1C1A18] shadow-xs flex items-start gap-3">
+            <div className="size-10 rounded-lg bg-[#DCFAE5] dark:bg-[#03D26F]/20 flex items-center justify-center shrink-0">
+              <ShieldCheck className="size-5 text-[#047857] dark:text-[#03D26F] stroke-[2.5]" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-2">
-                <h5 className="font-heading font-black text-sm text-[#161514]">
+                <h5 className="font-heading font-black text-sm text-[#161514] dark:text-[#FAF8F5]">
                   Inventory: {streakFreeze.tokensAvailable} / 2 Shields
                 </h5>
-                <span className="bg-[#CEF431] text-[#161514] font-black text-[9px] px-2 py-0.5 rounded-md border border-[#161514]">
-                  {streakFreeze.tokensAvailable > 0 ? "SHIELD ARMED" : "REFILLS 1ST"}
+                <span className="bg-[#DCFAE5] dark:bg-[#03D26F]/20 text-[#04250e] dark:text-[#03D26F] font-bold text-[9px] px-2 py-0.5 rounded-md">
+                  {streakFreeze.tokensAvailable > 0 ? "Shield armed" : "Refills 1st"}
                 </span>
               </div>
-              <p className="text-xs text-[#161514]/80 mt-1 leading-relaxed">
+              <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] mt-1 leading-relaxed">
                 Autonomous monitoring ensures your hard-earned flame never gets wiped out by a single missed day.
               </p>
             </div>
           </div>
 
           <div className="space-y-2.5">
-            <h6 className="font-heading font-black text-xs text-[#161514] uppercase tracking-wider">
-              How The Shield Works
+            <h6 className="font-heading font-black text-xs text-[#161514] dark:text-[#FAF8F5]">
+              How the shield works
             </h6>
-            <div className="space-y-2 text-xs text-[#161514]/85">
-              <div className="p-2.5 rounded-lg border border-[#161514] bg-white flex items-start gap-2.5">
-                <span className="text-base">🤖</span>
+            <div className="space-y-2 text-xs text-[#6B6B6B] dark:text-[#A8A29E]">
+              <div className="p-2.5 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] bg-white dark:bg-[#161514] flex items-start gap-2.5">
+                <div className="size-6 rounded-md bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0">
+                  <Bot className="size-3.5 text-[#161514] dark:text-[#FAF8F5] stroke-[2.5]" />
+                </div>
                 <div>
-                  <strong className="text-[#161514] font-heading font-bold block">Autonomous Activation</strong>
+                  <strong className="text-[#161514] dark:text-[#FAF8F5] font-heading font-bold block">Autonomous Activation</strong>
                   If you miss a scheduled habit, the system automatically detects it, consumes 1 shield token, and freezes the date. No manual toggle required.
                 </div>
               </div>
 
-              <div className="p-2.5 rounded-lg border border-[#161514] bg-white flex items-start gap-2.5">
-                <span className="text-base">🔥</span>
+              <div className="p-2.5 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] bg-white dark:bg-[#161514] flex items-start gap-2.5">
+                <div className="size-6 rounded-md bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center shrink-0">
+                  <Flame className="size-3.5 text-rose-600 dark:text-rose-400 fill-rose-600 dark:fill-rose-400" />
+                </div>
                 <div>
-                  <strong className="text-[#161514] font-heading font-bold block">Continuous Flame Calculation</strong>
+                  <strong className="text-[#161514] dark:text-[#FAF8F5] font-heading font-bold block">Continuous Flame Calculation</strong>
                   Streak algorithms fold frozen days into your active streak history, bridging the gap so your count continues uninterrupted.
                 </div>
               </div>
 
-              <div className="p-2.5 rounded-lg border border-[#161514] bg-white flex items-start gap-2.5">
-                <span className="text-base">🌿</span>
+              <div className="p-2.5 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] bg-white dark:bg-[#161514] flex items-start gap-2.5">
+                <div className="size-6 rounded-md bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
+                  <Moon className="size-3.5 text-emerald-700 dark:text-emerald-400 stroke-[2.5]" />
+                </div>
                 <div>
-                  <strong className="text-[#161514] font-heading font-bold block">Zero-Penalty Rest Days</strong>
-                  Custom-scheduled habits (e.g. 3 days/week) recognize rest days naturally — they never break your streak or consume freeze tokens.
+                  <strong className="text-[#161514] dark:text-[#FAF8F5] font-heading font-bold block">Zero-Penalty Rest Days</strong>
+                  Custom-scheduled habits (e.g. 3 days/week) recognize rest days naturally: they never break your streak or consume freeze tokens.
                 </div>
               </div>
 
-              <div className="p-2.5 rounded-lg border border-[#161514] bg-white flex items-start gap-2.5">
-                <span className="text-base">🔄</span>
+              <div className="p-2.5 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] bg-white dark:bg-[#161514] flex items-start gap-2.5">
+                <div className="size-6 rounded-md bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center shrink-0">
+                  <RefreshCw className="size-3.5 text-amber-700 dark:text-amber-400 stroke-[2.5]" />
+                </div>
                 <div>
-                  <strong className="text-[#161514] font-heading font-bold block">Monthly Auto-Refill</strong>
+                  <strong className="text-[#161514] dark:text-[#FAF8F5] font-heading font-bold block">Monthly Auto-Refill</strong>
                   Every month on the 1st, 1 free streak shield is granted to your inventory (maximum capacity: 2).
                 </div>
               </div>
@@ -1101,17 +1063,17 @@ function GoalsPageContent() {
 
           {/* Frozen Dates Ledger */}
           {streakFreeze.frozenDates && streakFreeze.frozenDates.length > 0 && (
-            <div className="space-y-2 pt-1 border-t border-[#161514]/15">
-              <h6 className="font-heading font-black text-xs text-[#161514] uppercase tracking-wider">
-                Protected Dates History ({streakFreeze.frozenDates.length})
+            <div className="space-y-2 pt-1 border-t border-[#E8E5DF] dark:border-[#2A2724]">
+              <h6 className="font-heading font-black text-xs text-[#161514] dark:text-[#FAF8F5]">
+                Protected dates history ({streakFreeze.frozenDates.length})
               </h6>
               <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto p-1">
                 {streakFreeze.frozenDates.map((dateStr) => (
                   <span
                     key={dateStr}
-                    className="bg-cyan-100 text-[#161514] font-mono font-bold text-xs px-2.5 py-1 rounded-md border border-[#161514] flex items-center gap-1 shadow-[1px_1px_0px_#161514]"
+                    className="bg-[#FAF8F5] dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] font-mono font-bold text-xs px-2.5 py-1 rounded-md border border-[#E8E5DF] dark:border-[#2A2724] flex items-center gap-1 shadow-xs"
                   >
-                    <span>🛡️</span>
+                    <ShieldCheck className="size-3 text-emerald-600 dark:text-emerald-400 stroke-[2.5]" />
                     <span>{dateStr}</span>
                   </span>
                 ))}
@@ -1121,7 +1083,7 @@ function GoalsPageContent() {
 
           <Button
             onClick={() => setIsShieldInfoOpen(false)}
-            className="w-full bg-[#161514] hover:bg-[#161514]/90 text-white font-heading font-black text-xs py-2.5 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_#161514]"
+            className="w-full bg-[#161514] hover:bg-[#252321] dark:bg-[#FAF8F5] dark:hover:bg-[#E8E5DF] text-white dark:text-[#161514] font-heading font-black text-xs py-2.5 rounded-xl shadow-xs transition-all"
           >
             Got It
           </Button>
@@ -1133,7 +1095,7 @@ function GoalsPageContent() {
 
 export default function GoalsPage() {
   return (
-    <Suspense fallback={<InvictusLoadingScreen message="Loading Life & Goals…" />}>
+    <Suspense fallback={<HabitsCockpitSkeleton />}>
       <GoalsPageContent />
     </Suspense>
   );

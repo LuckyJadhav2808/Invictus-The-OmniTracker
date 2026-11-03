@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Invictus Daily Overview — Refined Neobrutalist Split Deck
-    Authentic Invictus Design System: Warm cream, solid #161514 borders, #CEF431 accents.
+    Invictus Sovereign Monolith Daily Cockpit — Refined Neobrutalist Split Deck
+    Authentic Invictus Design System: Warm cream / Obsidian ink, 1.5dp borders, #CEF431 accents.
     High-contrast financial pacing on the left, live habit checklist on the right.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -10,24 +10,32 @@
     android:layout_height="match_parent"
     android:background="@drawable/widget_background"
     android:orientation="vertical"
-    android:padding="10dp">
+    android:padding="12dp">
 
-    <!-- Top Bar: Branded Invictus Header & Date / Days Left Pill -->
+    <!-- Top Bar: Branded Sovereign Header & Date Countdown Pill -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="7dp"
+        android:layout_marginBottom="8dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
+
+        <!-- Sovereign Monolith Brand Mark -->
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginEnd="6dp"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_widget_monolith" />
 
         <TextView
             android:id="@+id/widget_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="⚡ INVICTUS DAILY"
+            android:text="INVICTUS"
             android:textColor="@color/widget_text_primary"
-            android:textSize="11sp"
+            android:textSize="11.5sp"
             android:textStyle="bold" />
 
         <TextView
@@ -36,7 +44,7 @@
             android:layout_height="wrap_content"
             android:text="TODAY • 24d left"
             android:textColor="@color/widget_text_muted"
-            android:textSize="9sp"
+            android:textSize="9.5sp"
             android:textStyle="bold" />
     </LinearLayout>
 
@@ -44,7 +52,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
         android:layout_weight="1"
         android:baselineAligned="false"
         android:orientation="horizontal">
@@ -54,49 +61,33 @@
             android:id="@+id/widget_finance_section"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginEnd="4dp"
+            android:layout_marginEnd="5dp"
             android:layout_weight="1"
             android:background="@drawable/widget_card_inset"
             android:orientation="vertical"
-            android:padding="8dp">
+            android:padding="9dp">
 
-            <!-- Card Header: Spent Today & Allowance Status -->
-            <LinearLayout
+            <!-- Card Header: Title -->
+            <TextView
+                android:id="@+id/widget_hero_label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="2dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/widget_hero_label"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="DAILY LIMIT LEFT"
-                    android:textColor="@color/widget_text_muted"
-                    android:textSize="8.5sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/widget_days_left"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="24d left"
-                    android:textColor="@color/widget_text_muted"
-                    android:textSize="8sp"
-                    android:textStyle="bold"
-                    android:visibility="gone" />
-            </LinearLayout>
+                android:singleLine="true"
+                android:text="DAILY LIMIT LEFT"
+                android:textColor="@color/widget_text_muted"
+                android:textSize="8.5sp"
+                android:textStyle="bold" />
 
             <!-- Big Bold Hero Stat: Daily Limit Left / Safe to Spend -->
             <TextView
                 android:id="@+id/widget_safe_amount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:singleLine="true"
                 android:text="₹1,000"
                 android:textColor="@color/widget_text_primary"
-                android:textSize="18sp"
+                android:textSize="18.5sp"
                 android:textStyle="bold" />
 
             <!-- Daily Allowance Status Sub-badge -->
@@ -115,8 +106,8 @@
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="6dp"
                 android:background="@color/widget_border_subtle" />
 
             <!-- Liquidity Breakdown: UPI & Cash Balances -->
@@ -125,20 +116,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:singleLine="true"
-                android:text="📱 UPI: ₹12,400"
+                android:text="UPI: ₹12,400"
                 android:textColor="@color/widget_text_primary"
-                android:textSize="8.5sp"
+                android:textSize="9sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/widget_cash_left"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="1.5dp"
+                android:layout_marginTop="2dp"
                 android:singleLine="true"
-                android:text="💵 Cash: ₹3,200"
+                android:text="Cash: ₹3,200"
                 android:textColor="@color/widget_text_muted"
-                android:textSize="8.5sp"
+                android:textSize="9sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -147,17 +138,17 @@
             android:id="@+id/widget_habits_section"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginStart="4dp"
+            android:layout_marginStart="5dp"
             android:layout_weight="1"
             android:background="@drawable/widget_card_inset"
             android:orientation="vertical"
-            android:padding="8dp">
+            android:padding="9dp">
 
             <!-- Card Header: Title & Progress Count -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp"
+                android:layout_marginBottom="5dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -165,6 +156,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:singleLine="true"
                     android:text="TODAY'S HABITS"
                     android:textColor="@color/widget_text_muted"
                     android:textSize="8.5sp"
@@ -213,7 +205,7 @@
                     android:id="@+id/widget_habit_1_streak"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="🔥 3d"
+                    android:text="3d"
                     android:textColor="@color/widget_accent_amber"
                     android:textSize="8sp"
                     android:textStyle="bold" />
@@ -252,7 +244,7 @@
                     android:id="@+id/widget_habit_2_streak"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="🔥 5d"
+                    android:text="5d"
                     android:textColor="@color/widget_accent_amber"
                     android:textSize="8sp"
                     android:textStyle="bold" />
@@ -290,7 +282,7 @@
                     android:id="@+id/widget_habit_3_streak"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="🔥 1d"
+                    android:text="1d"
                     android:textColor="@color/widget_accent_amber"
                     android:textSize="8sp"
                     android:textStyle="bold" />
@@ -301,11 +293,11 @@
                 android:id="@+id/widget_habits_empty"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="8dp"
                 android:singleLine="true"
-                android:text="🌱 Tap to check habits"
+                android:text="All habits completed • Tap to view"
                 android:textColor="@color/widget_text_muted"
-                android:textSize="9sp"
+                android:textSize="8.5sp"
                 android:textStyle="bold"
                 android:visibility="gone" />
 
@@ -313,9 +305,11 @@
     </LinearLayout>
 
     <!-- Bottom Bar: Dual Neobrutalist Action Buttons (+ EXPENSE & ✓ HABITS) -->
+    <!-- Android Accessibility Compliant 40dp Touch Target Height -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="32dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="8dp"
         android:orientation="horizontal">
 
         <TextView
@@ -328,7 +322,7 @@
             android:gravity="center"
             android:text="+ EXPENSE"
             android:textColor="#161514"
-            android:textSize="10.5sp"
+            android:textSize="11sp"
             android:textStyle="bold" />
 
         <TextView
@@ -340,8 +334,8 @@
             android:background="@drawable/widget_button_secondary"
             android:gravity="center"
             android:text="✓ HABITS"
-            android:textColor="#161514"
-            android:textSize="10.5sp"
+            android:textColor="@color/widget_text_primary"
+            android:textSize="11sp"
             android:textStyle="bold" />
     </LinearLayout>
 

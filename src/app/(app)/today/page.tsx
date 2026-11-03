@@ -41,6 +41,7 @@ import { RetroStickyScratchpadDrawer } from "@/components/today/RetroStickyScrat
 import { EveningCloseoutDrawer } from "@/components/today/EveningCloseoutDrawer";
 import { StickyIslandMiniCockpit } from "@/components/today/StickyIslandMiniCockpit";
 import { ConfettiCelebration } from "@/components/common/ConfettiCelebration";
+import { FirstRunQuickStartDeck } from "@/components/today/FirstRunQuickStartDeck";
 import { useTodayCockpitViewModel, computeDailyConquestScore } from "@/components/today/useTodayCockpitViewModel";
 
 export default function TodayPage() {
@@ -135,20 +136,20 @@ export default function TodayPage() {
 
       toast.custom(
         () => (
-          <div className="bg-white border border-[#E8E5DF] p-3.5 rounded-xl shadow-md flex items-center gap-3 w-full max-w-sm">
-            <div className="size-8 rounded-lg bg-[#DCFAE5] flex items-center justify-center shrink-0">
-              <Shield className="size-4 text-[#047857] stroke-[1.5]" />
+          <div className="bg-white dark:bg-[#161514] border border-[#E8E5DF] dark:border-[#2A2724] p-3.5 rounded-xl shadow-md flex items-center gap-3 w-full max-w-sm">
+            <div className="size-8 rounded-lg bg-[#DCFAE5] dark:bg-[#03D26F]/20 flex items-center justify-center shrink-0">
+              <Shield className="size-4 text-[#047857] dark:text-[#03D26F] stroke-[1.5]" />
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5">
-                <span className="font-semibold text-xs text-[#161514]">
+                <span className="font-semibold text-xs text-[#161514] dark:text-[#FAF8F5]">
                   Streak Protected
                 </span>
-                <span className="bg-[#DCFAE5] text-[#04250e] font-medium text-xs px-1.5 py-0.5 rounded">
+                <span className="bg-[#DCFAE5] dark:bg-[#03D26F]/20 text-[#04250e] dark:text-[#03D26F] font-medium text-xs px-1.5 py-0.5 rounded">
                   Saved
                 </span>
               </div>
-              <p className="text-xs text-[#6B6B6B] leading-tight mt-0.5">
+              <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] leading-tight mt-0.5">
                 Protected {datesList} ({streakFreeze.tokensAvailable}/2 tokens remaining)
               </p>
             </div>
@@ -444,6 +445,10 @@ export default function TodayPage() {
     const el = document.getElementById("money-section");
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
+  const handleOpenExpenseModal = () => {
+    setIsQuickExpenseOpen(true);
+    scrollToMoney();
+  };
   const scrollToTop = () => {
     const mainContainer = document.getElementById("main-scroll-container");
     if (mainContainer) {
@@ -484,7 +489,7 @@ export default function TodayPage() {
         isTimerRunning={isTimerRunning}
         stopwatchSeconds={stopwatchSeconds}
         onToggleTimer={() => setIsTimerRunning(!isTimerRunning)}
-        onOpenExpenseModal={() => setIsQuickExpenseOpen(true)}
+        onOpenExpenseModal={handleOpenExpenseModal}
         onScrollToTop={scrollToTop}
         visible={isStickyIslandVisible}
       />
@@ -520,9 +525,22 @@ export default function TodayPage() {
         onScrollToStudy={scrollToStudy}
         onScrollToMoney={scrollToMoney}
         onToggleTimer={() => setIsTimerRunning(!isTimerRunning)}
-        onOpenExpenseModal={() => setIsQuickExpenseOpen(true)}
+        onOpenExpenseModal={handleOpenExpenseModal}
         onOpenCloseoutDrawer={() => setIsCloseoutDrawerOpen(true)}
         onOpenScratchpad={() => setIsScratchpadDrawerOpen(true)}
+      />
+
+      {/* Guided First-Run Quick Start Deck (Disappears upon dismissal or completion) */}
+      <FirstRunQuickStartDeck
+        totalHabitsCount={totalHabitsCount}
+        completedHabitsCount={completedHabitsCount}
+        hasBudgetOrExpenses={transactions.length > 0 || (Boolean(cloudBudgetPrefs?.customDailyBudget) && (cloudBudgetPrefs?.customDailyBudget ?? 0) > 0)}
+        hasStudySessions={studySessions.length > 0 || todayStudyMinutes > 0}
+        onOpenDailyLimitModal={() => setIsDailyLimitModalOpen(true)}
+        onStartStudySprint={() => {
+          scrollToStudy();
+          setIsTimerRunning(true);
+        }}
       />
 
       {/* ZONE 2: DAILY CORE HUB (Bento Row 1 - Habits & Study Focus - Locked Baseline) */}

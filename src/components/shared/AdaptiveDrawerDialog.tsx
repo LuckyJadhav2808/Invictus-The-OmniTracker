@@ -42,28 +42,27 @@ export function AdaptiveDrawerDialog({
       <DialogContent
         showCloseButton={false}
         className={cn(
-          "w-[94vw] max-h-[88vh] flex flex-col bg-white rounded-3xl p-0 border-2 sm:border-[2.5px] border-[#161514]",
-          "shadow-[6px_6px_0px_0px_#161514] overflow-hidden",
+          "w-[94vw] max-h-[88vh] flex flex-col bg-white dark:bg-[#161514] rounded-2xl p-0 border border-[#E8E5DF] dark:border-[#2A2724]",
+          "shadow-2xl overflow-hidden transition-colors",
           maxWidth,
           className
         )}
       >
-        <DialogHeader className="shrink-0 px-5 sm:px-6 pt-5 pb-3.5 border-b-2 border-[#161514]/15 bg-[#FAF8F5] relative flex flex-row items-center justify-between">
+        <DialogHeader className="shrink-0 px-5 sm:px-6 pt-4 pb-3.5 border-b border-[#E8E5DF] dark:border-[#2A2724] bg-white dark:bg-[#161514] relative flex flex-row items-center justify-between">
           <div className="pr-4 min-w-0 flex-1">
             <DialogTitle
-              className="text-lg sm:text-xl font-heading font-black text-[#161514] tracking-tight truncate"
-              style={{ fontFamily: "var(--font-heading)" }}
+              className="text-base sm:text-lg font-heading font-bold text-[#161514] dark:text-[#FAF8F5] tracking-tight truncate"
             >
               {title}
             </DialogTitle>
             {description && (
-              <DialogDescription className="text-xs font-semibold text-[#161514]/70 mt-0.5 line-clamp-2">
+              <DialogDescription className="text-xs font-normal text-[#8C8882] dark:text-[#A8A29E] mt-0.5 line-clamp-2">
                 {description}
               </DialogDescription>
             )}
           </div>
 
-          {/* Standard Neobrutalist Close Button */}
+          {/* Standard Close Button */}
           <NeobrutalistCloseButton onClose={handleClose} size="sm" />
         </DialogHeader>
 

@@ -151,34 +151,34 @@ export function ExerciseGuideModal({
     >
       <div className="space-y-4 pt-1 pb-2">
         {/* Header Title Card */}
-        <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)]">
+        <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] p-3.5 rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-[#CEF431] text-[#161514] border border-[#161514] inline-block mb-1.5 shadow-[1px_1px_0px_0px_rgba(22,21,20,1)]">
+              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-[#CEF431] text-[#161514] border border-[#161514] inline-block mb-1.5 shadow-xs">
                 {targetMuscle}
               </span>
-              <h2 className="text-base font-black text-[#161514] uppercase tracking-tight leading-tight">
+              <h2 className="text-base font-black text-[#161514] dark:text-[#FAF8F5] uppercase tracking-tight leading-tight">
                 {title}
               </h2>
             </div>
-            <div className="h-9 w-9 rounded-xl bg-amber-300 border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] flex items-center justify-center text-amber-950 font-black shrink-0">
+            <div className="h-9 w-9 rounded-xl bg-amber-300 dark:bg-amber-400/20 border border-[#E8E5DF] dark:border-amber-400/30 shadow-xs flex items-center justify-center text-amber-950 dark:text-amber-300 font-black shrink-0">
               <Dumbbell className="h-5 w-5 stroke-[2.5]" />
             </div>
           </div>
 
           {/* Quick Spec Tags */}
-          <div className="flex flex-wrap items-center gap-1.5 mt-2.5 pt-2.5 border-t border-[#161514]/10 text-[11px] font-bold text-[#161514]">
-            <span className="bg-white px-2 py-0.5 rounded-lg border border-[#161514] flex items-center gap-1 shadow-[1px_1px_0px_0px_rgba(22,21,20,1)]">
-              <span className="text-gray-500">Equipment:</span> {equipment}
+          <div className="flex flex-wrap items-center gap-1.5 mt-2.5 pt-2.5 border-t border-[#E8E5DF] dark:border-[#2A2724] text-[11px] font-bold text-[#161514] dark:text-[#FAF8F5]">
+            <span className="bg-white dark:bg-[#252321] px-2 py-0.5 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] flex items-center gap-1 shadow-xs">
+              <span className="text-gray-500 dark:text-[#A8A29E]">Equipment:</span> {equipment}
             </span>
             {details?.mechanic && (
-              <span className="bg-white px-2 py-0.5 rounded-lg border border-[#161514] flex items-center gap-1 shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] capitalize">
-                <span className="text-gray-500">Type:</span> {details.mechanic}
+              <span className="bg-white dark:bg-[#252321] px-2 py-0.5 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] flex items-center gap-1 shadow-xs capitalize">
+                <span className="text-gray-500 dark:text-[#A8A29E]">Type:</span> {details.mechanic}
               </span>
             )}
             {details?.level && (
-              <span className="bg-white px-2 py-0.5 rounded-lg border border-[#161514] flex items-center gap-1 shadow-[1px_1px_0px_0px_rgba(22,21,20,1)] capitalize">
-                <span className="text-gray-500">Level:</span> {details.level}
+              <span className="bg-white dark:bg-[#252321] px-2 py-0.5 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] flex items-center gap-1 shadow-xs capitalize">
+                <span className="text-gray-500 dark:text-[#A8A29E]">Level:</span> {details.level}
               </span>
             )}
           </div>
@@ -186,7 +186,7 @@ export function ExerciseGuideModal({
 
         {/* Visual Demonstration Player */}
         {loading && resolvedImages.length === 0 ? (
-          <div className="bg-[#161514] rounded-2xl border-2 border-[#161514] shadow-[4px_4px_0px_0px_rgba(22,21,20,1)] p-6 text-center space-y-3">
+          <div className="bg-[#161514] dark:bg-[#121110] rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs p-6 text-center space-y-3">
             <div className="h-44 bg-[#242220] rounded-xl flex flex-col items-center justify-center gap-3 border border-white/10">
               <Loader2 className="h-8 w-8 text-[#CEF431] animate-spin" />
               <p className="text-xs font-black text-white uppercase tracking-wider">
@@ -195,7 +195,7 @@ export function ExerciseGuideModal({
             </div>
           </div>
         ) : resolvedImages.length > 0 ? (
-          <div className="bg-[#161514] rounded-2xl border-2 border-[#161514] shadow-[4px_4px_0px_0px_rgba(22,21,20,1)] p-3 overflow-hidden text-center">
+          <div className="bg-[#161514] dark:bg-[#121110] rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs p-3 overflow-hidden text-center">
             <div className="relative aspect-[4/3] max-h-56 mx-auto bg-[#242220] rounded-xl overflow-hidden border border-[#363432] flex items-center justify-center">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -220,7 +220,7 @@ export function ExerciseGuideModal({
                 <button
                   type="button"
                   onClick={() => setIsPlaying(!isPlaying)}
-                  className="absolute bottom-2 right-2 bg-white text-[#161514] px-2 py-1 rounded-lg border border-[#161514] text-[10px] font-black shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] cursor-pointer hover:bg-amber-100 transition-all flex items-center gap-1"
+                  className="absolute bottom-2 right-2 bg-white text-[#161514] px-2 py-1 rounded-lg border border-[#161514] text-[10px] font-black shadow-xs cursor-pointer hover:bg-amber-100 transition-all flex items-center gap-1"
                 >
                   {isPlaying ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
                   <span>{isPlaying ? "Pause Loop" : "Play Loop"}</span>
@@ -249,25 +249,25 @@ export function ExerciseGuideModal({
             )}
           </div>
         ) : (
-          <div className="bg-[#FAF8F5] p-4 rounded-2xl border-2 border-[#161514] text-center space-y-1.5 shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)]">
-            <Dumbbell className="h-7 w-7 text-amber-600 mx-auto stroke-[2.5]" />
-            <p className="text-xs font-black text-[#161514] uppercase">
+          <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] p-4 rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] text-center space-y-1.5 shadow-xs">
+            <Dumbbell className="h-7 w-7 text-amber-600 dark:text-amber-400 mx-auto stroke-[2.5]" />
+            <p className="text-xs font-black text-[#161514] dark:text-[#FAF8F5] uppercase">
               Custom Exercise Movement
             </p>
-            <p className="text-[11px] font-bold text-gray-600">
+            <p className="text-[11px] font-bold text-gray-600 dark:text-[#A8A29E]">
               Focus on strict tempo: 2-3s eccentric lowering, explosive contraction.
             </p>
           </div>
         )}
 
         {/* Visual Human Muscle Anatomy & Target Activation Map */}
-        <div className="bg-[#FAF8F5] p-3.5 sm:p-4 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] space-y-3">
+        <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] p-3.5 sm:p-4 rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-3">
           <div className="flex items-center justify-between gap-2 flex-wrap">
-            <div className="flex items-center gap-2 text-xs font-black uppercase text-[#161514]">
-              <Target className="h-4 w-4 text-rose-600 stroke-[2.5]" />
+            <div className="flex items-center gap-2 text-xs font-black uppercase text-[#161514] dark:text-[#FAF8F5]">
+              <Target className="h-4 w-4 text-rose-600 dark:text-rose-400 stroke-[2.5]" />
               <span>Anatomical Muscle Activation</span>
             </div>
-            <span className="text-[10px] font-heading font-black px-2 py-0.5 rounded-md bg-[#CEF431] text-[#161514] border border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
+            <span className="text-[10px] font-heading font-black px-2 py-0.5 rounded-md bg-[#CEF431] text-[#161514] border border-[#161514] shadow-xs">
               {anatomy.dominantName} Focus
             </span>
           </div>
@@ -289,21 +289,21 @@ export function ExerciseGuideModal({
 
           {/* Primary & Secondary Breakdown Cards */}
           <div className="grid grid-cols-2 gap-2 pt-1 text-xs">
-            <div className="bg-white p-2.5 rounded-xl border border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)]">
-              <span className="text-[10px] font-black uppercase text-gray-500 block mb-0.5">
+            <div className="bg-white dark:bg-[#252321] p-2.5 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs">
+              <span className="text-[10px] font-black uppercase text-gray-500 dark:text-[#A8A29E] block mb-0.5">
                 Primary Driver
               </span>
-              <span className="font-black text-rose-600 capitalize flex items-center gap-1">
-                <Flame className="size-3.5 fill-rose-500 text-rose-600 shrink-0" />
+              <span className="font-black text-rose-600 dark:text-rose-400 capitalize flex items-center gap-1">
+                <Flame className="size-3.5 fill-rose-500 text-rose-600 dark:text-rose-400 shrink-0" />
                 <span>{anatomy.dominantName}</span>
               </span>
             </div>
 
-            <div className="bg-white p-2.5 rounded-xl border border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)]">
-              <span className="text-[10px] font-black uppercase text-gray-500 block mb-0.5">
+            <div className="bg-white dark:bg-[#252321] p-2.5 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs">
+              <span className="text-[10px] font-black uppercase text-gray-500 dark:text-[#A8A29E] block mb-0.5">
                 Secondary Assists
               </span>
-              <span className="font-bold text-[#161514] capitalize truncate block">
+              <span className="font-bold text-[#161514] dark:text-[#FAF8F5] capitalize truncate block">
                 {secondaryMuscles.length > 0
                   ? secondaryMuscles.join(", ")
                   : anatomy.secondary.length > 0
@@ -315,9 +315,9 @@ export function ExerciseGuideModal({
         </div>
 
         {/* Step-by-Step Execution Instructions */}
-        <div className="bg-[#FAF8F5] p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)] space-y-2.5">
-          <div className="flex items-center gap-2 text-xs font-black uppercase text-[#161514]">
-            <Sparkles className="h-4 w-4 text-amber-600 stroke-[2.5]" />
+        <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] p-3.5 rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-2.5">
+          <div className="flex items-center gap-2 text-xs font-black uppercase text-[#161514] dark:text-[#FAF8F5]">
+            <Sparkles className="h-4 w-4 text-amber-600 dark:text-amber-400 stroke-[2.5]" />
             <span>How to Perform (Step-by-Step)</span>
           </div>
 
@@ -325,9 +325,9 @@ export function ExerciseGuideModal({
             {instructions.map((step: string, idx: number) => (
               <div
                 key={idx}
-                className="bg-white p-2.5 rounded-xl border border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] flex items-start gap-2.5 text-xs text-[#161514]"
+                className="bg-white dark:bg-[#252321] p-2.5 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex items-start gap-2.5 text-xs text-[#161514] dark:text-[#FAF8F5]"
               >
-                <div className="h-5 w-5 rounded-full bg-[#161514] text-[#CEF431] font-black text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                <div className="h-5 w-5 rounded-full bg-[#161514] dark:bg-[#FAF8F5] text-[#CEF431] dark:text-[#161514] font-black text-[10px] flex items-center justify-center shrink-0 mt-0.5">
                   {idx + 1}
                 </div>
                 <p className="font-semibold leading-relaxed">{step}</p>
@@ -337,12 +337,12 @@ export function ExerciseGuideModal({
         </div>
 
         {/* Pro Tips Box */}
-        <div className="bg-emerald-100 p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)] space-y-1.5 text-xs text-emerald-950 font-bold">
-          <div className="flex items-center gap-1.5 font-black uppercase text-emerald-900">
-            <CheckCircle2 className="h-4 w-4 text-emerald-700 stroke-[2.5]" />
+        <div className="bg-emerald-50 dark:bg-emerald-950/20 p-3.5 rounded-2xl border border-emerald-200 dark:border-emerald-800/40 shadow-xs space-y-1.5 text-xs text-emerald-950 dark:text-emerald-200 font-bold">
+          <div className="flex items-center gap-1.5 font-black uppercase text-emerald-900 dark:text-emerald-300">
+            <CheckCircle2 className="h-4 w-4 text-emerald-700 dark:text-emerald-400 stroke-[2.5]" />
             <span>Invictus Execution Pro-Tip</span>
           </div>
-          <p className="text-[11px] font-semibold text-emerald-900 leading-snug">
+          <p className="text-[11px] font-semibold text-emerald-800 dark:text-emerald-300/80 leading-snug">
             Control the eccentric (lowering) phase for 2-3 full seconds. Never sacrifice range of motion for heavier weight to protect your joints and maximize mechanical tension.
           </p>
         </div>
@@ -351,7 +351,7 @@ export function ExerciseGuideModal({
         <button
           type="button"
           onClick={() => onOpenChange(false)}
-          className="w-full bg-[#CEF431] hover:bg-[#bce41e] text-[#161514] font-black text-xs uppercase tracking-wider rounded-2xl py-3 border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center justify-center gap-2 mt-2"
+          className="w-full bg-[#CEF431] hover:bg-[#bce41e] text-[#161514] font-black text-xs uppercase tracking-wider rounded-xl py-3 border border-[#161514] shadow-xs active:translate-y-0.5 cursor-pointer transition-all flex items-center justify-center gap-2 mt-2"
         >
           <span>Got It, Ready to Lift! 🚀</span>
         </button>

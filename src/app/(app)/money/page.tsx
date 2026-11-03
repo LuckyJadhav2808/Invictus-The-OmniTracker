@@ -27,7 +27,7 @@ import {
   computeMonthlyBudgetStats,
   computeDailyBudgetStats,
 } from "@/lib/utils/budget-rollover";
-import { InvictusLoadingScreen } from "@/components/shared/InvictusLoadingScreen";
+import { MoneyCockpitSkeleton } from "@/components/shared/NeobrutalistSkeleton";
 import { type Transaction, type Category } from "@/types";
 import dynamic from "next/dynamic";
 
@@ -223,7 +223,7 @@ function MoneyPageContent() {
       } catch {}
     }
     setCashRefillDate(nowIso);
-    toast.success(`Cash Till refilled to full ${currencySymbol}${baseCashBudget.toLocaleString()}! 💵✨`);
+    toast.success(`Cash Till refilled to full ${currencySymbol}${baseCashBudget.toLocaleString()}`);
   };
 
   const dailyStats = useMemo(() => {
@@ -255,13 +255,13 @@ function MoneyPageContent() {
   }) => {
     if (payload.id) {
       await updateTxMutation.mutateAsync(payload as any);
-      toast.success("Transaction updated! ✏️");
+      toast.success("Transaction updated");
     } else {
       const res = await addTxMutation.mutateAsync(payload as any);
       const newId = (res as any)?.id || (res as any)?._id;
       const cat = categoryMap.get(payload.categoryId);
       toast.success(
-        `Logged ${currencySymbol}${payload.amount} ${cat?.icon || ""} ${payload.note ? `• ${payload.note}` : ""}`,
+        `Logged ${currencySymbol}${payload.amount} for ${cat?.name || "Expense"}${payload.note ? ` • ${payload.note}` : ""}`,
         {
           action: {
             label: "Undo",
@@ -285,7 +285,7 @@ function MoneyPageContent() {
         paymentMethod: tx.paymentMethod,
       } as any);
       const newId = (newTx as any)?.id || (newTx as any)?._id;
-      toast.success(`Duplicated transaction! ⚡`, {
+      toast.success("Duplicated transaction", {
         action: {
           label: "Undo",
           onClick: () => {
@@ -344,7 +344,7 @@ function MoneyPageContent() {
     });
 
     toast.success(
-      `Transferred ${currencySymbol}${amount} from ${fromCat?.name || "Wallet"} to ${toCat?.name || "Wallet"}! 🔄`
+      `Transferred ${currencySymbol}${amount} from ${fromCat?.name || "Wallet"} to ${toCat?.name || "Wallet"}`
     );
   };
 
@@ -369,7 +369,7 @@ function MoneyPageContent() {
     });
 
     const newId = (res as any)?.id || (res as any)?._id;
-    toast.success(`Sent ${currencySymbol}${payload.amount} to ${payload.recipient}! 💸`, {
+    toast.success(`Sent ${currencySymbol}${payload.amount} to ${payload.recipient}`, {
       action: {
         label: "Undo",
         onClick: () => {
@@ -389,10 +389,10 @@ function MoneyPageContent() {
   }) => {
     if (payload.id) {
       await updateCatMutation.mutateAsync(payload as any);
-      toast.success(`Updated category envelope: ${payload.name}!`);
+      toast.success(`Updated category envelope: ${payload.name}`);
     } else {
       await addCatMutation.mutateAsync(payload as any);
-      toast.success(`Created category envelope: ${payload.name} ${payload.icon}! ✨`);
+      toast.success(`Created category envelope: ${payload.name}`);
     }
   };
 
@@ -433,9 +433,9 @@ function MoneyPageContent() {
         customDailyBudget: payload.customDailyBudget,
         enableRollover: payload.enableRollover,
       });
-      toast.success("Budget allowances saved & synced to cloud! 🎯");
+      toast.success("Budget allowances saved");
     } catch {
-      toast.success("Allowances saved locally! 🎯");
+      toast.success("Allowances saved locally");
     }
   };
 
@@ -455,14 +455,14 @@ function MoneyPageContent() {
             name: item.title,
             type: (item.type?.toLowerCase() === "income" ? "income" : "expense") as any,
             color: "amber",
-            icon: pack.icon || "💳",
+            icon: pack.icon || "Wallet",
             monthlyBudget: item.amount || 0,
             isTemplate: true,
             templatePackId: pack.id,
           } as any);
         }
       }
-      toast.success(`Applied ${pack.name} pack! 🚀`);
+      toast.success(`Applied ${pack.name} pack`);
     } catch {
       toast.error("Failed to apply category pack");
     }
@@ -474,14 +474,14 @@ function MoneyPageContent() {
       for (const cat of templateCats) {
         await deleteCatMutation.mutateAsync(cat.id);
       }
-      toast.success(`Unapplied ${pack.name}! 🧹`);
+      toast.success(`Unapplied ${pack.name}`);
     } catch {
       toast.error("Failed to unapply category pack");
     }
   };
 
   if (catsLoading || txsLoading) {
-    return <InvictusLoadingScreen message="Loading Financial Cockpit…" />;
+    return <MoneyCockpitSkeleton />;
   }
 
   return (
@@ -507,36 +507,36 @@ function MoneyPageContent() {
         onOpenCashModal={() => setIsCashModalOpen(true)}
       />
 
-      {/* 📑 TABS CONTROLS */}
+      {/* 📑 FLOATING SUB-NAV DOCK */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         <div className="w-full overflow-x-auto no-scrollbar pb-1 mb-4">
-          <TabsList className="bg-[#FAF8F5] rounded-2xl p-1.5 border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex items-center gap-1.5 w-max min-w-full sm:min-w-0 sm:w-auto">
+          <TabsList className="bg-white/80 dark:bg-[#161514]/80 backdrop-blur-md rounded-2xl p-1.5 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex items-center gap-1.5 w-max min-w-full sm:min-w-0 sm:w-auto">
             <TabsTrigger
               value="ledger"
-              className="rounded-xl text-xs font-heading font-extrabold py-2 px-3.5 sm:px-4 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#161514] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0 cursor-pointer"
+              className="rounded-xl text-xs font-semibold py-2 px-3.5 sm:px-4 border border-transparent data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:shadow-xs dark:data-[state=active]:bg-white dark:data-[state=active]:text-[#161514] text-[#6B6B6B] hover:text-[#161514] dark:text-[#A8A29E] dark:hover:text-stone-100 transition-all flex items-center gap-2 shrink-0 cursor-pointer"
             >
-              <Receipt className="size-3.5 stroke-[2.2]" />
+              <Receipt className="size-3.5 stroke-[2]" />
               <span>Daily Ledger</span>
             </TabsTrigger>
             <TabsTrigger
               value="budgets"
-              className="rounded-xl text-xs font-heading font-extrabold py-2 px-3.5 sm:px-4 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#161514] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0 cursor-pointer"
+              className="rounded-xl text-xs font-semibold py-2 px-3.5 sm:px-4 border border-transparent data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:shadow-xs dark:data-[state=active]:bg-white dark:data-[state=active]:text-[#161514] text-[#6B6B6B] hover:text-[#161514] dark:text-[#A8A29E] dark:hover:text-stone-100 transition-all flex items-center gap-2 shrink-0 cursor-pointer"
             >
-              <Target className="size-3.5 stroke-[2.2]" />
-              <span>Budget & Rollover</span>
+              <Target className="size-3.5 stroke-[2]" />
+              <span>Budget &amp; Rollover</span>
             </TabsTrigger>
             <TabsTrigger
               value="vault"
-              className="rounded-xl text-xs font-heading font-extrabold py-2 px-3.5 sm:px-4 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#161514] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0 cursor-pointer"
+              className="rounded-xl text-xs font-semibold py-2 px-3.5 sm:px-4 border border-transparent data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:shadow-xs dark:data-[state=active]:bg-white dark:data-[state=active]:text-[#161514] text-[#6B6B6B] hover:text-[#161514] dark:text-[#A8A29E] dark:hover:text-stone-100 transition-all flex items-center gap-2 shrink-0 cursor-pointer"
             >
-              <PiggyBank className="size-3.5 stroke-[2.2]" />
-              <span>Goals & Debts</span>
+              <PiggyBank className="size-3.5 stroke-[2]" />
+              <span>Goals &amp; Vault</span>
             </TabsTrigger>
             <TabsTrigger
               value="analytics"
-              className="rounded-xl text-xs font-heading font-extrabold py-2 px-3.5 sm:px-4 border-2 border-transparent data-[state=active]:border-[#161514] data-[state=active]:bg-[#CEF431] data-[state=active]:text-[#161514] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#161514] text-[#161514]/70 hover:text-[#161514] hover:bg-white/50 transition-all flex items-center gap-1.5 shrink-0 cursor-pointer"
+              className="rounded-xl text-xs font-semibold py-2 px-3.5 sm:px-4 border border-transparent data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:shadow-xs dark:data-[state=active]:bg-white dark:data-[state=active]:text-[#161514] text-[#6B6B6B] hover:text-[#161514] dark:text-[#A8A29E] dark:hover:text-stone-100 transition-all flex items-center gap-2 shrink-0 cursor-pointer"
             >
-              <BarChart2 className="size-3.5 stroke-[2.2]" />
+              <BarChart2 className="size-3.5 stroke-[2]" />
               <span>Analytics</span>
             </TabsTrigger>
           </TabsList>
@@ -577,6 +577,7 @@ function MoneyPageContent() {
             onEditCategory={(cat) => setEditingCat(cat)}
             onOpenTemplates={() => setIsTemplateModalOpen(true)}
             onOpenAllowances={() => setIsAllowanceModalOpen(true)}
+            onApplyCategoryPack={handleApplyCategoryPack}
           />
         </TabsContent>
 
@@ -772,7 +773,7 @@ function MoneyPageContent() {
 
 export default function MoneyPage() {
   return (
-    <Suspense fallback={<InvictusLoadingScreen message="Loading Financial Cockpit…" />}>
+    <Suspense fallback={<MoneyCockpitSkeleton />}>
       <MoneyPageContent />
     </Suspense>
   );

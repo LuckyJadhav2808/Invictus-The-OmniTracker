@@ -11,6 +11,7 @@ import { OmniWidgetSync } from "@/components/shared/OmniWidgetSync";
 import { AutoUpdateBanner } from "@/components/shared/AutoUpdateBanner";
 import { APP_VERSION_CONFIG } from "@/config/version";
 import { InvictusLoadingScreen } from "@/components/shared/InvictusLoadingScreen";
+import { SpaceCockpitSkeleton } from "@/components/shared/NeobrutalistSkeleton";
 import { getCustomSession } from "@/lib/custom-auth";
 import { safeModeWatchdog } from "@/lib/runtime/safe-mode-watchdog";
 import { SafeModeScreen } from "@/components/shared/SafeModeScreen";
@@ -41,9 +42,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     migrationEngine.runMigrations().catch(() => {});
 
     const isGuest = localStorage.getItem("invictus_guest_mode") === "true";
-    const onboardedLocal = localStorage.getItem("invictus_onboarded") === "true";
     const session = getCustomSession();
-    if (session && (session.onboarded || onboardedLocal || isGuest)) {
+    if (session || isGuest) {
       setChecking(false);
     }
 
@@ -61,19 +61,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    // Check onboarding status
-    const checkOnboarding = () => {
-      if (!user.onboarded) {
-        const onboardedLocal = localStorage.getItem("invictus_onboarded") === "true";
-        if (!onboardedLocal) {
-          router.push("/onboarding");
-          return;
-        }
-      }
-      setChecking(false);
-    };
-
-    checkOnboarding();
+    setChecking(false);
   }, [user, loading, router]);
 
   // Scroll Restoration: Reset custom viewport scroll to top on route change
@@ -89,7 +77,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-[#FBF9F5] text-[#161514]">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-[#FAF8F5] dark:bg-[#161514] text-[#161514] dark:text-[#FAF8F5] transition-colors">
       {/* Native Android & Mobile Backstack Manager */}
       <NativeBackHandler />
 
@@ -112,17 +100,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
         {/* Dynamic Route Content */}
         <div className="flex-1 w-full max-w-6xl mx-auto">
-          <Suspense fallback={<InvictusLoadingScreen message="Loading Space…" />}>
+          <Suspense fallback={<SpaceCockpitSkeleton />}>
             {children}
           </Suspense>
         </div>
 
         {/* Minimalist Production Status Footer */}
-        <footer className="mt-auto border-t-2 border-[#161514]/15 py-4 px-6 lg:pr-64 text-center sm:flex sm:items-center sm:justify-between max-w-6xl mx-auto w-full text-[#161514]/60 text-[11px] font-semibold gap-4 select-none">
+        <footer className="mt-auto border-t border-[#E8E5DF] dark:border-[#2A2724] py-3.5 px-6 lg:pr-64 text-center sm:flex sm:items-center sm:justify-between max-w-6xl mx-auto w-full text-[#8C8882] dark:text-[#A8A29E] text-[11px] font-medium gap-4 select-none transition-colors">
           <div className="flex items-center justify-center sm:justify-start gap-2">
-            <span className="font-heading font-black text-[#161514]">Invictus OS</span>
+            <span className="font-heading font-bold text-[#161514] dark:text-[#FAF8F5]">Invictus OS</span>
             <span>•</span>
-            <span className="bg-white px-2 py-0.5 rounded-md border border-[#161514]/30 text-[10px] font-mono">
+            <span className="bg-[#F1EFEA] dark:bg-[#252321] px-2 py-0.5 rounded text-[10px] font-mono font-medium text-[#8C8882] dark:text-[#A8A29E] border border-[#E8E5DF] dark:border-[#2A2724]">
               v{APP_VERSION_CONFIG.version} Production
             </span>
           </div>
@@ -135,15 +123,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   window.dispatchEvent(new CustomEvent("invictus:open-quick-actions"));
                 }
               }}
-              className="bg-white border-2 border-[#161514] px-2.5 py-1 rounded-lg text-[10px] font-heading font-extrabold text-[#161514] flex items-center gap-1.5 shadow-[1.5px_1.5px_0px_0px_#161514] hover:bg-[#F1EFEA] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
+              className="bg-white dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] px-2.5 py-1 rounded-lg text-[11px] font-medium text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5 shadow-xs hover:bg-[#F1EFEA] dark:hover:bg-[#252321] transition-colors cursor-pointer"
               title="Open Command Palette (⌘K)"
             >
-              <kbd className="font-mono bg-[#F1EFEA] px-1 rounded border border-[#161514]/30">⌘ K</kbd>
+              <kbd className="font-mono bg-[#F1EFEA] dark:bg-[#252321] px-1 rounded border border-[#E8E5DF] dark:border-[#2A2724] text-[10px] text-[#8C8882] dark:text-[#A8A29E]">⌘ K</kbd>
               <span>Quick Actions</span>
             </button>
             <span>•</span>
             <span className="flex items-center gap-1.5">
-              <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="size-1.5 rounded-full bg-emerald-500" />
               <span>All systems healthy</span>
             </span>
           </div>
