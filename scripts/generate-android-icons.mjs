@@ -13,25 +13,21 @@ const resDir = path.join(rootDir, "android", "app", "src", "main", "res");
 
 // Standalone Foreground SVG for Android Adaptive Icons (Transparent Canvas)
 const foregroundSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="invictus-stem" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#CEF431" />
+      <stop offset="100%" stop-color="#03D26F" />
+    </linearGradient>
+  </defs>
   <g id="icon" transform="translate(256, 256)">
-    <!-- Top Horizontal Pediment -->
+    <!-- Contiguous Roman Monolith "I" Body -->
     <path
-      d="M -110 -150 L 110 -150 L 80 -95 L -80 -95 Z"
-      fill="#FAF8F5"
+      d="M -140 -160 L 140 -160 L 105 -100 L 55 -100 L 55 100 L 105 100 L 140 160 L -140 160 L -105 100 L -55 100 L -55 -100 L -105 -100 Z"
+      fill="url(#invictus-stem)"
     />
-    <!-- Central Monolithic Stem (Electric Volt) -->
+    <!-- Ascending Victory Chevron Cutout -->
     <path
-      d="M -45 -80 L 45 -80 L 45 80 L -45 80 Z"
-      fill="#CEF431"
-    />
-    <!-- Bottom Horizontal Base Pedestal -->
-    <path
-      d="M -80 95 L 80 95 L 110 150 L -110 150 Z"
-      fill="#FAF8F5"
-    />
-    <!-- Inner Upward Chevron Arrow Cutout -->
-    <polygon
-      points="0,-50 30,10 0,-10 -30,10"
+      d="M 0 -50 L 36 15 L 16 15 L 0 -10 L -16 15 L -36 15 Z"
       fill="#161514"
     />
   </g>
@@ -195,10 +191,16 @@ async function generateAllIcons() {
     <!-- Top Header -->
     <rect x="32" y="28" width="28" height="28" rx="8" fill="#161514"/>
     <!-- Monolith mini-icon inside header -->
-    <rect x="38" y="32" width="16" height="3" rx="1.5" fill="#FAF8F5"/>
-    <rect x="42" y="37" width="8" height="10" rx="1" fill="#CEF431"/>
-    <polygon points="46,39 43,43 49,43" fill="#161514"/>
-    <rect x="38" y="49" width="16" height="3" rx="1.5" fill="#FAF8F5"/>
+    <g transform="translate(46, 42) scale(0.065)">
+      <path
+        d="M -140 -160 L 140 -160 L 105 -100 L 55 -100 L 55 100 L 105 100 L 140 160 L -140 160 L -105 100 L -55 100 L -55 -100 L -105 -100 Z"
+        fill="#CEF431"
+      />
+      <path
+        d="M 0 -50 L 36 15 L 16 15 L 0 -10 L -16 15 L -36 15 Z"
+        fill="#161514"
+      />
+    </g>
     <text x="68" y="47" fill="#161514" font-family="system-ui, sans-serif" font-weight="900" font-size="16" letter-spacing="0.5">INVICTUS DAILY</text>
     <text x="472" y="47" text-anchor="end" fill="#73716D" font-family="system-ui, sans-serif" font-weight="700" font-size="12">TODAY • 24d left</text>
     
