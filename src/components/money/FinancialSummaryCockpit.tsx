@@ -19,6 +19,10 @@ interface FinancialSummaryCockpitProps {
   monthlyStats: MonthlyBudgetStats;
   dailyStats: DailyBudgetStats;
   currencySymbol: string;
+  selectedMonth?: string;
+  availableMonths?: Array<{ key: string; label: string; isCurrent: boolean }>;
+  onSelectMonth?: (monthKey: string) => void;
+  onResetToCurrentMonth?: () => void;
   onAddTransaction: () => void;
   onBulkScan: () => void;
   onAddCategory: () => void;
@@ -32,6 +36,10 @@ export function FinancialSummaryCockpit({
   monthlyStats,
   dailyStats,
   currencySymbol,
+  selectedMonth,
+  availableMonths,
+  onSelectMonth,
+  onResetToCurrentMonth,
   onAddTransaction,
   onBulkScan,
   onOpenCalculator,
@@ -60,19 +68,50 @@ export function FinancialSummaryCockpit({
       {/* Top Telemetry Header */}
       <div className="flex items-center justify-between gap-2 pb-2.5 border-b border-[#E8E5DF] dark:border-[#383531]">
         <div className="flex items-center gap-2 min-w-0">
-          <span className="size-2 rounded-full bg-[#03D26F] shrink-0" />
+          <span
+            className={cn(
+              "size-2 rounded-full shrink-0",
+              monthlyStats.isCurrentCalendarMonth ? "bg-[#03D26F]" : "bg-amber-500"
+            )}
+          />
           <h2 className="text-sm sm:text-[15px] font-heading font-bold text-[#161514] dark:text-[#FAF8F5] truncate tracking-tight">
             Financial Cockpit
           </h2>
-          <span className="text-[11px] font-mono font-medium text-[#6B6B6B] dark:text-[#A8A29E] bg-[#FAF8F5] dark:bg-[#252321] px-2 py-0.5 rounded border border-[#E8E5DF] dark:border-[#383531]">
-            {monthlyStats.targetMonthLabel}
-          </span>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <span
+              className={cn(
+                "text-[11px] font-mono font-medium px-2 py-0.5 rounded border transition-colors",
+                !monthlyStats.isCurrentCalendarMonth
+                  ? "bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 border-amber-300 dark:border-amber-800"
+                  : "text-[#6B6B6B] dark:text-[#A8A29E] bg-[#FAF8F5] dark:bg-[#252321] border-[#E8E5DF] dark:border-[#383531]"
+              )}
+            >
+              {monthlyStats.targetMonthLabel}
+            </span>
+            {!monthlyStats.isCurrentCalendarMonth && onResetToCurrentMonth && (
+              <button
+                type="button"
+                onClick={onResetToCurrentMonth}
+                className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-[#161514] text-[#CEF431] dark:bg-[#FAF8F5] dark:text-[#161514] hover:opacity-90 active:scale-95 transition-all cursor-pointer flex items-center gap-1 shadow-xs"
+                title="Jump to Current Month"
+              >
+                <span>Current</span>
+                <RotateCcw className="size-2.5" />
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
-          <span className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] font-mono hidden md:inline-block tabular-nums">
-            Safe pace: ~{currencySymbol}{dailyStats.todayRemaining.toLocaleString()}/day
-          </span>
+          {monthlyStats.isCurrentCalendarMonth ? (
+            <span className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] font-mono hidden md:inline-block tabular-nums">
+              Safe pace: ~{currencySymbol}{dailyStats.todayRemaining.toLocaleString()}/day
+            </span>
+          ) : (
+            <span className="text-xs text-amber-700 dark:text-amber-300 font-mono hidden md:inline-block tabular-nums">
+              Historical Ledger Archive
+            </span>
+          )}
           <span
             className={cn(
               "text-xs font-mono font-semibold px-2 py-0.5 rounded-md border tabular-nums",

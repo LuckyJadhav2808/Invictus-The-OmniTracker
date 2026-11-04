@@ -18,7 +18,7 @@ import { BUDGET_CATEGORY_TEMPLATE_PACKS } from "@/lib/templates-data";
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Receipt, Target, PiggyBank, BarChart2 } from "lucide-react";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { toast } from "sonner";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { ProactiveReminderBanner } from "@/components/shared/ProactiveReminderBanner";
@@ -201,19 +201,42 @@ function MoneyPageContent() {
   }, [cloudBudgetPrefs]);
 
   // Compute Monthly & Daily Stats
-  const targetMonthKey = format(new Date(), "yyyy-MM");
+  const currentCalMonthKey = useMemo(() => format(new Date(), "yyyy-MM"), []);
+  const [selectedMonth, setSelectedMonth] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      const cached = sessionStorage.getItem("invictus_ledger_month");
+      if (cached) return cached;
+    }
+    return format(new Date(), "yyyy-MM");
+  });
+
+  const effectiveTargetMonthKey = selectedMonth === "all" ? currentCalMonthKey : selectedMonth;
+
+  const handleSelectMonth = (monthKey: string) => {
+    setSelectedMonth(monthKey);
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("invictus_ledger_month", monthKey);
+    }
+  };
+
+  const handleResetToCurrentMonth = () => {
+    setSelectedMonth(currentCalMonthKey);
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("invictus_ledger_month", currentCalMonthKey);
+    }
+  };
 
   const monthlyStats = useMemo(() => {
     return computeMonthlyBudgetStats({
       transactions,
       categories,
-      targetMonthKey,
+      targetMonthKey: effectiveTargetMonthKey,
       baseUpiBudget,
       baseCashBudget,
       enableRollover,
       cashRefillDate,
     });
-  }, [transactions, categories, targetMonthKey, baseUpiBudget, baseCashBudget, enableRollover, cashRefillDate]);
+  }, [transactions, categories, effectiveTargetMonthKey, baseUpiBudget, baseCashBudget, enableRollover, cashRefillDate]);
 
   const handleRefillCashTill = () => {
     const nowIso = new Date().toISOString();
@@ -227,13 +250,20 @@ function MoneyPageContent() {
   };
 
   const dailyStats = useMemo(() => {
+    let refDate = new Date();
+    try {
+      if (!monthlyStats.isCurrentCalendarMonth) {
+        refDate = parseISO(`${effectiveTargetMonthKey}-01`);
+      }
+    } catch {}
+
     return computeDailyBudgetStats({
       transactions,
       monthlyStats,
       customDailyBudget,
-      referenceDate: new Date(),
+      referenceDate: refDate,
     });
-  }, [transactions, monthlyStats, customDailyBudget]);
+  }, [transactions, monthlyStats, customDailyBudget, effectiveTargetMonthKey]);
 
 
   // Category map helper
@@ -491,6 +521,9 @@ function MoneyPageContent() {
         monthlyStats={monthlyStats}
         dailyStats={dailyStats}
         currencySymbol={currencySymbol}
+        selectedMonth={selectedMonth}
+        onSelectMonth={handleSelectMonth}
+        onResetToCurrentMonth={handleResetToCurrentMonth}
         onAddTransaction={() => setIsAddTxOpen(true)}
         onBulkScan={() => setIsBulkModalOpen(true)}
         onAddCategory={() => setIsAddCatOpen(true)}
@@ -548,9 +581,11 @@ function MoneyPageContent() {
             transactions={transactions}
             categories={categories}
             currencySymbol={currencySymbol}
-            targetMonthKey={targetMonthKey}
+            targetMonthKey={effectiveTargetMonthKey}
             monthlyStats={monthlyStats}
             initialMethodFilter={ledgerMethodFilter}
+            selectedMonth={selectedMonth}
+            onSelectMonth={handleSelectMonth}
             onInspectTransaction={(tx) => setInspectingTx(tx)}
             onEditTransaction={(tx) => setEditingTx(tx)}
             onDuplicateTransaction={handleDuplicateTransaction}
@@ -592,7 +627,7 @@ function MoneyPageContent() {
             transactions={transactions}
             categories={categories}
             currencySymbol={currencySymbol}
-            targetMonthKey={targetMonthKey}
+            targetMonthKey={effectiveTargetMonthKey}
             onOpenAddTransaction={() => setIsAddTxOpen(true)}
           />
         </TabsContent>
@@ -707,7 +742,7 @@ function MoneyPageContent() {
         onOpenChange={setIsExportModalOpen}
         transactions={transactions}
         categories={categories}
-        currentMonthKey={targetMonthKey}
+        currentMonthKey={effectiveTargetMonthKey}
         currencySymbol={currencySymbol}
         userName={user?.displayName || "Invictus User"}
       />

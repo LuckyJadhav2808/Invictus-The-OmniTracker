@@ -70,7 +70,7 @@ export function QuickCashEntryModal({
     setIsSubmitting(true);
     try {
       soundFX.play("coin");
-      await onSave({
+      const savePromise = onSave({
         amount: Math.round(numAmount * 100) / 100,
         type: "expense",
         categoryId: activeCategoryId,
@@ -82,6 +82,7 @@ export function QuickCashEntryModal({
       setNote("");
       setCategoryId("");
       onOpenChange(false);
+      await savePromise;
     } catch {
       soundFX.play("error");
     } finally {

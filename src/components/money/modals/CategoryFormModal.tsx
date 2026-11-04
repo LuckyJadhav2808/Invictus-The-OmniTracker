@@ -104,7 +104,7 @@ export function CategoryFormModal({
 
     setIsSubmitting(true);
     try {
-      await onSave({
+      const savePromise = onSave({
         id: initialData?.id,
         name: name.trim(),
         type,
@@ -114,6 +114,7 @@ export function CategoryFormModal({
       });
       soundFX.playPop();
       onOpenChange(false);
+      await savePromise;
     } finally {
       setIsSubmitting(false);
     }

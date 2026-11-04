@@ -27,7 +27,9 @@ export async function GET(req: Request) {
       ? ["user-admin-default", "user_1kapw9sad_1784744868999"]
       : [userId];
 
-    const txs = await Transaction.find({ userId: { $in: targetUserIds } }).sort({ date: -1, createdAt: -1 });
+    const txs = await Transaction.find({ userId: { $in: targetUserIds } })
+      .sort({ date: -1, createdAt: -1 })
+      .lean();
     return NextResponse.json(txs);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

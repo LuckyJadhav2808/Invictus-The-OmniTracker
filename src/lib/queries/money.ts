@@ -82,6 +82,8 @@ export function useCategories() {
       }));
     },
     enabled: true,
+    staleTime: 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 }
 
@@ -97,7 +99,7 @@ export function useAddCategory() {
         const list = local ? JSON.parse(local) : [...DEFAULT_CATEGORIES];
         const newCategory = {
           ...category,
-          id: `cat-${Math.random().toString(36).substring(2, 9)}`,
+          id: (category as any).id || `cat-${Math.random().toString(36).substring(2, 9)}`,
           archived: false,
           createdAt: new Date().toISOString(),
         } as unknown as Category;
@@ -106,7 +108,7 @@ export function useAddCategory() {
         return newCategory;
       }
 
-      const catId = `cat_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+      const catId = (category as any).id || `cat_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
       const res = await fetch("/api/money/categories", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -119,13 +121,31 @@ export function useAddCategory() {
       }
       return res.json();
     },
-    onSuccess: (newCat) => {
+    onMutate: async (newCategory) => {
       const userId = getActiveUserId(user);
-      queryClient.setQueryData<Category[]>(["categories", userId], (old) => {
-        if (!old) return [newCat];
-        return [...old, newCat];
-      });
-      queryClient.invalidateQueries({ queryKey: ["categories", userId] });
+      await queryClient.cancelQueries({ queryKey: ["categories", userId] });
+
+      const previousCategories = queryClient.getQueryData<Category[]>(["categories", userId]);
+
+      const optimisticCategory: Category = {
+        ...newCategory,
+        id: (newCategory as any).id || `cat_opt_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+        archived: false,
+        createdAt: new Date().toISOString(),
+      } as unknown as Category;
+
+      queryClient.setQueryData<Category[]>(["categories", userId], (old = []) => [...old, optimisticCategory]);
+
+      return { previousCategories, userId };
+    },
+    onError: (_err, _newCategory, context) => {
+      if (context?.previousCategories) {
+        queryClient.setQueryData(["categories", context.userId], context.previousCategories);
+      }
+    },
+    onSettled: (_data, _error, _variables, context) => {
+      const uid = context?.userId || getActiveUserId(user);
+      queryClient.invalidateQueries({ queryKey: ["categories", uid] });
     },
   });
 }
@@ -160,13 +180,26 @@ export function useUpdateCategory() {
       }
       return res.json();
     },
-    onSuccess: (updatedCat) => {
+    onMutate: async (updatedCat) => {
       const userId = getActiveUserId(user);
-      queryClient.setQueryData<Category[]>(["categories", userId], (old) => {
-        if (!old) return [updatedCat as Category];
-        return old.map((c) => (c.id === updatedCat.id ? { ...c, ...updatedCat } : c));
-      });
-      queryClient.invalidateQueries({ queryKey: ["categories", userId] });
+      await queryClient.cancelQueries({ queryKey: ["categories", userId] });
+
+      const previousCategories = queryClient.getQueryData<Category[]>(["categories", userId]);
+
+      queryClient.setQueryData<Category[]>(["categories", userId], (old = []) =>
+        (old || []).map((c) => (c.id === updatedCat.id ? { ...c, ...updatedCat } : c))
+      );
+
+      return { previousCategories, userId };
+    },
+    onError: (_err, _updatedCat, context) => {
+      if (context?.previousCategories) {
+        queryClient.setQueryData(["categories", context.userId], context.previousCategories);
+      }
+    },
+    onSettled: (_data, _error, _variables, context) => {
+      const uid = context?.userId || getActiveUserId(user);
+      queryClient.invalidateQueries({ queryKey: ["categories", uid] });
     },
   });
 }
@@ -194,9 +227,26 @@ export function useDeleteCategory() {
       if (!res.ok) throw new Error("Failed to delete category from MongoDB");
       return categoryId;
     },
-    onSuccess: () => {
+    onMutate: async (categoryId) => {
       const userId = getActiveUserId(user);
-      queryClient.invalidateQueries({ queryKey: ["categories", userId] });
+      await queryClient.cancelQueries({ queryKey: ["categories", userId] });
+
+      const previousCategories = queryClient.getQueryData<Category[]>(["categories", userId]);
+
+      queryClient.setQueryData<Category[]>(["categories", userId], (old = []) =>
+        (old || []).filter((c) => c.id !== categoryId)
+      );
+
+      return { previousCategories, userId };
+    },
+    onError: (_err, _categoryId, context) => {
+      if (context?.previousCategories) {
+        queryClient.setQueryData(["categories", context.userId], context.previousCategories);
+      }
+    },
+    onSettled: (_data, _error, _variables, context) => {
+      const uid = context?.userId || getActiveUserId(user);
+      queryClient.invalidateQueries({ queryKey: ["categories", uid] });
     },
   });
 }
@@ -222,6 +272,8 @@ export function useTransactions() {
       return list.map((t: any) => ({ ...t, id: t.id || t._id }));
     },
     enabled: !!userId || isGuestMode(),
+    staleTime: 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 }
 
@@ -237,7 +289,7 @@ export function useAddTransaction() {
         const list = local ? JSON.parse(local) : [];
         const newTransaction = {
           ...transaction,
-          id: Math.random().toString(36).substring(2, 9),
+          id: (transaction as any).id || Math.random().toString(36).substring(2, 9),
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         } as unknown as Transaction;
@@ -248,7 +300,7 @@ export function useAddTransaction() {
 
       if (!userId) throw new Error("Unauthenticated");
 
-      const txId = `tx_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+      const txId = (transaction as any).id || `tx_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
       const txPayload = { id: txId, userId, ...transaction };
 
       return executeOfflineMutation(txPayload, {
@@ -259,11 +311,34 @@ export function useAddTransaction() {
         getOptimisticResult: () => txPayload,
       });
     },
-    onSuccess: () => {
+    onMutate: async (newTx) => {
       const userId = getActiveUserId(user);
-      queryClient.invalidateQueries({ queryKey: ["transactions", userId] });
+      await queryClient.cancelQueries({ queryKey: ["transactions", userId] });
+
+      const previousTxs = queryClient.getQueryData<Transaction[]>(["transactions", userId]);
+
+      const optimisticTx: Transaction = {
+        ...newTx,
+        id: (newTx as any).id || `tx_opt_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+        userId,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      } as unknown as Transaction;
+
+      queryClient.setQueryData<Transaction[]>(["transactions", userId], (old = []) => [optimisticTx, ...old]);
+
+      return { previousTxs, userId };
+    },
+    onError: (_err, _newTx, context) => {
+      if (context?.previousTxs) {
+        queryClient.setQueryData(["transactions", context.userId], context.previousTxs);
+      }
+    },
+    onSettled: (_data, _error, _variables, context) => {
+      const uid = context?.userId || getActiveUserId(user);
+      queryClient.invalidateQueries({ queryKey: ["transactions", uid] });
       queryClient.invalidateQueries({ queryKey: ["transactions", user?.uid] });
-      queryClient.invalidateQueries({ queryKey: ["categories", userId] });
+      queryClient.invalidateQueries({ queryKey: ["categories", uid] });
     },
   });
 }
@@ -345,11 +420,28 @@ export function useDeleteTransaction() {
       if (!res.ok) throw new Error("Failed to delete transaction from MongoDB");
       return transactionId;
     },
-    onSuccess: () => {
+    onMutate: async (transactionId) => {
       const userId = getActiveUserId(user);
-      queryClient.invalidateQueries({ queryKey: ["transactions", userId] });
+      await queryClient.cancelQueries({ queryKey: ["transactions", userId] });
+
+      const previousTxs = queryClient.getQueryData<Transaction[]>(["transactions", userId]);
+
+      queryClient.setQueryData<Transaction[]>(["transactions", userId], (old = []) =>
+        (old || []).filter((t) => t.id !== transactionId)
+      );
+
+      return { previousTxs, userId };
+    },
+    onError: (_err, _transactionId, context) => {
+      if (context?.previousTxs) {
+        queryClient.setQueryData(["transactions", context.userId], context.previousTxs);
+      }
+    },
+    onSettled: (_data, _error, _variables, context) => {
+      const uid = context?.userId || getActiveUserId(user);
+      queryClient.invalidateQueries({ queryKey: ["transactions", uid] });
       queryClient.invalidateQueries({ queryKey: ["transactions", user?.uid] });
-      queryClient.invalidateQueries({ queryKey: ["categories", userId] });
+      queryClient.invalidateQueries({ queryKey: ["categories", uid] });
     },
   });
 }
@@ -382,11 +474,28 @@ export function useUpdateTransaction() {
       if (!res.ok) throw new Error("Failed to update transaction in MongoDB");
       return res.json();
     },
-    onSuccess: () => {
+    onMutate: async (updatedTx) => {
       const userId = getActiveUserId(user);
-      queryClient.invalidateQueries({ queryKey: ["transactions", userId] });
+      await queryClient.cancelQueries({ queryKey: ["transactions", userId] });
+
+      const previousTxs = queryClient.getQueryData<Transaction[]>(["transactions", userId]);
+
+      queryClient.setQueryData<Transaction[]>(["transactions", userId], (old = []) =>
+        (old || []).map((t) => (t.id === updatedTx.id ? { ...t, ...updatedTx } : t))
+      );
+
+      return { previousTxs, userId };
+    },
+    onError: (_err, _updatedTx, context) => {
+      if (context?.previousTxs) {
+        queryClient.setQueryData(["transactions", context.userId], context.previousTxs);
+      }
+    },
+    onSettled: (_data, _error, _variables, context) => {
+      const uid = context?.userId || getActiveUserId(user);
+      queryClient.invalidateQueries({ queryKey: ["transactions", uid] });
       queryClient.invalidateQueries({ queryKey: ["transactions", user?.uid] });
-      queryClient.invalidateQueries({ queryKey: ["categories", userId] });
+      queryClient.invalidateQueries({ queryKey: ["categories", uid] });
     },
   });
 }

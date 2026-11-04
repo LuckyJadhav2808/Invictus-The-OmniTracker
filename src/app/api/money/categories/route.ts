@@ -16,7 +16,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "UserId required for data isolation" }, { status: 400 });
     }
 
-    const categories = await Category.find({ userId }).sort({ createdAt: 1 });
+    const categories = await Category.find({ userId }).sort({ createdAt: 1 }).lean();
     return NextResponse.json(categories);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

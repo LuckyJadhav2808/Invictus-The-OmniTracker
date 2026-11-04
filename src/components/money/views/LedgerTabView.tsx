@@ -19,6 +19,8 @@ interface LedgerTabViewProps {
   targetMonthKey?: string;
   monthlyStats?: MonthlyBudgetStats;
   initialMethodFilter?: string;
+  selectedMonth?: string;
+  onSelectMonth?: (monthKey: string) => void;
   onInspectTransaction: (tx: Transaction) => void;
   onEditTransaction: (tx: Transaction) => void;
   onDuplicateTransaction: (tx: Transaction) => Promise<void>;
@@ -40,6 +42,8 @@ export function LedgerTabView({
   targetMonthKey,
   monthlyStats,
   initialMethodFilter,
+  selectedMonth: selectedMonthProp,
+  onSelectMonth,
   onInspectTransaction,
   onEditTransaction,
   onDuplicateTransaction,
@@ -55,13 +59,26 @@ export function LedgerTabView({
 }: LedgerTabViewProps) {
   const activeMonthKey = targetMonthKey || format(new Date(), "yyyy-MM");
   // Retain filter and search state across tab navigations via sessionStorage
-  const [selectedMonth, setSelectedMonth] = useState<string>(() => {
+  const [internalSelectedMonth, setInternalSelectedMonth] = useState<string>(() => {
+    if (selectedMonthProp !== undefined) return selectedMonthProp;
     if (typeof window !== "undefined") {
       const cached = sessionStorage.getItem("invictus_ledger_month");
       if (cached) return cached;
     }
     return activeMonthKey;
   });
+
+  const selectedMonth = selectedMonthProp !== undefined ? selectedMonthProp : internalSelectedMonth;
+  const setSelectedMonth = (val: string) => {
+    setInternalSelectedMonth(val);
+    onSelectMonth?.(val);
+  };
+
+  useEffect(() => {
+    if (selectedMonthProp !== undefined && selectedMonthProp !== internalSelectedMonth) {
+      setInternalSelectedMonth(selectedMonthProp);
+    }
+  }, [selectedMonthProp, internalSelectedMonth]);
   const [searchQuery, setSearchQuery] = useState(() => {
     if (typeof window !== "undefined") {
       return sessionStorage.getItem("invictus_ledger_search") || "";

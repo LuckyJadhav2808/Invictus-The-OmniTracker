@@ -33,5 +33,6 @@ const CategorySchema = new Schema<ICategory>(
 
 CategorySchema.index({ userId: 1, id: 1 }, { unique: true });
 CategorySchema.index({ userId: 1, type: 1 });
+CategorySchema.index({ userId: 1, createdAt: 1 });
 
 export const Category = models.Category || model<ICategory>("Category", CategorySchema);

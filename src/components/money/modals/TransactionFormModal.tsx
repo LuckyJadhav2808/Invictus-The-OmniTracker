@@ -175,7 +175,8 @@ export function TransactionFormModal({
       const trimmedNote = note.trim();
       const targetCatId = categoryId || filteredCategories[0]?.id || "";
 
-      await onSave({
+      // Fire save (optimistic mutation updates TanStack cache immediately)
+      const savePromise = onSave({
         id: initialData?.id,
         amount: numAmt,
         type,
@@ -201,6 +202,7 @@ export function TransactionFormModal({
       soundFX.playCashRegister();
       soundFX.vibrate([30, 50, 30]);
       onOpenChange(false);
+      await savePromise;
     } catch {
       // Error handled by caller toast
     } finally {
