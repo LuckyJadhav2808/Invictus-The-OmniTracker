@@ -119,11 +119,21 @@ function BottomNavContent() {
             onClick={(e) => {
               const now = Date.now();
               if (isActive) {
-                // If re-tapping active tab: smooth scroll main container to top
+                // If re-tapping active tab: smooth scroll viewport and container to top
                 const scrollContainer = document.getElementById("main-scroll-container");
-                if (scrollContainer && scrollContainer.scrollTop > 10) {
+                const isScrolled =
+                  (scrollContainer && scrollContainer.scrollTop > 10) ||
+                  (typeof window !== "undefined" && window.scrollY > 10);
+
+                if (isScrolled) {
                   e.preventDefault();
-                  scrollContainer.scrollTo({ top: 0, behavior: "smooth" });
+                  if (scrollContainer && scrollContainer.scrollTop > 0) {
+                    scrollContainer.scrollTo({ top: 0, behavior: "smooth" });
+                  }
+                  if (typeof window !== "undefined") {
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                    document.documentElement.scrollTo({ top: 0, behavior: "smooth" });
+                  }
                   soundFX.playPop();
                   triggerHaptic();
                   return;

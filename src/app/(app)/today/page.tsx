@@ -451,10 +451,17 @@ export default function TodayPage() {
   };
   const scrollToTop = () => {
     const mainContainer = document.getElementById("main-scroll-container");
-    if (mainContainer) {
+    if (mainContainer && mainContainer.scrollTop > 0) {
       mainContainer.scrollTo({ top: 0, behavior: "smooth" });
-    } else {
+    }
+    if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "smooth" });
+      if (document.documentElement) {
+        document.documentElement.scrollTo({ top: 0, behavior: "smooth" });
+      }
+      if (document.body) {
+        document.body.scrollTo({ top: 0, behavior: "smooth" });
+      }
     }
   };
 

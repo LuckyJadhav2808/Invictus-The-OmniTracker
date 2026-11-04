@@ -17,10 +17,17 @@ export function TodayCockpitFooter({
   const handleTopClick = () => {
     soundFX.playPop();
     soundFX.vibrate(15);
-    if (onScrollToTop) onScrollToTop();
-    else {
-      const el = document.getElementById("main-scroll-container") || window;
-      if ("scrollTo" in el) el.scrollTo({ top: 0, behavior: "smooth" });
+    if (onScrollToTop) {
+      onScrollToTop();
+    } else {
+      const scrollContainer = document.getElementById("main-scroll-container");
+      if (scrollContainer && scrollContainer.scrollTop > 0) {
+        scrollContainer.scrollTo({ top: 0, behavior: "smooth" });
+      }
+      if (typeof window !== "undefined") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        document.documentElement.scrollTo({ top: 0, behavior: "smooth" });
+      }
     }
   };
 

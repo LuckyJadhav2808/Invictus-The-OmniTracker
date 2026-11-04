@@ -64,11 +64,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     setChecking(false);
   }, [user, loading, router]);
 
-  // Scroll Restoration: Reset custom viewport scroll to top on route change
+  // Scroll Restoration: Reset custom viewport and window scroll to top on route change
   useEffect(() => {
     const scrollContainer = document.getElementById("main-scroll-container");
     if (scrollContainer) {
       scrollContainer.scrollTop = 0;
+    }
+    if (typeof window !== "undefined") {
+      window.scrollTo(0, 0);
     }
   }, [pathname]);
 
