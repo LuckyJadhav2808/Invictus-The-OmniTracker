@@ -16,9 +16,9 @@
   "apk": {
     "exists": true,
     "fileName": "Invictus.apk",
-    "sha256": "4cb3efd9a63d8b5905fdda9853f7f0d759cabf1c9968081c9c7aa4fa3726f0bc",
-    "sizeBytes": 4340478,
-    "sizeFormatted": "4.14 MB",
+    "sha256": "bd1620ac8389bd3464dfda12abf08a23a91ab308d33c5d5b2634bb9b718b8209",
+    "sizeBytes": 4400558,
+    "sizeFormatted": "4.20 MB",
     "directDownloadUrl": "https://invictus-the-omni-tracker.vercel.app/downloads/Invictus.apk",
     "githubReleaseAssetUrl": "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v1.8.0/Invictus.apk"
   },

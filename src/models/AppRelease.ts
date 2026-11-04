@@ -36,6 +36,7 @@ const AppReleaseSchema = new Schema<IAppRelease>(
   },
   {
     timestamps: true,
+    collection: "app_releases",
   }
 );
 

@@ -10,16 +10,16 @@ describe("Financial Cockpit Historical Month Synchronization Engine", () => {
 
   const dummyTransactions: Transaction[] = [
     // Current Month (2026-11)
-    { id: "tx-1", userId: "user-1", amount: 500, type: "expense", categoryId: "cat-food", date: "2026-11-02", paymentMethod: "UPI" },
-    { id: "tx-2", userId: "user-1", amount: 200, type: "expense", categoryId: "cat-food", date: "2026-11-03", paymentMethod: "Cash" },
+    { id: "tx-1", amount: 500, type: "expense", categoryId: "cat-food", date: "2026-11-02", paymentMethod: "UPI" },
+    { id: "tx-2", amount: 200, type: "expense", categoryId: "cat-food", date: "2026-11-03", paymentMethod: "Cash" },
 
     // Past Month 1 (2026-10)
-    { id: "tx-3", userId: "user-1", amount: 3500, type: "expense", categoryId: "cat-food", date: "2026-10-15", paymentMethod: "UPI" },
-    { id: "tx-4", userId: "user-1", amount: 1500, type: "expense", categoryId: "cat-food", date: "2026-10-20", paymentMethod: "Cash" },
-    { id: "tx-5", userId: "user-1", amount: 10000, type: "income", categoryId: "cat-salary", date: "2026-10-01", paymentMethod: "Bank" },
+    { id: "tx-3", amount: 3500, type: "expense", categoryId: "cat-food", date: "2026-10-15", paymentMethod: "UPI" },
+    { id: "tx-4", amount: 1500, type: "expense", categoryId: "cat-food", date: "2026-10-20", paymentMethod: "Cash" },
+    { id: "tx-5", amount: 10000, type: "income", categoryId: "cat-salary", date: "2026-10-01", paymentMethod: "Bank" },
 
     // Past Month 2 (2026-09)
-    { id: "tx-6", userId: "user-1", amount: 2000, type: "expense", categoryId: "cat-rent", date: "2026-09-10", paymentMethod: "UPI" },
+    { id: "tx-6", amount: 2000, type: "expense", categoryId: "cat-rent", date: "2026-09-10", paymentMethod: "UPI" },
   ];
 
   it("computes current calendar month stats accurately", () => {
