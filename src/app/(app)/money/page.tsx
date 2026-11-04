@@ -766,6 +766,7 @@ function MoneyPageContent() {
       <NeobrutalistCalculator
         open={isCalculatorOpen}
         onOpenChange={setIsCalculatorOpen}
+        hideFloatingTrigger={true}
       />
     </div>
   );

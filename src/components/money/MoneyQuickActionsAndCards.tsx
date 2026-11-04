@@ -52,6 +52,8 @@ import {
   Percent,
   Coins,
   Layers,
+  LayoutGrid,
+  ListFilter,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
@@ -191,6 +193,23 @@ export function MoneyQuickActionsAndCards({
   onDeleteCategory,
 }: MoneyQuickActionsProps) {
   const [isHideBalance, setIsHideBalance] = useState(false);
+  const [viewMode, setViewMode] = useState<"rail" | "cards">(() => {
+    if (typeof window !== "undefined") {
+      const saved = sessionStorage.getItem("invictus_wallets_view");
+      if (saved === "rail" || saved === "cards") return saved;
+    }
+    return "rail";
+  });
+
+  const toggleViewMode = (mode: "rail" | "cards") => {
+    soundFX.playClick();
+    setViewMode(mode);
+    if (typeof window !== "undefined") {
+      try {
+        sessionStorage.setItem("invictus_wallets_view", mode);
+      } catch {}
+    }
+  };
 
   useEffect(() => {
     try {
@@ -232,6 +251,38 @@ export function MoneyQuickActionsAndCards({
           >
             {isHideBalance ? <EyeOff className="size-3 stroke-[1.5]" /> : <Eye className="size-3 stroke-[1.5]" />}
           </button>
+
+          {/* View Mode Toggle: Rail vs Cards */}
+          <div className="flex items-center gap-0.5 bg-[#F1EFEA] dark:bg-[#252321] p-0.5 rounded-md border border-[#E8E5DF] dark:border-[#383531]">
+            <button
+              type="button"
+              onClick={() => toggleViewMode("rail")}
+              className={cn(
+                "px-2 py-0.5 rounded text-[11px] font-medium flex items-center gap-1 transition-colors cursor-pointer",
+                viewMode === "rail"
+                  ? "bg-white dark:bg-[#161514] text-[#161514] dark:text-[#FAF8F5] shadow-xs font-semibold"
+                  : "text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5]"
+              )}
+              title="Compact horizontal filter rail (fastest)"
+            >
+              <ListFilter className="size-3 stroke-[2]" />
+              <span className="hidden sm:inline">Rail</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => toggleViewMode("cards")}
+              className={cn(
+                "px-2 py-0.5 rounded text-[11px] font-medium flex items-center gap-1 transition-colors cursor-pointer",
+                viewMode === "cards"
+                  ? "bg-white dark:bg-[#161514] text-[#161514] dark:text-[#FAF8F5] shadow-xs font-semibold"
+                  : "text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5]"
+              )}
+              title="Expanded tactile wallet cards"
+            >
+              <LayoutGrid className="size-3 stroke-[2]" />
+              <span className="hidden sm:inline">Cards</span>
+            </button>
+          </div>
 
           {selectedCategoryId && selectedCategoryId !== "all" && (
             <button
@@ -320,6 +371,60 @@ export function MoneyQuickActionsAndCards({
               <span>Create Your First Wallet</span>
             </button>
           )}
+        </div>
+      ) : viewMode === "rail" ? (
+        /* High-Density Tactile Filter Rail (Linear & Apple Style) */
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 px-0.5">
+          {/* "All Wallets" Filter Chip */}
+          <button
+            type="button"
+            onClick={() => {
+              soundFX.playClick();
+              onSelectCategory?.("all");
+            }}
+            className={cn(
+              "px-3 py-1.5 rounded-lg text-xs font-semibold shrink-0 transition-colors cursor-pointer border flex items-center gap-1.5 min-h-[34px]",
+              !selectedCategoryId || selectedCategoryId === "all"
+                ? "bg-[#161514] text-white dark:bg-[#CEF431] dark:text-[#161514] border-[#161514] dark:border-[#CEF431] shadow-xs"
+                : "bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] border-[#E8E5DF] dark:border-[#383531] hover:bg-[#FAF8F5] dark:hover:bg-[#252321]"
+            )}
+          >
+            <span>All Wallets</span>
+            <span className="text-[10px] font-mono opacity-70">({categories.length})</span>
+          </button>
+
+          {/* Individual Category Filter Chips */}
+          {categories.map((cat) => {
+            const isSelected = selectedCategoryId === cat.id;
+            const accentColor = getCategoryAccent(cat);
+
+            return (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => {
+                  soundFX.playClick();
+                  onSelectCategory?.(isSelected ? "all" : cat.id);
+                }}
+                className={cn(
+                  "px-2.5 py-1.5 rounded-lg text-xs font-medium shrink-0 transition-colors cursor-pointer border flex items-center gap-1.5 min-h-[34px]",
+                  isSelected
+                    ? "bg-[#161514] text-white dark:bg-[#CEF431] dark:text-[#161514] border-[#161514] dark:border-[#CEF431] shadow-xs font-semibold"
+                    : "bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] border-[#E8E5DF] dark:border-[#383531] hover:bg-[#FAF8F5] dark:hover:bg-[#252321]"
+                )}
+              >
+                <span
+                  className="size-2 rounded-full shrink-0"
+                  style={{ backgroundColor: accentColor }}
+                />
+                <CategoryIcon name={cat.icon} className="size-3 stroke-[1.8] shrink-0" />
+                <span className="truncate max-w-[120px]">{cat.name}</span>
+                <span className="text-[10px] font-mono tabular-nums opacity-70">
+                  {isHideBalance ? "••" : `${currencySymbol}${Math.round(cat.amount).toLocaleString()}`}
+                </span>
+              </button>
+            );
+          })}
         </div>
       ) : (
         <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory no-scrollbar px-1 py-1 -my-1">

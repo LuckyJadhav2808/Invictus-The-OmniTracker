@@ -74,6 +74,7 @@ export function SpaceHeader() {
     if (pathname === "/today") {
       return {
         title: "Today",
+        shortTitle: "Today",
         subtitle: "Daily Action Cockpit",
         icon: SunMedium,
         accentColor: "bg-[#CEF431] text-[#161514]",
@@ -82,6 +83,7 @@ export function SpaceHeader() {
     if (pathname.startsWith("/goals")) {
       return {
         title: "Habits & Health",
+        shortTitle: "Habits",
         subtitle: "Routines, Streaks & Wellness",
         icon: CheckSquare,
         accentColor: "bg-[#03D26F] text-[#161514]",
@@ -90,6 +92,7 @@ export function SpaceHeader() {
     if (pathname.startsWith("/study")) {
       return {
         title: "Study & Exams",
+        shortTitle: "Study",
         subtitle: "Syllabus, Sessions & Mock Tests",
         icon: GraduationCap,
         accentColor: "bg-[#C084FC] text-[#161514]",
@@ -98,6 +101,7 @@ export function SpaceHeader() {
     if (pathname.startsWith("/tasks")) {
       return {
         title: "Tasks & Projects",
+        shortTitle: "Tasks",
         subtitle: "Kanban, Priorities & Subtasks",
         icon: Kanban,
         accentColor: "bg-[#F59E0B] text-[#161514]",
@@ -106,6 +110,7 @@ export function SpaceHeader() {
     if (pathname.startsWith("/money")) {
       return {
         title: "Money & Ledger",
+        shortTitle: "Money",
         subtitle: "Cash Flow, Budgets & Vault",
         icon: Wallet,
         accentColor: "bg-[#03D26F] text-[#161514]",
@@ -114,6 +119,7 @@ export function SpaceHeader() {
     if (pathname.startsWith("/analytics")) {
       return {
         title: "Analytics Hub",
+        shortTitle: "Analytics",
         subtitle: "Cross-Module Insights & Performance",
         icon: BarChart2,
         accentColor: "bg-white text-[#161514]",
@@ -122,6 +128,7 @@ export function SpaceHeader() {
     if (pathname.startsWith("/settings")) {
       return {
         title: "Settings",
+        shortTitle: "Settings",
         subtitle: "Preferences, Backup & Configuration",
         icon: Settings,
         accentColor: "bg-white text-[#161514]",
@@ -130,6 +137,7 @@ export function SpaceHeader() {
     if (pathname.startsWith("/profile")) {
       return {
         title: "Profile",
+        shortTitle: "Profile",
         subtitle: "Account Details & Activity Matrix",
         icon: User,
         accentColor: "bg-white text-[#161514]",
@@ -138,6 +146,7 @@ export function SpaceHeader() {
     if (pathname.startsWith("/admin")) {
       return {
         title: "Admin Panel",
+        shortTitle: "Admin",
         subtitle: "System Management & Health",
         icon: ShieldCheck,
         accentColor: "bg-amber-300 text-[#161514]",
@@ -145,6 +154,7 @@ export function SpaceHeader() {
     }
     return {
       title: "Invictus",
+      shortTitle: "Invictus",
       subtitle: "OmniTracker",
       icon: Sparkles,
       accentColor: "bg-[#CEF431] text-[#161514]",
@@ -177,9 +187,9 @@ export function SpaceHeader() {
       )}
 
       {/* Main Header Container */}
-      <div className="max-w-6xl mx-auto px-4 py-2.5 flex items-center justify-between gap-4">
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2.5 flex items-center justify-between gap-2 sm:gap-4">
         {/* Left: Mobile Brand / Contextual Back Button & Space Breadcrumb */}
-        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           {subrouteInfo ? (
             <button
               type="button"
@@ -211,7 +221,8 @@ export function SpaceHeader() {
 
           <div className="min-w-0">
             <h1 className="font-heading font-bold text-sm lg:text-[15px] leading-tight text-[#161514] dark:text-[#FAF8F5] tracking-tight truncate">
-              {space.title}
+              <span className="sm:hidden">{space.shortTitle}</span>
+              <span className="hidden sm:inline">{space.title}</span>
             </h1>
             <p className="hidden sm:block text-[11px] font-medium text-[#8C8882] dark:text-[#A8A29E] leading-tight mt-0.5 truncate">
               {space.subtitle}
@@ -225,7 +236,7 @@ export function SpaceHeader() {
         </div>
 
         {/* Right: Actions, Date, Sync & User Profile */}
-        <div className="flex items-center gap-2 sm:gap-2.5">
+        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           {/* Date Indicator (Tablet & Desktop) */}
           <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#F1EFEA] dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#2A2724] text-xs font-mono font-medium text-[#161514] dark:text-[#FAF8F5] transition-colors">
             <Calendar className="size-3.5 stroke-[1.75] text-[#8C8882] dark:text-[#A8A29E]" />
