@@ -252,8 +252,8 @@ export function SmsSyncControlBanner({
         </div>
       )}
 
-      {/* 2. Main SMS Telemetry & Action Banner */}
-      <div className="bg-white dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] rounded-xl p-3.5 mb-4">
+      {/* 2. Main SMS Telemetry & Action Banner (Densified) */}
+      <div className="bg-white dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#383531] shadow-none rounded-xl p-2.5 sm:px-3 sm:py-2 mb-3">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 w-full">
           {/* Left Side: Telemetry Info */}
           <div className="flex items-start sm:items-center gap-2.5 min-w-0 flex-1">

@@ -9,7 +9,7 @@ import { NewTaskModal } from "@/components/tasks/NewTaskModal";
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
 import { VixPixelCompanion } from "@/components/mascot/VixPixelCompanion";
 import { TaskItem } from "@/types";
-import { CheckSquare, LayoutGrid, List, Flame, Plus, Clock, CheckCircle2, AlertCircle } from "lucide-react";
+import { CheckSquare, LayoutGrid, List, Flame, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { TasksCockpitSkeleton } from "@/components/shared/NeobrutalistSkeleton";
@@ -63,6 +63,7 @@ export default function TasksPage() {
   const inProgressTasks = tasks.filter((t) => t.status === "in_progress").length;
   const completedTasks = tasks.filter((t) => t.status === "completed").length;
   const p1UrgentTasks = tasks.filter((t) => t.priority === "p1" && t.status !== "completed").length;
+  const todoTasks = tasks.filter((t) => t.status === "todo").length;
 
   // Filter tasks based on active filter
   const filteredTasks = tasks.filter((t) => {
@@ -101,26 +102,8 @@ export default function TasksPage() {
             </p>
           </div>
 
-          {/* Quick Metrics & Action */}
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            <div className="px-3 py-2 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] bg-[#FAF8F5] dark:bg-[#252321] shadow-xs text-center min-w-[65px]">
-              <span className="text-[9px] font-heading font-black uppercase text-[#161514]/60 dark:text-[#FAF8F5]/60 block leading-tight">Total</span>
-              <span className="text-sm font-heading font-black text-[#161514] dark:text-[#FAF8F5]">{totalTasks}</span>
-            </div>
-            <div className="px-3 py-2 rounded-xl border border-amber-500/30 bg-amber-500/10 dark:bg-amber-950/20 shadow-xs text-center min-w-[65px]">
-              <span className="text-[9px] font-heading font-black uppercase text-amber-700 dark:text-amber-400 block leading-tight">Active</span>
-              <span className="text-sm font-heading font-black text-amber-800 dark:text-amber-300 flex items-center justify-center gap-1">
-                <Clock className="size-3 text-amber-600 dark:text-amber-400" />
-                {inProgressTasks}
-              </span>
-            </div>
-            <div className="px-3 py-2 rounded-xl border border-rose-500/30 bg-rose-500/10 dark:bg-rose-950/20 shadow-xs text-center min-w-[65px]">
-              <span className="text-[9px] font-heading font-black uppercase text-rose-700 dark:text-rose-400 block leading-tight">Urgent</span>
-              <span className="text-sm font-heading font-black text-rose-700 dark:text-rose-400 flex items-center justify-center gap-1">
-                <AlertCircle className="size-3" />
-                {p1UrgentTasks}
-              </span>
-            </div>
+          {/* Primary Action & Companion */}
+          <div className="flex items-center gap-2.5 sm:gap-3">
             <Button
               onClick={() => {
                 setTaskToEdit(null);
@@ -176,23 +159,39 @@ export default function TasksPage() {
             })}
           </div>
 
-          {/* Quick Filter Pills */}
+          {/* Quick Filter Pills with Live Telemetry */}
           <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1 sm:pt-0 border-t sm:border-t-0 border-[#E8E5DF] dark:border-[#2A2724]">
-            {["All", "To Do", "In Progress", "P1 Urgent", "Completed"].map((filter) => {
-              const isSelected = activeFilter === filter;
+            {[
+              { id: "All", count: totalTasks },
+              { id: "To Do", count: todoTasks },
+              { id: "In Progress", count: inProgressTasks },
+              { id: "P1 Urgent", count: p1UrgentTasks },
+              { id: "Completed", count: completedTasks },
+            ].map((filter) => {
+              const isSelected = activeFilter === filter.id;
               return (
                 <button
-                  key={filter}
+                  key={filter.id}
                   type="button"
-                  onClick={() => setActiveFilter(filter)}
+                  onClick={() => setActiveFilter(filter.id)}
                   className={cn(
-                    "px-2.5 py-1 rounded-lg text-[10px] font-heading font-bold border transition-all cursor-pointer shrink-0 shadow-xs",
+                    "px-2.5 py-1 rounded-lg text-[10px] font-heading font-bold border transition-all cursor-pointer shrink-0 shadow-xs flex items-center gap-1.5",
                     isSelected
                       ? "bg-[#161514] dark:bg-[#FAF8F5] text-white dark:text-[#161514] border-[#161514] dark:border-[#FAF8F5]"
                       : "bg-white dark:bg-[#1C1A18] text-[#161514]/70 dark:text-[#FAF8F5]/70 border-[#E8E5DF] dark:border-[#2A2724] hover:bg-[#FAF8F5] dark:hover:bg-[#252321]"
                   )}
                 >
-                  {filter}
+                  <span>{filter.id}</span>
+                  <span
+                    className={cn(
+                      "px-1.5 py-0.2 rounded font-mono text-[9px]",
+                      isSelected
+                        ? "bg-white/20 text-white dark:bg-[#161514]/20 dark:text-[#161514]"
+                        : "bg-[#F1EFEA] dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5]"
+                    )}
+                  >
+                    {filter.count}
+                  </span>
                 </button>
               );
             })}

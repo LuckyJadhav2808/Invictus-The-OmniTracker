@@ -17,16 +17,15 @@ import {
 
 describe("Loading States Architecture: Spinner vs. Skeletons", () => {
   describe("InvictusLoadingScreen (Unknown Layout Gate)", () => {
-    it("renders default initializing message and telemetry badge", () => {
+    it("renders default initializing message and dark mode support", () => {
       const html = renderToStaticMarkup(React.createElement(InvictusLoadingScreen));
       expect(html).toContain("INITIALIZING INVICTUS OS");
-      expect(html).toContain("Hydrating encrypted vault &amp; offline cache");
-      expect(html).toContain("Vault Active • Offline-First");
-      // Contains the Sovereign Monolith polygon vector
-      expect(html).toContain("polygon points=\"12,2 22,22 12,17 2,22\"");
+      expect(html).toContain("Loading encrypted offline state…");
+      // Contains the Sovereign Monolith vector SVG mark
+      expect(html).toContain("<svg viewBox=\"0 0 512 512\"");
       // Contains dark mode classes
       expect(html).toContain("dark:bg-[#121110]");
-      expect(html).toContain("dark:bg-[#1C1A18]");
+      expect(html).toContain("dark:bg-[#1E1C1A]");
     });
 
     it("renders custom message and submessage accurately", () => {
@@ -45,8 +44,8 @@ describe("Loading States Architecture: Spinner vs. Skeletons", () => {
     it("renders InvictusInlineLoader with correct size variants", () => {
       const sm = renderToStaticMarkup(React.createElement(InvictusInlineLoader, { size: "sm" }));
       const lg = renderToStaticMarkup(React.createElement(InvictusInlineLoader, { size: "lg" }));
-      expect(sm).toContain("size-8");
-      expect(lg).toContain("size-12");
+      expect(sm).toContain("size-4");
+      expect(lg).toContain("size-6");
     });
   });
 

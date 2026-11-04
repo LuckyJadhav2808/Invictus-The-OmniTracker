@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { useAuth } from "@/components/shared/AuthProvider";
-import { Button } from "@/components/ui/button";
-import { LogOut, Settings, User, Sparkles, ShieldCheck, Database, Bell, Sliders, ArrowRight, Trophy, RefreshCw, AlarmClock, Layers, BarChart3, Lock } from "lucide-react";
+import { LogOut, Settings, User, Sparkles, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { UpdateCheckModal } from "@/components/shared/UpdateCheckModal";
 import { YearlyActivityMatrix } from "@/components/profile/YearlyActivityMatrix";
@@ -52,76 +51,31 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={() => setIsUpdateModalOpen(true)}
-              className="p-2.5 rounded-2xl bg-[#FAF8F5] dark:bg-[#252321] hover:bg-[#FFF9EA] dark:hover:bg-[#2A2724] border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] text-[#161514] dark:text-[#FAF8F5] text-xs font-black flex items-center gap-1.5 cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all shrink-0"
-              title="Check for updates"
-            >
-              <RefreshCw className="h-4 w-4" />
-              <span className="hidden sm:inline">Updates</span>
-            </button>
+            <div className="flex items-center gap-2 shrink-0">
+              <Link
+                href="/settings"
+                className="p-2.5 rounded-2xl bg-[#FAF8F5] dark:bg-[#252321] hover:bg-[#FFF9EA] dark:hover:bg-[#2A2724] border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] text-[#161514] dark:text-[#FAF8F5] text-xs font-black flex items-center gap-1.5 cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+                title="Settings"
+              >
+                <Settings className="h-4 w-4" />
+                <span className="hidden sm:inline">Settings</span>
+              </Link>
+              <button
+                type="button"
+                onClick={() => setIsUpdateModalOpen(true)}
+                className="p-2.5 rounded-2xl bg-[#FAF8F5] dark:bg-[#252321] hover:bg-[#FFF9EA] dark:hover:bg-[#2A2724] border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] text-[#161514] dark:text-[#FAF8F5] text-xs font-black flex items-center gap-1.5 cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
+                title="Check for updates"
+              >
+                <RefreshCw className="h-4 w-4" />
+                <span className="hidden sm:inline">Updates</span>
+              </button>
+            </div>
           </div>
         </div>
 
         {/* 365-DAY GITHUB-STYLE LIFE MOMENTUM MATRIX */}
         <div id="activity-matrix-section" className="scroll-mt-24">
           <YearlyActivityMatrix />
-        </div>
-
-        {/* Prominent Settings Discovery Hero Card */}
-        <div id="settings-discovery-card" className="bg-[#CEF431] rounded-3xl p-6 border-[2.5px] border-[#161514] dark:border-[#383531] shadow-[5px_5px_0px_0px_#161514] dark:shadow-[5px_5px_0px_0px_#000000] space-y-4 scroll-mt-24">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <span className="bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] px-3 py-1 rounded-xl text-xs font-black border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] uppercase tracking-wider flex items-center gap-1.5 whitespace-nowrap shrink-0 self-start sm:self-auto">
-              <Sparkles className="h-4 w-4" /> 11 Settings Categories Available
-            </span>
-            <span className="text-xs font-black text-[#161514] dark:text-[#FAF8F5] bg-white/90 dark:bg-[#1C1A18]/90 px-2.5 py-1 rounded-lg border-2 border-[#161514] dark:border-[#383531] shadow-[1px_1px_0px_0px_#161514] dark:shadow-[1px_1px_0px_0px_#000000] whitespace-nowrap shrink-0 self-start sm:self-auto">
-              FULL CONTROL
-            </span>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-black text-[#161514] tracking-tight uppercase font-heading">
-              LIFE ENGINE SETTINGS CONTROL CENTER
-            </h2>
-            <p className="text-xs font-bold text-[#161514] mt-1 leading-relaxed">
-              Customize your entire workspace with global wake-up timers, space modules, currency, security, data backups, and OS status bar alerts.
-            </p>
-          </div>
-
-          {/* Quick Features Badges */}
-          <div className="flex flex-wrap gap-1.5 pt-1">
-            {[
-              { label: `v${APP_VERSION_CONFIG.version} Updates`, Icon: Sparkles },
-              { label: "Global Wake-Up", Icon: AlarmClock },
-              { label: "Badges & XP", Icon: Trophy },
-              { label: "Habit Groups", Icon: Layers },
-              { label: "CSV Exporter", Icon: BarChart3 },
-              { label: "Security & Auth", Icon: Lock },
-              { label: "Alerts & Reminders", Icon: Bell },
-              { label: "Data Backup", Icon: Database },
-            ].map((badge, idx) => (
-              <span
-                key={idx}
-                className="bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] text-[10px] font-black px-2.5 py-1 rounded-xl border-2 border-[#161514] dark:border-[#383531] shadow-[1px_1px_0px_0px_#161514] dark:shadow-[1px_1px_0px_0px_#000000] flex items-center gap-1.5"
-              >
-                <badge.Icon className="h-3 w-3 stroke-[2.5]" />
-                <span>{badge.label}</span>
-              </span>
-            ))}
-          </div>
-
-          {/* Primary CTA Button to Settings */}
-          <div className="pt-2">
-            <Link
-              href="/settings"
-              className="w-full bg-[#161514] hover:bg-[#2a2725] text-white font-black text-xs uppercase tracking-widest py-3.5 px-5 rounded-2xl border-2 border-[#161514] dark:border-[#383531] shadow-[3.5px_3.5px_0px_0px_#161514] dark:shadow-[3.5px_3.5px_0px_0px_#000000] flex items-center justify-center gap-2 transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer"
-            >
-              <Settings className="h-4 w-4 stroke-[2.5]" />
-              <span>OPEN SETTINGS CONTROL CENTER</span>
-              <ArrowRight className="h-4 w-4 stroke-[3]" />
-            </Link>
-          </div>
         </div>
 
         {/* Sign Out Button */}

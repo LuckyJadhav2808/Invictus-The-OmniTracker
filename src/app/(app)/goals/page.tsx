@@ -22,8 +22,6 @@ import { NewHabitForm } from "@/components/goals/NewHabitForm";
 import { WaterTracker } from "@/components/goals/WaterTracker";
 import { MoodJournalWidget } from "@/components/goals/MoodJournalWidget";
 import { SleepAndActiveWidgets } from "@/components/goals/SleepAndActiveWidgets";
-import { WeeklyOverviewWidget } from "@/components/goals/WeeklyOverviewWidget";
-import { WeeklyVelocityAndHabitMatrix } from "@/components/goals/WeeklyVelocityAndHabitMatrix";
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { HabitsCockpitSkeleton, HabitsListSkeleton } from "@/components/shared/NeobrutalistSkeleton";
@@ -53,6 +51,7 @@ import {
   Check,
   Bot,
   RefreshCw,
+  ChevronDown,
 } from "lucide-react";
 import { format, getDay } from "date-fns";
 import { toast } from "sonner";
@@ -81,6 +80,7 @@ function GoalsPageContent() {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isChoiceOpen, setIsChoiceOpen] = useState(false);
   const [soundMuted, setSoundMuted] = useState(soundFX.isMuted());
+  const [showRecovery, setShowRecovery] = useState(false);
 
   // Health Profile & Habits Database Query hooks
   const { data: userProfile = { gender: "Female", age: "24 Years", weight: "68 kg" } } = useHealthProfile();
@@ -446,10 +446,7 @@ function GoalsPageContent() {
       {/* 2. Proactive Reminder Banner */}
       <ProactiveReminderBanner space="goals" />
 
-      {/* 3. Weekly Overview Widget */}
-      <WeeklyOverviewWidget />
-
-      {/* 4. Primary Hero Workspace: Habits Checklist + Hydration */}
+      {/* 3. Primary Hero Workspace: Habits Checklist + Hydration */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 my-4">
         {/* Left Column (2 cols on lg): Habits Checklist */}
         <div id="habits-section" className="lg:col-span-2 space-y-4">
@@ -680,29 +677,31 @@ function GoalsPageContent() {
             </div>
           )}
 
-          {/* Suggestions Carousel */}
-          <div className="space-y-2 pt-2">
-            <h4 className="text-xs font-sans font-semibold text-[#161514] dark:text-[#FAF8F5]">Suggested routines</h4>
-            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none select-none -mx-4 px-4 md:-mx-0 md:px-0">
-              {SUGGESTED_HABITS.map((suggested) => (
-                <div
-                  key={suggested.title}
-                  className="flex-shrink-0 w-[200px] bg-white dark:bg-[#1C1A18] rounded-xl p-3 border border-[#E8E5DF] dark:border-[#383531] flex items-center justify-between gap-2 hover:bg-[#FAF8F5] dark:hover:bg-[#252321] transition-colors"
-                >
-                  <div className="min-w-0">
-                    <span className="text-xs font-sans font-medium text-[#161514] dark:text-[#FAF8F5] block truncate">{suggested.title}</span>
-                    <span className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E] block truncate">{suggested.desc}</span>
-                  </div>
-                  <button
-                    onClick={() => handleAddSuggested(suggested)}
-                    className="size-7 rounded-lg bg-[#F1EFEA] dark:bg-[#252321] hover:bg-[#E8E5DF] dark:hover:bg-[#2e2b28] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#383531] flex items-center justify-center cursor-pointer transition-colors shrink-0"
+          {/* Suggestions Carousel: Only shown as onboarding guide when user has no active habits */}
+          {habits.length === 0 && (
+            <div className="space-y-2 pt-2">
+              <h4 className="text-xs font-sans font-semibold text-[#161514] dark:text-[#FAF8F5]">Suggested routines</h4>
+              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none select-none -mx-4 px-4 md:-mx-0 md:px-0">
+                {SUGGESTED_HABITS.map((suggested) => (
+                  <div
+                    key={suggested.title}
+                    className="flex-shrink-0 w-[200px] bg-white dark:bg-[#1C1A18] rounded-xl p-3 border border-[#E8E5DF] dark:border-[#383531] flex items-center justify-between gap-2 hover:bg-[#FAF8F5] dark:hover:bg-[#252321] transition-colors"
                   >
-                    <Plus className="size-3.5 stroke-[2]" />
-                  </button>
-                </div>
-              ))}
+                    <div className="min-w-0">
+                      <span className="text-xs font-sans font-medium text-[#161514] dark:text-[#FAF8F5] block truncate">{suggested.title}</span>
+                      <span className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E] block truncate">{suggested.desc}</span>
+                    </div>
+                    <button
+                      onClick={() => handleAddSuggested(suggested)}
+                      className="size-7 rounded-lg bg-[#F1EFEA] dark:bg-[#252321] hover:bg-[#E8E5DF] dark:hover:bg-[#2e2b28] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#383531] flex items-center justify-center cursor-pointer transition-colors shrink-0"
+                    >
+                      <Plus className="size-3.5 stroke-[2]" />
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Right Column (1 col on lg): Hydration & Health Stats */}
@@ -746,17 +745,43 @@ function GoalsPageContent() {
         </div>
       </div>
 
-      {/* 5. Deep Consistency & Habit Analytics Dock */}
-      <WeeklyVelocityAndHabitMatrix />
+      {/* 4. Evening Recovery & Reflections (Collapsible to keep daytime focus clean) */}
+      <div id="mood-section" className="border border-[#E8E5DF] dark:border-[#383531] rounded-2xl bg-white dark:bg-[#1C1A18] overflow-hidden transition-all">
+        <button
+          type="button"
+          onClick={() => {
+            soundFX.playPop();
+            setShowRecovery((prev) => !prev);
+          }}
+          className="w-full p-4 flex items-center justify-between hover:bg-[#FAF8F5] dark:hover:bg-[#252321] transition-colors cursor-pointer text-left"
+        >
+          <div className="flex items-center gap-3">
+            <div className="size-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/40 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+              <Moon className="size-4 stroke-[1.8]" />
+            </div>
+            <div>
+              <h3 className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5] uppercase tracking-wide">
+                Evening Recovery &amp; Reflections
+              </h3>
+              <p className="text-[11px] text-[#6B6B6B] dark:text-[#A8A29E]">
+                Sleep duration, active burn, and daily mood journal
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded-md bg-[#F1EFEA] dark:bg-[#252321] text-[#6B6B6B] dark:text-[#A8A29E] border border-[#E8E5DF] dark:border-[#383531]">
+              {showRecovery ? "Collapse" : "Open"}
+            </span>
+            <ChevronDown className={cn("size-4 text-[#8C8882] transition-transform duration-200", showRecovery && "rotate-180")} />
+          </div>
+        </button>
 
-      {/* 6. Recovery & Daily Reflections Section */}
-      <div id="mood-section" className="space-y-4 pt-2">
-        <h3 className="text-[15px] font-sans font-semibold text-[#161514] dark:text-[#FAF8F5] flex items-center gap-2">
-          <Moon className="size-3.5 text-indigo-600 dark:text-indigo-400 stroke-[1.5]" />
-          <span>Recovery & daily reflections</span>
-        </h3>
-        <SleepAndActiveWidgets />
-        <MoodJournalWidget dateStr={selectedDate} />
+        {showRecovery && (
+          <div className="p-4 pt-0 space-y-4 border-t border-[#E8E5DF] dark:border-[#383531] mt-1 animate-in fade-in duration-200">
+            <SleepAndActiveWidgets />
+            <MoodJournalWidget dateStr={selectedDate} />
+          </div>
+        )}
       </div>
 
       {/* Immersive Habit Choice Modal (Atomic Presets, Custom Architect, Protocol Packs) */}

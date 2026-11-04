@@ -4,6 +4,7 @@ import React, { useMemo } from "react";
 import { BarChart2, Flame, Award, Calendar, Sparkles } from "lucide-react";
 import { useHabits, useStreaks, useMonthHabitLogs } from "@/lib/queries/goals";
 import { WeeklyVelocityAndHabitMatrix } from "@/components/goals/WeeklyVelocityAndHabitMatrix";
+import { WeeklyOverviewWidget } from "@/components/goals/WeeklyOverviewWidget";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isSameDay, subWeeks } from "date-fns";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from "recharts";
 import { cn } from "@/lib/utils";
@@ -254,7 +255,10 @@ export default function GoalsAnalyticsPage() {
         </div>
       </div>
 
-      {/* 5. Weekly Velocity & Habit Matrix */}
+      {/* 5. 7-Day Habit Overview */}
+      <WeeklyOverviewWidget />
+
+      {/* 6. Weekly Velocity & Habit Matrix */}
       <WeeklyVelocityAndHabitMatrix />
     </div>
   );

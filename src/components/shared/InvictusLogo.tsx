@@ -30,7 +30,7 @@ export function InvictusLogo({
   const logoGraphic = (
     <div
       className={cn(
-        "relative rounded-xl flex items-center justify-center bg-[#161514] overflow-hidden shrink-0 shadow-xs border border-[#161514]/20 transition-transform duration-150 hover:scale-105 active:scale-95",
+        "relative rounded-xl flex items-center justify-center bg-[#161514] dark:bg-[#1E1C1A] overflow-hidden shrink-0 shadow-xs border border-[#161514]/20 dark:border-[#383531] dark:shadow-[1px_1px_0px_0px_#000000] transition-transform duration-150 hover:scale-105 active:scale-95",
         currentSize.icon
       )}
     >
@@ -62,7 +62,7 @@ export function InvictusLogo({
   if (variant === "icon-only") {
     if (href) {
       return (
-        <Link href={href} className={cn("inline-block", className)}>
+        <Link href={href} className={cn("inline-block", className)} aria-label="Invictus Today">
           {logoGraphic}
         </Link>
       );
@@ -79,7 +79,7 @@ export function InvictusLogo({
             className={cn(
               "font-black tracking-tight leading-none uppercase",
               currentSize.text,
-              theme === "dark" ? "text-white" : "text-[#161514]"
+              theme === "dark" ? "text-white" : "text-[#161514] dark:text-[#FAF8F5]"
             )}
             style={{ fontFamily: "var(--font-heading)" }}
           >
@@ -88,7 +88,7 @@ export function InvictusLogo({
         </div>
         <span
           className={cn(
-            "font-mono font-medium tracking-widest uppercase rounded px-1.5 py-0.5 mt-0.5 w-fit border border-[#E8E5DF] bg-[#F1EFEA] text-[#8C8882] text-[9px] hidden xs:inline-block"
+            "font-mono font-medium tracking-widest uppercase rounded px-1.5 py-0.5 mt-0.5 w-fit border border-[#E8E5DF] dark:border-[#383531] bg-[#F1EFEA] dark:bg-[#252321] text-[#8C8882] dark:text-[#A8A29E] text-[9px] hidden xs:inline-block"
           )}
         >
           OMNITRACKER
@@ -98,7 +98,7 @@ export function InvictusLogo({
   );
 
   if (href) {
-    return <Link href={href}>{logoContent}</Link>;
+    return <Link href={href} aria-label="Invictus Home">{logoContent}</Link>;
   }
 
   return logoContent;

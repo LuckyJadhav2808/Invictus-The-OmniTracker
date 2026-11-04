@@ -36,6 +36,7 @@ import {
   Plus,
   Calendar as CalendarIcon,
   Trophy,
+  Award,
   BarChart2,
   AlertCircle,
   FileText,
@@ -354,6 +355,14 @@ function StudyPageContent() {
     }))
     .reverse();
 
+  // Test Telemetry
+  const avgTestScore = tests.length > 0
+    ? Math.round(tests.reduce((acc, t) => acc + (t.score / (t.totalScore || 100)) * 100, 0) / tests.length)
+    : 0;
+  const bestTestScore = tests.length > 0
+    ? Math.max(...tests.map((t) => Math.round((t.score / (t.totalScore || 100)) * 100)))
+    : 0;
+
   return (
     <div className="min-h-screen bg-cream-bg p-4 md:p-8 space-y-6">
       <div className="max-w-5xl mx-auto space-y-6">
@@ -637,35 +646,35 @@ function StudyPageContent() {
 
           {/* Tab 3: Mock Tests & Analytics */}
           <TabsContent value="tests" className="space-y-6 outline-none">
-            {/* Stat summary grid */}
+            {/* Test Performance Telemetry Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
               <div className="bg-white dark:bg-[#1C1A18] rounded-2xl p-4 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex items-center gap-3.5 transition-colors">
                 <div className="size-11 rounded-xl bg-[#FED7AA] dark:bg-amber-950/40 border border-[#161514]/20 dark:border-amber-900/40 shadow-xs flex items-center justify-center text-[#161514] dark:text-amber-200 shrink-0">
-                  <Clock className="size-5 stroke-[2.2]" />
+                  <FileText className="size-5 stroke-[2.2]" />
                 </div>
                 <div>
-                  <h5 className="text-[10px] font-heading font-black text-[#161514]/70 dark:text-[#FAF8F5]/70 uppercase tracking-wider">Logged Hours</h5>
-                  <p className="text-xl font-heading font-black text-[#161514] dark:text-[#FAF8F5] mt-0.5">{totalLoggedHours}h</p>
+                  <h5 className="text-[10px] font-heading font-black text-[#161514]/70 dark:text-[#FAF8F5]/70 uppercase tracking-wider">Mocks Taken</h5>
+                  <p className="text-xl font-heading font-black text-[#161514] dark:text-[#FAF8F5] mt-0.5">{tests.length}</p>
                 </div>
               </div>
 
               <div className="bg-white dark:bg-[#1C1A18] rounded-2xl p-4 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex items-center gap-3.5 transition-colors">
                 <div className="size-11 rounded-xl bg-[#CEF431] dark:bg-lime-950/40 border border-[#161514]/20 dark:border-lime-900/40 shadow-xs flex items-center justify-center text-[#161514] dark:text-lime-200 shrink-0">
-                  <Trophy className="size-5 stroke-[2.2]" />
+                  <Award className="size-5 stroke-[2.2]" />
                 </div>
                 <div>
-                  <h5 className="text-[10px] font-heading font-black text-[#161514]/70 dark:text-[#FAF8F5]/70 uppercase tracking-wider">Mastery Rate</h5>
-                  <p className="text-xl font-heading font-black text-[#161514] dark:text-[#FAF8F5] mt-0.5">{masteryRate}%</p>
+                  <h5 className="text-[10px] font-heading font-black text-[#161514]/70 dark:text-[#FAF8F5]/70 uppercase tracking-wider">Average Score</h5>
+                  <p className="text-xl font-heading font-black text-[#161514] dark:text-[#FAF8F5] mt-0.5">{avgTestScore}%</p>
                 </div>
               </div>
 
               <div className="bg-white dark:bg-[#1C1A18] rounded-2xl p-4 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex items-center gap-3.5 transition-colors">
-                <div className="size-11 rounded-xl bg-[#FCA5A5] dark:bg-rose-950/40 border border-[#161514]/20 dark:border-rose-900/40 shadow-xs flex items-center justify-center text-[#161514] dark:text-rose-200 shrink-0">
-                  <AlertCircle className="size-5 stroke-[2.2]" />
+                <div className="size-11 rounded-xl bg-[#A7F3D0] dark:bg-emerald-950/40 border border-[#161514]/20 dark:border-emerald-900/40 shadow-xs flex items-center justify-center text-[#161514] dark:text-emerald-200 shrink-0">
+                  <Trophy className="size-5 stroke-[2.2]" />
                 </div>
                 <div>
-                  <h5 className="text-[10px] font-heading font-black text-[#161514]/70 dark:text-[#FAF8F5]/70 uppercase tracking-wider">Revision Due</h5>
-                  <p className="text-xl font-heading font-black text-[#161514] dark:text-[#FAF8F5] mt-0.5">{revisionDueCount} topic{revisionDueCount !== 1 ? "s" : ""}</p>
+                  <h5 className="text-[10px] font-heading font-black text-[#161514]/70 dark:text-[#FAF8F5]/70 uppercase tracking-wider">Personal Best</h5>
+                  <p className="text-xl font-heading font-black text-[#161514] dark:text-[#FAF8F5] mt-0.5">{bestTestScore}%</p>
                 </div>
               </div>
             </div>
