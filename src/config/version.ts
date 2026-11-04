@@ -10,20 +10,19 @@ export interface AppVersionInfo {
 }
 
 export const APP_VERSION_CONFIG: AppVersionInfo = {
-  version: "1.7.9",
-  buildNumber: 30,
+  version: "1.8.0",
+  buildNumber: 31,
   releaseDate: "November 4, 2026",
   channel: "stable",
   minSupportedVersion: "1.0.0",
   githubRepoUrl: "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker",
   latestReleaseApiUrl: "https://api.github.com/repos/LuckyJadhav2808/Invictus-The-OmniTracker/releases/latest",
   changelog: [
-    "🌓 Full Neobrutalist Dark Mode & Theme Harmonization: Complete zero-blur obsidian contrast overhaul across all 8 spaces (Today, Goals, Money, Study, Tasks, Analytics, Profile, Settings) with instantaneous zero-flicker theme toggle",
-    "🦴 Skeletons vs Spinner Loading Engine: Route-preserving Neobrutalist wireframe pulses for page routes, paired with high-energy monogram spinner for indeterminate transitions",
-    "🧮 Continuous Arithmetic Calculator: Fluid multi-step chaining (e.g., 2+2+2), operator switching, and 1-tap budget insertion with haptic audio feedback",
-    "🚀 First-Run Quick-Start HUD: Instant frictionless onboarding deck with interactive quick-action missions replacing legacy onboarding wizard",
-    "📱 Android Safe-Spend Monolith Widget: High-contrast layout, direct SMS sync intents, and native update bridge integration",
-    "📦 Resilient In-App APK Downloader: Direct in-app updates with multi-hop redirect streaming, Android User-Agent header bypass, and live version dump telemetry engine",
+    "🏛️ Sovereign Roman Monolith Asset Synchronizer: Unified Roman Monolith 'I' geometry across Web, PWA, and Android launcher mipmaps, adaptive foregrounds, splash screens, widget previews, and notification silhouettes",
+    "💎 Financial Cockpit & Wallet Architecture: Slashed vertical height by 65%, removed visual clutter, introduced a 34px high-speed horizontal category wallet filter rail, and isolated the floating calculator",
+    "🔔 Proactive Calm Reminder Banner: Replaced fluorescent yellow modal with calm #1C1A18 obsidian HUD, persistent localStorage dismissals, and non-intrusive timing",
+    "⚡ Production Database Scaling: Added MongoDB connection pooling (maxPoolSize: 10, minPoolSize: 2, socketTimeoutMS: 45000), compound ESR indexes (userId + isExpense + date), and eliminated the N+1 findOne query loop",
+    "📦 Resilient In-App APK Updater: Version Dump Engine with direct self-hosted streaming, multi-hop redirect resolution, and zero-404 air-gapped GitHub fallback",
   ],
 };
 
