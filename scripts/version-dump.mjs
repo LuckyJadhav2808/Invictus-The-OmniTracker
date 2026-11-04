@@ -21,6 +21,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { validateApkBinaryVersion } from "./lib/apk-binary-validator.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -60,12 +61,25 @@ function getApkTelemetry(version) {
   let sha256 = "";
   let sizeBytes = 0;
   let exists = false;
+  let isVersionVerified = false;
+  let binaryVersion = "unknown";
 
   if (fs.existsSync(localApkPath)) {
     exists = true;
     const fileBuffer = fs.readFileSync(localApkPath);
     sizeBytes = fileBuffer.length;
     sha256 = crypto.createHash("sha256").update(fileBuffer).digest("hex");
+
+    const validation = validateApkBinaryVersion(localApkPath, version);
+    if (validation.valid) {
+      isVersionVerified = true;
+      binaryVersion = version;
+    } else {
+      binaryVersion = (validation.foundVersions && validation.foundVersions[0]) || "mismatched";
+      console.warn(`\n⚠️  WARNING: Local APK is OUTDATED!`);
+      console.warn(`   Expected version: '${version}', but APK bytecode contains: '${binaryVersion}'`);
+      console.warn(`   Run 'npm run release' to trigger CI compilation and sync the authentic binary.\n`);
+    }
   }
 
   const sizeFormatted = sizeBytes > 0 
@@ -74,6 +88,8 @@ function getApkTelemetry(version) {
 
   return {
     exists,
+    isVersionVerified,
+    binaryVersion,
     fileName: "Invictus.apk",
     sha256,
     sizeBytes,

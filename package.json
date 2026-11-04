@@ -16,6 +16,7 @@
     "version:dump": "node scripts/version-dump.mjs",
     "apk:stage": "node scripts/stage-apk.mjs",
     "apk:build": "node scripts/build-and-stage-apk.mjs",
+    "release": "node scripts/release-pipeline.mjs",
     "ci:verify": "npm run version:check && npx tsc --noEmit && npm test",
     "release:publish": "node scripts/publish-release.mjs"
   },

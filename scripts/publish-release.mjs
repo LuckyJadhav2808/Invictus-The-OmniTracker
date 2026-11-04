@@ -9,6 +9,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { validateApkBinaryVersion } from "./lib/apk-binary-validator.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -124,6 +125,17 @@ Download \`Invictus.apk\` below and tap to install/update seamlessly.
 
   if (apkPath && fs.existsSync(apkPath)) {
     console.log(`  ✓ Found local APK at ${apkPath}`);
+    console.log(`  🔍 Verifying binary bytecode version inside APK...`);
+    const validation = validateApkBinaryVersion(apkPath, version);
+    if (!validation.valid) {
+      console.error(`\n❌ HARD RELEASE BLOCKER: Stale APK Binary Detected!`);
+      console.error(`  ${validation.reason}`);
+      console.error(`\nTo prevent serving an outdated APK to users, compilation is required before publishing:`);
+      console.error(`  Run: node scripts/sync-compiled-apk.mjs (to pull the latest CI build)`);
+      console.error(`  Or:  npm run release (for full automated remote CI build and sync)\n`);
+      process.exit(1);
+    }
+    console.log(`  ✅ Verified APK bytecode contains authentic version '${version}' (${validation.packageName})`);
     apkBuffer = fs.readFileSync(apkPath);
   } else {
     // Download the latest compiled APK from the release v1.2.0 where CI uploaded it

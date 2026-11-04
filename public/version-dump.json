@@ -6,15 +6,17 @@
   "releaseDate": "November 4, 2026",
   "minSupportedVersion": "1.0.0",
   "git": {
-    "commitHash": "f5a4fb29ca09ac1546e8f9a8495090a1da59701d",
-    "shortHash": "f5a4fb2",
+    "commitHash": "e94a84d3324b0d026e3ca38f053ca58cea7e1e6a",
+    "shortHash": "e94a84d",
     "branch": "main",
     "commitAuthor": "Lucky Manoj Jadhav",
-    "commitDate": "2026-11-04 16:18:00 +0530",
-    "commitMessage": "brand(icons): synchronize Roman Monolith mark across all web, PWA, and Android assets"
+    "commitDate": "2026-11-04 17:19:24 +0530",
+    "commitMessage": "fix(release): compile authentic v1.8.0 APK binary (build 31) and synchronize checksums across registry"
   },
   "apk": {
     "exists": true,
+    "isVersionVerified": true,
+    "binaryVersion": "1.8.0",
     "fileName": "Invictus.apk",
     "sha256": "bd1620ac8389bd3464dfda12abf08a23a91ab308d33c5d5b2634bb9b718b8209",
     "sizeBytes": 4400558,
@@ -39,6 +41,6 @@
     "nodeVersion": "v24.12.0",
     "platform": "win32",
     "arch": "x64",
-    "generatedAt": "2026-11-04T10:58:15.119Z"
+    "generatedAt": "2026-11-04T11:54:48.216Z"
   }
 }
