@@ -37,17 +37,17 @@ export function InvictusLoadingScreen({
           {/* Central Invictus Monolith Tile */}
           <div className="size-10 rounded-xl bg-[#161514] dark:bg-[#1E1C1A] border border-[#161514]/20 dark:border-[#383531] shadow-xs flex items-center justify-center overflow-hidden">
             <svg viewBox="0 0 512 512" className="size-7 p-0.5" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <linearGradient id="loader-stem" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="#CEF431" />
-                  <stop offset="100%" stopColor="#03D26F" />
-                </linearGradient>
-              </defs>
               <g transform="translate(256, 256)">
-                <path d="M -130 -160 L 130 -160 L 96 -96 L -96 -96 Z" fill="#FAF8F5" />
-                <path d="M -56 -78 L 56 -78 L 56 78 L -56 78 Z" fill="url(#loader-stem)" />
-                <path d="M 0 -44 L 38 12 L 18 12 L 0 -12 L -18 12 L -38 12 Z" fill="#161514" />
-                <path d="M -96 96 L 96 96 L 130 160 L -130 160 Z" fill="#FAF8F5" />
+                {/* Contiguous Roman Monolith "I" Body in High-Contrast Electric Lime */}
+                <path
+                  d="M -140 -160 L 140 -160 L 105 -100 L 55 -100 L 55 100 L 105 100 L 140 160 L -140 160 L -105 100 L -55 100 L -55 -100 L -105 -100 Z"
+                  fill="#CEF431"
+                />
+                {/* Ascending Victory Chevron Cutout */}
+                <path
+                  d="M 0 -50 L 36 15 L 16 15 L 0 -10 L -16 15 L -36 15 Z"
+                  fill="#161514"
+                />
               </g>
             </svg>
           </div>

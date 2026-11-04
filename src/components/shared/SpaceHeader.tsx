@@ -199,24 +199,23 @@ export function SpaceHeader() {
               <span className="hidden sm:inline">{subrouteInfo.parentLabel}</span>
               <span className="sm:hidden text-[11px]">Back</span>
             </button>
-          ) : (
-            <div className="lg:hidden shrink-0">
+          ) : pathname === "/today" ? (
+            <div className="shrink-0">
               <InvictusLogo size="sm" variant="icon-only" href="/today" />
             </div>
-          )}
-
-          <div className="flex items-center gap-2.5 min-w-0">
+          ) : (
             <div className="size-8 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] bg-[#F1EFEA] dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] flex items-center justify-center shrink-0 shadow-xs transition-colors">
               <Icon className="size-4 stroke-[1.75]" />
             </div>
-            <div className="min-w-0">
-              <h1 className="font-heading font-bold text-sm lg:text-[15px] leading-tight text-[#161514] dark:text-[#FAF8F5] tracking-tight truncate">
-                {space.title}
-              </h1>
-              <p className="hidden sm:block text-[11px] font-medium text-[#8C8882] dark:text-[#A8A29E] leading-tight mt-0.5 truncate">
-                {space.subtitle}
-              </p>
-            </div>
+          )}
+
+          <div className="min-w-0">
+            <h1 className="font-heading font-bold text-sm lg:text-[15px] leading-tight text-[#161514] dark:text-[#FAF8F5] tracking-tight truncate">
+              {space.title}
+            </h1>
+            <p className="hidden sm:block text-[11px] font-medium text-[#8C8882] dark:text-[#A8A29E] leading-tight mt-0.5 truncate">
+              {space.subtitle}
+            </p>
           </div>
         </div>
 
