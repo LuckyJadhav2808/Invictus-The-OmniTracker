@@ -115,9 +115,9 @@ export function ReminderManagerModal({
             <button
               type="button"
               onClick={handleTestNotification}
-              className="px-3 py-1 rounded-lg bg-white dark:bg-[#1C1A18] hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-[#161514] dark:text-[#FAF8F5] font-black text-[10px] uppercase border border-emerald-300 dark:border-emerald-700 cursor-pointer shrink-0 ml-auto shadow-xs transition-colors"
+              className="px-3 py-1 rounded-lg bg-white dark:bg-[#1C1A18] hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-[#161514] dark:text-[#FAF8F5] font-semibold text-[10px] border border-emerald-300 dark:border-emerald-700 cursor-pointer shrink-0 ml-auto shadow-xs transition-colors"
             >
-              Test Alarm 🔔
+              Test Alarm
             </button>
           </div>
         ) : permissionState === "denied" ? (
@@ -172,7 +172,7 @@ export function ReminderManagerModal({
               <div className="size-8 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
                 <Wallet className="size-4 stroke-[2.2]" />
               </div>
-              <span className="text-xs font-black uppercase text-[#161514] dark:text-[#FAF8F5]">
+              <span className="text-xs font-heading font-bold text-[#161514] dark:text-[#FAF8F5]">
                 Money & Expense Log Reminder
               </span>
             </div>
@@ -201,7 +201,7 @@ export function ReminderManagerModal({
               <div className="size-8 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
                 <CheckSquare className="size-4 stroke-[2.2]" />
               </div>
-              <span className="text-xs font-black uppercase text-[#161514] dark:text-[#FAF8F5]">
+              <span className="text-xs font-heading font-bold text-[#161514] dark:text-[#FAF8F5]">
                 Habits & Streaks Check-in
               </span>
             </div>
@@ -230,8 +230,8 @@ export function ReminderManagerModal({
               <div className="size-8 rounded-lg bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-600 dark:text-purple-400 shrink-0">
                 <GraduationCap className="size-4 stroke-[2.2]" />
               </div>
-              <span className="text-xs font-black uppercase text-[#161514] dark:text-[#FAF8F5]">
-                Study Log & PYQ Review
+              <span className="text-xs font-heading font-bold text-[#161514] dark:text-[#FAF8F5]">
+                Study Log & Review
               </span>
             </div>
             <input
@@ -259,7 +259,7 @@ export function ReminderManagerModal({
               <div className="size-8 rounded-lg bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-600 dark:text-rose-400 shrink-0">
                 <Target className="size-4 stroke-[2.2]" />
               </div>
-              <span className="text-xs font-black uppercase text-[#161514] dark:text-[#FAF8F5]">
+              <span className="text-xs font-heading font-bold text-[#161514] dark:text-[#FAF8F5]">
                 Exam Target & Countdown Review
               </span>
             </div>
@@ -310,10 +310,10 @@ export function ReminderManagerModal({
         {/* Submit Save */}
         <button
           type="submit"
-          className="w-full bg-[#03D26F] hover:bg-[#02b35d] text-[#161514] font-black text-xs uppercase tracking-wider rounded-xl py-3 border border-[#03D26F] shadow-xs hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center gap-2 mt-2 cursor-pointer"
+          className="w-full bg-[#03D26F] hover:bg-[#02b35d] text-[#161514] font-heading font-bold text-xs rounded-xl py-2.5 border border-[#03D26F] shadow-xs hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center gap-2 mt-2 cursor-pointer"
         >
           <CheckCircle2 className="h-4 w-4 stroke-[2.5]" />
-          <span>Save All Reminder Settings</span>
+          <span>Save Reminder Settings</span>
         </button>
       </form>
     </ResponsiveFormContainer>

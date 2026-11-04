@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Bell, Clock, Sparkles, Check, X, ShieldAlert } from "lucide-react";
-import { getReminderConfig, saveReminderConfig, type ReminderConfig } from "@/lib/utils/reminder-scheduler";
+import { Bell, Clock, Check, X } from "lucide-react";
+import { getReminderConfig, saveReminderConfig } from "@/lib/utils/reminder-scheduler";
 import { requestNotificationPermission, sendNativeNotification } from "@/lib/utils/notifications";
 import { ReminderManagerModal } from "@/components/shared/ReminderManagerModal";
 import { toast } from "sonner";
@@ -17,7 +17,19 @@ export function ProactiveReminderBanner({ space = "today" }: ProactiveReminderBa
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [hasEnabledReminders, setHasEnabledReminders] = useState(true);
 
+  const dismissStorageKey = `invictus_reminder_dismissed_${space}`;
+
   useEffect(() => {
+    // 1. Check persistent dismissal in localStorage
+    if (typeof window !== "undefined") {
+      const savedDismissed = localStorage.getItem(dismissStorageKey);
+      if (savedDismissed === "true") {
+        setIsDismissed(true);
+        return;
+      }
+    }
+
+    // 2. Check active reminder state
     const config = getReminderConfig();
     let isActive = false;
     if (space === "money") isActive = config.moneyEnabled;
@@ -27,15 +39,29 @@ export function ProactiveReminderBanner({ space = "today" }: ProactiveReminderBa
     else isActive = config.moneyEnabled || config.habitsEnabled || config.studyEnabled || config.examEnabled;
 
     setHasEnabledReminders(isActive);
-  }, [space]);
+  }, [space, dismissStorageKey]);
+
+  const handleDismiss = () => {
+    setIsDismissed(true);
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem(dismissStorageKey, "true");
+      } catch {}
+    }
+  };
 
   const handleQuickEnable = async () => {
     const granted = await requestNotificationPermission();
     const config = getReminderConfig();
-    config.moneyEnabled = true;
-    config.habitsEnabled = true;
-    config.studyEnabled = true;
-    config.examEnabled = true;
+    
+    if (space === "money") {
+      config.moneyEnabled = true;
+    } else if (space === "study" || space === "exam") {
+      config.studyEnabled = true;
+    } else {
+      config.habitsEnabled = true;
+    }
+
     saveReminderConfig(config);
     setHasEnabledReminders(true);
 
@@ -44,61 +70,107 @@ export function ProactiveReminderBanner({ space = "today" }: ProactiveReminderBa
       await scheduleAllNativeAlarms(config);
     } else if (granted) {
       sendNativeNotification(
-        "🔔 Reminders Enabled!",
-        "You're all set! Daily reminders for Money, Habits & Study sessions are now active.",
+        "Reminders Enabled",
+        "Your daily check-in alarms are now active.",
         "/today"
       );
     }
-    toast.success("Default Reminders Active! 🔔 (8:00 PM Money, 9:00 PM Habits)");
+    toast.success("Daily Reminders Active", {
+      description: space === "money" ? "Evening expense log set for 8:00 PM" : space === "study" ? "Study session prompt set for 6:00 PM" : "Habit streak check-in set for 9:00 PM",
+    });
+  };
+
+  const getContextualContent = () => {
+    switch (space) {
+      case "goals":
+      case "habits":
+        return {
+          title: "Habit Streak Reminders",
+          description: "Get a gentle evening prompt at 9:00 PM to review and protect your streaks.",
+          buttonLabel: "Enable (9:00 PM)",
+        };
+      case "study":
+      case "exam":
+        return {
+          title: "Study Sprint Reminders",
+          description: "Stay consistent for exams. Evening reminder prompt at 6:00 PM.",
+          buttonLabel: "Enable (6:00 PM)",
+        };
+      case "money":
+        return {
+          title: "Expense Logging Reminders",
+          description: "Keep safe-to-spend accurate. Quick daily prompt at 8:00 PM.",
+          buttonLabel: "Enable (8:00 PM)",
+        };
+      default:
+        return {
+          title: "Daily Consistency Reminders",
+          description: "Gentle daily alerts for habits, study sprints, and expense logs.",
+          buttonLabel: "Enable Reminders",
+        };
+    }
   };
 
   if (isDismissed || hasEnabledReminders) return null;
 
+  const content = getContextualContent();
+
   return (
     <>
-      <div className="bg-[#CEF431] text-[#161514] rounded-2xl p-4 border-2 border-[#161514] shadow-[3.5px_3.5px_0px_0px_rgba(22,21,20,1)] relative my-3 space-y-2">
-        <button
-          type="button"
-          onClick={() => setIsDismissed(true)}
-          className="absolute right-3 top-3 text-[#161514]/60 hover:text-[#161514] p-0.5 cursor-pointer border-none bg-transparent"
-          title="Dismiss banner"
-        >
-          <X className="h-4 w-4 stroke-[3]" />
-        </button>
+      <div className="bg-white dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#383531] p-3 sm:p-3.5 my-3 shadow-xs transition-colors">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3">
+          {/* Left: Icon & Text */}
+          <div className="flex items-start sm:items-center gap-2.5 min-w-0 flex-1">
+            <div className="size-8 rounded-lg bg-[#FAF8F5] dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#383531] flex items-center justify-center shrink-0 text-[#161514] dark:text-[#FAF8F5]">
+              <Bell className="size-4 stroke-[1.8] text-[#03D26F] dark:text-[#CEF431]" />
+            </div>
 
-        <div className="flex items-center gap-3 pr-6">
-          <div className="h-10 w-10 rounded-xl bg-white border-2 border-[#161514] flex items-center justify-center shrink-0 shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)]">
-            <Bell className="h-5 w-5 stroke-[2.5] text-[#161514] animate-bounce" />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <h4 className="font-heading font-bold text-xs sm:text-sm text-[#161514] dark:text-[#FAF8F5] tracking-tight">
+                  {content.title}
+                </h4>
+                <span className="text-[10px] font-mono text-[#6B6B6B] dark:text-[#A8A29E] bg-[#FAF8F5] dark:bg-[#252321] px-1.5 py-0.2 rounded border border-[#E8E5DF] dark:border-[#383531]">
+                  Alerts
+                </span>
+              </div>
+              <p className="text-[11px] sm:text-xs text-[#6B6B6B] dark:text-[#A8A29E] mt-0.5 leading-snug">
+                {content.description}
+              </p>
+            </div>
           </div>
 
-          <div>
-            <h4 className="font-black text-xs sm:text-sm uppercase tracking-wider text-[#161514] flex items-center gap-1.5">
-              <span>Stay consistent with daily reminders 🔔</span>
-            </h4>
-            <p className="text-[11px] sm:text-xs font-bold text-[#161514]/80 mt-0.5 leading-tight">
-              Set daily reminders for your habits, study sessions, and expenses.
-            </p>
+          {/* Right: Actions */}
+          <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
+            <button
+              type="button"
+              onClick={handleQuickEnable}
+              className="px-2.5 sm:px-3 py-1.5 rounded-lg bg-[#161514] dark:bg-[#CEF431] hover:bg-[#2A2826] dark:hover:bg-[#d6f64d] text-white dark:text-[#161514] font-semibold text-xs transition-colors flex items-center gap-1 cursor-pointer min-h-[32px]"
+            >
+              <Check className="size-3.5 stroke-[2.5]" />
+              <span className="whitespace-nowrap">{content.buttonLabel}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsModalOpen(true)}
+              className="p-1.5 rounded-lg bg-[#FAF8F5] dark:bg-[#252321] hover:bg-[#F1EFEA] dark:hover:bg-[#2e2b28] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#383531] transition-colors cursor-pointer min-h-[32px] flex items-center justify-center"
+              title="Customize exact reminder times"
+            >
+              <Clock className="size-3.5 stroke-[1.8]" />
+              <span className="sr-only">Customize Times</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleDismiss}
+              className="p-1.5 rounded-lg text-[#8C8882] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] cursor-pointer transition-colors"
+              title="Dismiss reminder prompt"
+            >
+              <X className="size-3.5 stroke-[2]" />
+              <span className="sr-only">Dismiss</span>
+            </button>
           </div>
-        </div>
-
-        <div className="flex items-center gap-2 pt-1 border-t border-[#161514]/20 flex-wrap">
-          <button
-            type="button"
-            onClick={handleQuickEnable}
-            className="px-3 py-1.5 rounded-xl bg-[#03D26F] text-[#161514] font-black text-xs uppercase tracking-wider border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center gap-1"
-          >
-            <Check className="h-3.5 w-3.5 stroke-[3]" />
-            <span>Enable Reminders</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setIsModalOpen(true)}
-            className="px-3 py-1.5 rounded-xl bg-white text-[#161514] font-black text-xs uppercase tracking-wider border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all flex items-center gap-1"
-          >
-            <Clock className="h-3.5 w-3.5 stroke-[2.5]" />
-            <span>Customize Times</span>
-          </button>
         </div>
       </div>
 
