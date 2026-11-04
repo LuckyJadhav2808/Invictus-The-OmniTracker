@@ -62,15 +62,33 @@ export async function POST(req: Request) {
       const today = new Date().toISOString().split("T")[0];
       const validDocs = [];
 
+      // Pre-fetch all existing deduplication signatures in 1 single query (eliminates N+1 loop)
+      const incomingSignatures = transactions
+        .map((t: any) => t.dedupSignature)
+        .filter((sig: any): sig is string => typeof sig === "string" && sig.length > 0);
+
+      const existingSignatures = new Set<string>();
+      if (incomingSignatures.length > 0) {
+        const existingDocs = await Transaction.find(
+          { userId, dedupSignature: { $in: incomingSignatures } },
+          { dedupSignature: 1 }
+        ).lean();
+        existingDocs.forEach((doc: any) => {
+          if (doc.dedupSignature) existingSignatures.add(doc.dedupSignature);
+        });
+      }
+
       for (let idx = 0; idx < transactions.length; idx++) {
         const t = transactions[idx];
         const numAmount = Number(t.amount);
         if (isNaN(numAmount) || numAmount <= 0) continue;
 
-        // Skip duplicates with same dedupSignature
+        // O(1) in-memory deduplication check
+        if (t.dedupSignature && existingSignatures.has(t.dedupSignature)) {
+          continue;
+        }
         if (t.dedupSignature) {
-          const exists = await Transaction.findOne({ userId, dedupSignature: t.dedupSignature });
-          if (exists) continue;
+          existingSignatures.add(t.dedupSignature);
         }
 
         validDocs.push({

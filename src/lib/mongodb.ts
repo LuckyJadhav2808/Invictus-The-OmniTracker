@@ -63,8 +63,13 @@ export async function connectToDatabase(options?: ConnectOptions): Promise<typeo
   const targetDb = options?.dbName || (options?.sandbox ? SANDBOX_DB_NAME : isTest ? TEST_DB_NAME : PROD_DB_NAME);
 
   if (!cached.promise) {
-    const opts = {
+    const opts: mongoose.ConnectOptions = {
       bufferCommands: false,
+      maxPoolSize: 10,
+      minPoolSize: 2,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+      family: 4,
     };
     const uri = getMongoUri();
     cached.promise = mongoose.connect(uri, opts).then((m) => m);

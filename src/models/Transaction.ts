@@ -42,6 +42,8 @@ const TransactionSchema = new Schema<ITransaction>(
 );
 
 TransactionSchema.index({ userId: 1, date: -1 });
+TransactionSchema.index({ userId: 1, categoryId: 1, date: -1 });
+TransactionSchema.index({ userId: 1, paymentMethod: 1, date: -1 });
 TransactionSchema.index({ userId: 1, dedupSignature: 1 });
 
 export const Transaction = models.Transaction || model<ITransaction>("Transaction", TransactionSchema);

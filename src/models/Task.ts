@@ -64,5 +64,7 @@ const TaskSchema = new Schema<ITask>(
 );
 
 TaskSchema.index({ userId: 1, createdAt: -1 });
+TaskSchema.index({ userId: 1, status: 1, orderKey: 1 });
+TaskSchema.index({ userId: 1, projectTag: 1, createdAt: -1 });
 
 export const Task = models.Task || model<ITask>("Task", TaskSchema);
