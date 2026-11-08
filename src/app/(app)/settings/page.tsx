@@ -72,6 +72,7 @@ import { UpdateCheckModal } from "@/components/shared/UpdateCheckModal";
 import { InAppDiagnosticsModal } from "@/components/shared/InAppDiagnosticsModal";
 import { DeveloperInfoCard } from "@/components/settings/DeveloperInfoCard";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
+import { ThemeColorSelector } from "@/components/settings/ThemeColorSelector";
 import { APP_VERSION_CONFIG } from "@/config/version";
 import { Capacitor } from "@capacitor/core";
 import { encryptVaultPayload, decryptVaultPayload } from "@/lib/vault/vault-crypto";
@@ -906,7 +907,7 @@ export default function SettingsPage() {
               </div>
 
               {/* Interface Theme & Appearance (Light / Dark / System) */}
-              <div className="space-y-2 border-t border-[#E8E5DF] dark:border-[#2A2724] pt-4">
+              <div className="space-y-4 border-t border-[#E8E5DF] dark:border-[#2A2724] pt-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
                     <span className="text-xs font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] block font-heading">
@@ -918,6 +919,9 @@ export default function SettingsPage() {
                   </div>
                   <ThemeToggle variant="segmented" />
                 </div>
+
+                {/* Color Palette & Action Punch Theme Selector */}
+                <ThemeColorSelector className="pt-2 border-t border-[#E8E5DF]/60 dark:border-[#2A2724]/60" />
               </div>
 
               {/* Habit Layout Style Selector */}

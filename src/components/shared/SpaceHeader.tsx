@@ -77,7 +77,7 @@ export function SpaceHeader() {
         shortTitle: "Today",
         subtitle: "Daily Action Cockpit",
         icon: SunMedium,
-        accentColor: "bg-[#CEF431] text-[#161514]",
+        accentColor: "bg-[var(--btn-primary-bg)] text-[var(--btn-primary-fg)]",
       };
     }
     if (pathname.startsWith("/goals")) {
@@ -157,7 +157,7 @@ export function SpaceHeader() {
       shortTitle: "Invictus",
       subtitle: "OmniTracker",
       icon: Sparkles,
-      accentColor: "bg-[#CEF431] text-[#161514]",
+      accentColor: "bg-[var(--btn-primary-bg)] text-[var(--btn-primary-fg)]",
     };
   };
 

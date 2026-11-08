@@ -46,6 +46,8 @@ export default function RootLayout({
                   } else {
                     document.documentElement.classList.remove('dark');
                   }
+                  var storedColor = localStorage.getItem('invictus-color-theme') || 'classic';
+                  document.documentElement.setAttribute('data-color-theme', storedColor);
                 } catch (e) {}
               })();
             `,

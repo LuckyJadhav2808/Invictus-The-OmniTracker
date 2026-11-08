@@ -423,7 +423,7 @@ function GoalsPageContent() {
               soundFX.playPop();
               setIsChoiceOpen(true);
             }}
-            className="bg-[#161514] dark:bg-[#CEF431] hover:bg-[#2A2826] dark:hover:bg-[#d6f64d] text-white dark:text-[#161514] font-medium text-xs px-3.5 py-2 h-auto rounded-lg border border-[#161514] dark:border-[#CEF431] flex items-center gap-1.5 cursor-pointer transition-colors"
+            className="bg-[var(--btn-primary-bg)] hover:bg-[var(--btn-primary-hover)] text-[var(--btn-primary-fg)] font-heading font-black text-xs px-3.5 py-2 h-auto rounded-xl border-2 border-[var(--btn-primary-border)] shadow-[2px_2px_0px_0px_var(--btn-primary-shadow)] flex items-center gap-1.5 cursor-pointer transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
           >
             <Plus className="size-3.5 stroke-[2]" />
             <span>New Habit</span>

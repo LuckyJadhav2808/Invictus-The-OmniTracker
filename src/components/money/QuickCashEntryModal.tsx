@@ -203,7 +203,7 @@ export function QuickCashEntryModal({
             "w-full py-3 rounded-xl border border-[#161514] dark:border-white/20 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-xs active:translate-y-0.5 transition-all cursor-pointer mt-2",
             isSubmitting || !amount || parseFloat(amount) <= 0
               ? "bg-[#E5E5E5] dark:bg-[#252321] text-[#161514]/40 dark:text-[#A8A29E]/40 border-transparent cursor-not-allowed"
-              : "bg-[#CEF431] text-[#161514] hover:bg-[#bfe627]"
+              : "bg-[var(--btn-primary-bg)] text-[var(--btn-primary-fg)] hover:bg-[var(--btn-primary-hover)] border-[var(--btn-primary-border)] shadow-xs"
           )}
         >
           <Banknote className="size-4" />

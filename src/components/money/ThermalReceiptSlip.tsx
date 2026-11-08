@@ -423,7 +423,7 @@ export function ThermalReceiptSlip({
           <button
             type="button"
             onClick={handleNativeShare}
-            className="bg-[#CEF431] hover:bg-[#bde422] text-[#161514] font-black text-xs uppercase tracking-wider py-3 px-3 rounded-xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_#161514] transition-all flex items-center justify-center gap-1.5 cursor-pointer font-heading"
+            className="bg-[var(--btn-primary-bg)] hover:bg-[var(--btn-primary-hover)] text-[var(--btn-primary-fg)] font-black text-xs uppercase tracking-wider py-3 px-3 rounded-xl border-2 border-[var(--btn-primary-border)] shadow-[3px_3px_0px_0px_var(--btn-primary-shadow)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0px_0px_var(--btn-primary-shadow)] transition-all flex items-center justify-center gap-1.5 cursor-pointer font-heading"
           >
             {copiedShare ? (
               <>

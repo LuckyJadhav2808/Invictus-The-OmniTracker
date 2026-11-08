@@ -102,6 +102,15 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+
+  /* Dynamic Theme Semantic Bindings */
+  --color-theme-btn-bg: var(--btn-primary-bg);
+  --color-theme-btn-fg: var(--btn-primary-fg);
+  --color-theme-btn-hover: var(--btn-primary-hover);
+  --color-theme-btn-active: var(--btn-primary-active);
+  --color-theme-accent: var(--theme-accent-brand);
+  --color-theme-accent-contrast: var(--theme-accent-contrast);
+  --color-theme-accent-subtle: var(--theme-accent-subtle);
   
   --radius-sm: var(--radius-sm);
   --radius-md: var(--radius-md);
@@ -166,6 +175,21 @@
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-xl: 20px;
+
+  /* Dynamic Primary Action & Brand Persona Tokens (Classic Cyberpunk by default) */
+  --btn-primary-bg: #CEF431;
+  --btn-primary-fg: #161514;
+  --btn-primary-hover: #D8F74E;
+  --btn-primary-active: #BDE422;
+  --btn-primary-border: #161514;
+  --btn-primary-shadow: #161514;
+
+  --theme-accent-brand: #03D26F;
+  --theme-accent-contrast: #CEF431;
+  --theme-accent-subtle: rgba(206, 244, 49, 0.15);
+  --theme-accent-border: #161514;
+  --theme-badge-bg: #CEF431;
+  --theme-badge-fg: #161514;
 }
 
 .dark {
@@ -196,6 +220,119 @@
   --navy-700: #CBD5E1;
   --navy-800: #E2E8F0;
   --white: #1C1A18;
+
+  --btn-primary-border: #CEF431;
+  --btn-primary-shadow: #000000;
+  --theme-accent-border: #CEF431;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   TERRACOTTA SIGNAL THEME (Cream Canvas + Obsidian Ink + Signal Orange)
+   Two matching harmonic neutrals + high-visibility rescue orange punch
+   ───────────────────────────────────────────────────────────── */
+html[data-color-theme="terracotta"] {
+  --btn-primary-bg: #FF5C00;
+  --btn-primary-fg: #161514; /* 5.88:1 Contrast Ratio (Passes WCAG AA & AAA Large) */
+  --btn-primary-hover: #FF7324;
+  --btn-primary-active: #E05200;
+  --btn-primary-border: #161514;
+  --btn-primary-shadow: #161514;
+
+  --theme-accent-brand: #FF5C00;
+  --theme-accent-contrast: #FF5C00;
+  --theme-accent-subtle: rgba(255, 92, 0, 0.15);
+  --theme-accent-border: #161514;
+  --theme-badge-bg: #FF5C00;
+  --theme-badge-fg: #161514;
+}
+
+html[data-color-theme="terracotta"].dark,
+html[data-color-theme="terracotta"] .dark {
+  --btn-primary-bg: #FF5C00;
+  --btn-primary-fg: #161514;
+  --btn-primary-hover: #FF7324;
+  --btn-primary-active: #E05200;
+  --btn-primary-border: #FF5C00;
+  --btn-primary-shadow: #000000;
+
+  --theme-accent-brand: #FF5C00;
+  --theme-accent-contrast: #FF5C00;
+  --theme-accent-subtle: rgba(255, 92, 0, 0.22);
+  --theme-accent-border: #FF5C00;
+  --theme-badge-bg: #FF5C00;
+  --theme-badge-fg: #161514;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   INDUSTRIAL AMBER THEME (Cream + Obsidian + High-Voltage Amber)
+   ───────────────────────────────────────────────────────────── */
+html[data-color-theme="amber"] {
+  --btn-primary-bg: #F59E0B;
+  --btn-primary-fg: #161514;
+  --btn-primary-hover: #FBBF24;
+  --btn-primary-active: #D97706;
+  --btn-primary-border: #161514;
+  --btn-primary-shadow: #161514;
+
+  --theme-accent-brand: #F59E0B;
+  --theme-accent-contrast: #F59E0B;
+  --theme-accent-subtle: rgba(245, 158, 11, 0.15);
+  --theme-accent-border: #161514;
+  --theme-badge-bg: #F59E0B;
+  --theme-badge-fg: #161514;
+}
+
+html[data-color-theme="amber"].dark,
+html[data-color-theme="amber"] .dark {
+  --btn-primary-bg: #F59E0B;
+  --btn-primary-fg: #161514;
+  --btn-primary-hover: #FBBF24;
+  --btn-primary-active: #D97706;
+  --btn-primary-border: #F59E0B;
+  --btn-primary-shadow: #000000;
+
+  --theme-accent-brand: #F59E0B;
+  --theme-accent-contrast: #F59E0B;
+  --theme-accent-subtle: rgba(245, 158, 11, 0.22);
+  --theme-accent-border: #F59E0B;
+  --theme-badge-bg: #F59E0B;
+  --theme-badge-fg: #161514;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   SOVEREIGN COBALT THEME (Cream + Obsidian + Royal Klein Blue)
+   ───────────────────────────────────────────────────────────── */
+html[data-color-theme="cobalt"] {
+  --btn-primary-bg: #2563EB;
+  --btn-primary-fg: #FFFFFF;
+  --btn-primary-hover: #3B82F6;
+  --btn-primary-active: #1D4ED8;
+  --btn-primary-border: #161514;
+  --btn-primary-shadow: #161514;
+
+  --theme-accent-brand: #2563EB;
+  --theme-accent-contrast: #2563EB;
+  --theme-accent-subtle: rgba(37, 99, 235, 0.15);
+  --theme-accent-border: #161514;
+  --theme-badge-bg: #2563EB;
+  --theme-badge-fg: #FFFFFF;
+}
+
+html[data-color-theme="cobalt"].dark,
+html[data-color-theme="cobalt"] .dark {
+  --btn-primary-bg: #2563EB;
+  --btn-primary-fg: #FFFFFF;
+  --btn-primary-hover: #3B82F6;
+  --btn-primary-active: #1D4ED8;
+  --btn-primary-border: #3B82F6;
+  --btn-primary-shadow: #000000;
+
+  --theme-accent-brand: #3B82F6;
+  --theme-accent-contrast: #3B82F6;
+  --theme-accent-subtle: rgba(59, 130, 246, 0.22);
+  --theme-accent-border: #3B82F6;
+  --theme-badge-bg: #2563EB;
+  --theme-badge-fg: #FFFFFF;
 }
 
 @keyframes playfulAssemble {
@@ -457,11 +594,15 @@
 }
 
 .neo-btn-primary {
-  background-color: #CEF431;
-  color: #161514;
+  background-color: var(--btn-primary-bg);
+  color: var(--btn-primary-fg);
+  border-color: var(--btn-primary-border);
 }
 .neo-btn-primary:hover {
-  background-color: #D8F74E;
+  background-color: var(--btn-primary-hover);
+}
+.neo-btn-primary:active {
+  background-color: var(--btn-primary-active);
 }
 
 .neo-btn-secondary {

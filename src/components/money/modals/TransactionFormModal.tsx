@@ -558,7 +558,7 @@ export function TransactionFormModal({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 bg-[#CEF431] hover:bg-[#bde422] text-[#161514] font-black text-xs uppercase tracking-wider rounded-xl py-3 border border-[#161514] shadow-xs active:translate-y-0.5 cursor-pointer transition-all disabled:opacity-50"
+              className="flex-1 bg-[var(--btn-primary-bg)] hover:bg-[var(--btn-primary-hover)] text-[var(--btn-primary-fg)] font-black text-xs uppercase tracking-wider rounded-xl py-3 border border-[var(--btn-primary-border)] shadow-xs active:translate-y-0.5 cursor-pointer transition-all disabled:opacity-50"
             >
               {isSubmitting ? "Saving…" : isEditing ? "Save Changes" : "Log Record"}
             </button>

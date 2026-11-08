@@ -276,7 +276,7 @@ export function GladiatorCloseoutCard({
           <button
             type="button"
             onClick={handleSealDay}
-            className="w-full bg-[#CEF431] hover:bg-[#D8F74E] text-[#161514] border-2 border-[#161514] dark:border-[#CEF431] rounded-xl p-3 sm:p-3.5 shadow-[3px_3px_0px_#161514] dark:shadow-[3px_3px_0px_#000000] active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer group"
+            className="w-full bg-[var(--btn-primary-bg)] hover:bg-[var(--btn-primary-hover)] text-[var(--btn-primary-fg)] border-2 border-[var(--btn-primary-border)] rounded-xl p-3 sm:p-3.5 shadow-[3px_3px_0px_var(--btn-primary-shadow)] active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer group"
           >
             <Lock className="size-4 stroke-[2.5] group-hover:scale-110 transition-transform" />
             <span className="font-heading font-black text-xs sm:text-sm uppercase tracking-wider">
