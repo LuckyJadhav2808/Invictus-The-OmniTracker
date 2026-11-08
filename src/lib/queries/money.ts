@@ -253,20 +253,42 @@ export function useDeleteCategory() {
 
 // --- TRANSACTIONS (MongoDB Atlas Connected) ---
 
-export function useTransactions() {
+export interface UseTransactionsOptions {
+  month?: string;
+  limit?: number;
+}
+
+export function useTransactions(options?: UseTransactionsOptions) {
   const { user } = useAuth();
   const userId = getActiveUserId(user);
 
+  const queryKey = options?.month
+    ? ["transactions", userId, { month: options.month }]
+    : options?.limit
+    ? ["transactions", userId, { limit: options.limit }]
+    : ["transactions", userId];
+
   return useQuery<Transaction[]>({
-    queryKey: ["transactions", userId],
+    queryKey,
     queryFn: async () => {
       if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_transactions");
-        return local ? JSON.parse(local) : [];
+        const list: Transaction[] = local ? JSON.parse(local) : [];
+        if (options?.month) {
+          return list.filter((t) => t.date && t.date.startsWith(options.month!));
+        }
+        if (options?.limit) {
+          return list.slice(0, options.limit);
+        }
+        return list;
       }
       if (!userId) return [];
 
-      const res = await fetch(`/api/money/transactions?userId=${userId}`);
+      const params = new URLSearchParams({ userId });
+      if (options?.month) params.set("month", options.month);
+      if (options?.limit) params.set("limit", String(options.limit));
+
+      const res = await fetch(`/api/money/transactions?${params.toString()}`);
       if (!res.ok) return [];
       const list = await res.json();
       return list.map((t: any) => ({ ...t, id: t.id || t._id }));

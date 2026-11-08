@@ -207,3 +207,25 @@ export async function getOfflineCacheItem<T>(key: string): Promise<T | null> {
     return null;
   }
 }
+
+/**
+ * Retrieve all cached query results from IndexedDB for instant 0ms app hydration.
+ */
+export async function getAllOfflineCacheItems(): Promise<Array<{ key: string; data: any }>> {
+  try {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_CACHE, "readonly");
+      const store = tx.objectStore(STORE_CACHE);
+      const req = store.getAll();
+
+      req.onsuccess = () => {
+        resolve(req.result || []);
+      };
+      req.onerror = () => reject(req.error);
+    });
+  } catch (err) {
+    console.error("[OfflineDB] Failed to read all cached items:", err);
+    return [];
+  }
+}

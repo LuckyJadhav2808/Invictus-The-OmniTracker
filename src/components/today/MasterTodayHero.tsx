@@ -56,7 +56,7 @@ export interface MasterTodayHeroProps {
   className?: string;
 }
 
-export function MasterTodayHero({
+export const MasterTodayHero = React.memo(function MasterTodayHero({
   userName,
   currentDateObj,
   selectedDate,
@@ -456,4 +456,4 @@ export function MasterTodayHero({
       </div>
     </header>
   );
-}
+});

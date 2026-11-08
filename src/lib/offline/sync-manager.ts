@@ -30,7 +30,7 @@ class OfflineSyncEngine {
   private dbLatencyMs: number | null = null;
   private serverStatus: "connected" | "degraded" | "disconnected" = "connected";
   private listeners: Set<SyncListener> = new Set();
-  private queryClientInvalidator: (() => void) | null = null;
+  private queryClientInvalidator: ((types?: string[]) => void) | null = null;
 
   private constructor() {
     if (typeof window !== "undefined") {
@@ -52,7 +52,7 @@ class OfflineSyncEngine {
     return OfflineSyncEngine.instance;
   }
 
-  public registerQueryInvalidator(fn: () => void) {
+  public registerQueryInvalidator(fn: (types?: string[]) => void) {
     this.queryClientInvalidator = fn;
   }
 
@@ -161,6 +161,7 @@ class OfflineSyncEngine {
 
     let syncedCount = 0;
     let failedCount = 0;
+    const syncedTypes = new Set<string>();
 
     for (const job of jobs) {
       try {
@@ -177,6 +178,7 @@ class OfflineSyncEngine {
           // Success or already exists (idempotent)
           await removeOfflineMutation(job.id);
           syncedCount++;
+          if (job.type) syncedTypes.add(job.type);
         } else if (res.status >= 400 && res.status < 500) {
           // Client error (invalid payload) -> Drop to avoid blocking queue
           await removeOfflineMutation(job.id);
@@ -204,7 +206,7 @@ class OfflineSyncEngine {
 
     if (syncedCount > 0) {
       if (this.queryClientInvalidator) {
-        this.queryClientInvalidator();
+        this.queryClientInvalidator(Array.from(syncedTypes));
       }
 
       toast.success(`Synced ${syncedCount} offline action${syncedCount > 1 ? "s" : ""} to cloud! ☁️`, {

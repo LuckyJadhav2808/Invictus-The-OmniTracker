@@ -21,7 +21,7 @@ interface SafeToSpendGaugeProps {
   className?: string;
 }
 
-export function SafeToSpendGauge({
+export const SafeToSpendGauge = React.memo(function SafeToSpendGauge({
   spentToday,
   dailySafeToSpend,
   customDailyBudget = null,
@@ -268,4 +268,4 @@ export function SafeToSpendGauge({
       )}
     </div>
   );
-}
+});

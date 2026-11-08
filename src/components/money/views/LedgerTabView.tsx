@@ -136,6 +136,13 @@ export function LedgerTabView({
     }
   }, [selectedMethod]);
 
+  // Windowed slice limit for ultra-smooth 60fps DOM rendering
+  const [visibleGroupLimit, setVisibleGroupLimit] = useState(12);
+
+  useEffect(() => {
+    setVisibleGroupLimit(12);
+  }, [selectedMonth, selectedCategory, selectedType, selectedMethod, searchQuery]);
+
   useEffect(() => {
     if (initialMethodFilter) {
       setSelectedMethod(initialMethodFilter);
@@ -299,6 +306,11 @@ export function LedgerTabView({
 
     return groups;
   }, [filteredTransactions]);
+
+  const visibleGroups = useMemo(() => {
+    return groupedByDate.slice(0, visibleGroupLimit);
+  }, [groupedByDate, visibleGroupLimit]);
+  const hasMoreGroups = groupedByDate.length > visibleGroupLimit;
 
   const effectiveCategoryMonthKey = selectedMonth === "all" ? activeMonthKey : selectedMonth;
   const categoryCardsData = useMemo(() => {
@@ -579,7 +591,7 @@ export function LedgerTabView({
         )
       ) : (
         <div className="space-y-4">
-          {groupedByDate.map((group) => (
+          {visibleGroups.map((group) => (
             <div key={group.dateKey} className="space-y-2">
               {/* Date Group Header */}
               <div className="flex items-center justify-between px-1">
@@ -676,6 +688,19 @@ export function LedgerTabView({
               </div>
             </div>
           ))}
+
+          {/* Windowed Pagination Trigger */}
+          {hasMoreGroups && (
+            <div className="pt-2 pb-6 flex justify-center">
+              <button
+                type="button"
+                onClick={() => setVisibleGroupLimit((prev) => prev + 15)}
+                className="px-4 py-2 bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] text-xs font-mono font-bold text-[#161514] dark:text-[#FAF8F5] rounded-xl border border-[#E8E5DF] dark:border-[#383531] shadow-xs cursor-pointer transition-all hover:-translate-y-0.5 active:translate-y-0"
+              >
+                Showing {visibleGroups.length} of {groupedByDate.length} days · Load Earlier Records ↓
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

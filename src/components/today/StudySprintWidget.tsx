@@ -33,7 +33,7 @@ interface StudySprintWidgetProps {
   className?: string;
 }
 
-export function StudySprintWidget({
+export const StudySprintWidget = React.memo(function StudySprintWidget({
   stopwatchSeconds,
   isTimerRunning,
   onToggleTimer,
@@ -196,4 +196,4 @@ export function StudySprintWidget({
       </div>
     </div>
   );
-}
+});

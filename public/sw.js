@@ -1,12 +1,56 @@
-// Service Worker for Invictus OmniTracker Background Push Notifications
-const CACHE_NAME = "invictus-v1";
+// Service Worker for Invictus OmniTracker: Push Notifications & High-Speed Static Caching
+const STATIC_CACHE_NAME = "invictus-static-v1.8.0";
 
 self.addEventListener("install", (event) => {
   self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.filter((key) => key !== STATIC_CACHE_NAME).map((key) => caches.delete(key))
+      );
+    }).then(() => self.clients.claim())
+  );
+});
+
+// Runtime Caching for Content-Hashed Static Bundles & Media
+self.addEventListener("fetch", (event) => {
+  const { request } = event;
+  const url = new URL(request.url);
+
+  // 1. Air-gap API endpoints and dynamic mutations (always network-first)
+  if (request.method !== "GET" || url.pathname.startsWith("/api/")) {
+    return;
+  }
+
+  // 2. Cache-First for Immutable Next.js Static Chunks (/_next/static/*) and Static Media/Icons
+  const isStaticChunk = url.pathname.startsWith("/_next/static/");
+  const isStaticAsset =
+    url.pathname.endsWith(".svg") ||
+    url.pathname.endsWith(".png") ||
+    url.pathname.endsWith(".ico") ||
+    url.pathname.endsWith(".woff2") ||
+    url.pathname === "/manifest.json";
+
+  if (isStaticChunk || isStaticAsset) {
+    event.respondWith(
+      caches.open(STATIC_CACHE_NAME).then((cache) => {
+        return cache.match(request).then((cachedResponse) => {
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+          return fetch(request).then((networkResponse) => {
+            if (networkResponse && networkResponse.status === 200) {
+              cache.put(request, networkResponse.clone());
+            }
+            return networkResponse;
+          });
+        });
+      })
+    );
+  }
 });
 
 // Handle Background Push Notifications

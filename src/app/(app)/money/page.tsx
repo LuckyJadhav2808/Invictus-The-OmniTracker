@@ -13,9 +13,8 @@ import {
   useBudgetPreferences,
   useUpdateBudgetPreferences,
 } from "@/lib/queries/money";
-import { TemplateSelectionModal, TemplatePack } from "@/components/shared/TemplateSelectionModal";
+import type { TemplatePack } from "@/components/shared/TemplateSelectionModal";
 import { BUDGET_CATEGORY_TEMPLATE_PACKS } from "@/lib/templates-data";
-import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Receipt, Target, PiggyBank, BarChart2 } from "lucide-react";
 import { format, parseISO } from "date-fns";
@@ -37,15 +36,58 @@ import { LedgerTabView } from "@/components/money/views/LedgerTabView";
 import { BudgetTabView } from "@/components/money/views/BudgetTabView";
 import { VaultTabView } from "@/components/money/views/VaultTabView";
 import { AnalyticsTabView } from "@/components/money/views/AnalyticsTabView";
-import { TransactionFormModal } from "@/components/money/modals/TransactionFormModal";
-import { TransactionDetailModal } from "@/components/money/modals/TransactionDetailModal";
-import { CategoryFormModal } from "@/components/money/modals/CategoryFormModal";
-import { AllowanceSettingsModal } from "@/components/money/modals/AllowanceSettingsModal";
-import { MoveMoneyModal } from "@/components/money/modals/MoveMoneyModal";
-import { SendMoneyModal } from "@/components/money/modals/SendMoneyModal";
-import { NeobrutalistCalculator } from "@/components/shared/NeobrutalistCalculator";
 import { SmsSyncControlBanner } from "@/components/money/SmsSyncControlBanner";
-import { QuickCashEntryModal } from "@/components/money/QuickCashEntryModal";
+
+// Lazy-Loaded Heavy Modals (Zero TBT & Fast Initial Paint)
+const TransactionFormModal = dynamic(
+  () => import("@/components/money/modals/TransactionFormModal").then((mod) => mod.TransactionFormModal),
+  { ssr: false }
+);
+
+const TransactionDetailModal = dynamic(
+  () => import("@/components/money/modals/TransactionDetailModal").then((mod) => mod.TransactionDetailModal),
+  { ssr: false }
+);
+
+const CategoryFormModal = dynamic(
+  () => import("@/components/money/modals/CategoryFormModal").then((mod) => mod.CategoryFormModal),
+  { ssr: false }
+);
+
+const AllowanceSettingsModal = dynamic(
+  () => import("@/components/money/modals/AllowanceSettingsModal").then((mod) => mod.AllowanceSettingsModal),
+  { ssr: false }
+);
+
+const MoveMoneyModal = dynamic(
+  () => import("@/components/money/modals/MoveMoneyModal").then((mod) => mod.MoveMoneyModal),
+  { ssr: false }
+);
+
+const SendMoneyModal = dynamic(
+  () => import("@/components/money/modals/SendMoneyModal").then((mod) => mod.SendMoneyModal),
+  { ssr: false }
+);
+
+const QuickCashEntryModal = dynamic(
+  () => import("@/components/money/QuickCashEntryModal").then((mod) => mod.QuickCashEntryModal),
+  { ssr: false }
+);
+
+const NeobrutalistCalculator = dynamic(
+  () => import("@/components/shared/NeobrutalistCalculator").then((mod) => mod.NeobrutalistCalculator),
+  { ssr: false }
+);
+
+const TemplateSelectionModal = dynamic(
+  () => import("@/components/shared/TemplateSelectionModal").then((mod) => mod.TemplateSelectionModal),
+  { ssr: false }
+);
+
+const DeleteConfirmationModal = dynamic(
+  () => import("@/components/shared/DeleteConfirmationModal").then((mod) => mod.DeleteConfirmationModal),
+  { ssr: false }
+);
 
 const PDFExportModal = dynamic(
   () => import("@/components/money/PDFExportModal").then((mod) => mod.PDFExportModal),

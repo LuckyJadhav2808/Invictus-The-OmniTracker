@@ -9,6 +9,8 @@ export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get("userId");
+    const month = searchParams.get("month");
+    const limit = searchParams.get("limit");
 
     if (!userId) {
       return NextResponse.json({ error: "UserId is required" }, { status: 400 });
@@ -27,9 +29,20 @@ export async function GET(req: Request) {
       ? ["user-admin-default", "user_1kapw9sad_1784744868999"]
       : [userId];
 
-    const txs = await Transaction.find({ userId: { $in: targetUserIds } })
-      .sort({ date: -1, createdAt: -1 })
-      .lean();
+    const filter: Record<string, any> = { userId: { $in: targetUserIds } };
+
+    // Optimized Month Windowing (YYYY-MM): Leverages compound index { userId: 1, date: -1 }
+    if (month && /^\d{4}-\d{2}$/.test(month)) {
+      filter.date = { $regex: `^${month}` };
+    }
+
+    let query = Transaction.find(filter).sort({ date: -1, createdAt: -1 }).lean();
+
+    if (limit && !isNaN(Number(limit))) {
+      query = query.limit(Math.max(1, Math.min(Number(limit), 1000)));
+    }
+
+    const txs = await query;
     return NextResponse.json(txs);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

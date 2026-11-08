@@ -13,7 +13,7 @@ interface TaskBattleQueueProps {
   className?: string;
 }
 
-export function TaskBattleQueue({
+export const TaskBattleQueue = React.memo(function TaskBattleQueue({
   tasks,
   onCompleteTask,
   selectedDate,
@@ -136,4 +136,4 @@ export function TaskBattleQueue({
       </div>
     </div>
   );
-}
+});

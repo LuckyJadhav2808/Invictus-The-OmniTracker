@@ -11,6 +11,10 @@ import { OfflineStatusBanner } from "@/components/shared/OfflineStatusBanner";
 
 import { useRouter } from "next/navigation";
 import { initNativeNotificationBridge, isNativeApp } from "@/lib/native/native-notifications";
+import {
+  hydrateQueryCacheFromIndexedDB,
+  attachQueryCachePersister,
+} from "@/lib/offline/query-cache-persister";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -27,6 +31,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
   );
 
   useEffect(() => {
+    // 1. Instant 0ms Cache Hydration from native IndexedDB
+    hydrateQueryCacheFromIndexedDB(queryClient).catch(() => {});
+    const detachPersister = attachQueryCachePersister(queryClient);
+
     initReminderScheduler();
     registerServiceWorker().catch(() => {});
     if (isNativeApp()) {
@@ -37,9 +45,37 @@ export function Providers({ children }: { children: React.ReactNode }) {
         })
         .catch(() => {});
     }
-    syncEngine.registerQueryInvalidator(() => {
-      queryClient.invalidateQueries();
+    syncEngine.registerQueryInvalidator((types) => {
+      if (types && types.length > 0) {
+        for (const type of types) {
+          if (type === "money") {
+            queryClient.invalidateQueries({ queryKey: ["transactions"] });
+            queryClient.invalidateQueries({ queryKey: ["categories"] });
+            queryClient.invalidateQueries({ queryKey: ["budgetPreferences"] });
+          } else if (type === "goals") {
+            queryClient.invalidateQueries({ queryKey: ["habits"] });
+            queryClient.invalidateQueries({ queryKey: ["habitLogs"] });
+            queryClient.invalidateQueries({ queryKey: ["streaks"] });
+            queryClient.invalidateQueries({ queryKey: ["streakFreeze"] });
+          } else if (type === "study") {
+            queryClient.invalidateQueries({ queryKey: ["studySessions"] });
+            queryClient.invalidateQueries({ queryKey: ["subjects"] });
+            queryClient.invalidateQueries({ queryKey: ["allTopics"] });
+          } else if (type === "gym") {
+            queryClient.invalidateQueries({ queryKey: ["gym"] });
+            queryClient.invalidateQueries({ queryKey: ["workouts"] });
+          } else {
+            queryClient.invalidateQueries({ queryKey: [type] });
+          }
+        }
+      } else {
+        queryClient.invalidateQueries();
+      }
     });
+
+    return () => {
+      detachPersister();
+    };
   }, [queryClient, router]);
 
   return (

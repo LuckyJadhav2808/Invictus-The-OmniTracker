@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, memo } from 'react';
 import Link from 'next/link';
 import { CheckSquare, Check, Flame, ArrowRight, Plus, Droplets } from 'lucide-react';
 import { type Habit, type HabitLog } from '@/types';
@@ -19,7 +19,7 @@ interface HabitMomentumCardProps {
   className?: string;
 }
 
-export function HabitMomentumCard({
+export const HabitMomentumCard = memo(function HabitMomentumCard({
   habits,
   logs,
   streaks,
@@ -234,4 +234,4 @@ export function HabitMomentumCard({
       )}
     </div>
   );
-}
+});
