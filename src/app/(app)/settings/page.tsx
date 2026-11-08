@@ -1041,7 +1041,7 @@ export default function SettingsPage() {
             <Button
               onClick={handleSave}
               disabled={saving}
-              className="w-full bg-[#03D26F] hover:bg-[#02b35d] text-[#161514] font-black rounded-2xl py-3.5 border border-[#161514] shadow-xs hover:-translate-y-0.5 active:translate-y-0 cursor-pointer transition-all uppercase tracking-wider"
+              className="w-full bg-[var(--btn-primary-bg)] hover:bg-[var(--btn-primary-hover)] text-[var(--btn-primary-fg)] font-black rounded-2xl py-3.5 border-2 border-[var(--btn-primary-border)] shadow-[3px_3px_0px_0px_var(--btn-primary-shadow)] hover:-translate-y-0.5 active:translate-y-0 cursor-pointer transition-all uppercase tracking-wider"
             >
               <Save className="h-4 w-4 mr-2 stroke-[2.5]" />
               {saving ? "Saving Preferences…" : "Save Preferences"}
@@ -1262,7 +1262,7 @@ export default function SettingsPage() {
             <Button
               onClick={handleSave}
               disabled={saving}
-              className="w-full bg-[#03D26F] hover:bg-[#02b35d] text-[#161514] font-black rounded-2xl py-3.5 border border-[#161514] shadow-xs hover:-translate-y-0.5 active:translate-y-0 cursor-pointer transition-all uppercase tracking-wider"
+              className="w-full bg-[var(--btn-primary-bg)] hover:bg-[var(--btn-primary-hover)] text-[var(--btn-primary-fg)] font-black rounded-2xl py-3.5 border-2 border-[var(--btn-primary-border)] shadow-[3px_3px_0px_0px_var(--btn-primary-shadow)] hover:-translate-y-0.5 active:translate-y-0 cursor-pointer transition-all uppercase tracking-wider"
             >
               <Save className="h-4 w-4 mr-2 stroke-[2.5]" />
               {saving ? "Saving Configuration…" : "Save Workspace Configuration"}

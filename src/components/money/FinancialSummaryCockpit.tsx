@@ -271,7 +271,7 @@ export function FinancialSummaryCockpit({
           <button
             type="button"
             onClick={onAddTransaction}
-            className="flex-1 py-1.5 px-3 bg-[#161514] dark:bg-[#CEF431] hover:bg-[#2A2826] dark:hover:bg-[#d6f64d] text-white dark:text-[#161514] font-semibold text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer min-h-[36px]"
+            className="flex-1 py-1.5 px-3 bg-[var(--btn-primary-bg)] hover:bg-[var(--btn-primary-hover)] text-[var(--btn-primary-fg)] border border-[var(--btn-primary-border)] shadow-[2px_2px_0px_0px_var(--btn-primary-shadow)] font-bold text-xs rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer min-h-[36px] hover:-translate-y-0.5 active:translate-y-0"
           >
             <Plus className="size-3.5 stroke-[2.5]" />
             <span>Log Expense</span>
