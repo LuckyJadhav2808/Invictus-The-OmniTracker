@@ -57,12 +57,14 @@ describe("Loading States Architecture: Spinner vs. Skeletons", () => {
       expect(html).toContain("dark:border-[#383531]");
     });
 
-    it("renders MoneyCockpitSkeleton with 4-tab control placeholders", () => {
+    it("renders MoneyCockpitSkeleton with Belanje card deck, 4-launcher grid, and ledger rows", () => {
       const html = renderToStaticMarkup(React.createElement(MoneyCockpitSkeleton));
       expect(html).toContain("animate-pulse");
-      expect(html).toContain("rounded-xl");
-      // Contains category card grid wireframes
-      expect(html).toContain("grid-cols-1 md:grid-cols-2 lg:grid-cols-3");
+      expect(html).toContain("rounded-3xl");
+      // Contains 4-column squircle quick action launchers
+      expect(html).toContain("grid-cols-4");
+      // Contains dark luxury card deck wireframe
+      expect(html).toContain("dark:bg-[#0D0C0B]");
     });
 
     it("renders HabitsCockpitSkeleton and HabitsListSkeleton", () => {

@@ -137,73 +137,223 @@ export function SpaceCockpitSkeleton() {
 }
 
 /**
- * Money Cockpit Skeleton (Summary Cockpit + 4-Tab Bar + Wallet / Ledger Deck)
+ * Money Cockpit Skeleton (Belanje Benchmark Suite)
+ * Mirrored 1-to-1 against the updated Money page layout:
+ * 1. Financial Summary Cockpit (Available Funds + Stacked Card Deck + 4 Squircle Actions + Dynamic Recent Feed)
+ * 2. Zero-Knowledge SMS Sync Banner
+ * 3. Sub-Nav Segmented Tabs + Who Owes Who Quick Launcher
+ * 4. Daily Ledger (CategoryChipFilterRail + Streamlined Pill Filters + Squircle Transaction Rows)
+ * Zero Cumulative Layout Shift (CLS = 0).
  */
 export function MoneyCockpitSkeleton() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 animate-in fade-in duration-150 select-none">
-      {/* Financial Summary Cockpit Skeleton */}
-      <SkeletonCard className="p-5 sm:p-6 space-y-4">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <SkeletonBox className="h-4 w-28 rounded-full bg-[#CEF431]/30 dark:bg-[#CEF431]/15" />
-              <SkeletonBox className="h-4 w-36" />
-            </div>
-            <SkeletonBox className="h-9 w-48 sm:w-60 rounded-xl" />
+      {/* 🚀 1. FINANCIAL SUMMARY COCKPIT SKELETON */}
+      <div className="bg-white dark:bg-[#1C1A18] rounded-3xl border border-[#E8E5DF] dark:border-[#383531] p-3.5 sm:p-5 space-y-4 shadow-xs">
+        {/* Available Funds Header Strip */}
+        <div className="flex items-center justify-between pb-1">
+          <div className="space-y-1">
+            <SkeletonBox className="h-3 w-24" />
+            <SkeletonBox className="h-6 sm:h-7 w-32 sm:w-40 rounded-xl" />
           </div>
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <SkeletonBox className="h-10 flex-1 sm:flex-none sm:w-32 rounded-xl bg-[#03D26F]/30 dark:bg-[#03D26F]/15" />
-            <SkeletonBox className="h-10 flex-1 sm:flex-none sm:w-28 rounded-xl" />
+          <SkeletonBox className="h-8 w-36 rounded-xl" />
+        </div>
+
+        {/* Belanje Stacked Credit Card Deck Skeleton */}
+        <div className="relative w-full rounded-3xl bg-[#161514] dark:bg-[#0D0C0B] border border-[#2A2724] p-5 sm:p-6 text-white overflow-hidden min-h-[220px] sm:min-h-[240px] flex flex-col justify-between shadow-lg">
+          {/* Card Header: Icon + Title + Pill Badge */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="size-10 rounded-2xl bg-white/10 border border-white/10 animate-pulse" />
+              <div className="space-y-1.5">
+                <div className="h-4 w-28 bg-white/20 rounded animate-pulse" />
+                <div className="h-3 w-36 bg-white/10 rounded animate-pulse" />
+              </div>
+            </div>
+            <div className="h-5 w-18 rounded-full bg-[#03D26F]/20 border border-[#03D26F]/30 animate-pulse" />
+          </div>
+
+          {/* Card Balance Display */}
+          <div className="space-y-1 my-2">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-48 sm:w-56 bg-white/25 rounded-xl animate-pulse" />
+              <div className="size-6 rounded-full bg-white/10 animate-pulse" />
+            </div>
+            <div className="h-3 w-40 bg-white/10 rounded animate-pulse" />
+          </div>
+
+          {/* Card Footer: Income & Expense Split */}
+          <div className="grid grid-cols-2 gap-4 pt-3 border-t border-white/10">
+            <div className="space-y-1">
+              <div className="h-2.5 w-24 bg-white/10 rounded animate-pulse" />
+              <div className="h-4 w-20 bg-[#03D26F]/25 rounded animate-pulse" />
+            </div>
+            <div className="space-y-1">
+              <div className="h-2.5 w-24 bg-white/10 rounded animate-pulse" />
+              <div className="h-4 w-20 bg-rose-500/25 rounded animate-pulse" />
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="p-3 rounded-xl bg-[#FAF8F5] dark:bg-[#252321] space-y-1.5 border border-[#161514]/10 dark:border-[#383531]">
-              <SkeletonBox className="h-3 w-16" />
-              <SkeletonBox className="h-6 w-24" />
+        {/* Carousel Dots */}
+        <div className="flex justify-center items-center gap-1.5 py-0.5">
+          <SkeletonBox className="h-1.5 w-6 rounded-full bg-[#161514]/30 dark:bg-white/30" />
+          <SkeletonBox className="size-1.5 rounded-full" />
+          <SkeletonBox className="size-1.5 rounded-full" />
+        </div>
+
+        {/* 4 Squircle Quick Action Launchers Grid */}
+        <div className="grid grid-cols-4 gap-2 sm:gap-3">
+          {[
+            { color: "bg-[#CEF431]/25 dark:bg-[#CEF431]/15" },
+            { color: "bg-purple-500/20 dark:bg-purple-500/15" },
+            { color: "bg-amber-500/20 dark:bg-amber-500/15" },
+            { color: "bg-sky-500/20 dark:bg-sky-500/15" },
+          ].map((item, idx) => (
+            <div
+              key={idx}
+              className="p-2 sm:p-2.5 rounded-2xl border border-[#E8E5DF] dark:border-[#383531] bg-white dark:bg-[#1C1A18] flex flex-col items-center justify-center gap-1.5 shadow-xs"
+            >
+              <div className={cn("size-10 sm:size-12 rounded-2xl animate-pulse", item.color)} />
+              <SkeletonBox className="h-3 w-10 sm:w-12 rounded" />
             </div>
           ))}
         </div>
-      </SkeletonCard>
 
-      {/* 4-Tab Segmented Control Skeleton */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
-        {["Budget Wallets", "Live Ledger", "Analytics", "Vault"].map((tab, i) => (
-          <SkeletonBox
-            key={i}
-            className={cn(
-              "h-10 px-4 rounded-xl shrink-0",
-              i === 0 ? "w-36 bg-[#CEF431]/30 dark:bg-[#CEF431]/20" : "w-28"
-            )}
-          />
-        ))}
+        {/* Dynamic Card-Linked Recent Account Feed Skeleton */}
+        <div className="rounded-2xl border border-[#E8E5DF] dark:border-[#383531] p-3 sm:p-3.5 space-y-2.5 bg-[#FAF8F5]/60 dark:bg-[#161514]/40">
+          <div className="flex items-center justify-between pb-0.5">
+            <SkeletonBox className="h-3.5 w-36 rounded" />
+            <SkeletonBox className="h-3 w-14 rounded" />
+          </div>
+
+          {/* 3 Squircle Recent Transaction Rows */}
+          <div className="space-y-1.5">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div
+                key={i}
+                className="bg-white dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#383531] p-2.5 flex items-center justify-between gap-3 shadow-xs"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <SkeletonBox className="size-9 rounded-xl shrink-0" />
+                  <div className="space-y-1">
+                    <SkeletonBox className="h-3.5 w-28 sm:w-40 rounded" />
+                    <SkeletonBox className="h-2.5 w-20 sm:w-28 rounded" />
+                  </div>
+                </div>
+                <SkeletonBox className="h-4 w-16 sm:w-20 rounded shrink-0 font-mono" />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Vix Mascot Companion Bar */}
+        <div className="flex items-center justify-between gap-2 pt-1 border-t border-[#E8E5DF] dark:border-[#383531]">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#FAF8F5] dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#383531]">
+            <SkeletonBox className="size-6 rounded-full" />
+            <SkeletonBox className="h-3.5 w-48 sm:w-64 rounded" />
+          </div>
+          <SkeletonBox className="h-7 w-20 rounded-xl" />
+        </div>
       </div>
 
-      {/* Category Wallets Deck Skeleton */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <SkeletonCard key={i} className="h-40 flex flex-col justify-between">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <SkeletonBox className="size-10 rounded-xl" />
-                <div className="space-y-1">
-                  <SkeletonBox className="h-4 w-28" />
-                  <SkeletonBox className="h-3 w-16" />
+      {/* 🔒 2. ZERO-KNOWLEDGE SMS SYNC CONTROL BANNER SKELETON */}
+      <div className="rounded-2xl border border-[#E8E5DF] dark:border-[#383531] bg-white dark:bg-[#1C1A18] p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+        <div className="flex items-center gap-3">
+          <SkeletonBox className="size-9 rounded-xl shrink-0 bg-[#03D26F]/20 dark:bg-[#03D26F]/10" />
+          <div className="space-y-1">
+            <SkeletonBox className="h-4 w-44 sm:w-56 rounded" />
+            <SkeletonBox className="h-3 w-64 sm:w-80 rounded" />
+          </div>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <SkeletonBox className="h-8 w-24 rounded-xl" />
+          <SkeletonBox className="h-8 w-24 rounded-xl" />
+        </div>
+      </div>
+
+      {/* 📑 3. SUB-NAV TAB BAR + WHO OWES WHO BUTTON SKELETON */}
+      <div className="flex items-center justify-between gap-2 overflow-x-auto pb-1 no-scrollbar">
+        <div className="bg-white/80 dark:bg-[#161514]/80 rounded-2xl p-1.5 border border-[#E8E5DF] dark:border-[#2A2724] flex items-center gap-1.5 shrink-0">
+          {["Daily Ledger", "Budget & Rollover", "Goals & Vault", "Analytics"].map((tab, i) => (
+            <SkeletonBox
+              key={i}
+              className={cn(
+                "h-8 rounded-xl shrink-0",
+                i === 0 ? "w-28 bg-[#161514]/20 dark:bg-white/20" : "w-24 sm:w-28"
+              )}
+            />
+          ))}
+        </div>
+        <div className="h-9 w-32 rounded-2xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 shrink-0 flex items-center justify-center gap-1.5 animate-pulse">
+          <SkeletonBox className="size-3.5 rounded-full bg-amber-400/40" />
+          <SkeletonBox className="h-3 w-20 rounded bg-amber-400/30" />
+        </div>
+      </div>
+
+      {/* 🧾 4. DAILY LEDGER SKELETON VIEW */}
+      <div className="space-y-4">
+        {/* CategoryChipFilterRail Skeleton */}
+        <div className="space-y-2 bg-white dark:bg-[#1C1A18] p-3 sm:p-3.5 rounded-2xl border border-[#E8E5DF] dark:border-[#383531] shadow-xs">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <SkeletonBox className="size-4 rounded" />
+              <SkeletonBox className="h-4 w-36 rounded" />
+            </div>
+            <div className="flex items-center gap-1.5">
+              <SkeletonBox className="h-7 w-20 rounded-xl" />
+              <SkeletonBox className="h-7 w-20 rounded-xl" />
+              <SkeletonBox className="h-7 w-20 rounded-xl" />
+            </div>
+          </div>
+
+          {/* Horizontal Envelopes Chip Rail */}
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+            <SkeletonBox className="h-8 w-28 rounded-xl bg-[#161514]/20 dark:bg-[#CEF431]/20 shrink-0" />
+            {Array.from({ length: 5 }).map((_, i) => (
+              <SkeletonBox key={i} className="h-8 w-24 sm:w-28 rounded-xl shrink-0" />
+            ))}
+          </div>
+        </div>
+
+        {/* Belanje Streamlined Filter Bar Skeleton */}
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+          <SkeletonBox className="h-9 w-36 rounded-xl shrink-0" />
+          <SkeletonBox className="h-9 w-36 rounded-xl shrink-0" />
+          <SkeletonBox className="h-9 flex-1 min-w-[120px] rounded-xl" />
+          <SkeletonBox className="h-9 w-9 rounded-xl shrink-0" />
+        </div>
+
+        {/* Belanje Squircle Transaction Rows Skeleton */}
+        <div className="bg-white dark:bg-[#1C1A18] rounded-2xl border border-[#E8E5DF] dark:border-[#383531] p-3 sm:p-4 space-y-3 shadow-xs">
+          {/* Date Header */}
+          <div className="flex items-center justify-between border-b border-[#E8E5DF] dark:border-[#383531] pb-2">
+            <SkeletonBox className="h-3.5 w-20 rounded font-mono" />
+            <SkeletonBox className="h-3 w-24 rounded font-mono" />
+          </div>
+
+          {/* List of 5 Squircle Rows */}
+          <div className="space-y-2">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div
+                key={i}
+                className="p-3 rounded-2xl border border-[#E8E5DF]/60 dark:border-[#383531]/60 flex items-center justify-between gap-3"
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <SkeletonBox className="size-10 rounded-2xl shrink-0" />
+                  <div className="space-y-1.5">
+                    <SkeletonBox className="h-4 w-32 sm:w-48 rounded" />
+                    <SkeletonBox className="h-3 w-24 sm:w-36 rounded" />
+                  </div>
+                </div>
+                <div className="text-right space-y-1 shrink-0">
+                  <SkeletonBox className="h-4 w-20 sm:w-24 rounded ml-auto" />
+                  <SkeletonBox className="h-2.5 w-12 rounded ml-auto" />
                 </div>
               </div>
-              <SkeletonBox className="h-6 w-16 rounded-md" />
-            </div>
-            <div className="space-y-2">
-              <SkeletonBox className="h-2 w-full rounded-full" />
-              <div className="flex justify-between items-center">
-                <SkeletonBox className="h-3 w-20" />
-                <SkeletonBox className="h-4 w-24" />
-              </div>
-            </div>
-          </SkeletonCard>
-        ))}
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
