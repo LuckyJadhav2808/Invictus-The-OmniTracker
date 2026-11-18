@@ -411,25 +411,50 @@ export function HabitCard({
         </div>
       )}
 
-      {/* Matrix View Mode: Mini 28-Day Heat Matrix */}
+      {/* Matrix View Mode: Pristine 28-Day Calendar Heatmap */}
       {viewMode === "matrix" && (
-        <div className="pt-2 border-t border-[#161514]/10 dark:border-white/10 space-y-1">
-          <span className="text-[9px] font-mono font-black uppercase text-muted-foreground block tracking-wider">
-            30-Day Momentum Grid
-          </span>
-          <div className="grid grid-cols-14 gap-1">
+        <div className="pt-2.5 border-t border-[#161514]/10 dark:border-white/10 space-y-2">
+          <div className="flex items-center justify-between text-[9px] font-mono font-black uppercase text-muted-foreground tracking-wider">
+            <span>28-Day Consistency Matrix</span>
+            <span className="text-foreground">
+              {Math.min(28, currentStreak)} of 28d active
+            </span>
+          </div>
+
+          {/* 7-Col Day Names Header */}
+          <div className="grid grid-cols-7 gap-1 text-center font-mono font-bold text-[9px] text-muted-foreground uppercase opacity-75">
+            <span>M</span>
+            <span>T</span>
+            <span>W</span>
+            <span>T</span>
+            <span>F</span>
+            <span>S</span>
+            <span>S</span>
+          </div>
+
+          {/* 7-Col x 4-Row Grid */}
+          <div className="grid grid-cols-7 gap-1">
             {Array.from({ length: 28 }).map((_, idx) => {
               const isFilled = idx < currentStreak || (isCompletedToday && idx === 0);
+              const isTodayCell = idx === 0;
+
               return (
                 <div
                   key={`matrix-cell-${idx}`}
                   className={cn(
-                    "size-3 rounded-xs border transition-all",
+                    "h-6 rounded-md border-2 transition-all flex items-center justify-center font-mono text-[9px] font-bold select-none",
                     isFilled
-                      ? "bg-[#03D26F] border-[#161514] dark:border-black"
-                      : "bg-secondary border-border"
+                      ? isTodayCell
+                        ? "bg-[#CEF431] border-[#161514] text-[#161514] font-black shadow-2xs"
+                        : "bg-[#03D26F] border-[#161514] text-[#161514] font-black"
+                      : isTodayCell
+                      ? "border-2 border-dashed border-[#161514] dark:border-[#CEF431] bg-secondary"
+                      : "bg-secondary/40 border-border text-muted-foreground"
                   )}
-                />
+                  title={isTodayCell ? "Today" : `${idx}d ago • ${isFilled ? "Conquered" : "Pending"}`}
+                >
+                  {isFilled ? "✓" : isTodayCell ? "•" : ""}
+                </div>
               );
             })}
           </div>

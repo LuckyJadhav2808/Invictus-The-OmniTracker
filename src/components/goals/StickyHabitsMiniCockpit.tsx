@@ -100,7 +100,7 @@ export function StickyHabitsMiniCockpit({
       aria-label="Sticky Habits Mini Cockpit"
       aria-hidden={!isVisible}
     >
-      <div className="bg-[#FAF8F5]/95 dark:bg-[#161514]/95 border-2 border-[#161514] dark:border-[#38332E] rounded-2xl px-3 sm:px-4 py-1.5 sm:py-2 shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] flex items-center justify-between gap-2 sm:gap-4 backdrop-blur-md">
+      <div className="bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#38332E] rounded-2xl px-3 sm:px-4 py-1.5 sm:py-2 shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] flex items-center justify-between gap-2 sm:gap-4">
         {/* Left: Mini Velocity Ring & Telemetry */}
         <div
           onClick={handleScrollTop}

@@ -20,6 +20,7 @@ import {
 import { useUserAchievements } from "@/lib/queries/achievements";
 import { HabitCard } from "@/components/goals/HabitCard";
 import { HabitsCockpitDeck } from "@/components/goals/HabitsCockpitDeck";
+import { HabitsMatrixBoard } from "@/components/goals/HabitsMatrixBoard";
 import { StickyHabitsMiniCockpit } from "@/components/goals/StickyHabitsMiniCockpit";
 import { NewHabitForm } from "@/components/goals/NewHabitForm";
 import { WaterTracker } from "@/components/goals/WaterTracker";
@@ -533,6 +534,24 @@ function GoalsPageContent() {
                 </button>
               )}
             </div>
+          ) : habitLayoutStyle === "matrix" ? (
+            <HabitsMatrixBoard
+              habits={displayedHabits}
+              streaks={streaks}
+              selectedDate={selectedDate}
+              onSelectDate={setSelectedDate}
+              onToggleHabitLog={handleToggleLog}
+              onEditHabit={(habit) => {
+                setEditingHabit(habit);
+                setEditHabitTitle(habit.title);
+                setEditHabitDesc(habit.reminderTime || "");
+              }}
+              onDeleteHabit={(id) => setDeleteHabitId(id)}
+              onOpenNewHabit={() => {
+                soundFX.playPop();
+                setIsChoiceOpen(true);
+              }}
+            />
           ) : (
             <div className={cn("space-y-3", habitLayoutStyle === "compact" && "space-y-2")}>
               {displayedHabits.map((habit) => {
