@@ -273,21 +273,23 @@ export function MoneyCockpitSkeleton() {
       </div>
 
       {/* 📑 3. SUB-NAV TAB BAR + WHO OWES WHO BUTTON SKELETON */}
-      <div className="flex items-center justify-between gap-2 overflow-x-auto pb-1 no-scrollbar">
-        <div className="bg-white/80 dark:bg-[#161514]/80 rounded-2xl p-1.5 border border-[#E8E5DF] dark:border-[#2A2724] flex items-center gap-1.5 shrink-0">
-          {["Daily Ledger", "Budget & Rollover", "Goals & Vault", "Analytics"].map((tab, i) => (
-            <SkeletonBox
-              key={i}
-              className={cn(
-                "h-8 rounded-xl shrink-0",
-                i === 0 ? "w-28 bg-[#161514]/20 dark:bg-white/20" : "w-24 sm:w-28"
-              )}
-            />
-          ))}
-        </div>
-        <div className="h-9 w-32 rounded-2xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 shrink-0 flex items-center justify-center gap-1.5 animate-pulse">
-          <SkeletonBox className="size-3.5 rounded-full bg-amber-400/40" />
-          <SkeletonBox className="h-3 w-20 rounded bg-amber-400/30" />
+      <div className="w-full overflow-x-auto no-scrollbar pb-1 touch-pan-x">
+        <div className="inline-flex items-center gap-2 min-w-max">
+          <div className="bg-white/80 dark:bg-[#161514]/80 rounded-2xl p-1.5 border border-[#E8E5DF] dark:border-[#2A2724] flex items-center gap-1.5 shrink-0">
+            {["Daily Ledger", "Budget & Rollover", "Goals & Vault", "Analytics"].map((tab, i) => (
+              <SkeletonBox
+                key={i}
+                className={cn(
+                  "h-8 rounded-xl shrink-0",
+                  i === 0 ? "w-28 bg-[#161514]/20 dark:bg-white/20" : "w-24 sm:w-28"
+                )}
+              />
+            ))}
+          </div>
+          <div className="h-9 w-32 rounded-2xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 shrink-0 flex items-center justify-center gap-1.5 animate-pulse">
+            <SkeletonBox className="size-3.5 rounded-full bg-amber-400/40" />
+            <SkeletonBox className="h-3 w-20 rounded bg-amber-400/30" />
+          </div>
         </div>
       </div>
 

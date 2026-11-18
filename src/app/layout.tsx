@@ -80,7 +80,9 @@ export default function RootLayout({
       className={`h-full antialiased font-sans ${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} ${caveat.variable} ${permanentMarker.variable} ${architectsDaughter.variable}`}
     >
       <head>
-        <script
+        <Script
+          id="theme-initializer"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               (function() {

@@ -124,7 +124,7 @@ export function CategoryChipFilterRail({
               title="Create new category envelope"
             >
               <Plus className="size-3 stroke-[2.5]" />
-              <span>+ Envelope</span>
+              <span>Envelope</span>
             </button>
           )}
         </div>

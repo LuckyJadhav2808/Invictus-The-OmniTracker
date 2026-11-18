@@ -589,7 +589,7 @@ function MoneyPageContent() {
   }
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+    <div className="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-28 sm:pb-16">
       {/* 🚀 STICKY SUMMARY COCKPIT */}
       <FinancialSummaryCockpit
         monthlyStats={monthlyStats}
@@ -622,52 +622,54 @@ function MoneyPageContent() {
 
       {/* 📑 FLOATING SUB-NAV DOCK */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <div className="w-full flex items-center justify-between gap-2 overflow-x-auto no-scrollbar pb-1 mb-4">
-          <TabsList className="bg-white/80 dark:bg-[#161514]/80 backdrop-blur-md rounded-2xl p-1.5 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex items-center gap-1.5 w-max min-w-full sm:min-w-0 sm:w-auto">
-            <TabsTrigger
-              value="ledger"
-              className="rounded-xl text-xs font-semibold py-2 px-3.5 sm:px-4 border border-transparent data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:shadow-xs dark:data-[state=active]:bg-white dark:data-[state=active]:text-[#161514] text-[#6B6B6B] hover:text-[#161514] dark:text-[#A8A29E] dark:hover:text-stone-100 transition-all flex items-center gap-2 shrink-0 cursor-pointer"
-            >
-              <Receipt className="size-3.5 stroke-[2]" />
-              <span>Daily Ledger</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="budgets"
-              className="rounded-xl text-xs font-semibold py-2 px-3.5 sm:px-4 border border-transparent data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:shadow-xs dark:data-[state=active]:bg-white dark:data-[state=active]:text-[#161514] text-[#6B6B6B] hover:text-[#161514] dark:text-[#A8A29E] dark:hover:text-stone-100 transition-all flex items-center gap-2 shrink-0 cursor-pointer"
-            >
-              <Target className="size-3.5 stroke-[2]" />
-              <span>Budget &amp; Rollover</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="vault"
-              className="rounded-xl text-xs font-semibold py-2 px-3.5 sm:px-4 border border-transparent data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:shadow-xs dark:data-[state=active]:bg-white dark:data-[state=active]:text-[#161514] text-[#6B6B6B] hover:text-[#161514] dark:text-[#A8A29E] dark:hover:text-stone-100 transition-all flex items-center gap-2 shrink-0 cursor-pointer"
-            >
-              <PiggyBank className="size-3.5 stroke-[2]" />
-              <span>Goals &amp; Vault</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="analytics"
-              className="rounded-xl text-xs font-semibold py-2 px-3.5 sm:px-4 border border-transparent data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:shadow-xs dark:data-[state=active]:bg-white dark:data-[state=active]:text-[#161514] text-[#6B6B6B] hover:text-[#161514] dark:text-[#A8A29E] dark:hover:text-stone-100 transition-all flex items-center gap-2 shrink-0 cursor-pointer"
-            >
-              <BarChart2 className="size-3.5 stroke-[2]" />
-              <span>Analytics</span>
-            </TabsTrigger>
-          </TabsList>
+        <div className="w-full overflow-x-auto no-scrollbar pb-1 mb-4 touch-pan-x">
+          <div className="inline-flex items-center gap-2 min-w-max">
+            <TabsList className="bg-white/80 dark:bg-[#161514]/80 backdrop-blur-md rounded-2xl p-1.5 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex items-center gap-1.5 shrink-0">
+              <TabsTrigger
+                value="ledger"
+                className="rounded-xl text-xs font-semibold py-2 px-3.5 sm:px-4 border border-transparent data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:shadow-xs dark:data-[state=active]:bg-white dark:data-[state=active]:text-[#161514] text-[#6B6B6B] hover:text-[#161514] dark:text-[#A8A29E] dark:hover:text-stone-100 transition-all flex items-center gap-2 shrink-0 cursor-pointer"
+              >
+                <Receipt className="size-3.5 stroke-[2]" />
+                <span>Daily Ledger</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="budgets"
+                className="rounded-xl text-xs font-semibold py-2 px-3.5 sm:px-4 border border-transparent data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:shadow-xs dark:data-[state=active]:bg-white dark:data-[state=active]:text-[#161514] text-[#6B6B6B] hover:text-[#161514] dark:text-[#A8A29E] dark:hover:text-stone-100 transition-all flex items-center gap-2 shrink-0 cursor-pointer"
+              >
+                <Target className="size-3.5 stroke-[2]" />
+                <span>Budget &amp; Rollover</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="vault"
+                className="rounded-xl text-xs font-semibold py-2 px-3.5 sm:px-4 border border-transparent data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:shadow-xs dark:data-[state=active]:bg-white dark:data-[state=active]:text-[#161514] text-[#6B6B6B] hover:text-[#161514] dark:text-[#A8A29E] dark:hover:text-stone-100 transition-all flex items-center gap-2 shrink-0 cursor-pointer"
+              >
+                <PiggyBank className="size-3.5 stroke-[2]" />
+                <span>Goals &amp; Vault</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="analytics"
+                className="rounded-xl text-xs font-semibold py-2 px-3.5 sm:px-4 border border-transparent data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:shadow-xs dark:data-[state=active]:bg-white dark:data-[state=active]:text-[#161514] text-[#6B6B6B] hover:text-[#161514] dark:text-[#A8A29E] dark:hover:text-stone-100 transition-all flex items-center gap-2 shrink-0 cursor-pointer"
+              >
+                <BarChart2 className="size-3.5 stroke-[2]" />
+                <span>Analytics</span>
+              </TabsTrigger>
+            </TabsList>
 
-          {/* Who Owes Who Quick Launcher (Belanje Benchmark) */}
-          <button
-            type="button"
-            onClick={() => {
-              soundFX.playPop();
-              setWhoOwesWhoPrefill(null);
-              setIsWhoOwesWhoOpen(true);
-            }}
-            className="rounded-2xl text-xs font-heading font-black py-2.5 px-3.5 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:hover:bg-amber-900/60 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-700 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs shrink-0 active:scale-95"
-            title="Open Who Owes Who Split Tracker"
-          >
-            <Users className="size-3.5 stroke-[2.2] text-amber-700 dark:text-amber-300" />
-            <span>Who Owes Who</span>
-          </button>
+            {/* Who Owes Who Quick Launcher (Belanje Benchmark) */}
+            <button
+              type="button"
+              onClick={() => {
+                soundFX.playPop();
+                setWhoOwesWhoPrefill(null);
+                setIsWhoOwesWhoOpen(true);
+              }}
+              className="rounded-2xl text-xs font-heading font-black py-2.5 px-3.5 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:hover:bg-amber-900/60 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-700 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs shrink-0 active:scale-95 whitespace-nowrap"
+              title="Open Who Owes Who Split Tracker"
+            >
+              <Users className="size-3.5 stroke-[2.2] text-amber-700 dark:text-amber-300" />
+              <span>Who Owes Who</span>
+            </button>
+          </div>
         </div>
 
         {/* Tab 1: Ledger */}
@@ -913,19 +915,19 @@ function MoneyPageContent() {
         hideFloatingTrigger={true}
       />
 
-      {/* 🚀 CENTRAL QUICK ACTIONS FAB (Belanje Benchmark) */}
-      <div className="fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] right-4 sm:bottom-8 sm:right-8 z-30 flex items-center gap-2">
+      {/* 🚀 CENTRAL QUICK ACTIONS FAB (Belanje Benchmark - Positioned safely above Mobile Bottom Nav & Dynamic Island) */}
+      <div className="fixed bottom-[calc(5.75rem+env(safe-area-inset-bottom,0px))] right-3.5 sm:bottom-8 sm:right-8 z-30 flex items-center gap-2">
         <button
           type="button"
           onClick={() => {
             soundFX.playPop();
             setIsQuickActionsOpen(true);
           }}
-          className="size-14 rounded-full bg-[#161514] text-[#CEF431] dark:bg-[#FAF8F5] dark:text-[#161514] border-2 border-[#161514] dark:border-white shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#FAF8F5] flex items-center justify-center cursor-pointer hover:scale-105 active:scale-95 transition-all group"
+          className="size-12 sm:size-14 rounded-full bg-[#161514] text-[#CEF431] dark:bg-[#FAF8F5] dark:text-[#161514] border-2 border-[#161514] dark:border-white shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#FAF8F5] flex items-center justify-center cursor-pointer hover:scale-105 active:scale-95 transition-all group"
           title="Open Quick Actions (Add, Scan, Cash, Calc)"
           aria-label="Quick Actions"
         >
-          <Plus className="size-7 stroke-[3] group-hover:rotate-90 transition-transform duration-200" />
+          <Plus className="size-6 sm:size-7 stroke-[3] group-hover:rotate-90 transition-transform duration-200" />
         </button>
       </div>
 

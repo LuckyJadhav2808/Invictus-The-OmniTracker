@@ -148,14 +148,14 @@ export function BelanjeTransactionRow({
           </h4>
 
           {/* Subtext: Account • Time • Category Tag */}
-          <div className="flex items-center gap-1.5 text-[10.5px] font-mono text-[#6B6B6B] dark:text-[#A8A29E] leading-none">
-            <span className="font-semibold text-[#161514] dark:text-[#FAF8F5]">{accountLabel}</span>
-            <span>•</span>
-            <span>{formattedTimeOrDate}</span>
+          <div className="flex items-center gap-1.5 text-[10.5px] font-mono text-[#6B6B6B] dark:text-[#A8A29E] leading-none whitespace-nowrap overflow-hidden">
+            <span className="font-semibold text-[#161514] dark:text-[#FAF8F5] shrink-0">{accountLabel}</span>
+            <span className="shrink-0">•</span>
+            <span className="shrink-0">{formattedTimeOrDate}</span>
             {category?.name && tx.note && tx.note.toLowerCase() !== category.name.toLowerCase() && (
               <>
-                <span>•</span>
-                <span className="truncate max-w-[100px] text-[10px] px-1 py-0.2 rounded bg-stone-100 dark:bg-[#252321] border border-stone-200 dark:border-[#383531]">
+                <span className="shrink-0">•</span>
+                <span className="truncate max-w-[90px] sm:max-w-[140px] text-[10px] px-1 py-0.5 rounded bg-stone-100 dark:bg-[#252321] border border-stone-200 dark:border-[#383531]">
                   {category.name}
                 </span>
               </>
