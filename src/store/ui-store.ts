@@ -3,7 +3,7 @@ import { persist } from "zustand/middleware";
 
 type ActiveTab = "today" | "goals" | "study" | "money" | "tasks" | "profile";
 type ActiveTracker = "life" | "study" | "money" | "tasks";
-type HabitLayoutStyle = "cards" | "compact";
+type HabitLayoutStyle = "cards" | "compact" | "matrix";
 type WidgetVariantStyle = "classic" | "expanded" | "dark";
 
 interface UIState {

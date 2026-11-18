@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useMemo, Suspense } from "react";
 import {
   useHabits,
   useAddHabit,
@@ -8,6 +8,7 @@ import {
   useDeleteHabit,
   useToggleHabitLog,
   useHabitLogs,
+  useMonthHabitLogs,
   useStreaks,
   useStreakFreeze,
   useHealthProfile,
@@ -18,6 +19,8 @@ import {
 } from "@/lib/queries/goals";
 import { useUserAchievements } from "@/lib/queries/achievements";
 import { HabitCard } from "@/components/goals/HabitCard";
+import { HabitsCockpitDeck } from "@/components/goals/HabitsCockpitDeck";
+import { StickyHabitsMiniCockpit } from "@/components/goals/StickyHabitsMiniCockpit";
 import { NewHabitForm } from "@/components/goals/NewHabitForm";
 import { WaterTracker } from "@/components/goals/WaterTracker";
 import { MoodJournalWidget } from "@/components/goals/MoodJournalWidget";
@@ -53,7 +56,7 @@ import {
   RefreshCw,
   ChevronDown,
 } from "lucide-react";
-import { format, getDay } from "date-fns";
+import { format, getDay, startOfWeek, addDays, isSameDay } from "date-fns";
 import { toast } from "sonner";
 import { useUIStore } from "@/store/ui-store";
 import { cn } from "@/lib/utils";
@@ -61,7 +64,7 @@ import { ProactiveReminderBanner } from "@/components/shared/ProactiveReminderBa
 import { useSearchParams, useRouter } from "next/navigation";
 
 function GoalsPageContent() {
-  const { selectedDate } = useUIStore();
+  const { selectedDate, setSelectedDate, habitLayoutStyle, setHabitLayoutStyle } = useUIStore();
   const searchParams = useSearchParams();
   const router = useRouter();
   const tabParam = searchParams.get("tab");
@@ -94,8 +97,38 @@ function GoalsPageContent() {
   const { data: streaks = {} } = useStreaks();
   const { data: streakFreeze = { userId: "", tokensAvailable: 1, lastMonthlyCredit: "", frozenDates: [], autoShieldEvent: null } } = useStreakFreeze();
   const { data: logs = [] } = useHabitLogs(selectedDate);
+
+  // Active 7-Day Window Range & Logs for inline squircle status
+  const weekRange = useMemo(() => {
+    const baseDate = new Date(selectedDate);
+    const validBase = isNaN(baseDate.getTime()) ? new Date() : baseDate;
+    const start = startOfWeek(validBase, { weekStartsOn: 1 });
+    const end = addDays(start, 6);
+    return {
+      startStr: format(start, "yyyy-MM-dd"),
+      endStr: format(end, "yyyy-MM-dd"),
+      start,
+    };
+  }, [selectedDate]);
+
+  const { data: weekLogs = [] } = useMonthHabitLogs(weekRange.startStr, weekRange.endStr);
+
+  const weekDays = useMemo(() => {
+    return Array.from({ length: 7 }).map((_, i) => {
+      const d = addDays(weekRange.start, i);
+      const dateStr = format(d, "yyyy-MM-dd");
+      return {
+        date: d,
+        dateStr,
+        dayLabel: format(d, "EEE"),
+        dayNum: format(d, "d"),
+        isToday: isSameDay(d, new Date()),
+        isSelected: dateStr === selectedDate,
+      };
+    });
+  }, [weekRange, selectedDate]);
+
   const achievements = useUserAchievements();
-  const { habitLayoutStyle } = useUIStore();
 
   const addHabitMutation = useAddHabit();
   const updateHabitMutation = useUpdateHabit();
@@ -296,11 +329,11 @@ function GoalsPageContent() {
     }
   };
 
-  const handleToggleLog = async (habitId: string, completed: boolean) => {
+  const handleToggleLog = async (habitId: string, completed: boolean, dateStr: string = selectedDate) => {
     try {
       await toggleLogMutation.mutateAsync({
         habitId,
-        date: selectedDate,
+        date: dateStr,
         completed,
       });
       toast.success(completed ? "Habit checked" : "Removed check");
@@ -355,93 +388,51 @@ function GoalsPageContent() {
   const longestStreakValue = Object.values(streaks).reduce((max, s) => Math.max(max, s.longestStreak), 0);
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
-      {/* 1. Habits & Wellness Cockpit Header Card */}
-      <div className="bg-white dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#383531] rounded-xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-medium px-2 py-0.5 rounded-md bg-[#F1EFEA] dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#383531]">
-              Habits & Wellness
-            </span>
-            <span className="text-xs font-mono text-[#6B6B6B] dark:text-[#A8A29E]">
-              Lvl {achievements.userLevel} • {achievements.totalXP} XP
-            </span>
-          </div>
-          <h1 className="text-xl sm:text-2xl font-sans font-semibold text-[#161514] dark:text-[#FAF8F5] tracking-tight">
-            Habits & Routines
-          </h1>
-          <p className="text-xs font-normal text-[#6B6B6B] dark:text-[#A8A29E] max-w-lg">
-            Build daily consistency, conquer streaks, and maintain holistic vitality.
-          </p>
-        </div>
+    <div className="space-y-6 animate-in fade-in duration-300 relative">
+      {/* 0. Gliding Sticky Mini-Cockpit */}
+      <StickyHabitsMiniCockpit
+        dailyCompletionPercent={dailyCompletionPercent}
+        completedCount={completedTodayHabits.filter((h) => !isHabitRestDay(h)).length}
+        dueCount={dueTodayHabits.length}
+        longestStreak={longestStreakValue}
+        onOpenNewHabit={() => {
+          soundFX.playPop();
+          setIsChoiceOpen(true);
+        }}
+      />
 
-        {/* Quick Metrics & Actions */}
-        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
-          <button
-            type="button"
-            onClick={() => setIsShieldInfoOpen(true)}
-            className={cn(
-              "px-2.5 py-1.5 rounded-lg border border-[#E8E5DF] dark:border-[#383531] text-xs font-mono font-medium flex items-center gap-1.5 transition-colors cursor-pointer",
-              streakFreeze.tokensAvailable > 0
-                ? "bg-[#F1EFEA] dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] hover:bg-[#E8E5DF] dark:hover:bg-[#2e2b28]"
-                : "bg-amber-50 dark:bg-amber-950/30 text-amber-900 dark:text-amber-200 hover:bg-amber-100"
-            )}
-            title="Streak shield protection details"
-          >
-            <ShieldCheck className="size-3.5 stroke-[1.5] text-[#161514] dark:text-[#FAF8F5]" />
-            <span>
-              {streakFreeze.tokensAvailable > 0
-                ? `${streakFreeze.tokensAvailable}/2 Shielded`
-                : "0/2 Shields"}
-            </span>
-          </button>
-
-          <div className="px-2.5 py-1.5 rounded-lg border border-[#E8E5DF] dark:border-[#78350F]/40 bg-[#FFFBEB] dark:bg-[#78350F]/20 text-[#92400E] dark:text-[#FDE68A] text-center flex items-center gap-1.5">
-            <Flame className="size-3.5 fill-orange-500 text-orange-500" />
-            <span className="text-xs font-mono font-medium tabular-nums">
-              {longestStreakValue}d streak
-            </span>
-          </div>
-
-          {/* Tactile Audio Mute Toggle */}
-          <button
-            type="button"
-            onClick={() => {
-              const nextMuted = soundFX.toggleMute();
-              setSoundMuted(nextMuted);
-              toast.info(nextMuted ? "Tactile audio muted" : "Tactile audio active");
-            }}
-            className="size-9 rounded-lg border border-[#E8E5DF] dark:border-[#383531] bg-white dark:bg-[#252321] hover:bg-[#F5F3EF] dark:hover:bg-[#2e2b28] text-[#161514] dark:text-[#FAF8F5] transition-colors flex items-center justify-center cursor-pointer shrink-0"
-            title={soundMuted ? "Unmute tactile sounds" : "Mute tactile sounds"}
-            aria-label="Toggle sound"
-          >
-            {soundMuted ? <VolumeX className="size-3.5 stroke-[1.5]" /> : <Volume2 className="size-3.5 stroke-[1.5]" />}
-          </button>
-
-          <Button
-            onClick={() => {
-              soundFX.playPop();
-              setIsChoiceOpen(true);
-            }}
-            className="bg-[var(--btn-primary-bg)] hover:bg-[var(--btn-primary-hover)] text-[var(--btn-primary-fg)] font-heading font-black text-xs px-3.5 py-2 h-auto rounded-xl border-2 border-[var(--btn-primary-border)] shadow-[2px_2px_0px_0px_var(--btn-primary-shadow)] flex items-center gap-1.5 cursor-pointer transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
-          >
-            <Plus className="size-3.5 stroke-[2]" />
-            <span>New Habit</span>
-          </Button>
-
-          {/* Interactive Fitness Vix Companion */}
-          <VixPixelCompanion
-            gear="fitness"
-            state={isAllDueCompleted || longestStreakValue >= 3 ? "fire" : "idle"}
-            size={36}
-            onClick={() => {
-              soundFX.playPop();
-              setIsChoiceOpen(true);
-            }}
-            title={isAllDueCompleted ? "Vix: All daily habits conquered today!" : "Vix: Fitness companion (Click for Habit Vault)"}
-          />
-        </div>
-      </div>
+      {/* 1. Master Habits Momentum Cockpit Deck */}
+      <HabitsCockpitDeck
+        habits={habits}
+        streaks={streaks}
+        streakFreeze={streakFreeze}
+        selectedDate={selectedDate}
+        onSelectDate={setSelectedDate}
+        habitLayoutStyle={habitLayoutStyle}
+        onSelectLayoutStyle={setHabitLayoutStyle}
+        onOpenNewHabit={() => {
+          soundFX.playPop();
+          setIsChoiceOpen(true);
+        }}
+        onOpenShieldInfo={() => setIsShieldInfoOpen(true)}
+        dailyCompletionPercent={dailyCompletionPercent}
+        completedCount={completedTodayHabits.filter((h) => !isHabitRestDay(h)).length}
+        dueCount={dueTodayHabits.length}
+        userLevel={achievements.userLevel}
+        totalXP={achievements.totalXP}
+        userName="Gladiator"
+        soundMuted={soundMuted}
+        onToggleSound={() => {
+          const nextMuted = soundFX.toggleMute();
+          setSoundMuted(nextMuted);
+          toast.info(nextMuted ? "Tactile audio muted" : "Tactile audio active");
+        }}
+        weeklyAveragePercent={
+          dueTodayHabits.length > 0 && weekLogs.length > 0
+            ? Math.min(100, Math.round((weekLogs.length / Math.max(1, habits.length * 7)) * 100))
+            : dailyCompletionPercent
+        }
+      />
 
       {/* 2. Proactive Reminder Banner */}
       <ProactiveReminderBanner space="goals" />
@@ -458,13 +449,6 @@ function GoalsPageContent() {
                 {habits.length}
               </span>
             </h3>
-            <button
-              type="button"
-              onClick={() => setIsChoiceOpen(true)}
-              className="text-xs font-medium text-[#161514] dark:text-[#FAF8F5] bg-white dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#383531] hover:bg-[#F5F3EF] dark:hover:bg-[#2e2b28] px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
-            >
-              + New habit
-            </button>
           </div>
 
           {/* Daily Victory Celebration HUD */}
@@ -544,18 +528,6 @@ function GoalsPageContent() {
                   </span>
                 </button>
               </div>
-
-              {/* Daily Momentum Progress Pill */}
-              <div className="flex items-center gap-2 px-2.5 py-1 bg-[#F1EFEA] dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#383531] rounded-lg text-xs font-medium text-[#161514] dark:text-[#FAF8F5]">
-                <span className="text-xs text-[#6B6B6B] dark:text-[#A8A29E]">Today</span>
-                <div className="w-16 h-1.5 bg-[#E8E5DF] dark:bg-[#383531] rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-[#03D26F] transition-all duration-300"
-                    style={{ width: `${dailyCompletionPercent}%` }}
-                  />
-                </div>
-                <span className="text-xs font-mono font-medium tabular-nums">{dailyCompletionPercent}%</span>
-              </div>
             </div>
           )}
 
@@ -596,65 +568,13 @@ function GoalsPageContent() {
                 const isRest = isHabitRestDay(habit);
                 const habitStreak = streaks[habit.id];
 
-                if (habitLayoutStyle === "compact") {
-                  return (
-                    <div
-                      key={habit.id}
-                      className={cn(
-                        "bg-white dark:bg-[#1C1A18] rounded-xl p-3 border border-[#E8E5DF] dark:border-[#383531] flex items-center justify-between transition-colors cursor-pointer hover:bg-[#FAF8F5] dark:hover:bg-[#252321]",
-                        isDone && "bg-[#F9FAF9] dark:bg-[#181615] opacity-80",
-                        isRest && "bg-[#FAF8F5] dark:bg-[#181615] border-dashed opacity-80"
-                      )}
-                      onClick={() => router.push(`/goals/${habit.id}`)}
-                    >
-                      <div className="flex items-center gap-3">
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleToggleLog(habit.id, !isDone);
-                          }}
-                          className={cn(
-                            "size-7 rounded-md border flex items-center justify-center shrink-0 transition-colors cursor-pointer",
-                            isDone ? "bg-[#03D26F] border-[#03D26F] text-white" : "bg-white dark:bg-[#252321] border-[#D1D5DB] dark:border-[#4B5563] hover:bg-[#F1EFEA] dark:hover:bg-[#2e2b28]"
-                          )}
-                        >
-                          {isDone ? <Check className="size-3.5 stroke-[2.5]" /> : null}
-                        </button>
-                        <div>
-                          <div className="flex items-center gap-1.5">
-                            <h4 className={cn("font-sans font-medium text-xs text-[#161514] dark:text-[#FAF8F5]", isDone && "line-through text-[#6B6B6B] dark:text-[#A8A29E]")}>
-                              {habit.title}
-                            </h4>
-                            {isRest && (
-                              <span className="text-[9px] font-medium px-1.5 py-0.2 rounded border border-[#E8E5DF] dark:border-[#383531] bg-[#F1EFEA] dark:bg-[#252321] text-[#6B6B6B] dark:text-[#A8A29E] flex items-center gap-0.5">
-                                <Moon className="size-2 stroke-[1.5]" />
-                                <span>Rest</span>
-                              </span>
-                            )}
-                          </div>
-                          {habitStreak?.currentStreak ? (
-                            <span className="text-[10px] font-mono text-[#92400E] dark:text-[#FDE68A] flex items-center gap-1 mt-0.5">
-                              <Flame className="size-2.5 fill-orange-500 text-orange-500" />
-                              <span>{habitStreak.currentStreak}d streak</span>
-                            </span>
-                          ) : null}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        {habit.reminderTime && (
-                          <span className="text-[10px] font-mono text-[#6B6B6B] dark:text-[#A8A29E] px-1.5 py-0.5 rounded border border-[#E8E5DF] dark:border-[#383531] bg-white dark:bg-[#252321] flex items-center gap-1">
-                            <Clock className="size-2.5 stroke-[1.5]" />
-                            <span>{habit.reminderTime}</span>
-                          </span>
-                        )}
-                        <span className="text-[10px] font-medium px-2 py-0.5 rounded-md border border-[#E8E5DF] dark:border-[#383531] bg-[#F1EFEA] dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5]">
-                          {habit.frequency?.type || "Daily"}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                }
+                const habitWeekDays = weekDays.map((d) => ({
+                  ...d,
+                  isCompleted:
+                    d.dateStr === selectedDate
+                      ? isDone
+                      : weekLogs.some((l) => l.habitId === habit.id && l.date === d.dateStr),
+                }));
 
                 return (
                   <HabitCard
@@ -664,6 +584,15 @@ function GoalsPageContent() {
                     isCompletedToday={isDone}
                     isRestDay={isRest}
                     onToggle={() => handleToggleLog(habit.id, !isDone)}
+                    weekDays={habitWeekDays}
+                    onToggleDate={(dateStr) => {
+                      const isDayDone =
+                        dateStr === selectedDate
+                          ? isDone
+                          : weekLogs.some((l) => l.habitId === habit.id && l.date === dateStr);
+                      handleToggleLog(habit.id, !isDayDone, dateStr);
+                    }}
+                    viewMode={habitLayoutStyle}
                     onEdit={() => {
                       setEditingHabit(habit);
                       setEditHabitTitle(habit.title);
