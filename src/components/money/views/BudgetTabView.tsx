@@ -1,23 +1,35 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { type Category, type Transaction } from "@/types";
 import { type MonthlyBudgetStats } from "@/lib/utils/budget-rollover";
 import { cn } from "@/lib/utils";
-import { Plus, Sparkles, Sliders, RefreshCw, Banknote, Target, Layers } from "lucide-react";
+import { Plus, Sparkles, Sliders, RefreshCw, Banknote, Target, Layers, Smartphone, Zap, X, Check } from "lucide-react";
 import { CategoryIcon, getCategoryAccent } from "@/components/money/MoneyQuickActionsAndCards";
 import { BUDGET_CATEGORY_TEMPLATE_PACKS } from "@/lib/templates-data";
 import { type TemplatePack } from "@/components/shared/TemplateSelectionModal";
+import { soundFX } from "@/components/shared/SoundFX";
+import { toast } from "sonner";
 
 interface BudgetTabViewProps {
   categories: Category[];
   transactions: Transaction[];
   monthlyStats: MonthlyBudgetStats;
   currencySymbol: string;
+  defaultUpiBudget?: number;
+  defaultCashBudget?: number;
+  defaultCustomDailyBudget?: number | null;
+  defaultEnableRollover?: boolean;
+  onSaveAllowances?: (payload: {
+    upiBudget: number;
+    cashBudget: number;
+    customDailyBudget: number | null;
+    enableRollover: boolean;
+  }) => Promise<any> | void;
   onAddCategory: () => void;
   onEditCategory: (category: Category) => void;
-  onOpenTemplates: () => void;
-  onOpenAllowances: () => void;
+  onOpenTemplates?: () => void;
+  onOpenAllowances?: () => void;
   onApplyCategoryPack?: (pack: TemplatePack) => Promise<void> | void;
 }
 
@@ -26,6 +38,11 @@ export function BudgetTabView({
   transactions,
   monthlyStats,
   currencySymbol,
+  defaultUpiBudget,
+  defaultCashBudget,
+  defaultCustomDailyBudget,
+  defaultEnableRollover,
+  onSaveAllowances,
   onAddCategory,
   onEditCategory,
   onOpenTemplates,
@@ -34,8 +51,54 @@ export function BudgetTabView({
 }: BudgetTabViewProps) {
   const expenseCategories = categories.filter((c) => c.type === "expense" && !c.archived);
 
+  // In-situ state toggles
+  const [isConfiguringAllowances, setIsConfiguringAllowances] = useState(false);
+  const [isBrowsingTemplates, setIsBrowsingTemplates] = useState(false);
+
+  // Allowance form state
+  const [upiBudgetInput, setUpiBudgetInput] = useState(String(defaultUpiBudget ?? monthlyStats.baseBudget ?? 8000));
+  const [cashBudgetInput, setCashBudgetInput] = useState(String(defaultCashBudget ?? monthlyStats.baseCashBudget ?? 2000));
+  const [customDailyInput, setCustomDailyInput] = useState(
+    defaultCustomDailyBudget ? String(defaultCustomDailyBudget) : ""
+  );
+  const [enableRolloverInput, setEnableRolloverInput] = useState(defaultEnableRollover ?? false);
+  const [isSavingAllowances, setIsSavingAllowances] = useState(false);
+
+  useEffect(() => {
+    if (defaultUpiBudget !== undefined) setUpiBudgetInput(String(defaultUpiBudget));
+    if (defaultCashBudget !== undefined) setCashBudgetInput(String(defaultCashBudget));
+    if (defaultCustomDailyBudget !== undefined) {
+      setCustomDailyInput(defaultCustomDailyBudget ? String(defaultCustomDailyBudget) : "");
+    }
+    if (defaultEnableRollover !== undefined) setEnableRolloverInput(defaultEnableRollover);
+  }, [defaultUpiBudget, defaultCashBudget, defaultCustomDailyBudget, defaultEnableRollover]);
+
+  const handleSaveAllowanceForm = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!onSaveAllowances) {
+      onOpenAllowances?.();
+      return;
+    }
+
+    setIsSavingAllowances(true);
+    soundFX.playPop();
+    try {
+      await onSaveAllowances({
+        upiBudget: Number(upiBudgetInput) || 0,
+        cashBudget: Number(cashBudgetInput) || 0,
+        customDailyBudget: customDailyInput.trim() ? Number(customDailyInput) : null,
+        enableRollover: enableRolloverInput,
+      });
+      setIsConfiguringAllowances(false);
+    } catch {
+      toast.error("Failed to save allowances");
+    } finally {
+      setIsSavingAllowances(false);
+    }
+  };
+
   // Compute spend per category for the current target month
-  const categorySpendMap = React.useMemo(() => {
+  const categorySpendMap = useMemo(() => {
     const map = new Map<string, number>();
     transactions.forEach((tx) => {
       if (tx.type === "expense" && tx.date?.startsWith(monthlyStats.targetMonthKey)) {
@@ -75,13 +138,196 @@ export function BudgetTabView({
 
           <button
             type="button"
-            onClick={onOpenAllowances}
-            className="bg-white hover:bg-[#FAF8F5] dark:bg-[#1C1A18] dark:hover:bg-[#252321] text-[#161514] dark:text-stone-200 font-medium text-xs py-1.5 px-3 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+            onClick={() => {
+              soundFX.playPop();
+              if (onSaveAllowances) {
+                setIsConfiguringAllowances(!isConfiguringAllowances);
+              } else {
+                onOpenAllowances?.();
+              }
+            }}
+            className={cn(
+              "font-medium text-xs py-1.5 px-3 rounded-xl border shadow-xs transition-all flex items-center gap-1.5 cursor-pointer",
+              isConfiguringAllowances
+                ? "bg-[#161514] text-white dark:bg-[#CEF431] dark:text-[#161514] border-[#161514] dark:border-[#CEF431]"
+                : "bg-white hover:bg-[#FAF8F5] dark:bg-[#1C1A18] dark:hover:bg-[#252321] text-[#161514] dark:text-stone-200 border-[#E8E5DF] dark:border-[#2A2724]"
+            )}
           >
             <Sliders className="size-3.5 stroke-[1.8]" />
-            <span>Configure Allowances</span>
+            <span>{isConfiguringAllowances ? "Close Studio" : "Configure Allowances"}</span>
           </button>
         </div>
+
+        {/* ─── IN-SITU ALLOWANCE CONFIGURATION STUDIO (Zero-Modal Benchmark) ─── */}
+        {isConfiguringAllowances && (
+          <form
+            onSubmit={handleSaveAllowanceForm}
+            className="p-4 sm:p-5 rounded-2xl bg-[#FAF8F5] dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#CEF431] shadow-[2.5px_2.5px_0px_0px_#161514] space-y-4 animate-in fade-in duration-150"
+          >
+            <div className="flex items-center justify-between pb-2 border-b border-[#E8E5DF] dark:border-[#2A2724]">
+              <div className="flex items-center gap-2">
+                <span className="size-2 rounded-full bg-[#03D26F] animate-pulse" />
+                <h4 className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5] uppercase tracking-wider">
+                  In-Situ Allowance &amp; Rollover Studio
+                </h4>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsConfiguringAllowances(false)}
+                className="size-7 rounded-lg bg-white dark:bg-[#252321] hover:bg-neutral-100 dark:hover:bg-[#2e2a28] border border-[#E8E5DF] dark:border-[#383531] flex items-center justify-center text-[#161514] dark:text-[#FAF8F5] cursor-pointer"
+              >
+                <X className="size-3.5" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Digital UPI Allowance Input */}
+              <div className="space-y-1.5 bg-white dark:bg-[#252321] p-3 rounded-xl border border-[#E8E5DF] dark:border-[#383531]">
+                <div className="flex items-center justify-between">
+                  <label className="text-[11px] font-heading font-bold text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5">
+                    <Smartphone className="size-3.5 text-emerald-600 dark:text-emerald-400" />
+                    <span>Monthly Digital UPI Allowance</span>
+                  </label>
+                  <span className="text-[10px] font-mono text-[#6B6B6B] dark:text-[#A8A29E]">Bank / Cards</span>
+                </div>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 font-mono font-bold text-xs text-[#6B6B6B] dark:text-[#A8A29E]">
+                    {currencySymbol}
+                  </span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="100"
+                    placeholder="8000"
+                    value={upiBudgetInput}
+                    onChange={(e) => setUpiBudgetInput(e.target.value)}
+                    className="w-full pl-7 pr-3 py-2 rounded-lg text-xs font-mono font-bold bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#383531] text-[#161514] dark:text-[#FAF8F5] focus:outline-none focus:ring-1 focus:ring-[#161514]"
+                  />
+                </div>
+                {/* Presets */}
+                <div className="flex items-center gap-1 pt-1 flex-wrap">
+                  {[5000, 8000, 12000, 15000].map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => setUpiBudgetInput(String(preset))}
+                      className="px-2 py-0.5 rounded text-[10px] font-mono bg-[#FAF8F5] dark:bg-[#1C1A18] hover:bg-neutral-100 dark:hover:bg-[#2E2B28] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#383531] cursor-pointer"
+                    >
+                      {currencySymbol}{preset.toLocaleString()}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Physical Cash Budget Input */}
+              <div className="space-y-1.5 bg-white dark:bg-[#252321] p-3 rounded-xl border border-[#E8E5DF] dark:border-[#383531]">
+                <div className="flex items-center justify-between">
+                  <label className="text-[11px] font-heading font-bold text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5">
+                    <Banknote className="size-3.5 text-amber-600 dark:text-amber-400" />
+                    <span>Physical Cash Till Limit</span>
+                  </label>
+                  <span className="text-[10px] font-mono text-[#6B6B6B] dark:text-[#A8A29E]">Wallet Envelope</span>
+                </div>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 font-mono font-bold text-xs text-[#6B6B6B] dark:text-[#A8A29E]">
+                    {currencySymbol}
+                  </span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="100"
+                    placeholder="2000"
+                    value={cashBudgetInput}
+                    onChange={(e) => setCashBudgetInput(e.target.value)}
+                    className="w-full pl-7 pr-3 py-2 rounded-lg text-xs font-mono font-bold bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#383531] text-[#161514] dark:text-[#FAF8F5] focus:outline-none focus:ring-1 focus:ring-[#161514]"
+                  />
+                </div>
+                {/* Presets */}
+                <div className="flex items-center gap-1 pt-1 flex-wrap">
+                  {[1000, 2000, 3000, 5000].map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => setCashBudgetInput(String(preset))}
+                      className="px-2 py-0.5 rounded text-[10px] font-mono bg-[#FAF8F5] dark:bg-[#1C1A18] hover:bg-neutral-100 dark:hover:bg-[#2E2B28] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#383531] cursor-pointer"
+                    >
+                      {currencySymbol}{preset.toLocaleString()}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Custom Daily Pace Override & Rollover Toggle */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+              <div className="space-y-1 bg-white dark:bg-[#252321] p-3 rounded-xl border border-[#E8E5DF] dark:border-[#383531]">
+                <label className="text-[11px] font-heading font-bold text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5">
+                  <Zap className="size-3.5 text-amber-500" />
+                  <span>Daily Safe Pace Override (Optional)</span>
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="50"
+                  placeholder="Leave empty for auto pace calculation"
+                  value={customDailyInput}
+                  onChange={(e) => setCustomDailyInput(e.target.value)}
+                  className="w-full px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#383531] text-[#161514] dark:text-[#FAF8F5] focus:outline-none focus:ring-1 focus:ring-[#161514]"
+                />
+              </div>
+
+              {/* Rollover Toggle */}
+              <div className="flex items-center justify-between bg-white dark:bg-[#252321] p-3 rounded-xl border border-[#E8E5DF] dark:border-[#383531]">
+                <div>
+                  <span className="text-[11px] font-heading font-bold text-[#161514] dark:text-[#FAF8F5] block">
+                    Automatic Rollover
+                  </span>
+                  <p className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E]">
+                    Roll unspent UPI surplus into next month
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setEnableRolloverInput(!enableRolloverInput)}
+                  className={cn(
+                    "px-3 py-1 rounded-xl text-xs font-heading font-black border transition-all cursor-pointer",
+                    enableRolloverInput
+                      ? "bg-[#CEF431] text-[#161514] border-[#161514] shadow-xs"
+                      : "bg-[#FAF8F5] dark:bg-[#1C1A18] text-[#6B6B6B] dark:text-[#A8A29E] border-[#E8E5DF] dark:border-[#383531]"
+                  )}
+                >
+                  {enableRolloverInput ? "ENABLED" : "OFF"}
+                </button>
+              </div>
+            </div>
+
+            {/* Live Calculation Summary & Action Buttons */}
+            <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#E8E5DF] dark:border-[#2A2724]">
+              <div className="text-[11px] font-mono text-[#6B6B6B] dark:text-[#A8A29E]">
+                Total: <strong className="text-[#161514] dark:text-[#FAF8F5]">{currencySymbol}{((Number(upiBudgetInput) || 0) + (Number(cashBudgetInput) || 0)).toLocaleString()}</strong>
+                {" • "}
+                Estimated Pace: <strong className="text-emerald-700 dark:text-emerald-400">~{currencySymbol}{Math.round(((Number(upiBudgetInput) || 0) + (Number(cashBudgetInput) || 0)) / 30)}/day</strong>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsConfiguringAllowances(false)}
+                  className="px-3 py-1.5 rounded-xl text-xs font-heading font-medium text-[#6B6B6B] hover:text-[#161514] dark:text-[#A8A29E] dark:hover:text-white cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingAllowances}
+                  className="px-4 py-1.5 rounded-xl bg-[#161514] text-white dark:bg-[#CEF431] dark:text-[#161514] text-xs font-heading font-black shadow-xs active:scale-95 transition-all cursor-pointer border border-[#161514] dark:border-[#CEF431]"
+                >
+                  {isSavingAllowances ? "Saving…" : "Save Allowances"}
+                </button>
+              </div>
+            </div>
+          </form>
+        )}
 
         {/* Rollover Metrics Strip */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
@@ -161,11 +407,23 @@ export function BudgetTabView({
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={onOpenTemplates}
-              className="bg-white hover:bg-[#FAF8F5] dark:bg-[#161514] dark:hover:bg-[#1C1A18] text-[#161514] dark:text-stone-200 font-medium text-xs py-1.5 px-3 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+              onClick={() => {
+                soundFX.playPop();
+                if (onApplyCategoryPack) {
+                  setIsBrowsingTemplates(!isBrowsingTemplates);
+                } else {
+                  onOpenTemplates?.();
+                }
+              }}
+              className={cn(
+                "font-medium text-xs py-1.5 px-3 rounded-xl border shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer",
+                isBrowsingTemplates
+                  ? "bg-[#161514] text-white dark:bg-[#CEF431] dark:text-[#161514] border-[#161514] dark:border-[#CEF431]"
+                  : "bg-white hover:bg-[#FAF8F5] dark:bg-[#161514] dark:hover:bg-[#1C1A18] text-[#161514] dark:text-stone-200 border-[#E8E5DF] dark:border-[#2A2724]"
+              )}
             >
               <Sparkles className="size-3.5 stroke-[1.8]" />
-              <span>Template Packs</span>
+              <span>{isBrowsingTemplates ? "Close Packs" : "Template Packs"}</span>
             </button>
 
             <button
@@ -178,6 +436,73 @@ export function BudgetTabView({
             </button>
           </div>
         </div>
+
+        {/* ─── IN-SITU STARTER PACKS SHELF (Zero-Modal Benchmark) ─── */}
+        {isBrowsingTemplates && (
+          <div className="p-4 rounded-2xl bg-[#FAF8F5] dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#CEF431] shadow-[2px_2px_0px_0px_#161514] space-y-3 animate-in fade-in duration-150">
+            <div className="flex items-center justify-between pb-1 border-b border-[#E8E5DF] dark:border-[#2A2724]">
+              <div className="flex items-center gap-2">
+                <Sparkles className="size-3.5 text-amber-500" />
+                <h4 className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5] uppercase tracking-wider">
+                  Battle-Tested Student Budget Packs
+                </h4>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsBrowsingTemplates(false)}
+                className="size-6 rounded-lg bg-white dark:bg-[#252321] hover:bg-neutral-100 text-[#161514] dark:text-[#FAF8F5] flex items-center justify-center cursor-pointer border border-[#E8E5DF] dark:border-[#383531]"
+              >
+                <X className="size-3" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              {BUDGET_CATEGORY_TEMPLATE_PACKS.map((pack) => (
+                <div
+                  key={pack.id}
+                  className="p-3.5 rounded-xl bg-white dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#383531] shadow-xs flex flex-col justify-between space-y-2 hover:-translate-y-0.5 transition-all"
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-1 mb-1.5">
+                      <span className="text-base">{pack.icon === "PiggyBank" ? "🐷" : pack.icon === "BookOpen" ? "📚" : "💵"}</span>
+                      <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-[#FAF8F5] dark:bg-[#1C1A18] text-[#161514] dark:text-stone-300 border border-[#E8E5DF] dark:border-[#2A2724]">
+                        {pack.badge}
+                      </span>
+                    </div>
+                    <h5 className="font-heading font-black text-xs text-[#161514] dark:text-[#FAF8F5]">
+                      {pack.name}
+                    </h5>
+                    <p className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E] mt-0.5 line-clamp-2">
+                      {pack.tagline}
+                    </p>
+                  </div>
+
+                  <div className="pt-2 border-t border-[#E8E5DF]/60 dark:border-[#383531] flex items-center justify-between">
+                    <span className="font-mono text-[9px] text-[#6B6B6B] dark:text-[#A8A29E]">
+                      {pack.items.length} envelopes
+                    </span>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        soundFX.playPop();
+                        if (onApplyCategoryPack) {
+                          await onApplyCategoryPack(pack);
+                          setIsBrowsingTemplates(false);
+                          toast.success(`Loaded "${pack.name}" starter pack! ✨`);
+                        } else {
+                          onOpenTemplates?.();
+                        }
+                      }}
+                      className="px-2.5 py-1 rounded-lg bg-[#CEF431] text-[#161514] text-[10px] font-heading font-black border border-[#161514] shadow-xs hover:bg-[#bfe627] active:scale-95 transition-all cursor-pointer"
+                    >
+                      Load Pack ➔
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* ─── ZERO-CONFUSION FIRST-RUN ONBOARDING FOR BUDGETS ─── */}
         {expenseCategories.length === 0 ? (
@@ -222,7 +547,7 @@ export function BudgetTabView({
                       if (onApplyCategoryPack) {
                         onApplyCategoryPack(pack);
                       } else {
-                        onOpenTemplates();
+                        onOpenTemplates?.();
                       }
                     }}
                     className="text-left p-4 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] hover:bg-white dark:hover:bg-[#252321] border border-[#E8E5DF] dark:border-[#2A2724] hover:border-[#161514]/40 hover:shadow-xs transition-all cursor-pointer group flex flex-col justify-between"

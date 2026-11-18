@@ -738,6 +738,11 @@ function MoneyPageContent() {
             transactions={transactions}
             monthlyStats={monthlyStats}
             currencySymbol={currencySymbol}
+            defaultUpiBudget={baseUpiBudget}
+            defaultCashBudget={baseCashBudget}
+            defaultCustomDailyBudget={customDailyBudget}
+            defaultEnableRollover={enableRollover}
+            onSaveAllowances={handleSaveAllowances}
             onAddCategory={() => setIsAddCatOpen(true)}
             onEditCategory={(cat) => setEditingCat(cat)}
             onOpenTemplates={() => setIsTemplateModalOpen(true)}
