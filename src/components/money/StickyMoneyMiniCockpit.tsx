@@ -97,7 +97,7 @@ export function StickyMoneyMiniCockpit({
       aria-label="Sticky Money Mini Cockpit"
       aria-hidden={!isVisible}
     >
-      <div className="bg-white/95 dark:bg-[#1C1A18]/95 border-2 border-[#161514] dark:border-white/20 rounded-2xl px-3 sm:px-4 py-1.5 sm:py-2 shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,0.15)] flex items-center justify-between gap-2 sm:gap-4 backdrop-blur-md">
+      <div className="bg-white dark:bg-[#161514] border-2 border-[#161514] dark:border-[#38332E] rounded-2xl px-3.5 sm:px-4 py-1.5 sm:py-2 shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] flex items-center justify-between gap-2 sm:gap-4">
         {/* 1. Left: Remaining Budget Telemetry */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           <div className="inline-flex items-center gap-1 bg-[#DCFAE5] dark:bg-[#04250e] text-[#04250e] dark:text-[#A7F3D0] font-mono font-medium text-xs px-2 py-0.5 rounded-lg border border-[#03D26F]/30">

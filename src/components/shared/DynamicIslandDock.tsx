@@ -159,8 +159,15 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
       ? "pomodoro"
       : "ambient";
 
-  // Hide ambient pill if dismissed by user, or on /money page where full money cockpit & ledger already exist
-  if (currentMode === "ambient" && (isAmbientDismissed || pathname === "/money")) {
+  // Hide ambient pill if dismissed by user, or on dedicated space pages where full cockpits already exist
+  if (
+    currentMode === "ambient" &&
+    (isAmbientDismissed ||
+      pathname?.startsWith("/money") ||
+      pathname?.startsWith("/goals") ||
+      pathname?.startsWith("/quick-log") ||
+      (variant === "mobile" && pathname !== "/today"))
+  ) {
     return null;
   }
 

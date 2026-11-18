@@ -65,6 +65,7 @@ import {
 import Link from "next/link";
 import { toast } from "sonner";
 import { BankSmsSettingsSection } from "@/components/settings/BankSmsSettingsSection";
+import { AmbientQuickLogCard } from "@/components/money/AmbientQuickLogCard";
 import { ReminderManagerModal } from "@/components/shared/ReminderManagerModal";
 import { getReminderConfig, type ReminderConfig } from "@/lib/utils/reminder-scheduler";
 import { ReportIssueModal } from "@/components/shared/ReportIssueModal";
@@ -1658,6 +1659,14 @@ export default function SettingsPage() {
                 </Button>
               </form>
             )}
+
+            {/* Ambient Zero-App Quick-Log & Pull-Down Notification Shade Configuration */}
+            <div className="border-t border-[#E8E5DF] dark:border-[#2A2724] pt-4">
+              <AmbientQuickLogCard
+                safeDailyPace={cloudBudgetPrefs?.customDailyBudget || 657}
+                currencySymbol={currencySymbol}
+              />
+            </div>
 
             {/* Bank SMS Telemetry & Engine Section */}
             <div className="border-t border-[#E8E5DF] dark:border-[#2A2724] pt-4">

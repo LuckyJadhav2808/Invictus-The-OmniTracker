@@ -38,7 +38,6 @@ import { VaultTabView } from "@/components/money/views/VaultTabView";
 import { AnalyticsTabView } from "@/components/money/views/AnalyticsTabView";
 import { WhoOwesWhoTabView } from "@/components/money/views/WhoOwesWhoTabView";
 import { StickyMoneyMiniCockpit } from "@/components/money/StickyMoneyMiniCockpit";
-import { AmbientQuickLogCard } from "@/components/money/AmbientQuickLogCard";
 import { useWhoOwesWhoStore } from "@/store/who-owes-who-store";
 
 // Lazy-Loaded Heavy Modals (Zero TBT & Fast Initial Paint)
@@ -666,7 +665,7 @@ function MoneyPageContent() {
   }
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-28 sm:pb-16">
+    <div className="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-36 sm:pb-20">
       {/* 🧭 STICKY MINI-COCKPIT ON SCROLL (Belanje & Apple Wallet Benchmark) */}
       <StickyMoneyMiniCockpit
         currencySymbol={currencySymbol}
@@ -696,12 +695,6 @@ function MoneyPageContent() {
         onEditTransaction={(tx) => setEditingTx(tx)}
         onDuplicateTransaction={handleDuplicateTransaction}
         onDeleteTransaction={handleDeleteTransaction}
-      />
-
-      {/* ⚡ AMBIENT ZERO-APP QUICK-LOG DOCK CARD */}
-      <AmbientQuickLogCard
-        safeDailyPace={dailyStats.dailyBudgetTarget || monthlyStats.dailySafeToSpend || 0}
-        currencySymbol={currencySymbol}
       />
 
       {/* 📑 FLOATING SUB-NAV DOCK */}
