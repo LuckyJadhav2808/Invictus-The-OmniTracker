@@ -20,7 +20,10 @@ import {
   MessageCircle,
   Clock,
   Sparkles,
+  Share2,
+  AlertTriangle,
 } from "lucide-react";
+import { format, parseISO, isToday, isPast, differenceInDays, startOfDay } from "date-fns";
 
 export interface WhoOwesWhoTabViewProps {
   currencySymbol: string;
@@ -139,9 +142,65 @@ export function WhoOwesWhoTabView({
     }
   };
 
+  // Overdue and Due Date status calculator
+  const getDueDateStatus = (dueDateStr?: string) => {
+    if (!dueDateStr) return null;
+    try {
+      const due = parseISO(dueDateStr);
+      const today = startOfDay(new Date());
+      if (isToday(due)) {
+        return { label: "Due Today", isOverdue: false, isDueToday: true };
+      }
+      if (isPast(due)) {
+        const days = Math.max(1, differenceInDays(today, due));
+        return { label: `Overdue by ${days}d`, isOverdue: true, isDueToday: false };
+      }
+      return { label: `Due ${dueDateStr}`, isOverdue: false, isDueToday: false };
+    } catch {
+      return { label: `Due ${dueDateStr}`, isOverdue: false, isDueToday: false };
+    }
+  };
+
+  // Formats rich polite reminder message for WhatsApp & WebShare
+  const formatReminderMessage = (iou: IOU) => {
+    const isLent = iou.type === "lent";
+    if (isLent) {
+      let msg = `🤝 *Invictus Split & Debt Reminder*\nHey ${iou.personName}! Just a gentle ping regarding *${currencySymbol}${iou.amount.toLocaleString()}* for "${iou.description}".`;
+      if (iou.dueDate) {
+        msg += `\n📅 *Expected by:* ${iou.dueDate}`;
+      }
+      msg += `\n⚡ Settle via UPI or Cash whenever you get a second!`;
+      return msg;
+    } else {
+      return `💸 *Invictus Payment Notice*\nHey ${iou.personName}! Paying you back *${currencySymbol}${iou.amount.toLocaleString()}* for "${iou.description}". Sent via UPI/Cash! ⚡`;
+    }
+  };
+
   const generateWhatsAppReminder = (iou: IOU) => {
-    const text = `Hey ${iou.personName}, just a gentle ping regarding ${currencySymbol}${iou.amount} for "${iou.description}" tracked in Invictus 🤝`;
+    const text = formatReminderMessage(iou);
     return `https://wa.me/?text=${encodeURIComponent(text)}`;
+  };
+
+  const handleShareReminder = async (iou: IOU) => {
+    soundFX.playPop();
+    const message = formatReminderMessage(iou);
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({
+          title: `Invictus Reminder: ${iou.personName}`,
+          text: message,
+        });
+        toast.success("Reminder shared via native sheet! 🤝");
+        return;
+      } catch (err: any) {
+        if (err?.name === "AbortError") return;
+      }
+    }
+
+    const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    if (typeof window !== "undefined") {
+      window.open(url, "_blank");
+    }
   };
 
   return (
@@ -398,102 +457,131 @@ export function WhoOwesWhoTabView({
             </p>
           </div>
         ) : (
-          pendingItems.map((iou) => (
-            <div
-              key={iou.id}
-              className="bg-white dark:bg-[#161514] p-3.5 sm:p-4 rounded-2xl border border-[#E8E5DF] dark:border-[#383531] shadow-xs hover:border-[#161514]/30 dark:hover:border-white/20 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-            >
-              <div className="flex items-start gap-3 min-w-0">
-                <div
-                  className={cn(
-                    "size-10 rounded-2xl flex items-center justify-center shrink-0 border",
-                    iou.type === "lent"
-                      ? "bg-emerald-50 dark:bg-emerald-950/40 text-[#047857] dark:text-[#03D26F] border-emerald-200 dark:border-emerald-800"
-                      : "bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800"
-                  )}
-                >
-                  {iou.type === "lent" ? (
-                    <ArrowUpRight className="size-5 stroke-[2.5]" />
-                  ) : (
-                    <ArrowDownLeft className="size-5 stroke-[2.5]" />
-                  )}
-                </div>
+          pendingItems.map((iou) => {
+            const dueStatus = getDueDateStatus(iou.dueDate);
 
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h4 className="font-heading font-bold text-sm text-[#161514] dark:text-[#FAF8F5] truncate">
-                      {iou.personName}
-                    </h4>
-                    {iou.dueDate && (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-mono text-[#6B6B6B] dark:text-[#A8A29E] bg-[#FAF8F5] dark:bg-[#1C1A18] px-1.5 py-0.5 rounded border border-[#E8E5DF] dark:border-[#383531]">
-                        <Clock className="size-2.5" />
-                        <span>Due {iou.dueDate}</span>
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] mt-0.5 truncate">
-                    {iou.description}
-                  </p>
-                </div>
-              </div>
-
-              {/* Amount & Actions */}
-              <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#E8E5DF]/60 dark:border-[#2A2724]">
-                <div className="text-left sm:text-right">
-                  <span
+            return (
+              <div
+                key={iou.id}
+                className={cn(
+                  "bg-white dark:bg-[#161514] p-3.5 sm:p-4 rounded-2xl border shadow-xs hover:border-[#161514]/30 dark:hover:border-white/20 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3",
+                  dueStatus?.isOverdue
+                    ? "border-rose-300 dark:border-rose-900/60 bg-rose-50/20 dark:bg-rose-950/10"
+                    : "border-[#E8E5DF] dark:border-[#383531]"
+                )}
+              >
+                <div className="flex items-start gap-3 min-w-0">
+                  <div
                     className={cn(
-                      "font-mono font-black text-sm sm:text-base tabular-nums",
+                      "size-10 rounded-2xl flex items-center justify-center shrink-0 border",
                       iou.type === "lent"
-                        ? "text-[#047857] dark:text-[#03D26F]"
-                        : "text-rose-600 dark:text-rose-400"
+                        ? "bg-emerald-50 dark:bg-emerald-950/40 text-[#047857] dark:text-[#03D26F] border-emerald-200 dark:border-emerald-800"
+                        : "bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800"
                     )}
                   >
-                    {iou.type === "lent" ? "+" : "-"}{currencySymbol}{iou.amount.toLocaleString()}
-                  </span>
+                    {iou.type === "lent" ? (
+                      <ArrowUpRight className="size-5 stroke-[2.5]" />
+                    ) : (
+                      <ArrowDownLeft className="size-5 stroke-[2.5]" />
+                    )}
+                  </div>
+
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h4 className="font-heading font-bold text-sm text-[#161514] dark:text-[#FAF8F5] truncate">
+                        {iou.personName}
+                      </h4>
+                      {dueStatus && (
+                        dueStatus.isOverdue ? (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-rose-600 dark:text-rose-400 bg-rose-100 dark:bg-rose-950/60 border border-rose-300 dark:border-rose-800 px-2 py-0.5 rounded-full animate-pulse">
+                            <AlertTriangle className="size-2.5" />
+                            <span>{dueStatus.label}</span>
+                          </span>
+                        ) : dueStatus.isDueToday ? (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-amber-700 dark:text-amber-400 bg-amber-100 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-800 px-2 py-0.5 rounded-full">
+                            <Clock className="size-2.5" />
+                            <span>Due Today</span>
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-mono text-[#6B6B6B] dark:text-[#A8A29E] bg-[#FAF8F5] dark:bg-[#1C1A18] px-1.5 py-0.5 rounded border border-[#E8E5DF] dark:border-[#383531]">
+                            <Clock className="size-2.5" />
+                            <span>Due {iou.dueDate}</span>
+                          </span>
+                        )
+                      )}
+                    </div>
+                    <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] mt-0.5 truncate">
+                      {iou.description}
+                    </p>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-1.5">
-                  {/* WhatsApp Reminder Button (for money lent) */}
-                  {iou.type === "lent" && (
+                {/* Amount & Actions */}
+                <div className="flex items-center justify-between sm:justify-end gap-2.5 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#E8E5DF]/60 dark:border-[#2A2724]">
+                  <div className="text-left sm:text-right pr-1">
+                    <span
+                      className={cn(
+                        "font-mono font-black text-sm sm:text-base tabular-nums",
+                        iou.type === "lent"
+                          ? "text-[#047857] dark:text-[#03D26F]"
+                          : "text-rose-600 dark:text-rose-400"
+                      )}
+                    >
+                      {iou.type === "lent" ? "+" : "-"}{currencySymbol}{iou.amount.toLocaleString()}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    {/* 1-Tap WhatsApp Reminder Direct Button */}
                     <a
                       href={generateWhatsAppReminder(iou)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="size-8 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-[#E8E5DF] dark:border-[#383531] flex items-center justify-center transition-colors shadow-xs"
-                      title="Send polite WhatsApp ping"
+                      className="size-8 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] hover:bg-[#25D366]/15 hover:text-[#25D366] text-[#25D366] border border-[#E8E5DF] dark:border-[#383531] flex items-center justify-center transition-colors shadow-xs"
+                      title={iou.type === "lent" ? "Send WhatsApp reminder" : "Send WhatsApp payment ping"}
                     >
                       <MessageCircle className="size-3.5" />
                     </a>
-                  )}
 
-                  {/* Settle Button */}
-                  <button
-                    type="button"
-                    onClick={() => handleSettle(iou)}
-                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#03D26F] hover:bg-[#02be64] text-[#161514] text-xs font-heading font-black border border-[#161514] shadow-xs active:scale-95 transition-all cursor-pointer"
-                    title="Mark this IOU as settled"
-                  >
-                    <CheckCircle2 className="size-3 stroke-[2.5]" />
-                    <span>Settle</span>
-                  </button>
+                    {/* Native Web Share Sheet Button */}
+                    <button
+                      type="button"
+                      onClick={() => handleShareReminder(iou)}
+                      className="size-8 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] hover:bg-stone-100 dark:hover:bg-[#252321] text-[#6B6B6B] hover:text-[#161514] dark:text-[#A8A29E] dark:hover:text-white border border-[#E8E5DF] dark:border-[#383531] flex items-center justify-center transition-colors shadow-xs cursor-pointer"
+                      title="Share reminder via sheet"
+                    >
+                      <Share2 className="size-3.5" />
+                    </button>
 
-                  {/* Delete Button */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      soundFX.playPop();
-                      deleteIOU(iou.id);
-                      toast.success("Record deleted");
-                    }}
-                    className="size-8 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] hover:bg-rose-50 dark:hover:bg-rose-950/40 text-[#6B6B6B] hover:text-rose-600 border border-[#E8E5DF] dark:border-[#383531] flex items-center justify-center transition-colors cursor-pointer"
-                    title="Delete record"
-                  >
-                    <Trash2 className="size-3" />
-                  </button>
+                    {/* Settle Button */}
+                    <button
+                      type="button"
+                      onClick={() => handleSettle(iou)}
+                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#03D26F] hover:bg-[#02be64] text-[#161514] text-xs font-heading font-black border border-[#161514] shadow-xs active:scale-95 transition-all cursor-pointer"
+                      title="Mark this IOU as settled"
+                    >
+                      <CheckCircle2 className="size-3 stroke-[2.5]" />
+                      <span>Settle</span>
+                    </button>
+
+                    {/* Delete Button */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        soundFX.playPop();
+                        deleteIOU(iou.id);
+                        toast.success("Record deleted");
+                      }}
+                      className="size-8 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] hover:bg-rose-50 dark:hover:bg-rose-950/40 text-[#6B6B6B] hover:text-rose-600 border border-[#E8E5DF] dark:border-[#383531] flex items-center justify-center transition-colors cursor-pointer"
+                      title="Delete record"
+                    >
+                      <Trash2 className="size-3" />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
 

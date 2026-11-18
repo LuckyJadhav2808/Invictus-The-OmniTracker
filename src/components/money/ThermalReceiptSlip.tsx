@@ -89,6 +89,10 @@ export function ThermalReceiptSlip({
 
   const isIncome = transaction.type === "income";
 
+  React.useEffect(() => {
+    soundFX.playPop();
+  }, []);
+
   let formattedDate = transaction.date;
   let formattedTime = "12:00 PM";
   try {
@@ -207,6 +211,11 @@ export function ThermalReceiptSlip({
 
         {/* Paper Content Body */}
         <div className="p-5 sm:p-6 space-y-4">
+          {/* Authentic Hole Punch Cutout */}
+          <div className="flex justify-center -mt-1 mb-1">
+            <div className="size-3 rounded-full bg-[#161514] dark:bg-[#121110] border border-[#161514]/40 shadow-inner" />
+          </div>
+
           {/* Receipt Store Header */}
           <div className="text-center space-y-1 border-b-2 border-dashed border-[#161514]/30 pb-3">
             <div className="inline-flex items-center gap-1.5 font-black text-xs uppercase tracking-widest bg-[#161514] text-white px-2.5 py-0.5 rounded">

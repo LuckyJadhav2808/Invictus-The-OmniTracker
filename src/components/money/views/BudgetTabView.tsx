@@ -20,6 +20,8 @@ interface BudgetTabViewProps {
   defaultCashBudget?: number;
   defaultCustomDailyBudget?: number | null;
   defaultEnableRollover?: boolean;
+  selectedCategoryId?: string;
+  onSelectCategory?: (categoryId: string) => void;
   onSaveAllowances?: (payload: {
     upiBudget: number;
     cashBudget: number;
@@ -42,6 +44,8 @@ export function BudgetTabView({
   defaultCashBudget,
   defaultCustomDailyBudget,
   defaultEnableRollover,
+  selectedCategoryId,
+  onSelectCategory,
   onSaveAllowances,
   onAddCategory,
   onEditCategory,
@@ -586,12 +590,21 @@ export function BudgetTabView({
               const isOver = hasLimit && spent > budget;
               const isWarning = hasLimit && percent >= 80 && !isOver;
               const accentColor = getCategoryAccent(cat);
+              const isSelected = selectedCategoryId === cat.id;
 
               return (
                 <div
                   key={cat.id}
-                  onClick={() => onEditCategory(cat)}
-                  className="bg-white dark:bg-[#161514] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] hover:bg-[#FAF8F5] dark:hover:bg-[#1C1A18] transition-colors p-4 space-y-3 cursor-pointer group relative overflow-hidden shadow-xs hover:-translate-y-0.5"
+                  onClick={() => {
+                    onSelectCategory?.(cat.id);
+                    onEditCategory(cat);
+                  }}
+                  className={cn(
+                    "bg-white dark:bg-[#161514] rounded-xl border transition-all p-4 space-y-3 cursor-pointer group relative overflow-hidden shadow-xs",
+                    isSelected
+                      ? "border-2 border-[#161514] dark:border-[#CEF431] shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#CEF431] ring-2 ring-[#CEF431]/20 -translate-y-0.5"
+                      : "border-[#E8E5DF] dark:border-[#2A2724] hover:bg-[#FAF8F5] dark:hover:bg-[#1C1A18] hover:-translate-y-0.5"
+                  )}
                 >
                   {/* Subtle top indicator bar */}
                   <div
@@ -605,9 +618,16 @@ export function BudgetTabView({
                       <span className="size-8 rounded-lg bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] flex items-center justify-center shrink-0 text-[#161514] dark:text-stone-200">
                         <CategoryIcon name={cat.icon} className="size-4 stroke-[1.5]" />
                       </span>
-                      <span className="text-xs sm:text-sm font-heading font-black text-[#161514] dark:text-stone-100 truncate">
-                        {cat.name}
-                      </span>
+                      <div className="min-w-0">
+                        <span className="text-xs sm:text-sm font-heading font-black text-[#161514] dark:text-stone-100 truncate block">
+                          {cat.name}
+                        </span>
+                        {isSelected && (
+                          <span className="text-[9px] font-mono font-bold text-[#047857] dark:text-[#03D26F] block">
+                            Active Filter
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     {/* Status Badge */}

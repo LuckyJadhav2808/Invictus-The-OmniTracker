@@ -139,9 +139,10 @@ export function RecentAccountFeed({
       </div>
 
       {/* ─── CONTENT BODY: List of Belanje Squircles or Empty State or Card 3 Allowances ─── */}
-      {activeCardIndex === 3 ? (
-        /* Allowances Summary Card for Card 3 */
-        <div className="space-y-2.5 pt-1">
+      <div key={activeCardIndex} className="animate-in fade-in-50 duration-200">
+        {activeCardIndex === 3 ? (
+          /* Allowances Summary Card for Card 3 */
+          <div className="space-y-2.5 pt-1">
           <div className="grid grid-cols-2 gap-2">
             <div className="p-3 rounded-xl bg-[#FAF8F5] dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#383531]">
               <span className="text-[10px] font-mono uppercase text-[#6B6B6B] dark:text-[#A8A29E] block">
@@ -292,6 +293,7 @@ export function RecentAccountFeed({
           ))}
         </div>
       )}
+      </div>
     </div>
   );
 }

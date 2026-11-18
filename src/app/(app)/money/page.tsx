@@ -677,35 +677,39 @@ function MoneyPageContent() {
             <TabsList className="bg-white/80 dark:bg-[#161514]/80 backdrop-blur-md rounded-2xl p-1.5 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex items-center gap-1.5 shrink-0">
               <TabsTrigger
                 value="ledger"
-                className="rounded-xl text-xs font-semibold py-2 px-3.5 sm:px-4 border border-transparent data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:shadow-xs dark:data-[state=active]:bg-white dark:data-[state=active]:text-[#161514] text-[#6B6B6B] hover:text-[#161514] dark:text-[#A8A29E] dark:hover:text-stone-100 transition-all flex items-center gap-2 shrink-0 cursor-pointer"
+                className="rounded-xl text-xs font-semibold py-2 px-3 sm:px-4 border border-transparent data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:shadow-xs dark:data-[state=active]:bg-white dark:data-[state=active]:text-[#161514] text-[#6B6B6B] hover:text-[#161514] dark:text-[#A8A29E] dark:hover:text-stone-100 transition-all flex items-center gap-1.5 sm:gap-2 shrink-0 cursor-pointer"
               >
                 <Receipt className="size-3.5 stroke-[2]" />
-                <span>Daily Ledger</span>
+                <span className="hidden sm:inline">Daily Ledger</span>
+                <span className="sm:hidden">Ledger</span>
               </TabsTrigger>
               <TabsTrigger
                 value="budgets"
-                className="rounded-xl text-xs font-semibold py-2 px-3.5 sm:px-4 border border-transparent data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:shadow-xs dark:data-[state=active]:bg-white dark:data-[state=active]:text-[#161514] text-[#6B6B6B] hover:text-[#161514] dark:text-[#A8A29E] dark:hover:text-stone-100 transition-all flex items-center gap-2 shrink-0 cursor-pointer"
+                className="rounded-xl text-xs font-semibold py-2 px-3 sm:px-4 border border-transparent data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:shadow-xs dark:data-[state=active]:bg-white dark:data-[state=active]:text-[#161514] text-[#6B6B6B] hover:text-[#161514] dark:text-[#A8A29E] dark:hover:text-stone-100 transition-all flex items-center gap-1.5 sm:gap-2 shrink-0 cursor-pointer"
               >
                 <Target className="size-3.5 stroke-[2]" />
-                <span>Budget &amp; Rollover</span>
+                <span className="hidden sm:inline">Budget &amp; Rollover</span>
+                <span className="sm:hidden">Budgets</span>
               </TabsTrigger>
               <TabsTrigger
                 value="debts"
-                className="rounded-xl text-xs font-semibold py-2 px-3.5 sm:px-4 border border-transparent data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:shadow-xs dark:data-[state=active]:bg-white dark:data-[state=active]:text-[#161514] text-[#6B6B6B] hover:text-[#161514] dark:text-[#A8A29E] dark:hover:text-stone-100 transition-all flex items-center gap-2 shrink-0 cursor-pointer"
+                className="rounded-xl text-xs font-semibold py-2 px-3 sm:px-4 border border-transparent data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:shadow-xs dark:data-[state=active]:bg-white dark:data-[state=active]:text-[#161514] text-[#6B6B6B] hover:text-[#161514] dark:text-[#A8A29E] dark:hover:text-stone-100 transition-all flex items-center gap-1.5 sm:gap-2 shrink-0 cursor-pointer"
               >
                 <Users className="size-3.5 stroke-[2]" />
-                <span>Who Owes Who 🤝</span>
+                <span className="hidden sm:inline">Who Owes Who 🤝</span>
+                <span className="sm:hidden">IOUs 🤝</span>
               </TabsTrigger>
               <TabsTrigger
                 value="vault"
-                className="rounded-xl text-xs font-semibold py-2 px-3.5 sm:px-4 border border-transparent data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:shadow-xs dark:data-[state=active]:bg-white dark:data-[state=active]:text-[#161514] text-[#6B6B6B] hover:text-[#161514] dark:text-[#A8A29E] dark:hover:text-stone-100 transition-all flex items-center gap-2 shrink-0 cursor-pointer"
+                className="rounded-xl text-xs font-semibold py-2 px-3 sm:px-4 border border-transparent data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:shadow-xs dark:data-[state=active]:bg-white dark:data-[state=active]:text-[#161514] text-[#6B6B6B] hover:text-[#161514] dark:text-[#A8A29E] dark:hover:text-stone-100 transition-all flex items-center gap-1.5 sm:gap-2 shrink-0 cursor-pointer"
               >
                 <PiggyBank className="size-3.5 stroke-[2]" />
-                <span>Goals &amp; Vault</span>
+                <span className="hidden sm:inline">Goals &amp; Vault</span>
+                <span className="sm:hidden">Vault</span>
               </TabsTrigger>
               <TabsTrigger
                 value="analytics"
-                className="rounded-xl text-xs font-semibold py-2 px-3.5 sm:px-4 border border-transparent data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:shadow-xs dark:data-[state=active]:bg-white dark:data-[state=active]:text-[#161514] text-[#6B6B6B] hover:text-[#161514] dark:text-[#A8A29E] dark:hover:text-stone-100 transition-all flex items-center gap-2 shrink-0 cursor-pointer"
+                className="rounded-xl text-xs font-semibold py-2 px-3 sm:px-4 border border-transparent data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:shadow-xs dark:data-[state=active]:bg-white dark:data-[state=active]:text-[#161514] text-[#6B6B6B] hover:text-[#161514] dark:text-[#A8A29E] dark:hover:text-stone-100 transition-all flex items-center gap-1.5 sm:gap-2 shrink-0 cursor-pointer"
               >
                 <BarChart2 className="size-3.5 stroke-[2]" />
                 <span>Analytics</span>
@@ -753,6 +757,8 @@ function MoneyPageContent() {
             defaultCashBudget={baseCashBudget}
             defaultCustomDailyBudget={customDailyBudget}
             defaultEnableRollover={enableRollover}
+            selectedCategoryId={selectedCategory}
+            onSelectCategory={handleSelectCategory}
             onSaveAllowances={handleSaveAllowances}
             onAddCategory={() => setIsAddCatOpen(true)}
             onEditCategory={(cat) => setEditingCat(cat)}

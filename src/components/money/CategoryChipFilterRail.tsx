@@ -98,21 +98,6 @@ export function CategoryChipFilterRail({
             </button>
           )}
 
-          {onBulkAddExpense && (
-            <button
-              type="button"
-              onClick={() => {
-                soundFX.playPop();
-                onBulkAddExpense();
-              }}
-              className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#FAF8F5] dark:bg-[#252321] hover:bg-[#F1EFEA] dark:hover:bg-[#2E2B28] text-[#161514] dark:text-[#FAF8F5] text-[11px] font-heading font-bold border border-[#E8E5DF] dark:border-[#383531] shadow-xs active:scale-95 transition-all cursor-pointer shrink-0"
-              title="Bulk Expense Logger & Offline Scanner"
-            >
-              <Camera className="size-3 stroke-[2]" />
-              <span>Bulk</span>
-            </button>
-          )}
-
           {onAddCategory && (
             <button
               type="button"
