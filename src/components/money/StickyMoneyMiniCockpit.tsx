@@ -1,22 +1,24 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Plus, ArrowUp, Zap, Wallet } from "lucide-react";
 import { soundFX } from "@/components/shared/SoundFX";
 import { cn } from "@/lib/utils";
 
 interface StickyMoneyMiniCockpitProps {
-  visible: boolean;
+  visible?: boolean;
+  threshold?: number;
   currencySymbol: string;
   remainingBudget: number;
   safeDailyPace: number;
-  onScrollToTop: () => void;
+  onScrollToTop?: () => void;
   onAddTransaction: () => void;
   className?: string;
 }
 
 export function StickyMoneyMiniCockpit({
-  visible,
+  visible: controlledVisible,
+  threshold = 320,
   currencySymbol,
   remainingBudget,
   safeDailyPace,
@@ -24,10 +26,55 @@ export function StickyMoneyMiniCockpit({
   onAddTransaction,
   className,
 }: StickyMoneyMiniCockpitProps) {
+  const [internalVisible, setInternalVisible] = useState(false);
+  const isVisible = controlledVisible !== undefined ? controlledVisible : internalVisible;
+
+  useEffect(() => {
+    if (controlledVisible !== undefined) return;
+
+    const handleScroll = () => {
+      const scrollContainer = document.getElementById("main-scroll-container");
+      const currentScroll = Math.max(
+        scrollContainer ? scrollContainer.scrollTop : 0,
+        window.scrollY || 0,
+        document.documentElement.scrollTop || 0
+      );
+      setInternalVisible(currentScroll > threshold);
+    };
+
+    const scrollContainer = document.getElementById("main-scroll-container");
+    if (scrollContainer) {
+      scrollContainer.addEventListener("scroll", handleScroll, { passive: true, capture: true });
+    }
+    window.addEventListener("scroll", handleScroll, { passive: true, capture: true });
+    document.addEventListener("scroll", handleScroll, { passive: true, capture: true });
+
+    // Initial check
+    handleScroll();
+
+    return () => {
+      if (scrollContainer) {
+        scrollContainer.removeEventListener("scroll", handleScroll, { capture: true } as any);
+      }
+      window.removeEventListener("scroll", handleScroll, { capture: true } as any);
+      document.removeEventListener("scroll", handleScroll, { capture: true } as any);
+    };
+  }, [controlledVisible, threshold]);
+
   const handleScrollTop = () => {
     soundFX.playPop();
     soundFX.vibrate(15);
-    onScrollToTop();
+    if (onScrollToTop) {
+      onScrollToTop();
+    } else {
+      const scrollContainer = document.getElementById("main-scroll-container");
+      if (scrollContainer && scrollContainer.scrollTop > 0) {
+        scrollContainer.scrollTo({ top: 0, behavior: "smooth" });
+      }
+      if (typeof window !== "undefined") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    }
   };
 
   const handleAddTx = () => {
@@ -40,7 +87,7 @@ export function StickyMoneyMiniCockpit({
     <div
       className={cn(
         "fixed top-2.5 left-1/2 -translate-x-1/2 z-40 w-[94%] sm:w-auto max-w-xl transition-all duration-300 ease-out select-none",
-        visible
+        isVisible
           ? "translate-y-0 opacity-100 pointer-events-auto"
           : "-translate-y-12 opacity-0 pointer-events-none",
         className
@@ -48,7 +95,7 @@ export function StickyMoneyMiniCockpit({
       style={{ willChange: "transform, opacity" }}
       role="banner"
       aria-label="Sticky Money Mini Cockpit"
-      aria-hidden={!visible}
+      aria-hidden={!isVisible}
     >
       <div className="bg-white/95 dark:bg-[#1C1A18]/95 border-2 border-[#161514] dark:border-white/20 rounded-2xl px-3 sm:px-4 py-1.5 sm:py-2 shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,0.15)] flex items-center justify-between gap-2 sm:gap-4 backdrop-blur-md">
         {/* 1. Left: Remaining Budget Telemetry */}

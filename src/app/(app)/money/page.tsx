@@ -233,39 +233,7 @@ function MoneyPageContent() {
     }
   }, []);
 
-  // Sticky Mini-Cockpit On Scroll (Belanje / Apple Wallet Ergonomics)
-  const [isStickyCockpitVisible, setIsStickyCockpitVisible] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollContainer = document.getElementById("main-scroll-container");
-      const currentScroll = scrollContainer ? scrollContainer.scrollTop : window.scrollY;
-      setIsStickyCockpitVisible(currentScroll > 320);
-    };
-
-    const scrollContainer = document.getElementById("main-scroll-container");
-    if (scrollContainer) {
-      scrollContainer.addEventListener("scroll", handleScroll, { passive: true });
-    }
-    window.addEventListener("scroll", handleScroll, { passive: true });
-
-    return () => {
-      if (scrollContainer) {
-        scrollContainer.removeEventListener("scroll", handleScroll);
-      }
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
-  const handleScrollToTop = () => {
-    const scrollContainer = document.getElementById("main-scroll-container");
-    if (scrollContainer) {
-      scrollContainer.scrollTo({ top: 0, behavior: "smooth" });
-    }
-    if (typeof window !== "undefined") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  };
 
   useEffect(() => {
     if (cloudBudgetPrefs) {
@@ -659,11 +627,9 @@ function MoneyPageContent() {
     <div className="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-28 sm:pb-16">
       {/* 🧭 STICKY MINI-COCKPIT ON SCROLL (Belanje & Apple Wallet Benchmark) */}
       <StickyMoneyMiniCockpit
-        visible={isStickyCockpitVisible}
         currencySymbol={currencySymbol}
         remainingBudget={monthlyStats.remainingBudget}
         safeDailyPace={dailyStats.dailyBudgetTarget || monthlyStats.dailySafeToSpend || 0}
-        onScrollToTop={handleScrollToTop}
         onAddTransaction={() => setIsAddTxOpen(true)}
       />
 
