@@ -257,7 +257,7 @@ class SoundManager {
     } catch {}
   }
 
-  // Adorable 8-bit retro robot chirp/synthesizer for Vix companion
+  // Tactile synthesizer chirp for Strobi companion avatar
   public playBotChirp(variant: "happy" | "salute" | "curious" = "happy") {
     if (this.muted) return;
     const ctx = this.getContext();

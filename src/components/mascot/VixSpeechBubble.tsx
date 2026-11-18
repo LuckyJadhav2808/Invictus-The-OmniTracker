@@ -78,7 +78,7 @@ export function VixSpeechBubble({
       onClick={handleNextQuip}
       role="button"
       tabIndex={0}
-      title="Click to hear Vix's battle advice"
+      title="Click to hear Strobi's companion advice"
       className={`group relative bg-[#FFFDF8] border-2 border-[#161514] p-3 sm:p-4 rounded-md shadow-[3px_3px_0px_#161514] cursor-pointer hover:bg-[#FDFCF0] active:scale-[0.99] transition-all duration-150 ease-out ${className}`}
     >
       {/* Speech Bubble Pointer Beak (facing left on desktop, top on mobile) */}
@@ -89,7 +89,7 @@ export function VixSpeechBubble({
         <div className="flex items-center gap-1.5">
           <MessageSquareCode className="w-3.5 h-3.5 text-[#161514]" />
           <span className="font-mono text-[10px] font-black uppercase tracking-wider text-[#161514]">
-            [ VIX TELEMETRY // GLADIATOR BOT ]
+            [ STROBI TELEMETRY // COMPANION AVATAR ]
           </span>
         </div>
         <span className="text-[10px] font-mono font-bold text-[#161514]/70 flex items-center gap-1 group-hover:text-[#161514]">

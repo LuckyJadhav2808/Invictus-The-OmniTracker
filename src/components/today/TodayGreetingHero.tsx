@@ -13,7 +13,7 @@ import {
   Moon,
   Sparkles,
 } from 'lucide-react';
-import { VixPixelCompanion, VixPixelState } from '@/components/mascot/VixPixelCompanion';
+import { StrobiCompanion, type StrobiState } from '@/components/mascot/StrobiCompanion';
 import {
   DaypartMode,
   EffectiveDaypart,
@@ -64,8 +64,8 @@ export function TodayGreetingHero({
   effectiveDaypart = 'dawn',
   onSelectDaypartMode,
 }: TodayGreetingHeroProps) {
-  // Determine pixel mascot state based on live telemetry
-  const getVixState = (): VixPixelState => {
+  // Determine companion avatar state based on live telemetry
+  const getStrobiState = (): StrobiState => {
     if (allHabitsConquered && totalHabitsCount > 0) return 'celebrate';
     if (isStudyingActive) return 'focus';
     const hour = new Date().getHours();
@@ -74,7 +74,7 @@ export function TodayGreetingHero({
     return 'idle';
   };
 
-  const vixState = getVixState();
+  const strobiState = getStrobiState();
   const daypartConfig = DAYPART_CONFIGS[effectiveDaypart] || DAYPART_CONFIGS.dawn;
   const DaypartIcon = daypartConfig.icon;
 
@@ -120,9 +120,10 @@ export function TodayGreetingHero({
             </div>
           )}
 
-          {/* Compact Retro Pixel Art Gladiator Bot Companion */}
-          <VixPixelCompanion
-            state={vixState}
+          {/* Strobi Companion Avatar */}
+          <StrobiCompanion
+            state={strobiState}
+            gear="gladiator"
             size={34}
             streakDays={streakDays}
           />

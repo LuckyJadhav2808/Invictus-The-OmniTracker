@@ -366,8 +366,8 @@ export function HabitCompanionSprite({
 
         <p className="text-xs font-bold text-[#161514] mt-1 leading-snug line-clamp-2">
           {isCelebrating
-            ? "⚔️ Vix: Habit forged in iron! Consistency is your sharpest weapon. Let's conquer it!"
-            : `⚔️ Vix: "${habitTitle ? `For '${habitTitle}': ` : ""}${config.quip}"`}
+            ? "✨ Strobi: Habit forged in iron! Consistency is your sharpest weapon. Let's conquer it!"
+            : `✨ Strobi: "${habitTitle ? `For '${habitTitle}': ` : ""}${config.quip}"`}
         </p>
       </div>
     </div>

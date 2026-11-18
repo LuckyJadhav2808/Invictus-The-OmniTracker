@@ -27,7 +27,7 @@ import { StudyCockpitSkeleton, SubjectsGridSkeleton } from "@/components/shared/
 import { TemplateSelectionModal, TemplatePack } from "@/components/shared/TemplateSelectionModal";
 import { SUBJECT_TEMPLATE_PACKS, MOCK_TEST_TEMPLATE_PACKS } from "@/lib/templates-data";
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
-import { VixPixelCompanion } from "@/components/mascot/VixPixelCompanion";
+import { StrobiCompanion } from "@/components/mascot/StrobiCompanion";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProgressRing } from "@/components/shared/ProgressRing";
@@ -417,13 +417,13 @@ function StudyPageContent() {
               <span>New Subject</span>
             </Button>
 
-            {/* Interactive Scholar Vix Companion */}
-            <VixPixelCompanion
+            {/* Interactive Scholar Strobi Companion */}
+            <StrobiCompanion
               gear="study"
               state="focus"
               size={42}
               onClick={() => setIsSubjectChoiceOpen(true)}
-              title="Vix: Scholar Companion (Click for New Subject)"
+              title="Strobi: Scholar Companion (Click for New Subject)"
             />
           </div>
         </div>

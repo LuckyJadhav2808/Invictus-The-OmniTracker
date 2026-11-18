@@ -247,7 +247,7 @@ export function MoneyCockpitSkeleton() {
           </div>
         </div>
 
-        {/* Vix Mascot Companion Bar */}
+        {/* Strobi Mascot Companion Bar */}
         <div className="flex items-center justify-between gap-2 pt-1 border-t border-[#E8E5DF] dark:border-[#383531]">
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#FAF8F5] dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#383531]">
             <SkeletonBox className="size-6 rounded-full" />

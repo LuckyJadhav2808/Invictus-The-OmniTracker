@@ -22,7 +22,7 @@ const DEFAULT_FLAGS: Record<string, { value: any; description: string; category:
   },
   enable_vix_companion: {
     value: true,
-    description: "Interactive Vix pixel companion state engine",
+    description: "Interactive Strobi companion avatar state engine",
     category: "core",
   },
   enable_experimental_gym_timer: {

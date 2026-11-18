@@ -7,7 +7,7 @@ import { TaskListWidget } from "@/components/tasks/TaskListWidget";
 import { EisenhowerMatrixWidget } from "@/components/tasks/EisenhowerMatrixWidget";
 import { NewTaskModal } from "@/components/tasks/NewTaskModal";
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
-import { VixPixelCompanion } from "@/components/mascot/VixPixelCompanion";
+import { StrobiCompanion } from "@/components/mascot/StrobiCompanion";
 import { TaskItem } from "@/types";
 import { CheckSquare, LayoutGrid, List, Flame, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -115,8 +115,8 @@ export default function TasksPage() {
               <span>New Task</span>
             </Button>
 
-            {/* Interactive Taskmaster Vix Companion */}
-            <VixPixelCompanion
+            {/* Interactive Taskmaster Strobi Companion */}
+            <StrobiCompanion
               gear="tasks"
               state={p1UrgentTasks > 0 ? "focus" : completedTasks > 0 && completedTasks === totalTasks ? "celebrate" : "idle"}
               size={42}
@@ -124,7 +124,7 @@ export default function TasksPage() {
                 setTaskToEdit(null);
                 setIsCreateModalOpen(true);
               }}
-              title="Vix: Taskmaster Companion (Click for New Task)"
+              title="Strobi: Taskmaster Companion (Click for New Task)"
             />
           </div>
         </div>

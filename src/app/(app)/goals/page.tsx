@@ -35,7 +35,7 @@ import { TemplatePack } from "@/components/shared/TemplateSelectionModal";
 import { HabitChoiceModal, AtomicHabitPreset } from "@/components/goals/HabitChoiceModal";
 import { HABIT_TEMPLATE_PACKS } from "@/lib/templates-data";
 import { HabitCompanionSprite } from "@/components/mascot/HabitCompanionSprite";
-import { VixPixelCompanion } from "@/components/mascot/VixPixelCompanion";
+import { StrobiCompanion } from "@/components/mascot/StrobiCompanion";
 import { Button } from "@/components/ui/button";
 import {
   Target,
@@ -446,9 +446,10 @@ function GoalsPageContent() {
   const longestStreakValue = Object.values(streaks).reduce((max, s) => Math.max(max, s.longestStreak), 0);
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300 relative">
+    <div className="space-y-6 animate-in fade-in duration-300 relative pb-32 sm:pb-24">
       {/* 0. Gliding Sticky Mini-Cockpit */}
       <StickyHabitsMiniCockpit
+        threshold={550}
         dailyCompletionPercent={dailyCompletionPercent}
         completedCount={completedTodayHabits.filter((h) => !isHabitRestDay(h)).length}
         dueCount={dueTodayHabits.length}

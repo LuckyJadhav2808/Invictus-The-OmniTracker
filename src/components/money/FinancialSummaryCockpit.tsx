@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { type MonthlyBudgetStats, type DailyBudgetStats } from "@/lib/utils/budget-rollover";
 import { type Transaction, type Category } from "@/types";
-import { VixPixelCompanion } from "@/components/mascot/VixPixelCompanion";
+import { StrobiCompanion } from "@/components/mascot/StrobiCompanion";
 import { WalletCardDeck } from "@/components/money/WalletCardDeck";
 import { RecentAccountFeed } from "@/components/money/RecentAccountFeed";
 
@@ -72,26 +72,37 @@ export function FinancialSummaryCockpit({
         onActiveCardChange={setActiveCardIndex}
       />
 
-      {/* Vix Companion Mascot & Daily Pace Status */}
-      <div className="flex items-center justify-between gap-2 pt-1 border-t border-[#E8E5DF] dark:border-[#383531]">
+      {/* Strobi Financial Defense Companion & Daily Pace Status */}
+      <div className="flex items-center justify-between gap-3 p-2.5 rounded-2xl bg-[#FAF8F5] dark:bg-[#1E1B18] border-2 border-[#161514] dark:border-[#38332E] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]">
         <div
           onClick={onAddTransaction}
-          className="bg-[#FAF8F5] dark:bg-[#252321] px-3 py-1.5 rounded-xl border border-[#E8E5DF] dark:border-[#383531] flex items-center gap-2.5 cursor-pointer hover:bg-[#F1EFEA] dark:hover:bg-[#2e2b28] transition-colors"
+          className="flex items-center gap-3 cursor-pointer group flex-1 min-w-0"
           title="Click to Log Expense"
         >
-          <VixPixelCompanion
+          <StrobiCompanion
             gear="money"
             state={dailyStats.isOverDailyBudget ? "fire" : "idle"}
-            size={22}
+            size={40}
+            className="shrink-0"
           />
-          <div className="text-xs font-mono text-[#161514] dark:text-[#FAF8F5]">
-            {dailyStats.isOverDailyBudget ? (
-              <span className="text-rose-600 dark:text-rose-400 font-bold">
-                Daily pace exceeded by {currencySymbol}{dailyStats.overDailyAmount.toLocaleString()}
+          <div className="space-y-0.5 min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] font-mono font-black uppercase px-1.5 py-0.2 rounded bg-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:text-[#161514]">
+                {dailyStats.isOverDailyBudget ? "🚨 BUDGET CEILING" : "🛡️ FINANCIAL DEFENSE"}
               </span>
-            ) : (
-              <span>Safe pace: <strong className="font-bold text-[#047857] dark:text-[#03D26F]">~{currencySymbol}{dailyStats.todayRemaining.toLocaleString()}</strong> remaining today</span>
-            )}
+              <span className="text-[10px] font-mono text-muted-foreground hidden sm:inline">Strobi Guardian</span>
+            </div>
+            <div className="text-xs font-mono text-[#161514] dark:text-[#FAF8F5] truncate">
+              {dailyStats.isOverDailyBudget ? (
+                <span className="text-rose-600 dark:text-rose-400 font-black">
+                  Pace exceeded by {currencySymbol}{dailyStats.overDailyAmount.toLocaleString()}! Lock down spends.
+                </span>
+              ) : (
+                <span>
+                  Safe pace: <strong className="font-black text-[#047857] dark:text-[#03D26F]">~{currencySymbol}{dailyStats.todayRemaining.toLocaleString()}</strong> remaining today
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
@@ -99,7 +110,7 @@ export function FinancialSummaryCockpit({
           <button
             type="button"
             onClick={onOpenEditAllowances}
-            className="text-[11px] font-heading font-bold text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5] transition-colors cursor-pointer px-2 py-1"
+            className="text-[11px] font-heading font-black text-muted-foreground hover:text-foreground transition-colors cursor-pointer px-2.5 py-1.5 rounded-xl border border-border bg-secondary hover:bg-muted shrink-0 shadow-2xs"
           >
             Adjust Limits ▾
           </button>

@@ -14,7 +14,7 @@ import {
   Moon,
   FileText,
 } from "lucide-react";
-import { VixPixelCompanion, VixPixelState } from "@/components/mascot/VixPixelCompanion";
+import { StrobiCompanion, type StrobiState } from "@/components/mascot/StrobiCompanion";
 import {
   DaypartMode,
   EffectiveDaypart,
@@ -86,8 +86,8 @@ export const MasterTodayHero = React.memo(function MasterTodayHero({
   onOpenScratchpad,
   className,
 }: MasterTodayHeroProps) {
-  // Determine pixel companion state
-  const getVixState = (): VixPixelState => {
+  // Determine companion avatar state
+  const getStrobiState = (): StrobiState => {
     if (allHabitsConquered && totalHabitsCount > 0) return "celebrate";
     if (isStudyingActive) return "focus";
     const hour = new Date().getHours();
@@ -96,7 +96,7 @@ export const MasterTodayHero = React.memo(function MasterTodayHero({
     return "idle";
   };
 
-  const vixState = getVixState();
+  const strobiState = getStrobiState();
   const daypartConfig = DAYPART_CONFIGS[effectiveDaypart] || DAYPART_CONFIGS.dawn;
   const DaypartIcon = daypartConfig.icon;
 
@@ -165,13 +165,6 @@ export const MasterTodayHero = React.memo(function MasterTodayHero({
               <span>{streakFreezeTokens} shield</span>
             </div>
           )}
-
-          {/* Pixel Companion */}
-          <VixPixelCompanion
-            state={vixState}
-            size={34}
-            streakDays={streakDays}
-          />
         </div>
       </div>
 
@@ -230,6 +223,34 @@ export const MasterTodayHero = React.memo(function MasterTodayHero({
                       : `${totalHabitsCount} habits planned · 4.0h study goal · ${metrics.currencySymbol}${metrics.remainingSafeToSpend.toLocaleString()} safe spend`)
                   : `Viewing recorded logs for ${format(currentDateObj, "MMMM d, yyyy")}`}
               </p>
+            </div>
+
+            {/* Strobi Gladiator Companion Stage */}
+            <div className="p-3 sm:p-3.5 rounded-2xl bg-white dark:bg-[#1E1B18] border-2 border-[#161514] dark:border-[#38332E] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] flex items-center gap-3.5">
+              <StrobiCompanion
+                state={strobiState}
+                gear="gladiator"
+                size={58}
+                streakDays={streakDays}
+                className="shrink-0"
+              />
+              <div className="space-y-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-[9px] font-mono font-black uppercase px-2 py-0.5 rounded bg-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:text-[#161514]">
+                    {strobiState === "celebrate" ? "🏆 ALL CONQUERED" : "⚔️ STROBI'S DIRECTIVE"}
+                  </span>
+                  <span className="text-[10px] font-mono font-bold text-muted-foreground">
+                    Gladiator Companion
+                  </span>
+                </div>
+                <p className="text-xs sm:text-sm font-heading font-black text-foreground leading-snug">
+                  {strobiState === "celebrate"
+                    ? "Legendary discipline! Every daily trial conquered. Rest, recover, and prepare for tomorrow's arena."
+                    : effectiveDaypart === "night"
+                    ? "Evening wrap-up: defend your streak, log your final spends, and rest like a gladiator."
+                    : "Discipline over motivation. Check off your first routine and lock in today's momentum!"}
+                </p>
+              </div>
             </div>
 
             {/* Action Buttons Row - 1 Primary + Supporting Actions */}

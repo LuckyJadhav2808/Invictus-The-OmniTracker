@@ -16,7 +16,8 @@ import {
 } from "lucide-react";
 import { cn, getLocalTodayStr } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
-import { VixPixelCompanion } from "@/components/mascot/VixPixelCompanion";
+import { StrobiCompanion } from "@/components/mascot/StrobiCompanion";
+import { StrobiPartnerStage } from "@/components/mascot/StrobiPartnerStage";
 import { BeadedAmphitheaterArcGauge } from "./BeadedAmphitheaterArcGauge";
 import { type Habit, type Streak } from "@/types";
 
@@ -204,91 +205,109 @@ export function HabitsCockpitDeck({
             <Plus className="size-3.5 stroke-[3]" />
             <span>New Habit</span>
           </button>
-
-          {/* Vix Companion Avatar */}
-          <VixPixelCompanion
-            gear="fitness"
-            state={isConquered ? "celebrate" : longestStreakValue >= 3 ? "fire" : "idle"}
-            size={36}
-            onClick={() => {
-              soundFX.playPop();
-              onOpenNewHabit();
-            }}
-            title={isConquered ? "Vix: All daily habits conquered!" : "Vix: Fitness companion"}
-          />
         </div>
       </div>
 
-      {/* 2. Centerpiece: Beaded Amphitheater Arc Gauge & Dual Telemetry */}
-      <div
-        className={cn(
-          "border-2 rounded-2xl p-4 sm:p-5 flex flex-col items-center justify-center space-y-4 transition-all duration-300",
-          isConquered
-            ? "bg-[#FAF8F5] dark:bg-[#1C1A18] border-[#03D26F] shadow-[3px_3px_0px_0px_#03D26F]"
-            : "bg-[#FAF8F5] dark:bg-[#1C1A18] border-[#161514] dark:border-[#38332E] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]"
-        )}
-      >
-        <BeadedAmphitheaterArcGauge
-          todayPercent={dailyCompletionPercent}
-          weekPercent={weeklyAveragePercent}
-          streakPercent={streakPercent}
-        />
+      {/* 2. Centerpiece: Duolingo & Finch Benchmark Strobi Partner Stage & Arc Gauge */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+        {/* Left Column (5 cols on lg): Large 76px Strobi Partner Stage */}
+        <div className="lg:col-span-5 flex flex-col">
+          <StrobiPartnerStage
+            state={isConquered ? "celebrate" : longestStreakValue >= 3 ? "fire" : "idle"}
+            gear="fitness"
+            size={76}
+            streakDays={longestStreakValue}
+            moodBadge={
+              isConquered
+                ? "🏆 ALL CONQUERED"
+                : completedCount > 0
+                ? `⚡ ${completedCount}/${dueCount} REPS DONE`
+                : "⚔️ READY TO FORGE"
+            }
+            quip={
+              isConquered
+                ? `100% Conquered! 🏆 All ${dueCount} daily routines completed. Take a bow, Gladiator!`
+                : completedCount > 0
+                ? `${completedCount} of ${dueCount} routines down! Momentum is building — conquer the rest!`
+                : `0 of ${dueCount} routines done today. Discipline beats motivation every single day. Let's conquer rep #1!`
+            }
+            subtitle="Strobi • Fitness & Discipline Companion"
+            onClick={onOpenNewHabit}
+            className="h-full"
+          />
+        </div>
 
-        {/* Dual Telemetry Inset Row (Routinr Benchmark) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-md">
-          {/* Telemetry Card 1: This Week */}
-          <div className="bg-card border-2 border-border rounded-xl p-3 shadow-2xs space-y-1.5">
-            <div className="flex items-center justify-between text-xs font-mono font-bold text-muted-foreground">
-              <span className="flex items-center gap-1 text-emerald-600 dark:text-[#03D26F]">
-                📈 This week
-              </span>
-              <span className="text-foreground font-black">{weeklyAveragePercent}% average</span>
-            </div>
-            {/* 7 Segmented Diagonal Slash Bars */}
-            <div className="grid grid-cols-7 gap-1 h-3">
-              {Array.from({ length: 7 }).map((_, idx) => {
-                const isBarFilled = idx < Math.round((weeklyAveragePercent / 100) * 7);
-                return (
-                  <div
-                    key={`week-bar-${idx}`}
-                    className={cn(
-                      "rounded-sm border transition-all",
-                      isBarFilled
-                        ? "bg-[#03D26F] border-[#161514]/40 dark:border-black"
-                        : "bg-muted border-border"
-                    )}
-                  />
-                );
-              })}
-            </div>
-          </div>
+        {/* Right Column (7 cols on lg): Beaded Amphitheater Arc Gauge & Dual Telemetry */}
+        <div
+          className={cn(
+            "lg:col-span-7 border-2 rounded-2xl p-4 sm:p-5 flex flex-col items-center justify-center space-y-4 transition-all duration-300",
+            isConquered
+              ? "bg-[#FAF8F5] dark:bg-[#1C1A18] border-[#03D26F] shadow-[3px_3px_0px_0px_#03D26F]"
+              : "bg-[#FAF8F5] dark:bg-[#1C1A18] border-[#161514] dark:border-[#38332E] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]"
+          )}
+        >
+          <BeadedAmphitheaterArcGauge
+            todayPercent={dailyCompletionPercent}
+            weekPercent={weeklyAveragePercent}
+            streakPercent={streakPercent}
+          />
 
-          {/* Telemetry Card 2: Streak Momentum */}
-          <div className="bg-card border-2 border-border rounded-xl p-3 shadow-2xs space-y-1.5">
-            <div className="flex items-center justify-between text-xs font-mono font-bold text-muted-foreground">
-              <span className="flex items-center gap-1 text-amber-600 dark:text-[#F59E0B]">
-                🔥 Streak
-              </span>
-              <span className="text-foreground font-black">
-                {longestStreakValue} of {streakTarget}d
-              </span>
+          {/* Dual Telemetry Inset Row (Routinr Benchmark) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
+            {/* Telemetry Card 1: This Week */}
+            <div className="bg-card border-2 border-border rounded-xl p-3 shadow-2xs space-y-1.5">
+              <div className="flex items-center justify-between text-xs font-mono font-bold text-muted-foreground">
+                <span className="flex items-center gap-1 text-emerald-600 dark:text-[#03D26F]">
+                  📈 This week
+                </span>
+                <span className="text-foreground font-black">{weeklyAveragePercent}% average</span>
+              </div>
+              {/* 7 Segmented Diagonal Slash Bars */}
+              <div className="grid grid-cols-7 gap-1 h-3">
+                {Array.from({ length: 7 }).map((_, idx) => {
+                  const isBarFilled = idx < Math.round((weeklyAveragePercent / 100) * 7);
+                  return (
+                    <div
+                      key={`week-bar-${idx}`}
+                      className={cn(
+                        "rounded-sm border transition-all",
+                        isBarFilled
+                          ? "bg-[#03D26F] border-[#161514]/40 dark:border-black"
+                          : "bg-muted border-border"
+                      )}
+                    />
+                  );
+                })}
+              </div>
             </div>
-            {/* 7 Segmented Diagonal Slash Bars */}
-            <div className="grid grid-cols-7 gap-1 h-3">
-              {Array.from({ length: 7 }).map((_, idx) => {
-                const isBarFilled = idx < Math.round((longestStreakValue / streakTarget) * 7);
-                return (
-                  <div
-                    key={`streak-bar-${idx}`}
-                    className={cn(
-                      "rounded-sm border transition-all",
-                      isBarFilled
-                        ? "bg-[#F59E0B] border-[#161514]/40 dark:border-black"
-                        : "bg-muted border-border"
-                    )}
-                  />
-                );
-              })}
+
+            {/* Telemetry Card 2: Streak Momentum */}
+            <div className="bg-card border-2 border-border rounded-xl p-3 shadow-2xs space-y-1.5">
+              <div className="flex items-center justify-between text-xs font-mono font-bold text-muted-foreground">
+                <span className="flex items-center gap-1 text-amber-600 dark:text-[#F59E0B]">
+                  🔥 Streak
+                </span>
+                <span className="text-foreground font-black">
+                  {longestStreakValue} of {streakTarget}d
+                </span>
+              </div>
+              {/* 7 Segmented Diagonal Slash Bars */}
+              <div className="grid grid-cols-7 gap-1 h-3">
+                {Array.from({ length: 7 }).map((_, idx) => {
+                  const isBarFilled = idx < Math.round((longestStreakValue / streakTarget) * 7);
+                  return (
+                    <div
+                      key={`streak-bar-${idx}`}
+                      className={cn(
+                        "rounded-sm border transition-all",
+                        isBarFilled
+                          ? "bg-[#F59E0B] border-[#161514]/40 dark:border-black"
+                          : "bg-muted border-border"
+                      )}
+                    />
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
