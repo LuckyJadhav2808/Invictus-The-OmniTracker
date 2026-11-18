@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useTheme, ThemeMode } from "@/lib/hooks/useTheme";
 import { Sun, Moon, Laptop } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -19,13 +18,10 @@ export function ThemeToggle({
   size = "md",
 }: ThemeToggleProps) {
   const { theme, resolvedTheme, setTheme, toggleTheme, isDark, mounted } = useTheme();
-  const [isRippling, setIsRippling] = useState(false);
 
   const handleToggleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     soundFX.playPop();
     triggerHaptic("light");
-    setIsRippling(true);
-    setTimeout(() => setIsRippling(false), 650);
 
     const rect = e.currentTarget.getBoundingClientRect();
     const x = rect.left + rect.width / 2;
@@ -121,11 +117,6 @@ export function ThemeToggle({
         className
       )}
     >
-      {/* 🌊 Button Click Tactile Ripple Wave */}
-      {isRippling && (
-        <span className="absolute inset-0 rounded-lg border-2 border-amber-400 dark:border-[#CEF431] animate-ping pointer-events-none opacity-60" />
-      )}
-
       <div className="relative flex items-center justify-center">
         {isDark ? (
           <Moon

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { flushSync } from "react-dom";
 
 export type ThemeMode = "light" | "dark" | "system";
 
@@ -11,6 +12,44 @@ export interface ThemeRippleCoordinates {
 
 const THEME_STORAGE_KEY = "theme";
 const THEME_CHANGE_EVENT = "invictus-theme-change";
+
+/**
+ * Temporarily freezes CSS transitions on all elements during the theme DOM update.
+ * This guarantees the View Transitions API snapshot captures the final, fully-resolved
+ * styles immediately without intermediate CSS color interpolations or layout thrashing.
+ */
+function freezeTransitionsTemporarily(): () => void {
+  if (
+    typeof document === "undefined" ||
+    typeof document.createElement !== "function" ||
+    !document.head
+  ) {
+    return () => {};
+  }
+
+  const css = document.createElement("style");
+  css.setAttribute("id", "invictus-theme-freeze");
+  css.textContent = `*, *::before, *::after {
+    -webkit-transition: none !important;
+    -moz-transition: none !important;
+    -o-transition: none !important;
+    -ms-transition: none !important;
+    transition: none !important;
+  }`;
+  document.head.appendChild(css);
+
+  return () => {
+    // Force a computed style reflow so DOM evaluates new classes without transition
+    if (typeof window !== "undefined") {
+      void window.getComputedStyle(document.documentElement).opacity;
+      requestAnimationFrame(() => {
+        css.remove();
+      });
+    } else {
+      css.remove();
+    }
+  };
+}
 
 export function getStoredTheme(): ThemeMode {
   if (typeof window === "undefined") return "system";
@@ -121,6 +160,16 @@ export function useTheme() {
       }
     };
 
+    const flushThemeUpdate = () => {
+      try {
+        flushSync(() => {
+          applyThemeState();
+        });
+      } catch {
+        applyThemeState();
+      }
+    };
+
     // Circular Ripple Wave Animation via View Transitions API (animrippletheme)
     if (
       typeof document !== "undefined" &&
@@ -129,33 +178,49 @@ export function useTheme() {
     ) {
       const x = coordinates?.x ?? window.innerWidth / 2;
       const y = coordinates?.y ?? window.innerHeight / 2;
-      // Extra 32px buffer guarantees no corner clipping artifacts on high-DPI screens
-      const maxRadius = Math.hypot(
-        Math.max(x, window.innerWidth - x),
-        Math.max(y, window.innerHeight - y)
-      ) + 32;
+      // Extra 16px buffer guarantees zero corner clipping artifacts on high-DPI screens
+      const maxRadius =
+        Math.ceil(
+          Math.hypot(
+            Math.max(x, window.innerWidth - x),
+            Math.max(y, window.innerHeight - y)
+          )
+        ) + 16;
 
+      const unfreeze = freezeTransitionsTemporarily();
       const transition = (document as any).startViewTransition(() => {
-        applyThemeState();
+        flushThemeUpdate();
+        unfreeze();
       });
 
-      transition.ready.then(() => {
-        document.documentElement.animate(
-          {
-            clipPath: [
-              `circle(0px at ${x}px ${y}px)`,
-              `circle(${maxRadius}px at ${x}px ${y}px)`,
-            ],
-          },
-          {
-            duration: 650,
-            easing: "cubic-bezier(0.16, 1, 0.3, 1)",
-            pseudoElement: "::view-transition-new(root)",
-          }
-        );
-      });
+      if (transition?.ready && typeof transition.ready.then === "function") {
+        transition.ready
+          .then(() => {
+            if (typeof document.documentElement?.animate === "function") {
+              const animation = document.documentElement.animate(
+                {
+                  clipPath: [
+                    `circle(0px at ${x}px ${y}px)`,
+                    `circle(${maxRadius}px at ${x}px ${y}px)`,
+                  ],
+                },
+                {
+                  duration: 380,
+                  easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+                  pseudoElement: "::view-transition-new(root)",
+                }
+              );
+              return animation?.finished?.catch(() => {});
+            }
+          })
+          .catch(() => {
+            // Gracefully ignore aborted/skipped transitions
+          });
+      }
     } else {
+      const unfreeze = freezeTransitionsTemporarily();
       applyThemeState();
+      unfreeze();
     }
   }, []);
 

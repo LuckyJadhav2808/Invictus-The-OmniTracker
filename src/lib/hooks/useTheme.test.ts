@@ -107,4 +107,16 @@ describe("useTheme Architecture & Circular Ripple Animation Engine (animrippleth
     expect(resolved).toBe("dark");
     expect(classListSet.has("dark")).toBe(true);
   });
+
+  it("handles corrupted or invalid stored theme values gracefully by falling back to system", () => {
+    mockStorage["theme"] = "invalid_mode_xyz";
+    expect(getStoredTheme()).toBe("system");
+  });
+
+  it("falls back cleanly to light when window is undefined (SSR safety)", () => {
+    vi.stubGlobal("window", undefined);
+    expect(getStoredTheme()).toBe("system");
+    expect(getSystemTheme()).toBe("light");
+    expect(applyThemeToDOM("dark")).toBe("light");
+  });
 });

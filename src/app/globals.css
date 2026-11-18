@@ -987,12 +987,25 @@ html[data-color-theme="cobalt"] .dark {
 }
 
 /* ─── View Transition Theme Ripple Animation (animrippletheme) ─── */
+::view-transition-group(root) {
+  animation-duration: 0.38s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+::view-transition-image-pair(root) {
+  isolation: auto;
+}
+
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
-  transform: translateZ(0);
-  backface-visibility: hidden;
+  display: block;
+  height: 100%;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
 }
 
 ::view-transition-new(root) {
@@ -1000,13 +1013,10 @@ html[data-color-theme="cobalt"] .dark {
   will-change: clip-path;
 }
 
-::view-transition-old(root) {
-  z-index: 1;
-}
-
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(root),
-  ::view-transition-new(root) {
+  ::view-transition-new(root),
+  ::view-transition-group(root) {
     animation: none !important;
   }
 }
