@@ -36,6 +36,7 @@ import { CategoryIcon } from "@/components/money/MoneyQuickActionsAndCards";
 import { detectCategoryFromNote } from "@/lib/utils/merchant-categorizer";
 import { MerchantCategoryCache } from "@/lib/sms/merchant-cache";
 import { useSaveMerchantRule } from "@/lib/queries/merchant-rules";
+import { computeFrequentExpenses, type FrequentExpenseItem } from "@/lib/utils/frequent-expenses";
 
 interface TransactionFormModalProps {
   open: boolean;
@@ -43,6 +44,7 @@ interface TransactionFormModalProps {
   initialData?: Transaction | null;
   categories: Category[];
   currencySymbol: string;
+  transactions?: Transaction[];
   onOpenAddCategory?: () => void;
   onOpenReceiptScan?: () => void;
   onOpenWhoOwesWho?: (prefill?: { amount?: number; description?: string }) => void;
@@ -60,19 +62,13 @@ interface TransactionFormModalProps {
 
 const QUICK_INCREMENTS = [50, 100, 200, 500, 1000, 2000];
 
-const STARTER_QUICK_PRESETS = [
-  { name: "Chai & Snack", amount: 30 },
-  { name: "Campus Lunch", amount: 150 },
-  { name: "Metro / Auto", amount: 50 },
-  { name: "Groceries", amount: 350 },
-];
-
 export function TransactionFormModal({
   open,
   onOpenChange,
   initialData,
   categories,
   currencySymbol,
+  transactions = [],
   onOpenAddCategory,
   onOpenReceiptScan,
   onOpenWhoOwesWho,
@@ -146,6 +142,11 @@ export function TransactionFormModal({
   const selectedCategory = useMemo(() => {
     return categories.find((c) => c.id === categoryId);
   }, [categories, categoryId]);
+
+  // Dynamic Habit Mining: Computes frequent user expenses or graceful starter suggestions
+  const frequentHabits = useMemo(() => {
+    return computeFrequentExpenses(transactions, categories, 6);
+  }, [transactions, categories]);
 
   // Additive quick-chip button handler
   const handleQuickIncrement = (inc: number) => {
@@ -405,26 +406,48 @@ export function TransactionFormModal({
               </div>
             </div>
 
-            {/* Quick Starters (Visible when amount is blank) */}
-            {!isEditing && !amount && (
-              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-                {STARTER_QUICK_PRESETS.map((p) => (
-                  <button
-                    key={p.name}
-                    type="button"
-                    onClick={() => {
-                      soundFX.playPop();
-                      setAmount(String(p.amount));
-                      handleNoteChange(p.name);
-                    }}
-                    className="px-2.5 py-1 rounded-xl bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] text-[10.5px] font-bold border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs shrink-0 cursor-pointer transition-all active:scale-95"
-                  >
-                    <span>{p.name}</span>{" "}
-                    <span className="text-emerald-600 dark:text-emerald-400 font-mono font-bold">
-                      {currencySymbol}{p.amount}
+            {/* Quick Habits / Presets (Visible when amount is blank) */}
+            {!isEditing && !amount && frequentHabits.length > 0 && (
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between px-0.5">
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6B6B6B] dark:text-[#A8A29E] flex items-center gap-1">
+                    <Sparkles className="size-3 text-[#03D26F]" />
+                    <span>{frequentHabits.some((h) => h.isHabit) ? "Frequent Habits" : "Quick Starters"}</span>
+                  </span>
+                  {frequentHabits.some((h) => h.isHabit) && (
+                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-full bg-[#CEF431] text-[#161514]">
+                      Auto-Mined
                     </span>
-                  </button>
-                ))}
+                  )}
+                </div>
+                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
+                  {frequentHabits.map((p) => (
+                    <button
+                      key={p.name}
+                      type="button"
+                      onClick={() => {
+                        soundFX.playPop();
+                        soundFX.vibrate(15);
+                        setAmount(String(p.amount));
+                        handleNoteChange(p.name);
+                        if (p.categoryId) setCategoryId(p.categoryId);
+                        if (p.paymentMethod) setPaymentMethod(p.paymentMethod);
+                      }}
+                      className="px-2.5 py-1.5 rounded-xl bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] text-[11px] font-bold border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs shrink-0 cursor-pointer transition-all active:scale-95 flex items-center gap-1.5"
+                    >
+                      <span>{p.icon}</span>
+                      <span className="truncate max-w-[120px]">{p.name}</span>
+                      <span className="text-emerald-600 dark:text-emerald-400 font-mono font-black">
+                        {currencySymbol}{p.amount}
+                      </span>
+                      {p.isHabit && (
+                        <span className="text-[9px] font-mono px-1 py-0.2 rounded-full bg-[#161514]/10 dark:bg-white/15 text-inherit font-bold">
+                          {p.frequency}x
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
 

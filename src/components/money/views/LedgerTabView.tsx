@@ -4,7 +4,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import { type Transaction, type Category } from "@/types";
 import { cn } from "@/lib/utils";
 import { format, parseISO, isToday, isYesterday } from "date-fns";
-import { Search, Filter, FileDown, Plus, Calendar, Receipt, X, ArrowRightLeft, Edit2 } from "lucide-react";
+import { Search, Filter, FileDown, Plus, Calendar, Receipt, X, ArrowRightLeft, Edit2, Sparkles } from "lucide-react";
 import { soundFX } from "@/components/shared/SoundFX";
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
 import { BelanjeTransactionRow } from "@/components/money/BelanjeTransactionRow";
@@ -12,6 +12,7 @@ import { CategoryChipFilterRail, type CategoryRailItem } from "@/components/mone
 import { CategoryIcon, getCategoryAccent } from "@/components/money/MoneyQuickActionsAndCards";
 import { isCashTransaction, isOnlineTransaction, type MonthlyBudgetStats } from "@/lib/utils/budget-rollover";
 import { useAddTransaction } from "@/lib/queries/money";
+import { computeFrequentExpenses, type FrequentExpenseItem } from "@/lib/utils/frequent-expenses";
 import { toast } from "sonner";
 
 interface LedgerTabViewProps {
@@ -195,28 +196,50 @@ export function LedgerTabView({
   const addTxMutation = useAddTransaction();
   const [isQuickLogging, setIsQuickLogging] = useState(false);
 
-  const handleQuickLogExpense = async (item: { name: string; amount: number; method: string; cat: string }) => {
+  // Dynamic Habit Mining: Computes genuine user frequent habits or starter suggestions
+  const frequentHabits = useMemo(() => {
+    return computeFrequentExpenses(transactions, categories, 5);
+  }, [transactions, categories]);
+
+  const handleQuickLogExpense = async (item: FrequentExpenseItem) => {
     try {
       setIsQuickLogging(true);
-      const targetCat = categories.find((c) =>
-        c.type === "expense" && (
-          c.name.toLowerCase().includes(item.cat.toLowerCase()) ||
-          c.name.toLowerCase().includes(item.name.toLowerCase())
-        )
-      ) || categories.find((c) => c.type === "expense") || categories[0];
+      const targetCat =
+        categories.find((c) => c.id === item.categoryId) ||
+        categories.find(
+          (c) =>
+            c.type === "expense" &&
+            (c.name.toLowerCase().includes(item.categoryName.toLowerCase()) ||
+              c.name.toLowerCase().includes(item.name.toLowerCase()))
+        ) ||
+        categories.find((c) => c.type === "expense") ||
+        categories[0];
 
-      await addTxMutation.mutateAsync({
+      const res = await addTxMutation.mutateAsync({
         amount: item.amount,
         type: "expense",
         categoryId: targetCat?.id || "general",
         date: format(new Date(), "yyyy-MM-dd"),
         note: item.name,
-        paymentMethod: item.method,
+        paymentMethod: item.paymentMethod || "upi",
       } as any);
 
+      const newId = (res as any)?.id || (res as any)?._id;
       soundFX.playCompleteChime();
       soundFX.vibrate(20);
-      toast.success(`Logged ${currencySymbol}${item.amount} for ${item.name}! ⚡`);
+      toast.success(
+        `Logged ${currencySymbol}${item.amount} for ${item.name}! ⚡`,
+        {
+          action: newId && onDeleteTransaction
+            ? {
+                label: "Undo",
+                onClick: () => {
+                  onDeleteTransaction(newId);
+                },
+              }
+            : undefined,
+        }
+      );
     } catch {
       toast.error("Failed to log quick expense");
     } finally {
@@ -774,19 +797,25 @@ export function LedgerTabView({
               </button>
             </div>
 
-            {/* Quick 1-Tap Student Expenses */}
+            {/* Quick 1-Tap Frequent Habits / Expenses */}
             <div className="space-y-2 pt-1">
-              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6B6B6B] dark:text-[#A8A29E] block">
-                Quick Log Common Student Expenses:
-              </span>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6B6B6B] dark:text-[#A8A29E] flex items-center gap-1">
+                  <Sparkles className="size-3 text-[#03D26F]" />
+                  <span>
+                    {frequentHabits.some((h) => h.isHabit)
+                      ? "Frequent Habits (Learned from your history):"
+                      : "Quick Log Common Student Expenses:"}
+                  </span>
+                </span>
+                {frequentHabits.some((h) => h.isHabit) && (
+                  <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-full bg-[#CEF431] text-[#161514]">
+                    Auto-Mined
+                  </span>
+                )}
+              </div>
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
-                {[
-                  { name: "Chai & Snack", icon: "☕", amount: 40, method: "UPI", cat: "Food & Dining" },
-                  { name: "Mess / Lunch", icon: "🍛", amount: 120, method: "UPI", cat: "Food & Dining" },
-                  { name: "Metro / Auto", icon: "🚇", amount: 50, method: "UPI", cat: "Transport" },
-                  { name: "Books / Prints", icon: "📚", amount: 150, method: "UPI", cat: "Education" },
-                  { name: "Groceries / Milk", icon: "🛒", amount: 180, method: "Cash", cat: "Groceries" },
-                ].map((item) => (
+                {frequentHabits.map((item) => (
                   <button
                     key={item.name}
                     type="button"
@@ -795,12 +824,19 @@ export function LedgerTabView({
                     className="p-3 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] hover:bg-white dark:hover:bg-[#252321] border border-[#E8E5DF] dark:border-[#2A2724] hover:border-[#161514]/40 hover:shadow-xs transition-all text-left cursor-pointer group flex flex-col justify-between"
                   >
                     <div>
-                      <span className="text-lg block mb-1">{item.icon}</span>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-lg block">{item.icon}</span>
+                        {item.isHabit && (
+                          <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-full bg-[#161514]/10 dark:bg-white/15 text-inherit">
+                            {item.frequency}x
+                          </span>
+                        )}
+                      </div>
                       <h5 className="font-heading font-black text-xs text-[#161514] dark:text-stone-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors truncate">
                         {item.name}
                       </h5>
                       <span className="text-[9px] font-mono text-[#6B6B6B] dark:text-[#A8A29E]">
-                        {item.method} • {item.cat}
+                        {item.paymentMethod.toUpperCase()} • {item.categoryName}
                       </span>
                     </div>
                     <div className="mt-2 pt-1.5 border-t border-[#E8E5DF]/60 dark:border-[#2A2724] flex items-center justify-between text-xs font-mono font-bold">

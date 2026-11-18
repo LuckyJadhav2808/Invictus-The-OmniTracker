@@ -834,6 +834,7 @@ function MoneyPageContent() {
         initialData={editingTx}
         categories={categories}
         currencySymbol={currencySymbol}
+        transactions={transactions}
         onOpenAddCategory={() => {
           setReopenTxAfterCat(true);
           setIsAddTxOpen(false);
