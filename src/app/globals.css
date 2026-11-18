@@ -985,3 +985,25 @@ html[data-color-theme="cobalt"] .dark {
   will-change: transform, opacity;
   pointer-events: none;
 }
+
+/* ─── View Transition Theme Ripple Animation (animrippletheme) ─── */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-new(root) {
+  z-index: 99999;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
+}

@@ -4,6 +4,11 @@ import { useState, useEffect, useCallback } from "react";
 
 export type ThemeMode = "light" | "dark" | "system";
 
+export interface ThemeRippleCoordinates {
+  x: number;
+  y: number;
+}
+
 const THEME_STORAGE_KEY = "theme";
 const THEME_CHANGE_EVENT = "invictus-theme-change";
 
@@ -96,28 +101,66 @@ export function useTheme() {
     };
   }, []);
 
-  const setTheme = useCallback((newTheme: ThemeMode) => {
-    try {
-      localStorage.setItem(THEME_STORAGE_KEY, newTheme);
-    } catch {}
-    
-    setThemeState(newTheme);
-    const resolved = applyThemeToDOM(newTheme);
-    setResolvedTheme(resolved);
+  const setTheme = useCallback((newTheme: ThemeMode, coordinates?: ThemeRippleCoordinates) => {
+    const applyThemeState = () => {
+      try {
+        localStorage.setItem(THEME_STORAGE_KEY, newTheme);
+      } catch {}
 
-    // Broadcast change
-    if (typeof window !== "undefined") {
-      window.dispatchEvent(
-        new CustomEvent(THEME_CHANGE_EVENT, {
-          detail: { theme: newTheme, resolved },
-        })
+      setThemeState(newTheme);
+      const resolved = applyThemeToDOM(newTheme);
+      setResolvedTheme(resolved);
+
+      // Broadcast change to other mounted components
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(
+          new CustomEvent(THEME_CHANGE_EVENT, {
+            detail: { theme: newTheme, resolved },
+          })
+        );
+      }
+    };
+
+    // Circular Ripple Wave Animation via View Transitions API (animrippletheme)
+    if (
+      typeof document !== "undefined" &&
+      "startViewTransition" in document &&
+      !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      const x = coordinates?.x ?? window.innerWidth / 2;
+      const y = coordinates?.y ?? window.innerHeight / 2;
+      const maxRadius = Math.hypot(
+        Math.max(x, window.innerWidth - x),
+        Math.max(y, window.innerHeight - y)
       );
+
+      const transition = (document as any).startViewTransition(() => {
+        applyThemeState();
+      });
+
+      transition.ready.then(() => {
+        document.documentElement.animate(
+          {
+            clipPath: [
+              `circle(0px at ${x}px ${y}px)`,
+              `circle(${maxRadius}px at ${x}px ${y}px)`,
+            ],
+          },
+          {
+            duration: 450,
+            easing: "cubic-bezier(0.2, 0, 0, 1)",
+            pseudoElement: "::view-transition-new(root)",
+          }
+        );
+      });
+    } else {
+      applyThemeState();
     }
   }, []);
 
-  const toggleTheme = useCallback(() => {
+  const toggleTheme = useCallback((coordinates?: ThemeRippleCoordinates) => {
     const nextTheme: "light" | "dark" = resolvedTheme === "dark" ? "light" : "dark";
-    setTheme(nextTheme);
+    setTheme(nextTheme, coordinates);
   }, [resolvedTheme, setTheme]);
 
   return {

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useTheme, ThemeMode } from "@/lib/hooks/useTheme";
 import { Sun, Moon, Laptop } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -18,17 +19,27 @@ export function ThemeToggle({
   size = "md",
 }: ThemeToggleProps) {
   const { theme, resolvedTheme, setTheme, toggleTheme, isDark, mounted } = useTheme();
+  const [isRippling, setIsRippling] = useState(false);
 
-  const handleToggleClick = () => {
+  const handleToggleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     soundFX.playPop();
     triggerHaptic("light");
-    toggleTheme();
+    setIsRippling(true);
+    setTimeout(() => setIsRippling(false), 500);
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+    toggleTheme({ x, y });
   };
 
-  const handleSelectMode = (mode: ThemeMode) => {
+  const handleSelectMode = (mode: ThemeMode, e: React.MouseEvent<HTMLButtonElement>) => {
     soundFX.playPop();
     triggerHaptic("light");
-    setTheme(mode);
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+    setTheme(mode, { x, y });
   };
 
   // Static skeleton during SSR hydration to avoid layout shifts
@@ -78,7 +89,7 @@ export function ThemeToggle({
             <button
               key={opt.mode}
               type="button"
-              onClick={() => handleSelectMode(opt.mode)}
+              onClick={(e) => handleSelectMode(opt.mode, e)}
               role="radio"
               aria-checked={isSelected}
               className={cn(
@@ -105,11 +116,16 @@ export function ThemeToggle({
       aria-label={isDark ? "Switch to Day Mode (⌘D)" : "Switch to Night Mode (⌘D)"}
       title={isDark ? "Switch to Day Mode (⌘D)" : "Switch to Night Mode (⌘D)"}
       className={cn(
-        "relative rounded-lg bg-white dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] hover:bg-[#F1EFEA] dark:hover:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] flex items-center justify-center transition-colors shadow-xs cursor-pointer select-none shrink-0 group overflow-hidden",
+        "relative rounded-lg bg-white dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] hover:bg-[#F1EFEA] dark:hover:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] flex items-center justify-center transition-colors shadow-xs cursor-pointer select-none shrink-0 group overflow-hidden active:scale-95",
         size === "sm" ? "size-7" : "size-8",
         className
       )}
     >
+      {/* 🌊 Button Click Tactile Ripple Wave */}
+      {isRippling && (
+        <span className="absolute inset-0 rounded-lg border-2 border-amber-400 dark:border-[#CEF431] animate-ping pointer-events-none opacity-60" />
+      )}
+
       <div className="relative flex items-center justify-center">
         {isDark ? (
           <Moon
