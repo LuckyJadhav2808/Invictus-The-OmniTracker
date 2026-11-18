@@ -37,8 +37,8 @@ import { BudgetTabView } from "@/components/money/views/BudgetTabView";
 import { VaultTabView } from "@/components/money/views/VaultTabView";
 import { AnalyticsTabView } from "@/components/money/views/AnalyticsTabView";
 import { WhoOwesWhoTabView } from "@/components/money/views/WhoOwesWhoTabView";
-import { CategoryChipFilterRail } from "@/components/money/CategoryChipFilterRail";
 import { StickyMoneyMiniCockpit } from "@/components/money/StickyMoneyMiniCockpit";
+import { useWhoOwesWhoStore } from "@/store/who-owes-who-store";
 
 // Lazy-Loaded Heavy Modals (Zero TBT & Fast Initial Paint)
 const TransactionFormModal = dynamic(
@@ -363,6 +363,28 @@ function MoneyPageContent() {
     }));
   }, [categories, transactions, effectiveTargetMonthKey]);
 
+  // Telemetry for sub-nav badges
+  const todayTxCount = useMemo(() => {
+    const todayStr = format(new Date(), "yyyy-MM-dd");
+    return transactions.filter((t) => t.date === todayStr).length;
+  }, [transactions]);
+
+  const overBudgetCategoriesCount = useMemo(() => {
+    return categoryCardsData.filter((cat) => {
+      const budget = Number(cat.monthlyBudget || 0);
+      return budget > 0 && Number(cat.amount || 0) > budget;
+    }).length;
+  }, [categoryCardsData]);
+
+  const { ious } = useWhoOwesWhoStore();
+  const pendingIous = useMemo(() => {
+    return ious.filter((i) => i.status === "pending" && i.type === "lent");
+  }, [ious]);
+
+  const totalPendingLentAmount = useMemo(() => {
+    return pendingIous.reduce((sum, i) => sum + Number(i.amount || 0), 0);
+  }, [pendingIous]);
+
   // --- Handlers ---
   const handleSaveTransaction = async (payload: {
     id?: string;
@@ -631,6 +653,12 @@ function MoneyPageContent() {
         remainingBudget={monthlyStats.remainingBudget}
         safeDailyPace={dailyStats.dailyBudgetTarget || monthlyStats.dailySafeToSpend || 0}
         onAddTransaction={() => setIsAddTxOpen(true)}
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        todayTxCount={todayTxCount}
+        overBudgetCategoriesCount={overBudgetCategoriesCount}
+        pendingIouCount={pendingIous.length}
+        pendingIouAmount={totalPendingLentAmount}
       />
 
       {/* 🚀 PRIMARY SUMMARY COCKPIT */}
@@ -656,20 +684,6 @@ function MoneyPageContent() {
         onDeleteTransaction={handleDeleteTransaction}
       />
 
-      {/* 🏷️ CATEGORY ENVELOPES CHIP RAIL (Positioned under cockpit, above sub-nav) */}
-      <CategoryChipFilterRail
-        currencySymbol={currencySymbol}
-        categories={categoryCardsData}
-        selectedCategoryId={selectedCategory}
-        onSelectCategory={handleSelectCategory}
-        onMoveMoney={() => setIsMoveMoneyOpen(true)}
-        onSendMoney={() => setIsSendMoneyOpen(true)}
-        onBulkAddExpense={() => setIsBulkModalOpen(true)}
-        onAddCategory={() => setIsAddCatOpen(true)}
-        onEditCategory={(cat) => setEditingCat(cat)}
-        onDeleteCategory={(catId) => setDeleteCatId(catId)}
-      />
-
       {/* 📑 FLOATING SUB-NAV DOCK */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         <div className="w-full overflow-x-auto no-scrollbar pb-1 mb-4 touch-pan-x">
@@ -682,6 +696,11 @@ function MoneyPageContent() {
                 <Receipt className="size-3.5 stroke-[2]" />
                 <span className="hidden sm:inline">Daily Ledger</span>
                 <span className="sm:hidden">Ledger</span>
+                {todayTxCount > 0 && (
+                  <span className="px-1.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#161514]/10 dark:bg-white/10 text-inherit tabular-nums">
+                    {todayTxCount} <span className="hidden sm:inline">today</span>
+                  </span>
+                )}
               </TabsTrigger>
               <TabsTrigger
                 value="budgets"
@@ -690,6 +709,12 @@ function MoneyPageContent() {
                 <Target className="size-3.5 stroke-[2]" />
                 <span className="hidden sm:inline">Budget &amp; Rollover</span>
                 <span className="sm:hidden">Budgets</span>
+                {overBudgetCategoriesCount > 0 && (
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-mono font-black bg-amber-400 text-[#161514] border border-[#161514] shadow-2xs tabular-nums">
+                    <span className="size-1.5 rounded-full bg-rose-600 animate-pulse" />
+                    {overBudgetCategoriesCount} Over
+                  </span>
+                )}
               </TabsTrigger>
               <TabsTrigger
                 value="debts"
@@ -698,6 +723,13 @@ function MoneyPageContent() {
                 <Users className="size-3.5 stroke-[2]" />
                 <span className="hidden sm:inline">Who Owes Who 🤝</span>
                 <span className="sm:hidden">IOUs 🤝</span>
+                {pendingIous.length > 0 && (
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-mono font-black bg-[#CEF431] text-[#161514] border border-[#161514] shadow-2xs tabular-nums">
+                    <span className="size-1.5 rounded-full bg-[#161514] animate-pulse" />
+                    {pendingIous.length} pending
+                    <span className="hidden md:inline">• {currencySymbol}{Math.round(totalPendingLentAmount).toLocaleString()}</span>
+                  </span>
+                )}
               </TabsTrigger>
               <TabsTrigger
                 value="vault"
@@ -721,6 +753,7 @@ function MoneyPageContent() {
         {/* Tab 1: Ledger */}
         <TabsContent value="ledger">
           <LedgerTabView
+            categoryCardsData={categoryCardsData}
             transactions={transactions}
             categories={categories}
             currencySymbol={currencySymbol}

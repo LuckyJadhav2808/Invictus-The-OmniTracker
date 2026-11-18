@@ -35,6 +35,40 @@ export interface WhoOwesWhoTabViewProps {
   onLogSettlementIncome?: (iou: IOU) => Promise<any> | void;
 }
 
+// Overdue and Due Date status calculator
+export function calculateDueDateStatus(dueDateStr?: string, referenceDate: Date = new Date()) {
+  if (!dueDateStr) return null;
+  try {
+    const due = parseISO(dueDateStr);
+    const today = startOfDay(referenceDate);
+    if (isToday(due)) {
+      return { label: "Due Today", isOverdue: false, isDueToday: true };
+    }
+    if (isPast(due)) {
+      const days = Math.max(1, differenceInDays(today, due));
+      return { label: `Overdue by ${days}d`, isOverdue: true, isDueToday: false };
+    }
+    return { label: `Due ${dueDateStr}`, isOverdue: false, isDueToday: false };
+  } catch {
+    return { label: `Due ${dueDateStr}`, isOverdue: false, isDueToday: false };
+  }
+}
+
+// Formats rich polite reminder message for WhatsApp & WebShare
+export function formatReminderMessage(iou: IOU, currencySymbol: string = "₹") {
+  const isLent = iou.type === "lent";
+  if (isLent) {
+    let msg = `🤝 *Invictus Split & Debt Reminder*\nHey ${iou.personName}! Just a gentle ping regarding *${currencySymbol}${iou.amount.toLocaleString()}* for "${iou.description}".`;
+    if (iou.dueDate) {
+      msg += `\n📅 *Expected by:* ${iou.dueDate}`;
+    }
+    msg += `\n⚡ Settle via UPI or Cash whenever you get a second!`;
+    return msg;
+  } else {
+    return `💸 *Invictus Payment Notice*\nHey ${iou.personName}! Paying you back *${currencySymbol}${iou.amount.toLocaleString()}* for "${iou.description}". Sent via UPI/Cash! ⚡`;
+  }
+}
+
 export function WhoOwesWhoTabView({
   currencySymbol,
   prefill,
@@ -143,47 +177,16 @@ export function WhoOwesWhoTabView({
   };
 
   // Overdue and Due Date status calculator
-  const getDueDateStatus = (dueDateStr?: string) => {
-    if (!dueDateStr) return null;
-    try {
-      const due = parseISO(dueDateStr);
-      const today = startOfDay(new Date());
-      if (isToday(due)) {
-        return { label: "Due Today", isOverdue: false, isDueToday: true };
-      }
-      if (isPast(due)) {
-        const days = Math.max(1, differenceInDays(today, due));
-        return { label: `Overdue by ${days}d`, isOverdue: true, isDueToday: false };
-      }
-      return { label: `Due ${dueDateStr}`, isOverdue: false, isDueToday: false };
-    } catch {
-      return { label: `Due ${dueDateStr}`, isOverdue: false, isDueToday: false };
-    }
-  };
-
-  // Formats rich polite reminder message for WhatsApp & WebShare
-  const formatReminderMessage = (iou: IOU) => {
-    const isLent = iou.type === "lent";
-    if (isLent) {
-      let msg = `🤝 *Invictus Split & Debt Reminder*\nHey ${iou.personName}! Just a gentle ping regarding *${currencySymbol}${iou.amount.toLocaleString()}* for "${iou.description}".`;
-      if (iou.dueDate) {
-        msg += `\n📅 *Expected by:* ${iou.dueDate}`;
-      }
-      msg += `\n⚡ Settle via UPI or Cash whenever you get a second!`;
-      return msg;
-    } else {
-      return `💸 *Invictus Payment Notice*\nHey ${iou.personName}! Paying you back *${currencySymbol}${iou.amount.toLocaleString()}* for "${iou.description}". Sent via UPI/Cash! ⚡`;
-    }
-  };
+  const getDueDateStatus = (dueDateStr?: string) => calculateDueDateStatus(dueDateStr);
 
   const generateWhatsAppReminder = (iou: IOU) => {
-    const text = formatReminderMessage(iou);
+    const text = formatReminderMessage(iou, currencySymbol);
     return `https://wa.me/?text=${encodeURIComponent(text)}`;
   };
 
   const handleShareReminder = async (iou: IOU) => {
     soundFX.playPop();
-    const message = formatReminderMessage(iou);
+    const message = formatReminderMessage(iou, currencySymbol);
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share({

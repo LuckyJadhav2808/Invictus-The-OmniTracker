@@ -8,6 +8,7 @@ import { Search, Filter, FileDown, Plus, Calendar, Receipt, X, ArrowRightLeft, E
 import { soundFX } from "@/components/shared/SoundFX";
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
 import { BelanjeTransactionRow } from "@/components/money/BelanjeTransactionRow";
+import { CategoryChipFilterRail, type CategoryRailItem } from "@/components/money/CategoryChipFilterRail";
 import { CategoryIcon, getCategoryAccent } from "@/components/money/MoneyQuickActionsAndCards";
 import { isCashTransaction, isOnlineTransaction, type MonthlyBudgetStats } from "@/lib/utils/budget-rollover";
 import { useAddTransaction } from "@/lib/queries/money";
@@ -36,6 +37,7 @@ interface LedgerTabViewProps {
   onAddCategory?: () => void;
   onEditCategory?: (category: Category) => void;
   onDeleteCategory?: (categoryId: string) => void;
+  categoryCardsData?: CategoryRailItem[];
 }
 
 export function LedgerTabView({
@@ -61,6 +63,7 @@ export function LedgerTabView({
   onAddCategory,
   onEditCategory,
   onDeleteCategory,
+  categoryCardsData,
 }: LedgerTabViewProps) {
   const activeMonthKey = targetMonthKey || format(new Date(), "yyyy-MM");
   // Retain filter and search state across tab navigations via sessionStorage
@@ -385,8 +388,46 @@ export function LedgerTabView({
     };
   }, [activeCategory, transactions, selectedMonth, activeMonthKey]);
 
+  // Computed category cards data for the scoped rail
+  const computedCategoryCardsData: CategoryRailItem[] = useMemo(() => {
+    if (categoryCardsData) return categoryCardsData;
+
+    const map = new Map<string, number>();
+    const targetMonth = selectedMonth === "all" ? activeMonthKey : selectedMonth;
+    transactions.forEach((tx) => {
+      if (tx.type === "expense" && tx.date?.startsWith(targetMonth)) {
+        const curr = map.get(tx.categoryId) || 0;
+        map.set(tx.categoryId, curr + Number(tx.amount || 0));
+      }
+    });
+
+    return categories.map((cat) => ({
+      id: cat.id,
+      name: cat.name,
+      amount: map.get(cat.id) || 0,
+      color: cat.color || "mint",
+      icon: cat.icon || "Wallet",
+      type: cat.type,
+      monthlyBudget: cat.monthlyBudget,
+    }));
+  }, [categoryCardsData, categories, transactions, selectedMonth, activeMonthKey]);
+
   return (
     <div className="space-y-4">
+      {/* 🏷️ CATEGORY ENVELOPES CHIP RAIL (Contextually Scoped to Ledger) */}
+      <CategoryChipFilterRail
+        currencySymbol={currencySymbol}
+        categories={computedCategoryCardsData}
+        selectedCategoryId={selectedCategory}
+        onSelectCategory={setSelectedCategory}
+        onMoveMoney={onMoveMoney}
+        onSendMoney={onSendMoney}
+        onBulkAddExpense={onBulkAddExpense}
+        onAddCategory={onAddCategory}
+        onEditCategory={onEditCategory}
+        onDeleteCategory={onDeleteCategory}
+      />
+
       {/* 🏷️ ENVELOPE STUDIO PAGE-IN-PAGE (Belanje In-Situ Benchmark) */}
       {activeCategory && activeCategoryStats && (
         <div className="bg-white dark:bg-[#161514] rounded-3xl p-4 sm:p-5 border-2 border-[#161514] dark:border-[#383531] shadow-[2.5px_2.5px_0px_0px_#161514] space-y-4">
