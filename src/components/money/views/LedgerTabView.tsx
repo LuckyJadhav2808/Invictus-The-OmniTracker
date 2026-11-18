@@ -22,6 +22,7 @@ interface LedgerTabViewProps {
   targetMonthKey?: string;
   monthlyStats?: MonthlyBudgetStats;
   initialMethodFilter?: string;
+  methodFilterTrigger?: number;
   selectedMonth?: string;
   onSelectMonth?: (monthKey: string) => void;
   selectedCategory?: string;
@@ -48,6 +49,7 @@ export function LedgerTabView({
   targetMonthKey,
   monthlyStats,
   initialMethodFilter,
+  methodFilterTrigger,
   selectedMonth: selectedMonthProp,
   onSelectMonth,
   selectedCategory: selectedCategoryProp,
@@ -175,7 +177,7 @@ export function LedgerTabView({
         sessionStorage.setItem("invictus_ledger_method", initialMethodFilter);
       }
     }
-  }, [initialMethodFilter]);
+  }, [initialMethodFilter, methodFilterTrigger]);
 
   const handleResetFilters = () => {
     soundFX.playPop();
@@ -436,7 +438,7 @@ export function LedgerTabView({
   }, [categoryCardsData, categories, transactions, selectedMonth, activeMonthKey]);
 
   return (
-    <div className="space-y-4">
+    <div id="money-ledger-view" className="space-y-4 scroll-mt-24">
       {/* 🏷️ CATEGORY ENVELOPES CHIP RAIL (Contextually Scoped to Ledger) */}
       <CategoryChipFilterRail
         currencySymbol={currencySymbol}

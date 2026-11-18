@@ -114,6 +114,7 @@ function MoneyPageContent() {
   const actionParam = searchParams.get("action");
   const [activeTab, setActiveTab] = useState(tabParam || "ledger");
   const [ledgerMethodFilter, setLedgerMethodFilter] = useState<string>("all");
+  const [ledgerMethodFilterTrigger, setLedgerMethodFilterTrigger] = useState<number>(0);
 
   // Modal States
   const [isAddTxOpen, setIsAddTxOpen] = useState(false);
@@ -136,12 +137,30 @@ function MoneyPageContent() {
   // Deletion Safeguard
   const [deleteCatId, setDeleteCatId] = useState<string | null>(null);
 
-  const handleSelectPaymentMethodFromHero = (method: "upi" | "cash") => {
+  const handleSelectPaymentMethodFromHero = (method: "upi" | "cash" | "all") => {
     setLedgerMethodFilter(method);
+    setLedgerMethodFilterTrigger(Date.now());
+    setSelectedCategory("all");
     if (typeof window !== "undefined") {
       sessionStorage.setItem("invictus_ledger_method", method);
+      sessionStorage.removeItem("invictus_ledger_category");
+      sessionStorage.removeItem("invictus_ledger_search");
     }
     setActiveTab("ledger");
+
+    // Smooth scroll down to ledger view so user immediately sees all transactions
+    setTimeout(() => {
+      const scrollContainer = document.getElementById("main-scroll-container");
+      const target = document.getElementById("money-ledger-view");
+      if (target && scrollContainer) {
+        const containerRect = scrollContainer.getBoundingClientRect();
+        const targetRect = target.getBoundingClientRect();
+        const offset = targetRect.top - containerRect.top + scrollContainer.scrollTop - 90;
+        scrollContainer.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
+      } else if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 60);
   };
 
   // Sync tab with URL search parameter
@@ -754,6 +773,7 @@ function MoneyPageContent() {
             targetMonthKey={effectiveTargetMonthKey}
             monthlyStats={monthlyStats}
             initialMethodFilter={ledgerMethodFilter}
+            methodFilterTrigger={ledgerMethodFilterTrigger}
             selectedMonth={selectedMonth}
             onSelectMonth={handleSelectMonth}
             selectedCategory={selectedCategory}

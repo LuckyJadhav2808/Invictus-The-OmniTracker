@@ -18,7 +18,7 @@ interface FinancialSummaryCockpitProps {
   onAddCategory: () => void;
   onOpenEditAllowances: () => void;
   onOpenCalculator?: () => void;
-  onSelectPaymentMethod?: (method: "upi" | "cash") => void;
+  onSelectPaymentMethod?: (method: "upi" | "cash" | "all") => void;
   onRefillCashTill?: () => void;
   onNavigateToTab?: (tab: "ledger" | "budgets" | "vault" | "analytics") => void;
   transactions?: Transaction[];
@@ -120,8 +120,8 @@ export function FinancialSummaryCockpit({
           onDuplicateTransaction={onDuplicateTransaction}
           onDeleteTransaction={onDeleteTransaction}
           onSeeAll={(method) => {
-            if (method && method !== "all" && onSelectPaymentMethod) {
-              onSelectPaymentMethod(method);
+            if (onSelectPaymentMethod) {
+              onSelectPaymentMethod(method || "all");
             }
             onNavigateToTab?.("ledger");
           }}
