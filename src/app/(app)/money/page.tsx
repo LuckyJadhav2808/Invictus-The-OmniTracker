@@ -36,6 +36,7 @@ import { LedgerTabView } from "@/components/money/views/LedgerTabView";
 import { BudgetTabView } from "@/components/money/views/BudgetTabView";
 import { VaultTabView } from "@/components/money/views/VaultTabView";
 import { AnalyticsTabView } from "@/components/money/views/AnalyticsTabView";
+import { WhoOwesWhoTabView } from "@/components/money/views/WhoOwesWhoTabView";
 import { CategoryChipFilterRail } from "@/components/money/CategoryChipFilterRail";
 
 // Lazy-Loaded Heavy Modals (Zero TBT & Fast Initial Paint)
@@ -144,7 +145,7 @@ function MoneyPageContent() {
 
   // Sync tab with URL search parameter
   useEffect(() => {
-    if (tabParam && ["ledger", "budgets", "vault", "analytics"].includes(tabParam)) {
+    if (tabParam && ["ledger", "budgets", "debts", "vault", "analytics"].includes(tabParam)) {
       setActiveTab(tabParam);
     }
   }, [tabParam]);
@@ -678,6 +679,13 @@ function MoneyPageContent() {
                 <span>Budget &amp; Rollover</span>
               </TabsTrigger>
               <TabsTrigger
+                value="debts"
+                className="rounded-xl text-xs font-semibold py-2 px-3.5 sm:px-4 border border-transparent data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:shadow-xs dark:data-[state=active]:bg-white dark:data-[state=active]:text-[#161514] text-[#6B6B6B] hover:text-[#161514] dark:text-[#A8A29E] dark:hover:text-stone-100 transition-all flex items-center gap-2 shrink-0 cursor-pointer"
+              >
+                <Users className="size-3.5 stroke-[2]" />
+                <span>Who Owes Who 🤝</span>
+              </TabsTrigger>
+              <TabsTrigger
                 value="vault"
                 className="rounded-xl text-xs font-semibold py-2 px-3.5 sm:px-4 border border-transparent data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:shadow-xs dark:data-[state=active]:bg-white dark:data-[state=active]:text-[#161514] text-[#6B6B6B] hover:text-[#161514] dark:text-[#A8A29E] dark:hover:text-stone-100 transition-all flex items-center gap-2 shrink-0 cursor-pointer"
               >
@@ -692,21 +700,6 @@ function MoneyPageContent() {
                 <span>Analytics</span>
               </TabsTrigger>
             </TabsList>
-
-            {/* Who Owes Who Quick Launcher (Belanje Benchmark) */}
-            <button
-              type="button"
-              onClick={() => {
-                soundFX.playPop();
-                setWhoOwesWhoPrefill(null);
-                setIsWhoOwesWhoOpen(true);
-              }}
-              className="rounded-2xl text-xs font-heading font-black py-2.5 px-3.5 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:hover:bg-amber-900/60 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-700 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs shrink-0 active:scale-95 whitespace-nowrap"
-              title="Open Who Owes Who Split Tracker"
-            >
-              <Users className="size-3.5 stroke-[2.2] text-amber-700 dark:text-amber-300" />
-              <span>Who Owes Who</span>
-            </button>
           </div>
         </div>
 
@@ -753,7 +746,16 @@ function MoneyPageContent() {
           />
         </TabsContent>
 
-        {/* Tab 3: Vault */}
+        {/* Tab 3: Who Owes Who In-Situ Deck (Belanje Page-in-Page) */}
+        <TabsContent value="debts">
+          <WhoOwesWhoTabView
+            currencySymbol={currencySymbol}
+            prefill={whoOwesWhoPrefill}
+            onLogSettlementIncome={handleLogWhoOwesWhoRepayment}
+          />
+        </TabsContent>
+
+        {/* Tab 4: Vault */}
         <TabsContent value="vault">
           <VaultTabView currencySymbol={currencySymbol} />
         </TabsContent>
@@ -791,7 +793,9 @@ function MoneyPageContent() {
         onOpenReceiptScan={() => setIsBulkModalOpen(true)}
         onOpenWhoOwesWho={(prefill) => {
           setWhoOwesWhoPrefill(prefill || null);
-          setIsWhoOwesWhoOpen(true);
+          setIsAddTxOpen(false);
+          setEditingTx(null);
+          handleTabChange("debts");
         }}
         onSave={handleSaveTransaction}
         onDelete={handleDeleteTransaction}
