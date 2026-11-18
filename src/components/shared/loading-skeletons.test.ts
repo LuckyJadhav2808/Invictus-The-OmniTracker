@@ -17,13 +17,15 @@ import {
 
 describe("Loading States Architecture: Spinner vs. Skeletons", () => {
   describe("InvictusLoadingScreen (Unknown Layout Gate)", () => {
-    it("renders default initializing message and dark mode support", () => {
+    it("renders clean sovereign icon splash screen without terminal bootloader text", () => {
       const html = renderToStaticMarkup(React.createElement(InvictusLoadingScreen));
-      expect(html).toContain("INITIALIZING INVICTUS OS");
-      expect(html).toContain("Loading encrypted offline state…");
+      // Bootloader terminal clutter is cleanly removed
+      expect(html).not.toContain("INITIALIZING INVICTUS OS");
+      expect(html).not.toContain("Loading encrypted offline state…");
       // Contains the Sovereign Monolith vector SVG mark
       expect(html).toContain("<svg viewBox=\"0 0 512 512\"");
-      // Contains dark mode classes
+      // Contains squircle splash styling & dark mode tokens
+      expect(html).toContain("rounded-3xl");
       expect(html).toContain("dark:bg-[#121110]");
       expect(html).toContain("dark:bg-[#1E1C1A]");
     });
