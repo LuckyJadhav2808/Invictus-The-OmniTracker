@@ -115,7 +115,7 @@ export default function TasksPage() {
               <span>New Task</span>
             </Button>
 
-            {/* Interactive Taskmaster Strobi Companion */}
+            {/* Interactive 3D Strobi Companion */}
             <StrobiCompanion
               gear="tasks"
               state={p1UrgentTasks > 0 ? "focus" : completedTasks > 0 && completedTasks === totalTasks ? "celebrate" : "idle"}
@@ -124,7 +124,7 @@ export default function TasksPage() {
                 setTaskToEdit(null);
                 setIsCreateModalOpen(true);
               }}
-              title="Strobi: Taskmaster Companion (Click for New Task)"
+              title="Strobi (Click for New Task)"
             />
           </div>
         </div>

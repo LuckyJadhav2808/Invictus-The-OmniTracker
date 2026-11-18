@@ -12,7 +12,7 @@ type TransientReaction = "wink" | "salute" | "cheer" | null;
 export interface StrobiCompanionProps {
   state?: StrobiState;
   gear?: StrobiGear;
-  size?: number; // Default 42px
+  size?: number; // Default 48px
   className?: string;
   streakDays?: number;
   onClick?: () => void;
@@ -31,11 +31,12 @@ const STROBI_QUIPS = [
 ];
 
 /**
- * 🌟 Strobi Universal Companion Avatar
- * Parametric 3D-shaded vector blob companion derived from Strobi archetype.
+ * 🌟 Strobi Universal 3D Companion Avatar (Not in a box!)
+ * Parametric 3D-shaded sphere character derived from Strobi archetype.
  * Features:
- * - 64x64 Neobrutalist vector SVG with depth highlights and ambient drop shadow
- * - Autonomous procedural eye blink & glance timers (eyes glance left/right)
+ * - Free-standing 3D sphere with volumetric radial shading, specular gloss, and floor bounce lighting
+ * - Organic diffused ground contact shadow (no square wrapper box)
+ * - Autonomous procedural eye blink & glance timers
  * - State engine: 'idle' | 'focus' | 'fire' | 'celebrate' | 'sleep'
  * - Gear archetypes: 'gladiator' (Today) | 'fitness' (Habits) | 'study' (Study) | 'money' (Cashflow) | 'tasks' (Tasks)
  * - Tactile Emil Kowalski spring bounce on click + 8-bit bot synth audio + haptics
@@ -43,7 +44,7 @@ const STROBI_QUIPS = [
 export function StrobiCompanion({
   state = "idle",
   gear = "gladiator",
-  size = 42,
+  size = 48,
   className = "",
   streakDays = 0,
   onClick,
@@ -78,9 +79,9 @@ export function StrobiCompanion({
       glanceTimeout = setTimeout(() => {
         const roll = Math.random();
         if (roll < 0.35) {
-          setGlanceOffset(-1.8); // Glance left toward task list
+          setGlanceOffset(-2); // Glance left toward content
         } else if (roll < 0.7) {
-          setGlanceOffset(1.8); // Glance right toward actions
+          setGlanceOffset(2); // Glance right toward actions
         } else {
           setGlanceOffset(0); // Center focus
         }
@@ -131,7 +132,6 @@ export function StrobiCompanion({
       const quip = STROBI_QUIPS[quipIndex % STROBI_QUIPS.length];
       toast("✨ Strobi: " + quip, {
         duration: 2600,
-        description: "Your Loyal Productivity Companion",
       });
     }
   };
@@ -145,14 +145,14 @@ export function StrobiCompanion({
 
   const defaultTitle =
     gear === "fitness"
-      ? "Strobi: Fitness Companion (Click for New Habit)"
+      ? "Strobi (Click for New Habit)"
       : gear === "tasks"
-      ? "Strobi: Taskmaster Companion (Click for New Task)"
+      ? "Strobi (Click for New Task)"
       : gear === "study"
-      ? "Strobi: Scholar Companion (Click for Focus Session)"
+      ? "Strobi (Click for Study Focus)"
       : gear === "money"
-      ? "Strobi: Wealth Guardian (Click to Log Expense)"
-      : "Strobi: Gladiator Companion (Click for Motivation)";
+      ? "Strobi (Click to Log Expense)"
+      : "Strobi (Click to Chat)";
 
   return (
     <button
@@ -161,260 +161,317 @@ export function StrobiCompanion({
       title={title || defaultTitle}
       aria-label={title || defaultTitle}
       className={cn(
-        "relative inline-flex items-center justify-center p-1 bg-white dark:bg-[#1E1B18] border-2 border-[#161514] rounded-2xl shadow-[2.5px_2.5px_0px_#161514] dark:shadow-[2.5px_2.5px_0px_#000000] hover:bg-[#FAF8F5] dark:hover:bg-[#25221F] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-150 cursor-pointer shrink-0 select-none group",
-        isBouncing && "scale-105",
+        "relative inline-flex items-center justify-center p-0 bg-transparent border-0 outline-none focus:outline-none cursor-pointer shrink-0 select-none group transition-transform duration-200",
+        isBouncing && "scale-110 -translate-y-1",
         className
       )}
       style={{
         width: size,
         height: size,
-        transition: "transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)",
+        background: "transparent",
+        border: "none",
+        boxShadow: "none",
       }}
     >
-      {/* 🌟 Pulsing Aura for Celebratory & Fire States */}
+      {/* 🌟 Subtle Ambient Energy Glow (Only on Celebratory or Fiery Streak) */}
       {showAura && isCelebratory && (
-        <span className="absolute -inset-1 rounded-2xl bg-[#CEF431]/30 blur-xs animate-pulse pointer-events-none" />
+        <span className="absolute inset-0 rounded-full bg-[#CEF431]/25 blur-sm animate-pulse pointer-events-none" />
       )}
       {showAura && isFiery && (
-        <span className="absolute -inset-1 rounded-2xl bg-amber-500/25 blur-xs animate-pulse pointer-events-none" />
+        <span className="absolute inset-0 rounded-full bg-amber-500/20 blur-sm animate-pulse pointer-events-none" />
       )}
 
-      {/* 64x64 Strobi Vector Canvas */}
+      {/* 100x100 3D Parametric Strobi Vector Canvas */}
       <svg
-        viewBox="0 0 64 64"
+        viewBox="0 0 100 100"
         width="100%"
         height="100%"
-        className="size-full overflow-visible"
+        className="size-full overflow-visible pointer-events-none"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
-          {/* Strobi Signature 3D Shading Radial Gradient */}
+          {/* Ground Shadow Filter */}
+          <filter id="strobiGroundBlur" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="2.5" />
+          </filter>
+
+          {/* Strobi Signature 3D Volumetric Lighting (#5B7FE5 from JSON) */}
           <radialGradient
-            id="strobiBodyGrad"
-            cx="36%"
-            cy="32%"
-            r="64%"
-            fx="32%"
-            fy="28%"
+            id="strobi3DBody"
+            cx="34%"
+            cy="28%"
+            r="68%"
+            fx="30%"
+            fy="24%"
           >
-            <stop offset="0%" stopColor="#7C9BF5" />
-            <stop offset="55%" stopColor="#5B7FE5" />
-            <stop offset="100%" stopColor="#3A5EC9" />
+            <stop offset="0%" stopColor="#A8C4FF" />
+            <stop offset="18%" stopColor="#7E9FF8" />
+            <stop offset="50%" stopColor="#5B7FE5" />
+            <stop offset="78%" stopColor="#375DC7" />
+            <stop offset="92%" stopColor="#2441A3" />
+            <stop offset="100%" stopColor="#1B3285" />
           </radialGradient>
 
-          {/* Celebratory Emerald-Lime Tint Gradient */}
+          {/* Celebratory Emerald-Lime Tinted 3D Gradient */}
           <radialGradient
-            id="strobiCelebratoryGrad"
-            cx="36%"
-            cy="32%"
-            r="64%"
-            fx="32%"
-            fy="28%"
+            id="strobi3DCelebrate"
+            cx="34%"
+            cy="28%"
+            r="68%"
+            fx="30%"
+            fy="24%"
           >
-            <stop offset="0%" stopColor="#93C5FD" />
-            <stop offset="60%" stopColor="#5B7FE5" />
-            <stop offset="100%" stopColor="#047857" />
+            <stop offset="0%" stopColor="#BAF7D0" />
+            <stop offset="25%" stopColor="#6EE7B7" />
+            <stop offset="55%" stopColor="#10B981" />
+            <stop offset="85%" stopColor="#047857" />
+            <stop offset="100%" stopColor="#064E3B" />
           </radialGradient>
 
-          {/* Golden Fire Shading */}
+          {/* Fiery Golden 3D Shading */}
           <radialGradient
-            id="strobiFireGrad"
-            cx="36%"
-            cy="32%"
-            r="64%"
-            fx="32%"
-            fy="28%"
+            id="strobi3DFire"
+            cx="34%"
+            cy="28%"
+            r="68%"
+            fx="30%"
+            fy="24%"
           >
-            <stop offset="0%" stopColor="#93C5FD" />
-            <stop offset="65%" stopColor="#5B7FE5" />
-            <stop offset="100%" stopColor="#B45309" />
+            <stop offset="0%" stopColor="#FED7AA" />
+            <stop offset="25%" stopColor="#FBBF24" />
+            <stop offset="60%" stopColor="#F59E0B" />
+            <stop offset="85%" stopColor="#D97706" />
+            <stop offset="100%" stopColor="#92400E" />
           </radialGradient>
+
+          {/* Specular Soft Glow Gradient */}
+          <linearGradient id="strobiSpecular" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.75" />
+            <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
+          </linearGradient>
+
+          {/* Ambient Floor Bounce Light Gradient */}
+          <linearGradient id="strobiBounceGrad" x1="50%" y1="100%" x2="50%" y2="0%">
+            <stop offset="0%" stopColor="#A0C0FF" stopOpacity="0.45" />
+            <stop offset="100%" stopColor="#A0C0FF" stopOpacity="0" />
+          </linearGradient>
         </defs>
 
-        {/* 1. Ground Drop Shadow (Breathes with avatar) */}
+        {/* 1. Organic Diffuse Ground Contact Shadow (Resting in 3D Space) */}
         <ellipse
-          cx="32"
-          cy="57.5"
-          rx={isBouncing ? 15 : 12.5}
+          cx="50"
+          cy="87.5"
+          rx={isBouncing ? 28 : 24}
+          ry="6"
+          fill="#161514"
+          opacity="0.22"
+          filter="url(#strobiGroundBlur)"
+        />
+        <ellipse
+          cx="50"
+          cy="87"
+          rx={isBouncing ? 16 : 13}
           ry="3"
           fill="#161514"
-          opacity="0.18"
-          className="transition-all duration-300"
+          opacity="0.32"
         />
 
-        {/* 2. Primary Spherical Body (240x240 sphere normalized to 40x40 at cx=32, cy=35) */}
-        <circle
-          cx="32"
-          cy="34.5"
-          r="19.5"
-          fill={
-            isCelebratory
-              ? "url(#strobiCelebratoryGrad)"
-              : isFiery
-              ? "url(#strobiFireGrad)"
-              : "url(#strobiBodyGrad)"
-          }
-          stroke="#161514"
-          strokeWidth="2.4"
-        />
+        {/* 2. Primary 3D Spherical Body (r=34 at cx=50, cy=49) */}
+        <g className="transition-transform duration-300">
+          <circle
+            cx="50"
+            cy="49"
+            r="34"
+            fill={
+              isCelebratory
+                ? "url(#strobi3DCelebrate)"
+                : isFiery
+                ? "url(#strobi3DFire)"
+                : "url(#strobi3DBody)"
+            }
+            stroke="#161514"
+            strokeWidth="2.2"
+          />
 
-        {/* 3. Specular Light Curve (Apple HIG Depth Reflection) */}
-        <path
-          d="M 21 24 A 13 13 0 0 1 34 17"
-          stroke="rgba(255, 255, 255, 0.55)"
-          strokeWidth="2.4"
-          strokeLinecap="round"
-          fill="none"
-        />
+          {/* 3. Ambient Floor Bounce Light (Curved Lower Rim) */}
+          <path
+            d="M 26 66 A 34 34 0 0 0 74 66 A 32 32 0 0 1 26 66"
+            fill="url(#strobiBounceGrad)"
+          />
 
-        {/* === 4. MODULAR HEADGEAR & ACCESSORIES === */}
-        {gear === "tasks" ? (
-          /* TASKS: Cyber Sensor Antenna with Golden Orb */
-          <g>
-            <line x1="32" y1="15" x2="32" y2="5" stroke="#161514" strokeWidth="2.2" strokeLinecap="round" />
-            <circle cx="32" cy="5" r="3.2" fill="#F59E0B" stroke="#161514" strokeWidth="1.6" />
-            <circle cx="33" cy="4" r="0.8" fill="#FFFFFF" />
-            <rect x="28" y="14" width="8" height="2.5" rx="1" fill="#E2E8F0" stroke="#161514" strokeWidth="1.4" />
-          </g>
-        ) : gear === "study" ? (
-          /* STUDY: Scholar Academic Mortarboard Cap */
-          <g>
-            <polygon
-              points="32,4 47,9.5 32,15 17,9.5"
-              fill="#1E1B4B"
-              stroke="#161514"
-              strokeWidth="2"
-              strokeLinejoin="round"
-            />
-            <rect x="25" y="14" width="14" height="3" rx="1" fill="#312E81" stroke="#161514" strokeWidth="1.6" />
-            <circle cx="32" cy="9.5" r="1.3" fill="#F59E0B" stroke="#161514" strokeWidth="0.8" />
-            <path d="M32 9.5 C 37 9.5, 41 12, 40 16" stroke="#F59E0B" strokeWidth="1.4" strokeLinecap="round" fill="none" />
-          </g>
-        ) : gear === "money" ? (
-          /* MONEY: Emerald Banker Visor with Golden Pip */
-          <g>
-            <path
-              d="M 17 18 C 23 12, 41 12, 47 18 L 44 20 C 39 16, 25 16, 20 20 Z"
-              fill="#059669"
-              stroke="#161514"
-              strokeWidth="1.8"
-              strokeLinejoin="round"
-            />
-            <circle cx="32" cy="9" r="2.8" fill="#F59E0B" stroke="#161514" strokeWidth="1.4" />
-            <line x1="32" y1="7.5" x2="32" y2="10.5" stroke="#161514" strokeWidth="1" strokeLinecap="round" />
-          </g>
-        ) : gear === "fitness" ? (
-          /* FITNESS: Crimson Sweatband with White Competition Stripes */
-          <g>
-            <rect x="18" y="19" width="28" height="4.5" rx="2" fill="#E11D48" stroke="#161514" strokeWidth="1.8" />
-            <line x1="22" y1="19" x2="22" y2="23.5" stroke="#FFFFFF" strokeWidth="1.4" />
-            <line x1="42" y1="19" x2="42" y2="23.5" stroke="#FFFFFF" strokeWidth="1.4" />
-            {isFiery && (
-              <path
-                d="M 32 5 C 29 11, 35 13, 32 19 C 37 14, 38 10, 32 5 Z"
-                fill="#F59E0B"
+          {/* 4. Glossy Specular Highlight (Apple / Pixar 3D Depth) */}
+          <ellipse
+            cx="38"
+            cy="31"
+            rx="11"
+            ry="6"
+            transform="rotate(-32 38 31)"
+            fill="url(#strobiSpecular)"
+          />
+          {/* Crisp Pin-Point Core Catchlight */}
+          <circle cx="34" cy="27" r="2.2" fill="#FFFFFF" opacity="0.9" />
+
+          {/* === 5. 3D MODULAR HEADGEAR & ACCESSORIES === */}
+          {gear === "tasks" ? (
+            /* TASKS: 3D Cyber Sensor Antenna */
+            <g>
+              <line x1="50" y1="16" x2="50" y2="5" stroke="#161514" strokeWidth="2.4" strokeLinecap="round" />
+              <circle cx="50" cy="5" r="4.2" fill="#F59E0B" stroke="#161514" strokeWidth="1.8" />
+              <circle cx="51.5" cy="3.5" r="1.2" fill="#FFFFFF" />
+              <rect x="44" y="14" width="12" height="3.5" rx="1.5" fill="#E2E8F0" stroke="#161514" strokeWidth="1.8" />
+            </g>
+          ) : gear === "study" ? (
+            /* STUDY: 3D Scholar Mortarboard Cap */
+            <g>
+              <polygon
+                points="50,2 72,9.5 50,17 28,9.5"
+                fill="#1E1B4B"
                 stroke="#161514"
-                strokeWidth="1.4"
-                className="animate-pulse"
+                strokeWidth="2.2"
+                strokeLinejoin="round"
+              />
+              <rect x="40" y="15" width="20" height="4" rx="1.5" fill="#312E81" stroke="#161514" strokeWidth="2" />
+              <circle cx="50" cy="9.5" r="1.8" fill="#F59E0B" stroke="#161514" strokeWidth="1" />
+              <path d="M50 9.5 C 57 9.5, 62 13, 61 19" stroke="#F59E0B" strokeWidth="1.8" strokeLinecap="round" fill="none" />
+            </g>
+          ) : gear === "money" ? (
+            /* MONEY: 3D Emerald Banker Visor with Golden Pip */
+            <g>
+              <path
+                d="M 26 27 C 36 18, 64 18, 74 27 L 70 30 C 62 23, 38 23, 30 30 Z"
+                fill="#059669"
+                stroke="#161514"
+                strokeWidth="2"
+                strokeLinejoin="round"
+              />
+              <circle cx="50" cy="16" r="3.6" fill="#F59E0B" stroke="#161514" strokeWidth="1.8" />
+              <line x1="50" y1="14" x2="50" y2="18" stroke="#161514" strokeWidth="1.2" strokeLinecap="round" />
+            </g>
+          ) : gear === "fitness" ? (
+            /* FITNESS: 3D Curved Sweatband wrapped around forehead */
+            <g>
+              <path
+                d="M 23 37 C 38 26, 62 26, 77 37 L 75 43 C 61 32, 39 32, 25 43 Z"
+                fill="#E11D48"
+                stroke="#161514"
+                strokeWidth="2.2"
+              />
+              <path d="M 28 39 C 39 30, 61 30, 72 39" stroke="#FFFFFF" strokeWidth="1.4" fill="none" />
+              {isFiery && (
+                <path
+                  d="M 50 3 C 45 11, 55 14, 50 22 C 58 15, 59 10, 50 3 Z"
+                  fill="#F59E0B"
+                  stroke="#161514"
+                  strokeWidth="1.8"
+                  className="animate-pulse"
+                />
+              )}
+            </g>
+          ) : (
+            /* GLADIATOR (Today / Default): 3D Golden Victory Laurel Crest */
+            <g>
+              {isFiery ? (
+                <g className="animate-pulse">
+                  <path
+                    d="M42 22C36 11 46 2 50 1C54 6 64 11 58 22Z"
+                    fill="#FF4343"
+                    stroke="#161514"
+                    strokeWidth="2.4"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M46 22C43 14 49 8 50 6C52 10 57 14 54 22Z"
+                    fill="#FFB800"
+                    stroke="#161514"
+                    strokeWidth="1.6"
+                    strokeLinejoin="round"
+                  />
+                </g>
+              ) : (
+                <g>
+                  <circle cx="50" cy="15" r="3.8" fill="#CEF431" stroke="#161514" strokeWidth="2" />
+                  <circle cx="51.2" cy="13.8" r="1.1" fill="#FFFFFF" />
+                  <path d="M 44 16 L 50 11.5 L 56 16" stroke="#161514" strokeWidth="1.6" fill="none" strokeLinecap="round" />
+                </g>
+              )}
+            </g>
+          )}
+
+          {/* === 6. 3D FACIAL EXPRESSIONS (Eyes & Twinkle from JSON #111316) === */}
+          <g transform={`translate(${glanceOffset}, 0)`} className="transition-transform duration-200">
+            {isSleeping ? (
+              /* Sleeping: Peaceful Curved Lashes */
+              <g>
+                <path d="M 39 49 Q 44 53 49 49" stroke="#111316" strokeWidth="3" strokeLinecap="round" fill="none" />
+                <path d="M 53 49 Q 58 53 63 49" stroke="#111316" strokeWidth="3" strokeLinecap="round" fill="none" />
+                <text x="68" y="34" fill="#818CF8" fontSize="11" fontWeight="900" fontFamily="monospace">Z</text>
+                <text x="75" y="27" fill="#818CF8" fontSize="8" fontWeight="900" fontFamily="monospace">z</text>
+              </g>
+            ) : isCelebratory ? (
+              /* Celebratory: Joyous Cheerful Arcs + Rosy Cheeks */
+              <g>
+                <path d="M 38 50 Q 43 43 48 50" stroke="#111316" strokeWidth="3.4" strokeLinecap="round" fill="none" />
+                <path d="M 54 50 Q 59 43 64 50" stroke="#111316" strokeWidth="3.4" strokeLinecap="round" fill="none" />
+                {/* Cheerful Glowing Cheeks */}
+                <ellipse cx="34" cy="54" rx="4.5" ry="2.6" fill="#CEF431" opacity="0.9" />
+                <ellipse cx="68" cy="54" rx="4.5" ry="2.6" fill="#CEF431" opacity="0.9" />
+                {/* Happy Mouth */}
+                <path d="M 46 56 Q 51 60 56 56" stroke="#111316" strokeWidth="2.4" strokeLinecap="round" fill="none" />
+                {/* Sparkle Star */}
+                <path d="M 72 32 L 73.5 36 L 77.5 37.5 L 73.5 39 L 72 43 L 70.5 39 L 66.5 37.5 L 70.5 36 Z" fill="#CEF431" />
+              </g>
+            ) : isBlinking ? (
+              /* Blinking: Quick Flat Slits */
+              <g>
+                <line x1="39" y1="48.5" x2="47" y2="48.5" stroke="#111316" strokeWidth="3.2" strokeLinecap="round" />
+                <line x1="55" y1="48.5" x2="63" y2="48.5" stroke="#111316" strokeWidth="3.2" strokeLinecap="round" />
+              </g>
+            ) : isWinking ? (
+              /* Winking: One Wink Chevron, One Glossy Eye */
+              <g>
+                <path d="M 38 46 L 43 49.5 L 38 53" stroke="#111316" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                <ellipse cx="58" cy="48.5" rx="4.2" ry="4.5" fill="#111316" />
+                <circle cx="56.6" cy="46.8" r="1.5" fill="#FFFFFF" />
+                <path d="M 46 57 Q 50 60 54 57" stroke="#111316" strokeWidth="2.2" strokeLinecap="round" fill="none" />
+              </g>
+            ) : isFocused ? (
+              /* Focused: Academic Glasses with Inset Pupils */
+              <g>
+                <circle cx="43" cy="48.5" r="6" stroke="#F59E0B" strokeWidth="2.2" fill="rgba(255,255,255,0.2)" />
+                <circle cx="59" cy="48.5" r="6" stroke="#F59E0B" strokeWidth="2.2" fill="rgba(255,255,255,0.2)" />
+                <line x1="49" y1="48.5" x2="53" y2="48.5" stroke="#F59E0B" strokeWidth="2.4" />
+                <circle cx="43" cy="48.5" r="3" fill="#111316" />
+                <circle cx="42" cy="47.2" r="1.1" fill="#FFFFFF" />
+                <circle cx="59" cy="48.5" r="3" fill="#111316" />
+                <circle cx="58" cy="47.2" r="1.1" fill="#FFFFFF" />
+              </g>
+            ) : (
+              /* Standard Ambient Eyes: Iconic Glossy Obsidian Spheres with 3D Specular Twinkle */
+              <g>
+                {/* Left Eye */}
+                <ellipse cx="43" cy="48" rx="4.2" ry="4.6" fill="#111316" />
+                <circle cx="41.6" cy="46.2" r="1.5" fill="#FFFFFF" />
+                <circle cx="44.2" cy="49.5" r="0.9" fill="#9DB9FF" opacity="0.6" />
+
+                {/* Right Eye */}
+                <ellipse cx="59" cy="48" rx="4.2" ry="4.6" fill="#111316" />
+                <circle cx="57.6" cy="46.2" r="1.5" fill="#FFFFFF" />
+                <circle cx="60.2" cy="49.5" r="0.9" fill="#9DB9FF" opacity="0.6" />
+              </g>
+            )}
+
+            {/* Subtle Happy Mouth Curve (when cheering/celebrating) */}
+            {(isCelebratory || isWinking) && !isSleeping && (
+              <path
+                d="M 46 56 Q 51 59.5 56 56"
+                stroke="#111316"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                fill="none"
               />
             )}
           </g>
-        ) : (
-          /* GLADIATOR (Today / Default): Golden Champion Laurel or Mohawk Crest */
-          <g>
-            {isFiery ? (
-              <g className="animate-pulse">
-                <path
-                  d="M26 15C22 7 29 1 32 0C35 4 42 7 38 15Z"
-                  fill="#FF4343"
-                  stroke="#161514"
-                  strokeWidth="2"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M29 15C27 10 31 6 32 4C34 7 37 10 35 15Z"
-                  fill="#FFB800"
-                  stroke="#161514"
-                  strokeWidth="1.2"
-                  strokeLinejoin="round"
-                />
-              </g>
-            ) : (
-              <g>
-                <circle cx="32" cy="11" r="2.8" fill="#CEF431" stroke="#161514" strokeWidth="1.6" />
-                <path d="M 28 11.5 L 32 8 L 36 11.5" stroke="#161514" strokeWidth="1.2" fill="none" />
-              </g>
-            )}
-          </g>
-        )}
-
-        {/* === 5. FACIAL EXPRESSIONS (JSON: eyes gap, shiftY, dynamic states) === */}
-        <g transform={`translate(${glanceOffset}, 0)`} className="transition-transform duration-200">
-          {isSleeping ? (
-            /* Sleeping: Calm Resting Curved Lines */
-            <g>
-              <path d="M 24 35 Q 27 37.5 30 35" stroke="#111316" strokeWidth="2.2" strokeLinecap="round" fill="none" />
-              <path d="M 34 35 Q 37 37.5 40 35" stroke="#111316" strokeWidth="2.2" strokeLinecap="round" fill="none" />
-              <text x="44" y="24" fill="#818CF8" fontSize="8" fontWeight="bold" fontFamily="monospace">Z</text>
-              <text x="49" y="19" fill="#818CF8" fontSize="6" fontWeight="bold" fontFamily="monospace">z</text>
-            </g>
-          ) : isCelebratory ? (
-            /* Celebratory: Happy Arcs + Cheeks */
-            <g>
-              <path d="M 24 36 Q 27 32 30 36" stroke="#111316" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-              <path d="M 34 36 Q 37 32 40 36" stroke="#111316" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-              {/* Joyous Cheeks */}
-              <circle cx="21.5" cy="38" r="2.4" fill="#CEF431" opacity="0.9" />
-              <circle cx="42.5" cy="38" r="2.4" fill="#CEF431" opacity="0.9" />
-              {/* Confetti Star */}
-              <path d="M 46 22 L 47 25 L 50 26 L 47 27 L 46 30 L 45 27 L 42 26 L 45 25 Z" fill="#CEF431" />
-            </g>
-          ) : isBlinking ? (
-            /* Blinking: Flat Quick Blink Slits */
-            <g>
-              <line x1="24.5" y1="34.5" x2="29.5" y2="34.5" stroke="#111316" strokeWidth="2.4" strokeLinecap="round" />
-              <line x1="34.5" y1="34.5" x2="39.5" y2="34.5" stroke="#111316" strokeWidth="2.4" strokeLinecap="round" />
-            </g>
-          ) : isWinking ? (
-            /* Winking: One Wink Chevron, One Open Eye */
-            <g>
-              <path d="M 24 33 L 27 35.5 L 24 38" stroke="#111316" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-              <circle cx="37" cy="34.5" r="2.8" fill="#111316" />
-              <circle cx="36.2" cy="33.6" r="0.9" fill="#FFFFFF" />
-            </g>
-          ) : isFocused ? (
-            /* Focused: Scholar Glasses with Bead Eyes */
-            <g>
-              <circle cx="27" cy="34.5" r="4.5" stroke="#F59E0B" strokeWidth="1.6" fill="rgba(255,255,255,0.25)" />
-              <circle cx="37" cy="34.5" r="4.5" stroke="#F59E0B" strokeWidth="1.6" fill="rgba(255,255,255,0.25)" />
-              <line x1="31.5" y1="34.5" x2="32.5" y2="34.5" stroke="#F59E0B" strokeWidth="1.8" />
-              <circle cx="27" cy="34.5" r="2" fill="#111316" />
-              <circle cx="37" cy="34.5" r="2" fill="#111316" />
-            </g>
-          ) : (
-            /* Standard Ambient Eyes: Iconic Strobi Obsidian Beads with Twinkle */
-            <g>
-              {/* Left Eye */}
-              <circle cx="27" cy="34.5" r="2.8" fill="#111316" />
-              <circle cx="26.1" cy="33.6" r="0.9" fill="#FFFFFF" />
-
-              {/* Right Eye */}
-              <circle cx="37" cy="34.5" r="2.8" fill="#111316" />
-              <circle cx="36.1" cy="33.6" r="0.9" fill="#FFFFFF" />
-            </g>
-          )}
-
-          {/* Subtle Happy Mouth Curve (when celebrating or cheering) */}
-          {(isCelebratory || isWinking) && (
-            <path
-              d="M 29.5 41 Q 32 43.5 34.5 41"
-              stroke="#111316"
-              strokeWidth="2"
-              strokeLinecap="round"
-              fill="none"
-            />
-          )}
         </g>
       </svg>
     </button>

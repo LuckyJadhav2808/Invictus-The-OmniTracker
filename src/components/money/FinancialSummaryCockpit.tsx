@@ -72,8 +72,8 @@ export function FinancialSummaryCockpit({
         onActiveCardChange={setActiveCardIndex}
       />
 
-      {/* Strobi Financial Defense Companion & Daily Pace Status */}
-      <div className="flex items-center justify-between gap-3 p-2.5 rounded-2xl bg-[#FAF8F5] dark:bg-[#1E1B18] border-2 border-[#161514] dark:border-[#38332E] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]">
+      {/* 3D Strobi Financial Pace Telemetry */}
+      <div className="flex items-center justify-between gap-3 p-3 rounded-2xl bg-white dark:bg-[#1E1B18] border-2 border-[#161514] dark:border-[#38332E] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]">
         <div
           onClick={onAddTransaction}
           className="flex items-center gap-3 cursor-pointer group flex-1 min-w-0"
@@ -82,27 +82,21 @@ export function FinancialSummaryCockpit({
           <StrobiCompanion
             gear="money"
             state={dailyStats.isOverDailyBudget ? "fire" : "idle"}
-            size={40}
+            size={38}
             className="shrink-0"
           />
-          <div className="space-y-0.5 min-w-0">
-            <div className="flex items-center gap-2">
-              <span className="text-[9px] font-mono font-black uppercase px-1.5 py-0.2 rounded bg-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:text-[#161514]">
-                {dailyStats.isOverDailyBudget ? "🚨 BUDGET CEILING" : "🛡️ FINANCIAL DEFENSE"}
-              </span>
-              <span className="text-[10px] font-mono text-muted-foreground hidden sm:inline">Strobi Guardian</span>
-            </div>
-            <div className="text-xs font-mono text-[#161514] dark:text-[#FAF8F5] truncate">
+          <div className="min-w-0">
+            <p className="text-xs font-mono font-bold text-foreground truncate">
               {dailyStats.isOverDailyBudget ? (
                 <span className="text-rose-600 dark:text-rose-400 font-black">
-                  Pace exceeded by {currencySymbol}{dailyStats.overDailyAmount.toLocaleString()}! Lock down spends.
+                  Pace exceeded by {currencySymbol}{dailyStats.overDailyAmount.toLocaleString()} today
                 </span>
               ) : (
                 <span>
-                  Safe pace: <strong className="font-black text-[#047857] dark:text-[#03D26F]">~{currencySymbol}{dailyStats.todayRemaining.toLocaleString()}</strong> remaining today
+                  Safe to spend: <strong className="font-black text-[#047857] dark:text-[#03D26F]">{currencySymbol}{dailyStats.todayRemaining.toLocaleString()}</strong> today
                 </span>
               )}
-            </div>
+            </p>
           </div>
         </div>
 
@@ -112,7 +106,7 @@ export function FinancialSummaryCockpit({
             onClick={onOpenEditAllowances}
             className="text-[11px] font-heading font-black text-muted-foreground hover:text-foreground transition-colors cursor-pointer px-2.5 py-1.5 rounded-xl border border-border bg-secondary hover:bg-muted shrink-0 shadow-2xs"
           >
-            Adjust Limits ▾
+            Adjust Limits
           </button>
         )}
       </div>

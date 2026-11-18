@@ -225,30 +225,26 @@ export const MasterTodayHero = React.memo(function MasterTodayHero({
               </p>
             </div>
 
-            {/* Strobi Gladiator Companion Stage */}
-            <div className="p-3 sm:p-3.5 rounded-2xl bg-white dark:bg-[#1E1B18] border-2 border-[#161514] dark:border-[#38332E] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] flex items-center gap-3.5">
+            {/* 3D Strobi Live Companion Dialogue */}
+            <div className="flex items-center gap-3.5 pt-0.5">
               <StrobiCompanion
                 state={strobiState}
                 gear="gladiator"
-                size={58}
+                size={54}
                 streakDays={streakDays}
                 className="shrink-0"
               />
-              <div className="space-y-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="text-[9px] font-mono font-black uppercase px-2 py-0.5 rounded bg-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:text-[#161514]">
-                    {strobiState === "celebrate" ? "🏆 ALL CONQUERED" : "⚔️ STROBI'S DIRECTIVE"}
-                  </span>
-                  <span className="text-[10px] font-mono font-bold text-muted-foreground">
-                    Gladiator Companion
-                  </span>
-                </div>
+              <div className="relative flex-1 bg-white dark:bg-[#1E1B18] border-2 border-[#161514] dark:border-[#38332E] rounded-xl px-3.5 py-2.5 shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]">
+                {/* Speech Beak pointing directly at 3D Strobi */}
+                <div className="absolute top-1/2 -left-1.5 -translate-y-1/2 size-2.5 bg-white dark:bg-[#1E1B18] border-l-2 border-b-2 border-[#161514] dark:border-[#38332E] rotate-45" />
                 <p className="text-xs sm:text-sm font-heading font-black text-foreground leading-snug">
                   {strobiState === "celebrate"
-                    ? "Legendary discipline! Every daily trial conquered. Rest, recover, and prepare for tomorrow's arena."
+                    ? "All daily trials cleared today. You've earned your rest!"
                     : effectiveDaypart === "night"
-                    ? "Evening wrap-up: defend your streak, log your final spends, and rest like a gladiator."
-                    : "Discipline over motivation. Check off your first routine and lock in today's momentum!"}
+                    ? "Evening review: wrap up open tasks and preserve your streak."
+                    : effectiveDaypart === "forge"
+                    ? "Midday push — keep the rhythm going through your routines."
+                    : "Discipline over motivation. Check off rep #1 to ignite momentum!"}
                 </p>
               </div>
             </div>

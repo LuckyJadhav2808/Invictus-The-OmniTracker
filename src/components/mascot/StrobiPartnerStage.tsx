@@ -128,14 +128,14 @@ export function StrobiPartnerStage({
         </span>
       </div>
 
-      {/* 2. Center Stage: Large 76px 3D Strobi Sphere */}
-      <div className="relative my-1 flex items-center justify-center">
+      {/* 2. Center Stage: Free-Standing 3D Strobi Sphere */}
+      <div className="relative my-2 flex items-center justify-center">
         <StrobiCompanion
           state={state}
           gear={gear}
           size={size}
           streakDays={streakDays}
-          className="border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] group-hover:scale-105 transition-transform"
+          className="group-hover:scale-105 transition-transform"
           onClick={handleStageClick}
         />
       </div>
@@ -145,12 +145,9 @@ export function StrobiPartnerStage({
         {/* Speech Bubble Pointer Arrow */}
         <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 size-2.5 bg-white dark:bg-[#25221F] border-t-2 border-l-2 border-[#161514] dark:border-[#38332E] rotate-45" />
 
-        <p className="text-xs font-heading font-black text-foreground leading-snug tracking-tight line-clamp-3">
+        <p className="text-xs font-heading font-black text-foreground leading-snug tracking-tight">
           &ldquo;{currentQuip}&rdquo;
         </p>
-        <span className="text-[9px] font-mono font-bold text-muted-foreground block mt-1">
-          {subtitle}
-        </span>
       </div>
     </div>
   );

@@ -417,13 +417,13 @@ function StudyPageContent() {
               <span>New Subject</span>
             </Button>
 
-            {/* Interactive Scholar Strobi Companion */}
+            {/* Interactive 3D Strobi Companion */}
             <StrobiCompanion
               gear="study"
               state="focus"
               size={42}
               onClick={() => setIsSubjectChoiceOpen(true)}
-              title="Strobi: Scholar Companion (Click for New Subject)"
+              title="Strobi (Click for New Subject)"
             />
           </div>
         </div>

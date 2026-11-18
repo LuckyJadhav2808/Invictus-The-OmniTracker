@@ -219,19 +219,18 @@ export function HabitsCockpitDeck({
             streakDays={longestStreakValue}
             moodBadge={
               isConquered
-                ? "🏆 ALL CONQUERED"
+                ? "🏆 All Conquered"
                 : completedCount > 0
-                ? `⚡ ${completedCount}/${dueCount} REPS DONE`
-                : "⚔️ READY TO FORGE"
+                ? `⚡ ${completedCount}/${dueCount} Done`
+                : "⚡ Ready"
             }
             quip={
               isConquered
-                ? `100% Conquered! 🏆 All ${dueCount} daily routines completed. Take a bow, Gladiator!`
+                ? `All ${dueCount} routines conquered today!`
                 : completedCount > 0
-                ? `${completedCount} of ${dueCount} routines down! Momentum is building — conquer the rest!`
-                : `0 of ${dueCount} routines done today. Discipline beats motivation every single day. Let's conquer rep #1!`
+                ? `${completedCount} of ${dueCount} routines down. Keep the rhythm going!`
+                : `${dueCount} routines due today. Start with rep #1.`
             }
-            subtitle="Strobi • Fitness & Discipline Companion"
             onClick={onOpenNewHabit}
             className="h-full"
           />
