@@ -4,10 +4,12 @@ import React, { useState, useMemo, useEffect } from "react";
 import { type Transaction, type Category } from "@/types";
 import { cn } from "@/lib/utils";
 import { format, parseISO, isToday, isYesterday } from "date-fns";
-import { Search, Filter, FileDown, Plus, Copy, Edit2, Trash2, Calendar, Zap, Smartphone, Banknote, Globe, Receipt, X } from "lucide-react";
+import { Search, Filter, FileDown, Plus, Calendar, Receipt, X } from "lucide-react";
 import { soundFX } from "@/components/shared/SoundFX";
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
-import { CategoryIcon, MoneyQuickActionsAndCards } from "@/components/money/MoneyQuickActionsAndCards";
+import { CategoryIcon } from "@/components/money/MoneyQuickActionsAndCards";
+import { CategoryChipFilterRail } from "@/components/money/CategoryChipFilterRail";
+import { BelanjeTransactionRow } from "@/components/money/BelanjeTransactionRow";
 import { isCashTransaction, isOnlineTransaction, type MonthlyBudgetStats } from "@/lib/utils/budget-rollover";
 import { useAddTransaction } from "@/lib/queries/money";
 import { toast } from "sonner";
@@ -346,13 +348,12 @@ export function LedgerTabView({
 
   return (
     <div className="space-y-4">
-      {/* 💳 CATEGORY WALLETS CAROUSEL & QUICK ACTIONS DOCK */}
-      <MoneyQuickActionsAndCards
+      {/* 🏷️ CATEGORY ENVELOPE TAG/CHIP RAIL & QUICK ACTIONS (Belanje Benchmark) */}
+      <CategoryChipFilterRail
         currencySymbol={currencySymbol}
         categories={categoryCardsData}
         selectedCategoryId={selectedCategory}
         onSelectCategory={setSelectedCategory}
-        onAddTransaction={onOpenAddTransaction}
         onMoveMoney={onMoveMoney}
         onSendMoney={onSendMoney}
         onBulkAddExpense={onBulkAddExpense}
@@ -603,88 +604,20 @@ export function LedgerTabView({
                 </span>
               </div>
 
-              {/* Transactions in Date Group */}
+              {/* Transactions in Date Group (Belanje Squircle Rows) */}
               <div className="space-y-2">
-                {group.items.map((tx) => {
-                  const cat = categoryMap.get(tx.categoryId);
-                  const isIncome = tx.type === "income";
-
-                  return (
-                    <div
-                      key={tx.id}
-                      onClick={() => onInspectTransaction(tx)}
-                      className="bg-white dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#383531] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] transition-colors p-3 sm:p-3.5 flex items-center justify-between gap-3 cursor-pointer group"
-                    >
-                      {/* Left: Category Icon & Details */}
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="size-9 rounded-lg bg-[#F1EFEA] dark:bg-[#252321] flex items-center justify-center shrink-0 text-[#161514] dark:text-[#FAF8F5]">
-                          <CategoryIcon name={cat?.icon} className="size-4 stroke-[1.5]" />
-                        </div>
-
-                        <div className="min-w-0 space-y-0.5">
-                          <span className="text-xs sm:text-[13px] font-medium text-[#161514] dark:text-[#FAF8F5] truncate block">
-                            {tx.note || cat?.name || "Transaction"}
-                          </span>
-
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="text-[10px] font-medium text-[#6B6B6B] dark:text-[#A8A29E] bg-[#F1EFEA] dark:bg-[#252321] px-1.5 py-0.5 rounded border border-[#E8E5DF] dark:border-[#383531]">
-                              {cat?.name || "Uncategorized"}
-                            </span>
-                            <span className="text-[10px] font-mono text-[#6B6B6B] dark:text-[#A8A29E]">
-                              {tx.paymentMethod === "cash" ? "Cash" : tx.paymentMethod || "UPI"}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Right: Amount & Quick Actions */}
-                      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-                        <span
-                          className={cn(
-                            "text-sm sm:text-[15px] font-semibold font-mono tabular-nums",
-                            isIncome ? "text-[#03D26F]" : "text-rose-600 dark:text-rose-400"
-                          )}
-                        >
-                          {isIncome ? "+" : "-"}{currencySymbol}{Number(tx.amount).toLocaleString()}
-                        </span>
-
-                        {/* Quick 1-Click Duplicate & Edit (visible on desktop or tap) */}
-                        <div
-                          className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <button
-                            type="button"
-                            onClick={() => {
-                              soundFX.playPop();
-                              onDuplicateTransaction(tx);
-                            }}
-                            className="p-1 rounded-md bg-white dark:bg-[#252321] hover:bg-[#F1EFEA] dark:hover:bg-[#2e2b28] border border-[#E8E5DF] dark:border-[#383531] text-[#161514] dark:text-[#FAF8F5] transition-colors cursor-pointer"
-                            title="1-Click Duplicate"
-                          >
-                            <Copy className="size-3 stroke-[1.5]" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => onEditTransaction(tx)}
-                            className="p-1 rounded-md bg-white dark:bg-[#252321] hover:bg-[#F1EFEA] dark:hover:bg-[#2e2b28] border border-[#E8E5DF] dark:border-[#383531] text-[#161514] dark:text-[#FAF8F5] transition-colors cursor-pointer"
-                            title="Edit"
-                          >
-                            <Edit2 className="size-3 stroke-[1.5]" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => onDeleteTransaction(tx.id)}
-                            className="p-1 rounded-md bg-white dark:bg-[#252321] hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-[#E8E5DF] dark:border-[#383531] text-rose-600 dark:text-rose-400 transition-colors cursor-pointer"
-                            title="Delete"
-                          >
-                            <Trash2 className="size-3 stroke-[1.5]" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+                {group.items.map((tx) => (
+                  <BelanjeTransactionRow
+                    key={tx.id}
+                    tx={tx}
+                    category={categoryMap.get(tx.categoryId)}
+                    currencySymbol={currencySymbol}
+                    onInspect={onInspectTransaction}
+                    onEdit={onEditTransaction}
+                    onDuplicate={onDuplicateTransaction}
+                    onDelete={onDeleteTransaction}
+                  />
+                ))}
               </div>
             </div>
           ))}

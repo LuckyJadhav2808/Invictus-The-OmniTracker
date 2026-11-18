@@ -16,7 +16,7 @@ import {
 import type { TemplatePack } from "@/components/shared/TemplateSelectionModal";
 import { BUDGET_CATEGORY_TEMPLATE_PACKS } from "@/lib/templates-data";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Receipt, Target, PiggyBank, BarChart2, Plus } from "lucide-react";
+import { Receipt, Target, PiggyBank, BarChart2, Plus, Users } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { soundFX } from "@/components/shared/SoundFX";
 import { toast } from "sonner";
@@ -102,6 +102,11 @@ const PDFExportModal = dynamic(
 
 const BulkExpenseModal = dynamic(
   () => import("@/components/money/BulkExpenseModal").then((mod) => mod.BulkExpenseModal),
+  { ssr: false }
+);
+
+const WhoOwesWhoModal = dynamic(
+  () => import("@/components/money/modals/WhoOwesWhoModal").then((mod) => mod.WhoOwesWhoModal),
   { ssr: false }
 );
 
@@ -198,6 +203,8 @@ function MoneyPageContent() {
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
   const [isCashModalOpen, setIsCashModalOpen] = useState(false);
   const [isQuickActionsOpen, setIsQuickActionsOpen] = useState(false);
+  const [isWhoOwesWhoOpen, setIsWhoOwesWhoOpen] = useState(false);
+  const [whoOwesWhoPrefill, setWhoOwesWhoPrefill] = useState<{ amount?: number; description?: string } | null>(null);
   const [reopenTxAfterCat, setReopenTxAfterCat] = useState(false);
 
   // Deletion Safeguard
@@ -388,6 +395,25 @@ function MoneyPageContent() {
           }
         : undefined,
     });
+  };
+
+  const handleLogWhoOwesWhoRepayment = async (iou: { personName: string; amount: number; description?: string }) => {
+    try {
+      const generalCat = categories.find((c) => c.type === "income") || categories[0];
+      await addTxMutation.mutateAsync({
+        amount: iou.amount,
+        type: "income",
+        categoryId: generalCat?.id || "general",
+        date: format(new Date(), "yyyy-MM-dd"),
+        note: `Repayment from ${iou.personName}${iou.description ? ` (${iou.description})` : ""}`,
+        paymentMethod: "upi",
+      } as any);
+      soundFX.playCompleteChime();
+      soundFX.vibrate(20);
+      toast.success(`Logged ${currencySymbol}${iou.amount} repayment from ${iou.personName} in ledger! ⚡`);
+    } catch {
+      toast.error("Failed to log repayment in ledger");
+    }
   };
 
   const handleExecuteTransfer = async (
@@ -581,6 +607,12 @@ function MoneyPageContent() {
         onSelectPaymentMethod={handleSelectPaymentMethodFromHero}
         onRefillCashTill={handleRefillCashTill}
         onNavigateToTab={handleTabChange}
+        transactions={transactions}
+        categories={categories}
+        onInspectTransaction={(tx) => setInspectingTx(tx)}
+        onEditTransaction={(tx) => setEditingTx(tx)}
+        onDuplicateTransaction={handleDuplicateTransaction}
+        onDeleteTransaction={handleDeleteTransaction}
       />
 
       {/* 🔒 Zero-Knowledge SMS Sync Banner & Cash Action */}
@@ -592,7 +624,7 @@ function MoneyPageContent() {
 
       {/* 📑 FLOATING SUB-NAV DOCK */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <div className="w-full overflow-x-auto no-scrollbar pb-1 mb-4">
+        <div className="w-full flex items-center justify-between gap-2 overflow-x-auto no-scrollbar pb-1 mb-4">
           <TabsList className="bg-white/80 dark:bg-[#161514]/80 backdrop-blur-md rounded-2xl p-1.5 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex items-center gap-1.5 w-max min-w-full sm:min-w-0 sm:w-auto">
             <TabsTrigger
               value="ledger"
@@ -623,6 +655,21 @@ function MoneyPageContent() {
               <span>Analytics</span>
             </TabsTrigger>
           </TabsList>
+
+          {/* Who Owes Who Quick Launcher (Belanje Benchmark) */}
+          <button
+            type="button"
+            onClick={() => {
+              soundFX.playPop();
+              setWhoOwesWhoPrefill(null);
+              setIsWhoOwesWhoOpen(true);
+            }}
+            className="rounded-2xl text-xs font-heading font-black py-2.5 px-3.5 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:hover:bg-amber-900/60 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-700 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs shrink-0 active:scale-95"
+            title="Open Who Owes Who Split Tracker"
+          >
+            <Users className="size-3.5 stroke-[2.2] text-amber-700 dark:text-amber-300" />
+            <span>Who Owes Who</span>
+          </button>
         </div>
 
         {/* Tab 1: Ledger */}
@@ -702,8 +749,21 @@ function MoneyPageContent() {
           setIsAddCatOpen(true);
         }}
         onOpenReceiptScan={() => setIsBulkModalOpen(true)}
+        onOpenWhoOwesWho={(prefill) => {
+          setWhoOwesWhoPrefill(prefill || null);
+          setIsWhoOwesWhoOpen(true);
+        }}
         onSave={handleSaveTransaction}
         onDelete={handleDeleteTransaction}
+      />
+
+      {/* 1c. Who Owes Who (Student IOU & Split Tracker) */}
+      <WhoOwesWhoModal
+        open={isWhoOwesWhoOpen}
+        onOpenChange={setIsWhoOwesWhoOpen}
+        currencySymbol={currencySymbol}
+        prefill={whoOwesWhoPrefill}
+        onLogSettlementIncome={handleLogWhoOwesWhoRepayment}
       />
 
       {/* 1b. 1-Tap Quick Cash Entry Modal */}

@@ -31,6 +31,7 @@ import {
   Receipt,
   QrCode,
   Tag,
+  Users,
 } from "lucide-react";
 import { CategoryIcon } from "@/components/money/MoneyQuickActionsAndCards";
 
@@ -46,6 +47,7 @@ interface TransactionFormModalProps {
   currencySymbol: string;
   onOpenAddCategory?: () => void;
   onOpenReceiptScan?: () => void;
+  onOpenWhoOwesWho?: (prefill?: { amount?: number; description?: string }) => void;
   onSave: (payload: {
     id?: string;
     amount: number;
@@ -75,6 +77,7 @@ export function TransactionFormModal({
   currencySymbol,
   onOpenAddCategory,
   onOpenReceiptScan,
+  onOpenWhoOwesWho,
   onSave,
   onDelete,
 }: TransactionFormModalProps) {
@@ -636,6 +639,33 @@ export function TransactionFormModal({
                       </div>
                     </div>
                     <Plus className="size-4 stroke-[2] text-[#6B6B6B] dark:text-[#A8A29E]" />
+                  </div>
+                )}
+
+                {/* Row 4: Belanje Photo 6 Trigger: "Lent it to someone? Track it in Who Owes Who >" */}
+                {onOpenWhoOwesWho && (
+                  <div
+                    onClick={() => {
+                      onOpenChange(false);
+                      onOpenWhoOwesWho({
+                        amount: parseFloat(amount) || undefined,
+                        description: note || undefined,
+                      });
+                    }}
+                    className="p-3 flex items-center justify-between cursor-pointer hover:bg-white dark:hover:bg-[#201D1A] transition-colors group"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Users className="size-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                      <div>
+                        <span className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5] block">
+                          Lent it to someone?
+                        </span>
+                        <span className="text-[10px] font-mono text-[#6B6B6B] dark:text-[#A8A29E] block">
+                          Track it in Who Owes Who &gt;
+                        </span>
+                      </div>
+                    </div>
+                    <ChevronRight className="size-4 stroke-[2] text-[#6B6B6B] dark:text-[#A8A29E] group-hover:translate-x-0.5 transition-transform" />
                   </div>
                 )}
               </div>

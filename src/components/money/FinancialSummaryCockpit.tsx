@@ -1,9 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { type MonthlyBudgetStats, type DailyBudgetStats } from "@/lib/utils/budget-rollover";
+import { type Transaction, type Category } from "@/types";
 import { VixPixelCompanion } from "@/components/mascot/VixPixelCompanion";
 import { WalletCardDeck } from "@/components/money/WalletCardDeck";
+import { RecentAccountFeed } from "@/components/money/RecentAccountFeed";
 import { cn } from "@/lib/utils";
 
 interface FinancialSummaryCockpitProps {
@@ -22,6 +24,12 @@ interface FinancialSummaryCockpitProps {
   onSelectPaymentMethod?: (method: "upi" | "cash") => void;
   onRefillCashTill?: () => void;
   onNavigateToTab?: (tab: "ledger" | "budgets" | "vault" | "analytics") => void;
+  transactions?: Transaction[];
+  categories?: Category[];
+  onInspectTransaction?: (tx: Transaction) => void;
+  onEditTransaction?: (tx: Transaction) => void;
+  onDuplicateTransaction?: (tx: Transaction) => Promise<void>;
+  onDeleteTransaction?: (id: string) => Promise<void>;
 }
 
 export function FinancialSummaryCockpit({
@@ -40,7 +48,15 @@ export function FinancialSummaryCockpit({
   onSelectPaymentMethod,
   onRefillCashTill,
   onNavigateToTab,
+  transactions,
+  categories,
+  onInspectTransaction,
+  onEditTransaction,
+  onDuplicateTransaction,
+  onDeleteTransaction,
 }: FinancialSummaryCockpitProps) {
+  const [activeCardIndex, setActiveCardIndex] = useState(0);
+
   return (
     <div className="bg-white dark:bg-[#1C1A18] rounded-3xl border border-[#E8E5DF] dark:border-[#383531] p-3.5 sm:p-5 space-y-4 shadow-xs transition-colors">
       {/* 💳 Belanje Swipeable Card Deck & Squircle Quick Launchers */}
@@ -57,6 +73,8 @@ export function FinancialSummaryCockpit({
         onBulkScan={onBulkScan}
         onOpenCalculator={onOpenCalculator}
         onNavigateToTab={onNavigateToTab}
+        activeCardIndex={activeCardIndex}
+        onActiveCardChange={setActiveCardIndex}
       />
 
       {/* Vix Companion Mascot & Daily Pace Status */}
@@ -92,6 +110,35 @@ export function FinancialSummaryCockpit({
           </button>
         )}
       </div>
+
+      {/* ⚡ Belanje Card-Linked Dynamic Recent Feed (Photo 1 Benchmark) */}
+      {transactions && categories && (
+        <RecentAccountFeed
+          activeCardIndex={activeCardIndex}
+          transactions={transactions}
+          categories={categories}
+          currencySymbol={currencySymbol}
+          dailyStats={dailyStats}
+          monthlyStats={monthlyStats}
+          onInspectTransaction={onInspectTransaction || (() => {})}
+          onEditTransaction={onEditTransaction}
+          onDuplicateTransaction={onDuplicateTransaction}
+          onDeleteTransaction={onDeleteTransaction}
+          onSeeAll={(method) => {
+            if (method && method !== "all" && onSelectPaymentMethod) {
+              onSelectPaymentMethod(method);
+            }
+            onNavigateToTab?.("ledger");
+          }}
+          onAddTransaction={(suggestedMethod) => {
+            if (suggestedMethod && onSelectPaymentMethod) {
+              onSelectPaymentMethod(suggestedMethod);
+            }
+            onAddTransaction();
+          }}
+          onOpenAllowances={onOpenEditAllowances}
+        />
+      )}
     </div>
   );
 }

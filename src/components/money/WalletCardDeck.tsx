@@ -33,6 +33,8 @@ interface WalletCardDeckProps {
   onBulkScan: () => void;
   onOpenCalculator?: () => void;
   onNavigateToTab?: (tab: "ledger" | "budgets" | "vault" | "analytics") => void;
+  activeCardIndex?: number;
+  onActiveCardChange?: (index: number) => void;
 }
 
 export function WalletCardDeck({
@@ -48,6 +50,8 @@ export function WalletCardDeck({
   onBulkScan,
   onOpenCalculator,
   onNavigateToTab,
+  activeCardIndex: externalActiveCardIndex,
+  onActiveCardChange,
 }: WalletCardDeckProps) {
   // Balance privacy state persisted in sessionStorage
   const [isBalanceHidden, setIsBalanceHidden] = useState<boolean>(() => {
@@ -57,13 +61,19 @@ export function WalletCardDeck({
     return false;
   });
 
-  const [activeCardIndex, setActiveCardIndex] = useState(0);
+  const [internalActiveIndex, setInternalActiveIndex] = useState(0);
+  const activeCardIndex = externalActiveCardIndex !== undefined ? externalActiveCardIndex : internalActiveIndex;
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const touchStartXRef = useRef<number | null>(null);
   const touchStartYRef = useRef<number | null>(null);
 
   const totalCards = 4;
+
+  const updateCardIndex = useCallback((nextIndex: number) => {
+    setInternalActiveIndex(nextIndex);
+    onActiveCardChange?.(nextIndex);
+  }, [onActiveCardChange]);
 
   const toggleHideBalance = () => {
     soundFX.playPop();
@@ -79,20 +89,22 @@ export function WalletCardDeck({
   const nextCard = useCallback(() => {
     soundFX.playPop();
     soundFX.vibrate(12);
-    setActiveCardIndex((prev) => (prev + 1) % totalCards);
-  }, [totalCards]);
+    const nextIdx = (activeCardIndex + 1) % totalCards;
+    updateCardIndex(nextIdx);
+  }, [activeCardIndex, totalCards, updateCardIndex]);
 
   const prevCard = useCallback(() => {
     soundFX.playPop();
     soundFX.vibrate(12);
-    setActiveCardIndex((prev) => (prev - 1 + totalCards) % totalCards);
-  }, [totalCards]);
+    const prevIdx = (activeCardIndex - 1 + totalCards) % totalCards;
+    updateCardIndex(prevIdx);
+  }, [activeCardIndex, totalCards, updateCardIndex]);
 
   const goToCard = (index: number) => {
     if (index === activeCardIndex) return;
     soundFX.playPop();
     soundFX.vibrate(10);
-    setActiveCardIndex(index);
+    updateCardIndex(index);
   };
 
   // Touch handlers for swipe & flip gestures
