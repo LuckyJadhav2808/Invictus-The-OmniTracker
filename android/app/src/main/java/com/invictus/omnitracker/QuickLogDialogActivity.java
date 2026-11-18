@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -42,6 +43,8 @@ public class QuickLogDialogActivity extends AppCompatActivity {
 
     private TextView tvAmountDisplay;
     private TextView tvSafeSpendBadge;
+    private EditText etExpenseNote;
+    private TextView btnClearNote;
     private Button btnCatFood;
     private Button btnCatTravel;
     private Button btnCatGrocery;
@@ -65,6 +68,8 @@ public class QuickLogDialogActivity extends AppCompatActivity {
     private void initViews() {
         tvAmountDisplay = findViewById(R.id.tv_amount_display);
         tvSafeSpendBadge = findViewById(R.id.tv_safe_spend_badge);
+        etExpenseNote = findViewById(R.id.et_expense_note);
+        btnClearNote = findViewById(R.id.btn_clear_note);
         btnCatFood = findViewById(R.id.btn_cat_food);
         btnCatTravel = findViewById(R.id.btn_cat_travel);
         btnCatGrocery = findViewById(R.id.btn_cat_grocery);
@@ -95,6 +100,35 @@ public class QuickLogDialogActivity extends AppCompatActivity {
             vibrateTactile(15);
             finish();
         });
+
+        // Note Input Listeners
+        if (etExpenseNote != null) {
+            etExpenseNote.addTextChangedListener(new android.text.TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    if (btnClearNote != null) {
+                        btnClearNote.setVisibility(s.length() > 0 ? View.VISIBLE : View.GONE);
+                    }
+                    optionalNote = s.toString().trim();
+                }
+
+                @Override
+                public void afterTextChanged(android.text.Editable s) {}
+            });
+        }
+
+        if (btnClearNote != null) {
+            btnClearNote.setOnClickListener(v -> {
+                vibrateTactile(15);
+                if (etExpenseNote != null) {
+                    etExpenseNote.setText("");
+                }
+                optionalNote = "";
+            });
+        }
 
         // Habits
         setupHabitButton(R.id.btn_habit_chai, "30", "Food", "Chai");
@@ -175,6 +209,11 @@ public class QuickLogDialogActivity extends AppCompatActivity {
                 optionalNote = note;
                 updateAmountDisplay();
 
+                if (etExpenseNote != null) {
+                    etExpenseNote.setText(note);
+                    etExpenseNote.setSelection(note.length());
+                }
+
                 if ("Food".equals(category)) updateCategorySelection(btnCatFood, "Food");
                 else if ("Travel".equals(category)) updateCategorySelection(btnCatTravel, "Travel");
                 else if ("Grocery".equals(category)) updateCategorySelection(btnCatGrocery, "Grocery");
@@ -225,7 +264,8 @@ public class QuickLogDialogActivity extends AppCompatActivity {
 
         final double finalAmount = parsedAmount;
         final String finalCategory = selectedCategory;
-        final String finalNote = (optionalNote != null && !optionalNote.isEmpty()) ? optionalNote : selectedCategory;
+        String customNote = (etExpenseNote != null) ? etExpenseNote.getText().toString().trim() : optionalNote;
+        final String finalNote = (customNote != null && !customNote.isEmpty()) ? customNote : selectedCategory;
         final String todayDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
 
         // Update local SharedPreferences remaining budget

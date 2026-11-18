@@ -79,12 +79,10 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`h-full antialiased font-sans ${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} ${caveat.variable} ${permanentMarker.variable} ${architectsDaughter.variable}`}
     >
+      <head>
+        <script async src="/theme-init.js" />
+      </head>
       <body className="min-h-full flex flex-col bg-background text-foreground transition-colors duration-150">
-        <Script
-          id="theme-initializer"
-          src="/theme-init.js"
-          strategy="beforeInteractive"
-        />
         <Providers>{children}</Providers>
       </body>
     </html>

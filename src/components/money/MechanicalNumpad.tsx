@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { soundFX } from "@/components/shared/SoundFX";
 import { cn } from "@/lib/utils";
-import { Zap, Check, ArrowLeft, RefreshCw } from "lucide-react";
+import { Zap, ArrowLeft, RefreshCw, PenLine, X } from "lucide-react";
 
 export interface MechanicalNumpadProps {
   remainingBudget?: number;
@@ -12,14 +12,14 @@ export interface MechanicalNumpadProps {
   onCancel?: () => void;
 }
 
-const DEFAULT_HABITS = [
+export const DEFAULT_HABITS = [
   { label: "☕ Chai", amount: 30, category: "Food" },
   { label: "🍛 Meal", amount: 100, category: "Food" },
   { label: "🚇 Metro", amount: 40, category: "Travel" },
   { label: "🍪 Snack", amount: 20, category: "Food" },
 ];
 
-const CORE_CATEGORIES = [
+export const CORE_CATEGORIES = [
   { id: "Food", name: "Food 🍔" },
   { id: "Travel", name: "Travel 🚕" },
   { id: "Grocery", name: "Grocery 🛒" },
@@ -94,7 +94,7 @@ export function MechanicalNumpad({
       await onLogExpense({
         amount: val,
         category: selectedCategory,
-        note: note || selectedCategory,
+        note: note.trim() || selectedCategory,
       });
     } finally {
       setIsSubmitting(false);
@@ -105,51 +105,77 @@ export function MechanicalNumpad({
   const projectedRemaining = Math.max(0, remainingBudget - numericValue);
 
   return (
-    <div className="w-full max-w-sm mx-auto bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#38332E] rounded-3xl p-5 shadow-[4px_4px_0px_0px_#161514] space-y-4 font-sans select-none">
+    <div className="w-full max-w-sm mx-auto bg-card text-card-foreground border-2 border-[#161514] dark:border-[#38332E] rounded-3xl p-5 shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#000000] space-y-4 font-sans select-none">
       {/* Header Bar */}
-      <div className="flex items-center justify-between border-b border-[#161514]/15 dark:border-white/10 pb-3">
+      <div className="flex items-center justify-between border-b border-border pb-3">
         <div className="flex items-center gap-2">
           {onCancel && (
             <button
               onClick={onCancel}
-              className="size-8 rounded-xl bg-white dark:bg-[#201D1A] border border-[#161514] flex items-center justify-center text-[#161514] dark:text-white cursor-pointer shadow-2xs hover:bg-[#E8E5DF]"
+              className="size-8 rounded-xl bg-secondary border border-border flex items-center justify-center text-foreground cursor-pointer shadow-2xs hover:bg-muted transition-colors"
+              title="Back"
             >
               <ArrowLeft className="size-4" />
             </button>
           )}
           <div>
-            <h2 className="text-xs font-black uppercase tracking-wider text-[#161514] dark:text-white flex items-center gap-1">
+            <h2 className="text-xs font-black uppercase tracking-wider text-foreground flex items-center gap-1">
               <Zap className="size-3.5 fill-[#CEF431] text-[#161514]" />
               <span>Fast Quick-Log</span>
             </h2>
-            <p className="text-[10px] text-[#161514]/60 dark:text-white/60 font-mono">
+            <p className="text-[10px] text-muted-foreground font-mono">
               Remaining: {currencySymbol}{Math.round(remainingBudget).toLocaleString()}
             </p>
           </div>
         </div>
 
         <div className="text-right">
-          <span className="text-[9px] font-black uppercase text-[#161514]/50 dark:text-white/50 block">
+          <span className="text-[9px] font-black uppercase text-muted-foreground block">
             After Spend
           </span>
-          <span className="text-xs font-mono font-bold text-emerald-700 dark:text-emerald-400">
+          <span className="text-xs font-mono font-bold text-emerald-600 dark:text-[#03D26F]">
             {currencySymbol}{Math.round(projectedRemaining).toLocaleString()}
           </span>
         </div>
       </div>
 
       {/* Amount Display */}
-      <div className="bg-white dark:bg-[#0C0B0A] border-2 border-[#161514] dark:border-[#38332E] rounded-2xl py-4 px-3 text-center shadow-[inset_2px_2px_0px_0px_rgba(22,21,20,0.06)]">
-        <div className="text-4xl sm:text-5xl font-mono font-black tracking-tight text-[#161514] dark:text-[#FAF8F5]">
-          <span className="text-[#161514]/40 dark:text-white/40 mr-1 text-3xl sm:text-4xl">
+      <div className="bg-muted border-2 border-border rounded-2xl py-4 px-3 text-center shadow-inner">
+        <div className="text-4xl sm:text-5xl font-mono font-black tracking-tight text-foreground">
+          <span className="text-muted-foreground mr-1 text-3xl sm:text-4xl">
             {currencySymbol}
           </span>
           {amountStr}
         </div>
+      </div>
+
+      {/* Note Input Pill */}
+      <div className="relative flex items-center">
+        <div className="absolute left-3 flex items-center pointer-events-none text-muted-foreground">
+          <PenLine className="size-3.5" />
+        </div>
+        <input
+          type="text"
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          placeholder="Add note (e.g. Chai, Auto, Lunch)..."
+          maxLength={40}
+          className="w-full h-10 pl-9 pr-8 text-xs font-bold rounded-xl bg-secondary text-secondary-foreground border border-border focus:border-[#161514] dark:focus:border-white focus:outline-none transition-colors placeholder:text-muted-foreground/60 shadow-2xs"
+          data-testid="quick-log-note-input"
+        />
         {note && (
-          <p className="text-[11px] font-bold text-stone-500 dark:text-stone-400 mt-1">
-            &ldquo;{note}&rdquo;
-          </p>
+          <button
+            type="button"
+            onClick={() => {
+              soundFX.playPop();
+              setNote("");
+            }}
+            className="absolute right-2.5 p-1 rounded-md text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            title="Clear note"
+            data-testid="quick-log-clear-note"
+          >
+            <X className="size-3.5" />
+          </button>
         )}
       </div>
 
@@ -159,7 +185,7 @@ export function MechanicalNumpad({
           <button
             key={habit.label}
             onClick={() => handleHabitSelect(habit)}
-            className="px-2.5 py-1.5 rounded-xl bg-white dark:bg-[#201D1A] border border-[#161514] text-xs font-black text-[#161514] dark:text-white shrink-0 hover:bg-[#CEF431] hover:text-[#161514] transition-all cursor-pointer shadow-2xs"
+            className="px-2.5 py-1.5 rounded-xl bg-secondary border border-border text-xs font-black text-secondary-foreground shrink-0 hover:bg-[#CEF431] hover:text-[#161514] hover:border-[#161514] transition-all cursor-pointer shadow-2xs"
           >
             {habit.label} {currencySymbol}{habit.amount}
           </button>
@@ -177,8 +203,8 @@ export function MechanicalNumpad({
               className={cn(
                 "py-1.5 px-1 rounded-xl text-[11px] font-black border transition-all cursor-pointer text-center truncate",
                 isSelected
-                  ? "bg-[#161514] text-[#CEF431] border-[#161514] shadow-2xs dark:bg-white dark:text-[#161514]"
-                  : "bg-white dark:bg-[#201D1A] text-[#161514] dark:text-white border-[#161514]/40 hover:bg-[#E8E5DF]"
+                  ? "bg-[#161514] text-[#CEF431] border-[#161514] dark:bg-[#CEF431] dark:text-[#161514] dark:border-[#CEF431] shadow-2xs"
+                  : "bg-secondary text-secondary-foreground border-border hover:bg-muted"
               )}
             >
               {cat.name}
@@ -193,7 +219,7 @@ export function MechanicalNumpad({
           <button
             key={k}
             onClick={() => handleKeyPress(k)}
-            className="h-12 rounded-xl bg-white dark:bg-[#201D1A] border-2 border-[#161514] dark:border-[#38332E] text-lg font-black text-[#161514] dark:text-white flex items-center justify-center shadow-[2px_2px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
+            className="h-12 rounded-xl bg-secondary text-secondary-foreground border-2 border-border text-xl font-mono font-black flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(22,21,20,0.6)] dark:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.8)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none hover:bg-muted active:bg-[#CEF431] active:text-[#161514] transition-all cursor-pointer"
           >
             {k === "backspace" ? "⌫" : k}
           </button>
@@ -205,21 +231,21 @@ export function MechanicalNumpad({
         onClick={handleSubmit}
         disabled={isSubmitting || numericValue <= 0}
         className={cn(
-          "w-full h-12 rounded-xl font-black text-sm uppercase tracking-wider border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] transition-all flex items-center justify-center gap-2 cursor-pointer",
+          "w-full h-12 rounded-xl font-black text-sm uppercase tracking-wider border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] transition-all flex items-center justify-center gap-2 cursor-pointer",
           numericValue > 0
             ? "bg-[#CEF431] hover:bg-[#bce028] text-[#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
-            : "bg-stone-300 dark:bg-stone-800 text-stone-500 border-stone-400 cursor-not-allowed shadow-none"
+            : "bg-muted text-muted-foreground border-border cursor-not-allowed shadow-none"
         )}
       >
         {isSubmitting ? (
           <>
-            <RefreshCw className="size-4 animate-spin" />
-            <span>Logging...</span>
+            <RefreshCw className="size-4 animate-spin text-[#161514]" />
+            <span className="text-[#161514]">Logging...</span>
           </>
         ) : (
           <>
-            <Zap className="size-4 fill-current" />
-            <span>LOG EXPENSE ⚡</span>
+            <Zap className="size-4 fill-current text-[#161514]" />
+            <span className="text-[#161514]">LOG EXPENSE ⚡</span>
           </>
         )}
       </button>

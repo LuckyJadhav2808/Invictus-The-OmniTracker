@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { MechanicalNumpad } from "@/components/money/MechanicalNumpad";
 import { useCategories, useAddTransaction, useTransactions } from "@/lib/queries/money";
@@ -12,10 +12,15 @@ import { format } from "date-fns";
 
 export default function QuickLogPage() {
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const { user } = useAuth();
   const { data: categories = [] } = useCategories();
   const { data: transactions = [] } = useTransactions();
   const addTxMutation = useAddTransaction();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const currencySymbol = useMemo(() => {
     const curr = (user as any)?.currency || "INR";
@@ -67,8 +72,16 @@ export default function QuickLogPage() {
     }
   };
 
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
+        <div className="w-full max-w-sm h-[520px] bg-card border-2 border-[#161514] dark:border-[#38332E] rounded-3xl p-5 shadow-[4px_4px_0px_0px_#161514] animate-pulse" />
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-[#F5F3EF] dark:bg-[#0E0D0C] flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center p-4">
       <MechanicalNumpad
         remainingBudget={monthlyStats.remainingBudget}
         currencySymbol={currencySymbol}
