@@ -24,14 +24,15 @@ export function InvictusLoadingScreen({
 }: InvictusLoadingScreenProps) {
   return (
     <div
+      suppressHydrationWarning
       className={cn(
         "flex flex-col items-center justify-center bg-[#FAF8F5] dark:bg-[#121110] transition-colors select-none",
         fullscreen ? "min-h-screen w-full fixed inset-0 z-50" : "h-full w-full py-16"
       )}
     >
-      <div className="flex flex-col items-center space-y-4 animate-in fade-in zoom-in-95 duration-200">
+      <div suppressHydrationWarning className="flex flex-col items-center space-y-4 animate-in fade-in zoom-in-95 duration-200">
         {/* 🏛️ Sovereign Roman Monolith Squircle Splash Icon */}
-        <div className="relative size-20 sm:size-24 rounded-3xl bg-[#161514] dark:bg-[#1E1C1A] border-2 border-[#161514]/20 dark:border-[#383531] shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] flex items-center justify-center overflow-hidden transition-transform duration-300 motion-safe:animate-pulse">
+        <div suppressHydrationWarning className="relative size-20 sm:size-24 rounded-3xl bg-[#161514] dark:bg-[#1E1C1A] border-2 border-[#161514]/20 dark:border-[#383531] shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] flex items-center justify-center overflow-hidden transition-transform duration-300 motion-safe:animate-pulse">
           <svg
             viewBox="0 0 512 512"
             className="size-14 sm:size-16 p-1 drop-shadow-xs"

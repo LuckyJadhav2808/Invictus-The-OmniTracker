@@ -1,6 +1,13 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { getLocalTodayStr } from "@/lib/utils";
+
+const getLocalSystemToday = (): string => {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
 
 type ActiveTab = "today" | "goals" | "study" | "money" | "tasks" | "profile";
 type ActiveTracker = "life" | "study" | "money" | "tasks";
@@ -29,7 +36,7 @@ export const useUIStore = create<UIState>()(
     (set) => ({
       activeTab: "today",
       setActiveTab: (tab) => set({ activeTab: tab }),
-      selectedDate: getLocalTodayStr(),
+      selectedDate: getLocalSystemToday(),
       setSelectedDate: (date) => set({ selectedDate: date }),
       isMobileNavOpen: false,
       setMobileNavOpen: (open) => set({ isMobileNavOpen: open }),

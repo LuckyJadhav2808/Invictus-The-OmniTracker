@@ -62,7 +62,7 @@ import {
 import { format, getDay, startOfWeek, addDays, isSameDay } from "date-fns";
 import { toast } from "sonner";
 import { useUIStore } from "@/store/ui-store";
-import { cn, getLocalTodayStr } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { ProactiveReminderBanner } from "@/components/shared/ProactiveReminderBanner";
 import { useSearchParams, useRouter } from "next/navigation";
 
@@ -74,7 +74,7 @@ function GoalsPageContent() {
 
   // Auto-snap habit cockpit to current day when entering habits space
   useEffect(() => {
-    const todayStr = getLocalTodayStr();
+    const todayStr = format(new Date(), "yyyy-MM-dd");
     if (selectedDate !== todayStr) {
       setSelectedDate(todayStr);
     }

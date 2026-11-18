@@ -14,7 +14,7 @@ import {
   CheckCheck,
   Calendar,
 } from "lucide-react";
-import { cn, getLocalTodayStr } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
 import { StrobiCompanion } from "@/components/mascot/StrobiCompanion";
 import { StrobiPartnerStage } from "@/components/mascot/StrobiPartnerStage";
@@ -74,7 +74,7 @@ export function HabitsCockpitDeck({
   }, [streaks]);
 
   // Deterministic local today date string (prevents UTC timezone shift bug)
-  const todayStr = useMemo(() => getLocalTodayStr(), []);
+  const todayStr = useMemo(() => format(new Date(), "yyyy-MM-dd"), []);
 
   // Current active 7-day week window (Monday to Sunday)
   const weekDays = useMemo(() => {
