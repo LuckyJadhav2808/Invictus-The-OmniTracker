@@ -129,10 +129,11 @@ export function useTheme() {
     ) {
       const x = coordinates?.x ?? window.innerWidth / 2;
       const y = coordinates?.y ?? window.innerHeight / 2;
+      // Extra 32px buffer guarantees no corner clipping artifacts on high-DPI screens
       const maxRadius = Math.hypot(
         Math.max(x, window.innerWidth - x),
         Math.max(y, window.innerHeight - y)
-      );
+      ) + 32;
 
       const transition = (document as any).startViewTransition(() => {
         applyThemeState();
@@ -147,8 +148,8 @@ export function useTheme() {
             ],
           },
           {
-            duration: 450,
-            easing: "cubic-bezier(0.2, 0, 0, 1)",
+            duration: 650,
+            easing: "cubic-bezier(0.16, 1, 0.3, 1)",
             pseudoElement: "::view-transition-new(root)",
           }
         );

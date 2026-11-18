@@ -991,10 +991,13 @@ html[data-color-theme="cobalt"] .dark {
 ::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 ::view-transition-new(root) {
   z-index: 99999;
+  will-change: clip-path;
 }
 
 ::view-transition-old(root) {

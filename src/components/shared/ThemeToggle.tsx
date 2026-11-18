@@ -25,7 +25,7 @@ export function ThemeToggle({
     soundFX.playPop();
     triggerHaptic("light");
     setIsRippling(true);
-    setTimeout(() => setIsRippling(false), 500);
+    setTimeout(() => setIsRippling(false), 650);
 
     const rect = e.currentTarget.getBoundingClientRect();
     const x = rect.left + rect.width / 2;
@@ -130,14 +130,14 @@ export function ThemeToggle({
         {isDark ? (
           <Moon
             className={cn(
-              "stroke-[1.75] text-[#FAF8F5] transition-all duration-200 transform scale-100 rotate-0 group-hover:-rotate-12",
+              "stroke-[1.75] text-[#FAF8F5] transition-transform duration-500 ease-out transform scale-100 rotate-0 group-hover:-rotate-12",
               size === "sm" ? "size-3.5" : "size-4"
             )}
           />
         ) : (
           <Sun
             className={cn(
-              "stroke-[1.75] text-[#161514] transition-all duration-200 transform scale-100 rotate-0 group-hover:rotate-45",
+              "stroke-[1.75] text-[#161514] transition-transform duration-500 ease-out transform scale-100 rotate-0 group-hover:rotate-45",
               size === "sm" ? "size-3.5" : "size-4"
             )}
           />
