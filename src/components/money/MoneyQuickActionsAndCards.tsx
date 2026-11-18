@@ -242,16 +242,6 @@ export function MoneyQuickActionsAndCards({
             {categories.length} {categories.length === 1 ? "wallet" : "wallets"}
           </span>
 
-          {/* Hide/Show Balance Toggle */}
-          <button
-            type="button"
-            onClick={toggleHideBalance}
-            className="p-1 rounded-md bg-white dark:bg-[#252321] hover:bg-[#F5F3EF] dark:hover:bg-[#2e2b28] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#383531] cursor-pointer transition-colors"
-            title={isHideBalance ? "Show balances" : "Hide balances"}
-          >
-            {isHideBalance ? <EyeOff className="size-3 stroke-[1.5]" /> : <Eye className="size-3 stroke-[1.5]" />}
-          </button>
-
           {/* View Mode Toggle: Rail vs Cards */}
           <div className="flex items-center gap-0.5 bg-[#F1EFEA] dark:bg-[#252321] p-0.5 rounded-md border border-[#E8E5DF] dark:border-[#383531]">
             <button

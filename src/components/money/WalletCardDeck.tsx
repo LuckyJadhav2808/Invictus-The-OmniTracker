@@ -217,24 +217,17 @@ export function WalletCardDeck({
 
   return (
     <div className="space-y-3.5">
-      {/* ─── TOP BAR: Available Funds, Eye Toggle & Flip Steppers ─── */}
+      {/* ─── TOP BAR: Available Funds & Flip Steppers (Belanje Signature Metaphor) ─── */}
       <div className="flex items-center justify-between px-1">
-        <div className="flex items-center gap-2">
+        <div className="flex items-baseline gap-2">
           <span className="text-xs sm:text-sm font-heading font-black text-[#6B6B6B] dark:text-[#A8A29E] tracking-tight">
             Available funds
           </span>
-          <button
-            type="button"
-            onClick={toggleHideBalance}
-            className="p-1 rounded-md text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5] hover:bg-[#E8E5DF]/50 dark:hover:bg-[#2A2724] transition-colors cursor-pointer"
-            title={isBalanceHidden ? "Show balance" : "Hide balance"}
-          >
-            {isBalanceHidden ? (
-              <EyeOff className="size-3.5 stroke-[2]" />
-            ) : (
-              <Eye className="size-3.5 stroke-[2]" />
-            )}
-          </button>
+          <span className="text-xs sm:text-sm font-mono font-bold text-[#161514] dark:text-[#FAF8F5] tabular-nums">
+            {isBalanceHidden
+              ? "••••••"
+              : `${currencySymbol}${(monthlyStats.remainingBudget + monthlyStats.remainingCashBudget).toLocaleString()}`}
+          </span>
         </div>
 
         {/* Stack Navigation & Target Month Pill */}
@@ -310,31 +303,48 @@ export function WalletCardDeck({
           {/* Subtle Ambient Radial Highlight */}
           <div className="absolute -right-12 -bottom-12 w-48 h-48 bg-blue-500/10 dark:bg-blue-500/15 rounded-full blur-2xl pointer-events-none" />
 
-          {/* Card Top: Logo & Name (Optically Aligned to Top Baseline) */}
-          <div className="flex items-start justify-between relative z-10">
-            <div className="flex items-start gap-3">
+          {/* Card Top: Logo & Name (Vertically Centered & Ergonomically Aligned) */}
+          <div className="flex items-center justify-between relative z-10">
+            <div className="flex items-center gap-3">
               <div className="size-10 rounded-2xl bg-blue-50 dark:bg-white/10 border border-blue-200 dark:border-white/15 flex items-center justify-center text-blue-700 dark:text-white shadow-xs shrink-0">
                 <Building2 className="size-5 stroke-[2]" />
               </div>
-              <div className="space-y-0.5 pt-0.5">
-                <h3 className="text-sm font-heading font-black tracking-tight text-[#161514] dark:text-white leading-tight">
+              <div className="flex flex-col justify-center">
+                <h3 className="text-sm sm:text-[15px] font-heading font-black tracking-tight text-[#161514] dark:text-white leading-tight">
                   Main Account
                 </h3>
-                <span className="text-[11px] font-mono text-[#64748B] dark:text-stone-300 block leading-tight">
+                <span className="text-[11px] font-mono text-[#64748B] dark:text-stone-300 leading-tight mt-0.5">
                   UPI &amp; Digital Bank
                 </span>
               </div>
             </div>
 
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-500/20 text-[#047857] dark:text-[#03D26F] border border-emerald-300 dark:border-emerald-500/30 mt-0.5">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-500/20 text-[#047857] dark:text-[#03D26F] border border-emerald-300 dark:border-emerald-500/30">
               Primary
             </span>
           </div>
 
-          {/* Card Middle: Massive Balance (Clean, Zero Duplicate Eye Button) */}
+          {/* Card Middle: Massive Balance with Single Privacy Toggle (Belanje Benchmark) */}
           <div className="relative z-10 my-auto">
-            <div className="text-3xl sm:text-4xl font-mono font-black tracking-tight text-[#161514] dark:text-white tabular-nums leading-none">
-              {formatAmount(monthlyStats.remainingBudget)}
+            <div className="flex items-center gap-2.5">
+              <span className="text-3xl sm:text-4xl font-mono font-black tracking-tight text-[#161514] dark:text-white tabular-nums leading-none">
+                {formatAmount(monthlyStats.remainingBudget)}
+              </span>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleHideBalance();
+                }}
+                className="p-1 rounded-md text-[#64748B] dark:text-stone-400 hover:text-[#161514] dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 active:scale-95 transition-all cursor-pointer"
+                title={isBalanceHidden ? "Show balance" : "Hide balance"}
+              >
+                {isBalanceHidden ? (
+                  <EyeOff className="size-4 stroke-[2]" />
+                ) : (
+                  <Eye className="size-4 stroke-[2]" />
+                )}
+              </button>
             </div>
             <span className="text-[10.5px] font-mono text-[#64748B] dark:text-stone-400 block mt-1.5">
               Spendable digital liquidity
@@ -381,17 +391,17 @@ export function WalletCardDeck({
           {/* Subtle Ambient Radial Highlight */}
           <div className="absolute -right-12 -bottom-12 w-48 h-48 bg-amber-400/10 dark:bg-amber-500/15 rounded-full blur-2xl pointer-events-none" />
 
-          {/* Card Top: Logo & Refill CTA (Optically Aligned to Top Baseline) */}
-          <div className="flex items-start justify-between relative z-10">
-            <div className="flex items-start gap-3">
+          {/* Card Top: Logo & Refill CTA (Vertically Centered & Ergonomically Aligned) */}
+          <div className="flex items-center justify-between relative z-10">
+            <div className="flex items-center gap-3">
               <div className="size-10 rounded-2xl bg-amber-50 dark:bg-amber-500/20 border border-amber-200 dark:border-amber-400/30 flex items-center justify-center text-amber-800 dark:text-amber-400 shadow-xs shrink-0">
                 <Banknote className="size-5 stroke-[2]" />
               </div>
-              <div className="space-y-0.5 pt-0.5">
-                <h3 className="text-sm font-heading font-black tracking-tight text-[#161514] dark:text-white leading-tight">
+              <div className="flex flex-col justify-center">
+                <h3 className="text-sm sm:text-[15px] font-heading font-black tracking-tight text-[#161514] dark:text-white leading-tight">
                   Cash Till
                 </h3>
-                <span className="text-[11px] font-mono text-[#64748B] dark:text-stone-300 block leading-tight">
+                <span className="text-[11px] font-mono text-[#64748B] dark:text-stone-300 leading-tight mt-0.5">
                   Physical Pocket Envelope
                 </span>
               </div>
@@ -404,7 +414,7 @@ export function WalletCardDeck({
                   e.stopPropagation();
                   onRefillCashTill();
                 }}
-                className="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-amber-400 text-[#161514] hover:bg-amber-300 border border-[#161514] active:scale-95 transition-all cursor-pointer shadow-xs mt-0.5"
+                className="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-amber-400 text-[#161514] hover:bg-amber-300 border border-[#161514] active:scale-95 transition-all cursor-pointer shadow-xs"
                 title="Refill physical cash till"
               >
                 + Refill Till
@@ -412,10 +422,27 @@ export function WalletCardDeck({
             )}
           </div>
 
-          {/* Card Middle: Cash Remaining */}
+          {/* Card Middle: Cash Remaining with Single Privacy Toggle */}
           <div className="relative z-10 my-auto">
-            <div className="text-3xl sm:text-4xl font-mono font-black tracking-tight text-[#161514] dark:text-white tabular-nums leading-none">
-              {formatAmount(monthlyStats.remainingCashBudget)}
+            <div className="flex items-center gap-2.5">
+              <span className="text-3xl sm:text-4xl font-mono font-black tracking-tight text-[#161514] dark:text-white tabular-nums leading-none">
+                {formatAmount(monthlyStats.remainingCashBudget)}
+              </span>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleHideBalance();
+                }}
+                className="p-1 rounded-md text-[#64748B] dark:text-stone-400 hover:text-[#161514] dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 active:scale-95 transition-all cursor-pointer"
+                title={isBalanceHidden ? "Show balance" : "Hide balance"}
+              >
+                {isBalanceHidden ? (
+                  <EyeOff className="size-4 stroke-[2]" />
+                ) : (
+                  <Eye className="size-4 stroke-[2]" />
+                )}
+              </button>
             </div>
             <span className="text-[10.5px] font-mono text-[#64748B] dark:text-stone-400 block mt-1.5">
               Cash remaining in hand
@@ -460,17 +487,17 @@ export function WalletCardDeck({
           {/* Subtle Ambient Radial Highlight */}
           <div className="absolute -right-12 -bottom-12 w-48 h-48 bg-emerald-400/10 dark:bg-emerald-500/15 rounded-full blur-2xl pointer-events-none" />
 
-          {/* Card Top: Gauge & Budget Status (Optically Aligned to Top Baseline) */}
-          <div className="flex items-start justify-between relative z-10">
-            <div className="flex items-start gap-3">
+          {/* Card Top: Gauge & Budget Status (Vertically Centered & Ergonomically Aligned) */}
+          <div className="flex items-center justify-between relative z-10">
+            <div className="flex items-center gap-3">
               <div className="size-10 rounded-2xl bg-emerald-50 dark:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-400/30 flex items-center justify-center text-[#047857] dark:text-emerald-400 shadow-xs shrink-0">
                 <Target className="size-5 stroke-[2]" />
               </div>
-              <div className="space-y-0.5 pt-0.5">
-                <h3 className="text-sm font-heading font-black tracking-tight text-[#161514] dark:text-white leading-tight">
+              <div className="flex flex-col justify-center">
+                <h3 className="text-sm sm:text-[15px] font-heading font-black tracking-tight text-[#161514] dark:text-white leading-tight">
                   Safe-to-Spend
                 </h3>
-                <span className="text-[11px] font-mono text-[#64748B] dark:text-stone-300 block leading-tight">
+                <span className="text-[11px] font-mono text-[#64748B] dark:text-stone-300 leading-tight mt-0.5">
                   {monthlyStats.daysRemainingInMonth} days left in cycle
                 </span>
               </div>
@@ -478,7 +505,7 @@ export function WalletCardDeck({
 
             <span
               className={cn(
-                "text-[10px] font-mono font-bold px-2.5 py-1 rounded-full border mt-0.5",
+                "text-[10px] font-mono font-bold px-2.5 py-1 rounded-full border",
                 budgetPercentageRemaining <= 15
                   ? "bg-rose-50 text-rose-700 border-rose-300 dark:bg-rose-500/20 dark:text-rose-300 dark:border-rose-500/30"
                   : budgetPercentageRemaining <= 30
