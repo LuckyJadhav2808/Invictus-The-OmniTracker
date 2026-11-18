@@ -12,9 +12,16 @@ import {
   Sparkles,
   Clock,
   Moon,
+  MoreHorizontal,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 
 export interface WeekDayItem {
   dateStr: string;
@@ -121,8 +128,9 @@ export function HabitCard({
       <div
         onClick={onClick}
         className={cn(
-          "bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#38332E] rounded-2xl p-3 flex items-center justify-between transition-all cursor-pointer select-none shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] hover:bg-muted active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
-          isCompletedToday && "opacity-85"
+          "bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#38332E] rounded-2xl p-3 flex items-center justify-between transition-all duration-200 cursor-pointer select-none shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] hover:bg-muted active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
+          isCompletedToday && "opacity-75 bg-[#F7F9F7] dark:bg-[#121613]",
+          isAnimating && "scale-[0.98]"
         )}
       >
         <div className="flex items-center gap-3 min-w-0 pr-2">
@@ -143,8 +151,8 @@ export function HabitCard({
           <div className="min-w-0">
             <h4
               className={cn(
-                "font-heading font-black text-xs text-foreground truncate",
-                isCompletedToday && "line-through text-muted-foreground"
+                "font-heading font-black text-xs text-foreground truncate transition-all duration-200",
+                isCompletedToday && "line-through text-muted-foreground opacity-75"
               )}
             >
               {habit.title}
@@ -168,6 +176,52 @@ export function HabitCard({
           <span className="text-[10px] font-mono font-black px-2 py-0.5 rounded-md border border-border bg-secondary text-foreground">
             {habit.frequency?.type || "Daily"}
           </span>
+
+          {(onEdit || onDelete) && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    soundFX.playPop();
+                  }}
+                  className="size-7 rounded-lg border border-transparent hover:border-border text-muted-foreground hover:text-foreground hover:bg-secondary transition-all flex items-center justify-center cursor-pointer ml-1"
+                  title="More options"
+                >
+                  <MoreHorizontal className="size-3.5" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#38332E] rounded-xl shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] p-1 min-w-[140px] z-50">
+                {onEdit && (
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      soundFX.playPop();
+                      onEdit();
+                    }}
+                    className="flex items-center gap-2 px-3 py-2 text-xs font-heading font-bold cursor-pointer rounded-lg hover:bg-secondary focus:bg-secondary text-foreground"
+                  >
+                    <Edit3 className="size-3.5" />
+                    <span>Edit Routine</span>
+                  </DropdownMenuItem>
+                )}
+                {onDelete && (
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      soundFX.playPop();
+                      onDelete();
+                    }}
+                    className="flex items-center gap-2 px-3 py-2 text-xs font-heading font-bold cursor-pointer rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 focus:bg-rose-100 text-rose-600 dark:text-rose-400"
+                  >
+                    <Trash2 className="size-3.5" />
+                    <span>Delete Habit</span>
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
       </div>
     );
@@ -178,9 +232,9 @@ export function HabitCard({
     <div
       onClick={onClick}
       className={cn(
-        "relative bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#38332E] rounded-2xl p-4 shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] space-y-3 transition-all select-none group overflow-hidden cursor-pointer",
-        isCompletedToday && "bg-[#F7F9F7] dark:bg-[#141815]",
-        isAnimating && "scale-[0.99]"
+        "relative bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#38332E] rounded-2xl p-4 shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] space-y-3 transition-all duration-200 select-none group overflow-hidden cursor-pointer",
+        isCompletedToday && "opacity-75 bg-[#F7F9F7] dark:bg-[#121613]",
+        isAnimating && "scale-[0.98]"
       )}
     >
       {/* Floating Sparkle Particles */}
@@ -204,8 +258,8 @@ export function HabitCard({
           <div className="flex-1 min-w-0">
             <h4
               className={cn(
-                "font-heading font-black text-sm sm:text-base text-foreground truncate leading-tight transition-colors",
-                isCompletedToday && "line-through text-muted-foreground"
+                "font-heading font-black text-sm sm:text-base text-foreground truncate leading-tight transition-all duration-200",
+                isCompletedToday && "line-through text-muted-foreground opacity-75"
               )}
             >
               {habit.title}
@@ -251,41 +305,56 @@ export function HabitCard({
           </div>
         </div>
 
-        {/* Quick Action Controls */}
+        {/* Quick Action Controls: Unified Subtle Options Menu + 44px Check Ring */}
         <div className="flex items-center gap-1.5 shrink-0">
-          {onEdit && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                soundFX.playPop();
-                onEdit();
-              }}
-              type="button"
-              className="size-8 rounded-xl border border-border bg-secondary hover:bg-muted text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center cursor-pointer shadow-2xs"
-              title="Edit Habit"
-              aria-label="Edit Habit"
-            >
-              <Edit3 className="size-3.5 stroke-[1.8]" />
-            </button>
+          {(onEdit || onDelete) && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    soundFX.playPop();
+                  }}
+                  className="size-8 rounded-xl border border-transparent hover:border-border text-muted-foreground hover:text-foreground hover:bg-secondary transition-all flex items-center justify-center cursor-pointer active:scale-95"
+                  title="More options"
+                  aria-label="Habit options"
+                >
+                  <MoreHorizontal className="size-4" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#38332E] rounded-xl shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] p-1 min-w-[140px] z-50">
+                {onEdit && (
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      soundFX.playPop();
+                      onEdit();
+                    }}
+                    className="flex items-center gap-2 px-3 py-2 text-xs font-heading font-bold cursor-pointer rounded-lg hover:bg-secondary focus:bg-secondary text-foreground"
+                  >
+                    <Edit3 className="size-3.5" />
+                    <span>Edit Routine</span>
+                  </DropdownMenuItem>
+                )}
+                {onDelete && (
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      soundFX.playPop();
+                      onDelete();
+                    }}
+                    className="flex items-center gap-2 px-3 py-2 text-xs font-heading font-bold cursor-pointer rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 focus:bg-rose-100 text-rose-600 dark:text-rose-400"
+                  >
+                    <Trash2 className="size-3.5" />
+                    <span>Delete Habit</span>
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
 
-          {onDelete && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                soundFX.playPop();
-                onDelete();
-              }}
-              type="button"
-              className="size-8 rounded-xl border border-border bg-secondary hover:bg-rose-100 dark:hover:bg-rose-950/40 text-muted-foreground hover:text-rose-600 transition-colors flex items-center justify-center cursor-pointer shadow-2xs"
-              title="Delete Habit"
-              aria-label="Delete Habit"
-            >
-              <Trash2 className="size-3.5 stroke-[1.8]" />
-            </button>
-          )}
-
-          {/* Primary 40px Checkbox Toggle */}
+          {/* Primary 44px Checkbox Ring */}
           <button
             onClick={handleToggleClick}
             type="button"
@@ -298,7 +367,7 @@ export function HabitCard({
             )}
           >
             {isCompletedToday ? (
-              <Check className="size-4.5 stroke-[3]" />
+              <Check className="size-4.5 stroke-[3] animate-in zoom-in-50 duration-150" />
             ) : (
               <Circle className="size-4.5 stroke-[1.8]" />
             )}

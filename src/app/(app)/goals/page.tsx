@@ -292,33 +292,6 @@ function GoalsPageContent() {
     }
   };
 
-  const SUGGESTED_HABITS = [
-    { title: "Start Exercising", color: "rose", frequency: "daily" as const, desc: "30 min activity" },
-    { title: "Low Carb Day", color: "emerald", frequency: "daily" as const, desc: "Healthy diet" },
-    { title: "Avoid Fast Food", color: "orange", frequency: "weekly" as const, desc: "Clean eating" },
-    { title: "Drink 2L Water", color: "sky", frequency: "daily" as const, desc: "Hydration" },
-    { title: "Read 10 Pages", color: "indigo", frequency: "daily" as const, desc: "Growth" },
-  ];
-
-  const handleAddSuggested = async (suggested: typeof SUGGESTED_HABITS[0]) => {
-    try {
-      await addHabitMutation.mutateAsync({
-        title: suggested.title,
-        color: suggested.color,
-        icon: "Target",
-        frequency: {
-          type: suggested.frequency,
-          targetPerDay: 1,
-        },
-        allowGraceSkip: false,
-        isGoalStyle: false,
-      });
-      toast.success(`Added habit: ${suggested.title}`);
-    } catch {
-      toast.error("Failed to add suggested habit");
-    }
-  };
-
   const handleAddHabit = async (data: any) => {
     try {
       await addHabitMutation.mutateAsync(data);
@@ -441,92 +414,74 @@ function GoalsPageContent() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 my-4">
         {/* Left Column (2 cols on lg): Habits Checklist */}
         <div id="habits-section" className="lg:col-span-2 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-[15px] font-sans font-semibold text-[#161514] dark:text-[#FAF8F5] flex items-center gap-2">
-              <Sparkles className="size-3.5 text-[#03D26F]" />
-              <span>Active habit streaks</span>
-              <span className="bg-[#F1EFEA] dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] text-xs px-2 py-0.5 rounded-md border border-[#E8E5DF] dark:border-[#383531] font-mono font-medium">
-                {habits.length}
-              </span>
-            </h3>
-          </div>
-
-          {/* Daily Victory Celebration HUD */}
-          {isAllDueCompleted && habits.length > 0 && (
-            <div className="bg-[#DCFAE5] dark:bg-[#03D26F]/20 border border-[#03D26F]/30 rounded-xl p-4 flex items-center justify-between gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-              <div className="flex items-center gap-3">
-                <div className="size-9 rounded-lg bg-white dark:bg-[#1C1A18] border border-[#03D26F]/40 flex items-center justify-center text-[#047857] dark:text-[#03D26F] shrink-0">
-                  <Trophy className="size-4.5 stroke-[1.5]" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-semibold tracking-tight text-[#04250e] dark:text-[#DCFAE5]">
-                      Daily conquered • 100% complete
-                    </span>
-                    <span className="bg-[#03D26F] text-white text-[10px] font-mono font-medium px-2 py-0.5 rounded-full">
-                      All due done
-                    </span>
-                  </div>
-                  <p className="text-xs text-[#047857] dark:text-[#A7F3D0] mt-0.5">
-                    Vix is ecstatic! Every single habit scheduled for today has been checked off. Take a bow.
-                  </p>
-                </div>
-              </div>
-              <div className="hidden sm:flex shrink-0">
-                <VixPixelCompanion gear="fitness" state="celebrate" size={40} title="Daily conquered!" />
-              </div>
-            </div>
-          )}
-
-          {/* Quick Filter Bar */}
+          {/* Quick Filter Bar: Unified Neobrutalist filter dock with inline counts */}
           {habits.length > 0 && (
-            <div className="flex flex-wrap items-center justify-between gap-2 bg-white dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#383531] rounded-xl p-2.5">
-              <div className="flex items-center gap-1 p-0.5 bg-[#F1EFEA] dark:bg-[#161514] border border-[#E8E5DF] dark:border-[#383531] rounded-lg">
+            <div className="flex items-center justify-between gap-2 bg-[#FAF8F5] dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#38332E] rounded-2xl p-1.5 shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]">
+              <div className="flex items-center gap-1">
                 <button
                   type="button"
-                  onClick={() => setHabitStatusFilter("all")}
+                  onClick={() => {
+                    soundFX.playPop();
+                    setHabitStatusFilter("all");
+                  }}
                   className={cn(
-                    "px-2.5 py-1 text-xs font-medium rounded capitalize transition-colors cursor-pointer",
+                    "px-3 py-1.5 text-xs font-mono font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5",
                     habitStatusFilter === "all"
-                      ? "bg-white dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] shadow-sm font-semibold"
-                      : "text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5]"
+                      ? "bg-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:text-[#161514] font-black shadow-[1px_1px_0px_0px_#161514]"
+                      : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                   )}
                 >
-                  All ({habits.length})
+                  <span>All</span>
+                  <span className="opacity-80">({habits.length})</span>
                 </button>
                 <button
                   type="button"
-                  onClick={() => setHabitStatusFilter("pending")}
+                  onClick={() => {
+                    soundFX.playPop();
+                    setHabitStatusFilter("pending");
+                  }}
                   className={cn(
-                    "px-2.5 py-1 text-xs font-medium rounded capitalize transition-colors cursor-pointer flex items-center gap-1",
+                    "px-3 py-1.5 text-xs font-mono font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5",
                     habitStatusFilter === "pending"
-                      ? "bg-white dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] shadow-sm font-semibold"
-                      : "text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5]"
+                      ? "bg-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:text-[#161514] font-black shadow-[1px_1px_0px_0px_#161514]"
+                      : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                   )}
                 >
-                  <span>Due today</span>
-                  <span className={cn(
-                    "px-1.5 py-0.2 rounded text-[10px] font-mono font-medium",
-                    pendingTodayHabits.length > 0 ? "bg-amber-100 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200" : "bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
-                  )}>
+                  <span>Due</span>
+                  <span
+                    className={cn(
+                      "px-1.5 py-0.2 rounded-md text-[10px] font-mono font-black",
+                      pendingTodayHabits.length > 0
+                        ? "bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300"
+                        : "bg-muted text-muted-foreground"
+                    )}
+                  >
                     {pendingTodayHabits.length}
                   </span>
                 </button>
                 <button
                   type="button"
-                  onClick={() => setHabitStatusFilter("completed")}
+                  onClick={() => {
+                    soundFX.playPop();
+                    setHabitStatusFilter("completed");
+                  }}
                   className={cn(
-                    "px-2.5 py-1 text-xs font-medium rounded capitalize transition-colors cursor-pointer flex items-center gap-1",
+                    "px-3 py-1.5 text-xs font-mono font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5",
                     habitStatusFilter === "completed"
-                      ? "bg-white dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] shadow-sm font-semibold"
-                      : "text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5]"
+                      ? "bg-[#161514] text-[#03D26F] dark:bg-[#03D26F] dark:text-[#161514] font-black shadow-[1px_1px_0px_0px_#161514]"
+                      : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                   )}
                 >
-                  <span>Completed</span>
-                  <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-medium bg-[#DCFAE5] dark:bg-[#03D26F]/20 text-[#04250e] dark:text-[#03D26F]">
+                  <span>Done</span>
+                  <span className="px-1.5 py-0.2 rounded-md text-[10px] font-mono font-black bg-[#DCFAE5] dark:bg-[#03D26F]/20 text-[#04250e] dark:text-[#03D26F]">
                     {completedTodayHabits.length}
                   </span>
                 </button>
+              </div>
+
+              <div className="text-[11px] font-mono font-bold text-muted-foreground pr-2 hidden sm:flex items-center gap-1.5">
+                <span className="text-foreground font-black">{completedTodayHabits.length}/{dueTodayHabits.length}</span>
+                <span>Reps Conquered</span>
               </div>
             </div>
           )}
@@ -534,13 +489,30 @@ function GoalsPageContent() {
           {habitsLoading ? (
             <HabitsListSkeleton count={3} />
           ) : habits.length === 0 ? (
-            <EmptyState
-              title="Ready to build a new habit?"
-              description="Habits help you build daily routines and streaks. Pick a suggestion below or click 'Create a Habit'!"
-              Icon={Target}
-              ctaText="Create a Habit"
-              onCtaClick={() => setIsChoiceOpen(true)}
-            />
+            <div className="bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#38332E] rounded-2xl p-8 text-center space-y-4 shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000]">
+              <div className="size-12 rounded-2xl bg-[#CEF431] text-[#161514] border-2 border-[#161514] flex items-center justify-center mx-auto shadow-[2px_2px_0px_0px_#161514]">
+                <Target className="size-6 stroke-[2]" />
+              </div>
+              <div className="space-y-1">
+                <h4 className="font-heading font-black text-base text-foreground">
+                  Build Your Daily Discipline
+                </h4>
+                <p className="text-xs font-sans text-muted-foreground max-w-sm mx-auto">
+                  Habits turn discipline into identity. Explore 50+ curated atomic routines or craft your custom protocol.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  soundFX.playPop();
+                  setIsChoiceOpen(true);
+                }}
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#CEF431] text-[#161514] font-heading font-black text-xs uppercase tracking-wider rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none active:scale-95 transition-all cursor-pointer"
+              >
+                <Sparkles className="size-3.5 stroke-[2.5]" />
+                <span>Explore Habits Vault (50+ Presets)</span>
+              </button>
+            </div>
           ) : displayedHabits.length === 0 ? (
             <div className="bg-white dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#383531] p-8 text-center space-y-2">
               <Target className="size-8 text-[#6B6B6B]/40 dark:text-[#A8A29E]/40 stroke-[1.5] mx-auto" />
@@ -603,32 +575,6 @@ function GoalsPageContent() {
                   />
                 );
               })}
-            </div>
-          )}
-
-          {/* Suggestions Carousel: Only shown as onboarding guide when user has no active habits */}
-          {habits.length === 0 && (
-            <div className="space-y-2 pt-2">
-              <h4 className="text-xs font-sans font-semibold text-[#161514] dark:text-[#FAF8F5]">Suggested routines</h4>
-              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none select-none -mx-4 px-4 md:-mx-0 md:px-0">
-                {SUGGESTED_HABITS.map((suggested) => (
-                  <div
-                    key={suggested.title}
-                    className="flex-shrink-0 w-[200px] bg-white dark:bg-[#1C1A18] rounded-xl p-3 border border-[#E8E5DF] dark:border-[#383531] flex items-center justify-between gap-2 hover:bg-[#FAF8F5] dark:hover:bg-[#252321] transition-colors"
-                  >
-                    <div className="min-w-0">
-                      <span className="text-xs font-sans font-medium text-[#161514] dark:text-[#FAF8F5] block truncate">{suggested.title}</span>
-                      <span className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E] block truncate">{suggested.desc}</span>
-                    </div>
-                    <button
-                      onClick={() => handleAddSuggested(suggested)}
-                      className="size-7 rounded-lg bg-[#F1EFEA] dark:bg-[#252321] hover:bg-[#E8E5DF] dark:hover:bg-[#2e2b28] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#383531] flex items-center justify-center cursor-pointer transition-colors shrink-0"
-                    >
-                      <Plus className="size-3.5 stroke-[2]" />
-                    </button>
-                  </div>
-                ))}
-              </div>
             </div>
           )}
         </div>
