@@ -16,6 +16,17 @@ import {
   attachQueryCachePersister,
 } from "@/lib/offline/query-cache-persister";
 
+// Suppress React 19 false-positive script warning during development
+if (typeof window !== "undefined" && process.env.NODE_ENV === "development") {
+  const originalError = console.error;
+  console.error = (...args: any[]) => {
+    if (typeof args[0] === "string" && args[0].includes("Encountered a script tag while rendering React component")) {
+      return;
+    }
+    originalError(...args);
+  };
+}
+
 export function Providers({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [queryClient] = useState(

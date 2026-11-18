@@ -79,46 +79,13 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`h-full antialiased font-sans ${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} ${caveat.variable} ${permanentMarker.variable} ${architectsDaughter.variable}`}
     >
-      <head>
+      <body className="min-h-full flex flex-col bg-background text-foreground transition-colors duration-150">
         <Script
           id="theme-initializer"
+          src="/theme-init.js"
           strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var stored = localStorage.getItem('theme');
-                  var isDark = stored === 'dark' || (stored !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-                  if (isDark) {
-                    document.documentElement.classList.add('dark');
-                  } else {
-                    document.documentElement.classList.remove('dark');
-                  }
-                  var storedColor = localStorage.getItem('invictus-color-theme') || 'classic';
-                  document.documentElement.setAttribute('data-color-theme', storedColor);
-                } catch (e) {}
-              })();
-            `,
-          }}
         />
-      </head>
-      <body className="min-h-full flex flex-col bg-background text-foreground transition-colors duration-150">
         <Providers>{children}</Providers>
-        <Script
-          id="sw-register"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              if ('serviceWorker' in navigator) {
-                window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js').catch(function(err) {
-                    console.log('ServiceWorker registration failed: ', err);
-                  });
-                });
-              }
-            `,
-          }}
-        />
       </body>
     </html>
   );
