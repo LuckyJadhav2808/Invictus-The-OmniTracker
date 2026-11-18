@@ -17,6 +17,7 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(WidgetBridgePlugin.class);
         registerPlugin(SmsBridgePlugin.class);
         registerPlugin(AppUpdateBridgePlugin.class);
+        registerPlugin(QuickLogBridgePlugin.class);
         registerPlugin(LocalNotificationsPlugin.class);
         registerPlugin(HapticsPlugin.class);
         registerPlugin(AppPlugin.class);

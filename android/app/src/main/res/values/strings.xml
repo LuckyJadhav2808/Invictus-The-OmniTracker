@@ -18,4 +18,7 @@
     <!-- Home Screen Widget Strings -->
     <string name="widget_safe_spend_label">Invictus Daily Overview</string>
     <string name="widget_safe_spend_description">Daily safe-to-spend rate, remaining liquidity balances, and habit checklist.</string>
+
+    <!-- Quick Log Tile -->
+    <string name="quick_log_tile_label">+ Log Expense</string>
 </resources>

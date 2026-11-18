@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import { format } from "date-fns";
 import {
   calculateDueDateStatus,
   formatReminderMessage,
@@ -18,7 +19,7 @@ describe("WhoOwesWhoTabView (Belanje Debt Deck & Reminder Engine)", () => {
     });
 
     it("identifies Due Today correctly", () => {
-      const todayStr = new Date().toISOString().split("T")[0];
+      const todayStr = format(new Date(), "yyyy-MM-dd");
       const status = calculateDueDateStatus(todayStr);
       expect(status).not.toBeNull();
       expect(status?.isDueToday).toBe(true);
@@ -30,7 +31,7 @@ describe("WhoOwesWhoTabView (Belanje Debt Deck & Reminder Engine)", () => {
       // 5 days in past
       const pastDate = new Date();
       pastDate.setDate(pastDate.getDate() - 5);
-      const pastStr = pastDate.toISOString().split("T")[0];
+      const pastStr = format(pastDate, "yyyy-MM-dd");
 
       const status = calculateDueDateStatus(pastStr);
       expect(status).not.toBeNull();
@@ -43,7 +44,7 @@ describe("WhoOwesWhoTabView (Belanje Debt Deck & Reminder Engine)", () => {
       // 10 days in future
       const futureDate = new Date();
       futureDate.setDate(futureDate.getDate() + 10);
-      const futureStr = futureDate.toISOString().split("T")[0];
+      const futureStr = format(futureDate, "yyyy-MM-dd");
 
       const status = calculateDueDateStatus(futureStr);
       expect(status).not.toBeNull();

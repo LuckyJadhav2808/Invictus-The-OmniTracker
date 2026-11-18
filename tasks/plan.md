@@ -1,58 +1,97 @@
-# Implementation Plan: Production-Grade App Updates, Cloud Sync Hub & Version Control
+# Implementation Plan: Ambient Notification Dock + Translucent Floating Micro-Dialog
 
 ## Overview
-Elevate the Invictus Android Capacitor app and web client to production-grade enterprise standards by delivering:
-1. An in-app direct APK downloader and native Android `PackageInstaller` bridge (eliminating browser redirection).
-2. An instant OTA web update detector with 1-tap cache flush.
-3. An interactive Cloud Sync Hub with live MongoDB Atlas ping latency, pending mutation queue inspection, and manual sync trigger.
-4. Single-source automated SemVer synchronization across `package.json`, `android/app/build.gradle`, and `src/config/version.ts` with a production `/api/health` probe.
+Streamline out-of-app expense logging into a focused, 2-tier ambient flow:
+1. **Clean Ambient Notification in Notification Shade**: A silent, low-priority pinned notification displaying real-time financial telemetry (`⚡ Safe to Spend Today: ₹1,420 • Tap to Log`).
+2. **Translucent Floating Micro-Dialog (`QuickLogDialogActivity`)**: Tapping the notification (or the Android Quick Settings tile) immediately slides up a translucent, Neobrutalist floating bottom-sheet dialog directly over whatever app the user has open. It features a tactile mechanical numpad (1-9, 0, ⌫), quick habit chips (`Chai ₹30`, `Meal ₹100`), 4 core category pills, and a 1-tap `[LOG EXPENSE ⚡]` button. Upon submission, it logs the expense in the background, updates the notification's remaining balance, buzzes haptically, and calls `finish()` in under 1.5 seconds without ever loading the full Next.js/Capacitor WebView.
 
 ---
 
-## Architecture Decisions
+## User Experience Journey
 
-- **Hybrid Dual Update Engine**:
-  - Native binary updates (new native plugins, permissions, major bumps) are downloaded in-app with a visual progress bar and launched directly via Android's native `PackageInstaller` (`FileProvider` intent).
-  - Web/UI updates served from Vercel are detected via `/api/version` and offer an instant 1-tap cache-busting reload.
-- **Reactive Cloud Sync State Machine**:
-  - Replace the static `navigator.onLine` check in `SpaceHeader` with a live subscription to `OfflineSyncEngine`.
-  - Provide a tactile Neobrutalist `CloudSyncDrawer` displaying real DB latency (ping ms to `/api/health`), pending mutation queue details, and an animated "Sync Now" button.
-- **Single-Source Version Control**:
-  - Create `scripts/bump-version.mjs` ensuring that `package.json`, `android/app/build.gradle` (`versionCode`, `versionName`), and `src/config/version.ts` stay 100% in sync.
-  - Implement `/api/health` returning DB connectivity, uptime, response time, and app version per `/production-grade-engineering`.
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                        ANDROID SYSTEM SHADE / TILE                     │
+├────────────────────────────────────────────────────────────────────────┤
+│  ⚡ Invictus Ambient Fast-Log                                          │
+│  Remaining Today: ₹1,420 • Tap to log expense                          │
+└────────────────────────────────────────────────────────────────────────┘
+                                │
+                  Tap notification or Quick Tile
+                                │
+                                ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│             TRANSLUCENT FLOATING MICRO-DIALOG (Native Android)         │
+│  ┌──────────────────────────────────────────────────────────────────┐  │
+│  │  ⚡ QUICK EXPENSE                                        [X]      │  │
+│  │  Remaining Today: ₹1,420                                         │  │
+│  │                                                                  │  │
+│  │                       ₹ 4 5                                      │  │
+│  │                                                                  │  │
+│  │  [☕ Chai ₹30]   [🍛 Meal ₹100]   [🚇 Metro ₹40]                 │  │
+│  │  [🍔 Food]      [🚕 Travel]      [🛒 Grocery]     [💡 Bills]    │  │
+│  │                                                                  │  │
+│  │  [ 1 ] [ 2 ] [ 3 ]                                               │  │
+│  │  [ 4 ] [ 5 ] [ 6 ]                                               │  │
+│  │  [ 7 ] [ 8 ] [ 9 ]                                               │  │
+│  │  [ . ] [ 0 ] [ ⌫ ]                                               │  │
+│  │                                                                  │  │
+│  │               [ LOG EXPENSE ⚡ ]                                 │  │
+│  └──────────────────────────────────────────────────────────────────┘  │
+└────────────────────────────────────────────────────────────────────────┘
+                                │
+                   Submits in 50ms & finish()
+                                │
+                                ▼
+• Activity closes instantly (total time ~1.5s)
+• User returns seamlessly to Instagram/WhatsApp/GPay
+• Notification updates to "Remaining Today: ₹1,375"
+• Full app / WebView is NEVER launched
+```
 
 ---
 
-## Task List
+## Architecture & Dependency Graph
 
-### Phase 1: Foundation & Version Control Automation
-- [ ] **Task 1**: Implement `/api/health` production probe and runtime environment validation (`src/lib/env.ts`).
-- [ ] **Task 2**: Create automated SemVer CLI synchronization script (`scripts/bump-version.mjs`) and version unit tests.
-- [ ] **Checkpoint 1**: Health probe pings MongoDB, version sync script checks pass, TypeScript passes.
-
-### Phase 2: Android Native In-App APK Downloader & Installer Bridge
-- [ ] **Task 3**: Configure Android permissions (`REQUEST_INSTALL_PACKAGES`) and `FileProvider` paths (`file_paths.xml`).
-- [ ] **Task 4**: Create `AppUpdateBridgePlugin.java` with background streaming download, progress events, and `PackageInstaller` intent.
-- [ ] **Task 5**: Build frontend TypeScript bridge (`src/lib/native/app-update-bridge.ts`) and enhance `UpdateCheckModal.tsx` with live download progress.
-- [ ] **Checkpoint 2**: Native plugin builds, modal displays in-app progress bar, web fallback functions cleanly.
-
-### Phase 3: Interactive Cloud Sync Hub & Telemetry Engine
-- [ ] **Task 6**: Upgrade `OfflineSyncEngine` (`src/lib/offline/sync-manager.ts`) with reactive state machine, DB latency probe, and queue telemetry.
-- [ ] **Task 7**: Create `CloudSyncDrawer.tsx` Neobrutalist bottom sheet/drawer with live connection pulse, latency ms, pending queue list, and "Sync Now".
-- [ ] **Task 8**: Wire `SpaceHeader.tsx` with dynamic `CloudSyncPill` and connect to `CloudSyncDrawer`.
-- [ ] **Checkpoint 3**: Header displays live sync states, clicking opens drawer, manual sync triggers queue flush, DB ping measures latency.
-
-### Phase 4: Web OTA Instant Updates & Verification
-- [ ] **Task 9**: Enhance `AutoUpdateBanner.tsx` with OTA live reload detection and cache invalidation.
-- [ ] **Task 10**: Full verification: TypeScript `tsc --noEmit`, Vitest test suite, and live browser Playwright checks.
-- [ ] **Checkpoint 4**: Production hardening complete, zero errors, walkthrough documented.
+```
+[Android System Shade / Quick Settings Tile]
+        │                       │
+        ▼                       ▼
+[Notification Click]    [QuickLogTileService]
+        │                       │
+        └───────────┬───────────┘
+                    ▼
+     [QuickLogDialogActivity.java]
+     (Translucent Dialog with Numpad & Habits)
+                    │
+         ┌──────────┴──────────┐
+         ▼                     ▼
+[HTTP POST Sync]       [Update Notification]
+/api/money/sms-webhook QuickLogNotificationManager
+         │                     │
+         └──────────┬──────────┘
+                    ▼
+          [finish() in 1.5s]
+```
 
 ---
 
-## Risks and Mitigations
+## Phased Execution Plan
 
-| Risk | Impact | Mitigation |
-|---|---|---|
-| Android 8.0+ restricts unknown sources installation | High | Detect `canRequestPackageInstalls()`; if false, guide user directly to system toggle with helpful explanatory copy. |
-| In-app download interrupted by network drop | Medium | Support chunked download or clear retry state with friendly error toast. |
-| DB health ping creates excessive traffic | Low | Cache health probe results for 30 seconds; only actively ping when Cloud Sync Drawer opens or user taps "Sync Now". |
+### Phase 1: Native Translucent Dialog Layout & Theme
+- Create `@style/Theme.Invictus.TranslucentDialog` enabling transparent background with dimmed backdrop.
+- Build `activity_quick_log_dialog.xml` in Neobrutalist design (`#FAF8F5`, obsidian `#161514`, hard ink shadow, big amount display, mechanical numpad grid, quick habit chips, category selector).
+
+### Phase 2: Dialog Logic, Auto-Dismissal & Headless Sync
+- Implement `QuickLogDialogActivity.java` with numpad state, habit chip auto-fill, category selection, and haptics.
+- On `[LOG EXPENSE ⚡]`, asynchronously dispatch payload to `/api/money/sms-webhook` or offline queue, update SharedPreferences, and call `finish()` immediately.
+
+### Phase 3: Ambient Notification Manager & Quick Settings Tile
+- Implement `QuickLogNotificationManager.java` to post a silent, ongoing notification dock in the shade with PendingIntent launching `QuickLogDialogActivity`.
+- Implement `QuickLogTileService.java` for Android pull-down Quick Settings control center.
+
+### Phase 4: Capacitor Bridge & Settings Integration
+- Implement `QuickLogBridgePlugin.java` & TypeScript client `quick-log-bridge.ts` to sync daily budget and frequent habit amounts from React to native SharedPreferences.
+- Add an Ambient Quick-Log toggle card in the Money page.
+- Create standalone `/quick-log` page with tactile mechanical numpad for web/PWA users.
+- Full verification: TypeScript, Vitest suite, build check.

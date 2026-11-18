@@ -65,6 +65,27 @@
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
         </receiver>
+
+        <!-- Ambient Floating Quick Log Micro-Dialog -->
+        <activity
+            android:name=".QuickLogDialogActivity"
+            android:theme="@style/Theme.Invictus.TranslucentDialog"
+            android:launchMode="singleTask"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:configChanges="orientation|keyboardHidden|screenSize|uiMode" />
+
+        <!-- Android Pull-Down Quick Settings TileService -->
+        <service
+            android:name=".QuickLogTileService"
+            android:label="@string/quick_log_tile_label"
+            android:icon="@drawable/ic_stat_icon"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
     </application>
 
     <!-- Native Hardware Permissions for Alarms & Notifications -->

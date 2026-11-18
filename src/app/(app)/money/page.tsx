@@ -38,6 +38,7 @@ import { VaultTabView } from "@/components/money/views/VaultTabView";
 import { AnalyticsTabView } from "@/components/money/views/AnalyticsTabView";
 import { WhoOwesWhoTabView } from "@/components/money/views/WhoOwesWhoTabView";
 import { StickyMoneyMiniCockpit } from "@/components/money/StickyMoneyMiniCockpit";
+import { AmbientQuickLogCard } from "@/components/money/AmbientQuickLogCard";
 import { useWhoOwesWhoStore } from "@/store/who-owes-who-store";
 
 // Lazy-Loaded Heavy Modals (Zero TBT & Fast Initial Paint)
@@ -695,6 +696,12 @@ function MoneyPageContent() {
         onEditTransaction={(tx) => setEditingTx(tx)}
         onDuplicateTransaction={handleDuplicateTransaction}
         onDeleteTransaction={handleDeleteTransaction}
+      />
+
+      {/* ⚡ AMBIENT ZERO-APP QUICK-LOG DOCK CARD */}
+      <AmbientQuickLogCard
+        safeDailyPace={dailyStats.dailyBudgetTarget || monthlyStats.dailySafeToSpend || 0}
+        currencySymbol={currencySymbol}
       />
 
       {/* 📑 FLOATING SUB-NAV DOCK */}
