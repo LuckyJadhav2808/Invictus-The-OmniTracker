@@ -653,12 +653,6 @@ function MoneyPageContent() {
         remainingBudget={monthlyStats.remainingBudget}
         safeDailyPace={dailyStats.dailyBudgetTarget || monthlyStats.dailySafeToSpend || 0}
         onAddTransaction={() => setIsAddTxOpen(true)}
-        activeTab={activeTab}
-        onTabChange={handleTabChange}
-        todayTxCount={todayTxCount}
-        overBudgetCategoriesCount={overBudgetCategoriesCount}
-        pendingIouCount={pendingIous.length}
-        pendingIouAmount={totalPendingLentAmount}
       />
 
       {/* 🚀 PRIMARY SUMMARY COCKPIT */}
