@@ -1,5 +1,6 @@
 package com.invictus.omnitracker;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,12 +9,21 @@ import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
+import com.getcapacitor.annotation.Permission;
 
 /**
  * Invictus QuickLogBridge Capacitor Plugin
  * Bridges the React frontend with the native ambient notification dock and floating micro-dialog.
  */
-@CapacitorPlugin(name = "QuickLogBridge")
+@CapacitorPlugin(
+    name = "QuickLogBridge",
+    permissions = {
+        @Permission(
+            alias = "notifications",
+            strings = { Manifest.permission.POST_NOTIFICATIONS }
+        )
+    }
+)
 public class QuickLogBridgePlugin extends Plugin {
 
     private static final String PREFS_NAME = "invictus_quick_log_prefs";

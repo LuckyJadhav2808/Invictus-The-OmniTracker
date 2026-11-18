@@ -6,10 +6,13 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.util.Log;
+import android.Manifest;
 
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
 import java.util.Locale;
 
@@ -44,6 +47,14 @@ public class QuickLogNotificationManager {
 
             NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             if (nm == null) return;
+
+            // Check runtime permission on Android 13+ (API 33+)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                    Log.w(TAG, "Notification permission not granted (POST_NOTIFICATIONS). Ambient dock awaiting user permission.");
+                    return;
+                }
+            }
 
             // 1. Create Silent Low-Priority Notification Channel (Android 8.0+)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

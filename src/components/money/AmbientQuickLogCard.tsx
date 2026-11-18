@@ -35,6 +35,9 @@ export function AmbientQuickLogCard({
   const handleToggle = async () => {
     soundFX.playPop();
     const nextState = !isEnabled;
+    if (nextState && NativeQuickLogBridge.isSupported()) {
+      await NativeQuickLogBridge.requestNotificationPermission();
+    }
     setIsEnabled(nextState);
     await NativeQuickLogBridge.setAmbientDockEnabled(nextState);
 

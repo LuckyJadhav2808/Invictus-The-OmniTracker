@@ -95,4 +95,17 @@ export const NativeQuickLogBridge = {
       return false;
     }
   },
+
+  async requestNotificationPermission(): Promise<boolean> {
+    if (!this.isSupported()) return true;
+    try {
+      if (typeof (QuickLogBridge as any).requestPermissions === "function") {
+        const res = await (QuickLogBridge as any).requestPermissions({ permissions: ["notifications"] });
+        return res?.notifications === "granted";
+      }
+      return true;
+    } catch {
+      return false;
+    }
+  },
 };
