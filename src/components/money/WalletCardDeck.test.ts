@@ -12,10 +12,28 @@ describe("WalletCardDeck Production Architecture & Belanje Design Verification",
     expect(typeof WalletCardDeck).toBe("function");
   });
 
-  it("verifies swipeable horizontal carousel with snap mandatory scrolling", () => {
-    expect(source).toContain("snap-x snap-mandatory");
-    expect(source).toContain("overflow-x-auto");
-    expect(source).toContain("scrollSnapType: \"x mandatory\"");
+  it("verifies flippable stacked card architecture with swipe gestures", () => {
+    expect(source).toContain("getCardStyle");
+    expect(source).toContain("nextCard");
+    expect(source).toContain("prevCard");
+    expect(source).toContain("handleTouchStart");
+    expect(source).toContain("handleTouchMove");
+    expect(source).toContain("handleTouchEnd");
+    expect(source).toContain("touch-pan-y select-none");
+  });
+
+  it("implements light mode white surface with calibrated card gradients", () => {
+    // Card 1: Main account white gradient
+    expect(source).toContain("from-white via-[#F8FAFC] to-[#EEF2F6]");
+    expect(source).toContain("dark:from-[#161514] dark:via-[#1E1C1A] dark:to-[#141E28]");
+
+    // Card 2: Cash till white/honey gradient
+    expect(source).toContain("from-white via-[#FFFDF5] to-[#FEF3C7]");
+    expect(source).toContain("dark:from-[#1C1A18] dark:via-[#24211D] dark:to-[#2E2416]");
+
+    // Card 3: Safe-to-Spend mint gradient
+    expect(source).toContain("from-white via-[#F0FDF4] to-[#DCFCE7]");
+    expect(source).toContain("dark:from-[#161514] dark:via-[#1A201C] dark:to-[#122B1E]");
   });
 
   it("implements privacy eye toggle for hiding sensitive balance telemetry", () => {
@@ -25,7 +43,7 @@ describe("WalletCardDeck Production Architecture & Belanje Design Verification",
     expect(source).toContain("toggleHideBalance");
   });
 
-  it("renders all 4 Belanje-benchmarked card metaphors", () => {
+  it("renders all 4 Belanje-benchmarked card metaphors in stack", () => {
     // Card 1: Main Account (UPI & Digital Bank)
     expect(source).toContain("Main Account");
     expect(source).toContain("Income this month");
@@ -51,8 +69,10 @@ describe("WalletCardDeck Production Architecture & Belanje Design Verification",
     expect(source).toContain("Analytics");
   });
 
-  it("renders dot pagination indicator", () => {
-    expect(source).toContain("scrollToIndex");
+  it("renders dot pagination indicator and quick stack flip steppers", () => {
+    expect(source).toContain("goToCard");
     expect(source).toContain("activeCardIndex === idx");
+    expect(source).toContain("ChevronLeft");
+    expect(source).toContain("ChevronRight");
   });
 });

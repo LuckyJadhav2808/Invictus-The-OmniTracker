@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { type MonthlyBudgetStats, type DailyBudgetStats } from "@/lib/utils/budget-rollover";
 import { soundFX } from "@/components/shared/SoundFX";
 import { cn } from "@/lib/utils";
@@ -14,10 +14,10 @@ import {
   RotateCcw,
   Sparkles,
   ChevronRight,
+  ChevronLeft,
   TrendingUp,
   TrendingDown,
   Layers,
-  ArrowRight,
 } from "lucide-react";
 
 interface WalletCardDeckProps {
@@ -58,7 +58,12 @@ export function WalletCardDeck({
   });
 
   const [activeCardIndex, setActiveCardIndex] = useState(0);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const touchStartXRef = useRef<number | null>(null);
+  const touchStartYRef = useRef<number | null>(null);
+
+  const totalCards = 4;
 
   const toggleHideBalance = () => {
     soundFX.playPop();
@@ -71,27 +76,82 @@ export function WalletCardDeck({
     });
   };
 
-  // Synchronize active dot with scroll position
-  const handleScroll = () => {
-    if (!scrollContainerRef.current) return;
-    const { scrollLeft, clientWidth } = scrollContainerRef.current;
-    if (clientWidth <= 0) return;
-    const newIndex = Math.round(scrollLeft / (clientWidth * 0.85));
-    setActiveCardIndex(Math.min(3, Math.max(0, newIndex)));
+  const nextCard = useCallback(() => {
+    soundFX.playPop();
+    soundFX.vibrate(12);
+    setActiveCardIndex((prev) => (prev + 1) % totalCards);
+  }, [totalCards]);
+
+  const prevCard = useCallback(() => {
+    soundFX.playPop();
+    soundFX.vibrate(12);
+    setActiveCardIndex((prev) => (prev - 1 + totalCards) % totalCards);
+  }, [totalCards]);
+
+  const goToCard = (index: number) => {
+    if (index === activeCardIndex) return;
+    soundFX.playPop();
+    soundFX.vibrate(10);
+    setActiveCardIndex(index);
   };
 
-  const scrollToIndex = (index: number) => {
-    if (!scrollContainerRef.current) return;
-    soundFX.playPop();
-    const children = scrollContainerRef.current.children;
-    if (children[index]) {
-      (children[index] as HTMLElement).scrollIntoView({
-        behavior: "smooth",
-        inline: "center",
-        block: "nearest",
-      });
-      setActiveCardIndex(index);
+  // Touch handlers for swipe & flip gestures
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartXRef.current = e.touches[0].clientX;
+    touchStartYRef.current = e.touches[0].clientY;
+    setIsDragging(true);
+    setDragOffset(0);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (touchStartXRef.current === null || touchStartYRef.current === null) return;
+    const currentX = e.touches[0].clientX;
+    const currentY = e.touches[0].clientY;
+    const deltaX = currentX - touchStartXRef.current;
+    const deltaY = currentY - touchStartYRef.current;
+
+    // Only drag horizontally if user isn't scrolling vertically
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      setDragOffset(deltaX);
     }
+  };
+
+  const handleTouchEnd = () => {
+    if (dragOffset < -40) {
+      nextCard();
+    } else if (dragOffset > 40) {
+      prevCard();
+    }
+    setIsDragging(false);
+    setDragOffset(0);
+    touchStartXRef.current = null;
+    touchStartYRef.current = null;
+  };
+
+  // Mouse drag handlers for desktop
+  const handleMouseDown = (e: React.MouseEvent) => {
+    touchStartXRef.current = e.clientX;
+    setIsDragging(true);
+    setDragOffset(0);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || touchStartXRef.current === null) return;
+    const deltaX = e.clientX - touchStartXRef.current;
+    setDragOffset(deltaX);
+  };
+
+  const handleMouseUp = () => {
+    if (isDragging) {
+      if (dragOffset < -40) {
+        nextCard();
+      } else if (dragOffset > 40) {
+        prevCard();
+      }
+    }
+    setIsDragging(false);
+    setDragOffset(0);
+    touchStartXRef.current = null;
   };
 
   const budgetPercentageRemaining = Math.max(
@@ -109,9 +169,55 @@ export function WalletCardDeck({
     return `${currencySymbol}${val.toLocaleString()}`;
   };
 
+  // Stacked transform generator for card at position i
+  const getCardStyle = (i: number): React.CSSProperties => {
+    const diff = (i - activeCardIndex + totalCards) % totalCards;
+
+    if (diff === 0) {
+      // Front active card
+      return {
+        zIndex: 30,
+        transform: `translate3d(${dragOffset}px, 0, 0) rotate(${dragOffset * 0.03}deg) scale(1)`,
+        opacity: 1,
+        pointerEvents: "auto",
+        transition: isDragging ? "none" : "transform 260ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease-out",
+      };
+    } else if (diff === 1) {
+      // 1st stacked card peeking on the right
+      const peekX = 18;
+      const extraPull = dragOffset < 0 ? Math.min(10, Math.abs(dragOffset) * 0.15) : 0;
+      return {
+        zIndex: 20,
+        transform: `translate3d(${peekX - extraPull}px, 0, 0) scale(0.96)`,
+        opacity: 0.88,
+        pointerEvents: "auto",
+        transition: isDragging ? "none" : "transform 260ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease-out",
+      };
+    } else if (diff === 2) {
+      // 2nd stacked card peeking further
+      const peekX = 32;
+      return {
+        zIndex: 10,
+        transform: `translate3d(${peekX}px, 0, 0) scale(0.92)`,
+        opacity: 0.5,
+        pointerEvents: "auto",
+        transition: isDragging ? "none" : "transform 260ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease-out",
+      };
+    } else {
+      // Hidden tucked behind
+      return {
+        zIndex: 0,
+        transform: `translate3d(40px, 0, 0) scale(0.88)`,
+        opacity: 0,
+        pointerEvents: "none",
+        transition: "transform 260ms ease, opacity 200ms ease",
+      };
+    }
+  };
+
   return (
     <div className="space-y-3.5">
-      {/* ─── TOP BAR: Available Funds & Eye Toggle (Belanje Benchmark) ─── */}
+      {/* ─── TOP BAR: Available Funds, Eye Toggle & Flip Steppers ─── */}
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
           <span className="text-xs sm:text-sm font-heading font-black text-[#6B6B6B] dark:text-[#A8A29E] tracking-tight">
@@ -131,8 +237,28 @@ export function WalletCardDeck({
           </button>
         </div>
 
-        {/* Target Month Pill & Reset */}
-        <div className="flex items-center gap-1.5">
+        {/* Stack Navigation & Target Month Pill */}
+        <div className="flex items-center gap-2">
+          {/* Quick Stack Steppers (< >) for desktop / keyboard */}
+          <div className="hidden sm:flex items-center gap-1">
+            <button
+              type="button"
+              onClick={prevCard}
+              className="size-6 rounded-lg bg-white dark:bg-[#252321] hover:bg-[#E8E5DF] dark:hover:bg-[#2e2b28] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#2A2724] flex items-center justify-center transition-colors cursor-pointer shadow-xs"
+              title="Previous Card in Stack"
+            >
+              <ChevronLeft className="size-3 stroke-[2.5]" />
+            </button>
+            <button
+              type="button"
+              onClick={nextCard}
+              className="size-6 rounded-lg bg-white dark:bg-[#252321] hover:bg-[#E8E5DF] dark:hover:bg-[#2e2b28] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#2A2724] flex items-center justify-center transition-colors cursor-pointer shadow-xs"
+              title="Next Card in Stack"
+            >
+              <ChevronRight className="size-3 stroke-[2.5]" />
+            </button>
+          </div>
+
           <span
             className={cn(
               "text-[11px] font-mono font-bold px-2 py-0.5 rounded-lg border transition-colors",
@@ -157,36 +283,50 @@ export function WalletCardDeck({
         </div>
       </div>
 
-      {/* ─── SWIPEABLE WALLET CARDS CAROUSEL ─── */}
+      {/* ─── FLIPPABLE STACKED WALLET CARD DECK (Belanje & Apple Wallet Benchmark) ─── */}
       <div
-        ref={scrollContainerRef}
-        onScroll={handleScroll}
-        className="flex gap-3.5 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-1 px-1 -mx-1"
-        style={{ scrollSnapType: "x mandatory" }}
+        className="relative w-full max-w-[520px] mx-auto h-[210px] sm:h-[220px] touch-pan-y select-none cursor-grab active:cursor-grabbing"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
       >
-        {/* CARD 1: Main UPI / Bank Account */}
+        {/* CARD 0: Main UPI / Bank Account */}
         <div
-          onClick={() => onSelectPaymentMethod?.("upi")}
-          className="snap-center shrink-0 w-[88vw] sm:w-[380px] md:w-[400px] h-[200px] sm:h-[210px] rounded-3xl p-5 sm:p-6 bg-gradient-to-br from-[#161514] via-[#1E1C1A] to-[#141E28] text-white border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex flex-col justify-between relative overflow-hidden group cursor-pointer transition-all active:scale-[0.99]"
+          onClick={(e) => {
+            if (activeCardIndex !== 0) {
+              e.stopPropagation();
+              goToCard(0);
+            } else {
+              onSelectPaymentMethod?.("upi");
+            }
+          }}
+          style={getCardStyle(0)}
+          className="absolute inset-y-0 left-0 w-[calc(100%-28px)] sm:w-[calc(100%-36px)] rounded-3xl p-5 sm:p-6 bg-gradient-to-br from-white via-[#F8FAFC] to-[#EEF2F6] dark:from-[#161514] dark:via-[#1E1C1A] dark:to-[#141E28] text-[#161514] dark:text-white border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex flex-col justify-between overflow-hidden group cursor-pointer will-change-transform"
         >
           {/* Subtle Ambient Radial Highlight */}
-          <div className="absolute -right-12 -bottom-12 w-48 h-48 bg-blue-500/15 rounded-full blur-2xl pointer-events-none" />
+          <div className="absolute -right-12 -bottom-12 w-48 h-48 bg-blue-500/10 dark:bg-blue-500/15 rounded-full blur-2xl pointer-events-none" />
 
           {/* Card Top: Logo & Name */}
           <div className="flex items-center justify-between relative z-10">
             <div className="flex items-center gap-3">
-              <div className="size-10 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center justify-center text-white shadow-xs">
+              <div className="size-10 rounded-2xl bg-blue-50 dark:bg-white/10 border border-blue-200 dark:border-white/15 flex items-center justify-center text-blue-700 dark:text-white shadow-xs">
                 <Building2 className="size-5 stroke-[2]" />
               </div>
               <div>
-                <h3 className="text-sm font-heading font-black tracking-tight text-white flex items-center gap-1.5">
+                <h3 className="text-sm font-heading font-black tracking-tight flex items-center gap-1.5 text-[#161514] dark:text-white">
                   Main Account
                 </h3>
-                <span className="text-[11px] font-mono text-stone-300">UPI &amp; Digital Bank</span>
+                <span className="text-[11px] font-mono text-[#64748B] dark:text-stone-300">
+                  UPI &amp; Digital Bank
+                </span>
               </div>
             </div>
 
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-[#03D26F] border border-emerald-500/30">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/20 text-[#047857] dark:text-[#03D26F] border border-emerald-300 dark:border-emerald-500/30">
               Primary
             </span>
           </div>
@@ -194,7 +334,7 @@ export function WalletCardDeck({
           {/* Card Middle: Massive Balance with Eye Toggle */}
           <div className="relative z-10 my-auto">
             <div className="flex items-baseline gap-2">
-              <span className="text-3xl sm:text-4xl font-mono font-black tracking-tight text-white tabular-nums">
+              <span className="text-3xl sm:text-4xl font-mono font-black tracking-tight text-[#161514] dark:text-white tabular-nums">
                 {formatAmount(monthlyStats.remainingBudget)}
               </span>
               <button
@@ -203,7 +343,7 @@ export function WalletCardDeck({
                   e.stopPropagation();
                   toggleHideBalance();
                 }}
-                className="text-stone-400 hover:text-white transition-colors cursor-pointer p-1"
+                className="text-[#64748B] dark:text-stone-400 hover:text-[#161514] dark:hover:text-white transition-colors cursor-pointer p-1"
                 title={isBalanceHidden ? "Show balance" : "Hide balance"}
               >
                 {isBalanceHidden ? (
@@ -213,28 +353,28 @@ export function WalletCardDeck({
                 )}
               </button>
             </div>
-            <span className="text-[10px] font-mono text-stone-400">
+            <span className="text-[10px] font-mono text-[#64748B] dark:text-stone-400">
               Spendable digital liquidity
             </span>
           </div>
 
           {/* Card Footer: Split Income vs Spent (Belanje Signature Metaphor) */}
-          <div className="grid grid-cols-2 gap-2 pt-3 border-t border-white/10 relative z-10">
+          <div className="grid grid-cols-2 gap-2 pt-3 border-t border-[#E2E8F0] dark:border-white/10 relative z-10">
             <div>
-              <span className="text-[10px] font-mono uppercase tracking-wider text-stone-400 block">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-[#64748B] dark:text-stone-400 block">
                 Income this month
               </span>
-              <span className="text-xs sm:text-sm font-mono font-bold text-[#03D26F] tabular-nums flex items-center gap-1">
+              <span className="text-xs sm:text-sm font-mono font-bold text-[#047857] dark:text-[#03D26F] tabular-nums flex items-center gap-1">
                 <TrendingUp className="size-3 stroke-[2.5]" />
                 {isBalanceHidden ? "••••" : `+${currencySymbol}${monthlyStats.monthlyIncome.toLocaleString()}`}
               </span>
             </div>
 
             <div>
-              <span className="text-[10px] font-mono uppercase tracking-wider text-stone-400 block">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-[#64748B] dark:text-stone-400 block">
                 Spent this month
               </span>
-              <span className="text-xs sm:text-sm font-mono font-bold text-rose-400 tabular-nums flex items-center gap-1">
+              <span className="text-xs sm:text-sm font-mono font-bold text-rose-600 dark:text-rose-400 tabular-nums flex items-center gap-1">
                 <TrendingDown className="size-3 stroke-[2.5]" />
                 {isBalanceHidden ? "••••" : `-${currencySymbol}${monthlyStats.monthlyExpense.toLocaleString()}`}
               </span>
@@ -242,25 +382,35 @@ export function WalletCardDeck({
           </div>
         </div>
 
-        {/* CARD 2: Cash Till (Pocket Envelope) */}
+        {/* CARD 1: Cash Till (Physical Pocket Envelope) */}
         <div
-          onClick={() => onSelectPaymentMethod?.("cash")}
-          className="snap-center shrink-0 w-[88vw] sm:w-[380px] md:w-[400px] h-[200px] sm:h-[210px] rounded-3xl p-5 sm:p-6 bg-gradient-to-br from-[#1C1A18] via-[#24211D] to-[#2E2416] text-white border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex flex-col justify-between relative overflow-hidden group cursor-pointer transition-all active:scale-[0.99]"
+          onClick={(e) => {
+            if (activeCardIndex !== 1) {
+              e.stopPropagation();
+              goToCard(1);
+            } else {
+              onSelectPaymentMethod?.("cash");
+            }
+          }}
+          style={getCardStyle(1)}
+          className="absolute inset-y-0 left-0 w-[calc(100%-28px)] sm:w-[calc(100%-36px)] rounded-3xl p-5 sm:p-6 bg-gradient-to-br from-white via-[#FFFDF5] to-[#FEF3C7] dark:from-[#1C1A18] dark:via-[#24211D] dark:to-[#2E2416] text-[#161514] dark:text-white border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex flex-col justify-between overflow-hidden group cursor-pointer will-change-transform"
         >
           {/* Subtle Ambient Radial Highlight */}
-          <div className="absolute -right-12 -bottom-12 w-48 h-48 bg-amber-500/15 rounded-full blur-2xl pointer-events-none" />
+          <div className="absolute -right-12 -bottom-12 w-48 h-48 bg-amber-400/10 dark:bg-amber-500/15 rounded-full blur-2xl pointer-events-none" />
 
           {/* Card Top: Logo & Refill CTA */}
           <div className="flex items-center justify-between relative z-10">
             <div className="flex items-center gap-3">
-              <div className="size-10 rounded-2xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-400 shadow-xs">
+              <div className="size-10 rounded-2xl bg-amber-50 dark:bg-amber-500/20 border border-amber-200 dark:border-amber-400/30 flex items-center justify-center text-amber-800 dark:text-amber-400 shadow-xs">
                 <Banknote className="size-5 stroke-[2]" />
               </div>
               <div>
-                <h3 className="text-sm font-heading font-black tracking-tight text-white flex items-center gap-1.5">
+                <h3 className="text-sm font-heading font-black tracking-tight text-[#161514] dark:text-white flex items-center gap-1.5">
                   Cash Till
                 </h3>
-                <span className="text-[11px] font-mono text-stone-300">Physical Pocket Envelope</span>
+                <span className="text-[11px] font-mono text-[#64748B] dark:text-stone-300">
+                  Physical Pocket Envelope
+                </span>
               </div>
             </div>
 
@@ -271,7 +421,7 @@ export function WalletCardDeck({
                   e.stopPropagation();
                   onRefillCashTill();
                 }}
-                className="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-amber-400 text-[#161514] hover:bg-amber-300 active:scale-95 transition-all cursor-pointer shadow-xs"
+                className="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-amber-400 text-[#161514] hover:bg-amber-300 border border-[#161514] active:scale-95 transition-all cursor-pointer shadow-xs"
                 title="Refill physical cash till"
               >
                 + Refill Till
@@ -281,55 +431,63 @@ export function WalletCardDeck({
 
           {/* Card Middle: Cash Remaining */}
           <div className="relative z-10 my-auto">
-            <div className="text-3xl sm:text-4xl font-mono font-black tracking-tight text-white tabular-nums">
+            <div className="text-3xl sm:text-4xl font-mono font-black tracking-tight text-[#161514] dark:text-white tabular-nums">
               {formatAmount(monthlyStats.remainingCashBudget)}
             </div>
-            <span className="text-[10px] font-mono text-stone-400">
+            <span className="text-[10px] font-mono text-[#64748B] dark:text-stone-400">
               Cash remaining in hand
             </span>
           </div>
 
           {/* Card Footer: Cash Limit & Spent Today */}
-          <div className="grid grid-cols-2 gap-2 pt-3 border-t border-white/10 relative z-10">
+          <div className="grid grid-cols-2 gap-2 pt-3 border-t border-[#E2E8F0] dark:border-white/10 relative z-10">
             <div>
-              <span className="text-[10px] font-mono uppercase tracking-wider text-stone-400 block">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-[#64748B] dark:text-stone-400 block">
                 Envelope Cap
               </span>
-              <span className="text-xs sm:text-sm font-mono font-bold text-stone-200 tabular-nums">
+              <span className="text-xs sm:text-sm font-mono font-bold text-[#161514] dark:text-stone-200 tabular-nums">
                 {formatAmount(monthlyStats.baseCashBudget)}
               </span>
             </div>
 
             <div>
-              <span className="text-[10px] font-mono uppercase tracking-wider text-stone-400 block">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-[#64748B] dark:text-stone-400 block">
                 Today Spent
               </span>
-              <span className="text-xs sm:text-sm font-mono font-bold text-amber-300 tabular-nums">
+              <span className="text-xs sm:text-sm font-mono font-bold text-amber-700 dark:text-amber-300 tabular-nums">
                 -{currencySymbol}{dailyStats.todayCashExpense.toLocaleString()}
               </span>
             </div>
           </div>
         </div>
 
-        {/* CARD 3: Safe-To-Spend Budget Gauge */}
+        {/* CARD 2: Safe-To-Spend Budget Gauge */}
         <div
-          onClick={onOpenAllowances}
-          className="snap-center shrink-0 w-[88vw] sm:w-[380px] md:w-[400px] h-[200px] sm:h-[210px] rounded-3xl p-5 sm:p-6 bg-gradient-to-br from-[#161514] via-[#1A201C] to-[#122B1E] text-white border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex flex-col justify-between relative overflow-hidden group cursor-pointer transition-all active:scale-[0.99]"
+          onClick={(e) => {
+            if (activeCardIndex !== 2) {
+              e.stopPropagation();
+              goToCard(2);
+            } else {
+              onOpenAllowances?.();
+            }
+          }}
+          style={getCardStyle(2)}
+          className="absolute inset-y-0 left-0 w-[calc(100%-28px)] sm:w-[calc(100%-36px)] rounded-3xl p-5 sm:p-6 bg-gradient-to-br from-white via-[#F0FDF4] to-[#DCFCE7] dark:from-[#161514] dark:via-[#1A201C] dark:to-[#122B1E] text-[#161514] dark:text-white border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] flex flex-col justify-between overflow-hidden group cursor-pointer will-change-transform"
         >
           {/* Subtle Ambient Radial Highlight */}
-          <div className="absolute -right-12 -bottom-12 w-48 h-48 bg-emerald-500/15 rounded-full blur-2xl pointer-events-none" />
+          <div className="absolute -right-12 -bottom-12 w-48 h-48 bg-emerald-400/10 dark:bg-emerald-500/15 rounded-full blur-2xl pointer-events-none" />
 
           {/* Card Top: Gauge & Budget Status */}
           <div className="flex items-center justify-between relative z-10">
             <div className="flex items-center gap-3">
-              <div className="size-10 rounded-2xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-400 shadow-xs">
+              <div className="size-10 rounded-2xl bg-emerald-50 dark:bg-emerald-500/20 border border-emerald-200 dark:border-emerald-400/30 flex items-center justify-center text-[#047857] dark:text-emerald-400 shadow-xs">
                 <Target className="size-5 stroke-[2]" />
               </div>
               <div>
-                <h3 className="text-sm font-heading font-black tracking-tight text-white">
+                <h3 className="text-sm font-heading font-black tracking-tight text-[#161514] dark:text-white">
                   Safe-to-Spend
                 </h3>
-                <span className="text-[11px] font-mono text-stone-300">
+                <span className="text-[11px] font-mono text-[#64748B] dark:text-stone-300">
                   {monthlyStats.daysRemainingInMonth} days left in cycle
                 </span>
               </div>
@@ -339,10 +497,10 @@ export function WalletCardDeck({
               className={cn(
                 "text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border",
                 budgetPercentageRemaining <= 15
-                  ? "bg-rose-500/20 text-rose-300 border-rose-500/30"
+                  ? "bg-rose-50 text-rose-700 border-rose-300 dark:bg-rose-500/20 dark:text-rose-300 dark:border-rose-500/30"
                   : budgetPercentageRemaining <= 30
-                  ? "bg-amber-500/20 text-amber-300 border-amber-500/30"
-                  : "bg-emerald-500/20 text-[#03D26F] border-emerald-500/30"
+                  ? "bg-amber-50 text-amber-800 border-amber-300 dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/30"
+                  : "bg-emerald-50 text-[#047857] border-emerald-300 dark:bg-emerald-500/20 dark:text-[#03D26F] dark:border-emerald-500/30"
               )}
             >
               {budgetPercentageRemaining}% Left
@@ -351,26 +509,26 @@ export function WalletCardDeck({
 
           {/* Card Middle: Daily Safe Pace */}
           <div className="relative z-10 my-auto">
-            <div className="text-3xl sm:text-4xl font-mono font-black tracking-tight text-white tabular-nums">
+            <div className="text-3xl sm:text-4xl font-mono font-black tracking-tight text-[#161514] dark:text-white tabular-nums">
               ~{currencySymbol}{dailyStats.todayRemaining.toLocaleString()}
-              <span className="text-sm font-normal text-stone-400 ml-1.5">/ day</span>
+              <span className="text-sm font-normal text-[#64748B] dark:text-stone-400 ml-1.5">/ day</span>
             </div>
             {monthlyStats.rolloverSurplus > 0 && (
-              <span className="text-[10px] font-mono text-emerald-300">
+              <span className="text-[10px] font-mono text-[#047857] dark:text-emerald-300">
                 +{currencySymbol}{monthlyStats.rolloverSurplus.toLocaleString()} surplus rolled over
               </span>
             )}
           </div>
 
           {/* Card Footer: Progress Bar & Total Allowance */}
-          <div className="space-y-1.5 pt-2 border-t border-white/10 relative z-10">
-            <div className="flex items-center justify-between text-[10px] font-mono text-stone-400">
+          <div className="space-y-1.5 pt-2 border-t border-[#E2E8F0] dark:border-white/10 relative z-10">
+            <div className="flex items-center justify-between text-[10px] font-mono text-[#64748B] dark:text-stone-400">
               <span>Budget Progress</span>
-              <span className="text-white font-semibold">
+              <span className="text-[#161514] dark:text-white font-semibold">
                 {currencySymbol}{monthlyStats.onlineExpense.toLocaleString()} / {currencySymbol}{monthlyStats.totalAvailableBudget.toLocaleString()}
               </span>
             </div>
-            <div className="w-full bg-white/15 h-1.5 rounded-full overflow-hidden">
+            <div className="w-full bg-[#E2E8F0] dark:bg-white/15 h-1.5 rounded-full overflow-hidden">
               <div
                 className={cn(
                   "h-full rounded-full transition-all duration-500",
@@ -386,10 +544,18 @@ export function WalletCardDeck({
           </div>
         </div>
 
-        {/* CARD 4: Manage Cards & Accounts (Belanje Signature Swiped Card) */}
+        {/* CARD 3: Manage Cards & Accounts */}
         <div
-          onClick={onOpenAllowances}
-          className="snap-center shrink-0 w-[88vw] sm:w-[380px] md:w-[400px] h-[200px] sm:h-[210px] rounded-3xl p-5 sm:p-6 bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] border-2 border-dashed border-[#161514] dark:border-[#383531] shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#383531] flex flex-col items-center justify-center text-center group cursor-pointer hover:bg-[#FAF8F5] dark:hover:bg-[#252321] transition-all active:scale-[0.99]"
+          onClick={(e) => {
+            if (activeCardIndex !== 3) {
+              e.stopPropagation();
+              goToCard(3);
+            } else {
+              onOpenAllowances?.();
+            }
+          }}
+          style={getCardStyle(3)}
+          className="absolute inset-y-0 left-0 w-[calc(100%-28px)] sm:w-[calc(100%-36px)] rounded-3xl p-5 sm:p-6 bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] border-2 border-dashed border-[#161514] dark:border-[#383531] shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#383531] flex flex-col items-center justify-center text-center group cursor-pointer hover:bg-[#FAF8F5] dark:hover:bg-[#252321] will-change-transform"
         >
           <div className="size-12 rounded-full bg-[#161514] text-white dark:bg-[#FAF8F5] dark:text-[#161514] flex items-center justify-center shadow-xs mb-3 group-hover:scale-110 transition-transform">
             <Plus className="size-6 stroke-[2.5]" />
@@ -407,20 +573,20 @@ export function WalletCardDeck({
         </div>
       </div>
 
-      {/* ─── DOT PAGINATION INDICATOR (Belanje Benchmark) ─── */}
+      {/* ─── DOT PAGINATION INDICATOR (1-Tap Jump to Card in Stack) ─── */}
       <div className="flex items-center justify-center gap-1.5 pt-1">
         {[0, 1, 2, 3].map((idx) => (
           <button
             key={idx}
             type="button"
-            onClick={() => scrollToIndex(idx)}
+            onClick={() => goToCard(idx)}
             className={cn(
               "h-1.5 rounded-full transition-all duration-300 cursor-pointer",
               activeCardIndex === idx
-                ? "w-6 bg-[#161514] dark:bg-white"
+                ? "w-7 bg-[#161514] dark:bg-white"
                 : "w-1.5 bg-[#E8E5DF] dark:bg-[#383531] hover:bg-[#161514]/40 dark:hover:bg-white/40"
             )}
-            title={`Go to Card ${idx + 1}`}
+            title={`Flip to Card ${idx + 1}`}
           />
         ))}
       </div>
