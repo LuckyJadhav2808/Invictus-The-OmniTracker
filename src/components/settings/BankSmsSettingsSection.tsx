@@ -26,6 +26,7 @@ import {
   syncRecentBankSms,
   getLastSmsSyncTimestamp,
   resetLastSmsSyncTimestamp,
+  SmsBridge,
 } from "@/lib/sms/sms-sync-service";
 import { parseBankSms } from "@/lib/sms/sms-local-parser";
 import { MerchantCategoryCache } from "@/lib/sms/merchant-cache";
@@ -42,6 +43,8 @@ export function BankSmsSettingsSection() {
   const { data: transactions = [] } = useTransactions();
 
   const [isNative, setIsNative] = useState(false);
+  const [hasSmsPermission, setHasSmsPermission] = useState<boolean | null>(null);
+  const [autoSyncEnabled, setAutoSyncEnabled] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [isPurging, setIsPurging] = useState(false);
   const [showPurgeConfirm, setShowPurgeConfirm] = useState(false);
@@ -61,12 +64,92 @@ export function BankSmsSettingsSection() {
   const addCategoryMutation = useAddCategory();
 
   useEffect(() => {
-    isSmsSyncAvailable().then((avail) => {
+    let mounted = true;
+    if (typeof window !== "undefined") {
+      const savedAuto = localStorage.getItem("invictus_sms_auto_fetch_enabled");
+      if (savedAuto === "true") setAutoSyncEnabled(true);
+    }
+
+    isSmsSyncAvailable().then(async (avail) => {
+      if (!mounted) return;
       setIsNative(avail);
+      if (avail) {
+        try {
+          const perm = await SmsBridge.checkPermissions();
+          if (mounted) setHasSmsPermission(perm.smsGranted);
+        } catch {
+          if (mounted) setHasSmsPermission(false);
+        }
+      }
     });
 
     refreshSyncTime();
+    return () => {
+      mounted = false;
+    };
   }, []);
+
+  const handleToggleAutoSync = () => {
+    soundFX.play("pop");
+    const next = !autoSyncEnabled;
+    setAutoSyncEnabled(next);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("invictus_sms_auto_fetch_enabled", String(next));
+    }
+    toast.info(next ? "Automatic bank SMS fetching enabled" : "Automatic bank SMS fetching disabled");
+  };
+
+  const handleRequestPermission = async () => {
+    soundFX.play("click");
+    try {
+      const req = await SmsBridge.requestPermissions();
+      if (req.smsGranted) {
+        soundFX.play("celebrate");
+        setHasSmsPermission(true);
+        toast.success("SMS permission granted!", {
+          description: "Invictus can now scan and parse bank transaction alerts.",
+        });
+      } else {
+        soundFX.play("error");
+        setHasSmsPermission(false);
+        toast.error("SMS permission denied by Android.");
+      }
+    } catch (err: any) {
+      soundFX.play("error");
+      toast.error(err.message || "Failed to request SMS permission");
+    }
+  };
+
+  const handleSyncRecent = async () => {
+    if (!isNative) {
+      toast.info("SMS scanning is only available in the native Android app.");
+      return;
+    }
+    setIsSyncing(true);
+    soundFX.play("click");
+    try {
+      const result = await syncRecentBankSms(categories, transactions, {
+        addCategoryFn: addCategoryMutation.mutateAsync,
+      });
+      if (result.transactions.length > 0) {
+        soundFX.play("celebrate");
+        await bulkAddMutation.mutateAsync(result.transactions);
+        toast.success(`⚡ Imported ${result.transactions.length} new bank transactions!`, {
+          description: `Scanned ${result.scannedCount} SMS messages with 0 duplicates.`,
+        });
+      } else {
+        toast.info("Ledger up to date", {
+          description: `Scanned ${result.scannedCount} SMS. No new transactions found.`,
+        });
+      }
+      refreshSyncTime();
+    } catch (err: any) {
+      soundFX.play("error");
+      toast.error(err.message || "SMS sync failed");
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   const refreshSyncTime = () => {
     const saved = getLastSmsSyncTimestamp();
@@ -259,6 +342,73 @@ export function BankSmsSettingsSection() {
               </p>
             </div>
           </div>
+
+          {/* Quick Scan Primary Action */}
+          <button
+            type="button"
+            disabled={isSyncing}
+            onClick={handleSyncRecent}
+            className={cn(
+              "px-3.5 py-1.5 rounded-xl font-heading font-black text-xs uppercase shadow-xs transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 border border-[#161514] shrink-0",
+              isSyncing
+                ? "bg-neutral-200 dark:bg-neutral-800 text-neutral-400 cursor-not-allowed border-transparent"
+                : "bg-[#161514] text-white hover:bg-stone-800 dark:bg-white dark:text-[#161514] dark:hover:bg-neutral-200 active:scale-95"
+            )}
+          >
+            <RefreshCw className={cn("size-3.5", isSyncing && "animate-spin")} />
+            <span>{isSyncing ? "Scanning…" : "Scan Inbox"}</span>
+          </button>
+        </div>
+
+        {/* Android Native Permission Callout (if missing) */}
+        {isNative && hasSmsPermission === false && (
+          <div className="flex items-center justify-between bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-700/50 rounded-2xl p-3 shadow-xs">
+            <div className="flex items-center gap-2.5 min-w-0 pr-2">
+              <AlertTriangle className="size-4 text-amber-600 dark:text-amber-400 shrink-0" />
+              <p className="text-[11px] font-bold text-amber-900 dark:text-amber-200 truncate">
+                SMS permission is required on Android to parse incoming bank alerts.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleRequestPermission}
+              className="px-3 py-1 rounded-xl bg-amber-400 text-[#161514] font-black text-xs uppercase border border-[#161514] shadow-xs active:scale-95 transition-all shrink-0 cursor-pointer"
+            >
+              Grant Permission
+            </button>
+          </div>
+        )}
+
+        {/* Automatic Background Auto-Fetch Switch */}
+        <div className="flex items-center justify-between bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] rounded-2xl p-3.5 shadow-xs">
+          <div className="flex items-center gap-3 min-w-0 pr-2">
+            <div className="size-9 rounded-xl bg-emerald-100 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/40 flex items-center justify-center text-emerald-800 dark:text-emerald-400 shadow-xs shrink-0">
+              <Zap className="size-4" />
+            </div>
+            <div className="min-w-0">
+              <h5 className="font-black text-xs text-[#161514] dark:text-[#FAF8F5] uppercase font-heading truncate">
+                Automatic Background Sync
+              </h5>
+              <p className="text-[10px] text-[#161514]/70 dark:text-[#FAF8F5]/60 font-bold truncate">
+                Silently scan today's bank SMS on app launch (Air-gapped on device)
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleToggleAutoSync}
+            className={cn(
+              "px-3 py-1.5 rounded-xl border font-black text-xs uppercase shadow-xs transition-all cursor-pointer whitespace-nowrap shrink-0 flex items-center gap-1.5",
+              autoSyncEnabled
+                ? "bg-[#CEF431] text-[#161514] border-[#161514]"
+                : "bg-white dark:bg-[#252220] text-[#161514]/70 dark:text-[#FAF8F5]/60 border-[#E8E5DF] dark:border-[#2A2724]"
+            )}
+          >
+            <span>Auto-Fetch:</span>
+            <span className={cn("font-mono", autoSyncEnabled ? "font-black" : "opacity-60")}>
+              {autoSyncEnabled ? "ON" : "OFF"}
+            </span>
+          </button>
         </div>
 
         {/* Feature 1: Learned Merchant Rules Modal Trigger */}

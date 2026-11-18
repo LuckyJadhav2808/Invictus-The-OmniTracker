@@ -257,18 +257,26 @@ export function MoneyCockpitSkeleton() {
         </div>
       </div>
 
-      {/* 🔒 2. ZERO-KNOWLEDGE SMS SYNC CONTROL BANNER SKELETON */}
-      <div className="rounded-2xl border border-[#E8E5DF] dark:border-[#383531] bg-white dark:bg-[#1C1A18] p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
-        <div className="flex items-center gap-3">
-          <SkeletonBox className="size-9 rounded-xl shrink-0 bg-[#03D26F]/20 dark:bg-[#03D26F]/10" />
-          <div className="space-y-1">
-            <SkeletonBox className="h-4 w-44 sm:w-56 rounded" />
-            <SkeletonBox className="h-3 w-64 sm:w-80 rounded" />
+      {/* 🏷️ 2. CATEGORY ENVELOPES CHIP RAIL SKELETON (Positioned under cockpit, above sub-nav) */}
+      <div className="space-y-2 bg-white dark:bg-[#1C1A18] p-3 sm:p-3.5 rounded-2xl border border-[#E8E5DF] dark:border-[#383531] shadow-xs">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <SkeletonBox className="size-4 rounded" />
+            <SkeletonBox className="h-4 w-36 rounded" />
+          </div>
+          <div className="flex items-center gap-1.5">
+            <SkeletonBox className="h-7 w-16 sm:w-20 rounded-xl" />
+            <SkeletonBox className="h-7 w-16 sm:w-20 rounded-xl" />
+            <SkeletonBox className="h-7 w-16 sm:w-20 rounded-xl" />
           </div>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <SkeletonBox className="h-8 w-24 rounded-xl" />
-          <SkeletonBox className="h-8 w-24 rounded-xl" />
+
+        {/* Horizontal Envelopes Chip Rail */}
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+          <SkeletonBox className="h-8 w-28 rounded-xl bg-[#161514]/20 dark:bg-[#CEF431]/20 shrink-0" />
+          {Array.from({ length: 5 }).map((_, i) => (
+            <SkeletonBox key={i} className="h-8 w-24 sm:w-28 rounded-xl shrink-0" />
+          ))}
         </div>
       </div>
 
@@ -295,29 +303,6 @@ export function MoneyCockpitSkeleton() {
 
       {/* 🧾 4. DAILY LEDGER SKELETON VIEW */}
       <div className="space-y-4">
-        {/* CategoryChipFilterRail Skeleton */}
-        <div className="space-y-2 bg-white dark:bg-[#1C1A18] p-3 sm:p-3.5 rounded-2xl border border-[#E8E5DF] dark:border-[#383531] shadow-xs">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <SkeletonBox className="size-4 rounded" />
-              <SkeletonBox className="h-4 w-36 rounded" />
-            </div>
-            <div className="flex items-center gap-1.5">
-              <SkeletonBox className="h-7 w-20 rounded-xl" />
-              <SkeletonBox className="h-7 w-20 rounded-xl" />
-              <SkeletonBox className="h-7 w-20 rounded-xl" />
-            </div>
-          </div>
-
-          {/* Horizontal Envelopes Chip Rail */}
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
-            <SkeletonBox className="h-8 w-28 rounded-xl bg-[#161514]/20 dark:bg-[#CEF431]/20 shrink-0" />
-            {Array.from({ length: 5 }).map((_, i) => (
-              <SkeletonBox key={i} className="h-8 w-24 sm:w-28 rounded-xl shrink-0" />
-            ))}
-          </div>
-        </div>
-
         {/* Belanje Streamlined Filter Bar Skeleton */}
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
           <SkeletonBox className="h-9 w-36 rounded-xl shrink-0" />

@@ -124,6 +124,19 @@ export default function SettingsPage() {
 
   useEffect(() => {
     setIsDemoActive(isDemoDataActive());
+    if (typeof window !== "undefined") {
+      const hash = window.location.hash;
+      const search = new URLSearchParams(window.location.search);
+      const tabParam = search.get("tab") as SettingsTab | null;
+      if (tabParam && ["preferences", "modules", "reminders", "security", "datavault"].includes(tabParam)) {
+        setActiveTab(tabParam);
+      } else if (hash === "#bank-sms") {
+        setActiveTab("security");
+        setTimeout(() => {
+          document.getElementById("bank-sms")?.scrollIntoView({ behavior: "smooth" });
+        }, 150);
+      }
+    }
   }, []);
 
   // Active Tab State (5-Tab Sub-navigation Dock)
@@ -1204,6 +1217,36 @@ export default function SettingsPage() {
                       </button>
                     )}
                   </div>
+                </div>
+
+                {/* Bank SMS Telemetry Quick Link */}
+                <div className="flex items-center justify-between bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] rounded-2xl p-3.5 shadow-xs mt-3">
+                  <div className="flex items-center gap-3 min-w-0 pr-2">
+                    <div className="size-9 rounded-xl bg-[#CEF431] border border-[#161514] flex items-center justify-center text-[#161514] shadow-xs shrink-0">
+                      <Smartphone className="size-4 stroke-[2.5]" />
+                    </div>
+                    <div className="min-w-0">
+                      <h4 className="font-black text-xs text-[#161514] dark:text-[#FAF8F5] uppercase font-heading truncate">
+                        Bank SMS Auto-Sync Engine
+                      </h4>
+                      <p className="text-[10px] text-[#161514]/70 dark:text-[#FAF8F5]/60 font-bold truncate">
+                        Air-gapped on-device SMS parser, merchant dictionary & filters
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      soundFX.play("pop");
+                      setActiveTab("security");
+                      setTimeout(() => {
+                        document.getElementById("bank-sms")?.scrollIntoView({ behavior: "smooth" });
+                      }, 100);
+                    }}
+                    className="px-3 py-1.5 rounded-xl border border-[#161514] dark:border-[#2A2724] bg-white dark:bg-[#252220] hover:bg-[#CEF431] dark:hover:bg-[#CEF431] text-[#161514] dark:text-[#FAF8F5] dark:hover:text-[#161514] font-black text-xs uppercase shadow-xs hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer whitespace-nowrap shrink-0"
+                  >
+                    Configure →
+                  </button>
                 </div>
               </div>
             )}

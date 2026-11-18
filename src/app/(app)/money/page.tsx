@@ -36,7 +36,7 @@ import { LedgerTabView } from "@/components/money/views/LedgerTabView";
 import { BudgetTabView } from "@/components/money/views/BudgetTabView";
 import { VaultTabView } from "@/components/money/views/VaultTabView";
 import { AnalyticsTabView } from "@/components/money/views/AnalyticsTabView";
-import { SmsSyncControlBanner } from "@/components/money/SmsSyncControlBanner";
+import { CategoryChipFilterRail } from "@/components/money/CategoryChipFilterRail";
 
 // Lazy-Loaded Heavy Modals (Zero TBT & Fast Initial Paint)
 const TransactionFormModal = dynamic(
@@ -324,6 +324,41 @@ function MoneyPageContent() {
     return map;
   }, [categories]);
 
+  // Category envelope selection and data calculation
+  const [selectedCategory, setSelectedCategory] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      return sessionStorage.getItem("invictus_ledger_category") || "all";
+    }
+    return "all";
+  });
+
+  const handleSelectCategory = (catId: string) => {
+    setSelectedCategory(catId);
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("invictus_ledger_category", catId);
+    }
+  };
+
+  const categoryCardsData = useMemo(() => {
+    const map = new Map<string, number>();
+    transactions.forEach((tx) => {
+      if (tx.type === "expense" && tx.date?.startsWith(effectiveTargetMonthKey)) {
+        const curr = map.get(tx.categoryId) || 0;
+        map.set(tx.categoryId, curr + Number(tx.amount || 0));
+      }
+    });
+
+    return categories.map((cat) => ({
+      id: cat.id,
+      name: cat.name,
+      amount: map.get(cat.id) || 0,
+      color: cat.color || "mint",
+      icon: cat.icon || "Wallet",
+      type: cat.type,
+      monthlyBudget: cat.monthlyBudget,
+    }));
+  }, [categories, transactions, effectiveTargetMonthKey]);
+
   // --- Handlers ---
   const handleSaveTransaction = async (payload: {
     id?: string;
@@ -609,11 +644,18 @@ function MoneyPageContent() {
         onDeleteTransaction={handleDeleteTransaction}
       />
 
-      {/* 🔒 Zero-Knowledge SMS Sync Banner & Cash Action */}
-      <SmsSyncControlBanner
-        categories={categories}
-        transactions={transactions}
-        onOpenCashModal={() => setIsCashModalOpen(true)}
+      {/* 🏷️ CATEGORY ENVELOPES CHIP RAIL (Positioned under cockpit, above sub-nav) */}
+      <CategoryChipFilterRail
+        currencySymbol={currencySymbol}
+        categories={categoryCardsData}
+        selectedCategoryId={selectedCategory}
+        onSelectCategory={handleSelectCategory}
+        onMoveMoney={() => setIsMoveMoneyOpen(true)}
+        onSendMoney={() => setIsSendMoneyOpen(true)}
+        onBulkAddExpense={() => setIsBulkModalOpen(true)}
+        onAddCategory={() => setIsAddCatOpen(true)}
+        onEditCategory={(cat) => setEditingCat(cat)}
+        onDeleteCategory={(catId) => setDeleteCatId(catId)}
       />
 
       {/* 📑 FLOATING SUB-NAV DOCK */}
@@ -679,6 +721,8 @@ function MoneyPageContent() {
             initialMethodFilter={ledgerMethodFilter}
             selectedMonth={selectedMonth}
             onSelectMonth={handleSelectMonth}
+            selectedCategory={selectedCategory}
+            onSelectCategory={handleSelectCategory}
             onInspectTransaction={(tx) => setInspectingTx(tx)}
             onEditTransaction={(tx) => setEditingTx(tx)}
             onDuplicateTransaction={handleDuplicateTransaction}

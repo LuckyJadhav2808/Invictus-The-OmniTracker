@@ -7,7 +7,6 @@ import { format, parseISO, isToday, isYesterday } from "date-fns";
 import { Search, Filter, FileDown, Plus, Calendar, Receipt, X } from "lucide-react";
 import { soundFX } from "@/components/shared/SoundFX";
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
-import { CategoryChipFilterRail } from "@/components/money/CategoryChipFilterRail";
 import { BelanjeTransactionRow } from "@/components/money/BelanjeTransactionRow";
 import { isCashTransaction, isOnlineTransaction, type MonthlyBudgetStats } from "@/lib/utils/budget-rollover";
 import { useAddTransaction } from "@/lib/queries/money";
@@ -22,6 +21,8 @@ interface LedgerTabViewProps {
   initialMethodFilter?: string;
   selectedMonth?: string;
   onSelectMonth?: (monthKey: string) => void;
+  selectedCategory?: string;
+  onSelectCategory?: (categoryId: string) => void;
   onInspectTransaction: (tx: Transaction) => void;
   onEditTransaction: (tx: Transaction) => void;
   onDuplicateTransaction: (tx: Transaction) => Promise<void>;
@@ -45,6 +46,8 @@ export function LedgerTabView({
   initialMethodFilter,
   selectedMonth: selectedMonthProp,
   onSelectMonth,
+  selectedCategory: selectedCategoryProp,
+  onSelectCategory,
   onInspectTransaction,
   onEditTransaction,
   onDuplicateTransaction,
@@ -86,12 +89,28 @@ export function LedgerTabView({
     }
     return "";
   });
-  const [selectedCategory, setSelectedCategory] = useState<string>(() => {
+  const [internalSelectedCategory, setInternalSelectedCategory] = useState<string>(() => {
+    if (selectedCategoryProp !== undefined) return selectedCategoryProp;
     if (typeof window !== "undefined") {
       return sessionStorage.getItem("invictus_ledger_category") || "all";
     }
     return "all";
   });
+
+  const selectedCategory = selectedCategoryProp !== undefined ? selectedCategoryProp : internalSelectedCategory;
+  const setSelectedCategory = (val: string) => {
+    setInternalSelectedCategory(val);
+    onSelectCategory?.(val);
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("invictus_ledger_category", val);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedCategoryProp !== undefined && selectedCategoryProp !== internalSelectedCategory) {
+      setInternalSelectedCategory(selectedCategoryProp);
+    }
+  }, [selectedCategoryProp, internalSelectedCategory]);
   const [selectedType, setSelectedType] = useState<"all" | "expense" | "income">(() => {
     if (typeof window !== "undefined") {
       return (sessionStorage.getItem("invictus_ledger_type") as any) || "all";
@@ -313,27 +332,6 @@ export function LedgerTabView({
   }, [groupedByDate, visibleGroupLimit]);
   const hasMoreGroups = groupedByDate.length > visibleGroupLimit;
 
-  const effectiveCategoryMonthKey = selectedMonth === "all" ? activeMonthKey : selectedMonth;
-  const categoryCardsData = useMemo(() => {
-    const map = new Map<string, number>();
-    transactions.forEach((tx) => {
-      if (tx.type === "expense" && tx.date?.startsWith(effectiveCategoryMonthKey)) {
-        const curr = map.get(tx.categoryId) || 0;
-        map.set(tx.categoryId, curr + Number(tx.amount || 0));
-      }
-    });
-
-    return categories.map((cat) => ({
-      id: cat.id,
-      name: cat.name,
-      amount: map.get(cat.id) || 0,
-      color: cat.color || "mint",
-      icon: cat.icon || "Wallet",
-      type: cat.type,
-      monthlyBudget: cat.monthlyBudget,
-    }));
-  }, [categories, transactions, effectiveCategoryMonthKey]);
-
   const selectedMonthSummary = useMemo(() => {
     let expense = 0;
     let income = 0;
@@ -347,20 +345,6 @@ export function LedgerTabView({
 
   return (
     <div className="space-y-4">
-      {/* 🏷️ CATEGORY ENVELOPE TAG/CHIP RAIL & QUICK ACTIONS (Belanje Benchmark) */}
-      <CategoryChipFilterRail
-        currencySymbol={currencySymbol}
-        categories={categoryCardsData}
-        selectedCategoryId={selectedCategory}
-        onSelectCategory={setSelectedCategory}
-        onMoveMoney={onMoveMoney}
-        onSendMoney={onSendMoney}
-        onBulkAddExpense={onBulkAddExpense}
-        onAddCategory={onAddCategory}
-        onEditCategory={onEditCategory}
-        onDeleteCategory={onDeleteCategory}
-      />
-
       {/* 🔍 Search & Filters Bar */}
       <div className="bg-white dark:bg-[#1C1A18] p-4 rounded-xl border border-[#E8E5DF] dark:border-[#383531] space-y-3">
         <div className="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center justify-between">
