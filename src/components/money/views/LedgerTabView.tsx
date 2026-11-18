@@ -7,7 +7,6 @@ import { format, parseISO, isToday, isYesterday } from "date-fns";
 import { Search, Filter, FileDown, Plus, Calendar, Receipt, X } from "lucide-react";
 import { soundFX } from "@/components/shared/SoundFX";
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
-import { CategoryIcon } from "@/components/money/MoneyQuickActionsAndCards";
 import { CategoryChipFilterRail } from "@/components/money/CategoryChipFilterRail";
 import { BelanjeTransactionRow } from "@/components/money/BelanjeTransactionRow";
 import { isCashTransaction, isOnlineTransaction, type MonthlyBudgetStats } from "@/lib/utils/budget-rollover";

@@ -13,8 +13,6 @@ import {
   Edit2,
   Trash2,
   Layers,
-  ChevronRight,
-  MoreVertical,
 } from "lucide-react";
 
 export interface CategoryRailItem {
@@ -53,8 +51,6 @@ export function CategoryChipFilterRail({
   onBulkAddExpense,
 }: CategoryChipFilterRailProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-
-  const selectedCategoryItem = categories.find((c) => c.id === selectedCategoryId);
 
   return (
     <div className="space-y-2 bg-white dark:bg-[#1C1A18] p-3 sm:p-3.5 rounded-2xl border border-[#E8E5DF] dark:border-[#383531] shadow-xs">

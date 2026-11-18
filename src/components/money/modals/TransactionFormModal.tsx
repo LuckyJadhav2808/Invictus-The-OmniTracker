@@ -29,8 +29,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Receipt,
-  QrCode,
-  Tag,
   Users,
 } from "lucide-react";
 import { CategoryIcon } from "@/components/money/MoneyQuickActionsAndCards";

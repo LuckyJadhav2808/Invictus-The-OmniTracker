@@ -5,17 +5,14 @@ import { type Transaction, type Category } from "@/types";
 import { type DailyBudgetStats, type MonthlyBudgetStats } from "@/lib/utils/budget-rollover";
 import { BelanjeTransactionRow } from "@/components/money/BelanjeTransactionRow";
 import { soundFX } from "@/components/shared/SoundFX";
-import { cn } from "@/lib/utils";
 import {
   ChevronRight,
   Receipt,
   Plus,
-  ArrowRight,
-  TrendingDown,
-  TrendingUp,
   SlidersHorizontal,
   Flame,
   ShieldCheck,
+  Gauge,
 } from "lucide-react";
 
 interface RecentAccountFeedProps {
@@ -173,30 +170,55 @@ export function RecentAccountFeed({
           </button>
         </div>
       ) : activeCardIndex === 2 ? (
-        /* Safe to Spend Velocity Breakdown */
+        /* Safe to Spend Spend Velocity Meter (Zero Duplicate Text) */
         <div className="space-y-2.5">
-          <div className="p-3 rounded-xl bg-[#FAF8F5] dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#383531] flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              {dailyStats.isOverDailyBudget ? (
-                <Flame className="size-4 text-rose-600 dark:text-rose-400" />
-              ) : (
-                <ShieldCheck className="size-4 text-[#03D26F]" />
-              )}
-              <div className="text-xs font-mono">
-                {dailyStats.isOverDailyBudget ? (
-                  <span className="text-rose-600 dark:text-rose-400 font-bold">
-                    Pace exceeded by {currencySymbol}{dailyStats.overDailyAmount.toLocaleString()}
-                  </span>
-                ) : (
-                  <span>
-                    Safe pace: <strong className="font-bold text-[#047857] dark:text-[#03D26F]">{currencySymbol}{dailyStats.todayRemaining.toLocaleString()}</strong> remaining today
-                  </span>
-                )}
+          <div className="p-3.5 rounded-xl bg-[#FAF8F5] dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#383531] space-y-2">
+            <div className="flex items-center justify-between text-xs font-mono">
+              <div className="flex items-center gap-1.5">
+                <Gauge className="size-3.5 stroke-[2] text-[#6B6B6B] dark:text-[#A8A29E]" />
+                <span className="font-heading font-bold text-[#161514] dark:text-[#FAF8F5]">
+                  Today&apos;s Spend Velocity
+                </span>
+              </div>
+              <span className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E]">
+                {monthlyStats.daysRemainingInMonth} days left
+              </span>
+            </div>
+
+            {/* Velocity Bar */}
+            <div className="h-2 w-full bg-[#E8E5DF] dark:bg-[#383531] rounded-full overflow-hidden">
+              <div
+                className={`h-full transition-all duration-300 rounded-full ${
+                  dailyStats.isOverDailyBudget
+                    ? "bg-rose-500"
+                    : dailyStats.todayUsedPercentage > 80
+                    ? "bg-amber-400"
+                    : "bg-[#03D26F]"
+                }`}
+                style={{ width: `${Math.min(100, Math.max(4, dailyStats.todayUsedPercentage))}%` }}
+              />
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 pt-1 text-center">
+              <div>
+                <span className="text-[9.5px] font-mono text-[#6B6B6B] dark:text-[#A8A29E] block">Spent Today</span>
+                <span className="text-xs font-mono font-bold text-rose-600 dark:text-rose-400 tabular-nums">
+                  -{currencySymbol}{dailyStats.todayExpense.toLocaleString()}
+                </span>
+              </div>
+              <div>
+                <span className="text-[9.5px] font-mono text-[#6B6B6B] dark:text-[#A8A29E] block">Daily Target</span>
+                <span className="text-xs font-mono font-bold text-[#161514] dark:text-[#FAF8F5] tabular-nums">
+                  {currencySymbol}{dailyStats.dailyBudgetTarget.toLocaleString()}
+                </span>
+              </div>
+              <div>
+                <span className="text-[9.5px] font-mono text-[#6B6B6B] dark:text-[#A8A29E] block">Headroom</span>
+                <span className="text-xs font-mono font-bold text-[#047857] dark:text-[#03D26F] tabular-nums">
+                  {currencySymbol}{dailyStats.todayRemaining.toLocaleString()}
+                </span>
               </div>
             </div>
-            <span className="text-[10px] font-mono text-[#6B6B6B] dark:text-[#A8A29E]">
-              {monthlyStats.daysRemainingInMonth} days left
-            </span>
           </div>
 
           {feedConfig.items.length > 0 ? (

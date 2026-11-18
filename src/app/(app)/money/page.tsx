@@ -21,7 +21,6 @@ import { format, parseISO } from "date-fns";
 import { soundFX } from "@/components/shared/SoundFX";
 import { toast } from "sonner";
 import { useAuth } from "@/components/shared/AuthProvider";
-import { ProactiveReminderBanner } from "@/components/shared/ProactiveReminderBanner";
 import { useSearchParams } from "next/navigation";
 import {
   computeMonthlyBudgetStats,
@@ -117,6 +116,28 @@ function MoneyPageContent() {
   const [activeTab, setActiveTab] = useState(tabParam || "ledger");
   const [ledgerMethodFilter, setLedgerMethodFilter] = useState<string>("all");
 
+  // Modal States
+  const [isAddTxOpen, setIsAddTxOpen] = useState(false);
+  const [editingTx, setEditingTx] = useState<Transaction | null>(null);
+  const [inspectingTx, setInspectingTx] = useState<Transaction | null>(null);
+  const [isAddCatOpen, setIsAddCatOpen] = useState(false);
+  const [editingCat, setEditingCat] = useState<Category | null>(null);
+  const [isAllowanceModalOpen, setIsAllowanceModalOpen] = useState(false);
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
+  const [isMoveMoneyOpen, setIsMoveMoneyOpen] = useState(false);
+  const [isSendMoneyOpen, setIsSendMoneyOpen] = useState(false);
+  const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
+  const [isCashModalOpen, setIsCashModalOpen] = useState(false);
+  const [isQuickActionsOpen, setIsQuickActionsOpen] = useState(false);
+  const [isWhoOwesWhoOpen, setIsWhoOwesWhoOpen] = useState(false);
+  const [whoOwesWhoPrefill, setWhoOwesWhoPrefill] = useState<{ amount?: number; description?: string } | null>(null);
+  const [reopenTxAfterCat, setReopenTxAfterCat] = useState(false);
+
+  // Deletion Safeguard
+  const [deleteCatId, setDeleteCatId] = useState<string | null>(null);
+
   const handleSelectPaymentMethodFromHero = (method: "upi" | "cash") => {
     setLedgerMethodFilter(method);
     if (typeof window !== "undefined") {
@@ -187,28 +208,6 @@ function MoneyPageContent() {
   const updateCatMutation = useUpdateCategory();
   const deleteCatMutation = useDeleteCategory();
   const updateBudgetMutation = useUpdateBudgetPreferences();
-
-  // Modal States
-  const [isAddTxOpen, setIsAddTxOpen] = useState(false);
-  const [editingTx, setEditingTx] = useState<Transaction | null>(null);
-  const [inspectingTx, setInspectingTx] = useState<Transaction | null>(null);
-  const [isAddCatOpen, setIsAddCatOpen] = useState(false);
-  const [editingCat, setEditingCat] = useState<Category | null>(null);
-  const [isAllowanceModalOpen, setIsAllowanceModalOpen] = useState(false);
-  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
-  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
-  const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
-  const [isMoveMoneyOpen, setIsMoveMoneyOpen] = useState(false);
-  const [isSendMoneyOpen, setIsSendMoneyOpen] = useState(false);
-  const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
-  const [isCashModalOpen, setIsCashModalOpen] = useState(false);
-  const [isQuickActionsOpen, setIsQuickActionsOpen] = useState(false);
-  const [isWhoOwesWhoOpen, setIsWhoOwesWhoOpen] = useState(false);
-  const [whoOwesWhoPrefill, setWhoOwesWhoPrefill] = useState<{ amount?: number; description?: string } | null>(null);
-  const [reopenTxAfterCat, setReopenTxAfterCat] = useState(false);
-
-  // Deletion Safeguard
-  const [deleteCatId, setDeleteCatId] = useState<string | null>(null);
 
   // Allowances & Rollover States
   const [baseUpiBudget, setBaseUpiBudget] = useState(8000);
@@ -597,7 +596,6 @@ function MoneyPageContent() {
         dailyStats={dailyStats}
         currencySymbol={currencySymbol}
         selectedMonth={selectedMonth}
-        onSelectMonth={handleSelectMonth}
         onResetToCurrentMonth={handleResetToCurrentMonth}
         onAddTransaction={() => setIsAddTxOpen(true)}
         onBulkScan={() => setIsBulkModalOpen(true)}

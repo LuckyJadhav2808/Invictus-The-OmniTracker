@@ -6,15 +6,12 @@ import { type Transaction, type Category } from "@/types";
 import { VixPixelCompanion } from "@/components/mascot/VixPixelCompanion";
 import { WalletCardDeck } from "@/components/money/WalletCardDeck";
 import { RecentAccountFeed } from "@/components/money/RecentAccountFeed";
-import { cn } from "@/lib/utils";
 
 interface FinancialSummaryCockpitProps {
   monthlyStats: MonthlyBudgetStats;
   dailyStats: DailyBudgetStats;
   currencySymbol: string;
   selectedMonth?: string;
-  availableMonths?: Array<{ key: string; label: string; isCurrent: boolean }>;
-  onSelectMonth?: (monthKey: string) => void;
   onResetToCurrentMonth?: () => void;
   onAddTransaction: () => void;
   onBulkScan: () => void;
@@ -37,8 +34,6 @@ export function FinancialSummaryCockpit({
   dailyStats,
   currencySymbol,
   selectedMonth,
-  availableMonths,
-  onSelectMonth,
   onResetToCurrentMonth,
   onAddTransaction,
   onBulkScan,

@@ -21,7 +21,6 @@ import {
   X,
   ArrowUpRight,
   ArrowDownLeft,
-  Sparkles,
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
@@ -351,17 +350,32 @@ export function WhoOwesWhoModal({
                 </div>
               </div>
 
-              <div>
-                <label className="text-[10px] font-mono text-[#6B6B6B] dark:text-[#A8A29E] block mb-1">
-                  For / Reason
-                </label>
-                <input
-                  type="text"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="e.g. Dinner split at Social, Swiggy order..."
-                  className="w-full bg-[#FAF8F5] dark:bg-[#252321] px-3 py-2 rounded-xl text-xs font-medium text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#383531] focus:outline-none focus:ring-1 focus:ring-[#161514]"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div>
+                  <label className="text-[10px] font-mono text-[#6B6B6B] dark:text-[#A8A29E] block mb-1">
+                    For / Reason
+                  </label>
+                  <input
+                    type="text"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="e.g. Dinner split, Swiggy order..."
+                    className="w-full bg-[#FAF8F5] dark:bg-[#252321] px-3 py-2 rounded-xl text-xs font-medium text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#383531] focus:outline-none focus:ring-1 focus:ring-[#161514]"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-mono text-[#6B6B6B] dark:text-[#A8A29E] block mb-1 flex items-center gap-1">
+                    <Calendar className="size-3 stroke-[2]" />
+                    <span>Due Date (Optional)</span>
+                  </label>
+                  <input
+                    type="date"
+                    value={dueDate}
+                    onChange={(e) => setDueDate(e.target.value)}
+                    className="w-full bg-[#FAF8F5] dark:bg-[#252321] px-3 py-2 rounded-xl text-xs font-mono font-medium text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#383531] focus:outline-none focus:ring-1 focus:ring-[#161514]"
+                  />
+                </div>
               </div>
 
               <div className="flex justify-end gap-2 pt-1">
@@ -411,9 +425,17 @@ export function WhoOwesWhoModal({
                     </div>
 
                     <div className="min-w-0 space-y-0.5">
-                      <h4 className="text-xs sm:text-[13.5px] font-heading font-black text-[#161514] dark:text-[#FAF8F5] truncate leading-tight">
-                        {iou.personName}
-                      </h4>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <h4 className="text-xs sm:text-[13.5px] font-heading font-black text-[#161514] dark:text-[#FAF8F5] truncate leading-tight">
+                          {iou.personName}
+                        </h4>
+                        {iou.dueDate && (
+                          <span className="inline-flex items-center gap-1 text-[9.5px] font-mono text-[#6B6B6B] dark:text-[#A8A29E] bg-[#FAF8F5] dark:bg-[#252321] px-1.5 py-0.5 rounded-md border border-[#E8E5DF] dark:border-[#383531] shrink-0">
+                            <Calendar className="size-2.5 stroke-[2]" />
+                            <span>Due: {iou.dueDate}</span>
+                          </span>
+                        )}
+                      </div>
                       <p className="text-[11px] font-mono text-[#6B6B6B] dark:text-[#A8A29E] truncate">
                         {iou.description}
                       </p>
