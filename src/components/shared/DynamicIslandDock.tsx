@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import {
   Timer,
   Play,
@@ -27,6 +27,7 @@ interface DynamicIslandDockProps {
 
 export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps) {
   const router = useRouter();
+  const pathname = usePathname();
 
   const {
     activeActivity,
@@ -158,8 +159,8 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
       ? "pomodoro"
       : "ambient";
 
-  // Hide ambient pill if dismissed by user
-  if (currentMode === "ambient" && isAmbientDismissed) {
+  // Hide ambient pill if dismissed by user, or on /money page where full money cockpit & ledger already exist
+  if (currentMode === "ambient" && (isAmbientDismissed || pathname === "/money")) {
     return null;
   }
 

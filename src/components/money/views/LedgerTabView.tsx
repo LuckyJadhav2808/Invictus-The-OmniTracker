@@ -553,8 +553,8 @@ export function LedgerTabView({
 
       {/* 🔍 Search & Filters Bar */}
       <div className="bg-white dark:bg-[#1C1A18] p-4 rounded-xl border border-[#E8E5DF] dark:border-[#383531] space-y-3">
-        <div className="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center justify-between">
-          {/* Search Input */}
+        <div className="flex flex-row gap-2 items-center justify-between">
+          {/* Search Input with 1-Tap Clear */}
           <div className="relative flex-1">
             <Search className="size-4 text-[#A8A29E] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
@@ -562,18 +562,30 @@ export function LedgerTabView({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by merchant, note, or category…"
-              className="w-full bg-white dark:bg-[#252321] pl-9 pr-3 py-2 text-xs font-medium rounded-lg border border-[#E8E5DF] dark:border-[#383531] text-[#161514] dark:text-[#FAF8F5] placeholder:text-[#A8A29E] focus:outline-none focus:ring-1 focus:ring-[#161514] dark:focus:ring-[#CEF431]"
+              className="w-full bg-[#FAF8F5] dark:bg-[#252321] pl-9 pr-8 py-2 text-xs font-medium rounded-xl border border-[#E8E5DF] dark:border-[#383531] text-[#161514] dark:text-[#FAF8F5] placeholder:text-[#A8A29E] focus:outline-none focus:ring-1 focus:ring-[#161514] dark:focus:ring-[#CEF431] transition-all"
             />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-700 text-[#8C8882] cursor-pointer"
+                title="Clear search"
+              >
+                <X className="size-3.5" />
+              </button>
+            )}
           </div>
 
-          {/* PDF Export Button */}
+          {/* PDF Export Button (Compact on mobile, full on desktop) */}
           <button
             type="button"
             onClick={onOpenExportModal}
-            className="bg-white dark:bg-[#252321] hover:bg-[#F5F3EF] dark:hover:bg-[#2e2b28] text-[#161514] dark:text-[#FAF8F5] font-medium text-xs py-2 px-3 rounded-lg border border-[#E8E5DF] dark:border-[#383531] transition-colors flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
+            className="bg-white dark:bg-[#252321] hover:bg-[#F5F3EF] dark:hover:bg-[#2e2b28] text-[#161514] dark:text-[#FAF8F5] font-semibold text-xs py-2 px-3 rounded-xl border border-[#E8E5DF] dark:border-[#383531] transition-colors flex items-center justify-center gap-1.5 shrink-0 cursor-pointer shadow-xs active:scale-95"
+            title="Export monthly statement PDF"
           >
-            <FileDown className="size-3.5 stroke-[1.5]" />
-            <span>Export Statement</span>
+            <FileDown className="size-3.5 stroke-[2]" />
+            <span className="hidden sm:inline">Export Statement</span>
+            <span className="sm:hidden">Export</span>
           </button>
         </div>
 
