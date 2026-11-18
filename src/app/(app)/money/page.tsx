@@ -16,8 +16,9 @@ import {
 import type { TemplatePack } from "@/components/shared/TemplateSelectionModal";
 import { BUDGET_CATEGORY_TEMPLATE_PACKS } from "@/lib/templates-data";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Receipt, Target, PiggyBank, BarChart2 } from "lucide-react";
+import { Receipt, Target, PiggyBank, BarChart2, Plus } from "lucide-react";
 import { format, parseISO } from "date-fns";
+import { soundFX } from "@/components/shared/SoundFX";
 import { toast } from "sonner";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { ProactiveReminderBanner } from "@/components/shared/ProactiveReminderBanner";
@@ -81,6 +82,11 @@ const NeobrutalistCalculator = dynamic(
 
 const TemplateSelectionModal = dynamic(
   () => import("@/components/shared/TemplateSelectionModal").then((mod) => mod.TemplateSelectionModal),
+  { ssr: false }
+);
+
+const MoneyQuickActionsSheet = dynamic(
+  () => import("@/components/money/modals/MoneyQuickActionsSheet").then((mod) => mod.MoneyQuickActionsSheet),
   { ssr: false }
 );
 
@@ -191,6 +197,7 @@ function MoneyPageContent() {
   const [isSendMoneyOpen, setIsSendMoneyOpen] = useState(false);
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
   const [isCashModalOpen, setIsCashModalOpen] = useState(false);
+  const [isQuickActionsOpen, setIsQuickActionsOpen] = useState(false);
   const [reopenTxAfterCat, setReopenTxAfterCat] = useState(false);
 
   // Deletion Safeguard
@@ -573,6 +580,7 @@ function MoneyPageContent() {
         onOpenCalculator={() => setIsCalculatorOpen(true)}
         onSelectPaymentMethod={handleSelectPaymentMethodFromHero}
         onRefillCashTill={handleRefillCashTill}
+        onNavigateToTab={handleTabChange}
       />
 
       {/* 🔒 Zero-Knowledge SMS Sync Banner & Cash Action */}
@@ -693,6 +701,7 @@ function MoneyPageContent() {
           setIsAddTxOpen(false);
           setIsAddCatOpen(true);
         }}
+        onOpenReceiptScan={() => setIsBulkModalOpen(true)}
         onSave={handleSaveTransaction}
         onDelete={handleDeleteTransaction}
       />
@@ -844,6 +853,34 @@ function MoneyPageContent() {
         open={isCalculatorOpen}
         onOpenChange={setIsCalculatorOpen}
         hideFloatingTrigger={true}
+      />
+
+      {/* 🚀 CENTRAL QUICK ACTIONS FAB (Belanje Benchmark) */}
+      <div className="fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] right-4 sm:bottom-8 sm:right-8 z-30 flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => {
+            soundFX.playPop();
+            setIsQuickActionsOpen(true);
+          }}
+          className="size-14 rounded-full bg-[#161514] text-[#CEF431] dark:bg-[#FAF8F5] dark:text-[#161514] border-2 border-[#161514] dark:border-white shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#FAF8F5] flex items-center justify-center cursor-pointer hover:scale-105 active:scale-95 transition-all group"
+          title="Open Quick Actions (Add, Scan, Cash, Calc)"
+          aria-label="Quick Actions"
+        >
+          <Plus className="size-7 stroke-[3] group-hover:rotate-90 transition-transform duration-200" />
+        </button>
+      </div>
+
+      {/* 🚀 Quick Actions Bottom Sheet */}
+      <MoneyQuickActionsSheet
+        open={isQuickActionsOpen}
+        onOpenChange={setIsQuickActionsOpen}
+        onSelectAction={(action) => {
+          if (action === "add_transaction") setIsAddTxOpen(true);
+          if (action === "scan_receipt") setIsBulkModalOpen(true);
+          if (action === "quick_cash") setIsCashModalOpen(true);
+          if (action === "calculator") setIsCalculatorOpen(true);
+        }}
       />
     </div>
   );

@@ -48,8 +48,20 @@ export function BudgetTabView({
 
   return (
     <div className="space-y-4">
+      {/* ─── Belanje-Style Header (Plan, Save & Budget) ─── */}
+      <div className="flex items-center justify-between px-1">
+        <div>
+          <h3 className="text-base sm:text-lg font-heading font-black text-[#161514] dark:text-[#FAF8F5] tracking-tight">
+            Plan, save, and clear debt
+          </h3>
+          <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E]">
+            Automated monthly rollover, digital pace, and category envelopes
+          </p>
+        </div>
+      </div>
+
       {/* Rollover & Allowances Summary Banner */}
-      <div className="bg-white dark:bg-[#161514] p-5 rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-4">
+      <div className="bg-white dark:bg-[#161514] p-5 rounded-3xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#E8E5DF] dark:border-[#2A2724] pb-3">
           <div className="space-y-0.5">
             <span className="text-[15px] font-heading font-black text-[#161514] dark:text-stone-100 tracking-tight flex items-center gap-2">

@@ -3,6 +3,7 @@
 import React from "react";
 import { type MonthlyBudgetStats, type DailyBudgetStats } from "@/lib/utils/budget-rollover";
 import { VixPixelCompanion } from "@/components/mascot/VixPixelCompanion";
+import { WalletCardDeck } from "@/components/money/WalletCardDeck";
 import {
   Plus,
   ScanLine,
@@ -30,6 +31,7 @@ interface FinancialSummaryCockpitProps {
   onOpenCalculator?: () => void;
   onSelectPaymentMethod?: (method: "upi" | "cash") => void;
   onRefillCashTill?: () => void;
+  onNavigateToTab?: (tab: "ledger" | "budgets" | "vault" | "analytics") => void;
 }
 
 export function FinancialSummaryCockpit({
@@ -42,9 +44,12 @@ export function FinancialSummaryCockpit({
   onResetToCurrentMonth,
   onAddTransaction,
   onBulkScan,
+  onAddCategory,
+  onOpenEditAllowances,
   onOpenCalculator,
   onSelectPaymentMethod,
   onRefillCashTill,
+  onNavigateToTab,
 }: FinancialSummaryCockpitProps) {
   const budgetPercentageRemaining = Math.max(
     0,
@@ -64,108 +69,22 @@ export function FinancialSummaryCockpit({
   const upiMonthPercent = totalChannelMonth > 0 ? Math.round((monthlyStats.upiExpense / totalChannelMonth) * 100) : 0;
 
   return (
-    <div className="bg-white dark:bg-[#1C1A18] rounded-2xl border border-[#E8E5DF] dark:border-[#383531] p-4 sm:p-5 space-y-3.5 shadow-xs transition-colors">
-      {/* Top Telemetry Header */}
-      <div className="flex items-center justify-between gap-2 pb-2.5 border-b border-[#E8E5DF] dark:border-[#383531]">
-        <div className="flex items-center gap-2 min-w-0">
-          <span
-            className={cn(
-              "size-2 rounded-full shrink-0",
-              monthlyStats.isCurrentCalendarMonth ? "bg-[#03D26F]" : "bg-amber-500"
-            )}
-          />
-          <h2 className="text-sm sm:text-[15px] font-heading font-bold text-[#161514] dark:text-[#FAF8F5] truncate tracking-tight">
-            Financial Cockpit
-          </h2>
-          <div className="flex items-center gap-1.5 shrink-0">
-            <span
-              className={cn(
-                "text-[11px] font-mono font-medium px-2 py-0.5 rounded border transition-colors",
-                !monthlyStats.isCurrentCalendarMonth
-                  ? "bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 border-amber-300 dark:border-amber-800"
-                  : "text-[#6B6B6B] dark:text-[#A8A29E] bg-[#FAF8F5] dark:bg-[#252321] border-[#E8E5DF] dark:border-[#383531]"
-              )}
-            >
-              {monthlyStats.targetMonthLabel}
-            </span>
-            {!monthlyStats.isCurrentCalendarMonth && onResetToCurrentMonth && (
-              <button
-                type="button"
-                onClick={onResetToCurrentMonth}
-                className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-[#161514] text-[#CEF431] dark:bg-[#FAF8F5] dark:text-[#161514] hover:opacity-90 active:scale-95 transition-all cursor-pointer flex items-center gap-1 shadow-xs"
-                title="Jump to Current Month"
-              >
-                <span>Current</span>
-                <RotateCcw className="size-2.5" />
-              </button>
-            )}
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 shrink-0">
-          {monthlyStats.isCurrentCalendarMonth ? (
-            <span className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] font-mono hidden md:inline-block tabular-nums">
-              Safe pace: ~{currencySymbol}{dailyStats.todayRemaining.toLocaleString()}/day
-            </span>
-          ) : (
-            <span className="text-xs text-amber-700 dark:text-amber-300 font-mono hidden md:inline-block tabular-nums">
-              Historical Ledger Archive
-            </span>
-          )}
-          <span
-            className={cn(
-              "text-xs font-mono font-semibold px-2 py-0.5 rounded-md border tabular-nums",
-              budgetPercentageRemaining <= 15
-                ? "bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border-rose-200 dark:border-rose-900/40"
-                : budgetPercentageRemaining <= 30
-                ? "bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-900/40"
-                : "bg-[#DCFAE5] dark:bg-[#03D26F]/20 text-[#04250e] dark:text-[#03D26F] border-[#03D26F]/30"
-            )}
-          >
-            {budgetPercentageRemaining}% Left
-          </span>
-        </div>
-      </div>
-
-      {/* Main Liquidity Hero Section (Zero-Nesting, High Density) */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 pt-0.5">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] font-mono font-medium uppercase tracking-wider text-[#6B6B6B] dark:text-[#A8A29E]">
-              Spendable Liquidity
-            </span>
-            {monthlyStats.rolloverSurplus > 0 && (
-              <span className="text-[10px] font-mono font-bold tabular-nums text-[#047857] dark:text-[#03D26F] bg-[#DCFAE5] dark:bg-[#03D26F]/20 px-1.5 py-0.5 rounded border border-[#03D26F]/30">
-                +{currencySymbol}{monthlyStats.rolloverSurplus.toLocaleString()} Rollover
-              </span>
-            )}
-          </div>
-          <div className="text-3xl sm:text-4xl font-mono font-bold tracking-tight text-[#161514] dark:text-[#FAF8F5] tabular-nums mt-0.5 leading-tight">
-            {currencySymbol}{monthlyStats.remainingBudget.toLocaleString()}
-          </div>
-        </div>
-
-        <div className="text-xs font-mono text-[#6B6B6B] dark:text-[#A8A29E] tabular-nums sm:text-right">
-          Budget: <span className="font-semibold text-[#161514] dark:text-[#FAF8F5]">{currencySymbol}{monthlyStats.totalAvailableBudget.toLocaleString()}</span>
-          {" • "}
-          Spent: <span className="font-semibold text-rose-600 dark:text-rose-400">{currencySymbol}{monthlyStats.onlineExpense.toLocaleString()}</span>
-        </div>
-      </div>
-
-      {/* Single 4px Progress Line */}
-      <div className="w-full bg-[#E8E5DF] dark:bg-[#2A2724] h-1.5 rounded-full overflow-hidden">
-        <div
-          className={cn(
-            "h-full rounded-full transition-all duration-500",
-            budgetPercentageRemaining <= 15
-              ? "bg-rose-500"
-              : budgetPercentageRemaining <= 30
-              ? "bg-amber-400"
-              : "bg-[#03D26F]"
-          )}
-          style={{ width: `${Math.max(3, budgetPercentageRemaining)}%` }}
-        />
-      </div>
+    <div className="bg-white dark:bg-[#1C1A18] rounded-3xl border border-[#E8E5DF] dark:border-[#383531] p-3.5 sm:p-5 space-y-4 shadow-xs transition-colors">
+      {/* 💳 Belanje Swipeable Card Deck & Squircle Quick Launchers */}
+      <WalletCardDeck
+        monthlyStats={monthlyStats}
+        dailyStats={dailyStats}
+        currencySymbol={currencySymbol}
+        selectedMonth={selectedMonth}
+        onResetToCurrentMonth={onResetToCurrentMonth}
+        onOpenAllowances={onOpenEditAllowances}
+        onRefillCashTill={onRefillCashTill}
+        onSelectPaymentMethod={onSelectPaymentMethod}
+        onAddTransaction={onAddTransaction}
+        onBulkScan={onBulkScan}
+        onOpenCalculator={onOpenCalculator}
+        onNavigateToTab={onNavigateToTab}
+      />
 
       {/* Channels Data Rail (Flat 3-Column Strip on Mobile and Desktop) */}
       <div className="grid grid-cols-3 divide-x divide-[#E8E5DF] dark:divide-[#383531] rounded-xl border border-[#E8E5DF] dark:border-[#383531] bg-[#FAF8F5] dark:bg-[#161514] overflow-hidden">
@@ -265,62 +184,38 @@ export function FinancialSummaryCockpit({
         </div>
       </div>
 
-      {/* Action Row + Vix Mascot Status */}
-      <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-[#E8E5DF] dark:border-[#383531]">
-        <div className="flex items-center gap-1.5 flex-1 min-w-[200px]">
-          <button
-            type="button"
-            onClick={onAddTransaction}
-            className="flex-1 py-1.5 px-3 bg-[var(--btn-primary-bg)] hover:bg-[var(--btn-primary-hover)] text-[var(--btn-primary-fg)] border border-[var(--btn-primary-border)] shadow-[2px_2px_0px_0px_var(--btn-primary-shadow)] font-bold text-xs rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer min-h-[36px] hover:-translate-y-0.5 active:translate-y-0"
-          >
-            <Plus className="size-3.5 stroke-[2.5]" />
-            <span>Log Expense</span>
-          </button>
-
-          {onOpenCalculator && (
-            <button
-              type="button"
-              onClick={onOpenCalculator}
-              className="py-1.5 px-2.5 bg-white dark:bg-[#252321] hover:bg-[#FAF8F5] dark:hover:bg-[#2e2b28] text-[#161514] dark:text-[#FAF8F5] font-medium text-xs rounded-lg border border-[#E8E5DF] dark:border-[#383531] transition-colors flex items-center justify-center gap-1 cursor-pointer min-h-[36px]"
-              title="Open Calculator"
-            >
-              <Calculator className="size-3.5 stroke-[1.75]" />
-              <span className="hidden sm:inline">Calc</span>
-            </button>
-          )}
-
-          <button
-            type="button"
-            onClick={onBulkScan}
-            className="py-1.5 px-2.5 bg-white dark:bg-[#252321] hover:bg-[#FAF8F5] dark:hover:bg-[#2e2b28] text-[#161514] dark:text-[#FAF8F5] font-medium text-xs rounded-lg border border-[#E8E5DF] dark:border-[#383531] transition-colors flex items-center justify-center gap-1 cursor-pointer min-h-[36px]"
-            title="Bulk Expenses or OCR Scan"
-          >
-            <ScanLine className="size-3.5 stroke-[1.75]" />
-            <span className="hidden sm:inline">Scan</span>
-          </button>
-        </div>
-
-        {/* Vix Companion Mascot */}
+      {/* Vix Companion Mascot & Daily Pace Status */}
+      <div className="flex items-center justify-between gap-2 pt-1.5 border-t border-[#E8E5DF] dark:border-[#383531]">
         <div
           onClick={onAddTransaction}
-          className="bg-[#FAF8F5] dark:bg-[#252321] px-2.5 py-1 rounded-lg border border-[#E8E5DF] dark:border-[#383531] flex items-center gap-2 cursor-pointer hover:bg-[#F1EFEA] dark:hover:bg-[#2e2b28] transition-colors shrink-0 min-h-[36px]"
+          className="bg-[#FAF8F5] dark:bg-[#252321] px-3 py-1.5 rounded-xl border border-[#E8E5DF] dark:border-[#383531] flex items-center gap-2.5 cursor-pointer hover:bg-[#F1EFEA] dark:hover:bg-[#2e2b28] transition-colors"
           title="Click to Log Expense"
         >
           <VixPixelCompanion
             gear="money"
             state={dailyStats.isOverDailyBudget ? "fire" : "idle"}
-            size={20}
+            size={22}
           />
-          <div className="text-[11px] font-mono text-[#161514] dark:text-[#FAF8F5]">
+          <div className="text-xs font-mono text-[#161514] dark:text-[#FAF8F5]">
             {dailyStats.isOverDailyBudget ? (
-              <span className="text-rose-600 dark:text-rose-400 font-semibold">
-                Over by {currencySymbol}{dailyStats.overDailyAmount.toLocaleString()}
+              <span className="text-rose-600 dark:text-rose-400 font-bold">
+                Daily pace exceeded by {currencySymbol}{dailyStats.overDailyAmount.toLocaleString()}
               </span>
             ) : (
-              <span>~{currencySymbol}{dailyStats.todayRemaining.toLocaleString()} today</span>
+              <span>Safe pace: <strong className="font-bold text-[#047857] dark:text-[#03D26F]">~{currencySymbol}{dailyStats.todayRemaining.toLocaleString()}</strong> remaining today</span>
             )}
           </div>
         </div>
+
+        {onOpenEditAllowances && (
+          <button
+            type="button"
+            onClick={onOpenEditAllowances}
+            className="text-[11px] font-heading font-bold text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5] transition-colors cursor-pointer px-2 py-1"
+          >
+            Adjust Limits ▾
+          </button>
+        )}
       </div>
     </div>
   );
