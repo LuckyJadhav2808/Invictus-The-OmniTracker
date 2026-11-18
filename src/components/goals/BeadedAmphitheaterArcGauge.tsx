@@ -84,11 +84,10 @@ export function BeadedAmphitheaterArcGauge({
             d="M 28,145 A 136,136 0 0,1 292,145"
             fill="none"
           />
-          {/* Linear gradient for 100% conquer glow */}
-          <linearGradient id="limeConquerGlow" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#CEF431" />
-            <stop offset="100%" stopColor="#03D26F" />
-          </linearGradient>
+          {/* Glow filter for conquered dots */}
+          <filter id="limeArcGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="0" dy="0" stdDeviation="2.5" floodColor="#CEF431" floodOpacity="0.8" />
+          </filter>
         </defs>
 
         {/* Curved Header Label: TODAY • WEEK • STREAK */}
@@ -107,15 +106,16 @@ export function BeadedAmphitheaterArcGauge({
             key={`outer-${dot.index}`}
             cx={dot.x}
             cy={dot.y}
-            r={dot.isFilled ? 4.5 : 3.8}
-            className={cn(
-              "transition-all duration-300",
-              dot.isFilled
-                ? clampedToday === 100
-                  ? "fill-[#CEF431] stroke-[#161514] stroke-[1.2]"
-                  : "fill-[#CEF431] stroke-[#161514] dark:stroke-black stroke-[1]"
-                : "fill-[#161514]/15 dark:fill-white/20 stroke-[#161514]/10 dark:stroke-white/10 stroke-[0.8]"
-            )}
+            r={dot.isFilled ? 4.5 : 3.6}
+            fill={dot.isFilled ? "#CEF431" : "rgba(150, 150, 150, 0.25)"}
+            stroke={dot.isFilled ? "#161514" : "rgba(150, 150, 150, 0.15)"}
+            strokeWidth={dot.isFilled ? (clampedToday === 100 ? 1.5 : 1) : 0.8}
+            className="transition-all duration-300"
+            filter={clampedToday === 100 && dot.isFilled ? "url(#limeArcGlow)" : undefined}
+            style={{
+              fill: dot.isFilled ? "#CEF431" : "rgba(150, 150, 150, 0.25)",
+              stroke: dot.isFilled ? "#161514" : "rgba(150, 150, 150, 0.15)",
+            }}
           />
         ))}
 
@@ -126,28 +126,32 @@ export function BeadedAmphitheaterArcGauge({
             cx={dot.x}
             cy={dot.y}
             r={dot.isFilled ? 4 : 3.2}
-            className={cn(
-              "transition-all duration-300",
-              dot.isFilled
-                ? "fill-[#03D26F] stroke-[#161514]/60 dark:stroke-black stroke-[0.8]"
-                : "fill-[#161514]/10 dark:fill-white/15 stroke-[#161514]/10 dark:stroke-white/10 stroke-[0.8]"
-            )}
+            fill={dot.isFilled ? "#03D26F" : "rgba(150, 150, 150, 0.2)"}
+            stroke={dot.isFilled ? "#161514" : "rgba(150, 150, 150, 0.1)"}
+            strokeWidth={dot.isFilled ? 1 : 0.8}
+            className="transition-all duration-300"
+            style={{
+              fill: dot.isFilled ? "#03D26F" : "rgba(150, 150, 150, 0.2)",
+              stroke: dot.isFilled ? "#161514" : "rgba(150, 150, 150, 0.1)",
+            }}
           />
         ))}
 
-        {/* 3. Inner Arc: Streak Momentum (Lavender #C084FC) */}
+        {/* 3. Inner Arc: Streak Momentum (Amber #F59E0B) */}
         {innerDots.map((dot) => (
           <circle
             key={`inner-${dot.index}`}
             cx={dot.x}
             cy={dot.y}
             r={dot.isFilled ? 3.5 : 2.8}
-            className={cn(
-              "transition-all duration-300",
-              dot.isFilled
-                ? "fill-[#C084FC] stroke-[#161514]/60 dark:stroke-black stroke-[0.8]"
-                : "fill-[#161514]/10 dark:fill-white/15 stroke-[#161514]/10 dark:stroke-white/10 stroke-[0.8]"
-            )}
+            fill={dot.isFilled ? "#F59E0B" : "rgba(150, 150, 150, 0.2)"}
+            stroke={dot.isFilled ? "#161514" : "rgba(150, 150, 150, 0.1)"}
+            strokeWidth={dot.isFilled ? 1 : 0.8}
+            className="transition-all duration-300"
+            style={{
+              fill: dot.isFilled ? "#F59E0B" : "rgba(150, 150, 150, 0.2)",
+              stroke: dot.isFilled ? "#161514" : "rgba(150, 150, 150, 0.1)",
+            }}
           />
         ))}
 
@@ -157,8 +161,14 @@ export function BeadedAmphitheaterArcGauge({
             x={cx}
             y={cy - 14}
             textAnchor="middle"
-            fill="currentColor"
-            className="text-4xl sm:text-5xl font-mono font-black tracking-tighter text-[#161514] dark:text-[#FAF8F5]"
+            fill={clampedToday === 100 ? "#CEF431" : "currentColor"}
+            style={{
+              fill: clampedToday === 100 ? "#CEF431" : undefined,
+            }}
+            className={cn(
+              "text-4xl sm:text-5xl font-mono font-black tracking-tighter transition-colors",
+              clampedToday === 100 ? "text-[#CEF431]" : "text-[#161514] dark:text-[#FAF8F5]"
+            )}
           >
             {clampedToday}
           </text>
@@ -166,8 +176,14 @@ export function BeadedAmphitheaterArcGauge({
             x={cx}
             y={cy + 8}
             textAnchor="middle"
-            fill="currentColor"
-            className="text-[11px] font-mono font-black uppercase tracking-widest text-[#6B6B6B] dark:text-[#A8A29E]"
+            fill={clampedToday === 100 ? "#03D26F" : "currentColor"}
+            style={{
+              fill: clampedToday === 100 ? "#03D26F" : undefined,
+            }}
+            className={cn(
+              "text-[11px] font-mono font-black uppercase tracking-widest transition-colors",
+              clampedToday === 100 ? "text-[#03D26F]" : "text-[#6B6B6B] dark:text-[#A8A29E]"
+            )}
           >
             {clampedToday === 100 ? "CONQUERED 🏆" : "% TODAY"}
           </text>

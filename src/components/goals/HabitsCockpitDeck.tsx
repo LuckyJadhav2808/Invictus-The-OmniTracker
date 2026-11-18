@@ -11,8 +11,10 @@ import {
   LayoutList,
   Rows,
   Grid,
+  CheckCheck,
+  Calendar,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, getLocalTodayStr } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
 import { VixPixelCompanion } from "@/components/mascot/VixPixelCompanion";
 import { BeadedAmphitheaterArcGauge } from "./BeadedAmphitheaterArcGauge";
@@ -42,6 +44,7 @@ export interface HabitsCockpitDeckProps {
   soundMuted: boolean;
   onToggleSound: () => void;
   weeklyAveragePercent?: number;
+  onCheckAllDue?: () => void;
 }
 
 export function HabitsCockpitDeck({
@@ -63,21 +66,26 @@ export function HabitsCockpitDeck({
   soundMuted,
   onToggleSound,
   weeklyAveragePercent = 85,
+  onCheckAllDue,
 }: HabitsCockpitDeckProps) {
   const longestStreakValue = useMemo(() => {
     return Object.values(streaks).reduce((max, s) => Math.max(max, s.longestStreak), 0);
   }, [streaks]);
 
+  // Deterministic local today date string (prevents UTC timezone shift bug)
+  const todayStr = useMemo(() => getLocalTodayStr(), []);
+
   // Current active 7-day week window (Monday to Sunday)
   const weekDays = useMemo(() => {
-    const baseDate = new Date(selectedDate);
-    const validBase = isNaN(baseDate.getTime()) ? new Date() : baseDate;
+    // Parse selectedDate safely without UTC time shift
+    const [y, m, d] = (selectedDate || todayStr).split("-").map(Number);
+    const validBase = y && m && d ? new Date(y, m - 1, d) : new Date();
     const weekStart = startOfWeek(validBase, { weekStartsOn: 1 }); // Monday
 
     return Array.from({ length: 7 }).map((_, i) => {
       const date = addDays(weekStart, i);
       const dateStr = format(date, "yyyy-MM-dd");
-      const isToday = isSameDay(date, new Date());
+      const isToday = dateStr === todayStr;
       const isSelected = dateStr === selectedDate;
 
       return {
@@ -89,7 +97,7 @@ export function HabitsCockpitDeck({
         isSelected,
       };
     });
-  }, [selectedDate]);
+  }, [selectedDate, todayStr]);
 
   const streakTarget = 14;
   const streakPercent = Math.min(100, Math.round((longestStreakValue / streakTarget) * 100));
@@ -160,6 +168,30 @@ export function HabitsCockpitDeck({
             {soundMuted ? <VolumeX className="size-3.5 stroke-[2]" /> : <Volume2 className="size-3.5 stroke-[2]" />}
           </button>
 
+          {/* Check All Habits Shortcut Button */}
+          {onCheckAllDue && dueCount > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                soundFX.playPop();
+                onCheckAllDue();
+              }}
+              className={cn(
+                "hidden sm:flex items-center gap-1.5 text-xs font-heading font-black px-3 py-2 rounded-xl border-2 transition-all cursor-pointer active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
+                isConquered
+                  ? "bg-secondary text-muted-foreground border-border hover:border-[#161514] hover:text-foreground shadow-2xs"
+                  : "bg-white dark:bg-[#252321] text-foreground border-border hover:border-[#161514] shadow-2xs hover:shadow-[2px_2px_0px_0px_#161514]"
+              )}
+              title={isConquered ? "Reset all habits for today" : "Check all due habits (Shift+⌘A)"}
+            >
+              <CheckCheck className={cn("size-3.5 stroke-[2.5]", isConquered ? "text-muted-foreground" : "text-[#03D26F]")} />
+              <span>{isConquered ? "Reset Today" : "Check All"}</span>
+              <kbd className="hidden md:inline-block text-[9px] font-mono px-1 py-0.2 bg-muted rounded border border-border text-muted-foreground">
+                ⇧⌘A
+              </kbd>
+            </button>
+          )}
+
           {/* New Habit Trigger Button */}
           <button
             type="button"
@@ -188,7 +220,14 @@ export function HabitsCockpitDeck({
       </div>
 
       {/* 2. Centerpiece: Beaded Amphitheater Arc Gauge & Dual Telemetry */}
-      <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#38332E] rounded-2xl p-4 sm:p-5 flex flex-col items-center justify-center space-y-4 shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]">
+      <div
+        className={cn(
+          "border-2 rounded-2xl p-4 sm:p-5 flex flex-col items-center justify-center space-y-4 transition-all duration-300",
+          isConquered
+            ? "bg-[#FAF8F5] dark:bg-[#1C1A18] border-[#03D26F] shadow-[3px_3px_0px_0px_#03D26F]"
+            : "bg-[#FAF8F5] dark:bg-[#1C1A18] border-[#161514] dark:border-[#38332E] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]"
+        )}
+      >
         <BeadedAmphitheaterArcGauge
           todayPercent={dailyCompletionPercent}
           weekPercent={weeklyAveragePercent}
@@ -256,7 +295,18 @@ export function HabitsCockpitDeck({
       </div>
 
       {/* 3. Dedicated Full-Width 7-Day Date Scrubber (Routinr Benchmark) */}
-      <div className="w-full pt-1">
+      <div className="w-full pt-1 space-y-2">
+        <div className="flex items-center justify-between px-1 text-xs font-mono font-bold text-muted-foreground">
+          <span className="flex items-center gap-1.5 text-foreground font-black">
+            <Calendar className="size-3.5 text-[#03D26F]" />
+            <span>7-Day Routine Horizon</span>
+          </span>
+          <span className="text-[10px] uppercase tracking-wider font-mono font-black text-emerald-600 dark:text-[#03D26F] bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20 flex items-center gap-1">
+            <span className="size-1.5 rounded-full bg-[#03D26F] animate-pulse" />
+            <span>Today: {format(new Date(), "EEE, MMM d")}</span>
+          </span>
+        </div>
+
         <div className="grid grid-cols-7 gap-1 sm:gap-2 w-full">
           {weekDays.map((day) => (
             <button
@@ -267,25 +317,39 @@ export function HabitsCockpitDeck({
                 onSelectDate(day.dateStr);
               }}
               className={cn(
-                "py-2 px-1 sm:px-2 rounded-2xl border-2 text-center transition-all cursor-pointer flex flex-col items-center justify-center w-full min-h-[52px]",
+                "relative py-2 px-1 sm:px-2 rounded-2xl border-2 text-center transition-all cursor-pointer flex flex-col items-center justify-center w-full min-h-[58px]",
                 day.isSelected
-                  ? "bg-[#161514] text-[#CEF431] border-[#161514] dark:bg-[#CEF431] dark:text-[#161514] dark:border-[#CEF431] shadow-[2px_2px_0px_0px_rgba(22,21,20,0.6)] font-black scale-[1.02]"
+                  ? "bg-[#CEF431] text-[#161514] border-[#161514] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] font-black scale-[1.03] z-10"
+                  : day.isToday
+                  ? "bg-secondary text-foreground border-[#03D26F] hover:bg-muted font-black"
                   : "bg-secondary text-secondary-foreground border-border hover:bg-muted font-bold"
               )}
+              title={`${day.dayLabel} ${day.dayNum} ${day.isToday ? "(Today)" : ""}`}
             >
-              <span className="text-[9px] uppercase tracking-wider opacity-75">
-                {day.dayLabel}
-              </span>
-              <span className="text-xs sm:text-sm font-mono font-black mt-0.5">
-                {day.dayNum}
-              </span>
+              {/* Pointing Badge for Current Day */}
               {day.isToday && (
                 <span
                   className={cn(
-                    "size-1.5 rounded-full mt-1",
-                    day.isSelected ? "bg-[#CEF431] dark:bg-[#161514]" : "bg-emerald-500"
+                    "text-[7px] font-mono font-black uppercase tracking-wider px-1 py-0.2 rounded-sm border leading-none mb-1",
+                    day.isSelected
+                      ? "bg-[#161514] text-[#CEF431] border-[#161514]"
+                      : "bg-[#03D26F] text-[#161514] border-[#161514] animate-pulse"
                   )}
-                />
+                >
+                  TODAY
+                </span>
+              )}
+
+              <span className="text-[9px] uppercase tracking-wider opacity-85 leading-tight">
+                {day.dayLabel}
+              </span>
+              <span className="text-xs sm:text-sm font-mono font-black mt-0.5 leading-none">
+                {day.dayNum}
+              </span>
+
+              {/* Status Pip for Today if not selected */}
+              {day.isToday && !day.isSelected && (
+                <span className="size-1.5 rounded-full mt-1 bg-[#03D26F] shadow-[0_0_6px_#03D26F]" />
               )}
             </button>
           ))}

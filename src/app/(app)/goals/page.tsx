@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, Suspense } from "react";
+import { useState, useEffect, useMemo, useCallback, Suspense } from "react";
 import {
   useHabits,
   useAddHabit,
@@ -53,6 +53,8 @@ import {
   Trophy,
   Clock,
   Check,
+  CheckCheck,
+  RotateCcw,
   Bot,
   RefreshCw,
   ChevronDown,
@@ -60,7 +62,7 @@ import {
 import { format, getDay, startOfWeek, addDays, isSameDay } from "date-fns";
 import { toast } from "sonner";
 import { useUIStore } from "@/store/ui-store";
-import { cn } from "@/lib/utils";
+import { cn, getLocalTodayStr } from "@/lib/utils";
 import { ProactiveReminderBanner } from "@/components/shared/ProactiveReminderBanner";
 import { useSearchParams, useRouter } from "next/navigation";
 
@@ -70,7 +72,14 @@ function GoalsPageContent() {
   const router = useRouter();
   const tabParam = searchParams.get("tab");
 
-  // Graceful backward compatibility redirect for legacy ?tab= queries
+  // Auto-snap habit cockpit to current day when entering habits space
+  useEffect(() => {
+    const todayStr = getLocalTodayStr();
+    if (selectedDate !== todayStr) {
+      setSelectedDate(todayStr);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   useEffect(() => {
     if (tabParam === "gym") {
       router.replace("/goals/gym");
@@ -349,6 +358,81 @@ function GoalsPageContent() {
     : 0;
   const isAllDueCompleted = dueTodayHabits.length > 0 && pendingTodayHabits.length === 0;
 
+  // 1-Tap Bulk Check / Reset Habits for active day (Shift+⌘A)
+  const handleCheckAllDue = useCallback(async () => {
+    soundFX.playPop();
+    soundFX.vibrate(25);
+
+    if (isAllDueCompleted) {
+      try {
+        await Promise.all(
+          completedTodayHabits.map((h) =>
+            toggleLogMutation.mutateAsync({
+              habitId: h.id,
+              date: selectedDate,
+              completed: false,
+            })
+          )
+        );
+        toast.info("Reset routines for today");
+      } catch {
+        toast.error("Failed to reset routines");
+      }
+      return;
+    }
+
+    try {
+      await Promise.all(
+        pendingTodayHabits.map((h) =>
+          toggleLogMutation.mutateAsync({
+            habitId: h.id,
+            date: selectedDate,
+            completed: true,
+          })
+        )
+      );
+      soundFX.playCompleteChime();
+      soundFX.playBotChirp("happy");
+      soundFX.vibrate([40, 60, 100]);
+      toast.success(`⚡ Conquered all ${dueTodayHabits.length} routines! Take a bow. 🏆`);
+    } catch {
+      toast.error("Failed to check all habits");
+    }
+  }, [
+    isAllDueCompleted,
+    completedTodayHabits,
+    pendingTodayHabits,
+    selectedDate,
+    dueTodayHabits.length,
+    toggleLogMutation,
+  ]);
+
+  // Global Keyboard Shortcut: Shift+Meta+A or Alt+A to Check All Due
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+
+      if (
+        (e.shiftKey && (e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "a") ||
+        (e.altKey && e.key.toLowerCase() === "a")
+      ) {
+        e.preventDefault();
+        handleCheckAllDue();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleCheckAllDue]);
+
   // Filtered habits list based on active filter
   const displayedHabits = habits.filter((habit) => {
     const isDone = isCompletedToday(habit.id);
@@ -406,6 +490,7 @@ function GoalsPageContent() {
             ? Math.min(100, Math.round((weekLogs.length / Math.max(1, habits.length * 7)) * 100))
             : dailyCompletionPercent
         }
+        onCheckAllDue={handleCheckAllDue}
       />
 
       {/* 2. Proactive Reminder Banner */}
@@ -480,9 +565,38 @@ function GoalsPageContent() {
                 </button>
               </div>
 
-              <div className="text-[11px] font-mono font-bold text-muted-foreground pr-2 hidden sm:flex items-center gap-1.5">
-                <span className="text-foreground font-black">{completedTodayHabits.length}/{dueTodayHabits.length}</span>
-                <span>Reps Conquered</span>
+              <div className="flex items-center gap-2 pr-1">
+                <div className="text-[11px] font-mono font-bold text-muted-foreground hidden sm:flex items-center gap-1.5">
+                  <span className="text-foreground font-black">
+                    {completedTodayHabits.length}/{dueTodayHabits.length}
+                  </span>
+                  <span>Reps</span>
+                </div>
+                {dueTodayHabits.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={handleCheckAllDue}
+                    className={cn(
+                      "px-2.5 py-1 text-[11px] font-heading font-black rounded-xl border-2 transition-all cursor-pointer flex items-center gap-1 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
+                      isAllDueCompleted
+                        ? "bg-secondary text-muted-foreground border-border hover:border-[#161514] hover:text-foreground shadow-2xs"
+                        : "bg-[#03D26F] text-[#161514] border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:bg-[#02b35e]"
+                    )}
+                    title={isAllDueCompleted ? "Reset habits for today" : "Check all due habits (Shift+⌘A)"}
+                  >
+                    {isAllDueCompleted ? (
+                      <>
+                        <RotateCcw className="size-3 stroke-[2.5]" />
+                        <span>Reset</span>
+                      </>
+                    ) : (
+                      <>
+                        <CheckCheck className="size-3 stroke-[3]" />
+                        <span>Check All</span>
+                      </>
+                    )}
+                  </button>
+                )}
               </div>
             </div>
           )}

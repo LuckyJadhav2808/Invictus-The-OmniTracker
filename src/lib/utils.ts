@@ -69,3 +69,13 @@ export function throttle<T extends (...args: any[]) => void>(func: T, limit: num
   };
 }
 
+// Returns today's date formatted as "YYYY-MM-DD" in local system time (avoids UTC timezone shift bug)
+export function getLocalTodayStr(): string {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+

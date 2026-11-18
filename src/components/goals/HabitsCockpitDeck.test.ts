@@ -28,6 +28,8 @@ describe("HabitsCockpitDeck & BeadedAmphitheaterArcGauge Architecture", () => {
     const mockOnShield = vi.fn();
     const mockToggleSound = vi.fn();
 
+    const mockCheckAllDue = vi.fn();
+
     const element = React.createElement(HabitsCockpitDeck, {
       habits: [],
       streaks: {},
@@ -43,10 +45,12 @@ describe("HabitsCockpitDeck & BeadedAmphitheaterArcGauge Architecture", () => {
       dueCount: 3,
       soundMuted: false,
       onToggleSound: mockToggleSound,
+      onCheckAllDue: mockCheckAllDue,
     });
 
     expect(element).toBeDefined();
     expect(element.props.selectedDate).toBe("2026-11-19");
     expect(element.props.dailyCompletionPercent).toBe(67);
+    expect(element.props.onCheckAllDue).toBe(mockCheckAllDue);
   });
 });

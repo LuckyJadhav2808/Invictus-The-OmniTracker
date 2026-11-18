@@ -1,4 +1,5 @@
 "use client";
+// Money Workspace Engine — Belanje & Neobrutalist Ledger Benchmark
 
 import { useState, useEffect, useMemo, Suspense } from "react";
 import {
