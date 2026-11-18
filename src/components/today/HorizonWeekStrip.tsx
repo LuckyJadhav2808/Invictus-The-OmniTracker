@@ -72,10 +72,10 @@ export function HorizonWeekStrip({
       <button
         type="button"
         onClick={handlePrev}
-        className="size-7 sm:size-8 rounded-lg border border-[#E8E5DF] dark:border-[#383531] bg-white dark:bg-[#1C1A18] hover:bg-[#F5F3EF] dark:hover:bg-[#252321] flex items-center justify-center transition-colors cursor-pointer shrink-0 active:translate-y-px text-[#161514] dark:text-[#FAF8F5]"
+        className="size-8 sm:size-9 rounded-xl border-2 border-border hover:border-[#161514] dark:hover:border-white/40 bg-secondary hover:bg-muted flex items-center justify-center transition-all cursor-pointer shrink-0 active:translate-x-0.5 active:translate-y-0.5 text-foreground shadow-2xs"
         aria-label="Previous Day"
       >
-        <ChevronLeft className="size-3.5 sm:size-4 stroke-[1.5]" />
+        <ChevronLeft className="size-4 stroke-[2.2]" />
       </button>
 
       {/* 2. 7-Day Magnetic Horizon Rail */}
@@ -90,10 +90,10 @@ export function HorizonWeekStrip({
               type="button"
               onClick={() => handleSelect(day)}
               className={cn(
-                "relative flex flex-col items-center justify-center min-w-[38px] sm:min-w-[44px] h-11 sm:h-12 px-1 sm:px-2 rounded-lg transition-colors cursor-pointer",
+                "relative flex flex-col items-center justify-center min-w-[38px] sm:min-w-[44px] h-11 sm:h-12 px-1 sm:px-2 rounded-xl border-2 transition-all cursor-pointer",
                 isSelected
-                  ? "bg-[#161514] text-white border border-[#161514] dark:bg-[#FAF8F5] dark:text-[#161514] dark:border-[#FAF8F5]"
-                  : "bg-white dark:bg-[#1C1A18] hover:bg-[#F5F3EF] dark:hover:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#383531]"
+                  ? "bg-[#161514] text-[#CEF431] border-[#161514] dark:bg-[#CEF431] dark:text-[#161514] dark:border-[#CEF431] shadow-[2px_2px_0px_0px_rgba(22,21,20,0.6)] font-black scale-[1.02]"
+                  : "bg-secondary text-secondary-foreground border-border hover:bg-muted hover:border-[#161514]/40 font-bold"
               )}
               aria-label={`Select ${day.dayName}, ${day.dateStr}`}
               aria-current={isSelected ? "date" : undefined}
@@ -101,12 +101,12 @@ export function HorizonWeekStrip({
               {/* Day Name (e.g. Mon, Tue) */}
               <span
                 className={cn(
-                  "font-mono text-[10px] font-medium leading-tight",
+                  "font-mono text-[9px] uppercase tracking-wider leading-tight",
                   isSelected
-                    ? "text-[#03D26F] dark:text-[#047857]"
+                    ? "opacity-90 font-black"
                     : isCurrentToday
-                    ? "text-[#047857] dark:text-[#03D26F] font-semibold"
-                    : "text-[#6B6B6B] dark:text-[#A8A29E]"
+                    ? "text-[#03D26F] font-black"
+                    : "text-muted-foreground font-bold"
                 )}
               >
                 {day.dayName}
@@ -115,8 +115,8 @@ export function HorizonWeekStrip({
               {/* Day Number (e.g. 24, 25) */}
               <span
                 className={cn(
-                  "font-mono font-semibold text-xs sm:text-sm leading-none mt-0.5 tabular-nums",
-                  isSelected ? "text-white dark:text-[#161514]" : "text-[#161514] dark:text-[#FAF8F5]"
+                  "font-mono font-black text-xs sm:text-sm leading-none mt-0.5 tabular-nums",
+                  isSelected ? "text-[#CEF431] dark:text-[#161514]" : "text-foreground"
                 )}
               >
                 {day.dayNumber}
@@ -130,14 +130,14 @@ export function HorizonWeekStrip({
                   <span
                     className={cn(
                       "size-1.5 rounded-full",
-                      isSelected ? "bg-[#03D26F] dark:bg-[#047857]" : "bg-[#047857] dark:bg-[#03D26F]"
+                      isSelected ? "bg-[#CEF431] dark:bg-[#161514]" : "bg-[#03D26F]"
                     )}
                   />
                 ) : (
                   <span
                     className={cn(
                       "size-1 rounded-full",
-                      isSelected ? "bg-white/40 dark:bg-black/40" : "bg-[#161514]/20 dark:bg-white/20"
+                      isSelected ? "bg-[#CEF431]/40 dark:bg-black/40" : "bg-muted-foreground/30"
                     )}
                   />
                 )}
@@ -151,10 +151,10 @@ export function HorizonWeekStrip({
       <button
         type="button"
         onClick={handleNext}
-        className="size-7 sm:size-8 rounded-lg border border-[#E8E5DF] dark:border-[#383531] bg-white dark:bg-[#1C1A18] hover:bg-[#F5F3EF] dark:hover:bg-[#252321] flex items-center justify-center transition-colors cursor-pointer shrink-0 active:translate-y-px text-[#161514] dark:text-[#FAF8F5]"
+        className="size-8 sm:size-9 rounded-xl border-2 border-border hover:border-[#161514] dark:hover:border-white/40 bg-secondary hover:bg-muted flex items-center justify-center transition-all cursor-pointer shrink-0 active:translate-x-0.5 active:translate-y-0.5 text-foreground shadow-2xs"
         aria-label="Next Day"
       >
-        <ChevronRight className="size-3.5 sm:size-4 stroke-[1.5]" />
+        <ChevronRight className="size-4 stroke-[2.2]" />
       </button>
 
       {/* 4. Quick "Today" Snap Pill (Visible when looking at past/future dates) */}
@@ -162,7 +162,7 @@ export function HorizonWeekStrip({
         <button
           type="button"
           onClick={handleToday}
-          className="h-7 sm:h-8 px-2.5 rounded-lg bg-[#161514] hover:bg-[#252321] dark:bg-[#CEF431] dark:hover:bg-[#d6f64d] dark:text-[#161514] text-xs font-medium text-white transition-colors cursor-pointer shrink-0 whitespace-nowrap flex items-center gap-1 active:translate-y-px"
+          className="h-8 sm:h-9 px-3 rounded-xl bg-[#CEF431] hover:bg-[#bce028] text-[#161514] font-heading font-black text-xs border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] dark:shadow-[1.5px_1.5px_0px_0px_#000000] transition-all cursor-pointer shrink-0 whitespace-nowrap flex items-center gap-1 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
         >
           <span>Today</span>
         </button>

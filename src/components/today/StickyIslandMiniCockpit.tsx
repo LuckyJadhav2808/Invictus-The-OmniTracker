@@ -67,15 +67,15 @@ export function StickyIslandMiniCockpit({
       aria-label="Sticky Island Mini Cockpit"
       aria-hidden={!visible}
     >
-      <div className="bg-white/95 border border-[#E8E5DF] rounded-xl px-3 sm:px-4 py-1.5 sm:py-2 shadow-md flex items-center justify-between gap-2 sm:gap-4 backdrop-blur-md">
+      <div className="bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#38332E] rounded-2xl px-3 sm:px-4 py-1.5 sm:py-2 shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] flex items-center justify-between gap-2 sm:gap-4">
         {/* 1. Left: Overall Progress Score + Date */}
-        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-          <div className="inline-flex items-center gap-1 bg-[#DCFAE5] text-[#04250e] font-mono font-medium text-xs px-2 py-0.5 rounded-md border border-[#03D26F]/30">
-            <Zap className="size-3 text-[#03D26F]" />
-            <span className="tabular-nums font-semibold">{metrics.overallScore}%</span>
+        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+          <div className="inline-flex items-center gap-1 bg-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:text-[#161514] border-2 border-[#161514] font-mono font-black text-xs px-2.5 py-0.5 rounded-xl shadow-2xs">
+            <Zap className="size-3 text-[#CEF431] dark:text-[#161514] stroke-[3]" />
+            <span className="tabular-nums font-black">{metrics.overallScore}%</span>
           </div>
 
-          <span className="font-medium text-xs text-[#161514] whitespace-nowrap hidden xs:inline">
+          <span className="font-mono font-bold text-xs text-foreground whitespace-nowrap hidden xs:inline">
             {format(currentDateObj, "EEE, MMM d")}
           </span>
         </div>
@@ -86,21 +86,21 @@ export function StickyIslandMiniCockpit({
             <button
               type="button"
               onClick={handleToggleTimer}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500 hover:bg-amber-600 text-xs font-mono font-medium text-white transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-500 hover:bg-amber-600 border-2 border-[#161514] text-xs font-mono font-black text-white shadow-2xs transition-all cursor-pointer active:translate-x-0.5 active:translate-y-0.5"
               title="Pause Focus Sprint"
             >
-              <span className="inline-block size-1.5 rounded-full bg-white" />
+              <span className="inline-block size-1.5 rounded-full bg-white animate-ping" />
               <span className="tabular-nums">{formatStopwatch(stopwatchSeconds)}</span>
-              <Pause className="size-3" />
+              <Pause className="size-3 stroke-[2.5]" />
             </button>
           ) : (
             <button
               type="button"
               onClick={handleToggleTimer}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#F1EFEA] hover:bg-[#EAE8E3] text-xs font-medium text-[#161514] transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-[#CEF431] hover:bg-[#bce028] border-2 border-[#161514] text-xs font-heading font-black text-[#161514] shadow-2xs transition-all cursor-pointer active:translate-x-0.5 active:translate-y-0.5"
               title="Start Focus Sprint"
             >
-              <Clock className="size-3 text-[#6B6B6B]" />
+              <Clock className="size-3 stroke-[2.5]" />
               <span className="hidden sm:inline">Focus</span>
               <Play className="size-2.5 fill-current" />
             </button>
@@ -108,25 +108,25 @@ export function StickyIslandMiniCockpit({
         </div>
 
         {/* 3. Right: Quick Expense + Smooth Jump to Top */}
-        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+        <div className="flex items-center gap-1.5 shrink-0">
           <button
             type="button"
             onClick={handleExpenseClick}
-            className="px-2 py-1 rounded-md bg-[#F1EFEA] hover:bg-[#EAE8E3] text-xs font-medium text-[#161514] transition-colors cursor-pointer flex items-center gap-1"
+            className="px-2.5 py-1 rounded-xl bg-card hover:bg-secondary border-2 border-[#161514] dark:border-[#38332E] text-xs font-heading font-bold text-foreground shadow-2xs transition-all cursor-pointer flex items-center gap-1 active:translate-x-0.5 active:translate-y-0.5"
             title="Log Expense"
           >
-            <Plus className="size-3 stroke-[1.5]" />
-            <span>{metrics.currencySymbol}</span>
+            <Plus className="size-3.5 stroke-[2.5]" />
+            <span className="font-mono font-black">{metrics.currencySymbol}</span>
           </button>
 
           <button
             type="button"
             onClick={handleTopClick}
-            className="size-7 rounded-md bg-[#161514] text-white flex items-center justify-center hover:bg-[#252321] transition-colors cursor-pointer"
+            className="size-8 rounded-xl bg-secondary hover:bg-muted border-2 border-border hover:border-[#161514] text-foreground flex items-center justify-center transition-all cursor-pointer active:translate-x-0.5 active:translate-y-0.5 shadow-2xs"
             aria-label="Scroll back to top"
             title="Scroll to top"
           >
-            <ArrowUp className="size-3.5 stroke-[1.5]" />
+            <ArrowUp className="size-3.5 stroke-[2.2]" />
           </button>
         </div>
       </div>

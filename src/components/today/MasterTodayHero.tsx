@@ -136,7 +136,7 @@ export const MasterTodayHero = React.memo(function MasterTodayHero({
   return (
     <header className={cn("space-y-4", className)} aria-label="Command Deck">
       {/* 1. Date Navigation Horizon Bar & Ambient Telemetry */}
-      <div className="bg-white dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] p-2.5 sm:p-3 rounded-xl flex flex-wrap items-center justify-between gap-2 sm:gap-3 transition-colors">
+      <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#38332E] p-2.5 sm:p-3 rounded-2xl shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] flex flex-wrap items-center justify-between gap-2 sm:gap-3 transition-colors">
         <HorizonWeekStrip
           currentDateObj={currentDateObj}
           selectedDate={selectedDate || format(currentDateObj, "yyyy-MM-dd")}
@@ -151,17 +151,17 @@ export const MasterTodayHero = React.memo(function MasterTodayHero({
         {/* Mascot & Streak telemetry */}
         <div className="flex items-center gap-2 shrink-0 ml-auto">
           {/* Streak Flame */}
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-[#E8E5DF] dark:border-[#383531] bg-[#FFFBEB] dark:bg-[#261E14] text-[#92400E] dark:text-amber-300 shrink-0">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl border-2 border-[#161514] dark:border-[#38332E] bg-[#FFFBEB] dark:bg-[#261E14] text-[#92400E] dark:text-amber-300 shadow-2xs shrink-0">
             <Flame className="size-3.5 text-orange-500 fill-orange-500 shrink-0" />
-            <span className="font-mono font-medium text-xs tabular-nums">
+            <span className="font-mono font-bold text-xs tabular-nums">
               {streakDays}d streak
             </span>
           </div>
 
           {/* Shield Freeze */}
           {streakFreezeTokens > 0 && (
-            <div className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] bg-[#F1EFEA] dark:bg-[#252321] text-xs font-mono font-medium text-[#161514] dark:text-[#FAF8F5] shrink-0">
-              <Shield className="size-3.5 text-[#161514]/70 dark:text-[#FAF8F5]/70" />
+            <div className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-xl border-2 border-[#161514] dark:border-[#38332E] bg-secondary text-xs font-mono font-bold text-foreground shadow-2xs shrink-0">
+              <Shield className="size-3.5 text-muted-foreground" />
               <span>{streakFreezeTokens} shield</span>
             </div>
           )}
@@ -169,40 +169,40 @@ export const MasterTodayHero = React.memo(function MasterTodayHero({
           {/* Pixel Companion */}
           <VixPixelCompanion
             state={vixState}
-            size={32}
+            size={34}
             streakDays={streakDays}
           />
         </div>
       </div>
 
       {/* 2. Unified Master Cockpit Card: Context Hero + Tri-Rings HUD */}
-      <div className="rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] p-5 sm:p-6 bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] transition-colors">
+      <div className="rounded-2xl border-2 border-[#161514] dark:border-[#38332E] p-5 sm:p-6 bg-[#FAF8F5] dark:bg-[#161514] text-[#161514] dark:text-[#FAF8F5] shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] transition-colors">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
           {/* Left Column (lg:col-span-7): Clean Title & Action Deck */}
           <div className="lg:col-span-7 space-y-4 min-w-0">
             {/* Context Badge Row */}
             <div className="flex items-center justify-between gap-2 flex-wrap">
               <div className="flex items-center gap-2">
-                <div className="size-7 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] bg-[#F1EFEA] dark:bg-[#252321] flex items-center justify-center shrink-0 text-[#161514] dark:text-[#FAF8F5]">
-                  <DaypartIcon className="size-3.5 stroke-[1.5]" />
+                <div className="size-7 rounded-lg border-2 border-[#161514] dark:border-[#38332E] bg-secondary flex items-center justify-center shrink-0 text-foreground shadow-2xs">
+                  <DaypartIcon className="size-3.5 stroke-[2]" />
                 </div>
-                <span className="text-xs font-medium text-[#6B6B6B] dark:text-[#A8A29E] px-2 py-0.5 rounded-md bg-[#F1EFEA] dark:bg-[#252321]">
+                <span className="text-xs font-mono font-bold text-foreground px-2 py-0.5 rounded-md bg-secondary border border-border">
                   {daypartConfig.badgeText}
                 </span>
               </div>
 
               {/* Daypart Mode Switcher */}
-              <div className="flex items-center p-0.5 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] bg-[#F1EFEA] dark:bg-[#252321] shrink-0">
+              <div className="flex items-center p-0.5 rounded-xl border-2 border-border bg-secondary shrink-0">
                 {(["auto", "dawn", "forge", "night"] as const).map((mode) => (
                   <button
                     key={mode}
                     type="button"
                     onClick={() => handleModeChange(mode)}
                     className={cn(
-                      "px-2.5 py-1 rounded text-xs font-medium transition-colors cursor-pointer",
+                      "px-2.5 py-1 rounded-lg text-xs font-mono transition-all cursor-pointer",
                       daypartMode === mode
-                        ? "bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] shadow-sm font-semibold"
-                        : "text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5]"
+                        ? "bg-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:text-[#161514] font-black shadow-[1px_1px_0px_0px_#161514]"
+                        : "text-muted-foreground hover:text-foreground"
                     )}
                     title={`Switch to ${modeLabels[mode]}`}
                   >
@@ -214,20 +214,20 @@ export const MasterTodayHero = React.memo(function MasterTodayHero({
 
             {/* Clear Title Row */}
             <div className="space-y-1">
-              <h1 className="font-heading font-semibold text-2xl sm:text-3xl tracking-tight leading-tight text-[#161514] dark:text-[#FAF8F5]">
+              <h1 className="font-heading font-black text-2xl sm:text-3xl tracking-tight leading-tight text-foreground">
                 {isToday
                   ? (effectiveDaypart === "night"
                       ? `Evening Review, ${displayName}`
                       : effectiveDaypart === "forge"
-                      ? `Afternoon Focus, ${displayName}`
+                      ? `Afternoon Forge, ${displayName}`
                       : `Morning Focus, ${displayName}`)
                   : format(currentDateObj, "EEEE, MMMM d")}
               </h1>
-              <p className="text-xs sm:text-sm font-normal leading-relaxed text-[#6B6B6B] dark:text-[#A8A29E]">
+              <p className="text-xs sm:text-sm font-sans font-medium leading-relaxed text-muted-foreground">
                 {isToday
                   ? (effectiveDaypart === "night"
                       ? "Daily review ready. Check remaining tasks, preserve your streak, and wrap up."
-                      : `${totalHabitsCount} habits planned · 4.0h study goal · ${metrics.currencySymbol}${metrics.remainingSafeToSpend.toLocaleString()} safe budget`)
+                      : `${totalHabitsCount} habits planned · 4.0h study goal · ${metrics.currencySymbol}${metrics.remainingSafeToSpend.toLocaleString()} safe spend`)
                   : `Viewing recorded logs for ${format(currentDateObj, "MMMM d, yyyy")}`}
               </p>
             </div>
@@ -240,14 +240,14 @@ export const MasterTodayHero = React.memo(function MasterTodayHero({
                   type="button"
                   onClick={() => handleInteractiveClick(onToggleTimer)}
                   className={cn(
-                    "min-h-[40px] px-4 py-2 rounded-lg active:translate-y-px flex items-center gap-2 text-xs font-medium transition-colors cursor-pointer",
+                    "min-h-[42px] px-4 py-2 rounded-xl border-2 border-[#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none flex items-center gap-2 text-xs font-heading font-black transition-all cursor-pointer shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]",
                     isStudyingActive
                       ? "bg-amber-500 hover:bg-amber-600 text-white"
-                      : "bg-[#161514] dark:bg-[#FAF8F5] hover:bg-[#252321] dark:hover:bg-neutral-200 text-white dark:text-[#161514]"
+                      : "bg-[#CEF431] hover:bg-[#bce028] text-[#161514]"
                   )}
                 >
                   {isStudyingActive ? (
-                    <Pause className="size-3.5 stroke-[1.5]" />
+                    <Pause className="size-3.5 stroke-[2.5]" />
                   ) : (
                     <Play className="size-3.5 fill-current" />
                   )}
@@ -260,9 +260,9 @@ export const MasterTodayHero = React.memo(function MasterTodayHero({
                 <button
                   type="button"
                   onClick={() => handleInteractiveClick(onOpenExpenseModal)}
-                  className="min-h-[40px] px-3 py-2 bg-white dark:bg-[#252321] hover:bg-[#F5F3EF] dark:hover:bg-[#2F2C29] border border-[#E8E5DF] dark:border-[#2A2724] rounded-lg active:translate-y-px flex items-center gap-1.5 text-xs font-medium text-[#161514] dark:text-[#FAF8F5] transition-colors cursor-pointer"
+                  className="min-h-[42px] px-3.5 py-2 bg-card hover:bg-secondary border-2 border-[#161514] dark:border-[#38332E] rounded-xl active:translate-x-0.5 active:translate-y-0.5 active:shadow-none flex items-center gap-1.5 text-xs font-heading font-bold text-foreground shadow-[1.5px_1.5px_0px_0px_#161514] dark:shadow-[1.5px_1.5px_0px_0px_#000000] transition-all cursor-pointer"
                 >
-                  <Wallet className="size-3.5 text-[#6B6B6B] dark:text-[#A8A29E] stroke-[1.5]" />
+                  <Wallet className="size-3.5 text-muted-foreground stroke-[2]" />
                   <span>Log Expense</span>
                 </button>
               )}
@@ -272,10 +272,10 @@ export const MasterTodayHero = React.memo(function MasterTodayHero({
                 <button
                   type="button"
                   onClick={() => handleInteractiveClick(onOpenScratchpad)}
-                  className="min-h-[40px] px-3 py-2 bg-white dark:bg-[#252321] hover:bg-[#F5F3EF] dark:hover:bg-[#2F2C29] border border-[#E8E5DF] dark:border-[#2A2724] rounded-lg active:translate-y-px flex items-center gap-1.5 text-xs font-medium text-[#161514] dark:text-[#FAF8F5] transition-colors cursor-pointer"
+                  className="min-h-[42px] px-3.5 py-2 bg-card hover:bg-secondary border-2 border-[#161514] dark:border-[#38332E] rounded-xl active:translate-x-0.5 active:translate-y-0.5 active:shadow-none flex items-center gap-1.5 text-xs font-heading font-bold text-foreground shadow-[1.5px_1.5px_0px_0px_#161514] dark:shadow-[1.5px_1.5px_0px_0px_#000000] transition-all cursor-pointer"
                   title="Open Scratchpad (⌘J)"
                 >
-                  <FileText className="size-3.5 text-[#6B6B6B] dark:text-[#A8A29E] stroke-[1.5]" />
+                  <FileText className="size-3.5 text-muted-foreground stroke-[2]" />
                   <span>Scratchpad</span>
                 </button>
               )}
@@ -285,10 +285,10 @@ export const MasterTodayHero = React.memo(function MasterTodayHero({
                 <button
                   type="button"
                   onClick={() => handleInteractiveClick(onOpenCloseoutDrawer)}
-                  className="min-h-[40px] px-3 py-2 bg-white dark:bg-[#252321] hover:bg-[#F5F3EF] dark:hover:bg-[#2F2C29] border border-[#E8E5DF] dark:border-[#2A2724] rounded-lg active:translate-y-px flex items-center gap-1.5 text-xs font-medium text-[#161514] dark:text-[#FAF8F5] transition-colors cursor-pointer"
+                  className="min-h-[42px] px-3.5 py-2 bg-card hover:bg-secondary border-2 border-[#161514] dark:border-[#38332E] rounded-xl active:translate-x-0.5 active:translate-y-0.5 active:shadow-none flex items-center gap-1.5 text-xs font-heading font-bold text-foreground shadow-[1.5px_1.5px_0px_0px_#161514] dark:shadow-[1.5px_1.5px_0px_0px_#000000] transition-all cursor-pointer"
                   title="Open Evening Closeout Drawer"
                 >
-                  <Moon className="size-3.5 text-[#6B6B6B] dark:text-[#A8A29E] stroke-[1.5]" />
+                  <Moon className="size-3.5 text-muted-foreground stroke-[2]" />
                   <span>{effectiveDaypart === "night" ? "Review & Close" : "Review Day"}</span>
                 </button>
               )}
@@ -296,17 +296,17 @@ export const MasterTodayHero = React.memo(function MasterTodayHero({
           </div>
 
           {/* Right Column (lg:col-span-5): Clean Concentric HUD */}
-          <div className="lg:col-span-5 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] p-4 bg-[#FBF9F5] dark:bg-[#161514] text-[#161514] dark:text-[#FAF8F5] space-y-3 transition-colors">
+          <div className="lg:col-span-5 rounded-2xl border-2 border-[#161514] dark:border-[#38332E] p-4.5 bg-card text-foreground space-y-3.5 shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] transition-colors">
             {/* Telemetry Header */}
-            <div className="flex items-center justify-between pb-2 border-b border-[#E8E5DF] dark:border-[#2A2724]">
-              <span className="font-sans font-semibold text-xs text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5">
-                <Zap className="size-3.5 text-[#03D26F] stroke-[1.5]" />
-                <span>Daily Momentum</span>
+            <div className="flex items-center justify-between pb-2 border-b-2 border-border">
+              <span className="font-heading font-black text-xs text-foreground flex items-center gap-1.5">
+                <Zap className="size-3.5 text-[#03D26F] stroke-[2.5]" />
+                <span>Daily Conquest Index</span>
               </span>
 
-              <div className="inline-flex items-center gap-1 bg-[#DCFAE5] dark:bg-[#03D26F]/20 text-[#04250e] dark:text-[#03D26F] font-mono font-medium text-xs px-2 py-0.5 rounded-md border border-[#03D26F]/30">
-                <span className="tabular-nums font-semibold">{metrics.overallScore}%</span>
-                <span>completed</span>
+              <div className="inline-flex items-center gap-1 bg-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:text-[#161514] border-2 border-[#161514] font-mono font-black text-xs px-2.5 py-0.5 rounded-xl shadow-2xs">
+                <span className="tabular-nums">{metrics.overallScore}%</span>
+                <span className="opacity-80">Score</span>
               </div>
             </div>
 
@@ -320,14 +320,14 @@ export const MasterTodayHero = React.memo(function MasterTodayHero({
                   aria-label={`Daily Progress: ${metrics.overallScore}% complete`}
                 >
                   {/* Outer Ring: Habits (🟢 #03D26F) */}
-                  <circle cx="80" cy="80" r="66" fill="none" stroke="#03D26F" strokeWidth="8" opacity="0.15" />
+                  <circle cx="80" cy="80" r="66" fill="none" stroke="#03D26F" strokeWidth="9" opacity="0.15" />
                   <circle
                     cx="80"
                     cy="80"
                     r="66"
                     fill="none"
                     stroke="#03D26F"
-                    strokeWidth="8"
+                    strokeWidth="9"
                     strokeLinecap="round"
                     strokeDasharray={CIRC_HABITS}
                     strokeDashoffset={habitOffset}
@@ -338,14 +338,14 @@ export const MasterTodayHero = React.memo(function MasterTodayHero({
                   />
 
                   {/* Middle Ring: Study Focus (Obsidian #161514 in light, Lavender #C084FC in dark) */}
-                  <circle cx="80" cy="80" r="50" fill="none" className="stroke-[#161514] dark:stroke-[#C084FC]" strokeWidth="8" opacity="0.2" />
+                  <circle cx="80" cy="80" r="50" fill="none" className="stroke-[#161514] dark:stroke-[#C084FC]" strokeWidth="9" opacity="0.2" />
                   <circle
                     cx="80"
                     cy="80"
                     r="50"
                     fill="none"
                     className="stroke-[#161514] dark:stroke-[#C084FC]"
-                    strokeWidth="8"
+                    strokeWidth="9"
                     strokeLinecap="round"
                     strokeDasharray={CIRC_STUDY}
                     strokeDashoffset={studyOffset}
@@ -356,14 +356,14 @@ export const MasterTodayHero = React.memo(function MasterTodayHero({
                   />
 
                   {/* Inner Ring: Budget Safe-to-Spend (Amber #D97706) */}
-                  <circle cx="80" cy="80" r="34" fill="none" stroke="#D97706" strokeWidth="8" opacity="0.15" />
+                  <circle cx="80" cy="80" r="34" fill="none" stroke="#D97706" strokeWidth="9" opacity="0.15" />
                   <circle
                     cx="80"
                     cy="80"
                     r="34"
                     fill="none"
                     stroke="#D97706"
-                    strokeWidth="8"
+                    strokeWidth="9"
                     strokeLinecap="round"
                     strokeDasharray={CIRC_BUDGET}
                     strokeDashoffset={budgetOffset}
@@ -376,11 +376,11 @@ export const MasterTodayHero = React.memo(function MasterTodayHero({
 
                 {/* Score in center */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none select-none">
-                  <span className="font-mono font-bold text-xl text-[#161514] dark:text-[#FAF8F5] leading-none tabular-nums">
+                  <span className="font-heading font-black text-2xl text-foreground leading-none tabular-nums">
                     {metrics.overallScore}%
                   </span>
-                  <span className="font-sans text-[11px] text-[#6B6B6B] dark:text-[#A8A29E] mt-0.5">
-                    Score
+                  <span className="font-mono font-bold text-[10px] text-muted-foreground uppercase mt-0.5">
+                    Conquest
                   </span>
                 </div>
               </div>
@@ -391,20 +391,20 @@ export const MasterTodayHero = React.memo(function MasterTodayHero({
                 <button
                   type="button"
                   onClick={() => handleInteractiveClick(onScrollToHabits)}
-                  className="w-full bg-white dark:bg-[#252321] hover:bg-[#F5F3EF] dark:hover:bg-[#2F2C29] border border-[#E8E5DF] dark:border-[#2A2724] rounded-lg px-2.5 py-1.5 flex items-center justify-between text-left transition-colors cursor-pointer group active:translate-y-px"
+                  className="w-full bg-[#FAF8F5] dark:bg-[#161514] hover:bg-secondary border-2 border-[#161514] dark:border-[#38332E] rounded-xl px-2.5 py-1.5 flex items-center justify-between text-left transition-all cursor-pointer group active:translate-x-0.5 active:translate-y-0.5 shadow-2xs"
                   title="Jump to Habits"
                 >
                   <div className="flex items-center gap-1.5 min-w-0">
                     <span className="size-2 rounded-full bg-[#03D26F] shrink-0" />
-                    <span className="font-sans font-medium text-xs text-[#161514] dark:text-[#FAF8F5] truncate">
+                    <span className="font-heading font-black text-xs text-foreground truncate">
                       Habits
                     </span>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
-                    <span className="font-mono text-xs text-[#161514] dark:text-[#FAF8F5] tabular-nums">
+                    <span className="font-mono font-bold text-xs text-foreground tabular-nums">
                       {metrics.completedHabitsCount}/{metrics.totalHabitsCount} ({metrics.habitPercent}%)
                     </span>
-                    <ChevronRight className="size-3 text-[#6B6B6B]/60 dark:text-[#A8A29E]/60 group-hover:text-[#161514] dark:group-hover:text-[#FAF8F5] transition-colors" />
+                    <ChevronRight className="size-3 text-muted-foreground group-hover:text-foreground transition-colors" />
                   </div>
                 </button>
 
@@ -412,20 +412,20 @@ export const MasterTodayHero = React.memo(function MasterTodayHero({
                 <button
                   type="button"
                   onClick={() => handleInteractiveClick(onScrollToStudy)}
-                  className="w-full bg-white dark:bg-[#252321] hover:bg-[#F5F3EF] dark:hover:bg-[#2F2C29] border border-[#E8E5DF] dark:border-[#2A2724] rounded-lg px-2.5 py-1.5 flex items-center justify-between text-left transition-colors cursor-pointer group active:translate-y-px"
+                  className="w-full bg-[#FAF8F5] dark:bg-[#161514] hover:bg-secondary border-2 border-[#161514] dark:border-[#38332E] rounded-xl px-2.5 py-1.5 flex items-center justify-between text-left transition-all cursor-pointer group active:translate-x-0.5 active:translate-y-0.5 shadow-2xs"
                   title="Jump to Study"
                 >
                   <div className="flex items-center gap-1.5 min-w-0">
                     <span className="size-2 rounded-full bg-[#161514] dark:bg-[#C084FC] shrink-0" />
-                    <span className="font-sans font-medium text-xs text-[#161514] dark:text-[#FAF8F5] truncate">
+                    <span className="font-heading font-black text-xs text-foreground truncate">
                       Study
                     </span>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
-                    <span className="font-mono text-xs text-[#161514] dark:text-[#FAF8F5] tabular-nums">
+                    <span className="font-mono font-bold text-xs text-foreground tabular-nums">
                       {metrics.studyHoursFormatted}/{metrics.studyTargetHoursFormatted} ({metrics.studyPercent}%)
                     </span>
-                    <ChevronRight className="size-3 text-[#6B6B6B]/60 dark:text-[#A8A29E]/60 group-hover:text-[#161514] dark:group-hover:text-[#FAF8F5] transition-colors" />
+                    <ChevronRight className="size-3 text-muted-foreground group-hover:text-foreground transition-colors" />
                   </div>
                 </button>
 
@@ -433,20 +433,20 @@ export const MasterTodayHero = React.memo(function MasterTodayHero({
                 <button
                   type="button"
                   onClick={() => handleInteractiveClick(onScrollToMoney)}
-                  className="w-full bg-white dark:bg-[#252321] hover:bg-[#F5F3EF] dark:hover:bg-[#2F2C29] border border-[#E8E5DF] dark:border-[#2A2724] rounded-lg px-2.5 py-1.5 flex items-center justify-between text-left transition-colors cursor-pointer group active:translate-y-px"
+                  className="w-full bg-[#FAF8F5] dark:bg-[#161514] hover:bg-secondary border-2 border-[#161514] dark:border-[#38332E] rounded-xl px-2.5 py-1.5 flex items-center justify-between text-left transition-all cursor-pointer group active:translate-x-0.5 active:translate-y-0.5 shadow-2xs"
                   title="Jump to Safe Spend"
                 >
                   <div className="flex items-center gap-1.5 min-w-0">
                     <span className="size-2 rounded-full bg-[#D97706] shrink-0" />
-                    <span className="font-sans font-medium text-xs text-[#161514] dark:text-[#FAF8F5] truncate">
+                    <span className="font-heading font-black text-xs text-foreground truncate">
                       Safe Left
                     </span>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
-                    <span className="font-mono text-xs text-[#161514] dark:text-[#FAF8F5] tabular-nums">
+                    <span className="font-mono font-bold text-xs text-foreground tabular-nums">
                       {metrics.currencySymbol}{metrics.remainingSafeToSpend.toLocaleString()}
                     </span>
-                    <ChevronRight className="size-3 text-[#6B6B6B]/60 dark:text-[#A8A29E]/60 group-hover:text-[#161514] dark:group-hover:text-[#FAF8F5] transition-colors" />
+                    <ChevronRight className="size-3 text-muted-foreground group-hover:text-foreground transition-colors" />
                   </div>
                 </button>
               </div>
