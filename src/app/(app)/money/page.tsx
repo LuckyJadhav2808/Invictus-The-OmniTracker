@@ -16,7 +16,8 @@ import {
 } from "@/lib/queries/money";
 import type { TemplatePack } from "@/components/shared/TemplateSelectionModal";
 import { BUDGET_CATEGORY_TEMPLATE_PACKS } from "@/lib/templates-data";
-import { Receipt, Target, PiggyBank, BarChart2, Users } from "lucide-react";
+import { Receipt, Target, PiggyBank, BarChart2, Users, Plus, RotateCcw, FileSpreadsheet } from "lucide-react";
+import { DropdownMenuItem, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
 import { format, parseISO } from "date-fns";
 import { soundFX } from "@/components/shared/SoundFX";
 import { toast } from "sonner";
@@ -753,7 +754,65 @@ function MoneyPageContent() {
   return (
     <div className="w-full max-w-xl mx-auto select-none space-y-2 sm:space-y-3 pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
       {/* ================= SLOT 1: SLIM TOP APP BAR (48-56px) ================= */}
-      <MobileAppBar title="Money" />
+      <MobileAppBar
+        title="Money"
+        selectedDate={effectiveTargetMonthKey}
+        dateLabel={monthlyStats.targetMonthLabel}
+        dateShortLabel={format(new Date(effectiveTargetMonthKey + "-01"), "MMM yy")}
+        onSelectDate={handleResetToCurrentMonth}
+        isCalendarActive={!monthlyStats.isCurrentCalendarMonth}
+        calendarTooltip={
+          monthlyStats.isCurrentCalendarMonth
+            ? "Viewing current month"
+            : "Jump back to current month"
+        }
+        customMenuItems={
+          <>
+            <DropdownMenuLabel className="text-[10px] font-mono font-bold uppercase tracking-wider text-muted-foreground px-2 py-1">
+              Quick Actions
+            </DropdownMenuLabel>
+            <DropdownMenuItem
+              onClick={() => {
+                soundFX.playPop();
+                setIsAddTxOpen(true);
+              }}
+              className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-black cursor-pointer hover:bg-secondary focus:bg-secondary"
+            >
+              <div className="flex items-center gap-2">
+                <Plus className="size-3.5 text-[#03D26F] stroke-[2.5]" />
+                <span>Log Transaction</span>
+              </div>
+              <span className="text-[9px] font-mono text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                ⌘N
+              </span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                soundFX.playPop();
+                handleResetToCurrentMonth();
+              }}
+              className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-bold cursor-pointer hover:bg-secondary focus:bg-secondary"
+            >
+              <div className="flex items-center gap-2">
+                <RotateCcw className="size-3.5 text-muted-foreground stroke-[2.2]" />
+                <span>Reset to Current Month</span>
+              </div>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                soundFX.playPop();
+                setIsExportModalOpen(true);
+              }}
+              className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-bold cursor-pointer hover:bg-secondary focus:bg-secondary"
+            >
+              <div className="flex items-center gap-2">
+                <FileSpreadsheet className="size-3.5 text-muted-foreground stroke-[2.2]" />
+                <span>Export PDF / CSV</span>
+              </div>
+            </DropdownMenuItem>
+          </>
+        }
+      />
 
       {/* ================= SLOT 2: STICKY SUB-NAV (4 PILLS: LEDGER | BUDGETS | IOUS | VAULT) ================= */}
       <SegmentedSubNav

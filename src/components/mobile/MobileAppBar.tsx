@@ -35,30 +35,40 @@ export interface MobileAppBarProps {
   title: string;
   selectedDate?: string;
   onSelectDate?: (date: string) => void;
+  dateLabel?: string;
+  dateShortLabel?: string;
+  calendarTooltip?: string;
+  isCalendarActive?: boolean;
   onCheckAllDue?: () => void;
   isAllDueCompleted?: boolean;
   dueCount?: number;
   className?: string;
+  customMenuItems?: React.ReactNode;
 }
 
 export function MobileAppBar({
   title,
   selectedDate,
   onSelectDate,
+  dateLabel,
+  dateShortLabel,
+  calendarTooltip,
+  isCalendarActive,
   onCheckAllDue,
   isAllDueCompleted = false,
   dueCount = 0,
   className,
+  customMenuItems,
 }: MobileAppBarProps) {
   const { habitLayoutStyle, setHabitLayoutStyle } = useUIStore();
   const { isOnline, isSyncing, pendingCount } = useOfflineSync();
   const [soundMuted, setSoundMuted] = useState(soundFX.isMuted());
 
   const todayStr = format(new Date(), "yyyy-MM-dd");
-  const dateObj = selectedDate ? new Date(selectedDate) : new Date();
-  const shortDate = format(dateObj, "MMM d");
-  const fullDate = format(dateObj, "EEE, MMM d");
-  const isViewingToday = !selectedDate || selectedDate === todayStr;
+  const dateObj = selectedDate ? new Date(selectedDate.length === 7 ? `${selectedDate}-01` : selectedDate) : new Date();
+  const shortDate = dateShortLabel || format(dateObj, "MMM d");
+  const fullDate = dateLabel || format(dateObj, "EEE, MMM d");
+  const isViewingToday = isCalendarActive !== undefined ? !isCalendarActive : (!selectedDate || selectedDate === todayStr);
 
   const handleToggleSound = () => {
     soundFX.playPop();
@@ -69,7 +79,7 @@ export function MobileAppBar({
   return (
     <header
       className={cn(
-        "sticky top-0 z-30 w-full h-[52px] px-3.5 bg-[#FAF8F5]/90 dark:bg-[#161514]/90 backdrop-blur-md border-b border-[#161514]/10 dark:border-white/10 flex items-center justify-between select-none transition-colors",
+        "sticky top-0 z-30 w-full h-[52px] px-3.5 bg-[#FAF8F5]/90 dark:bg-[#161514]/90 backdrop-blur-md border-b border-[#161514]/10 dark:border-white/10 flex items-center justify-between select-none transition-colors lg:hidden",
         className
       )}
     >
@@ -105,8 +115,8 @@ export function MobileAppBar({
                 ? "bg-secondary border-border text-muted-foreground hover:text-foreground"
                 : "bg-[#CEF431] text-[#161514] border-[#161514] shadow-2xs font-bold"
             )}
-            title={isViewingToday ? "Viewing Today" : "Jump back to Today"}
-            aria-label="Jump to Today"
+            title={calendarTooltip || (isViewingToday ? "Viewing Today" : "Jump back to Today")}
+            aria-label={calendarTooltip || "Jump to Today"}
           >
             <Calendar className="size-4 stroke-[2.2]" />
           </button>
@@ -130,96 +140,105 @@ export function MobileAppBar({
             align="end"
             className="w-56 p-1.5 bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#38332E] rounded-2xl shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] z-50 animate-in fade-in zoom-in-95 duration-150"
           >
-            <DropdownMenuLabel className="text-[10px] font-mono font-bold uppercase tracking-wider text-muted-foreground px-2 py-1">
-              Bulk Actions
-            </DropdownMenuLabel>
+            {customMenuItems ? (
+              <>
+                {customMenuItems}
+                <DropdownMenuSeparator className="my-1 bg-border" />
+              </>
+            ) : (
+              <>
+                {onCheckAllDue && (
+                  <>
+                    <DropdownMenuLabel className="text-[10px] font-mono font-bold uppercase tracking-wider text-muted-foreground px-2 py-1">
+                      Bulk Actions
+                    </DropdownMenuLabel>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        soundFX.playPop();
+                        onCheckAllDue();
+                      }}
+                      className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-black cursor-pointer hover:bg-secondary focus:bg-secondary"
+                    >
+                      <div className="flex items-center gap-2">
+                        {isAllDueCompleted ? (
+                          <RotateCcw className="size-3.5 text-muted-foreground stroke-[2.2]" />
+                        ) : (
+                          <CheckCheck className="size-3.5 text-[#03D26F] stroke-[2.5]" />
+                        )}
+                        <span>{isAllDueCompleted ? "Reset Routines" : "Check All Due"}</span>
+                      </div>
+                      <span className="text-[9px] font-mono text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                        Shift+⌘A
+                      </span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator className="my-1 bg-border" />
+                  </>
+                )}
 
-            {onCheckAllDue && (
-              <DropdownMenuItem
-                onClick={() => {
-                  soundFX.playPop();
-                  onCheckAllDue();
-                }}
-                className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-black cursor-pointer hover:bg-secondary focus:bg-secondary"
-              >
-                <div className="flex items-center gap-2">
-                  {isAllDueCompleted ? (
-                    <RotateCcw className="size-3.5 text-muted-foreground stroke-[2.2]" />
-                  ) : (
-                    <CheckCheck className="size-3.5 text-[#03D26F] stroke-[2.5]" />
+                <DropdownMenuLabel className="text-[10px] font-mono font-bold uppercase tracking-wider text-muted-foreground px-2 py-1">
+                  Layout Density
+                </DropdownMenuLabel>
+
+                <DropdownMenuItem
+                  onClick={() => {
+                    soundFX.playPop();
+                    setHabitLayoutStyle("compact");
+                  }}
+                  className={cn(
+                    "flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-bold cursor-pointer hover:bg-secondary focus:bg-secondary",
+                    habitLayoutStyle === "compact" && "bg-secondary font-black text-foreground"
                   )}
-                  <span>{isAllDueCompleted ? "Reset Routines" : "Check All Due"}</span>
-                </div>
-                <span className="text-[9px] font-mono text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
-                  Shift+⌘A
-                </span>
-              </DropdownMenuItem>
+                >
+                  <div className="flex items-center gap-2">
+                    <Rows className="size-3.5" />
+                    <span>Compact Rows</span>
+                  </div>
+                  {habitLayoutStyle === "compact" && (
+                    <span className="size-1.5 rounded-full bg-[#03D26F]" />
+                  )}
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  onClick={() => {
+                    soundFX.playPop();
+                    setHabitLayoutStyle("cards");
+                  }}
+                  className={cn(
+                    "flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-bold cursor-pointer hover:bg-secondary focus:bg-secondary",
+                    habitLayoutStyle === "cards" && "bg-secondary font-black text-foreground"
+                  )}
+                >
+                  <div className="flex items-center gap-2">
+                    <LayoutList className="size-3.5" />
+                    <span>Card View</span>
+                  </div>
+                  {habitLayoutStyle === "cards" && (
+                    <span className="size-1.5 rounded-full bg-[#03D26F]" />
+                  )}
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  onClick={() => {
+                    soundFX.playPop();
+                    setHabitLayoutStyle("matrix");
+                  }}
+                  className={cn(
+                    "flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-bold cursor-pointer hover:bg-secondary focus:bg-secondary",
+                    habitLayoutStyle === "matrix" && "bg-secondary font-black text-foreground"
+                  )}
+                >
+                  <div className="flex items-center gap-2">
+                    <Grid className="size-3.5" />
+                    <span>Heatmap Matrix</span>
+                  </div>
+                  {habitLayoutStyle === "matrix" && (
+                    <span className="size-1.5 rounded-full bg-[#03D26F]" />
+                  )}
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator className="my-1 bg-border" />
+              </>
             )}
-
-            <DropdownMenuSeparator className="my-1 bg-border" />
-
-            <DropdownMenuLabel className="text-[10px] font-mono font-bold uppercase tracking-wider text-muted-foreground px-2 py-1">
-              Layout Density
-            </DropdownMenuLabel>
-
-            <DropdownMenuItem
-              onClick={() => {
-                soundFX.playPop();
-                setHabitLayoutStyle("compact");
-              }}
-              className={cn(
-                "flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-bold cursor-pointer hover:bg-secondary focus:bg-secondary",
-                habitLayoutStyle === "compact" && "bg-secondary font-black text-foreground"
-              )}
-            >
-              <div className="flex items-center gap-2">
-                <Rows className="size-3.5" />
-                <span>Compact Rows</span>
-              </div>
-              {habitLayoutStyle === "compact" && (
-                <span className="size-1.5 rounded-full bg-[#03D26F]" />
-              )}
-            </DropdownMenuItem>
-
-            <DropdownMenuItem
-              onClick={() => {
-                soundFX.playPop();
-                setHabitLayoutStyle("cards");
-              }}
-              className={cn(
-                "flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-bold cursor-pointer hover:bg-secondary focus:bg-secondary",
-                habitLayoutStyle === "cards" && "bg-secondary font-black text-foreground"
-              )}
-            >
-              <div className="flex items-center gap-2">
-                <LayoutList className="size-3.5" />
-                <span>Card View</span>
-              </div>
-              {habitLayoutStyle === "cards" && (
-                <span className="size-1.5 rounded-full bg-[#03D26F]" />
-              )}
-            </DropdownMenuItem>
-
-            <DropdownMenuItem
-              onClick={() => {
-                soundFX.playPop();
-                setHabitLayoutStyle("matrix");
-              }}
-              className={cn(
-                "flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-bold cursor-pointer hover:bg-secondary focus:bg-secondary",
-                habitLayoutStyle === "matrix" && "bg-secondary font-black text-foreground"
-              )}
-            >
-              <div className="flex items-center gap-2">
-                <Grid className="size-3.5" />
-                <span>Heatmap Matrix</span>
-              </div>
-              {habitLayoutStyle === "matrix" && (
-                <span className="size-1.5 rounded-full bg-[#03D26F]" />
-              )}
-            </DropdownMenuItem>
-
-            <DropdownMenuSeparator className="my-1 bg-border" />
 
             <DropdownMenuItem
               onClick={handleToggleSound}
