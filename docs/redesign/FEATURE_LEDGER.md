@@ -159,16 +159,45 @@
 
 ---
 
+## 3. Today Action Cockpit (`/today`)
+
+| ID | Domain | Route | Feature / Control | Current Location | New Location | Depth | Container | Status |
+|:---|:---|:---|:---|:---|:---|:---:|:---:|:---:|
+| **T-01** | `CORE` | `/today` | Page Title "Today" + Live Date | `SpaceHeader` | `MobileAppBar` (Left): "Today" + compact date badge | L1 | `INLINE` | `KEPT` |
+| **T-02** | `CORE` | `/today` | Dynamic Island Live Activity Dock | `StickyIslandMiniCockpit` (floating) | `MobileAppBar` (Center) on mobile; `SpaceHeader` on desktop | L1 | `INLINE` | `MOVED` |
+| **T-03** | `CORE` | `/today` | Calendar Jump to Today / Date Picker | Date Scrubber button | `MobileAppBar` (Right Icon 1) + Horizon Scrubber | L1 | `INLINE` | `KEPT` |
+| **T-04** | `CORE` | `/today` | Daily Conquest Score & % Gauge | `TodayCommandDeck` (boxed card) | `TodayHeroPager` (Slide 1: Borderless Hero Surface) | L1 | `INLINE` | `KEPT` |
+| **T-05** | `CORE` | `/today` | Strobi Mascot & Coach Directive | Inside inner box of `TodayCommandDeck` | Pinned ambient avatar in Hero top corner with live haptics | L1 | `INLINE` | `MOVED` |
+| **T-06** | `MONEY` | `/today` | Safe-to-Spend Daily Glance | `TodayCommandDeck` Sector 2 | `TodayHeroPager` (Slide 2) & Door Tile 4 | L1 | `INLINE` | `KEPT` |
+| **T-07** | `HABITS` | `/today` | Active Streak & Cryo-Shields | `TodayCommandDeck` Sector 3 | `TodayHeroPager` (Slide 3) | L1 | `INLINE` | `KEPT` |
+| **T-08** | `CORE` | `/today` | 7-Day Horizon Scrubber | Inside `TodayCommandDeck` card | Hairline unboxed strip below Hero | L1 | `INLINE` | `KEPT` |
+| **T-09** | `CORE` | `/today` | Quick Notes / Scratchpad | Header button in deck | Door Tile 1: `📝 Notes` -> opens `RetroStickyScratchpadDrawer` | L2 | `SHEET` | `MOVED` |
+| **T-10** | `CORE` | `/today` | Evening Review / Closeout | Header button in deck | Door Tile 2: `🌙 Review` -> opens `EveningCloseoutDrawer` | L2 | `SHEET` | `MOVED` |
+| **T-11** | `HEALTH` | `/today` | Hydration Glance & Quick Water | Hidden in Habits page | Door Tile 3: `💧 Water` (1250/2000ml) + Flower Menu petal | L1/L2 | `SHEET` | `KEPT` |
+| **T-12** | `MONEY` | `/today` | Daily Spending Limit Calibration | In-card prompt | Door Tile 4: `💰 Limit` -> opens `AllowanceSettingsModal` | L2 | `SHEET` | `KEPT` |
+| **T-13** | `CORE` | `/today` | Chronological Day Agenda | Below hero (boxed card) | Slot 5 Primary Checklist (Morning/Workload/Night) | L1 | `INLINE` | `KEPT` |
+| **T-14** | `HABITS` | `/today` | 1-Tap Habit Completion Check | Agenda checkbox | Agenda 24px tactile checkbox with soundFX & haptics | L1 | `INLINE` | `KEPT` |
+| **T-15** | `TASKS` | `/today` | 1-Tap Task Completion Check | Agenda checkbox | Agenda 24px tactile checkbox with soundFX & haptics | L1 | `INLINE` | `KEPT` |
+| **T-16** | `CORE` | `/today` | Agenda Filter (To Do / Done / All) | Segmented pill row | Compact mono filter pill row with live counts | L1 | `INLINE` | `KEPT` |
+| **T-17** | `HABITS` | `/today` | Top Habits Momentum Strip | Stretched card at bottom | Desktop right bento column (on mobile accessible via "See All") | L1/L2 | `INLINE` | `KEPT` |
+| **T-18** | `MONEY` | `/today` | Quick Expense Modal | Floating mini cockpit `+ ₹` | Flower Arc FAB Petal 2 + Hero Slide 2 CTA | L2 | `SHEET` | `KEPT` |
+| **T-19** | `CORE` | `/today` | Milestone Confetti Celebration | Confetti wrapper | Triggered on 100% conquest achievement | L1 | `INLINE` | `KEPT` |
+| **T-20** | `SYSTEM` | `/today` | Sticky Island on Scroll | `StickyIslandMiniCockpit` | **REMOVED** (Dynamic Island restricted strictly to Header) | - | - | `REMOVED (approved by user)` |
+| **T-21** | `CORE` | `/today` | First Run Setup Deck | Full bordered card taking 300px | Dismissible ambient setup card / collapsed row | L1 | `INLINE` | `MERGED` |
+
+---
+
 ## Summary of Feature Audit & Protocol Verification
-- **Total Features Cataloged**: 104 features across Habits, Gym, Diet, Stats, and Money.
-- **Features Kept (Direct or Refined)**: 64
-- **Features Moved to L2/L3 Sheets/Tiles/Overflow**: 26
-- **Features Merged into Unified Controls**: 14
-- **Features Removed**: 0 without founder approval (duplicate hero feed removed to prevent redundant view).
+- **Total Features Cataloged**: 125 features across Habits, Gym, Diet, Stats, Money, and Today.
+- **Features Kept (Direct or Refined)**: 78
+- **Features Moved to L2/L3 Sheets/Tiles/Overflow**: 30
+- **Features Merged into Unified Controls**: 16
+- **Features Removed**: 1 (floating Dynamic Island on scroll `StickyIslandMiniCockpit`, per explicit user decree).
 - **Domain Breakdown**:
   - `HABITS CORE`: 48 features
   - `BODY & GYM`: 14 features
   - `NUTRITION`: 6 features
   - `RECOVERY`: 3 features
   - `MONEY`: 30 features
+  - `TODAY CORE`: 11 features
   - `SYSTEM`: 3 features

@@ -14,7 +14,7 @@
 |:---|:---|:---:|:---:|:---:|:---:|
 | **Habits** | `/goals` | `COMPLETED` ✅ | 2.8 screens (~2400px) $\rightarrow$ **1.48 screens (1247px)** | 11 cards $\rightarrow$ **4 cards** | 2026-11-19 |
 | **Money** | `/money` | `COMPLETED` ✅ | 3.6 screens (~3100px) $\rightarrow$ **1.25 screens (1050px)** | 8 cards $\rightarrow$ **3 cards** | 2026-11-19 |
-| **Today** | `/today` | `TODO` | - | - | - |
+| **Today** | `/today` | `IN PROGRESS` ⏳ | 2.17 screens (1829px) $\rightarrow$ target ≤ 1.4 screens | 64 cards $\rightarrow$ target ≤ 3 cards | 2026-11-20 |
 | **Tasks** | `/tasks` | `TODO` | - | - | - |
 
 ---
