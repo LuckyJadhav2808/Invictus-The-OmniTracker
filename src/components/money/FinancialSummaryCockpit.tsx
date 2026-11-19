@@ -5,7 +5,6 @@ import { type MonthlyBudgetStats, type DailyBudgetStats } from "@/lib/utils/budg
 import { type Transaction, type Category } from "@/types";
 import { StrobiCompanion } from "@/components/mascot/StrobiCompanion";
 import { WalletCardDeck } from "@/components/money/WalletCardDeck";
-import { RecentAccountFeed } from "@/components/money/RecentAccountFeed";
 
 interface FinancialSummaryCockpitProps {
   monthlyStats: MonthlyBudgetStats;
@@ -37,24 +36,17 @@ export function FinancialSummaryCockpit({
   onResetToCurrentMonth,
   onAddTransaction,
   onBulkScan,
-  onAddCategory,
   onOpenEditAllowances,
   onOpenCalculator,
   onSelectPaymentMethod,
   onRefillCashTill,
   onNavigateToTab,
-  transactions,
-  categories,
-  onInspectTransaction,
-  onEditTransaction,
-  onDuplicateTransaction,
-  onDeleteTransaction,
 }: FinancialSummaryCockpitProps) {
   const [activeCardIndex, setActiveCardIndex] = useState(0);
 
   return (
-    <div className="bg-white dark:bg-[#1C1A18] rounded-3xl border border-[#E8E5DF] dark:border-[#383531] p-3.5 sm:p-5 space-y-4 shadow-xs transition-colors">
-      {/* 💳 Belanje Swipeable Card Deck & Squircle Quick Launchers */}
+    <div className="w-full space-y-3">
+      {/* 💳 Belanje Swipeable Card Deck & Squircle Quick Launchers (Untouched Main Component) */}
       <WalletCardDeck
         monthlyStats={monthlyStats}
         dailyStats={dailyStats}
@@ -72,28 +64,28 @@ export function FinancialSummaryCockpit({
         onActiveCardChange={setActiveCardIndex}
       />
 
-      {/* 3D Strobi Financial Pace Telemetry */}
-      <div className="flex items-center justify-between gap-3 p-3 rounded-2xl bg-white dark:bg-[#1E1B18] border-2 border-[#161514] dark:border-[#38332E] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]">
+      {/* 🧭 Ambient Strobi Financial Pace Telemetry (Sleek Ambient Ribbon, No Border Fatigue) */}
+      <div className="flex items-center justify-between gap-3 px-3 py-2 rounded-xl bg-card/60 backdrop-blur-xs border border-border/80">
         <div
           onClick={onAddTransaction}
-          className="flex items-center gap-3 cursor-pointer group flex-1 min-w-0"
+          className="flex items-center gap-2.5 cursor-pointer group flex-1 min-w-0"
           title="Click to Log Expense"
         >
           <StrobiCompanion
             gear="money"
             state={dailyStats.isOverDailyBudget ? "fire" : "idle"}
-            size={38}
+            size={28}
             className="shrink-0"
           />
           <div className="min-w-0">
-            <p className="text-xs font-mono font-bold text-foreground truncate">
+            <p className="text-xs font-mono font-medium text-foreground truncate">
               {dailyStats.isOverDailyBudget ? (
-                <span className="text-rose-600 dark:text-rose-400 font-black">
+                <span className="text-rose-600 dark:text-rose-400 font-bold">
                   Pace exceeded by {currencySymbol}{dailyStats.overDailyAmount.toLocaleString()} today
                 </span>
               ) : (
                 <span>
-                  Safe to spend: <strong className="font-black text-[#047857] dark:text-[#03D26F]">{currencySymbol}{dailyStats.todayRemaining.toLocaleString()}</strong> today
+                  Daily pace: <strong className="font-bold text-[#047857] dark:text-[#03D26F]">{currencySymbol}{dailyStats.todayRemaining.toLocaleString()}</strong> remaining
                 </span>
               )}
             </p>
@@ -104,41 +96,12 @@ export function FinancialSummaryCockpit({
           <button
             type="button"
             onClick={onOpenEditAllowances}
-            className="text-[11px] font-heading font-black text-muted-foreground hover:text-foreground transition-colors cursor-pointer px-2.5 py-1.5 rounded-xl border border-border bg-secondary hover:bg-muted shrink-0 shadow-2xs"
+            className="text-[11px] font-heading font-black text-muted-foreground hover:text-foreground transition-colors cursor-pointer px-2.5 py-1.5 rounded-lg border border-border/70 bg-secondary/80 hover:bg-muted shrink-0 min-h-[36px] flex items-center"
           >
             Adjust Limits
           </button>
         )}
       </div>
-
-      {/* ⚡ Belanje Card-Linked Dynamic Recent Feed (Photo 1 Benchmark) */}
-      {transactions && categories && (
-        <RecentAccountFeed
-          activeCardIndex={activeCardIndex}
-          transactions={transactions}
-          categories={categories}
-          currencySymbol={currencySymbol}
-          dailyStats={dailyStats}
-          monthlyStats={monthlyStats}
-          onInspectTransaction={onInspectTransaction || (() => {})}
-          onEditTransaction={onEditTransaction}
-          onDuplicateTransaction={onDuplicateTransaction}
-          onDeleteTransaction={onDeleteTransaction}
-          onSeeAll={(method) => {
-            if (onSelectPaymentMethod) {
-              onSelectPaymentMethod(method || "all");
-            }
-            onNavigateToTab?.("ledger");
-          }}
-          onAddTransaction={(suggestedMethod) => {
-            if (suggestedMethod && onSelectPaymentMethod) {
-              onSelectPaymentMethod(suggestedMethod);
-            }
-            onAddTransaction();
-          }}
-          onOpenAllowances={onOpenEditAllowances}
-        />
-      )}
     </div>
   );
 }

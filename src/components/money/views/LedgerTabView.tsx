@@ -163,11 +163,11 @@ export function LedgerTabView({
     }
   }, [selectedMethod]);
 
-  // Windowed slice limit for ultra-smooth 60fps DOM rendering
-  const [visibleGroupLimit, setVisibleGroupLimit] = useState(12);
+  // Windowed slice limit for ultra-smooth 60fps DOM rendering & capped initial scroll
+  const [visibleGroupLimit, setVisibleGroupLimit] = useState(5);
 
   useEffect(() => {
-    setVisibleGroupLimit(12);
+    setVisibleGroupLimit(5);
   }, [selectedMonth, selectedCategory, selectedType, selectedMethod, searchQuery]);
 
   useEffect(() => {
@@ -907,7 +907,7 @@ export function LedgerTabView({
             <div className="pt-2 pb-6 flex justify-center">
               <button
                 type="button"
-                onClick={() => setVisibleGroupLimit((prev) => prev + 15)}
+                onClick={() => setVisibleGroupLimit((prev) => prev + 10)}
                 className="px-4 py-2 bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] text-xs font-mono font-bold text-[#161514] dark:text-[#FAF8F5] rounded-xl border border-[#E8E5DF] dark:border-[#383531] shadow-xs cursor-pointer transition-all hover:-translate-y-0.5 active:translate-y-0"
               >
                 Showing {visibleGroups.length} of {groupedByDate.length} days · Load Earlier Records ↓

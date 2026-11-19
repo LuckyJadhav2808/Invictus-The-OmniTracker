@@ -11,12 +11,15 @@ export interface SubNavTab {
   id: string;
   label: string;
   shortLabel?: string;
-  href: string;
+  href?: string;
   icon?: React.ElementType;
+  badge?: React.ReactNode;
 }
 
 export interface SegmentedSubNavProps {
   tabs?: SubNavTab[];
+  value?: string;
+  onValueChange?: (val: string) => void;
   className?: string;
 }
 
@@ -29,20 +32,27 @@ export const DEFAULT_HABITS_TABS: SubNavTab[] = [
 
 export function SegmentedSubNav({
   tabs = DEFAULT_HABITS_TABS,
+  value,
+  onValueChange,
   className,
 }: SegmentedSubNavProps) {
   const pathname = usePathname();
 
-  const isTabActive = (href: string) => {
-    if (href === "/goals") {
+  const isTabActive = (tab: SubNavTab) => {
+    if (value !== undefined) {
+      return tab.id === value;
+    }
+    if (!tab.href) return false;
+    if (tab.href === "/goals") {
       return pathname === "/goals";
     }
-    return pathname.startsWith(href);
+    return pathname.startsWith(tab.href);
   };
 
-  const handleTabClick = () => {
+  const handleTabClick = (tabId: string) => {
     soundFX.playPop();
     soundFX.vibrate(15);
+    onValueChange?.(tabId);
   };
 
   return (
@@ -55,17 +65,38 @@ export function SegmentedSubNav({
     >
       <div className="w-full bg-secondary/80 border border-border rounded-xl p-1 flex items-center justify-between gap-1">
         {tabs.map((tab) => {
-          const active = isTabActive(tab.href);
+          const active = isTabActive(tab);
           const Icon = tab.icon;
+
+          if (value !== undefined && onValueChange) {
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => handleTabClick(tab.id)}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "flex-1 py-1.5 px-2 rounded-lg text-xs font-heading text-center flex items-center justify-center gap-1 sm:gap-1.5 transition-all cursor-pointer active:scale-95 min-h-[36px]",
+                  active
+                    ? "bg-[#CEF431] text-[#161514] border border-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_#161514]"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted font-bold"
+                )}
+              >
+                {Icon && <Icon className="size-3.5 stroke-[2.2] shrink-0" />}
+                <span className="truncate">{tab.shortLabel || tab.label}</span>
+                {tab.badge}
+              </button>
+            );
+          }
 
           return (
             <Link
               key={tab.id}
-              href={tab.href}
-              onClick={handleTabClick}
+              href={tab.href || "#"}
+              onClick={() => handleTabClick(tab.id)}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "flex-1 py-1.5 px-2 rounded-lg text-xs font-heading text-center flex items-center justify-center gap-1.5 transition-all cursor-pointer active:scale-95",
+                "flex-1 py-1.5 px-2 rounded-lg text-xs font-heading text-center flex items-center justify-center gap-1 sm:gap-1.5 transition-all cursor-pointer active:scale-95 min-h-[36px]",
                 active
                   ? "bg-[#CEF431] text-[#161514] border border-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_#161514]"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted font-bold"
@@ -73,6 +104,7 @@ export function SegmentedSubNav({
             >
               {Icon && <Icon className="size-3.5 stroke-[2.2] shrink-0" />}
               <span className="truncate">{tab.shortLabel || tab.label}</span>
+              {tab.badge}
             </Link>
           );
         })}

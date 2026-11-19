@@ -16,7 +16,6 @@ import {
 } from "@/lib/queries/money";
 import type { TemplatePack } from "@/components/shared/TemplateSelectionModal";
 import { BUDGET_CATEGORY_TEMPLATE_PACKS } from "@/lib/templates-data";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Receipt, Target, PiggyBank, BarChart2, Users } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { soundFX } from "@/components/shared/SoundFX";
@@ -34,7 +33,9 @@ import dynamic from "next/dynamic";
 // Modular Sub-Components & Views
 import { FinancialSummaryCockpit } from "@/components/money/FinancialSummaryCockpit";
 import { LedgerTabView } from "@/components/money/views/LedgerTabView";
-import { StickyMoneyMiniCockpit } from "@/components/money/StickyMoneyMiniCockpit";
+import { MobileAppBar } from "@/components/mobile/MobileAppBar";
+import { SegmentedSubNav, type SubNavTab } from "@/components/mobile/SegmentedSubNav";
+import { MoneyDoorTileRow } from "@/components/money/MoneyDoorTileRow";
 import { useWhoOwesWhoStore } from "@/store/who-owes-who-store";
 
 // Lazy-Loaded Tab Views (Saves Recharts & IOU Bundles on Initial Paint)
@@ -204,6 +205,36 @@ function MoneyPageContent() {
       setIsAddTxOpen(true);
     }
   }, [actionParam]);
+
+  // Listen for FAB Contextual Action Sheet events
+  useEffect(() => {
+    const handleNewExpense = () => {
+      setIsAddTxOpen(true);
+    };
+    const handleNewIncome = () => {
+      setIsAddTxOpen(true);
+    };
+    const handleTransfer = () => {
+      setIsMoveMoneyOpen(true);
+    };
+    const handleSplit = () => {
+      setIsWhoOwesWhoOpen(true);
+    };
+
+    window.addEventListener("invictus:money-new-expense", handleNewExpense);
+    window.addEventListener("invictus:money-new-income", handleNewIncome);
+    window.addEventListener("invictus:money-transfer", handleTransfer);
+    window.addEventListener("invictus:money-split", handleSplit);
+    window.addEventListener("invictus:open-new-transaction", handleNewExpense);
+
+    return () => {
+      window.removeEventListener("invictus:money-new-expense", handleNewExpense);
+      window.removeEventListener("invictus:money-new-income", handleNewIncome);
+      window.removeEventListener("invictus:money-transfer", handleTransfer);
+      window.removeEventListener("invictus:money-split", handleSplit);
+      window.removeEventListener("invictus:open-new-transaction", handleNewExpense);
+    };
+  }, []);
 
   const { user } = useAuth();
   const [currency, setCurrency] = useState("INR");
@@ -418,6 +449,46 @@ function MoneyPageContent() {
   const totalPendingLentAmount = useMemo(() => {
     return pendingIous.reduce((sum, i) => sum + Number(i.amount || 0), 0);
   }, [pendingIous]);
+
+  const subNavTabs: SubNavTab[] = useMemo(() => [
+    {
+      id: "ledger",
+      label: "Ledger",
+      shortLabel: "Ledger",
+      icon: Receipt,
+      badge: todayTxCount > 0 ? (
+        <span className="px-1.5 py-0.2 rounded-full text-[9px] font-mono font-bold bg-[#161514]/15 dark:bg-white/20 text-inherit tabular-nums ml-0.5">
+          {todayTxCount}
+        </span>
+      ) : undefined,
+    },
+    {
+      id: "budgets",
+      label: "Budgets",
+      shortLabel: "Budgets",
+      icon: Target,
+      badge: overBudgetCategoriesCount > 0 ? (
+        <span className="size-1.5 rounded-full bg-rose-600 animate-pulse ml-0.5" />
+      ) : undefined,
+    },
+    {
+      id: "debts",
+      label: "IOUs 🤝",
+      shortLabel: "IOUs",
+      icon: Users,
+      badge: pendingIous.length > 0 ? (
+        <span className="px-1.5 py-0.2 rounded-full text-[9px] font-mono font-bold bg-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:text-[#161514] tabular-nums ml-0.5">
+          {pendingIous.length}
+        </span>
+      ) : undefined,
+    },
+    {
+      id: "vault",
+      label: "Vault",
+      shortLabel: "Vault",
+      icon: PiggyBank,
+    },
+  ], [todayTxCount, overBudgetCategoriesCount, pendingIous.length]);
 
   // --- Handlers ---
   const handleSaveTransaction = async (payload: {
@@ -680,108 +751,47 @@ function MoneyPageContent() {
   }
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-36 sm:pb-20">
-      {/* 🧭 STICKY MINI-COCKPIT ON SCROLL (Belanje & Apple Wallet Benchmark) */}
-      <StickyMoneyMiniCockpit
-        currencySymbol={currencySymbol}
-        remainingBudget={monthlyStats.remainingBudget}
-        safeDailyPace={dailyStats.dailyBudgetTarget || monthlyStats.dailySafeToSpend || 0}
-        onAddTransaction={() => setIsAddTxOpen(true)}
+    <div className="w-full max-w-xl mx-auto select-none space-y-2 sm:space-y-3 pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
+      {/* ================= SLOT 1: SLIM TOP APP BAR (48-56px) ================= */}
+      <MobileAppBar title="Money" />
+
+      {/* ================= SLOT 2: STICKY SUB-NAV (4 PILLS: LEDGER | BUDGETS | IOUS | VAULT) ================= */}
+      <SegmentedSubNav
+        tabs={subNavTabs}
+        value={activeTab === "analytics" ? undefined : activeTab}
+        onValueChange={handleTabChange}
       />
 
-      {/* 🚀 PRIMARY SUMMARY COCKPIT */}
-      <FinancialSummaryCockpit
-        monthlyStats={monthlyStats}
-        dailyStats={dailyStats}
-        currencySymbol={currencySymbol}
-        selectedMonth={selectedMonth}
-        onResetToCurrentMonth={handleResetToCurrentMonth}
-        onAddTransaction={() => setIsAddTxOpen(true)}
-        onBulkScan={() => setIsBulkModalOpen(true)}
-        onAddCategory={() => setIsAddCatOpen(true)}
-        onOpenEditAllowances={() => setIsAllowanceModalOpen(true)}
-        onOpenCalculator={() => setIsCalculatorOpen(true)}
-        onSelectPaymentMethod={handleSelectPaymentMethodFromHero}
-        onRefillCashTill={handleRefillCashTill}
-        onNavigateToTab={handleTabChange}
-        transactions={transactions}
-        categories={categories}
-        onInspectTransaction={(tx) => setInspectingTx(tx)}
-        onEditTransaction={(tx) => setEditingTx(tx)}
-        onDuplicateTransaction={handleDuplicateTransaction}
-        onDeleteTransaction={handleDeleteTransaction}
-      />
+      <div className="px-3.5 space-y-3">
+        {/* ================= SLOT 3: BORDERLESS HERO (Untouched WalletCardDeck + Ambient Strobi) ================= */}
+        <FinancialSummaryCockpit
+          monthlyStats={monthlyStats}
+          dailyStats={dailyStats}
+          currencySymbol={currencySymbol}
+          selectedMonth={selectedMonth}
+          onResetToCurrentMonth={handleResetToCurrentMonth}
+          onAddTransaction={() => setIsAddTxOpen(true)}
+          onBulkScan={() => setIsBulkModalOpen(true)}
+          onAddCategory={() => setIsAddCatOpen(true)}
+          onOpenEditAllowances={() => setIsAllowanceModalOpen(true)}
+          onOpenCalculator={() => setIsCalculatorOpen(true)}
+          onSelectPaymentMethod={handleSelectPaymentMethodFromHero}
+          onRefillCashTill={handleRefillCashTill}
+          onNavigateToTab={handleTabChange}
+        />
 
-      {/* 📑 FLOATING SUB-NAV DOCK */}
-      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <div className="w-full overflow-x-auto no-scrollbar pb-1 mb-4 touch-pan-x [mask-image:linear-gradient(to_right,black_calc(100%-32px),transparent)] sm:[mask-image:none]">
-          <div className="inline-flex items-center gap-2 min-w-max">
-            <TabsList className="bg-white/80 dark:bg-[#161514]/80 backdrop-blur-md rounded-2xl p-1.5 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex items-center gap-1.5 shrink-0">
-              <TabsTrigger
-                value="ledger"
-                className="rounded-xl text-xs font-semibold py-2 px-3 sm:px-4 border border-transparent data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:shadow-xs dark:data-[state=active]:bg-white dark:data-[state=active]:text-[#161514] text-[#6B6B6B] hover:text-[#161514] dark:text-[#A8A29E] dark:hover:text-stone-100 transition-all flex items-center gap-1.5 sm:gap-2 shrink-0 cursor-pointer"
-              >
-                <Receipt className="size-3.5 stroke-[2]" />
-                <span className="hidden sm:inline">Daily Ledger</span>
-                <span className="sm:hidden">Ledger</span>
-                {todayTxCount > 0 && (
-                  <span className="px-1.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#161514]/10 dark:bg-white/10 text-inherit tabular-nums">
-                    {todayTxCount} <span className="hidden sm:inline">today</span>
-                  </span>
-                )}
-              </TabsTrigger>
-              <TabsTrigger
-                value="budgets"
-                className="rounded-xl text-xs font-semibold py-2 px-3 sm:px-4 border border-transparent data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:shadow-xs dark:data-[state=active]:bg-white dark:data-[state=active]:text-[#161514] text-[#6B6B6B] hover:text-[#161514] dark:text-[#A8A29E] dark:hover:text-stone-100 transition-all flex items-center gap-1.5 sm:gap-2 shrink-0 cursor-pointer"
-              >
-                <Target className="size-3.5 stroke-[2]" />
-                <span className="hidden sm:inline">Budget &amp; Rollover</span>
-                <span className="sm:hidden">Budgets</span>
-                {overBudgetCategoriesCount > 0 && (
-                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-mono font-black bg-amber-400 text-[#161514] border border-[#161514] shadow-2xs tabular-nums">
-                    <span className="size-1.5 rounded-full bg-rose-600 animate-pulse" />
-                    <span>{overBudgetCategoriesCount}</span>
-                    <span className="hidden sm:inline">Over</span>
-                  </span>
-                )}
-              </TabsTrigger>
-              <TabsTrigger
-                value="debts"
-                className="rounded-xl text-xs font-semibold py-2 px-3 sm:px-4 border border-transparent data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:shadow-xs dark:data-[state=active]:bg-white dark:data-[state=active]:text-[#161514] text-[#6B6B6B] hover:text-[#161514] dark:text-[#A8A29E] dark:hover:text-stone-100 transition-all flex items-center gap-1.5 sm:gap-2 shrink-0 cursor-pointer"
-              >
-                <Users className="size-3.5 stroke-[2]" />
-                <span className="hidden sm:inline">Who Owes Who 🤝</span>
-                <span className="sm:hidden">IOUs 🤝</span>
-                {pendingIous.length > 0 && (
-                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-mono font-black bg-[#CEF431] text-[#161514] border border-[#161514] shadow-2xs tabular-nums">
-                    <span className="size-1.5 rounded-full bg-[#161514] animate-pulse" />
-                    <span>{pendingIous.length}</span>
-                    <span className="hidden sm:inline">pending</span>
-                    <span className="hidden md:inline">• {currencySymbol}{Math.round(totalPendingLentAmount).toLocaleString()}</span>
-                  </span>
-                )}
-              </TabsTrigger>
-              <TabsTrigger
-                value="vault"
-                className="rounded-xl text-xs font-semibold py-2 px-3 sm:px-4 border border-transparent data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:shadow-xs dark:data-[state=active]:bg-white dark:data-[state=active]:text-[#161514] text-[#6B6B6B] hover:text-[#161514] dark:text-[#A8A29E] dark:hover:text-stone-100 transition-all flex items-center gap-1.5 sm:gap-2 shrink-0 cursor-pointer"
-              >
-                <PiggyBank className="size-3.5 stroke-[2]" />
-                <span className="hidden sm:inline">Goals &amp; Vault</span>
-                <span className="sm:hidden">Vault</span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="analytics"
-                className="rounded-xl text-xs font-semibold py-2 px-3 sm:px-4 border border-transparent data-[state=active]:bg-[#161514] data-[state=active]:text-white data-[state=active]:shadow-xs dark:data-[state=active]:bg-white dark:data-[state=active]:text-[#161514] text-[#6B6B6B] hover:text-[#161514] dark:text-[#A8A29E] dark:hover:text-stone-100 transition-all flex items-center gap-1.5 sm:gap-2 shrink-0 cursor-pointer"
-              >
-                <BarChart2 className="size-3.5 stroke-[2]" />
-                <span>Analytics</span>
-              </TabsTrigger>
-            </TabsList>
-          </div>
-        </div>
+        {/* ================= SLOT 4: 4 L2 DOOR TILES (Limits, Transfer, Packs, Report) ================= */}
+        <MoneyDoorTileRow
+          monthlyBudget={monthlyStats.totalCombinedBudget || monthlyStats.baseBudget}
+          currencySymbol={currencySymbol}
+          onOpenAllowances={() => setIsAllowanceModalOpen(true)}
+          onMoveMoney={() => setIsMoveMoneyOpen(true)}
+          onOpenTemplates={() => setIsTemplateModalOpen(true)}
+          onOpenExport={() => setIsExportModalOpen(true)}
+        />
 
-        {/* Tab 1: Ledger */}
-        <TabsContent value="ledger">
+        {/* ================= SLOT 5: ACTIVE TAB VIEW ================= */}
+        {activeTab === "ledger" && (
           <LedgerTabView
             categoryCardsData={categoryCardsData}
             transactions={transactions}
@@ -808,10 +818,9 @@ function MoneyPageContent() {
             onEditCategory={(cat) => setEditingCat(cat)}
             onDeleteCategory={(catId) => setDeleteCatId(catId)}
           />
-        </TabsContent>
+        )}
 
-        {/* Tab 2: Budgets */}
-        <TabsContent value="budgets">
+        {activeTab === "budgets" && (
           <BudgetTabView
             categories={categories}
             transactions={transactions}
@@ -830,33 +839,41 @@ function MoneyPageContent() {
             onOpenAllowances={() => setIsAllowanceModalOpen(true)}
             onApplyCategoryPack={handleApplyCategoryPack}
           />
-        </TabsContent>
+        )}
 
-        {/* Tab 3: Who Owes Who In-Situ Deck (Belanje Page-in-Page) */}
-        <TabsContent value="debts">
+        {activeTab === "debts" && (
           <WhoOwesWhoTabView
             currencySymbol={currencySymbol}
             prefill={whoOwesWhoPrefill}
             onLogSettlementIncome={handleLogWhoOwesWhoRepayment}
           />
-        </TabsContent>
+        )}
 
-        {/* Tab 4: Vault */}
-        <TabsContent value="vault">
+        {activeTab === "vault" && (
           <VaultTabView currencySymbol={currencySymbol} />
-        </TabsContent>
+        )}
 
-        {/* Tab 4: Analytics */}
-        <TabsContent value="analytics">
-          <AnalyticsTabView
-            transactions={transactions}
-            categories={categories}
-            currencySymbol={currencySymbol}
-            targetMonthKey={effectiveTargetMonthKey}
-            onOpenAddTransaction={() => setIsAddTxOpen(true)}
-          />
-        </TabsContent>
-      </Tabs>
+        {activeTab === "analytics" && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => handleTabChange("ledger")}
+                className="text-xs font-mono font-bold text-muted-foreground hover:text-foreground flex items-center gap-1 cursor-pointer"
+              >
+                ← Back to Ledger
+              </button>
+            </div>
+            <AnalyticsTabView
+              transactions={transactions}
+              categories={categories}
+              currencySymbol={currencySymbol}
+              targetMonthKey={effectiveTargetMonthKey}
+              onOpenAddTransaction={() => setIsAddTxOpen(true)}
+            />
+          </div>
+        )}
+      </div>
 
       {/* 🚀 MODULAR MODALS (Zero Render Lag) */}
       {/* 1. Transaction Form Modal (Unified Add & Edit + 3-Sec Hyper-Log Keypad) */}

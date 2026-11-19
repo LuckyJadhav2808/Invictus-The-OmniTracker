@@ -12,8 +12,10 @@ import {
   CheckCircle2,
   Calendar,
   Wallet,
-  BookOpen,
   ArrowRightLeft,
+  Receipt,
+  TrendingUp,
+  Users,
 } from "lucide-react";
 import { soundFX } from "@/components/shared/SoundFX";
 import { cn } from "@/lib/utils";
@@ -44,6 +46,56 @@ export function ActionSheet({
   const getContextActions = (): ActionItem[] => {
     if (customActions && customActions.length > 0) {
       return customActions;
+    }
+
+    // Money Space Actions
+    if (pathname.startsWith("/money")) {
+      return [
+        {
+          id: "new-expense",
+          label: "Log Expense",
+          sublabel: "Record purchase, bill, or daily spend",
+          icon: Receipt,
+          colorClass: "bg-[#CEF431] text-[#161514] border-[#161514]",
+          onClick: () => {
+            onOpenChange(false);
+            window.dispatchEvent(new CustomEvent("invictus:money-new-expense"));
+          },
+        },
+        {
+          id: "new-income",
+          label: "Log Income",
+          sublabel: "Salary, allowance, freelance or dividend",
+          icon: TrendingUp,
+          colorClass: "bg-[#03D26F] text-[#161514] border-[#161514]",
+          onClick: () => {
+            onOpenChange(false);
+            window.dispatchEvent(new CustomEvent("invictus:money-new-income"));
+          },
+        },
+        {
+          id: "transfer",
+          label: "Transfer Funds",
+          sublabel: "Move funds between accounts or cash till",
+          icon: ArrowRightLeft,
+          colorClass: "bg-[#C084FC] text-[#161514] border-[#161514]",
+          onClick: () => {
+            onOpenChange(false);
+            window.dispatchEvent(new CustomEvent("invictus:money-transfer"));
+          },
+        },
+        {
+          id: "split-bill",
+          label: "Split Bill / IOU",
+          sublabel: "Track who owes who and settle debts",
+          icon: Users,
+          colorClass: "bg-[#F59E0B] text-[#161514] border-[#161514]",
+          onClick: () => {
+            onOpenChange(false);
+            window.dispatchEvent(new CustomEvent("invictus:money-split"));
+          },
+        },
+      ];
     }
 
     // Habits Space Actions

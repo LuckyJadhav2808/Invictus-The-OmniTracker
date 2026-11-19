@@ -200,10 +200,11 @@ export function DynamicIslandDock({
       : "ambient";
 
   // On mobile, show active live activities or ambient telemetry (if not dismissed)
-  if (variant === "mobile" && (isAmbientDismissed || pathname?.startsWith("/goals"))) {
-    // If on /goals, MobileAppBar already embeds DynamicIslandDock variant="header".
+  const isMobileAppBarPage = pathname?.startsWith("/goals") || pathname?.startsWith("/money");
+  if (variant === "mobile" && (isAmbientDismissed || isMobileAppBarPage)) {
+    // If on /goals or /money, MobileAppBar already embeds DynamicIslandDock variant="header".
     // Suppress floating variant to eliminate duplicate overlapping islands.
-    if (pathname?.startsWith("/goals")) {
+    if (isMobileAppBarPage) {
       return null;
     }
     if (currentMode === "ambient") {
