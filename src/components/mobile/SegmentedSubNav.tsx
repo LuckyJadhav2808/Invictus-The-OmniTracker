@@ -21,6 +21,7 @@ export interface SegmentedSubNavProps {
   value?: string;
   onValueChange?: (val: string) => void;
   className?: string;
+  sticky?: boolean;
 }
 
 export const DEFAULT_HABITS_TABS: SubNavTab[] = [
@@ -35,6 +36,7 @@ export function SegmentedSubNav({
   value,
   onValueChange,
   className,
+  sticky = false,
 }: SegmentedSubNavProps) {
   const pathname = usePathname();
 
@@ -59,7 +61,8 @@ export function SegmentedSubNav({
     <nav
       aria-label="Sub Navigation"
       className={cn(
-        "sticky top-[52px] lg:static lg:z-auto w-full px-3.5 py-1.5 bg-[#FAF8F5]/90 dark:bg-[#161514]/90 backdrop-blur-md border-b border-[#161514]/10 dark:border-white/10 select-none transition-colors",
+        sticky ? "sticky top-[52px] z-20" : "relative z-auto",
+        "w-full px-3.5 py-1.5 bg-[#FAF8F5]/90 dark:bg-[#161514]/90 backdrop-blur-md border-b border-[#161514]/10 dark:border-white/10 select-none transition-colors",
         className
       )}
     >
