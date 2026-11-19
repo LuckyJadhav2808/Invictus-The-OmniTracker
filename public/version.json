@@ -6,21 +6,21 @@
   "releaseDate": "November 19, 2026",
   "minSupportedVersion": "1.0.0",
   "git": {
-    "commitHash": "6f17694ee0f1f67bead2eccd7a992b8eda8d308a",
-    "shortHash": "6f17694",
+    "commitHash": "e053e262477dd149ed8e87b6bfd5087e15af746f",
+    "shortHash": "e053e26",
     "branch": "main",
     "commitAuthor": "Lucky Manoj Jadhav",
-    "commitDate": "2026-11-19 15:15:00 +0530",
-    "commitMessage": "fix(native): solve quick expense white keypad contrast, repair cloud webhook sync, add settings notification and Quick Settings tile logger, and fix header z-index"
+    "commitDate": "2026-11-19 15:21:46 +0530",
+    "commitMessage": "chore(release): bump version to v1.8.2 (build 33) and update changelog for native quick expense & cloud sync release"
   },
   "apk": {
     "exists": true,
-    "isVersionVerified": false,
-    "binaryVersion": "1.8.1",
+    "isVersionVerified": true,
+    "binaryVersion": "1.8.2",
     "fileName": "Invictus.apk",
-    "sha256": "76ded46cd28aba69edf9144df61685961bf7054fc8fe2c67668cc28ea7c619fc",
-    "sizeBytes": 4418750,
-    "sizeFormatted": "4.21 MB",
+    "sha256": "04b9031ccb91cce39a37c9656bcea7b96a4727670a5715e617656c5553ff17c8",
+    "sizeBytes": 4420370,
+    "sizeFormatted": "4.22 MB",
     "directDownloadUrl": "https://invictus-the-omni-tracker.vercel.app/downloads/Invictus.apk",
     "githubReleaseAssetUrl": "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v1.8.2/Invictus.apk"
   },
@@ -41,6 +41,6 @@
     "nodeVersion": "v24.12.0",
     "platform": "win32",
     "arch": "x64",
-    "generatedAt": "2026-11-19T09:50:57.273Z"
+    "generatedAt": "2026-11-19T09:54:48.213Z"
   }
 }
