@@ -106,7 +106,8 @@ export interface AutoMatchResult<T = any> {
   categoryId: string;
   categoryName: string;
   category: T;
-  matchType: "direct" | "keyword";
+  matchType: "direct" | "keyword" | "semantic";
+  confidence?: number;
 }
 
 /**
@@ -180,6 +181,40 @@ export function detectCategoryFromNote<T extends { id: string; name: string }>(
         };
       }
     }
+  }
+
+  return null;
+}
+
+/**
+ * Tier 3: Async semantic category detection using on-device ML embedding fallback
+ */
+export async function detectCategoryFromNoteAsync<T extends { id: string; name: string; description?: string }>(
+  note: string,
+  categories: T[]
+): Promise<AutoMatchResult<T> | null> {
+  // 1. Instant 0ms Synchronous Direct & Keyword Lookup
+  const syncMatch = detectCategoryFromNote(note, categories);
+  if (syncMatch) return syncMatch;
+
+  // 2. Air-Gapped Semantic ML Embedding Inference Fallback
+  try {
+    const { classifyMerchantSemantically } = await import("@/lib/ai/semantic-classifier");
+    const semanticMatch = await classifyMerchantSemantically(note, categories);
+    if (semanticMatch) {
+      const matchedCategory = categories.find((c) => c.id === semanticMatch.categoryId);
+      if (matchedCategory) {
+        return {
+          categoryId: matchedCategory.id,
+          categoryName: matchedCategory.name,
+          category: matchedCategory,
+          matchType: "semantic",
+          confidence: semanticMatch.confidence,
+        };
+      }
+    }
+  } catch {
+    // Graceful fallback to null if ML runtime is unavailable
   }
 
   return null;

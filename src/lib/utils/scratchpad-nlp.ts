@@ -1,5 +1,6 @@
 import { type Category } from "@/types";
-import { format, addDays, getDay } from "date-fns";
+import { format, addDays, isToday, isTomorrow, differenceInCalendarDays } from "date-fns";
+import * as chrono from "chrono-node";
 import { detectCategoryFromNote } from "./merchant-categorizer";
 
 export type ThoughtPriority = "p1" | "p2" | "p3";
@@ -27,32 +28,6 @@ export interface ScratchpadAnalysis {
   convertedCount: number;
 }
 
-const WEEKDAY_MAP: Record<string, number> = {
-  sunday: 0,
-  sun: 0,
-  monday: 1,
-  mon: 1,
-  tuesday: 2,
-  tue: 2,
-  wednesday: 3,
-  wed: 3,
-  thursday: 4,
-  thu: 4,
-  friday: 5,
-  fri: 5,
-  saturday: 6,
-  sat: 6,
-};
-
-/**
- * Calculates the next occurrence of a target weekday from a given base date.
- */
-function getNextWeekdayDate(baseDate: Date, targetDayIndex: number): Date {
-  const currentDay = getDay(baseDate);
-  let daysToAdd = (targetDayIndex - currentDay + 7) % 7;
-  if (daysToAdd === 0) daysToAdd = 7; // Next week's occurrence if today is that day
-  return addDays(baseDate, daysToAdd);
-}
 
 /**
  * Parses a single line from the scratchpad using a deterministic regex AST.
@@ -106,52 +81,50 @@ export function parseThoughtLine(
     workingText = workingText.replace(priorityP3Regex, "").trim();
   }
 
-  // 3. Extract Relative Dates ("today", "tomorrow", "day after tomorrow", "in N days", "friday")
-  // "day after tomorrow"
-  const dayAfterTomorrowRegex = /\b(?:due\s+|by\s+|on\s+)?day after tomorrow\b/i;
-  // "today" / "tonight"
-  const todayRegex = /\b(?:due\s+|by\s+|on\s+)?(today|tonight)\b/i;
-  // "tomorrow" / "tmrw"
-  const tomorrowRegex = /\b(?:due\s+|by\s+|on\s+)?(tomorrow|tmrw)\b/i;
-  // "in N days"
-  const inDaysRegex = /\b(?:due\s+|by\s+|in\s+)?in\s+(\d+)\s+days?\b/i;
-  // Weekday ("due friday", "on monday", "friday")
-  const weekdayRegex =
-    /\b(?:due\s+|by\s+|on\s+)?(monday|tuesday|wednesday|thursday|friday|saturday|sunday|mon|tue|wed|thu|fri|sat|sun)\b/i;
-
-  if (dayAfterTomorrowRegex.test(workingText)) {
+  // 3. Extract Natural Language Dates & Times (with colloquial day-after-tomorrow check)
+  const dayAfterRegex = /\b(?:due\s+|by\s+|on\s+)?day after tomorrow\b/i;
+  if (dayAfterRegex.test(workingText)) {
     const d = addDays(baseDate, 2);
     extractedDueDate = format(d, "yyyy-MM-dd");
     extractedDueDateLabel = "In 2 days";
-    workingText = workingText.replace(dayAfterTomorrowRegex, "").trim();
-  } else if (tomorrowRegex.test(workingText)) {
-    const d = addDays(baseDate, 1);
-    extractedDueDate = format(d, "yyyy-MM-dd");
-    extractedDueDateLabel = "Tomorrow";
-    workingText = workingText.replace(tomorrowRegex, "").trim();
-  } else if (todayRegex.test(workingText)) {
-    extractedDueDate = format(baseDate, "yyyy-MM-dd");
-    extractedDueDateLabel = "Today";
-    workingText = workingText.replace(todayRegex, "").trim();
-  } else if (inDaysRegex.test(workingText)) {
-    const match = workingText.match(inDaysRegex);
-    if (match && match[1]) {
-      const days = parseInt(match[1], 10);
-      const d = addDays(baseDate, days);
-      extractedDueDate = format(d, "yyyy-MM-dd");
-      extractedDueDateLabel = `In ${days}d`;
-      workingText = workingText.replace(inDaysRegex, "").trim();
-    }
-  } else if (weekdayRegex.test(workingText)) {
-    const match = workingText.match(weekdayRegex);
-    if (match && match[1]) {
-      const dayName = match[1].toLowerCase();
-      const targetDayIndex = WEEKDAY_MAP[dayName];
-      if (targetDayIndex !== undefined) {
-        const d = getNextWeekdayDate(baseDate, targetDayIndex);
+    workingText = workingText.replace(dayAfterRegex, "").trim();
+  } else {
+    const chronoResults = chrono.parse(workingText, baseDate, { forwardDate: true });
+    if (chronoResults.length > 0) {
+      const result = chronoResults[0];
+      const parsedDate = result.start.date();
+      extractedDueDate = format(parsedDate, "yyyy-MM-dd");
+
+      const inDaysMatch = result.text.match(/in\s+(\d+)\s+days?/i);
+      const diffDays = differenceInCalendarDays(parsedDate, baseDate);
+
+      if (inDaysMatch && inDaysMatch[1]) {
+        extractedDueDateLabel = `In ${inDaysMatch[1]}d`;
+      } else if (diffDays === 0 || isToday(parsedDate)) {
+        extractedDueDateLabel = "Today";
+      } else if (diffDays === 1 || isTomorrow(parsedDate)) {
+        extractedDueDateLabel = "Tomorrow";
+      } else if (diffDays === 2) {
+        extractedDueDateLabel = "In 2 days";
+      } else if (diffDays > 0 && diffDays < 7) {
+        extractedDueDateLabel = format(parsedDate, "EEE");
+      } else {
+        extractedDueDateLabel = format(parsedDate, "MMM d");
+      }
+
+      // Cleanly slice out the matched date text from the working title
+      workingText =
+        workingText.slice(0, result.index) +
+        " " +
+        workingText.slice(result.index + result.text.length);
+    } else {
+      // Shorthand fallback: "tmrw"
+      const tmrwRegex = /\b(?:due\s+|by\s+|on\s+)?tmrw\b/i;
+      if (tmrwRegex.test(workingText)) {
+        const d = addDays(baseDate, 1);
         extractedDueDate = format(d, "yyyy-MM-dd");
-        extractedDueDateLabel = format(d, "EEE");
-        workingText = workingText.replace(weekdayRegex, "").trim();
+        extractedDueDateLabel = "Tomorrow";
+        workingText = workingText.replace(tmrwRegex, "").trim();
       }
     }
   }

@@ -80,7 +80,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-[#FAF8F5] dark:bg-[#161514] text-[#161514] dark:text-[#FAF8F5] transition-colors">
+    <div
+      vaul-drawer-wrapper=""
+      className="min-h-screen flex flex-col lg:flex-row bg-[#FAF8F5] dark:bg-[#161514] text-[#161514] dark:text-[#FAF8F5] transition-colors"
+    >
       {/* Native Android & Mobile Backstack Manager */}
       <NativeBackHandler />
 

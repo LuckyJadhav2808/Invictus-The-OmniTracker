@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { type Transaction, type Category } from "@/types";
 import { cn } from "@/lib/utils";
 import { format, parseISO, isToday, isYesterday } from "date-fns";
@@ -163,12 +164,6 @@ export function LedgerTabView({
     }
   }, [selectedMethod]);
 
-  // Windowed slice limit for ultra-smooth 60fps DOM rendering & capped initial scroll
-  const [visibleGroupLimit, setVisibleGroupLimit] = useState(5);
-
-  useEffect(() => {
-    setVisibleGroupLimit(5);
-  }, [selectedMonth, selectedCategory, selectedType, selectedMethod, searchQuery]);
 
   useEffect(() => {
     if (initialMethodFilter) {
@@ -356,10 +351,19 @@ export function LedgerTabView({
     return groups;
   }, [filteredTransactions]);
 
-  const visibleGroups = useMemo(() => {
-    return groupedByDate.slice(0, visibleGroupLimit);
-  }, [groupedByDate, visibleGroupLimit]);
-  const hasMoreGroups = groupedByDate.length > visibleGroupLimit;
+  const listRef = useRef<HTMLDivElement>(null);
+  const rowVirtualizer = useVirtualizer({
+    count: groupedByDate.length,
+    getScrollElement: () => listRef.current,
+    estimateSize: useCallback(
+      (index: number) => {
+        const group = groupedByDate[index];
+        return 34 + (group?.items.length || 1) * 74 + 16;
+      },
+      [groupedByDate]
+    ),
+    overscan: 4,
+  });
 
   const selectedMonthSummary = useMemo(() => {
     let expense = 0;
@@ -871,49 +875,65 @@ export function LedgerTabView({
           </div>
         )
       ) : (
-        <div className="space-y-4">
-          {visibleGroups.map((group) => (
-            <div key={group.dateKey} className="space-y-2">
-              {/* Date Group Header */}
-              <div className="flex items-center justify-between px-1">
-                <span className="text-xs font-mono font-medium text-[#161514] dark:text-[#FAF8F5] bg-[#F1EFEA] dark:bg-[#252321] px-2.5 py-0.5 rounded-md border border-[#E8E5DF] dark:border-[#383531]">
-                  {group.label}
-                </span>
-                <span className="text-xs font-mono text-[#6B6B6B] dark:text-[#A8A29E]">
-                  {group.items.length} record{group.items.length === 1 ? "" : "s"}
-                </span>
-              </div>
+        <div
+          ref={listRef}
+          className="max-h-[750px] overflow-y-auto pr-1 select-none scrollbar-thin scrollbar-thumb-stone-300 dark:scrollbar-thumb-stone-700"
+        >
+          <div
+            style={{
+              height: `${rowVirtualizer.getTotalSize()}px`,
+              width: "100%",
+              position: "relative",
+            }}
+          >
+            {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+              const group = groupedByDate[virtualRow.index];
+              if (!group) return null;
+              return (
+                <div
+                  key={group.dateKey}
+                  data-index={virtualRow.index}
+                  ref={rowVirtualizer.measureElement}
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    transform: `translateY(${virtualRow.start}px)`,
+                  }}
+                  className="pb-4"
+                >
+                  <div className="space-y-2">
+                    {/* Date Group Header */}
+                    <div className="flex items-center justify-between px-1">
+                      <span className="text-xs font-mono font-medium text-[#161514] dark:text-[#FAF8F5] bg-[#F1EFEA] dark:bg-[#252321] px-2.5 py-0.5 rounded-md border border-[#E8E5DF] dark:border-[#383531]">
+                        {group.label}
+                      </span>
+                      <span className="text-xs font-mono text-[#6B6B6B] dark:text-[#A8A29E]">
+                        {group.items.length} record{group.items.length === 1 ? "" : "s"}
+                      </span>
+                    </div>
 
-              {/* Transactions in Date Group (Belanje Squircle Rows) */}
-              <div className="space-y-2">
-                {group.items.map((tx) => (
-                  <BelanjeTransactionRow
-                    key={tx.id}
-                    tx={tx}
-                    category={categoryMap.get(tx.categoryId)}
-                    currencySymbol={currencySymbol}
-                    onInspect={onInspectTransaction}
-                    onEdit={onEditTransaction}
-                    onDuplicate={onDuplicateTransaction}
-                    onDelete={onDeleteTransaction}
-                  />
-                ))}
-              </div>
-            </div>
-          ))}
-
-          {/* Windowed Pagination Trigger */}
-          {hasMoreGroups && (
-            <div className="pt-2 pb-6 flex justify-center">
-              <button
-                type="button"
-                onClick={() => setVisibleGroupLimit((prev) => prev + 10)}
-                className="px-4 py-2 bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] text-xs font-mono font-bold text-[#161514] dark:text-[#FAF8F5] rounded-xl border border-[#E8E5DF] dark:border-[#383531] shadow-xs cursor-pointer transition-all hover:-translate-y-0.5 active:translate-y-0"
-              >
-                Showing {visibleGroups.length} of {groupedByDate.length} days · Load Earlier Records ↓
-              </button>
-            </div>
-          )}
+                    {/* Transactions in Date Group (Belanje Squircle Rows) */}
+                    <div className="space-y-2">
+                      {group.items.map((tx) => (
+                        <BelanjeTransactionRow
+                          key={tx.id}
+                          tx={tx}
+                          category={categoryMap.get(tx.categoryId)}
+                          currencySymbol={currencySymbol}
+                          onInspect={onInspectTransaction}
+                          onEdit={onEditTransaction}
+                          onDuplicate={onDuplicateTransaction}
+                          onDelete={onDeleteTransaction}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>
