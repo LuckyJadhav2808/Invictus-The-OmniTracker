@@ -59,7 +59,7 @@ export function SegmentedSubNav({
     <nav
       aria-label="Sub Navigation"
       className={cn(
-        "sticky top-[52px] lg:top-0 z-20 w-full px-3.5 py-1.5 bg-[#FAF8F5]/90 dark:bg-[#161514]/90 backdrop-blur-md border-b border-[#161514]/10 dark:border-white/10 select-none transition-colors",
+        "sticky top-[52px] lg:static lg:z-auto w-full px-3.5 py-1.5 bg-[#FAF8F5]/90 dark:bg-[#161514]/90 backdrop-blur-md border-b border-[#161514]/10 dark:border-white/10 select-none transition-colors",
         className
       )}
     >

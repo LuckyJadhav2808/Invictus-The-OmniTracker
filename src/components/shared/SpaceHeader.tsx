@@ -160,7 +160,7 @@ export function SpaceHeader() {
   const isMobileAppBarRoute = pathname.startsWith("/goals") || pathname.startsWith("/money");
 
   return (
-    <header className={cn("sticky top-0 w-full bg-white/80 dark:bg-[#161514]/85 backdrop-blur-md border-b border-[#E8E5DF] dark:border-[#2A2724] select-none transition-colors", isProfileMenuOpen ? "z-[60]" : "z-40", isMobileAppBarRoute && "hidden lg:block")}>
+    <header className={cn("sticky top-0 w-full bg-white/95 dark:bg-[#161514]/95 backdrop-blur-md border-b border-[#E8E5DF] dark:border-[#2A2724] select-none transition-colors shadow-xs", isProfileMenuOpen ? "z-[60]" : "z-40", isMobileAppBarRoute && "hidden lg:block")}>
       {/* Optional Announcement Banner */}
       {announcement && announcement.message && !dismissedAnn && (
         <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] px-4 py-2 text-xs font-medium border-b border-[#E8E5DF] dark:border-[#2A2724] flex items-center justify-between transition-colors">
@@ -222,9 +222,9 @@ export function SpaceHeader() {
           </div>
         </div>
 
-        {/* Center: Desktop Dynamic Island Live Activity Dock (Zero Collision) */}
+        {/* Center: Desktop Dynamic Island Live Activity Dock (Header Integrated, Zero Collision) */}
         <div className="hidden lg:flex flex-1 justify-center items-center px-4 min-w-0">
-          <DynamicIslandDock variant="header" />
+          <DynamicIslandDock variant="header" floatOnScroll={false} />
         </div>
 
         {/* Right: Actions, Date, Sync & User Profile */}

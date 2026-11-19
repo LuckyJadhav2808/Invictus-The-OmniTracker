@@ -17,7 +17,6 @@ import { safeModeWatchdog } from "@/lib/runtime/safe-mode-watchdog";
 import { SafeModeScreen } from "@/components/shared/SafeModeScreen";
 import { migrationEngine } from "@/lib/offline/migration-engine";
 import { NativeBackHandler } from "@/components/shared/NativeBackHandler";
-import { DynamicIslandDock } from "@/components/shared/DynamicIslandDock";
 import { cn } from "@/lib/utils";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -85,16 +84,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       {/* Native Android & Mobile Backstack Manager */}
       <NativeBackHandler />
 
-      {/* Mobile Floating Dynamic Island Dock (Thumb-Zone above Bottom Nav) */}
-      <DynamicIslandDock variant="mobile" />
-
       {/* Desktop Persistent Sidebar */}
       <Sidebar />
 
       {/* Main Content Viewport */}
       <main
         id="main-scroll-container"
-        className="flex-1 pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0 min-h-screen relative overflow-y-visible lg:overflow-y-auto flex flex-col"
+        className="flex-1 pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0 min-h-screen relative overflow-y-visible flex flex-col"
       >
         {/* Proactive Auto-Update Notification Banner */}
         <AutoUpdateBanner />
