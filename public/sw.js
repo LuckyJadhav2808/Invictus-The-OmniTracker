@@ -1,5 +1,5 @@
 // Service Worker for Invictus OmniTracker: Push Notifications & High-Speed Static Caching
-const STATIC_CACHE_NAME = "invictus-static-v1.8.0";
+const STATIC_CACHE_NAME = "invictus-static-v1.8.3";
 
 self.addEventListener("install", (event) => {
   self.skipWaiting();
@@ -25,8 +25,19 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // 2. Cache-First for Immutable Next.js Static Chunks (/_next/static/*) and Static Media/Icons
-  const isStaticChunk = url.pathname.startsWith("/_next/static/");
+  // 2. Air-gap localhost dev server from chunk caching to prevent stale Turbopack/HMR modules
+  const isDevHost =
+    url.hostname === "localhost" ||
+    url.hostname === "127.0.0.1" ||
+    url.hostname.startsWith("192.168.") ||
+    url.hostname.startsWith("10.");
+
+  if (isDevHost) {
+    // In local development, never intercept or cache chunks; allow Next.js/Turbopack full control over HMR
+    return;
+  }
+
+  // 3. Cache-First ONLY for immutable static media and icons (never stale JS chunks)
   const isStaticAsset =
     url.pathname.endsWith(".svg") ||
     url.pathname.endsWith(".png") ||
@@ -34,7 +45,7 @@ self.addEventListener("fetch", (event) => {
     url.pathname.endsWith(".woff2") ||
     url.pathname === "/manifest.json";
 
-  if (isStaticChunk || isStaticAsset) {
+  if (isStaticAsset) {
     event.respondWith(
       caches.open(STATIC_CACHE_NAME).then((cache) => {
         return cache.match(request).then((cachedResponse) => {
@@ -55,7 +66,7 @@ self.addEventListener("fetch", (event) => {
 
 // Handle Background Push Notifications
 self.addEventListener("push", (event) => {
-  let data = { title: "Invictus Reminder 🚀", body: "You have an upcoming habit or study goal!", url: "/today" };
+  let data = { title: "Invictus Reminder 🚀", body: "You have an upcoming habit or budget pace target!", url: "/today" };
   if (event.data) {
     try {
       data = event.data.json();

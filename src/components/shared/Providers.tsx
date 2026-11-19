@@ -46,6 +46,17 @@ export function Providers({ children }: { children: React.ReactNode }) {
     hydrateQueryCacheFromIndexedDB(queryClient).catch(() => {});
     const detachPersister = attachQueryCachePersister(queryClient);
 
+    // 2. Self-healing purge for stale service worker caches (e.g. invictus-static-v1.8.0)
+    if (typeof window !== "undefined" && "caches" in window) {
+      caches.keys().then((keys) => {
+        keys.forEach((key) => {
+          if (key.startsWith("invictus-static") && key !== "invictus-static-v1.8.3") {
+            caches.delete(key).catch(() => {});
+          }
+        });
+      }).catch(() => {});
+    }
+
     initReminderScheduler();
     registerServiceWorker().catch(() => {});
     if (isNativeApp()) {

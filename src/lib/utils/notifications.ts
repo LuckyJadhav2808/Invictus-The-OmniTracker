@@ -6,6 +6,26 @@ export async function registerServiceWorker() {
   if (typeof window === "undefined" || !("serviceWorker" in navigator)) {
     return null;
   }
+
+  // In local development, unregister service workers and purge legacy caches to keep Turbopack HMR 100% clean
+  if (process.env.NODE_ENV === "development" && !window.location.search.includes("enable_sw")) {
+    try {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      for (const reg of registrations) {
+        await reg.unregister();
+      }
+      if ("caches" in window) {
+        const keys = await caches.keys();
+        for (const k of keys) {
+          if (k.startsWith("invictus-static")) {
+            await caches.delete(k);
+          }
+        }
+      }
+    } catch {}
+    return null;
+  }
+
   try {
     const registration = await navigator.serviceWorker.register("/sw.js");
     return registration;
