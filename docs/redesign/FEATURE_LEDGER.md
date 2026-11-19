@@ -214,11 +214,45 @@
 
 ---
 
+### Settings Space Features (ST-01 through ST-27)
+
+| ID | Domain | Route | Feature / Control | Current Location | New Location | Depth | Container | Status |
+|:---|:---|:---|:---|:---|:---|:---:|:---:|:---:|
+| **ST-01** | `SETTINGS` | `/settings` | Page Title "Settings" + Live Context | `SpaceHeader` + inner header | `MobileAppBar` on mobile; `SpaceHeader` on PC | L1 | `INLINE` | `KEPT` |
+| **ST-02** | `SETTINGS` | `/settings` | Contextual Back Navigation | Hardcoded `href="/goals"` | Contextual `router.back()` with `/today` fallback | L1 | `INLINE` | `KEPT` |
+| **ST-03** | `SETTINGS` | `/settings` | 5-Tab Sub-Nav Dock | Monolithic horizontal tabs | `SegmentedSubNav` (General, Spaces, Alerts, Security, Vault) | L1 | `TAB` | `KEPT` |
+| **ST-04** | `SETTINGS` | `/settings` | User Display Name / Nickname | Text input in card | General tab input row | L1 | `INLINE` | `KEPT` |
+| **ST-05** | `SETTINGS` | `/settings` | Timezone Preference | Custom Select | General tab select row | L1 | `INLINE` | `KEPT` |
+| **ST-06** | `SETTINGS` | `/settings` | Currency Symbol Preference | Custom Select | General tab select row | L1 | `INLINE` | `KEPT` |
+| **ST-07** | `SETTINGS` | `/settings` | Week Starts On (Monday / Sunday) | Dual segmented button | General tab segmented pill | L1 | `INLINE` | `KEPT` |
+| **ST-08** | `SETTINGS` | `/settings` | Interface Theme (Light / Dark / System) | `ThemeToggle` inside card | General tab & Door Tile 2 (`🎨 Theme`) | L1/L2 | `SHEET` | `KEPT` |
+| **ST-09** | `SETTINGS` | `/settings` | Color Theme & Action Palette | `ThemeColorSelector` | General tab color swatches | L1 | `INLINE` | `KEPT` |
+| **ST-10** | `SETTINGS` | `/settings` | Habit Layout Density (Cards / Compact) | Dual toggle button | General tab density switcher | L1 | `INLINE` | `KEPT` |
+| **ST-11** | `SETTINGS` | `/settings` | Tactile Audio Feedback Selector | 4-button sound picker | General tab sound selector with live preview | L1 | `INLINE` | `KEPT` |
+| **ST-12** | `SETTINGS` | `/settings` | Playful Toast Feedback Toggle | Toggle button | General tab toggle | L1 | `INLINE` | `KEPT` |
+| **ST-13** | `SETTINGS` | `/settings` | Save Preferences CTA | Huge button in card | Sticky bottom bar or inline action button | L1 | `INLINE` | `KEPT` |
+| **ST-14** | `SETTINGS` | `/settings` | Workspace Toggles (Habits, Tasks, Money) | 3 toggle cards | Workspaces tab toggle rows | L1 | `INLINE` | `KEPT` |
+| **ST-15** | `SETTINGS` | `/settings` | Ambient Quick-Log Configuration | `AmbientQuickLogCard` | Workspaces tab | L1 | `INLINE` | `KEPT` |
+| **ST-16** | `SETTINGS` | `/settings` | Web Push Notifications & Test Ping | Switch + test button | Alerts tab & Door Tile 1 (`🔔 Alerts`) | L1/L2 | `INLINE` | `KEPT` |
+| **ST-17** | `SETTINGS` | `/settings` | Push Reminder Schedules Manager | `ReminderManagerModal` | Alerts tab & Door Tile 1 modal | L2 | `SHEET` | `KEPT` |
+| **ST-18** | `SETTINGS` | `/settings` | Password Change (Auth Accounts) | Form inputs in card | Security tab | L1 | `INLINE` | `KEPT` |
+| **ST-19** | `SETTINGS` | `/settings` | Bank SMS Parser Rules | `BankSmsSettingsSection` | Security & SMS tab | L1 | `INLINE` | `KEPT` |
+| **ST-20** | `SETTINGS` | `/settings` | Encrypted Vault Backup Export | Password modal + export | Data Vault tab & Door Tile 3 (`💾 Backup`) | L1/L2 | `SHEET` | `KEPT` |
+| **ST-21** | `SETTINGS` | `/settings` | Encrypted Vault Backup Restore | File upload input | Data Vault tab | L1 | `INLINE` | `KEPT` |
+| **ST-22** | `SETTINGS` | `/settings` | Evaluator Demo Data Toggle | Load/Clear buttons | Data Vault tab & Desktop right bento | L1 | `INLINE` | `KEPT` |
+| **ST-23** | `SETTINGS` | `/settings` | In-App System Diagnostics | `InAppDiagnosticsModal` | Data Vault tab & Door Tile 4 (`🛡️ Air-Gap`) | L2 | `SHEET` | `KEPT` |
+| **ST-24** | `SETTINGS` | `/settings` | Check Updates & Release Notes | `UpdateCheckModal` | Data Vault tab & Desktop right bento | L2 | `SHEET` | `KEPT` |
+| **ST-25** | `SETTINGS` | `/settings` | Report Issue & Bug Feedback | `ReportIssueModal` | Data Vault tab & Desktop right bento | L2 | `SHEET` | `KEPT` |
+| **ST-26** | `SETTINGS` | `/settings` | Developer Info & Credits | `DeveloperInfoCard` | Desktop right bento column | L1 | `INLINE` | `KEPT` |
+| **ST-27** | `SETTINGS` | `/settings` | Danger Zone: Sign Out & Delete Account | Red buttons in card | Security tab with confirmation modal | L1/L2 | `SHEET` | `KEPT` |
+
+---
+
 ## Summary of Feature Audit & Protocol Verification
-- **Total Features Cataloged**: 145 features across Habits, Gym, Diet, Stats, Money, Today, and Tasks.
-- **Features Kept (Direct or Refined)**: 91
+- **Total Features Cataloged**: 172 features across Habits, Gym, Diet, Stats, Money, Today, Tasks, and Settings.
+- **Features Kept (Direct or Refined)**: 118
 - **Features Moved to L2/L3 Sheets/Tiles/Overflow**: 35
-- **Features Merged into Unified Controls**: 17
+- **Features Merged into Unified Controls**: 18
 - **Features Removed**: 1 (floating Dynamic Island on scroll `StickyIslandMiniCockpit`, per explicit user decree).
 - **Domain Breakdown**:
   - `HABITS CORE`: 48 features
@@ -227,4 +261,6 @@
   - `RECOVERY`: 3 features
   - `MONEY`: 30 features
   - `TODAY CORE`: 11 features
+  - `TASKS`: 20 features
+  - `SETTINGS`: 27 features
   - `SYSTEM`: 3 features

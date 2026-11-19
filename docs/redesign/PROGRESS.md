@@ -2,9 +2,9 @@
 
 ## Status Overview
 - **Protocol**: `invictus-mobile-redesign` (Nothing-Forgotten Protocol)
-- **Active Focus**: Tasks Space (`/tasks`) — **COMPLETED**
-- **Pages Completed**: 4 / 4 (Habits ✅ | Money ✅ | Today ✅ | Tasks ✅)
-- **Gate Status**: All quality gates passed.
+- **Active Focus**: Settings Space (`/settings`) — **COMPLETED** ✅
+- **Pages Completed**: 5 / 5 (Habits ✅ | Money ✅ | Today ✅ | Tasks ✅ | Settings ✅)
+- **Gate Status**: All quality gates passed with 100% green tests.
 
 ---
 
@@ -16,6 +16,7 @@
 | **Money** | `/money` | `COMPLETED` ✅ | 3.6 screens (~3100px) $\rightarrow$ **1.25 screens (1050px)** | 8 cards $\rightarrow$ **3 cards** | 2026-11-19 |
 | **Today** | `/today` | `COMPLETED` ✅ | 2.17 screens (1829px) $\rightarrow$ **1.38 screens (1167px)** | 64 cards $\rightarrow$ **2 cards** | 2026-11-20 |
 | **Tasks** | `/tasks` | `COMPLETED` ✅ | 2.96 screens (2499px) $\rightarrow$ **1.22 screens (1036px)** | 67 cards $\rightarrow$ **3 cards (mobile)** | 2026-11-20 |
+| **Settings** | `/settings` | `COMPLETED` ✅ | 2.39 screens (2016px) $\rightarrow$ **1.42 screens (1274px)** | 97 borders $\rightarrow$ **3 cards (mobile)** | 2026-11-20 |
 
 ---
 
@@ -23,6 +24,8 @@
 
 | Component | Path | Description | Status |
 |:---|:---|:---|:---:|
+| **`SettingsHeroSummary`** | `src/components/settings/SettingsHeroSummary.tsx` | Borderless Routinr-style hero surface with User Profile, Air-Gap / Synced status badge, 4-metric hairline telemetry strip, and Strobi companion | `DONE` ✅ |
+| **`SettingsDoorTileRow`** | `src/components/settings/SettingsDoorTileRow.tsx` | 4 doorway cards (Alerts, Theme, Backup, Health) opening L2 sheets/modals with haptic feedback | `DONE` ✅ |
 | **`TasksHeroPager`** | `src/components/tasks/TasksHeroPager.tsx` | Borderless hero surface with Velocity gauge (% Done), Priority Radar, Projects stream, and 3-column stats row | `DONE` ✅ |
 | **`TasksDoorTileRow`** | `src/components/tasks/TasksDoorTileRow.tsx` | 4 doorway cards (Kanban, Matrix, Projects, Archive) opening L2 sub-views with back navigation | `DONE` ✅ |
 | **`TasksPrimaryList`** | `src/components/tasks/TasksPrimaryList.tsx` | 56-64px single-line rows, 24px physical checkboxes, priority pills, subtasks count, capped at 6 items + "Show All" toggle | `DONE` ✅ |

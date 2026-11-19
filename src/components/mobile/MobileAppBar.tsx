@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { format } from "date-fns";
 import {
   Calendar,
@@ -16,6 +17,7 @@ import {
   WifiOff,
   RefreshCw,
   Sparkles,
+  ArrowLeft,
 } from "lucide-react";
 import { soundFX } from "@/components/shared/SoundFX";
 import { useUIStore } from "@/store/ui-store";
@@ -33,6 +35,8 @@ import { cn } from "@/lib/utils";
 
 export interface MobileAppBarProps {
   title: string;
+  onBack?: () => void;
+  backHref?: string;
   selectedDate?: string;
   onSelectDate?: (date: string) => void;
   dateLabel?: string;
@@ -48,6 +52,8 @@ export interface MobileAppBarProps {
 
 export function MobileAppBar({
   title,
+  onBack,
+  backHref,
   selectedDate,
   onSelectDate,
   dateLabel,
@@ -83,8 +89,30 @@ export function MobileAppBar({
         className
       )}
     >
-      {/* Left: Title + Date Badge */}
-      <div className="flex items-center gap-2 min-w-0 shrink-0">
+      {/* Left: Back Button + Title + Date Badge */}
+      <div className="flex items-center gap-1.5 min-w-0 shrink-0">
+        {onBack ? (
+          <button
+            type="button"
+            onClick={() => {
+              soundFX.playPop();
+              onBack();
+            }}
+            className="size-8 rounded-lg border border-border bg-secondary hover:bg-muted text-foreground flex items-center justify-center transition-all cursor-pointer active:scale-95 shrink-0"
+            aria-label="Back"
+          >
+            <ArrowLeft className="size-4 stroke-[2.2]" />
+          </button>
+        ) : backHref ? (
+          <Link
+            href={backHref}
+            onClick={() => soundFX.playPop()}
+            className="size-8 rounded-lg border border-border bg-secondary hover:bg-muted text-foreground flex items-center justify-center transition-all cursor-pointer active:scale-95 shrink-0"
+            aria-label="Back"
+          >
+            <ArrowLeft className="size-4 stroke-[2.2]" />
+          </Link>
+        ) : null}
         <h1 className="font-heading font-black text-lg sm:text-xl tracking-tight text-foreground truncate">
           {title}
         </h1>

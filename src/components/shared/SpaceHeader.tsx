@@ -157,7 +157,11 @@ export function SpaceHeader() {
 
   const subrouteInfo = getSubrouteInfo(pathname);
 
-  const isMobileAppBarRoute = pathname.startsWith("/goals") || pathname.startsWith("/money") || pathname.startsWith("/tasks");
+  const isMobileAppBarRoute =
+    pathname.startsWith("/goals") ||
+    pathname.startsWith("/money") ||
+    pathname.startsWith("/tasks") ||
+    pathname.startsWith("/settings");
 
   return (
     <header className={cn("sticky top-0 w-full bg-white/95 dark:bg-[#161514]/95 backdrop-blur-md border-b border-[#E8E5DF] dark:border-[#2A2724] select-none transition-colors shadow-xs", isProfileMenuOpen ? "z-[60]" : "z-40", isMobileAppBarRoute && "hidden lg:block")}>
