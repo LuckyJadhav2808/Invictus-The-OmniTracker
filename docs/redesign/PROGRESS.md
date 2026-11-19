@@ -2,8 +2,8 @@
 
 ## Status Overview
 - **Protocol**: `invictus-mobile-redesign` (Nothing-Forgotten Protocol)
-- **Active Focus**: Money Space (`/money`) — **COMPLETED**
-- **Pages Completed**: 2 / 4 (Habits ✅ | Money ✅ | Today ⏳ | Tasks ⏳)
+- **Active Focus**: Today Space (`/today`) — **COMPLETED**
+- **Pages Completed**: 3 / 4 (Habits ✅ | Money ✅ | Today ✅ | Tasks ⏳)
 - **Gate Status**: All quality gates passed.
 
 ---
@@ -14,7 +14,7 @@
 |:---|:---|:---:|:---:|:---:|:---:|
 | **Habits** | `/goals` | `COMPLETED` ✅ | 2.8 screens (~2400px) $\rightarrow$ **1.48 screens (1247px)** | 11 cards $\rightarrow$ **4 cards** | 2026-11-19 |
 | **Money** | `/money` | `COMPLETED` ✅ | 3.6 screens (~3100px) $\rightarrow$ **1.25 screens (1050px)** | 8 cards $\rightarrow$ **3 cards** | 2026-11-19 |
-| **Today** | `/today` | `IN PROGRESS` ⏳ | 2.17 screens (1829px) $\rightarrow$ target ≤ 1.4 screens | 64 cards $\rightarrow$ target ≤ 3 cards | 2026-11-20 |
+| **Today** | `/today` | `COMPLETED` ✅ | 2.17 screens (1829px) $\rightarrow$ **1.38 screens (1167px)** | 64 cards $\rightarrow$ **2 cards** | 2026-11-20 |
 | **Tasks** | `/tasks` | `TODO` | - | - | - |
 
 ---
@@ -23,6 +23,8 @@
 
 | Component | Path | Description | Status |
 |:---|:---|:---|:---:|
+| **`TodayHeroPager`** | `src/components/today/TodayHeroPager.tsx` | Borderless Routinr-style hero surface with Conquest gauge (% Conquered), Safe-to-Spend flow, and Active Streaks | `DONE` ✅ |
+| **`TodayDoorTileRow`** | `src/components/today/TodayDoorTileRow.tsx` | 4 doorway cards (Notes, Review, Water, Limit) opening L2/L3 sheets with back handling | `DONE` ✅ |
 | **`MobileAppBar`** | `src/components/mobile/MobileAppBar.tsx` | Slim 52px top app bar with title, date, calendar jump-to-today, overflow menu (⋯) for bulk actions, sound, density | `DONE` ✅ |
 | **`SegmentedSubNav`** | `src/components/mobile/SegmentedSubNav.tsx` | Sticky segmented pill control under app bar with filled lime active state | `DONE` ✅ |
 | **`BottomNav` (Docked FAB)** | `src/components/shared/BottomNav.tsx` | Global 5-item bottom nav with center-docked notch FAB action button | `DONE` ✅ |

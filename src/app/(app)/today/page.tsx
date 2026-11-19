@@ -20,7 +20,7 @@ import { useTransactions, useCategories, useAddTransaction, useBudgetPreferences
 import { useTasks, useUpdateTask, useCreateTask } from "@/lib/queries/tasks";
 import { computeMonthlyBudgetStats } from "@/lib/utils/budget-rollover";
 import { toast } from "sonner";
-import { Shield } from "lucide-react";
+import { Shield, SunMedium, Clock, Moon, Droplet, Plus, Wallet, FileText, ArrowUpRight } from "lucide-react";
 import dynamic from "next/dynamic";
 import {
   format,
@@ -30,16 +30,23 @@ import {
   isToday as checkIsToday,
 } from "date-fns";
 
-// Modular Today Cockpit Architecture (Benchmark Executive Dashboard)
-import { TodayCommandDeck } from "@/components/today/TodayCommandDeck";
+// 5-Slot Architecture Components
+import { MobileAppBar } from "@/components/mobile/MobileAppBar";
+import { SegmentedSubNav, type SubNavTab } from "@/components/mobile/SegmentedSubNav";
+import { TodayHeroPager } from "@/components/today/TodayHeroPager";
+import { HorizonWeekStrip } from "@/components/today/HorizonWeekStrip";
+import { TodayDoorTileRow } from "@/components/today/TodayDoorTileRow";
 import { TodayChronologicalAgenda } from "@/components/today/TodayChronologicalAgenda";
 import { TodayTopHabitsMomentum } from "@/components/today/TodayTopHabitsMomentum";
-import { StickyIslandMiniCockpit } from "@/components/today/StickyIslandMiniCockpit";
 import { FirstRunQuickStartDeck } from "@/components/today/FirstRunQuickStartDeck";
+import { BottomSheet } from "@/components/mobile/BottomSheet";
+import { WaterTracker } from "@/components/goals/WaterTracker";
 import { useTodayCockpitViewModel, computeDailyConquestScore } from "@/components/today/useTodayCockpitViewModel";
 import { useSyncNativeQuickLogs } from "@/lib/native/useSyncNativeQuickLogs";
+import type { StrobiState } from "@/components/mascot/StrobiCompanion";
+import { DropdownMenuItem, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
 
-// Dynamic imports for heavy drawers and modals to optimize mobile initial bundle & navigation
+// Dynamic imports for heavy drawers and modals to optimize initial bundle
 const TodayQuickExpenseModal = dynamic(
   () => import("@/components/today/TodayQuickExpenseModal").then((m) => m.TodayQuickExpenseModal),
   { ssr: false }
@@ -61,6 +68,12 @@ const ConfettiCelebration = dynamic(
   { ssr: false }
 );
 
+const TODAY_DESKTOP_SUB_NAV_TABS: SubNavTab[] = [
+  { id: "overview", label: "Overview", shortLabel: "Agenda", icon: SunMedium },
+  { id: "timeline", label: "Timeline", shortLabel: "Timeline", icon: Clock },
+  { id: "review", label: "Review", shortLabel: "Review", icon: Moon },
+];
+
 export default function TodayPage() {
   const { user } = useAuth();
   const { selectedDate, setSelectedDate } = useUIStore();
@@ -79,7 +92,6 @@ export default function TodayPage() {
   const { data: tasks = [] } = useTasks();
   const updateTaskMutation = useUpdateTask();
   const createTaskMutation = useCreateTask();
-  const { daypartMode, setDaypartMode, effectiveDaypart } = useTodayCockpitViewModel();
 
   const { data: moodLog } = useMoodLog(selectedDate);
   const saveMoodMutation = useSaveMoodLog();
@@ -104,7 +116,9 @@ export default function TodayPage() {
   const [isDailyLimitModalOpen, setIsDailyLimitModalOpen] = useState(false);
   const [isCloseoutDrawerOpen, setIsCloseoutDrawerOpen] = useState(false);
   const [isScratchpadDrawerOpen, setIsScratchpadDrawerOpen] = useState(false);
+  const [isWaterSheetOpen, setIsWaterSheetOpen] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [desktopActiveTab, setDesktopActiveTab] = useState("overview");
   const previousConqueredRef = useRef(false);
   const isInitialMountRef = useRef(true);
 
@@ -236,6 +250,11 @@ export default function TodayPage() {
   const completedItemsCount = completedHabitsCount + completedTasksCount;
   const pendingItemsCount = Math.max(0, totalItemsCount - completedItemsCount);
 
+  const completionPercent = useMemo(() => {
+    if (totalItemsCount === 0) return 100;
+    return Math.min(100, Math.round((completedItemsCount / totalItemsCount) * 100));
+  }, [completedItemsCount, totalItemsCount]);
+
   // Trigger confetti when hitting 100% completion during active session
   useEffect(() => {
     if (isInitialMountRef.current) {
@@ -252,7 +271,7 @@ export default function TodayPage() {
         sessionStorage.setItem(celebrationKey, "true");
       }
       setShowConfetti(true);
-      toast.success("All daily habits completed");
+      toast.success("All daily habits completed!");
     }
     previousConqueredRef.current = allHabitsConquered;
   }, [allHabitsConquered, selectedDate]);
@@ -417,144 +436,389 @@ export default function TodayPage() {
     return tasks.filter((t) => (t.dueDate === tomorrowDateStr || (t as any).date === tomorrowDateStr) && t.status !== "completed").length;
   }, [tasks, tomorrowDateStr]);
 
-  // Smooth scroll helpers
-  const scrollToHabits = () => {
-    const el = document.getElementById("agenda-section");
-    if (el) el.scrollIntoView({ behavior: "smooth" });
+  // Strobi state
+  const getStrobiState = (): StrobiState => {
+    if (allHabitsConquered && totalHabitsCount > 0) return "celebrate";
+    const hour = new Date().getHours();
+    if (hour >= 23 || hour < 5) return "sleep";
+    if (streakDays >= 3) return "fire";
+    return "idle";
   };
-  const scrollToMoney = () => {
-    const el = document.getElementById("telemetry-section");
-    if (el) el.scrollIntoView({ behavior: "smooth" });
-  };
-  const handleOpenExpenseModal = () => {
-    setIsQuickExpenseOpen(true);
-    scrollToMoney();
-  };
-  const scrollToTop = () => {
-    const mainContainer = document.getElementById("main-scroll-container");
-    if (mainContainer && mainContainer.scrollTop > 0) {
-      mainContainer.scrollTo({ top: 0, behavior: "smooth" });
-    }
-    if (typeof window !== "undefined") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      if (document.documentElement) {
-        document.documentElement.scrollTo({ top: 0, behavior: "smooth" });
-      }
-      if (document.body) {
-        document.body.scrollTo({ top: 0, behavior: "smooth" });
-      }
+  const strobiState = getStrobiState();
+
+  const handleDesktopTabChange = (val: string) => {
+    soundFX.playPop();
+    setDesktopActiveTab(val);
+    if (val === "review") {
+      setIsCloseoutDrawerOpen(true);
     }
   };
-
-  // Sticky Mini Island Sentinel & Visibility (IntersectionObserver)
-  const heroSentinelRef = useRef<HTMLDivElement>(null);
-  const [isStickyIslandVisible, setIsStickyIslandVisible] = useState(false);
-
-  useEffect(() => {
-    const sentinel = heroSentinelRef.current;
-    if (!sentinel) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsStickyIslandVisible(!entry.isIntersecting);
-      },
-      {
-        threshold: 0,
-        rootMargin: "-20px 0px 0px 0px",
-      }
-    );
-
-    observer.observe(sentinel);
-    return () => observer.disconnect();
-  }, []);
 
   return (
-    <div className="space-y-6 py-4 px-3 sm:px-6 max-w-5xl mx-auto relative pb-12">
-      {/* 0. Sticky Island Mini-Cockpit on Scroll (Apple Dynamic Island & Spotify Benchmark) */}
-      <StickyIslandMiniCockpit
-        metrics={conquestMetrics}
-        currentDateObj={currentDateObj}
-        onOpenExpenseModal={handleOpenExpenseModal}
-        onScrollToTop={scrollToTop}
-        visible={isStickyIslandVisible}
+    <div className="w-full max-w-xl lg:max-w-5xl xl:max-w-6xl mx-auto select-none space-y-3 sm:space-y-4 px-1 sm:px-3 pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
+      {/* ================= SLOT 1: SLIM TOP APP BAR (48-56px, Mobile Only) ================= */}
+      <MobileAppBar
+        title="Today"
+        selectedDate={selectedDate}
+        onSelectDate={setSelectedDate}
+        customMenuItems={
+          <>
+            <DropdownMenuLabel className="text-[10px] font-mono font-bold uppercase tracking-wider text-muted-foreground px-2 py-1">
+              Quick Actions
+            </DropdownMenuLabel>
+            <DropdownMenuItem
+              onClick={() => {
+                soundFX.playPop();
+                setIsQuickExpenseOpen(true);
+              }}
+              className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-black cursor-pointer hover:bg-secondary focus:bg-secondary"
+            >
+              <div className="flex items-center gap-2">
+                <Plus className="size-3.5 text-[#03D26F] stroke-[2.5]" />
+                <span>Log Expense</span>
+              </div>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                soundFX.playPop();
+                setIsScratchpadDrawerOpen(true);
+              }}
+              className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-bold cursor-pointer hover:bg-secondary focus:bg-secondary"
+            >
+              <div className="flex items-center gap-2">
+                <FileText className="size-3.5 text-amber-500 stroke-[2.2]" />
+                <span>Desk Notes (⌘J)</span>
+              </div>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                soundFX.playPop();
+                setIsCloseoutDrawerOpen(true);
+              }}
+              className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-bold cursor-pointer hover:bg-secondary focus:bg-secondary"
+            >
+              <div className="flex items-center gap-2">
+                <Moon className="size-3.5 text-purple-500 stroke-[2.2]" />
+                <span>Evening Review</span>
+              </div>
+            </DropdownMenuItem>
+          </>
+        }
       />
 
-      {/* Top Sentinel for Sticky Island trigger */}
-      <div ref={heroSentinelRef} className="h-0 w-full" aria-hidden="true" />
+      {/* ================= SLOT 2: DESKTOP SUB-NAV (Hidden on Mobile) ================= */}
+      <div className="hidden lg:block">
+        <SegmentedSubNav
+          tabs={TODAY_DESKTOP_SUB_NAV_TABS}
+          value={desktopActiveTab}
+          onValueChange={handleDesktopTabChange}
+        />
+      </div>
 
       {/* Milestone Confetti Celebration */}
       <ConfettiCelebration active={showConfetti} onComplete={() => setShowConfetti(false)} />
 
-      {/* ZONE 1: SIGNATURE DAILY COMMAND DECK (Creative + Production Level + Clean) */}
-      <div id="command-deck-section">
-        <TodayCommandDeck
+      {/* Guided First-Run Quick Start Deck (Disappears upon dismissal or completion) */}
+      <div className="px-3.5 sm:px-0">
+        <FirstRunQuickStartDeck
+          totalHabitsCount={totalHabitsCount}
+          completedHabitsCount={completedHabitsCount}
+          hasBudgetOrExpenses={transactions.length > 0 || (Boolean(cloudBudgetPrefs?.customDailyBudget) && (cloudBudgetPrefs?.customDailyBudget ?? 0) > 0)}
+          hasTasks={tasks.length > 0}
+          onOpenDailyLimitModal={() => setIsDailyLimitModalOpen(true)}
+        />
+      </div>
+
+      {/* ================= MOBILE VIEW (Single Column 5-Slot Flow) ================= */}
+      <div className="lg:hidden px-3.5 space-y-3">
+        {/* SLOT 3: ONE BORDERLESS HERO CAROUSEL SLOT */}
+        <TodayHeroPager
           userName={user?.displayName}
-          currentDateObj={currentDateObj}
-          selectedDate={selectedDate}
-          isToday={isCurrentDayToday}
-          onPrevDay={handlePrevDay}
-          onNextDay={handleNextDay}
-          onJumpToToday={handleJumpToToday}
-          onSelectDate={setSelectedDate}
+          completionPercent={completionPercent}
+          completedCount={completedItemsCount}
+          totalCount={totalItemsCount}
           streakDays={streakDays}
           streakFreezeTokens={streakFreeze.tokensAvailable || 0}
           allHabitsConquered={allHabitsConquered}
-          totalHabitsCount={totalHabitsCount}
-          completedCount={completedItemsCount}
-          pendingCount={pendingItemsCount}
-          totalCount={totalItemsCount}
           remainingSafeToSpend={budgetStats.dailySafeToSpend - spentToday}
           spentToday={spentToday}
           dailySafeToSpend={budgetStats.dailySafeToSpend}
           currencySymbol={currencySymbol}
+          strobiState={strobiState}
           onOpenQuickExpense={() => setIsQuickExpenseOpen(true)}
-          onOpenScratchpad={() => setIsScratchpadDrawerOpen(true)}
-          onOpenCloseoutDrawer={() => setIsCloseoutDrawerOpen(true)}
+          onOpenShieldInfo={() => setIsCloseoutDrawerOpen(true)}
         />
+
+        {/* 7-Day Horizon Scrubber (Unboxed hairline strip) */}
+        <div className="py-0.5">
+          <HorizonWeekStrip
+            currentDateObj={currentDateObj}
+            selectedDate={selectedDate || format(currentDateObj, "yyyy-MM-dd")}
+            isToday={isCurrentDayToday}
+            onSelectDate={setSelectedDate}
+            onPrevDay={handlePrevDay}
+            onNextDay={handleNextDay}
+            onJumpToToday={handleJumpToToday}
+          />
+        </div>
+
+        {/* SLOT 4: ONE DOOR TILE ROW (Max 4 Doorway Cards to L2) */}
+        <div className="py-1">
+          <TodayDoorTileRow
+            waterAmount={waterAmount}
+            waterTarget={waterTarget}
+            dailySafeToSpend={budgetStats.dailySafeToSpend}
+            currencySymbol={currencySymbol}
+            onOpenScratchpad={() => setIsScratchpadDrawerOpen(true)}
+            onOpenCloseout={() => setIsCloseoutDrawerOpen(true)}
+            onOpenWater={() => setIsWaterSheetOpen(true)}
+            onOpenDailyLimit={() => setIsDailyLimitModalOpen(true)}
+            onQuickLogWater={() => handleQuickLogWater(250)}
+          />
+        </div>
+
+        {/* SLOT 5: ONE UNIFIED CHRONOLOGICAL DAY AGENDA */}
+        <div id="agenda-section">
+          <TodayChronologicalAgenda
+            habits={habits}
+            logs={logs}
+            streaks={streaks}
+            tasks={tasks}
+            selectedDate={selectedDate}
+            isToday={isCurrentDayToday}
+            onToggleHabit={(habitId, completed) => {
+              toggleHabitMutation.mutate({
+                habitId,
+                date: selectedDate,
+                completed,
+              });
+            }}
+            onToggleTask={(taskId, completed) => {
+              updateTaskMutation.mutate({
+                id: taskId,
+                updates: { status: completed ? "completed" : "todo" },
+              });
+            }}
+          />
+        </div>
       </div>
 
-      {/* Guided First-Run Quick Start Deck (Disappears upon dismissal or completion) */}
-      <FirstRunQuickStartDeck
-        totalHabitsCount={totalHabitsCount}
-        completedHabitsCount={completedHabitsCount}
-        hasBudgetOrExpenses={transactions.length > 0 || (Boolean(cloudBudgetPrefs?.customDailyBudget) && (cloudBudgetPrefs?.customDailyBudget ?? 0) > 0)}
-        hasTasks={tasks.length > 0}
-        onOpenDailyLimitModal={() => setIsDailyLimitModalOpen(true)}
-      />
+      {/* ================= DESKTOP LAPTOP VIEW: FULL-BLEED 2-COLUMN BENTO GRID ================= */}
+      <div className="hidden lg:grid lg:grid-cols-12 lg:gap-6 px-1">
+        {/* Left Bento Column (7 cols): Hero + Scrubber + Agenda */}
+        <div className="lg:col-span-7 xl:col-span-8 space-y-4 min-w-0">
+          {/* Borderless Hero Surface */}
+          <div className="bg-card border border-border rounded-3xl p-5 shadow-xs">
+            <TodayHeroPager
+              userName={user?.displayName}
+              completionPercent={completionPercent}
+              completedCount={completedItemsCount}
+              totalCount={totalItemsCount}
+              streakDays={streakDays}
+              streakFreezeTokens={streakFreeze.tokensAvailable || 0}
+              allHabitsConquered={allHabitsConquered}
+              remainingSafeToSpend={budgetStats.dailySafeToSpend - spentToday}
+              spentToday={spentToday}
+              dailySafeToSpend={budgetStats.dailySafeToSpend}
+              currencySymbol={currencySymbol}
+              strobiState={strobiState}
+              onOpenQuickExpense={() => setIsQuickExpenseOpen(true)}
+              onOpenShieldInfo={() => setIsCloseoutDrawerOpen(true)}
+            />
 
-      {/* ZONE 3: UNIFIED CHRONOLOGICAL DAY AGENDA (Morning / Workload / Evening) */}
-      <div id="agenda-section">
-        <TodayChronologicalAgenda
-          habits={habits}
-          logs={logs}
-          streaks={streaks}
-          tasks={tasks}
-          selectedDate={selectedDate}
-          isToday={isCurrentDayToday}
-          onToggleHabit={(habitId, completed) => {
-            toggleHabitMutation.mutate({
-              habitId,
-              date: selectedDate,
-              completed,
-            });
-          }}
-          onToggleTask={(taskId, completed) => {
-            updateTaskMutation.mutate({
-              id: taskId,
-              updates: { status: completed ? "completed" : "todo" },
-            });
-          }}
-        />
+            {/* Unboxed 7-Day Horizon Scrubber */}
+            <div className="pt-3 border-t border-border/60">
+              <HorizonWeekStrip
+                currentDateObj={currentDateObj}
+                selectedDate={selectedDate || format(currentDateObj, "yyyy-MM-dd")}
+                isToday={isCurrentDayToday}
+                onSelectDate={setSelectedDate}
+                onPrevDay={handlePrevDay}
+                onNextDay={handleNextDay}
+                onJumpToToday={handleJumpToToday}
+              />
+            </div>
+          </div>
+
+          {/* Unified Chronological Agenda */}
+          <div id="agenda-section-desktop">
+            <TodayChronologicalAgenda
+              habits={habits}
+              logs={logs}
+              streaks={streaks}
+              tasks={tasks}
+              selectedDate={selectedDate}
+              isToday={isCurrentDayToday}
+              onToggleHabit={(habitId, completed) => {
+                toggleHabitMutation.mutate({
+                  habitId,
+                  date: selectedDate,
+                  completed,
+                });
+              }}
+              onToggleTask={(taskId, completed) => {
+                updateTaskMutation.mutate({
+                  id: taskId,
+                  updates: { status: completed ? "completed" : "todo" },
+                });
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Right Bento Column (5 cols): Top Habits + Scratchpad + Financial & Health Glances */}
+        <div className="lg:col-span-5 xl:col-span-4 space-y-4 min-w-0">
+          {/* 1. Top Habits Momentum Card */}
+          <TodayTopHabitsMomentum
+            habits={habits}
+            logs={logs}
+            streaks={streaks}
+          />
+
+          {/* 2. Desk Scratchpad Live Dock */}
+          <div className="bg-card border border-border rounded-3xl p-4.5 shadow-xs space-y-3">
+            <div className="flex items-center justify-between pb-2 border-b border-border">
+              <div className="flex items-center gap-2">
+                <div className="size-8 rounded-xl bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 flex items-center justify-center shadow-2xs">
+                  <FileText className="size-4 stroke-[2.2]" />
+                </div>
+                <div>
+                  <h3 className="font-heading font-black text-sm text-foreground">
+                    Desk Notes
+                  </h3>
+                  <span className="text-[10px] font-mono text-muted-foreground">
+                    Quick Capture (⌘J)
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  soundFX.playPop();
+                  setIsScratchpadDrawerOpen(true);
+                }}
+                className="text-xs font-heading font-bold text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors cursor-pointer group"
+              >
+                <span>Open Pad</span>
+                <ArrowUpRight className="size-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              </button>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Jot quick thoughts, grocery reminders, or code ideas. Auto-parses into actionable Tasks or Expenses with one click.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                soundFX.playPop();
+                soundFX.vibrate(15);
+                setIsScratchpadDrawerOpen(true);
+              }}
+              className="w-full py-2 px-3 rounded-xl border border-dashed border-border hover:border-[#161514] dark:hover:border-white/40 bg-secondary/50 hover:bg-secondary text-xs font-heading font-bold text-foreground flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <Plus className="size-3.5" />
+              <span>Capture Quick Thought</span>
+            </button>
+          </div>
+
+          {/* 3. Hydration & Safe-to-Spend Companion Card */}
+          <div className="bg-card border border-border rounded-3xl p-4.5 shadow-xs space-y-3.5">
+            <div className="flex items-center justify-between pb-2 border-b border-border">
+              <div className="flex items-center gap-2">
+                <div className="size-8 rounded-xl bg-[#DCFAE5] dark:bg-[#03D26F]/20 text-[#047857] dark:text-[#03D26F] flex items-center justify-center shadow-2xs">
+                  <Droplet className="size-4 stroke-[2.2]" />
+                </div>
+                <div>
+                  <h3 className="font-heading font-black text-sm text-foreground">
+                    Hydration &amp; Budget
+                  </h3>
+                  <span className="text-[10px] font-mono text-muted-foreground">
+                    Live Telemetry
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Hydration Tracker */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between text-xs font-mono font-bold">
+                <span className="text-muted-foreground">Water</span>
+                <span className="text-foreground">{waterAmount} / {waterTarget} ml</span>
+              </div>
+              <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-blue-500 rounded-full transition-all duration-300"
+                  style={{ width: `${Math.min(100, Math.round((waterAmount / waterTarget) * 100))}%` }}
+                />
+              </div>
+              <div className="flex gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => handleQuickLogWater(250)}
+                  className="flex-1 py-1.5 rounded-lg border border-border bg-secondary hover:bg-muted text-xs font-heading font-bold text-foreground flex items-center justify-center gap-1 transition-all cursor-pointer active:scale-95"
+                >
+                  <Plus className="size-3 text-blue-500" />
+                  <span>+250ml</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsWaterSheetOpen(true)}
+                  className="px-2.5 py-1.5 rounded-lg border border-border bg-secondary hover:bg-muted text-xs font-heading font-bold text-muted-foreground hover:text-foreground transition-all cursor-pointer"
+                >
+                  Manage
+                </button>
+              </div>
+            </div>
+
+            {/* Daily Limit Calibrate */}
+            <div className="pt-2 border-t border-border flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-mono font-bold uppercase text-muted-foreground block">
+                  Daily Limit
+                </span>
+                <span className="font-heading font-black text-sm text-foreground tabular-nums">
+                  {currencySymbol}{budgetStats.dailySafeToSpend.toLocaleString()}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  soundFX.playPop();
+                  setIsDailyLimitModalOpen(true);
+                }}
+                className="px-3 py-1.5 rounded-xl border border-border hover:border-foreground bg-secondary text-xs font-heading font-bold text-foreground transition-all cursor-pointer active:scale-95"
+              >
+                Calibrate
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* ZONE 4: TOP HABITS MOMENTUM STRIP (Benchmark from Reference Image) */}
-      <TodayTopHabitsMomentum
-        habits={habits}
-        logs={logs}
-        streaks={streaks}
-      />
+      {/* ================= L2/L3 DRAWERS & BOTTOM SHEETS ================= */}
 
-      {/* ZONE 4: ON-DEMAND SLIDE-OVER DESK SCRATCHPAD & FLOATING ACTION DOCK */}
+      {/* 1. Daily Hydration Bottom Sheet */}
+      <BottomSheet
+        open={isWaterSheetOpen}
+        onOpenChange={setIsWaterSheetOpen}
+        title="Daily Hydration"
+        description="Fast vessel logging & target management"
+      >
+        <div className="py-2">
+          <WaterTracker
+            amount={waterAmount}
+            targetAmount={waterTarget}
+            onLogWater={handleQuickLogWater}
+            onSetWater={async (amt, target) => {
+              await logWaterMutation.mutateAsync({
+                date: selectedDate,
+                amount: amt,
+              });
+            }}
+          />
+        </div>
+      </BottomSheet>
+
+      {/* 2. On-Demand Slide-Over Desk Scratchpad Drawer */}
       <RetroStickyScratchpadDrawer
         open={isScratchpadDrawerOpen}
         onOpenChange={setIsScratchpadDrawerOpen}
@@ -593,7 +857,7 @@ export default function TodayPage() {
         }}
       />
 
-      {/* ZONE 5: CONTEXTUAL EVENING CLOSEOUT DRAWER (Bottom Sheet Triggered at Night / on Demand) */}
+      {/* 3. Contextual Evening Closeout Drawer */}
       <EveningCloseoutDrawer
         open={isCloseoutDrawerOpen}
         onOpenChange={setIsCloseoutDrawerOpen}
@@ -611,9 +875,7 @@ export default function TodayPage() {
         isSavingMood={isSavingMood}
       />
 
-      {/* Note: The global footer is rendered once at the application root layout level (layout.tsx) */}
-
-      {/* Daily Spending Limit & Allowances Modal */}
+      {/* 4. Daily Spending Limit & Allowances Modal */}
       <AllowanceSettingsModal
         open={isDailyLimitModalOpen}
         onOpenChange={setIsDailyLimitModalOpen}
@@ -626,7 +888,7 @@ export default function TodayPage() {
         onSave={handleSaveDailyLimit}
       />
 
-      {/* 3-Second Quick Expense Modal (Benchmark Safe Spend) */}
+      {/* 5. 3-Second Quick Expense Modal */}
       <TodayQuickExpenseModal
         open={isQuickExpenseOpen}
         onOpenChange={setIsQuickExpenseOpen}

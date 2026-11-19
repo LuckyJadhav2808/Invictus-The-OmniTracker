@@ -60,6 +60,7 @@ export const TodayChronologicalAgenda = React.memo(function TodayChronologicalAg
   onToggleTask,
   className,
 }: TodayChronologicalAgendaProps) {
+  const [showAllItems, setShowAllItems] = useState(false);
   const [filter, setFilter] = useState<AgendaFilter>("todo");
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({
     morning: false,
@@ -314,12 +315,12 @@ export const TodayChronologicalAgenda = React.memo(function TodayChronologicalAg
   return (
     <div
       className={cn(
-        "bg-[#FAF8F5] dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#38332E] rounded-3xl p-4 sm:p-5 shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] transition-colors",
+        "bg-card border border-border rounded-2xl p-3.5 sm:p-5 shadow-xs transition-colors",
         className
       )}
     >
       {/* 1. TOP FILTER BAR (Exact Benchmark from Reference Image: To Do | Completed | Pending/All) */}
-      <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-[#EFECE6] dark:bg-[#1C1A18] border border-[#161514]/10 dark:border-white/10 mb-4">
+      <div className="flex items-center gap-1.5 p-1 rounded-xl bg-secondary border border-border mb-3.5">
         <button
           type="button"
           onClick={() => {
@@ -327,7 +328,7 @@ export const TodayChronologicalAgenda = React.memo(function TodayChronologicalAg
             setFilter("todo");
           }}
           className={cn(
-            "flex-1 py-1.5 px-3 rounded-xl text-xs font-heading font-black transition-all cursor-pointer flex items-center justify-center gap-1.5",
+            "flex-1 py-1.5 px-2.5 rounded-lg text-xs font-heading font-black transition-all cursor-pointer flex items-center justify-center gap-1.5",
             filter === "todo"
               ? "bg-[#161514] text-[#FAF8F5] dark:bg-[#CEF431] dark:text-[#161514] shadow-xs"
               : "text-muted-foreground hover:text-foreground"
@@ -344,14 +345,14 @@ export const TodayChronologicalAgenda = React.memo(function TodayChronologicalAg
             setFilter("completed");
           }}
           className={cn(
-            "flex-1 py-1.5 px-3 rounded-xl text-xs font-heading font-black transition-all cursor-pointer flex items-center justify-center gap-1.5",
+            "flex-1 py-1.5 px-2.5 rounded-lg text-xs font-heading font-black transition-all cursor-pointer flex items-center justify-center gap-1.5",
             filter === "completed"
               ? "bg-[#161514] text-[#FAF8F5] dark:bg-[#CEF431] dark:text-[#161514] shadow-xs"
               : "text-muted-foreground hover:text-foreground"
           )}
         >
           <CheckCircle2 className="size-3 stroke-[2.5]" />
-          <span>Completed ({totalCompleted})</span>
+          <span>Done ({totalCompleted})</span>
         </button>
 
         <button
@@ -361,7 +362,7 @@ export const TodayChronologicalAgenda = React.memo(function TodayChronologicalAg
             setFilter("all");
           }}
           className={cn(
-            "flex-1 py-1.5 px-3 rounded-xl text-xs font-heading font-black transition-all cursor-pointer flex items-center justify-center gap-1.5",
+            "flex-1 py-1.5 px-2.5 rounded-lg text-xs font-heading font-black transition-all cursor-pointer flex items-center justify-center gap-1.5",
             filter === "all"
               ? "bg-[#161514] text-[#FAF8F5] dark:bg-[#CEF431] dark:text-[#161514] shadow-xs"
               : "text-muted-foreground hover:text-foreground"
