@@ -30,7 +30,9 @@
 | **`ActionSheet`** | `src/components/mobile/ActionSheet.tsx` | Native swipe-to-dismiss bottom sheet for route-aware quick actions | `DONE` ✅ |
 | **`BottomSheet`** | `src/components/mobile/BottomSheet.tsx` | Accessible bottom sheet with drag handle, top border only, backdrop dim | `DONE` ✅ |
 | **`HabitListRow`** | `src/components/goals/HabitListRow.tsx` | 56-64px list row with 44px checkbox, 2-line title, swipe gestures, expand drawer | `DONE` ✅ |
-| **`HabitsHeroPager`** | `src/components/goals/HabitsHeroPager.tsx` | Compact ~175px 3-slide hero carousel (Gauge, Velocity, Streak) with level & shield chips | `DONE` ✅ |
+| **`Hero`** | `src/components/shared/Hero.tsx` | Universal borderless full-bleed hero shell (variant="gauge|ring|balance|countdown|chart") with swipe carousel, dots, and 2-column hairline stats row | `DONE` ✅ |
+| **`BeadedAmphitheaterArcGauge`** | `src/components/goals/BeadedAmphitheaterArcGauge.tsx` | Full-width large amphitheater dot-arc gauge (58px primary number, electric lime dots, animated fill, reduced-motion) | `DONE` ✅ |
+| **`HabitsHeroPager`** | `src/components/goals/HabitsHeroPager.tsx` | Borderless Routinr-style hero surface with gauge, weekly velocity, streak momentum, and corner chips | `DONE` ✅ |
 | **`HabitsDateStrip`** | `src/components/goals/HabitsDateStrip.tsx` | Single-line 7-day Monday to Sunday date scrubber with active day in lime | `DONE` ✅ |
 | **`DoorTileRow`** | `src/components/goals/DoorTileRow.tsx` | Max 4 entry door tiles (Water, Body, Alerts, Sleep) opening respective sheets | `DONE` ✅ |
 

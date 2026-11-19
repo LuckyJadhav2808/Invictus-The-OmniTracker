@@ -8,6 +8,7 @@ export interface BeadedAmphitheaterArcGaugeProps {
   weekPercent?: number; // 0 - 100
   streakPercent?: number; // 0 - 100
   className?: string;
+  size?: "sm" | "md" | "lg" | "hero";
 }
 
 export interface DotPoint {
@@ -60,40 +61,47 @@ export function BeadedAmphitheaterArcGauge({
   const clampedWeek = Math.max(0, Math.min(100, Math.round(weekPercent)));
   const clampedStreak = Math.max(0, Math.min(100, Math.round(streakPercent)));
 
-  const cx = 160;
-  const cy = 145;
+  // Full-width Hero Canvas Dimensions (Wide, high-presence amphitheater)
+  const cx = 170;
+  const cy = 152;
 
-  // Outer: Today completion dots (21 dots)
-  const outerDots = calculateArcDots(cx, cy, 116, 21, clampedToday);
-  // Middle: Weekly consistency dots (17 dots)
-  const middleDots = calculateArcDots(cx, cy, 96, 17, clampedWeek);
-  // Inner: Streak momentum dots (13 dots)
-  const innerDots = calculateArcDots(cx, cy, 76, 13, clampedStreak);
+  // Outer: Today completion dots (21 dots) - High presence Electric Lime
+  const outerDots = calculateArcDots(cx, cy, 126, 21, clampedToday);
+  // Middle: Weekly consistency dots (17 dots) - Emerald
+  const middleDots = calculateArcDots(cx, cy, 104, 17, clampedWeek);
+  // Inner: Streak momentum dots (13 dots) - Amber
+  const innerDots = calculateArcDots(cx, cy, 82, 13, clampedStreak);
 
   return (
-    <div className={cn("relative flex flex-col items-center justify-center select-none", className)}>
+    <div
+      className={cn(
+        "relative w-full flex flex-col items-center justify-center select-none py-1",
+        className
+      )}
+    >
       <svg
-        viewBox="0 0 320 185"
-        className="w-full max-w-[320px] h-auto overflow-visible"
-        aria-hidden="true"
+        viewBox="0 0 340 195"
+        className="w-full max-w-[360px] h-auto overflow-visible"
+        aria-label={`Habits completion gauge: ${clampedToday}% today`}
+        role="img"
       >
         <defs>
           {/* Curved text path along the outer halo */}
           <path
             id={arcLabelId}
-            d="M 28,145 A 136,136 0 0,1 292,145"
+            d="M 26,152 A 144,144 0 0,1 314,152"
             fill="none"
           />
-          {/* Glow filter for conquered dots */}
-          <filter id="limeArcGlow" x="-50%" y="-50%" width="200%" height="200%">
-            <feDropShadow dx="0" dy="0" stdDeviation="2.5" floodColor="#CEF431" floodOpacity="0.8" />
+          {/* Glow filter for 100% conquered dots */}
+          <filter id="limeArcHeroGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="0" dy="0" stdDeviation="3" floodColor="#CEF431" floodOpacity="0.85" />
           </filter>
         </defs>
 
         {/* Curved Header Label: TODAY • WEEK • STREAK */}
         <text
           fill="currentColor"
-          className="text-[9.5px] font-mono font-black uppercase tracking-[0.25em] text-[#6B6B6B] dark:text-[#A8A29E]"
+          className="text-[9.5px] font-mono font-black uppercase tracking-[0.25em] text-[#8C8882] dark:text-[#A8A29E] select-none"
         >
           <textPath href={`#${arcLabelId}`} startOffset="50%" textAnchor="middle">
             TODAY • WEEK • STREAK
@@ -106,15 +114,14 @@ export function BeadedAmphitheaterArcGauge({
             key={`outer-${dot.index}`}
             cx={dot.x}
             cy={dot.y}
-            r={dot.isFilled ? 4.5 : 3.6}
-            fill={dot.isFilled ? "#CEF431" : "rgba(150, 150, 150, 0.25)"}
-            stroke={dot.isFilled ? "#161514" : "rgba(150, 150, 150, 0.15)"}
-            strokeWidth={dot.isFilled ? (clampedToday === 100 ? 1.5 : 1) : 0.8}
-            className="transition-all duration-300"
-            filter={clampedToday === 100 && dot.isFilled ? "url(#limeArcGlow)" : undefined}
+            r={dot.isFilled ? 5.2 : 4.0}
+            fill={dot.isFilled ? "#CEF431" : "rgba(150, 150, 150, 0.22)"}
+            stroke={dot.isFilled ? "#161514" : "rgba(150, 150, 150, 0.12)"}
+            strokeWidth={dot.isFilled ? (clampedToday === 100 ? 1.6 : 1.2) : 0.8}
+            className="transition-all duration-300 motion-reduce:transition-none"
+            filter={clampedToday === 100 && dot.isFilled ? "url(#limeArcHeroGlow)" : undefined}
             style={{
-              fill: dot.isFilled ? "#CEF431" : "rgba(150, 150, 150, 0.25)",
-              stroke: dot.isFilled ? "#161514" : "rgba(150, 150, 150, 0.15)",
+              transition: "fill 250ms ease-out, stroke 250ms ease-out, r 250ms ease-out",
             }}
           />
         ))}
@@ -125,14 +132,13 @@ export function BeadedAmphitheaterArcGauge({
             key={`middle-${dot.index}`}
             cx={dot.x}
             cy={dot.y}
-            r={dot.isFilled ? 4 : 3.2}
-            fill={dot.isFilled ? "#03D26F" : "rgba(150, 150, 150, 0.2)"}
-            stroke={dot.isFilled ? "#161514" : "rgba(150, 150, 150, 0.1)"}
-            strokeWidth={dot.isFilled ? 1 : 0.8}
-            className="transition-all duration-300"
+            r={dot.isFilled ? 4.5 : 3.4}
+            fill={dot.isFilled ? "#03D26F" : "rgba(150, 150, 150, 0.18)"}
+            stroke={dot.isFilled ? "#161514" : "rgba(150, 150, 150, 0.08)"}
+            strokeWidth={dot.isFilled ? 1.2 : 0.8}
+            className="transition-all duration-300 motion-reduce:transition-none"
             style={{
-              fill: dot.isFilled ? "#03D26F" : "rgba(150, 150, 150, 0.2)",
-              stroke: dot.isFilled ? "#161514" : "rgba(150, 150, 150, 0.1)",
+              transition: "fill 250ms ease-out, stroke 250ms ease-out, r 250ms ease-out",
             }}
           />
         ))}
@@ -143,49 +149,58 @@ export function BeadedAmphitheaterArcGauge({
             key={`inner-${dot.index}`}
             cx={dot.x}
             cy={dot.y}
-            r={dot.isFilled ? 3.5 : 2.8}
-            fill={dot.isFilled ? "#F59E0B" : "rgba(150, 150, 150, 0.2)"}
-            stroke={dot.isFilled ? "#161514" : "rgba(150, 150, 150, 0.1)"}
-            strokeWidth={dot.isFilled ? 1 : 0.8}
-            className="transition-all duration-300"
+            r={dot.isFilled ? 3.8 : 2.8}
+            fill={dot.isFilled ? "#F59E0B" : "rgba(150, 150, 150, 0.16)"}
+            stroke={dot.isFilled ? "#161514" : "rgba(150, 150, 150, 0.08)"}
+            strokeWidth={dot.isFilled ? 1.0 : 0.8}
+            className="transition-all duration-300 motion-reduce:transition-none"
             style={{
-              fill: dot.isFilled ? "#F59E0B" : "rgba(150, 150, 150, 0.2)",
-              stroke: dot.isFilled ? "#161514" : "rgba(150, 150, 150, 0.1)",
+              transition: "fill 250ms ease-out, stroke 250ms ease-out, r 250ms ease-out",
             }}
           />
         ))}
 
-        {/* Center Telemetry Display */}
-        <g className="text-center">
+        {/* Center Primary Telemetry Display (Unobstructed, Dominant Focal Point) */}
+        <g className="select-none">
+          {/* Primary Number: 56-64px bold mono, biggest type on screen */}
           <text
             x={cx}
-            y={cy - 14}
+            y={cy - 12}
             textAnchor="middle"
-            fill={clampedToday === 100 ? "#CEF431" : "currentColor"}
-            style={{
-              fill: clampedToday === 100 ? "#CEF431" : undefined,
-            }}
+            fill="currentColor"
             className={cn(
-              "text-4xl sm:text-5xl font-mono font-black tracking-tighter transition-colors",
-              clampedToday === 100 ? "text-[#CEF431]" : "text-[#161514] dark:text-[#FAF8F5]"
+              "text-6xl font-mono font-black tracking-tighter transition-colors select-none",
+              clampedToday === 100
+                ? "fill-[#CEF431] text-[#CEF431]"
+                : "fill-[#161514] text-[#161514] dark:fill-[#FAF8F5] dark:text-[#FAF8F5]"
             )}
+            style={{
+              fontSize: "58px",
+              fontWeight: 900,
+            }}
           >
             {clampedToday}
           </text>
+
+          {/* Small Caps Label Beneath Primary Number */}
           <text
             x={cx}
-            y={cy + 8}
+            y={cy + 16}
             textAnchor="middle"
-            fill={clampedToday === 100 ? "#03D26F" : "currentColor"}
-            style={{
-              fill: clampedToday === 100 ? "#03D26F" : undefined,
-            }}
+            fill="currentColor"
             className={cn(
-              "text-[11px] font-mono font-black uppercase tracking-widest transition-colors",
-              clampedToday === 100 ? "text-[#03D26F]" : "text-[#6B6B6B] dark:text-[#A8A29E]"
+              "text-xs font-mono font-black uppercase tracking-widest transition-colors select-none",
+              clampedToday === 100
+                ? "fill-[#03D26F] text-[#03D26F]"
+                : "fill-[#8C8882] text-[#8C8882] dark:fill-[#A8A29E] dark:text-[#A8A29E]"
             )}
+            style={{
+              fontSize: "11px",
+              fontWeight: 800,
+              letterSpacing: "0.18em",
+            }}
           >
-            {clampedToday === 100 ? "COMPLETED 🏆" : "% TODAY"}
+            {clampedToday === 100 ? "CONQUERED 🏆" : "% TODAY"}
           </text>
         </g>
       </svg>
