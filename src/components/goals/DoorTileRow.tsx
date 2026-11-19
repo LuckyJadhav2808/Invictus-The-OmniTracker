@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Droplet, Activity, Bell, Moon } from "lucide-react";
+import { Droplet, Dumbbell, Utensils, BarChart2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
 
@@ -11,9 +11,12 @@ export interface DoorTileRowProps {
   bodyWeight?: string;
   bodyAge?: string;
   onOpenWater: () => void;
-  onOpenBodyProfile: () => void;
-  onOpenReminders: () => void;
-  onOpenRecovery: () => void;
+  onOpenGym?: () => void;
+  onOpenNutrition?: () => void;
+  onOpenStats?: () => void;
+  onOpenBodyProfile?: () => void;
+  onOpenReminders?: () => void;
+  onOpenRecovery?: () => void;
   className?: string;
 }
 
@@ -23,12 +26,35 @@ export function DoorTileRow({
   bodyWeight = "68 kg",
   bodyAge = "24y",
   onOpenWater,
+  onOpenGym,
+  onOpenNutrition,
+  onOpenStats,
   onOpenBodyProfile,
   onOpenReminders,
   onOpenRecovery,
   className,
 }: DoorTileRowProps) {
   const tiles = [
+    {
+      id: "gym",
+      label: "Gym",
+      value: "Workouts",
+      icon: Dumbbell,
+      iconColor: "text-emerald-600 dark:text-[#03D26F]",
+      bgClass: "hover:border-[#03D26F]/50",
+      onClick: onOpenGym || onOpenBodyProfile || (() => {}),
+      title: "Open Gym Workout Studio & Muscle Anatomy",
+    },
+    {
+      id: "diet",
+      label: "Diet",
+      value: "Fuel & Macros",
+      icon: Utensils,
+      iconColor: "text-amber-600 dark:text-amber-400",
+      bgClass: "hover:border-amber-500/50",
+      onClick: onOpenNutrition || onOpenRecovery || (() => {}),
+      title: "Open Nutrition, Calories & Macro Balance",
+    },
     {
       id: "water",
       label: "Water",
@@ -37,33 +63,17 @@ export function DoorTileRow({
       iconColor: "text-sky-500 fill-sky-500",
       bgClass: "hover:border-sky-500/50",
       onClick: onOpenWater,
+      title: "Log Hydration & Daily Water Target",
     },
     {
-      id: "body",
-      label: "Body",
-      value: `${bodyWeight} • ${bodyAge}`,
-      icon: Activity,
-      iconColor: "text-emerald-500",
-      bgClass: "hover:border-emerald-500/50",
-      onClick: onOpenBodyProfile,
-    },
-    {
-      id: "reminders",
-      label: "Alerts",
-      value: "Active",
-      icon: Bell,
-      iconColor: "text-amber-500",
-      bgClass: "hover:border-amber-500/50",
-      onClick: onOpenReminders,
-    },
-    {
-      id: "recovery",
-      label: "Sleep",
-      value: "Journal",
-      icon: Moon,
-      iconColor: "text-indigo-500",
-      bgClass: "hover:border-indigo-500/50",
-      onClick: onOpenRecovery,
+      id: "stats",
+      label: "Stats",
+      value: "Consistency",
+      icon: BarChart2,
+      iconColor: "text-purple-600 dark:text-purple-400",
+      bgClass: "hover:border-purple-500/50",
+      onClick: onOpenStats || onOpenReminders || (() => {}),
+      title: "Open Habit Consistency Matrix & Telemetry",
     },
   ];
 
@@ -89,7 +99,7 @@ export function DoorTileRow({
               "py-2 sm:py-3 px-1.5 sm:px-3 rounded-xl sm:rounded-2xl bg-card border border-border flex flex-col items-center justify-center text-center transition-all cursor-pointer active:scale-95 shadow-2xs group min-h-[58px] sm:min-h-[66px]",
               t.bgClass
             )}
-            title={`Open ${t.label} Sheet`}
+            title={t.title}
           >
             <div className="flex items-center gap-1 sm:gap-1.5">
               <Icon className={cn("size-3.5 sm:size-4 stroke-[2]", t.iconColor)} />

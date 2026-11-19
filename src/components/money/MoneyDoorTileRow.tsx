@@ -1,23 +1,34 @@
 "use client";
 
 import React from "react";
-import { SlidersHorizontal, ArrowRightLeft, Sparkles, FileDown } from "lucide-react";
+import { PiggyBank, Users, ShieldCheck, ReceiptText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
 
 export interface MoneyDoorTileRowProps {
   monthlyBudget?: number;
+  activeIouCount?: number;
   currencySymbol?: string;
-  onOpenAllowances: () => void;
-  onMoveMoney: () => void;
-  onOpenTemplates: () => void;
-  onOpenExport: () => void;
+  onOpenBudgets?: () => void;
+  onOpenIous?: () => void;
+  onOpenVault?: () => void;
+  onOpenLedger?: () => void;
+  // Legacy compatibility props
+  onOpenAllowances?: () => void;
+  onMoveMoney?: () => void;
+  onOpenTemplates?: () => void;
+  onOpenExport?: () => void;
   className?: string;
 }
 
 export function MoneyDoorTileRow({
   monthlyBudget,
+  activeIouCount = 0,
   currencySymbol = "₹",
+  onOpenBudgets,
+  onOpenIous,
+  onOpenVault,
+  onOpenLedger,
   onOpenAllowances,
   onMoveMoney,
   onOpenTemplates,
@@ -26,44 +37,44 @@ export function MoneyDoorTileRow({
 }: MoneyDoorTileRowProps) {
   const tiles = [
     {
-      id: "allowances",
-      label: "Limits",
-      value: monthlyBudget ? `${currencySymbol}${Math.round(monthlyBudget).toLocaleString()}` : "Allowances",
-      icon: SlidersHorizontal,
-      iconColor: "text-emerald-600 dark:text-emerald-400",
-      bgClass: "hover:border-emerald-500/50",
-      onClick: onOpenAllowances,
-      title: "Configure Monthly & Daily Budget Limits",
+      id: "budgets",
+      label: "Budgets",
+      value: monthlyBudget ? `${currencySymbol}${Math.round(monthlyBudget).toLocaleString()}` : "Envelopes",
+      icon: PiggyBank,
+      iconColor: "text-emerald-600 dark:text-[#03D26F]",
+      bgClass: "hover:border-[#03D26F]/50",
+      onClick: onOpenBudgets || onOpenAllowances || (() => {}),
+      title: "Category Envelopes & Monthly Spend Limits",
     },
     {
-      id: "transfer",
-      label: "Transfer",
-      value: "Envelopes",
-      icon: ArrowRightLeft,
-      iconColor: "text-indigo-600 dark:text-indigo-400",
-      bgClass: "hover:border-indigo-500/50",
-      onClick: onMoveMoney,
-      title: "Move Funds Between Envelopes",
-    },
-    {
-      id: "templates",
-      label: "Packs",
-      value: "Templates",
-      icon: Sparkles,
+      id: "ious",
+      label: "IOUs",
+      value: activeIouCount > 0 ? `${activeIouCount} Active` : "Split & Debts",
+      icon: Users,
       iconColor: "text-amber-600 dark:text-amber-400",
       bgClass: "hover:border-amber-500/50",
-      onClick: onOpenTemplates,
-      title: "Explore Curated Budget Template Packs",
+      onClick: onOpenIous || onMoveMoney || (() => {}),
+      title: "Who Owes Who & Group Expense Splits",
     },
     {
-      id: "export",
-      label: "Report",
-      value: "PDF / CSV",
-      icon: FileDown,
+      id: "vault",
+      label: "Vault",
+      value: "Emergency",
+      icon: ShieldCheck,
+      iconColor: "text-purple-600 dark:text-purple-400",
+      bgClass: "hover:border-purple-500/50",
+      onClick: onOpenVault || onOpenTemplates || (() => {}),
+      title: "Emergency Savings & Liquidity Vault",
+    },
+    {
+      id: "ledger",
+      label: "Ledger",
+      value: "All Records",
+      icon: ReceiptText,
       iconColor: "text-sky-600 dark:text-sky-400",
       bgClass: "hover:border-sky-500/50",
-      onClick: onOpenExport,
-      title: "Export Ledger Statement",
+      onClick: onOpenLedger || onOpenExport || (() => {}),
+      title: "Full Transaction Ledger & Search",
     },
   ];
 

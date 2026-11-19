@@ -16,7 +16,7 @@ import {
 } from "@/lib/queries/money";
 import type { TemplatePack } from "@/components/shared/TemplateSelectionModal";
 import { BUDGET_CATEGORY_TEMPLATE_PACKS } from "@/lib/templates-data";
-import { Receipt, Target, PiggyBank, BarChart2, Users, Plus, RotateCcw, ChevronRight, Wallet } from "lucide-react";
+import { Receipt, Target, PiggyBank, BarChart2, Users, Plus, RotateCcw, ChevronRight, Wallet, ArrowLeft } from "lucide-react";
 import { DropdownMenuItem, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
 import { format, parseISO } from "date-fns";
 import { soundFX } from "@/components/shared/SoundFX";
@@ -816,12 +816,36 @@ function MoneyPageContent() {
         }
       />
 
-      {/* ================= SLOT 2: STICKY SUB-NAV (4 PILLS: OVERVIEW | BUDGETS | IOUS | VAULT) ================= */}
-      <SegmentedSubNav
-        tabs={subNavTabs}
-        value={activeTab === "analytics" ? undefined : activeTab}
-        onValueChange={handleTabChange}
-      />
+      {/* ================= SLOT 2: DESKTOP SUB-NAV (Hidden on Mobile) ================= */}
+      <div className="hidden lg:block">
+        <SegmentedSubNav
+          tabs={subNavTabs}
+          value={activeTab === "analytics" ? undefined : activeTab}
+          onValueChange={handleTabChange}
+        />
+      </div>
+
+      {/* ================= MOBILE L2 SUB-PAGE HEADER (Back to Overview) ================= */}
+      {activeTab !== "overview" && activeTab !== "ledger" && (
+        <div className="lg:hidden sticky top-0 z-30 w-full h-[52px] px-3.5 bg-[#FAF8F5]/95 dark:bg-[#161514]/95 backdrop-blur-md border-b border-[#161514]/10 dark:border-white/10 flex items-center justify-between select-none">
+          <button
+            type="button"
+            onClick={() => {
+              soundFX.playPop();
+              soundFX.vibrate(15);
+              handleTabChange("overview");
+            }}
+            className="flex items-center gap-1.5 font-heading font-black text-xs text-[#161514] px-2.5 py-1.5 rounded-xl border-2 border-[#161514] bg-[#CEF431] shadow-[2px_2px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
+          >
+            <ArrowLeft className="size-4 stroke-[3]" />
+            <span>Overview</span>
+          </button>
+          <span className="font-heading font-black text-sm text-foreground">
+            {activeTab === "budgets" ? "Monthly Budgets" : activeTab === "ious" ? "IOUs & Debts" : activeTab === "vault" ? "Emergency Vault" : "Overview"}
+          </span>
+          <div className="w-16" />
+        </div>
+      )}
 
       <div className="px-3.5 space-y-3">
         {/* Render Slot 3 (Hero Cockpit), Slot 4 (Door Tiles), and Slot 5 (Recent Glance) ONLY on Overview */}
@@ -844,14 +868,15 @@ function MoneyPageContent() {
               onNavigateToTab={handleTabChange}
             />
 
-            {/* ================= SLOT 4: 4 L2 DOOR TILES (Limits, Transfer, Packs, Report) ================= */}
+            {/* ================= SLOT 4: 4 L2 DOOR TILES (Budgets, IOUs, Vault, Ledger) ================= */}
             <MoneyDoorTileRow
               monthlyBudget={monthlyStats.totalCombinedBudget || monthlyStats.baseBudget}
+              activeIouCount={pendingIous.length}
               currencySymbol={currencySymbol}
-              onOpenAllowances={() => setIsAllowanceModalOpen(true)}
-              onMoveMoney={() => setIsMoveMoneyOpen(true)}
-              onOpenTemplates={() => setIsTemplateModalOpen(true)}
-              onOpenExport={() => setIsExportModalOpen(true)}
+              onOpenBudgets={() => handleTabChange("budgets")}
+              onOpenIous={() => handleTabChange("ious")}
+              onOpenVault={() => handleTabChange("vault")}
+              onOpenLedger={() => setIsLedgerSheetOpen(true)}
             />
 
             {/* ================= SLOT 5: RECENT TRANSACTIONS GLANCE (Capped 5 Rows + Neobrutalist Action Dock) ================= */}

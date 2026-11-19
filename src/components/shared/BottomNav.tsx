@@ -14,6 +14,7 @@ import { useUIStore } from "@/store/ui-store";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
 import { ActionSheet } from "@/components/mobile/ActionSheet";
+import { HalfFlowerMenu } from "@/components/mobile/HalfFlowerMenu";
 
 function BottomNavContent() {
   const pathname = usePathname();
@@ -151,20 +152,9 @@ function BottomNavContent() {
             })}
           </div>
 
-          {/* Center-Docked Notch FAB (Belanje/Routinr Benchmark) */}
+          {/* Center-Docked Half-Flower Arc FAB (Animata-Inspired Radial Arc) */}
           <div className="relative -top-3.5 px-1 shrink-0">
-            <button
-              type="button"
-              onClick={() => {
-                soundFX.playPop();
-                soundFX.vibrate(25);
-                setIsActionSheetOpen(true);
-              }}
-              aria-label="Open Quick Action Sheet"
-              className="size-12 rounded-2xl bg-[#CEF431] text-[#161514] border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none flex items-center justify-center cursor-pointer transition-transform hover:scale-105"
-            >
-              <Plus className="size-6 stroke-[3]" />
-            </button>
+            <HalfFlowerMenu onOpenActionSheet={() => setIsActionSheetOpen(true)} />
           </div>
 
           {/* Right Nav Tabs: Tasks, Money */}

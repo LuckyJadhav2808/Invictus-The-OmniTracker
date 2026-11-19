@@ -52,6 +52,14 @@ const DeleteConfirmationModal = dynamic(
   () => import("@/components/shared/DeleteConfirmationModal").then((m) => m.DeleteConfirmationModal),
   { ssr: false }
 );
+const GymRoutineTracker = dynamic(
+  () => import("@/components/goals/GymRoutineTracker").then((m) => m.GymRoutineTracker),
+  { ssr: false }
+);
+const MealTracker = dynamic(
+  () => import("@/components/goals/MealTracker").then((m) => m.MealTracker),
+  { ssr: false }
+);
 import {
   Target,
   Sparkles,
@@ -64,6 +72,7 @@ import {
   Clock,
   ChevronDown,
   ChevronUp,
+  ArrowLeft,
 } from "lucide-react";
 import { format, getDay, startOfWeek, addDays, isSameDay } from "date-fns";
 import { toast } from "sonner";
@@ -107,6 +116,43 @@ function GoalsPageContent() {
   const [isRecoverySheetOpen, setIsRecoverySheetOpen] = useState(false);
   const [isShieldInfoOpen, setIsShieldInfoOpen] = useState(false);
   const [showAllHabits, setShowAllHabits] = useState(false);
+  const [activePortal, setActivePortal] = useState<"gym" | "nutrition" | "stats" | null>(null);
+
+  const openPortal = useCallback((portal: "gym" | "nutrition" | "stats") => {
+    soundFX.playPop();
+    soundFX.vibrate(15);
+    setActivePortal(portal);
+    if (typeof window !== "undefined") {
+      window.history.pushState({ invictusPortal: portal }, "");
+    }
+  }, []);
+
+  const closePortal = useCallback(() => {
+    soundFX.playPop();
+    soundFX.vibrate(15);
+    setActivePortal(null);
+    if (typeof window !== "undefined" && window.history.state?.invictusPortal) {
+      window.history.back();
+    }
+  }, []);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      setActivePortal(null);
+    };
+    const handleOpenPortalEvent = (e: any) => {
+      const p = e.detail?.portal;
+      if (p === "gym" || p === "nutrition" || p === "stats") {
+        openPortal(p);
+      }
+    };
+    window.addEventListener("popstate", handlePopState);
+    window.addEventListener("invictus:goals-open-portal", handleOpenPortalEvent);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+      window.removeEventListener("invictus:goals-open-portal", handleOpenPortalEvent);
+    };
+  }, [openPortal]);
 
   // Health Profile & Habits Database Query hooks
   const { data: userProfile = { gender: "Female", age: "24 Years", weight: "68 kg" } } = useHealthProfile();
@@ -454,8 +500,10 @@ function GoalsPageContent() {
         dueCount={dueTodayHabits.length}
       />
 
-      {/* ================= SLOT 2: STICKY SUB-NAV ================= */}
-      <SegmentedSubNav />
+      {/* ================= SLOT 2: DESKTOP SUB-NAV (Hidden on Mobile) ================= */}
+      <div className="hidden lg:block">
+        <SegmentedSubNav />
+      </div>
 
       <div className="px-3.5 space-y-3">
         {/* ================= SLOT 3: ONE HERO CAROUSEL SLOT (~175px) ================= */}
@@ -549,6 +597,9 @@ function GoalsPageContent() {
             bodyWeight={userProfile.weight || "68 kg"}
             bodyAge={userProfile.age || "24y"}
             onOpenWater={() => setIsWaterSheetOpen(true)}
+            onOpenGym={() => openPortal("gym")}
+            onOpenNutrition={() => openPortal("nutrition")}
+            onOpenStats={() => openPortal("stats")}
             onOpenBodyProfile={openProfileSheet}
             onOpenReminders={() => setIsRemindersSheetOpen(true)}
             onOpenRecovery={() => setIsRecoverySheetOpen(true)}
@@ -1143,6 +1194,41 @@ function GoalsPageContent() {
         title="Delete Habit"
         description="Are you sure you want to delete this habit goal? This will archive your routine."
       />
+
+      {/* ================= 10. MOBILE L2 PORTALS (Gym, Nutrition, Stats) ================= */}
+      {activePortal && (
+        <div className="fixed inset-0 z-50 bg-[#FAF8F5] dark:bg-[#161514] overflow-y-auto pb-28 animate-in slide-in-from-right duration-200">
+          <header className="sticky top-0 z-30 w-full h-[52px] px-3.5 bg-[#FAF8F5]/95 dark:bg-[#161514]/95 backdrop-blur-md border-b border-[#161514]/10 dark:border-white/10 flex items-center justify-between select-none">
+            <button
+              type="button"
+              onClick={closePortal}
+              className="flex items-center gap-1.5 font-heading font-black text-xs text-[#161514] px-2.5 py-1.5 rounded-xl border-2 border-[#161514] bg-[#CEF431] shadow-[2px_2px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer transition-all"
+            >
+              <ArrowLeft className="size-4 stroke-[3]" />
+              <span>Back to Habits</span>
+            </button>
+            <span className="font-heading font-black text-sm text-foreground">
+              {activePortal === "gym" ? "Gym & Routines" : activePortal === "nutrition" ? "Diet & Macros" : "Habit Analytics"}
+            </span>
+            <div className="w-16" />
+          </header>
+
+          <div className="max-w-xl lg:max-w-5xl mx-auto p-3.5 space-y-4">
+            {activePortal === "gym" && <GymRoutineTracker />}
+            {activePortal === "nutrition" && <MealTracker />}
+            {activePortal === "stats" && (
+              <HabitsMatrixBoard
+                habits={habits}
+                streaks={streaks}
+                selectedDate={selectedDate}
+                onSelectDate={setSelectedDate}
+                onToggleHabitLog={handleToggleLog}
+                onOpenNewHabit={() => setIsChoiceOpen(true)}
+              />
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
