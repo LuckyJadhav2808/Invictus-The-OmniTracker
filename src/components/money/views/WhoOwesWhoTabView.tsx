@@ -5,6 +5,7 @@ import { useWhoOwesWhoStore, type IOU, type IOUType } from "@/store/who-owes-who
 import { soundFX } from "@/components/shared/SoundFX";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { confettiBurst } from "@/lib/ui/confetti-burst";
 import {
   Users,
   Plus,
@@ -159,6 +160,9 @@ export function WhoOwesWhoTabView({
   const handleSettle = async (iou: IOU) => {
     soundFX.playCompleteChime();
     soundFX.vibrate(25);
+    try {
+      confettiBurst();
+    } catch {}
     settleIOU(iou.id);
 
     // If they owed us money, ask to log incoming repayment

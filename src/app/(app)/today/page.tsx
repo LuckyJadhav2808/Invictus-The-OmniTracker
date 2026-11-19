@@ -38,6 +38,7 @@ import { TodayDoorTileRow } from "@/components/today/TodayDoorTileRow";
 import { TodayChronologicalAgenda } from "@/components/today/TodayChronologicalAgenda";
 import { TodayTopHabitsMomentum } from "@/components/today/TodayTopHabitsMomentum";
 import { FirstRunQuickStartDeck } from "@/components/today/FirstRunQuickStartDeck";
+import { TelemetryMarquee } from "@/components/ui/telemetry-marquee";
 import { BottomSheet } from "@/components/mobile/BottomSheet";
 import { WaterTracker } from "@/components/goals/WaterTracker";
 import { computeDailyConquestScore } from "@/components/today/useTodayCockpitViewModel";
@@ -525,6 +526,22 @@ export default function TodayPage() {
           />
         </div>
 
+        {/* Real-time Gladiator Conquest Telemetry Marquee Tape */}
+        <div className="py-1">
+          <TelemetryMarquee
+            items={[
+              "⚔️ STOIC CONQUEST TELEMETRY",
+              "DISCIPLINE OVER MOTIVATION",
+              `${completedItemsCount}/${totalItemsCount} TARGETS CRUSHED (${completionPercent}%)`,
+              `HYDRATION: ${waterAmount}/${waterTarget}ML`,
+              `CRYO-SHIELDS: ${streakFreeze.tokensAvailable || 0}/2 READY`,
+              "SEAL DAY LEDGER BEFORE MIDNIGHT",
+            ]}
+            className="rounded-xl border-2 border-[#161514] dark:border-[#383531] shadow-2xs"
+            speed={26}
+          />
+        </div>
+
         {/* SLOT 5: ONE UNIFIED CHRONOLOGICAL DAY AGENDA */}
         <div id="agenda-section">
           <TodayChronologicalAgenda
@@ -587,6 +604,20 @@ export default function TodayPage() {
               />
             </div>
           </div>
+
+          {/* Real-time Gladiator Conquest Telemetry Marquee */}
+          <TelemetryMarquee
+            items={[
+              "⚔️ STOIC CONQUEST TELEMETRY",
+              "DISCIPLINE OVER MOTIVATION",
+              `${completedItemsCount}/${totalItemsCount} TARGETS CRUSHED (${completionPercent}%)`,
+              `HYDRATION: ${waterAmount}/${waterTarget}ML`,
+              `CRYO-SHIELDS: ${streakFreeze.tokensAvailable || 0}/2 READY`,
+              "SEAL DAY LEDGER BEFORE MIDNIGHT",
+            ]}
+            className="rounded-2xl border-2 border-[#161514] dark:border-[#383531] shadow-2xs"
+            speed={30}
+          />
 
           {/* Unified Chronological Agenda */}
           <div id="agenda-section-desktop">

@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
 import { Hero, HeroSlide, HeroStatItem } from "@/components/shared/Hero";
 import { StrobiCompanion, type StrobiState } from "@/components/mascot/StrobiCompanion";
+import { NumberTicker } from "@/components/ui/number-ticker";
 
 export interface TodayHeroPagerProps {
   userName?: string;
@@ -120,7 +121,7 @@ export function TodayHeroPager({
         {/* Center Primary Metric */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
           <span className="font-heading font-black text-4xl sm:text-5xl text-foreground tracking-tight tabular-nums leading-none">
-            {completionPercent}%
+            <NumberTicker value={completionPercent} suffix="%" duration={350} />
           </span>
           <span className="text-[10px] font-mono font-bold tracking-widest uppercase text-muted-foreground mt-1">
             CONQUERED
@@ -149,7 +150,11 @@ export function TodayHeroPager({
         SAFE TO SPEND TODAY
       </span>
       <span className="font-heading font-black text-3xl sm:text-4xl text-foreground tracking-tight tabular-nums mt-0.5">
-        {currencySymbol}{Math.max(0, remainingSafeToSpend).toLocaleString()}
+        <NumberTicker
+          value={Math.max(0, remainingSafeToSpend)}
+          prefix={currencySymbol}
+          duration={350}
+        />
       </span>
       <p className="text-xs font-mono font-medium text-muted-foreground mt-1">
         {spentToday > 0

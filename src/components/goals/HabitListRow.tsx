@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
+import { SwipeActionRow } from "@/components/mobile/SwipeActionRow";
 
 export interface WeekDayStatus {
   dateStr: string;
@@ -54,8 +55,6 @@ export function HabitListRow({
   onToggleDate,
 }: HabitListRowProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [swipeOffset, setSwipeOffset] = useState(0);
-  const touchStartX = useRef<number | null>(null);
 
   // Dynamically resolve Lucide icon
   const IconComponent =
@@ -78,61 +77,64 @@ export function HabitListRow({
     onToggle();
   };
 
-  // Touch Swipe Handlers (Swipe right = complete, Swipe left = expand/edit)
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (touchStartX.current === null) return;
-    const deltaX = e.touches[0].clientX - touchStartX.current;
-    if (Math.abs(deltaX) < 100) {
-      setSwipeOffset(deltaX);
-    }
-  };
-
-  const handleTouchEnd = () => {
-    if (swipeOffset > 60) {
-      // Swiped right -> complete
-      soundFX.playCompleteChime();
-      soundFX.vibrate(25);
-      onToggle();
-    } else if (swipeOffset < -60) {
-      // Swiped left -> expand options
-      soundFX.playPop();
-      setIsExpanded((prev) => !prev);
-    }
-    setSwipeOffset(0);
-    touchStartX.current = null;
-  };
-
   return (
-    <div
-      className={cn(
-        "border-b border-[#161514]/10 dark:border-white/10 transition-colors select-none",
-        isCompletedToday && "opacity-80"
-      )}
+    <SwipeActionRow
+      rightAction={{
+        icon: <Check className="size-4 stroke-[3]" />,
+        label: isCompletedToday ? "Undo" : "Done",
+        color: "bg-[#03D26F]",
+        textColor: "text-[#161514]",
+        onTrigger: () => {
+          soundFX.playCompleteChime();
+          soundFX.vibrate(25);
+          onToggle();
+        },
+      }}
+      leftAction={
+        onDelete
+          ? {
+              icon: <Trash2 className="size-4 stroke-[2.2]" />,
+              label: "Delete",
+              color: "bg-rose-600",
+              textColor: "text-white",
+              onTrigger: () => {
+                soundFX.playPop();
+                onDelete();
+              },
+            }
+          : onEdit
+          ? {
+              icon: <Edit3 className="size-4 stroke-[2.2]" />,
+              label: "Edit",
+              color: "bg-stone-800",
+              textColor: "text-white",
+              onTrigger: () => {
+                soundFX.playPop();
+                onEdit();
+              },
+            }
+          : undefined
+      }
     >
-      {/* Main Row Surface (56-64px height) */}
       <div
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        onClick={() => {
-          soundFX.playPop();
-          setIsExpanded((prev) => !prev);
-        }}
-        style={{
-          transform: swipeOffset !== 0 ? `translateX(${swipeOffset}px)` : undefined,
-          transition: swipeOffset === 0 ? "transform 0.2s ease-out" : "none",
-        }}
         className={cn(
-          "w-full min-h-[58px] py-2 px-3 flex items-center justify-between gap-3 cursor-pointer hover:bg-black/[0.02] dark:hover:bg-white/[0.02] active:bg-black/[0.04] transition-colors relative",
-          isExpanded && "bg-black/[0.02] dark:bg-white/[0.02]"
+          "border-b border-[#161514]/10 dark:border-white/10 transition-colors select-none",
+          isCompletedToday && "opacity-80"
         )}
       >
-        {/* Left: Icon + Title + Meta Stack */}
-        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+        {/* Main Row Surface (56-64px height) */}
+        <div
+          onClick={() => {
+            soundFX.playPop();
+            setIsExpanded((prev) => !prev);
+          }}
+          className={cn(
+            "w-full min-h-[58px] py-2 px-3 flex items-center justify-between gap-3 cursor-pointer hover:bg-black/[0.02] dark:hover:bg-white/[0.02] active:bg-black/[0.04] transition-colors relative",
+            isExpanded && "bg-black/[0.02] dark:bg-white/[0.02]"
+          )}
+        >
+          {/* Left: Icon + Title + Meta Stack */}
+          <div className="flex items-center gap-2.5 min-w-0 flex-1">
           {/* Compact 32px Icon Squircle */}
           <div
             className={cn(
@@ -317,5 +319,6 @@ export function HabitListRow({
         </div>
       )}
     </div>
+  </SwipeActionRow>
   );
 }

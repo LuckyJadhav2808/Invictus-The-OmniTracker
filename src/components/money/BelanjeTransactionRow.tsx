@@ -7,6 +7,7 @@ import { format, parseISO, isValid } from "date-fns";
 import { CategoryIcon } from "@/components/money/MoneyQuickActionsAndCards";
 import { soundFX } from "@/components/shared/SoundFX";
 import { Copy, Edit2, Trash2 } from "lucide-react";
+import { SwipeActionRow } from "@/components/mobile/SwipeActionRow";
 
 interface BelanjeTransactionRowProps {
   tx: Transaction;
@@ -120,13 +121,43 @@ export function BelanjeTransactionRow({
   };
 
   return (
-    <div
-      onClick={handleRowClick}
-      className={cn(
-        "group relative bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] border border-[#E8E5DF] dark:border-[#383531] rounded-2xl transition-all duration-150 cursor-pointer active:scale-[0.99] flex items-center justify-between gap-3 shadow-xs",
-        compact ? "p-2.5 sm:p-3" : "p-3 sm:p-3.5"
-      )}
+    <SwipeActionRow
+      rightAction={
+        onDuplicate
+          ? {
+              icon: <Copy className="size-4 stroke-[2]" />,
+              label: "Duplicate",
+              color: "bg-[#03D26F]",
+              textColor: "text-[#161514]",
+              onTrigger: () => {
+                soundFX.playPop();
+                onDuplicate(tx);
+              },
+            }
+          : undefined
+      }
+      leftAction={
+        onDelete
+          ? {
+              icon: <Trash2 className="size-4 stroke-[2.2]" />,
+              label: "Delete",
+              color: "bg-rose-600",
+              textColor: "text-white",
+              onTrigger: () => {
+                soundFX.playPop();
+                onDelete(tx.id);
+              },
+            }
+          : undefined
+      }
     >
+      <div
+        onClick={handleRowClick}
+        className={cn(
+          "group relative bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] border border-[#E8E5DF] dark:border-[#383531] rounded-2xl transition-all duration-150 cursor-pointer active:scale-[0.99] flex items-center justify-between gap-3 shadow-xs",
+          compact ? "p-2.5 sm:p-3" : "p-3 sm:p-3.5"
+        )}
+      >
       {/* Left: 40px Squircle Category Badge & Metadata */}
       <div className="flex items-center gap-3 min-w-0">
         <div
@@ -225,5 +256,6 @@ export function BelanjeTransactionRow({
         )}
       </div>
     </div>
+  </SwipeActionRow>
   );
 }

@@ -18,6 +18,7 @@ import {
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
 import { toast } from "sonner";
+import { NumberTicker } from "@/components/ui/number-ticker";
 
 export interface WaterTrackerProps {
   amount: number; // in ml
@@ -216,7 +217,7 @@ export function WaterTracker({
             </span>
           ) : (
             <span className="bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 font-mono font-bold text-[11px] px-2.5 py-1 rounded-full shrink-0">
-              {remaining.toLocaleString()} ml left
+              <NumberTicker value={remaining} suffix=" ml left" duration={250} />
             </span>
           )}
         </div>
@@ -225,10 +226,10 @@ export function WaterTracker({
         <div className="flex items-baseline justify-between pt-1">
           <div className="flex items-baseline gap-1.5">
             <span className="text-4xl sm:text-5xl font-heading font-black tabular-nums tracking-tight text-foreground">
-              {localAmount.toLocaleString()}
+              <NumberTicker value={localAmount} duration={250} />
             </span>
             <span className="text-sm sm:text-base font-mono text-muted-foreground font-bold">
-              / {dailyTarget.toLocaleString()} ml
+              / <NumberTicker value={dailyTarget} suffix=" ml" duration={250} />
             </span>
           </div>
 
@@ -239,7 +240,7 @@ export function WaterTracker({
                 isGoalMet ? "text-[#03D26F]" : "text-sky-600 dark:text-sky-400"
               )}
             >
-              {percentage}%
+              <NumberTicker value={percentage} suffix="%" duration={250} />
             </span>
           </div>
         </div>

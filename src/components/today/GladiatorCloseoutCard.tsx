@@ -24,6 +24,7 @@ import {
 import { soundFX } from "@/components/shared/SoundFX";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { confettiBurst } from "@/lib/ui/confetti-burst";
 
 interface GladiatorCloseoutCardProps {
   metrics: DailyConquestMetrics;
@@ -86,6 +87,7 @@ export function GladiatorCloseoutCard({
       soundFX.playCompleteChime();
       soundFX.playBotChirp("salute");
       soundFX.vibrate(30);
+      confettiBurst();
     } catch {}
 
     toast.success("Day Sealed! Today's progress archived into history.");

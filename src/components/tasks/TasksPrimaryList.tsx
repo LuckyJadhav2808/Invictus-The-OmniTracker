@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
+import { SwipeActionRow } from "@/components/mobile/SwipeActionRow";
 
 export interface TasksPrimaryListProps {
   tasks: TaskItem[];
@@ -245,15 +246,34 @@ export function TasksPrimaryList({
             const isSubtasksOpen = expandedSubtaskId === task.id;
 
             return (
-              <div
+              <SwipeActionRow
                 key={task.id}
-                className={cn(
-                  "rounded-xl border transition-all shadow-2xs group overflow-hidden",
-                  isDone
-                    ? "bg-emerald-50/40 dark:bg-emerald-950/10 border-emerald-500/20"
-                    : "bg-card border-border hover:border-[#161514]/30 dark:hover:border-[#FAF8F5]/30"
-                )}
+                rightAction={{
+                  icon: <CheckCircle2 className="size-4 stroke-[2.5]" />,
+                  label: isDone ? "Todo" : "Done",
+                  color: "bg-[#03D26F]",
+                  textColor: "text-[#161514]",
+                  onTrigger: () => handleToggleTask(task),
+                }}
+                leftAction={{
+                  icon: <Trash2 className="size-4 stroke-[2.2]" />,
+                  label: "Delete",
+                  color: "bg-rose-600",
+                  textColor: "text-white",
+                  onTrigger: () => {
+                    soundFX.playPop();
+                    onDeleteTask(task.id);
+                  },
+                }}
               >
+                <div
+                  className={cn(
+                    "rounded-xl border transition-all shadow-2xs group overflow-hidden",
+                    isDone
+                      ? "bg-emerald-50/40 dark:bg-emerald-950/10 border-emerald-500/20"
+                      : "bg-card border-border hover:border-[#161514]/30 dark:hover:border-[#FAF8F5]/30"
+                  )}
+                >
                 {/* Main 56-64px single-line row */}
                 <div className="px-3 py-2.5 flex items-center justify-between gap-2.5 min-h-[56px]">
                   {/* Left: 24px Physical Tactile Checkbox */}
@@ -400,7 +420,8 @@ export function TasksPrimaryList({
                   </div>
                 )}
               </div>
-            );
+            </SwipeActionRow>
+          );
           })
         )}
       </div>

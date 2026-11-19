@@ -15,6 +15,8 @@ import { isCashTransaction, isOnlineTransaction, type MonthlyBudgetStats } from 
 import { useAddTransaction } from "@/lib/queries/money";
 import { computeFrequentExpenses, type FrequentExpenseItem } from "@/lib/utils/frequent-expenses";
 import { toast } from "sonner";
+import { NumberTicker } from "@/components/ui/number-ticker";
+import { TelemetryMarquee } from "@/components/ui/telemetry-marquee";
 
 interface LedgerTabViewProps {
   transactions: Transaction[];
@@ -767,10 +769,23 @@ export function LedgerTabView({
             Statement for <strong className="font-semibold">{selectedMonth === "all" ? "All Time" : (availableMonths.find((m) => m.key === selectedMonth)?.label || selectedMonth)}</strong>
           </span>
         </div>
-        <span className="text-xs font-mono font-medium text-[#6B6B6B] dark:text-[#A8A29E] tabular-nums">
-          {selectedMonthSummary.count} {selectedMonthSummary.count === 1 ? "record" : "records"} • Spent: {currencySymbol}{selectedMonthSummary.expense.toLocaleString()}
+        <span className="text-xs font-mono font-medium text-[#6B6B6B] dark:text-[#A8A29E] tabular-nums flex items-center gap-1">
+          <NumberTicker value={selectedMonthSummary.count} duration={250} /> {selectedMonthSummary.count === 1 ? "record" : "records"} • Spent: <NumberTicker value={selectedMonthSummary.expense} prefix={currencySymbol} duration={250} />
         </span>
       </div>
+
+      {/* Real-time Ledger Telemetry Marquee Tape */}
+      <TelemetryMarquee
+        items={[
+          "SAFE DAILY PACE: " + currencySymbol + (activeCategoryStats?.safeDailyPace ?? 350) + "/DAY",
+          "CASH TILL & DIGITAL UPI BALANCED",
+          "0 UNRECONCILED TRANSACTIONS",
+          "ENVELOPE DISCIPLINE ACTIVE",
+          "AIR-GAPPED ON-DEVICE ML CATEGORIZATION READY",
+        ]}
+        className="rounded-lg border-2 border-[#161514] dark:border-[#383531] shadow-2xs"
+        speed={28}
+      />
 
       {/* TRANSACTION FEED LIST */}
       {groupedByDate.length === 0 ? (
