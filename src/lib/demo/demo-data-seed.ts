@@ -484,6 +484,7 @@ export function loadEvaluatorDemoData(): boolean {
     localStorage.setItem("invictus_monthly_upi_budget", "8000");
     localStorage.setItem("invictus_monthly_cash_budget", "2000");
     localStorage.setItem("invictus_enable_rollover", "true");
+    localStorage.setItem("invictus_budget_rollover_enabled", "true");
     localStorage.setItem("invictus_custom_daily_budget", "350");
 
     // 6. Scratchpad
@@ -563,6 +564,7 @@ export function clearEvaluatorDemoData(): boolean {
       "invictus_monthly_upi_budget",
       "invictus_monthly_cash_budget",
       "invictus_enable_rollover",
+      "invictus_budget_rollover_enabled",
       "invictus_custom_daily_budget",
       "invictus_sticky_scratchpad",
       DEMO_DATA_FLAG_KEY,

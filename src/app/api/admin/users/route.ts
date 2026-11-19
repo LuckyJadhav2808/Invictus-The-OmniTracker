@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
       currency: "INR",
       weekStartsOn: 1,
       onboarded: true,
-      modulesEnabled: { goals: true, study: true, money: true },
+      modulesEnabled: { goals: true, tasks: true, money: true },
       createdAt: new Date(),
       lastLogin: new Date(),
     });

@@ -144,6 +144,7 @@ describe("Evaluator Demo Data Seed Engine", () => {
       expect(mockStorage["invictus_savings_goals"]).toBeUndefined();
       expect(mockStorage["invictus_subscriptions"]).toBeUndefined();
       expect(mockStorage["invictus_sticky_scratchpad"]).toBeUndefined();
+      expect(mockStorage["invictus_budget_rollover_enabled"]).toBeUndefined();
 
       // Guest session credentials MUST be preserved
       expect(mockStorage["invictus_guest_mode"]).toBe("true");

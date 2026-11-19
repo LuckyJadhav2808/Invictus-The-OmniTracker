@@ -26,7 +26,7 @@ export function hydrateDeviceFromCloud(user: User): boolean {
       currency: user.currency || "INR",
       timezone: user.timezone || "Asia/Kolkata",
       weekStartsOn: user.weekStartsOn ?? 1,
-      modulesEnabled: user.modulesEnabled || { goals: true, study: true, money: true },
+      modulesEnabled: user.modulesEnabled || { goals: true, tasks: true, money: true },
     };
     localStorage.setItem("invictus_user_profile", JSON.stringify(userProfile));
     localStorage.setItem("invictus_currency", user.currency || "INR");
