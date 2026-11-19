@@ -766,7 +766,7 @@ function MoneyPageContent() {
   }
 
   return (
-    <div className="w-full max-w-xl mx-auto select-none space-y-2 sm:space-y-3 pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
+    <div className="w-full max-w-xl lg:max-w-5xl xl:max-w-6xl mx-auto select-none space-y-3 sm:space-y-4 px-1 sm:px-3 pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
       {/* ================= SLOT 1: SLIM TOP APP BAR (48-56px) ================= */}
       <MobileAppBar
         title="Money"
@@ -894,7 +894,7 @@ function MoneyPageContent() {
                         onEdit={(t) => setEditingTx(t)}
                         onDuplicate={handleDuplicateTransaction}
                         onDelete={handleDeleteTransaction}
-                        showQuickActions={false}
+                        showQuickActions={true}
                         compact={false}
                       />
                     ))}

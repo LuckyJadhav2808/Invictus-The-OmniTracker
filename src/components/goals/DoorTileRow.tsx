@@ -70,7 +70,7 @@ export function DoorTileRow({
   return (
     <div
       className={cn(
-        "grid grid-cols-4 gap-1.5 sm:gap-2 w-full select-none",
+        "grid grid-cols-4 gap-1.5 sm:gap-2.5 lg:gap-3 w-full select-none",
         className
       )}
     >
@@ -86,18 +86,18 @@ export function DoorTileRow({
               t.onClick();
             }}
             className={cn(
-              "py-2 px-1.5 rounded-xl bg-card border border-border flex flex-col items-center justify-center text-center transition-all cursor-pointer active:scale-95 shadow-2xs group min-h-[58px]",
+              "py-2 sm:py-3 px-1.5 sm:px-3 rounded-xl sm:rounded-2xl bg-card border border-border flex flex-col items-center justify-center text-center transition-all cursor-pointer active:scale-95 shadow-2xs group min-h-[58px] sm:min-h-[66px]",
               t.bgClass
             )}
             title={`Open ${t.label} Sheet`}
           >
-            <div className="flex items-center gap-1">
-              <Icon className={cn("size-3.5 stroke-[2]", t.iconColor)} />
-              <span className="font-heading font-black text-[11px] text-foreground tracking-tight">
+            <div className="flex items-center gap-1 sm:gap-1.5">
+              <Icon className={cn("size-3.5 sm:size-4 stroke-[2]", t.iconColor)} />
+              <span className="font-heading font-black text-[11px] sm:text-xs text-foreground tracking-tight">
                 {t.label}
               </span>
             </div>
-            <span className="text-[10px] font-mono font-medium text-muted-foreground truncate w-full mt-0.5">
+            <span className="text-[10px] sm:text-[11px] font-mono font-medium text-muted-foreground truncate w-full mt-0.5">
               {t.value}
             </span>
           </button>

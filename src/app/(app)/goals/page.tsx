@@ -443,7 +443,7 @@ function GoalsPageContent() {
       : dailyCompletionPercent;
 
   return (
-    <div className="w-full max-w-xl mx-auto pb-6 sm:pb-8 select-none space-y-2 sm:space-y-3">
+    <div className="w-full max-w-xl lg:max-w-5xl xl:max-w-6xl mx-auto pb-6 sm:pb-8 select-none space-y-3 sm:space-y-4 px-1 sm:px-3">
       {/* ================= SLOT 1: SLIM TOP APP BAR (48-56px) ================= */}
       <MobileAppBar
         title="Habits"
@@ -623,7 +623,7 @@ function GoalsPageContent() {
               }}
             />
           ) : habitLayoutStyle === "cards" ? (
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3">
               {displayedHabits.map((habit) => {
                 const isDone = isCompletedToday(habit.id);
                 const isRest = isHabitRestDay(habit);
@@ -666,8 +666,8 @@ function GoalsPageContent() {
               })}
             </div>
           ) : (
-            /* Default Compact 56-64px List Rows (No nested heavy cards) */
-            <div className="bg-card border border-border rounded-2xl overflow-hidden divide-y divide-border/60 shadow-xs">
+            /* Default Compact 56-64px List Rows (Responsive Bento on Laptop) */
+            <div className="bg-card border border-border rounded-2xl overflow-hidden divide-y divide-border/60 shadow-xs lg:bg-transparent lg:border-0 lg:divide-y-0 lg:shadow-none lg:grid lg:grid-cols-2 lg:gap-3">
               {visibleHabits.map((habit) => {
                 const isDone = isCompletedToday(habit.id);
                 const isRest = isHabitRestDay(habit);
@@ -682,30 +682,34 @@ function GoalsPageContent() {
                 }));
 
                 return (
-                  <HabitListRow
+                  <div
                     key={habit.id}
-                    habit={habit}
-                    streak={habitStreak}
-                    isCompletedToday={isDone}
-                    isRestDay={isRest}
-                    onToggle={() => handleToggleLog(habit.id, !isDone)}
-                    weekDays={habitWeekDays}
-                    onToggleDate={(dateStr) => {
-                      const isDayDone =
-                        dateStr === selectedDate
-                          ? isDone
-                          : weekLogs.some((l) => l.habitId === habit.id && l.date === dateStr);
-                      handleToggleLog(habit.id, !isDayDone, dateStr);
-                    }}
-                    onEdit={() => {
-                      setEditingHabit(habit);
-                      setEditHabitTitle(habit.title);
-                      setEditHabitDesc(habit.reminderTime || "");
-                    }}
-                    onDelete={() => setDeleteHabitId(habit.id)}
-                    onSkip={() => handleToggleLog(habit.id, false)}
-                    onViewDetail={() => router.push(`/goals/${habit.id}`)}
-                  />
+                    className="lg:bg-card lg:border lg:border-border lg:rounded-2xl lg:shadow-xs lg:overflow-hidden hover:lg:border-[#161514]/40 dark:hover:lg:border-white/30 transition-all"
+                  >
+                    <HabitListRow
+                      habit={habit}
+                      streak={habitStreak}
+                      isCompletedToday={isDone}
+                      isRestDay={isRest}
+                      onToggle={() => handleToggleLog(habit.id, !isDone)}
+                      weekDays={habitWeekDays}
+                      onToggleDate={(dateStr) => {
+                        const isDayDone =
+                          dateStr === selectedDate
+                            ? isDone
+                            : weekLogs.some((l) => l.habitId === habit.id && l.date === dateStr);
+                        handleToggleLog(habit.id, !isDayDone, dateStr);
+                      }}
+                      onEdit={() => {
+                        setEditingHabit(habit);
+                        setEditHabitTitle(habit.title);
+                        setEditHabitDesc(habit.reminderTime || "");
+                      }}
+                      onDelete={() => setDeleteHabitId(habit.id)}
+                      onSkip={() => handleToggleLog(habit.id, false)}
+                      onViewDetail={() => router.push(`/goals/${habit.id}`)}
+                    />
+                  </div>
                 );
               })}
 
@@ -717,7 +721,7 @@ function GoalsPageContent() {
                     soundFX.playPop();
                     setShowAllHabits((prev) => !prev);
                   }}
-                  className="w-full py-2.5 px-3 bg-secondary/50 hover:bg-secondary text-xs font-mono font-bold text-muted-foreground hover:text-foreground flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                  className="w-full py-2.5 px-3 bg-secondary/50 hover:bg-secondary text-xs font-mono font-bold text-muted-foreground hover:text-foreground flex items-center justify-center gap-1.5 transition-colors cursor-pointer lg:col-span-2 rounded-xl border border-dashed border-border"
                 >
                   {showAllHabits ? (
                     <>

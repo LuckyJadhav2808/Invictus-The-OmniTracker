@@ -42,7 +42,7 @@ export function HabitsDateStrip({
     <div
       role="group"
       aria-label="7-Day Routine Horizon"
-      className={cn("w-full grid grid-cols-7 gap-1 sm:gap-1.5 select-none", className)}
+      className={cn("w-full grid grid-cols-7 gap-1 sm:gap-2 select-none", className)}
     >
       {weekDays.map((day) => (
         <button
@@ -54,7 +54,7 @@ export function HabitsDateStrip({
             onSelectDate(day.dateStr);
           }}
           className={cn(
-            "relative py-1.5 px-1 rounded-xl border transition-all cursor-pointer flex flex-col items-center justify-center min-h-[46px]",
+            "relative py-1.5 sm:py-2 px-1 rounded-xl sm:rounded-2xl border transition-all cursor-pointer flex flex-col items-center justify-center min-h-[46px] sm:min-h-[54px]",
             day.isSelected
               ? "bg-[#CEF431] text-[#161514] border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] dark:shadow-[1.5px_1.5px_0px_0px_#000000] font-black scale-[1.02] z-10"
               : day.isToday
@@ -66,7 +66,7 @@ export function HabitsDateStrip({
           {day.isToday && (
             <span
               className={cn(
-                "text-[7px] font-mono font-black uppercase tracking-wider leading-none mb-0.5",
+                "text-[7px] sm:text-[8px] font-mono font-black uppercase tracking-wider leading-none mb-0.5",
                 day.isSelected ? "text-[#161514]" : "text-[#03D26F]"
               )}
             >
@@ -74,7 +74,7 @@ export function HabitsDateStrip({
             </span>
           )}
 
-          <span className="text-[8px] sm:text-[9px] uppercase tracking-wider leading-tight">
+          <span className="text-[8px] sm:text-[9.5px] uppercase tracking-wider leading-tight">
             {day.dayLabel}
           </span>
           <span className="text-xs sm:text-sm font-mono font-black mt-0.5 leading-none">

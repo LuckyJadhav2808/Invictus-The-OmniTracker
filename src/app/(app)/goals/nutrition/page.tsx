@@ -8,7 +8,7 @@ import { SegmentedSubNav } from "@/components/mobile/SegmentedSubNav";
 export default function NutritionPage() {
   return (
     <div className="space-y-4 animate-in fade-in duration-300">
-      <div className="max-w-xl mx-auto w-full">
+      <div className="max-w-xl lg:max-w-5xl xl:max-w-6xl mx-auto w-full">
         <SegmentedSubNav />
       </div>
 
