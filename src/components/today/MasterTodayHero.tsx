@@ -179,10 +179,10 @@ export const MasterTodayHero = React.memo(function MasterTodayHero({
                 <button
                   type="button"
                   onClick={() => handleInteractiveClick(onOpenScratchpad)}
-                  className="px-2.5 py-1 rounded-lg border-2 border-[#161514] dark:border-[#38332E] bg-[#F1EFEA] dark:bg-[#25221F] text-[#161514] dark:text-[#FAF8F5] text-2xs font-mono font-bold shadow-2xs hover:bg-[#CEF431] dark:hover:bg-[#CEF431] dark:hover:text-[#161514] transition-colors cursor-pointer"
+                  className="px-2.5 py-1 rounded-lg border-2 border-[#161514] dark:border-amber-800 bg-amber-100 dark:bg-amber-950 text-amber-900 dark:text-amber-300 text-2xs font-mono font-bold shadow-[1px_1px_0px_0px_#161514] dark:shadow-[1px_1px_0px_0px_#000000] hover:bg-amber-200 dark:hover:bg-amber-900 transition-colors cursor-pointer"
                   title="Open Scratchpad (⌘J)"
                 >
-                  <FileText className="size-3 inline-block mr-1 stroke-[2]" />
+                  <FileText className="size-3 inline-block mr-1 stroke-[2.2] text-amber-700 dark:text-amber-300" />
                   Notes
                 </button>
               )}
@@ -190,10 +190,10 @@ export const MasterTodayHero = React.memo(function MasterTodayHero({
                 <button
                   type="button"
                   onClick={() => handleInteractiveClick(onOpenCloseoutDrawer)}
-                  className="px-2.5 py-1 rounded-lg border-2 border-[#161514] dark:border-[#38332E] bg-[#F1EFEA] dark:bg-[#25221F] text-[#161514] dark:text-[#FAF8F5] text-2xs font-mono font-bold shadow-2xs hover:bg-[#CEF431] dark:hover:bg-[#CEF431] dark:hover:text-[#161514] transition-colors cursor-pointer"
+                  className="px-2.5 py-1 rounded-lg border-2 border-[#161514] dark:border-purple-800 bg-purple-100 dark:bg-purple-950 text-purple-900 dark:text-purple-300 text-2xs font-mono font-bold shadow-[1px_1px_0px_0px_#161514] dark:shadow-[1px_1px_0px_0px_#000000] hover:bg-purple-200 dark:hover:bg-purple-900 transition-colors cursor-pointer"
                   title="Evening Review"
                 >
-                  <Moon className="size-3 inline-block mr-1 stroke-[2]" />
+                  <Moon className="size-3 inline-block mr-1 stroke-[2.2] text-purple-700 dark:text-purple-300" />
                   Review
                 </button>
               )}

@@ -45,6 +45,7 @@ public class QuickLogDialogActivity extends AppCompatActivity {
     private TextView tvSafeSpendBadge;
     private EditText etExpenseNote;
     private TextView btnClearNote;
+    private LinearLayout llHabitPresetsContainer;
     private Button btnCatFood;
     private Button btnCatTravel;
     private Button btnCatGrocery;
@@ -54,6 +55,7 @@ public class QuickLogDialogActivity extends AppCompatActivity {
     private String selectedCategory = "Food";
     private String optionalNote = "";
     private double safeToSpend = 1420.0;
+    private boolean isManualCategorySelected = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +72,7 @@ public class QuickLogDialogActivity extends AppCompatActivity {
         tvSafeSpendBadge = findViewById(R.id.tv_safe_spend_badge);
         etExpenseNote = findViewById(R.id.et_expense_note);
         btnClearNote = findViewById(R.id.btn_clear_note);
+        llHabitPresetsContainer = findViewById(R.id.ll_habit_presets_container);
         btnCatFood = findViewById(R.id.btn_cat_food);
         btnCatTravel = findViewById(R.id.btn_cat_travel);
         btnCatGrocery = findViewById(R.id.btn_cat_grocery);
@@ -101,7 +104,7 @@ public class QuickLogDialogActivity extends AppCompatActivity {
             finish();
         });
 
-        // Note Input Listeners
+        // Note Input Listeners with Real-Time Smart Category Detection
         if (etExpenseNote != null) {
             etExpenseNote.addTextChangedListener(new android.text.TextWatcher() {
                 @Override
@@ -113,6 +116,9 @@ public class QuickLogDialogActivity extends AppCompatActivity {
                         btnClearNote.setVisibility(s.length() > 0 ? View.VISIBLE : View.GONE);
                     }
                     optionalNote = s.toString().trim();
+                    if (!isManualCategorySelected && !optionalNote.isEmpty()) {
+                        detectCategoryFromNoteText(optionalNote.toLowerCase());
+                    }
                 }
 
                 @Override
@@ -127,20 +133,30 @@ public class QuickLogDialogActivity extends AppCompatActivity {
                     etExpenseNote.setText("");
                 }
                 optionalNote = "";
+                isManualCategorySelected = false;
             });
         }
 
-        // Habits
-        setupHabitButton(R.id.btn_habit_chai, "30", "Food", "Chai");
-        setupHabitButton(R.id.btn_habit_meal, "100", "Food", "Meal");
-        setupHabitButton(R.id.btn_habit_metro, "40", "Travel", "Metro");
-        setupHabitButton(R.id.btn_habit_snack, "20", "Food", "Snack");
+        // Habit Presets (Dynamic from user transaction history with fallback defaults)
+        setupHabitPresets();
 
-        // Categories
-        btnCatFood.setOnClickListener(v -> updateCategorySelection(btnCatFood, "Food"));
-        btnCatTravel.setOnClickListener(v -> updateCategorySelection(btnCatTravel, "Travel"));
-        btnCatGrocery.setOnClickListener(v -> updateCategorySelection(btnCatGrocery, "Grocery"));
-        btnCatBills.setOnClickListener(v -> updateCategorySelection(btnCatBills, "Bills"));
+        // Categories (Manual taps lock the selection and give crisp tactile feedback)
+        btnCatFood.setOnClickListener(v -> {
+            isManualCategorySelected = true;
+            updateCategorySelection(btnCatFood, "Food");
+        });
+        btnCatTravel.setOnClickListener(v -> {
+            isManualCategorySelected = true;
+            updateCategorySelection(btnCatTravel, "Travel");
+        });
+        btnCatGrocery.setOnClickListener(v -> {
+            isManualCategorySelected = true;
+            updateCategorySelection(btnCatGrocery, "Grocery");
+        });
+        btnCatBills.setOnClickListener(v -> {
+            isManualCategorySelected = true;
+            updateCategorySelection(btnCatBills, "Bills");
+        });
 
         // Numpad Keys
         setupNumpadKey(R.id.btn_num_1, "1");
@@ -200,6 +216,75 @@ public class QuickLogDialogActivity extends AppCompatActivity {
         }
     }
 
+    private void setupHabitPresets() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        String presetsJson = prefs.getString("recent_presets", null);
+
+        boolean hasDynamicPresets = false;
+        if (presetsJson != null && !presetsJson.isEmpty()) {
+            try {
+                org.json.JSONArray presetsArray = new org.json.JSONArray(presetsJson);
+                if (presetsArray.length() > 0 && llHabitPresetsContainer != null) {
+                    llHabitPresetsContainer.removeAllViews();
+                    for (int i = 0; i < presetsArray.length(); i++) {
+                        org.json.JSONObject item = presetsArray.getJSONObject(i);
+                        final String name = item.optString("name", "Expense");
+                        final double amount = item.optDouble("amount", 0.0);
+                        final String category = item.optString("category", "Food");
+                        final String icon = item.optString("icon", "⚡");
+                        final String label = item.has("label") ? item.getString("label") : (icon + " " + name + " ₹" + (int) amount);
+
+                        Button btn = new Button(this, null, android.R.attr.borderlessButtonStyle);
+                        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.WRAP_CONTENT,
+                            dpToPx(34)
+                        );
+                        lp.setMarginEnd(dpToPx(8));
+                        btn.setLayoutParams(lp);
+                        btn.setText(label);
+                        btn.setBackgroundResource(R.drawable.chip_habit_bg);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            btn.setBackgroundTintList(null);
+                        }
+                        btn.setTextColor(getResources().getColor(R.color.widget_text_primary));
+                        btn.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 11);
+                        btn.setTypeface(null, android.graphics.Typeface.BOLD);
+                        btn.setMinWidth(0);
+                        btn.setPadding(dpToPx(12), 0, dpToPx(12), 0);
+
+                        final String amountStr = String.valueOf((int) amount);
+                        btn.setOnClickListener(v -> {
+                            vibrateTactile(20);
+                            currentAmount = amountStr;
+                            optionalNote = name;
+                            updateAmountDisplay();
+
+                            if (etExpenseNote != null) {
+                                etExpenseNote.setText(name);
+                                etExpenseNote.setSelection(name.length());
+                            }
+
+                            applyCategory(category);
+                            isManualCategorySelected = false;
+                        });
+
+                        llHabitPresetsContainer.addView(btn);
+                    }
+                    hasDynamicPresets = true;
+                }
+            } catch (Exception e) {
+                Log.w(TAG, "Failed to parse dynamic presets JSON, falling back to defaults", e);
+            }
+        }
+
+        if (!hasDynamicPresets) {
+            setupHabitButton(R.id.btn_habit_chai, "30", "Food", "Chai");
+            setupHabitButton(R.id.btn_habit_meal, "100", "Food", "Meal");
+            setupHabitButton(R.id.btn_habit_metro, "40", "Travel", "Metro");
+            setupHabitButton(R.id.btn_habit_snack, "20", "Food", "Snack");
+        }
+    }
+
     private void setupHabitButton(int viewId, String amount, String category, String note) {
         Button btn = findViewById(viewId);
         if (btn != null) {
@@ -214,16 +299,53 @@ public class QuickLogDialogActivity extends AppCompatActivity {
                     etExpenseNote.setSelection(note.length());
                 }
 
-                if ("Food".equals(category)) updateCategorySelection(btnCatFood, "Food");
-                else if ("Travel".equals(category)) updateCategorySelection(btnCatTravel, "Travel");
-                else if ("Grocery".equals(category)) updateCategorySelection(btnCatGrocery, "Grocery");
-                else if ("Bills".equals(category)) updateCategorySelection(btnCatBills, "Bills");
+                applyCategory(category);
+                isManualCategorySelected = false;
             });
+        }
+    }
+
+    private void applyCategory(String category) {
+        if ("Travel".equalsIgnoreCase(category) || "Transport".equalsIgnoreCase(category)) {
+            updateCategorySelection(btnCatTravel, "Travel");
+        } else if ("Grocery".equalsIgnoreCase(category) || "Groceries".equalsIgnoreCase(category)) {
+            updateCategorySelection(btnCatGrocery, "Grocery");
+        } else if ("Bills".equalsIgnoreCase(category) || "Utilities".equalsIgnoreCase(category)) {
+            updateCategorySelection(btnCatBills, "Bills");
+        } else {
+            updateCategorySelection(btnCatFood, "Food");
+        }
+    }
+
+    private void detectCategoryFromNoteText(String lowerNote) {
+        // 1. Food keywords
+        if (lowerNote.matches(".*\\b(chai|tea|coffee|snack|snacks|meal|lunch|dinner|breakfast|swiggy|zomato|burger|pizza|food|canteen|cafe|maggi|samosa|restaurant|biryani|ice cream|dosa|idli|momos|cake|pastry|bake|bakery|eat|drinks|juice|roti|thali)\\b.*")) {
+            updateCategorySelectionInternal(btnCatFood, "Food");
+            return;
+        }
+        // 2. Travel keywords
+        if (lowerNote.matches(".*\\b(metro|uber|ola|rapido|auto|cab|taxi|petrol|diesel|fuel|cng|bus|train|flight|ticket|toll|parking|commute|ride|travel)\\b.*")) {
+            updateCategorySelectionInternal(btnCatTravel, "Travel");
+            return;
+        }
+        // 3. Grocery keywords
+        if (lowerNote.matches(".*\\b(zepto|blinkit|instamart|grocery|groceries|supermarket|vegetables|veggies|fruits|milk|bread|curd|paneer|eggs|ration|dmart|d-mart|kirana|market|bigbasket)\\b.*")) {
+            updateCategorySelectionInternal(btnCatGrocery, "Grocery");
+            return;
+        }
+        // 4. Bills keywords
+        if (lowerNote.matches(".*\\b(bill|bills|electricity|power|wifi|internet|broadband|recharge|rent|water|gas|cylinder|lpg|subscription|netflix|spotify|prime|hotstar|airtel|jio|vi|maintenance)\\b.*")) {
+            updateCategorySelectionInternal(btnCatBills, "Bills");
+            return;
         }
     }
 
     private void updateCategorySelection(Button selectedBtn, String categoryName) {
         vibrateTactile(10);
+        updateCategorySelectionInternal(selectedBtn, categoryName);
+    }
+
+    private void updateCategorySelectionInternal(Button selectedBtn, String categoryName) {
         selectedCategory = categoryName;
 
         // Reset all category button states
@@ -233,8 +355,10 @@ public class QuickLogDialogActivity extends AppCompatActivity {
         resetCategoryButton(btnCatBills);
 
         // Highlight selected
-        selectedBtn.setSelected(true);
-        selectedBtn.setTextColor(getResources().getColor(R.color.widget_accent_lime));
+        if (selectedBtn != null) {
+            selectedBtn.setSelected(true);
+            selectedBtn.setTextColor(getResources().getColor(R.color.widget_accent_lime));
+        }
     }
 
     private void resetCategoryButton(Button btn) {
@@ -242,6 +366,10 @@ public class QuickLogDialogActivity extends AppCompatActivity {
             btn.setSelected(false);
             btn.setTextColor(getResources().getColor(R.color.widget_text_primary));
         }
+    }
+
+    private int dpToPx(int dp) {
+        return (int) (dp * getResources().getDisplayMetrics().density + 0.5f);
     }
 
     private void updateAmountDisplay() {

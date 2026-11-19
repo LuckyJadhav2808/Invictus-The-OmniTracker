@@ -159,7 +159,14 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
       ? "pomodoro"
       : "ambient";
 
-  // Hide ambient pill if dismissed by user, or on dedicated space pages where full cockpits already exist
+  // Apple HIG Dynamic Island Law:
+  // On mobile (variant === "mobile"), never float a static ambient pill over interactive content.
+  // Reserve the mobile floating dock strictly for ACTIVE live activities (Gym Rest timer or Pomodoro focus).
+  if (variant === "mobile" && currentMode === "ambient") {
+    return null;
+  }
+
+  // On desktop (variant === "header"), hide ambient pill if dismissed by user or on initial splash
   if (
     currentMode === "ambient" &&
     (isAmbientDismissed ||

@@ -136,9 +136,9 @@ export const TodayCommandDeck = React.memo(function TodayCommandDeck({
         </div>
 
         {/* Ambient Badges & Quick Action Pills */}
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 flex-wrap">
           {/* Streak Flame */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 border-[#161514] dark:border-[#38332E] bg-[#FFFBEB] dark:bg-[#261E14] text-[#92400E] dark:text-amber-300 shadow-2xs">
+          <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl border-2 border-[#161514] dark:border-[#38332E] bg-[#FFFBEB] dark:bg-[#261E14] text-[#92400E] dark:text-amber-300 shadow-2xs">
             <Flame className="size-3.5 text-orange-500 fill-orange-500 shrink-0" />
             <span className="font-heading font-black text-xs tabular-nums">
               {streakDays}d streak
@@ -147,7 +147,7 @@ export const TodayCommandDeck = React.memo(function TodayCommandDeck({
 
           {/* Streak Shield */}
           {streakFreezeTokens > 0 && (
-            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 border-[#161514] dark:border-[#38332E] bg-[#F1EFEA] dark:bg-[#25221F] text-xs font-heading font-bold text-[#161514] dark:text-[#FAF8F5] shadow-2xs">
+            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 border-[#161514] dark:border-[#38332E] bg-[#F1EFEA] dark:bg-[#1C1A18] text-xs font-heading font-bold text-[#161514] dark:text-[#FAF8F5] shadow-2xs">
               <Shield className="size-3.5 text-muted-foreground" />
               <span>{streakFreezeTokens}</span>
             </div>
@@ -158,10 +158,10 @@ export const TodayCommandDeck = React.memo(function TodayCommandDeck({
             <button
               type="button"
               onClick={() => handleActionClick(onOpenScratchpad)}
-              className="px-3 py-1.5 rounded-xl border-2 border-[#161514] dark:border-[#38332E] bg-[#F1EFEA] dark:bg-[#25221F] text-[#161514] dark:text-[#FAF8F5] text-xs font-heading font-black shadow-2xs hover:bg-[#CEF431] hover:text-[#161514] dark:hover:bg-[#CEF431] dark:hover:text-[#161514] transition-all cursor-pointer active:scale-95"
+              className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl border-2 border-[#161514] dark:border-amber-800 bg-amber-100 dark:bg-amber-950 text-amber-900 dark:text-amber-300 text-xs font-heading font-black shadow-[1.5px_1.5px_0px_0px_#161514] dark:shadow-[1.5px_1.5px_0px_0px_#000000] hover:bg-amber-200 dark:hover:bg-amber-900 transition-all cursor-pointer active:scale-95"
               title="Open Scratchpad (⌘J)"
             >
-              <FileText className="size-3.5 inline-block mr-1 stroke-[2]" />
+              <FileText className="size-3.5 inline-block mr-1 stroke-[2.2] text-amber-700 dark:text-amber-300" />
               Notes
             </button>
           )}
@@ -171,10 +171,10 @@ export const TodayCommandDeck = React.memo(function TodayCommandDeck({
             <button
               type="button"
               onClick={() => handleActionClick(onOpenCloseoutDrawer)}
-              className="px-3 py-1.5 rounded-xl border-2 border-[#161514] dark:border-[#38332E] bg-[#F1EFEA] dark:bg-[#25221F] text-[#161514] dark:text-[#FAF8F5] text-xs font-heading font-black shadow-2xs hover:bg-[#CEF431] hover:text-[#161514] dark:hover:bg-[#CEF431] dark:hover:text-[#161514] transition-all cursor-pointer active:scale-95"
+              className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl border-2 border-[#161514] dark:border-purple-800 bg-purple-100 dark:bg-purple-950 text-purple-900 dark:text-purple-300 text-xs font-heading font-black shadow-[1.5px_1.5px_0px_0px_#161514] dark:shadow-[1.5px_1.5px_0px_0px_#000000] hover:bg-purple-200 dark:hover:bg-purple-900 transition-all cursor-pointer active:scale-95"
               title="Daily Review & Closeout"
             >
-              <Moon className="size-3.5 inline-block mr-1 stroke-[2]" />
+              <Moon className="size-3.5 inline-block mr-1 stroke-[2.2] text-purple-700 dark:text-purple-300" />
               Review
             </button>
           )}
@@ -211,14 +211,14 @@ export const TodayCommandDeck = React.memo(function TodayCommandDeck({
           <div className="grid grid-cols-3 gap-2.5 sm:gap-4 pb-2 border-b border-[#161514]/10 dark:border-white/10">
             {/* Sector 1: Daily Progress */}
             <div className="min-w-0">
-              <span className="text-xs font-heading font-bold text-muted-foreground uppercase tracking-wider block">
-                Daily Progress
+              <span className="text-[11px] sm:text-xs font-heading font-bold text-muted-foreground uppercase tracking-wider block truncate">
+                <span className="hidden sm:inline">Daily </span>Progress
               </span>
               <div className="flex items-baseline gap-1 mt-1">
-                <span className="font-heading font-black text-lg sm:text-xl text-foreground tabular-nums">
+                <span className="font-heading font-black text-base sm:text-xl text-foreground tabular-nums">
                   {completedCount}/{totalCount}
                 </span>
-                <span className="text-xs font-heading font-bold text-muted-foreground">
+                <span className="text-[11px] sm:text-xs font-heading font-bold text-muted-foreground">
                   ({completionPercent}%)
                 </span>
               </div>
@@ -232,11 +232,11 @@ export const TodayCommandDeck = React.memo(function TodayCommandDeck({
 
             {/* Sector 2: Safe Spend */}
             <div className="min-w-0">
-              <span className="text-xs font-heading font-bold text-muted-foreground uppercase tracking-wider block">
+              <span className="text-[11px] sm:text-xs font-heading font-bold text-muted-foreground uppercase tracking-wider block truncate">
                 Safe Spend
               </span>
               <div className="flex items-center justify-between gap-1 mt-1">
-                <span className="font-heading font-black text-lg sm:text-xl text-foreground tabular-nums truncate">
+                <span className="font-heading font-black text-base sm:text-xl text-foreground tabular-nums truncate">
                   {currencySymbol}{Math.max(0, remainingSafeToSpend).toLocaleString()}
                 </span>
                 <button
@@ -248,18 +248,25 @@ export const TodayCommandDeck = React.memo(function TodayCommandDeck({
                   <Plus className="size-3.5 stroke-[2.5]" />
                 </button>
               </div>
-              <span className="text-xs font-sans font-medium text-muted-foreground block truncate mt-1">
-                {spentToday > 0 ? `Spent ${currencySymbol}${spentToday}` : "No spend yet"}
+              <span className="text-[11px] sm:text-xs font-sans font-medium text-muted-foreground block truncate mt-1">
+                {spentToday > 0 ? (
+                  <>
+                    <span className="sm:hidden">-{currencySymbol}{spentToday}</span>
+                    <span className="hidden sm:inline">Spent {currencySymbol}{spentToday}</span>
+                  </>
+                ) : (
+                  "No spend yet"
+                )}
               </span>
             </div>
 
             {/* Sector 3: Deep Work */}
             <div className="min-w-0">
-              <span className="text-xs font-heading font-bold text-muted-foreground uppercase tracking-wider block">
+              <span className="text-[11px] sm:text-xs font-heading font-bold text-muted-foreground uppercase tracking-wider block truncate">
                 Deep Work
               </span>
               <div className="flex items-center justify-between gap-1 mt-1">
-                <span className="font-heading font-black text-lg sm:text-xl text-foreground tabular-nums truncate">
+                <span className="font-heading font-black text-base sm:text-xl text-foreground tabular-nums truncate">
                   {isTimerRunning ? formatTimerDigits(stopwatchSeconds) : `${todayStudyHours}h`}
                 </span>
                 <button
@@ -280,16 +287,17 @@ export const TodayCommandDeck = React.memo(function TodayCommandDeck({
                   )}
                 </button>
               </div>
-              <span className="text-xs font-sans font-medium text-muted-foreground block truncate mt-1">
-                {studyTargetHours.toFixed(1)}h daily goal
+              <span className="text-[11px] sm:text-xs font-sans font-medium text-muted-foreground block truncate mt-1">
+                <span className="sm:hidden">{studyTargetHours.toFixed(1)}h goal</span>
+                <span className="hidden sm:inline">{studyTargetHours.toFixed(1)}h daily goal</span>
               </span>
             </div>
           </div>
 
           {/* Strobi's Punchy Speech Directive */}
-          <div className="flex items-center gap-2 pt-0.5">
-            <span className="size-2 rounded-full bg-[#03D26F] shrink-0" />
-            <p className="font-heading font-bold text-xs sm:text-sm text-foreground truncate leading-snug">
+          <div className="flex items-start sm:items-center gap-2 pt-0.5">
+            <span className="size-2 rounded-full bg-[#03D26F] shrink-0 mt-1 sm:mt-0" />
+            <p className="font-heading font-bold text-xs sm:text-sm text-foreground line-clamp-2 leading-snug">
               {strobiState === "celebrate"
                 ? "All caught up for today! Outstanding focus and discipline."
                 : isTimerRunning

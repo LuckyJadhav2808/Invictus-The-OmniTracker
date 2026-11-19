@@ -168,7 +168,7 @@ export default function TasksPage() {
           </div>
 
           {/* Quick Filter Pills with Live Telemetry */}
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1 sm:pt-0 border-t sm:border-t-0 border-[#E8E5DF] dark:border-[#2A2724]">
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1 sm:pt-0 border-t sm:border-t-0 border-[#E8E5DF] dark:border-[#2A2724] [mask-image:linear-gradient(to_right,black_calc(100%-24px),transparent)] sm:[mask-image:none] pr-5 sm:pr-0">
             {[
               { id: "All", count: totalTasks },
               { id: "To Do", count: todoTasks },

@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 export interface LifeSpaceTabItem {
   id: string;
   label: string;
+  shortLabel?: string;
   href: string;
   icon: typeof CheckSquare;
   badge?: string;
@@ -19,24 +20,28 @@ export const LIFE_SPACE_TABS: LifeSpaceTabItem[] = [
   {
     id: "habits",
     label: "Habits",
+    shortLabel: "Habits",
     href: "/goals",
     icon: CheckSquare,
   },
   {
     id: "gym",
     label: "Gym & Anatomy",
+    shortLabel: "Gym",
     href: "/goals/gym",
     icon: Dumbbell,
   },
   {
     id: "nutrition",
     label: "Meal & Fuel",
+    shortLabel: "Diet",
     href: "/goals/nutrition",
     icon: Utensils,
   },
   {
     id: "analytics",
     label: "Analytics",
+    shortLabel: "Stats",
     href: "/goals/analytics",
     icon: BarChart2,
   },
@@ -63,7 +68,10 @@ export function LifeSpaceSubNav({ className }: LifeSpaceSubNavProps) {
 
   return (
     <nav
-      className={cn("w-full overflow-x-auto no-scrollbar pb-1 mb-5 select-none", className)}
+      className={cn(
+        "w-full overflow-x-auto no-scrollbar pb-1 mb-5 select-none [mask-image:linear-gradient(to_right,black_calc(100%-28px),transparent)] sm:[mask-image:none]",
+        className
+      )}
       aria-label="Life Space Sub Navigation"
     >
       <div className="bg-card text-card-foreground border-2 border-[#161514] dark:border-[#38332E] rounded-2xl p-1.5 shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] flex items-center gap-1.5 w-max min-w-full sm:min-w-0 sm:w-auto">
@@ -85,7 +93,8 @@ export function LifeSpaceSubNav({ className }: LifeSpaceSubNavProps) {
               aria-current={active ? "page" : undefined}
             >
               <Icon className="size-3.5 stroke-[2.2]" />
-              <span>{tab.label}</span>
+              <span className="sm:hidden">{tab.shortLabel || tab.label}</span>
+              <span className="hidden sm:inline">{tab.label}</span>
               {tab.badge && (
                 <span className="bg-[#03D26F]/20 text-[#047857] dark:text-[#03D26F] text-[10px] font-mono font-black px-1.5 py-0.5 rounded-md border border-[#03D26F]/40">
                   {tab.badge}

@@ -72,7 +72,7 @@ export function HorizonWeekStrip({
       <button
         type="button"
         onClick={handlePrev}
-        className="size-8 sm:size-9 rounded-xl border-2 border-border dark:border-[#38332E] hover:border-[#161514] dark:hover:border-white/40 bg-secondary dark:bg-[#25221F] hover:bg-muted dark:hover:bg-[#2F2B26] flex items-center justify-center transition-all cursor-pointer shrink-0 active:translate-x-0.5 active:translate-y-0.5 text-foreground shadow-2xs"
+        className="size-8 sm:size-9 rounded-xl border-2 border-border dark:border-[#38332E] hover:border-[#161514] dark:hover:border-white/40 bg-secondary dark:bg-[#1C1A18] hover:bg-muted dark:hover:bg-[#2F2B26] flex items-center justify-center transition-all cursor-pointer shrink-0 active:translate-x-0.5 active:translate-y-0.5 text-foreground shadow-2xs"
         aria-label="Previous Day"
       >
         <ChevronLeft className="size-4 stroke-[2.2]" />
@@ -93,7 +93,7 @@ export function HorizonWeekStrip({
                 "relative flex flex-col items-center justify-center min-w-[38px] sm:min-w-[44px] h-11 sm:h-12 px-1 sm:px-2 rounded-xl border-2 transition-all cursor-pointer",
                 isSelected
                   ? "bg-[#161514] text-[#CEF431] border-[#161514] dark:bg-[#CEF431] dark:text-[#161514] dark:border-[#CEF431] shadow-[2px_2px_0px_0px_rgba(22,21,20,0.6)] dark:shadow-[2px_2px_0px_0px_#000000] font-black scale-[1.02]"
-                  : "bg-secondary dark:bg-[#25221F] text-secondary-foreground dark:text-[#FAF8F5] border-border dark:border-[#38332E] hover:bg-muted dark:hover:bg-[#2F2B26] hover:border-[#161514]/40 font-bold"
+                  : "bg-secondary dark:bg-[#1C1A18] text-secondary-foreground dark:text-[#FAF8F5] border-border dark:border-[#38332E] hover:bg-muted dark:hover:bg-[#2F2B26] hover:border-[#161514]/40 font-bold"
               )}
               aria-label={`Select ${day.dayName}, ${day.dateStr}`}
               aria-current={isSelected ? "date" : undefined}
@@ -151,7 +151,7 @@ export function HorizonWeekStrip({
       <button
         type="button"
         onClick={handleNext}
-        className="size-8 sm:size-9 rounded-xl border-2 border-border dark:border-[#38332E] hover:border-[#161514] dark:hover:border-white/40 bg-secondary dark:bg-[#25221F] hover:bg-muted dark:hover:bg-[#2F2B26] flex items-center justify-center transition-all cursor-pointer shrink-0 active:translate-x-0.5 active:translate-y-0.5 text-foreground shadow-2xs"
+        className="size-8 sm:size-9 rounded-xl border-2 border-border dark:border-[#38332E] hover:border-[#161514] dark:hover:border-white/40 bg-secondary dark:bg-[#1C1A18] hover:bg-muted dark:hover:bg-[#2F2B26] flex items-center justify-center transition-all cursor-pointer shrink-0 active:translate-x-0.5 active:translate-y-0.5 text-foreground shadow-2xs"
         aria-label="Next Day"
       >
         <ChevronRight className="size-4 stroke-[2.2]" />

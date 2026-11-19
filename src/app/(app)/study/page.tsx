@@ -442,28 +442,37 @@ function StudyPageContent() {
 
         {/* Tab Controls */}
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-          <div className="w-full overflow-x-auto no-scrollbar pb-1 mb-5">
-            <TabsList className="bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-2xl p-1.5 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex items-center gap-1.5 w-max min-w-full sm:min-w-0 sm:w-auto transition-colors">
+          <div className="w-full overflow-x-auto no-scrollbar pb-1 mb-5 [mask-image:linear-gradient(to_right,black_calc(100%-24px),transparent)] sm:[mask-image:none]">
+            <TabsList className="bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-2xl p-1.5 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex items-center gap-1.5 w-max min-w-full sm:min-w-0 sm:w-auto transition-colors pr-6 sm:pr-1.5">
               <TabsTrigger
                 value="subjects"
                 className="rounded-xl text-xs font-heading font-extrabold py-2 px-3.5 border border-transparent data-[state=active]:border-[#161514]/20 dark:data-[state=active]:border-white/20 data-[state=active]:bg-[#C084FC] data-[state=active]:text-[#161514] data-[state=active]:shadow-xs text-[#161514]/70 dark:text-[#FAF8F5]/70 hover:text-[#161514] dark:hover:text-[#FAF8F5] hover:bg-white/50 dark:hover:bg-white/5 transition-all flex items-center gap-1.5 shrink-0"
               >
                 <BookOpen className="size-3.5 stroke-[2.2]" />
-                <span>Subjects & Syllabus</span>
+                <span>
+                  <span className="sm:hidden">Syllabus</span>
+                  <span className="hidden sm:inline">Subjects & Syllabus</span>
+                </span>
               </TabsTrigger>
               <TabsTrigger
                 value="sessions"
                 className="rounded-xl text-xs font-heading font-extrabold py-2 px-3.5 border border-transparent data-[state=active]:border-[#161514]/20 dark:data-[state=active]:border-white/20 data-[state=active]:bg-[#C084FC] data-[state=active]:text-[#161514] data-[state=active]:shadow-xs text-[#161514]/70 dark:text-[#FAF8F5]/70 hover:text-[#161514] dark:hover:text-[#FAF8F5] hover:bg-white/50 dark:hover:bg-white/5 transition-all flex items-center gap-1.5 shrink-0"
               >
                 <Clock className="size-3.5 stroke-[2.2]" />
-                <span>Study Sessions</span>
+                <span>
+                  <span className="sm:hidden">Sessions</span>
+                  <span className="hidden sm:inline">Study Sessions</span>
+                </span>
               </TabsTrigger>
               <TabsTrigger
                 value="tests"
                 className="rounded-xl text-xs font-heading font-extrabold py-2 px-3.5 border border-transparent data-[state=active]:border-[#161514]/20 dark:data-[state=active]:border-white/20 data-[state=active]:bg-[#C084FC] data-[state=active]:text-[#161514] data-[state=active]:shadow-xs text-[#161514]/70 dark:text-[#FAF8F5]/70 hover:text-[#161514] dark:hover:text-[#FAF8F5] hover:bg-white/50 dark:hover:bg-white/5 transition-all flex items-center gap-1.5 shrink-0"
               >
                 <BarChart2 className="size-3.5 stroke-[2.2]" />
-                <span>Mock Tests & Analytics</span>
+                <span>
+                  <span className="sm:hidden">Mocks & Stats</span>
+                  <span className="hidden sm:inline">Mock Tests & Analytics</span>
+                </span>
               </TabsTrigger>
             </TabsList>
           </div>

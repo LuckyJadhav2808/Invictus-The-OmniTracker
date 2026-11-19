@@ -8,6 +8,7 @@ import { Zap, ArrowLeft, RefreshCw, PenLine, X } from "lucide-react";
 export interface MechanicalNumpadProps {
   remainingBudget?: number;
   currencySymbol?: string;
+  recentPresets?: Array<{ label: string; amount: number; category: string }>;
   onLogExpense: (payload: { amount: number; category: string; note: string }) => Promise<void> | void;
   onCancel?: () => void;
 }
@@ -29,13 +30,17 @@ export const CORE_CATEGORIES = [
 export function MechanicalNumpad({
   remainingBudget = 1420,
   currencySymbol = "₹",
+  recentPresets,
   onLogExpense,
   onCancel,
 }: MechanicalNumpadProps) {
   const [amountStr, setAmountStr] = useState<string>("0");
   const [selectedCategory, setSelectedCategory] = useState<string>("Food");
   const [note, setNote] = useState<string>("");
+  const [isManualCategory, setIsManualCategory] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  const activePresets = recentPresets && recentPresets.length > 0 ? recentPresets : DEFAULT_HABITS;
 
   const handleKeyPress = (char: string) => {
     soundFX.playPop();
@@ -70,13 +75,31 @@ export function MechanicalNumpad({
     soundFX.vibrate(25);
     setAmountStr(String(habit.amount));
     setSelectedCategory(habit.category);
+    setIsManualCategory(false);
     setNote(habit.label.replace(/[^\w\s]/gi, "").trim());
   };
 
   const handleCategorySelect = (catId: string) => {
     soundFX.playPop();
     soundFX.vibrate(15);
+    setIsManualCategory(true);
     setSelectedCategory(catId);
+  };
+
+  const handleNoteChange = (val: string) => {
+    setNote(val);
+    if (!isManualCategory && val.trim().length > 0) {
+      const lower = val.toLowerCase();
+      if (/(chai|tea|coffee|snack|meal|lunch|dinner|breakfast|swiggy|zomato|burger|pizza|food|canteen|cafe|maggi|samosa|restaurant|biryani|eat)/i.test(lower)) {
+        setSelectedCategory("Food");
+      } else if (/(metro|uber|ola|rapido|auto|cab|taxi|petrol|diesel|fuel|bus|train|flight|commute|ride|travel)/i.test(lower)) {
+        setSelectedCategory("Travel");
+      } else if (/(zepto|blinkit|instamart|grocery|groceries|supermarket|vegetables|fruits|milk|bread|ration|kirana|market)/i.test(lower)) {
+        setSelectedCategory("Grocery");
+      } else if (/(bill|electricity|wifi|internet|broadband|recharge|rent|water|gas|subscription|netflix|spotify)/i.test(lower)) {
+        setSelectedCategory("Bills");
+      }
+    }
   };
 
   const handleSubmit = async () => {
@@ -157,7 +180,7 @@ export function MechanicalNumpad({
         <input
           type="text"
           value={note}
-          onChange={(e) => setNote(e.target.value)}
+          onChange={(e) => handleNoteChange(e.target.value)}
           placeholder="Add note (e.g. Chai, Auto, Lunch)..."
           maxLength={40}
           className="w-full h-10 pl-9 pr-8 text-xs font-bold rounded-xl bg-secondary text-secondary-foreground border border-border focus:border-[#161514] dark:focus:border-white focus:outline-none transition-colors placeholder:text-muted-foreground/60 shadow-2xs"
@@ -169,6 +192,7 @@ export function MechanicalNumpad({
             onClick={() => {
               soundFX.playPop();
               setNote("");
+              setIsManualCategory(false);
             }}
             className="absolute right-2.5 p-1 rounded-md text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
             title="Clear note"
@@ -181,7 +205,7 @@ export function MechanicalNumpad({
 
       {/* Habit Chips Row */}
       <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
-        {DEFAULT_HABITS.map((habit) => (
+        {activePresets.map((habit) => (
           <button
             key={habit.label}
             onClick={() => handleHabitSelect(habit)}

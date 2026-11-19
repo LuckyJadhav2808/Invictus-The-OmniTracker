@@ -714,7 +714,7 @@ function MoneyPageContent() {
 
       {/* 📑 FLOATING SUB-NAV DOCK */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <div className="w-full overflow-x-auto no-scrollbar pb-1 mb-4 touch-pan-x">
+        <div className="w-full overflow-x-auto no-scrollbar pb-1 mb-4 touch-pan-x [mask-image:linear-gradient(to_right,black_calc(100%-32px),transparent)] sm:[mask-image:none]">
           <div className="inline-flex items-center gap-2 min-w-max">
             <TabsList className="bg-white/80 dark:bg-[#161514]/80 backdrop-blur-md rounded-2xl p-1.5 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex items-center gap-1.5 shrink-0">
               <TabsTrigger
@@ -740,7 +740,8 @@ function MoneyPageContent() {
                 {overBudgetCategoriesCount > 0 && (
                   <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-mono font-black bg-amber-400 text-[#161514] border border-[#161514] shadow-2xs tabular-nums">
                     <span className="size-1.5 rounded-full bg-rose-600 animate-pulse" />
-                    {overBudgetCategoriesCount} Over
+                    <span>{overBudgetCategoriesCount}</span>
+                    <span className="hidden sm:inline">Over</span>
                   </span>
                 )}
               </TabsTrigger>
@@ -754,7 +755,8 @@ function MoneyPageContent() {
                 {pendingIous.length > 0 && (
                   <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-mono font-black bg-[#CEF431] text-[#161514] border border-[#161514] shadow-2xs tabular-nums">
                     <span className="size-1.5 rounded-full bg-[#161514] animate-pulse" />
-                    {pendingIous.length} pending
+                    <span>{pendingIous.length}</span>
+                    <span className="hidden sm:inline">pending</span>
                     <span className="hidden md:inline">• {currencySymbol}{Math.round(totalPendingLentAmount).toLocaleString()}</span>
                   </span>
                 )}

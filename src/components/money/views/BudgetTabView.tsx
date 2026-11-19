@@ -403,12 +403,12 @@ export function BudgetTabView({
 
       {/* Category Envelopes Section */}
       <div className="space-y-3">
-        <div className="flex items-center justify-between px-1">
-          <span className="text-[15px] font-heading font-black text-[#161514] dark:text-stone-100 tracking-tight">
+        <div className="flex flex-wrap items-center justify-between gap-2 px-1">
+          <span className="text-sm sm:text-[15px] font-heading font-black text-[#161514] dark:text-stone-100 tracking-tight">
             Monthly Envelopes ({expenseCategories.length})
           </span>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <button
               type="button"
               onClick={() => {
@@ -420,23 +420,25 @@ export function BudgetTabView({
                 }
               }}
               className={cn(
-                "font-medium text-xs py-1.5 px-3 rounded-xl border shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer",
+                "font-medium text-xs py-1.5 px-2.5 sm:px-3 rounded-xl border shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer",
                 isBrowsingTemplates
                   ? "bg-[#161514] text-white dark:bg-[#CEF431] dark:text-[#161514] border-[#161514] dark:border-[#CEF431]"
                   : "bg-white hover:bg-[#FAF8F5] dark:bg-[#161514] dark:hover:bg-[#1C1A18] text-[#161514] dark:text-stone-200 border-[#E8E5DF] dark:border-[#2A2724]"
               )}
             >
               <Sparkles className="size-3.5 stroke-[1.8]" />
-              <span>{isBrowsingTemplates ? "Close Packs" : "Template Packs"}</span>
+              <span className="sm:hidden">{isBrowsingTemplates ? "Close" : "Packs"}</span>
+              <span className="hidden sm:inline">{isBrowsingTemplates ? "Close Packs" : "Template Packs"}</span>
             </button>
 
             <button
               type="button"
               onClick={onAddCategory}
-              className="bg-[#161514] hover:bg-[#2A2826] dark:bg-white dark:hover:bg-stone-200 text-white dark:text-[#161514] font-medium text-xs py-1.5 px-3 rounded-xl border border-[#161514] dark:border-white shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+              className="bg-[#161514] hover:bg-[#2A2826] dark:bg-white dark:hover:bg-stone-200 text-white dark:text-[#161514] font-medium text-xs py-1.5 px-2.5 sm:px-3 rounded-xl border border-[#161514] dark:border-white shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
             >
               <Plus className="size-3.5 stroke-[2]" />
-              <span>+ Envelope</span>
+              <span className="sm:hidden">Add</span>
+              <span className="hidden sm:inline">Envelope</span>
             </button>
           </div>
         </div>

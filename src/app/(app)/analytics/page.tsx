@@ -210,7 +210,7 @@ export default function AnalyticsHubPage() {
 
         {/* Tab Controls */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="bg-white dark:bg-[#1C1A18] rounded-2xl sm:rounded-3xl p-1.5 border-2 border-[#161514] dark:border-[#383531] shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] flex w-full max-w-[560px] mb-6 gap-1.5 overflow-x-auto no-scrollbar">
+          <TabsList className="bg-white dark:bg-[#1C1A18] rounded-2xl sm:rounded-3xl p-1.5 border-2 border-[#161514] dark:border-[#383531] shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] flex w-full max-w-[560px] mb-6 gap-1.5 overflow-x-auto no-scrollbar [mask-image:linear-gradient(to_right,black_calc(100%-20px),transparent)] sm:[mask-image:none] pr-4 sm:pr-1.5">
             <TabsTrigger
               value="goals"
               className="flex-1 rounded-xl sm:rounded-2xl text-xs font-heading font-extrabold py-2 uppercase tracking-wider border-2 border-transparent transition-all cursor-pointer text-[#161514] dark:text-[#FAF8F5] data-[state=active]:bg-[#161514] dark:data-[state=active]:bg-[#CEF431] data-[state=active]:text-white dark:data-[state=active]:text-[#161514] data-[state=active]:border-[#161514] dark:data-[state=active]:border-[#CEF431] data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#161514] dark:data-[state=active]:shadow-[1.5px_1.5px_0px_0px_#000000] flex items-center justify-center gap-1.5"

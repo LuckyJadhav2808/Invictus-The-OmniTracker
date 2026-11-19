@@ -4,6 +4,7 @@ import { Transaction } from "@/models/Transaction";
 import { Category } from "@/models/Category";
 import { parseBankSms } from "@/lib/sms/sms-local-parser";
 import { detectCategoryFromNote } from "@/lib/utils/merchant-categorizer";
+import { resolveExpenseCategoryId } from "@/lib/utils/resolve-category";
 
 export const dynamic = "force-dynamic";
 
@@ -68,30 +69,9 @@ export async function POST(req: Request) {
         });
       }
 
-      // Category matching
+      // Category matching: strictly resolve to expense category (never income like Salary)
       const userCategories = await Category.find({ userId: targetUserId, archived: { $ne: true } });
-      let categoryId = "cat-food";
-      const targetCatName = body.category || note;
-
-      if (userCategories.length > 0) {
-        const directMatch = userCategories.find(
-          (c) =>
-            c.name.toLowerCase() === targetCatName.toLowerCase() ||
-            c.id.toLowerCase() === targetCatName.toLowerCase() ||
-            c.name.toLowerCase().includes(targetCatName.toLowerCase())
-        );
-        if (directMatch) {
-          categoryId = directMatch.id;
-        } else {
-          const nlpMatch = detectCategoryFromNote(note, userCategories);
-          if (nlpMatch) {
-            categoryId = nlpMatch.categoryId;
-          } else {
-            const defaultCat = userCategories.find((c) => c.type === "expense") || userCategories[0];
-            if (defaultCat) categoryId = defaultCat.id;
-          }
-        }
-      }
+      const categoryId = resolveExpenseCategoryId(body.category, note, userCategories);
 
       const txId = `tx_quick_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
       const newTx = await Transaction.create({
@@ -170,19 +150,9 @@ export async function POST(req: Request) {
       });
     }
 
-    // 5. Intelligent Category Assignment
+    // 5. Intelligent Category Assignment (strictly expense category)
     const userCategories = await Category.find({ userId, archived: { $ne: true } });
-    let categoryId = "cat-food";
-
-    if (userCategories.length > 0) {
-      const match = detectCategoryFromNote(parsed.merchant, userCategories);
-      if (match) {
-        categoryId = match.categoryId;
-      } else {
-        const defaultCat = userCategories.find((c) => c.type === "expense") || userCategories[0];
-        if (defaultCat) categoryId = defaultCat.id;
-      }
-    }
+    const categoryId = resolveExpenseCategoryId(undefined, parsed.merchant, userCategories);
 
     // 6. Create Transaction
     const txId = `tx_sms_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;

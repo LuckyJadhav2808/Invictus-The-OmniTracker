@@ -117,14 +117,16 @@ export function HabitsCockpitDeck({
               Lvl {userLevel} • {totalXP} XP
             </span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-heading font-black tracking-tight text-foreground flex items-center gap-2">
-            <span>Daily Routines & Momentum</span>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-xl sm:text-2xl font-heading font-black tracking-tight text-foreground">
+              Daily Routines & Momentum
+            </h1>
             {isConquered && (
-              <span className="text-xs font-mono font-black uppercase px-2 py-0.5 rounded-full bg-[#03D26F]/20 text-[#047857] dark:text-[#03D26F] border border-[#03D26F]/40 animate-pulse">
+              <span className="text-[11px] font-mono font-black uppercase px-2.5 py-0.5 rounded-full bg-[#03D26F] text-[#161514] border border-[#161514] shadow-2xs shrink-0">
                 All Done ⚡
               </span>
             )}
-          </h1>
+          </div>
           <p className="text-xs text-muted-foreground font-medium">
             Welcome, <span className="font-bold text-foreground">{userName}</span> • {completedCount}/{dueCount} habits done today
           </p>
@@ -375,8 +377,8 @@ export function HabitsCockpitDeck({
       </div>
 
       {/* 4. Bottom Controls Strip: Selected Date & 3-Way View Switcher */}
-      <div className="flex items-center justify-between gap-3 pt-2 border-t border-[#161514]/10 dark:border-white/10">
-        <div className="flex items-center gap-2 min-w-0">
+      <div className="flex items-center justify-between gap-2 sm:gap-3 pt-2 border-t border-[#161514]/10 dark:border-white/10">
+        <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
           <span className="text-xs font-mono font-bold text-foreground truncate">
             {format(new Date(selectedDate), "EEEE, MMM d")}
           </span>
@@ -387,15 +389,16 @@ export function HabitsCockpitDeck({
                 soundFX.playPop();
                 onSelectDate(format(new Date(), "yyyy-MM-dd"));
               }}
-              className="text-[10px] font-mono font-black uppercase text-[#161514] bg-[#CEF431] border border-[#161514] px-2 py-0.5 rounded-md shadow-2xs hover:bg-[#bce028] cursor-pointer transition-all"
+              className="text-[10px] font-mono font-black uppercase text-[#161514] bg-[#CEF431] border border-[#161514] px-1.5 sm:px-2 py-0.5 rounded-md shadow-2xs hover:bg-[#bce028] cursor-pointer transition-all shrink-0"
             >
-              Jump to Today
+              <span className="sm:hidden">Today</span>
+              <span className="hidden sm:inline">Jump to Today</span>
             </button>
           )}
         </div>
 
         {/* 3-Way View Mode Switcher Pill */}
-        <div className="flex items-center gap-1 bg-secondary border-2 border-border rounded-xl p-1 shrink-0 shadow-2xs">
+        <div className="flex items-center gap-0.5 sm:gap-1 bg-secondary border-2 border-border rounded-xl p-0.5 sm:p-1 shrink-0 shadow-2xs">
           <button
             type="button"
             onClick={() => {
@@ -403,7 +406,7 @@ export function HabitsCockpitDeck({
               onSelectLayoutStyle("cards");
             }}
             className={cn(
-              "px-2.5 py-1 rounded-lg text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer",
+              "px-2 sm:px-2.5 py-1 rounded-lg text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer",
               habitLayoutStyle === "cards"
                 ? "bg-card text-foreground border border-border shadow-2xs font-black"
                 : "text-muted-foreground hover:text-foreground"
@@ -411,7 +414,7 @@ export function HabitsCockpitDeck({
             title="Card View (Detailed)"
           >
             <LayoutList className="size-3.5" />
-            <span className="inline">Cards</span>
+            <span className="hidden sm:inline">Cards</span>
           </button>
 
           <button
@@ -421,7 +424,7 @@ export function HabitsCockpitDeck({
               onSelectLayoutStyle("compact");
             }}
             className={cn(
-              "px-2.5 py-1 rounded-lg text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer",
+              "px-2 sm:px-2.5 py-1 rounded-lg text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer",
               habitLayoutStyle === "compact"
                 ? "bg-card text-foreground border border-border shadow-2xs font-black"
                 : "text-muted-foreground hover:text-foreground"
@@ -429,7 +432,7 @@ export function HabitsCockpitDeck({
             title="Compact Rows View"
           >
             <Rows className="size-3.5" />
-            <span className="inline">Compact</span>
+            <span className="hidden sm:inline">Compact</span>
           </button>
 
           <button
@@ -439,7 +442,7 @@ export function HabitsCockpitDeck({
               onSelectLayoutStyle("matrix");
             }}
             className={cn(
-              "px-2.5 py-1 rounded-lg text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer",
+              "px-2 sm:px-2.5 py-1 rounded-lg text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer",
               habitLayoutStyle === "matrix"
                 ? "bg-card text-foreground border border-border shadow-2xs font-black"
                 : "text-muted-foreground hover:text-foreground"
@@ -447,7 +450,7 @@ export function HabitsCockpitDeck({
             title="Contribution Heat Matrix View"
           >
             <Grid className="size-3.5" />
-            <span className="inline">Matrix</span>
+            <span className="hidden sm:inline">Matrix</span>
           </button>
         </div>
       </div>

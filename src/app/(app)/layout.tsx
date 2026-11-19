@@ -109,7 +109,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Minimalist Production Status Footer */}
-        <footer className="mt-auto border-t border-[#E8E5DF] dark:border-[#2A2724] py-3.5 px-6 lg:pr-64 text-center sm:flex sm:items-center sm:justify-between max-w-6xl mx-auto w-full text-[#8C8882] dark:text-[#A8A29E] text-[11px] font-medium gap-4 select-none transition-colors">
+        <footer className="mt-auto border-t border-[#E8E5DF] dark:border-[#2A2724] py-3 px-4 sm:px-6 lg:pr-64 flex flex-col sm:flex-row items-center justify-between max-w-6xl mx-auto w-full text-[#8C8882] dark:text-[#A8A29E] text-[11px] font-medium gap-2 sm:gap-4 select-none transition-colors">
           <div className="flex items-center justify-center sm:justify-start gap-2">
             <span className="font-heading font-bold text-[#161514] dark:text-[#FAF8F5]">Invictus OS</span>
             <span>•</span>
@@ -118,7 +118,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </span>
           </div>
 
-          <div className="flex items-center justify-center gap-3">
+          <div className="flex items-center justify-center flex-wrap gap-2 sm:gap-3">
             <button
               type="button"
               onClick={() => {
@@ -129,12 +129,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               className="bg-white dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] px-2.5 py-1 rounded-lg text-[11px] font-medium text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5 shadow-xs hover:bg-[#F1EFEA] dark:hover:bg-[#252321] transition-colors cursor-pointer"
               title="Open Command Palette (⌘K)"
             >
-              <kbd className="font-mono bg-[#F1EFEA] dark:bg-[#252321] px-1 rounded border border-[#E8E5DF] dark:border-[#2A2724] text-[10px] text-[#8C8882] dark:text-[#A8A29E]">⌘ K</kbd>
+              <kbd className="hidden sm:inline-block font-mono bg-[#F1EFEA] dark:bg-[#252321] px-1 rounded border border-[#E8E5DF] dark:border-[#2A2724] text-[10px] text-[#8C8882] dark:text-[#A8A29E]">⌘ K</kbd>
               <span>Quick Actions</span>
             </button>
-            <span>•</span>
-            <span className="flex items-center gap-1.5">
-              <span className="size-1.5 rounded-full bg-emerald-500" />
+            <span className="text-[#8C8882] dark:text-[#A8A29E]">•</span>
+            <span className="flex items-center gap-1.5 shrink-0">
+              <span className="size-1.5 rounded-full bg-emerald-500 shrink-0" />
               <span>All systems healthy</span>
             </span>
           </div>

@@ -10,8 +10,8 @@ export interface AppVersionInfo {
 }
 
 export const APP_VERSION_CONFIG: AppVersionInfo = {
-  version: "1.8.2",
-  buildNumber: 33,
+  version: "1.8.3",
+  buildNumber: 34,
   releaseDate: "November 19, 2026",
   channel: "stable",
   minSupportedVersion: "1.0.0",

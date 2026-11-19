@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import { useAuth } from "@/components/shared/AuthProvider";
-import { useCategories, useAddTransaction } from "@/lib/queries/money";
-import { NativeQuickLogBridge } from "@/lib/native/quick-log-bridge";
+import { useCategories, useAddTransaction, useTransactions } from "@/lib/queries/money";
+import { NativeQuickLogBridge, type QuickPresetItem } from "@/lib/native/quick-log-bridge";
+import { resolveExpenseCategoryId } from "@/lib/utils/resolve-category";
+import { computeFrequentExpenses } from "@/lib/utils/frequent-expenses";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -14,17 +16,37 @@ function getActiveUserId(user: any): string {
 export function useSyncNativeQuickLogs(remainingBudget?: number) {
   const { user } = useAuth();
   const { data: categories = [] } = useCategories();
+  const { data: transactions = [] } = useTransactions();
   const addTxMutation = useAddTransaction();
   const queryClient = useQueryClient();
   const isSyncingRef = useRef(false);
 
-  // 1. Sync live budget telemetry to Android Notification Shade & Tile
+  // Compute dynamic user frequent presets from recent transaction history
+  const dynamicPresets: QuickPresetItem[] = useMemo(() => {
+    const frequent = computeFrequentExpenses(transactions, categories, 6);
+    if (!frequent || frequent.length === 0) return [];
+    return frequent.map((item) => ({
+      label: `${item.icon || "⚡"} ${item.name} ₹${item.amount}`,
+      name: item.name,
+      amount: item.amount,
+      category: /travel|commute|transport/i.test(item.categoryName)
+        ? "Travel"
+        : /grocer/i.test(item.categoryName)
+        ? "Grocery"
+        : /bill|utilit/i.test(item.categoryName)
+        ? "Bills"
+        : "Food",
+      icon: item.icon || "⚡",
+    }));
+  }, [transactions, categories]);
+
+  // 1. Sync live budget telemetry & frequent presets to Android Notification Shade & Tile
   useEffect(() => {
     if (typeof remainingBudget === "number" && !isNaN(remainingBudget)) {
       const activeUid = getActiveUserId(user);
-      NativeQuickLogBridge.syncBudgetTelemetry(remainingBudget, activeUid);
+      NativeQuickLogBridge.syncBudgetTelemetry(remainingBudget, activeUid, dynamicPresets);
     }
-  }, [remainingBudget, user]);
+  }, [remainingBudget, user, dynamicPresets]);
 
   // 2. Poll & Ingest pending native offline quick logs on mount & app focus
   useEffect(() => {
@@ -38,13 +60,8 @@ export function useSyncNativeQuickLogs(remainingBudget?: number) {
           const activeUid = getActiveUserId(user);
 
           for (const item of pending) {
-            // Find category ID
-            const matchedCategory = categories.find(
-              (c) =>
-                c.name.toLowerCase() === item.category.toLowerCase() ||
-                c.id.toLowerCase() === item.category.toLowerCase()
-            );
-            const categoryId = matchedCategory?.id || categories[0]?.id || "cat-food";
+            // Strictly resolve to an expense category (never income like Salary)
+            const categoryId = resolveExpenseCategoryId(item.category, item.note, categories);
             const todayStr = item.date || new Date().toISOString().split("T")[0];
 
             await addTxMutation.mutateAsync({

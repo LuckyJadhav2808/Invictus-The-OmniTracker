@@ -36,6 +36,7 @@ public class QuickLogBridgePlugin extends Plugin {
             safeToSpend = 1420.0;
         }
         String userId = call.getString("userId");
+        String recentPresets = call.getString("recentPresets");
 
         try {
             Context context = getContext();
@@ -47,6 +48,9 @@ public class QuickLogBridgePlugin extends Plugin {
                 // Also sync to SMS prefs for unified identity
                 SharedPreferences smsPrefs = context.getSharedPreferences(SMS_PREFS_NAME, Context.MODE_PRIVATE);
                 smsPrefs.edit().putString("userId", userId).apply();
+            }
+            if (recentPresets != null && !recentPresets.isEmpty()) {
+                editor.putString("recent_presets", recentPresets);
             }
             editor.apply();
 

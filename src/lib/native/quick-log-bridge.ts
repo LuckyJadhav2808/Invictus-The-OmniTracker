@@ -11,8 +11,20 @@ export interface PendingQuickExpense {
   timestamp?: number;
 }
 
+export interface QuickPresetItem {
+  label: string;
+  name: string;
+  amount: number;
+  category: string;
+  icon?: string;
+}
+
 export interface QuickLogBridgePluginType {
-  syncBudgetTelemetry(options: { safeToSpend: number; userId?: string }): Promise<{ success: boolean; safeToSpend: number }>;
+  syncBudgetTelemetry(options: {
+    safeToSpend: number;
+    userId?: string;
+    recentPresets?: string;
+  }): Promise<{ success: boolean; safeToSpend: number }>;
   setAmbientDockEnabled(options: { enabled: boolean }): Promise<{ success: boolean; enabled: boolean }>;
   isAmbientDockEnabled(): Promise<{ enabled: boolean }>;
   launchQuickLogDialog(): Promise<{ success: boolean }>;
@@ -37,11 +49,18 @@ export const NativeQuickLogBridge = {
     return Capacitor.isNativePlatform() && Capacitor.getPlatform() === "android";
   },
 
-  async syncBudgetTelemetry(safeToSpend: number, userId?: string): Promise<{ success: boolean; safeToSpend: number }> {
+  async syncBudgetTelemetry(
+    safeToSpend: number,
+    userId?: string,
+    recentPresets?: QuickPresetItem[]
+  ): Promise<{ success: boolean; safeToSpend: number }> {
     const storage = getLocalStorage();
+    const presetsJson = recentPresets && recentPresets.length > 0 ? JSON.stringify(recentPresets) : undefined;
+
     if (storage) {
       storage.setItem("invictus_ambient_dock_budget", String(safeToSpend));
       if (userId) storage.setItem("invictus_ambient_user_id", userId);
+      if (presetsJson) storage.setItem("invictus_ambient_presets", presetsJson);
     }
 
     if (!this.isSupported()) {
@@ -49,7 +68,11 @@ export const NativeQuickLogBridge = {
     }
 
     try {
-      return await QuickLogBridge.syncBudgetTelemetry({ safeToSpend, userId });
+      return await QuickLogBridge.syncBudgetTelemetry({
+        safeToSpend,
+        userId,
+        recentPresets: presetsJson,
+      });
     } catch (err) {
       console.warn("[QuickLogBridge] syncBudgetTelemetry native fallback", err);
       return { success: false, safeToSpend };

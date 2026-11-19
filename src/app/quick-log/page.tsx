@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { MechanicalNumpad } from "@/components/money/MechanicalNumpad";
 import { useCategories, useAddTransaction, useTransactions } from "@/lib/queries/money";
 import { computeMonthlyBudgetStats } from "@/lib/utils/budget-rollover";
+import { computeFrequentExpenses } from "@/lib/utils/frequent-expenses";
+import { resolveExpenseCategoryId } from "@/lib/utils/resolve-category";
 import { NativeQuickLogBridge } from "@/lib/native/quick-log-bridge";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { toast } from "sonner";
@@ -40,12 +42,25 @@ export default function QuickLogPage() {
     return computeMonthlyBudgetStats({ categories, transactions, targetMonthKey: currentMonthKey });
   }, [categories, transactions, currentMonthKey]);
 
+  const frequentPresets = useMemo(() => {
+    const frequent = computeFrequentExpenses(transactions, categories, 6);
+    if (!frequent || frequent.length === 0) return undefined;
+    return frequent.map((item) => ({
+      label: `${item.icon || "⚡"} ${item.name}`,
+      amount: item.amount,
+      category: /travel|commute|transport/i.test(item.categoryName)
+        ? "Travel"
+        : /grocer/i.test(item.categoryName)
+        ? "Grocery"
+        : /bill|utilit/i.test(item.categoryName)
+        ? "Bills"
+        : "Food",
+    }));
+  }, [transactions, categories]);
+
   const handleLogExpense = async (payload: { amount: number; category: string; note: string }) => {
-    // Find matching category ID
-    const matchedCategory = categories.find(
-      (c) => c.name.toLowerCase() === payload.category.toLowerCase()
-    );
-    const categoryId = matchedCategory?.id || categories[0]?.id || "cat-food";
+    // Strictly resolve to an expense category (never income like Salary)
+    const categoryId = resolveExpenseCategoryId(payload.category, payload.note, categories);
 
     await addTxMutation.mutateAsync({
       amount: payload.amount,
@@ -85,6 +100,7 @@ export default function QuickLogPage() {
       <MechanicalNumpad
         remainingBudget={monthlyStats.remainingBudget}
         currencySymbol={currencySymbol}
+        recentPresets={frequentPresets}
         onLogExpense={handleLogExpense}
         onCancel={() => router.back()}
       />

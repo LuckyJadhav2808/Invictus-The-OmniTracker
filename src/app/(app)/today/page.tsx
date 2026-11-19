@@ -419,7 +419,7 @@ export default function TodayPage() {
       await addTransactionMutation.mutateAsync({
         amount,
         type: "expense",
-        categoryId: categoryId || (categories[0]?.id || "cat-food"),
+        categoryId: categoryId || (categories.find((c) => c.type === "expense")?.id || "cat-food"),
         date: selectedDate,
         paymentMethod: "upi",
         note: note.trim() || "Quick expense",

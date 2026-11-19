@@ -140,12 +140,9 @@ export function StrobiPartnerStage({
         />
       </div>
 
-      {/* 3. Bottom Speech Bubble: Dynamic Dialogue */}
-      <div className="relative w-full bg-white dark:bg-[#25221F] border-2 border-[#161514] dark:border-[#38332E] rounded-xl p-2.5 sm:p-3 shadow-[1.5px_1.5px_0px_0px_#161514] dark:shadow-[1.5px_1.5px_0px_0px_#000000] text-center">
-        {/* Speech Bubble Pointer Arrow */}
-        <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 size-2.5 bg-white dark:bg-[#25221F] border-t-2 border-l-2 border-[#161514] dark:border-[#38332E] rotate-45" />
-
-        <p className="text-xs font-heading font-black text-foreground leading-snug tracking-tight">
+      {/* 3. Bottom Speech Dialogue Card (Clean Neobrutalist Quote) */}
+      <div className="w-full bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#38332E] rounded-xl p-2.5 sm:p-3 shadow-[1.5px_1.5px_0px_0px_#161514] dark:shadow-[1.5px_1.5px_0px_0px_#000000] text-center">
+        <p className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5] leading-snug tracking-tight">
           &ldquo;{currentQuip}&rdquo;
         </p>
       </div>

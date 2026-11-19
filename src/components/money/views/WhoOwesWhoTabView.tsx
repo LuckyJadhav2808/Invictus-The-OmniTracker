@@ -215,16 +215,17 @@ export function WhoOwesWhoTabView({
             <div className="size-10 rounded-2xl bg-amber-100 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-800 dark:text-amber-300 flex items-center justify-center shadow-xs shrink-0">
               <Users className="size-5 stroke-[2.2]" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                 <h3 className="text-base sm:text-lg font-heading font-black text-[#161514] dark:text-[#FAF8F5] leading-tight">
                   Who Owes Who 🤝
                 </h3>
                 <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700/60">
-                  Student Debt Deck
+                  <span className="sm:hidden">Debts</span>
+                  <span className="hidden sm:inline">Student Debt Deck</span>
                 </span>
               </div>
-              <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] mt-0.5">
+              <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] mt-0.5 truncate">
                 Track shared meals, borrowed cash, and 1-tap debt settlements
               </p>
             </div>

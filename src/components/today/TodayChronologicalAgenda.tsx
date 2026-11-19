@@ -167,12 +167,13 @@ export const TodayChronologicalAgenda = React.memo(function TodayChronologicalAg
       else workload.push(item);
     });
 
-    // 2. Active Tasks
+    // 2. Active Tasks (Scheduled for selectedDate, or active P1 due today)
     const relevantTasks = tasks.filter((t) => {
-      if (t.status === "completed") {
-        return !t.dueDate || t.dueDate === selectedDate;
+      if (t.dueDate) {
+        return t.dueDate === selectedDate;
       }
-      return !t.dueDate || t.dueDate === selectedDate || t.priority === "p1";
+      // If task has no explicit due date, only show in Today's agenda if it is today and marked P1
+      return isToday && t.priority === "p1" && t.status !== "completed";
     });
 
     relevantTasks.forEach((t) => {
@@ -318,7 +319,7 @@ export const TodayChronologicalAgenda = React.memo(function TodayChronologicalAg
       )}
     >
       {/* 1. TOP FILTER BAR (Exact Benchmark from Reference Image: To Do | Completed | Pending/All) */}
-      <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-[#EFECE6] dark:bg-[#25221F] border border-[#161514]/10 dark:border-white/10 mb-4">
+      <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-[#EFECE6] dark:bg-[#1C1A18] border border-[#161514]/10 dark:border-white/10 mb-4">
         <button
           type="button"
           onClick={() => {

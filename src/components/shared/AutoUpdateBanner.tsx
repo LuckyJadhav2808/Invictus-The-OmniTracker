@@ -78,45 +78,61 @@ export function AutoUpdateBanner() {
 
   return (
     <>
-      <div className="w-full bg-[#CEF431] border-b-2 border-[#161514] px-4 py-2 text-[#161514] shadow-[0px_2px_0px_0px_#161514] z-40 sticky top-0 animate-in slide-in-from-top duration-300">
-        <div className="max-w-6xl mx-auto flex items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-[#161514] text-white text-xs font-black shadow-[1px_1px_0px_0px_#FAF8F5]">
+      <div className="w-full bg-[#CEF431] border-b-2 border-[#161514] px-3 sm:px-4 py-1.5 sm:py-2 text-[#161514] shadow-[0px_2px_0px_0px_#161514] z-40 sticky top-0 animate-in slide-in-from-top duration-300 select-none">
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-2 sm:gap-3 text-xs">
+          <div 
+            onClick={() => {
+              if (Capacitor.isNativePlatform()) {
+                setModalOpen(true);
+              } else {
+                window.location.reload();
+              }
+            }}
+            className="flex items-center gap-1.5 sm:gap-2 min-w-0 cursor-pointer"
+          >
+            <span className="flex h-5 w-5 sm:h-6 sm:w-6 shrink-0 items-center justify-center rounded-md sm:rounded-lg bg-[#161514] text-white text-[10px] sm:text-xs font-black shadow-[1px_1px_0px_0px_#FAF8F5]">
               ⚡
             </span>
-            <div className="truncate">
-              <span className="font-black uppercase tracking-wide mr-1.5 font-heading">
+            <div className="min-w-0 truncate">
+              {/* Mobile compact title (zero clipping guaranteed) */}
+              <span className="sm:hidden font-heading font-black text-xs tracking-tight">
+                v{updateInfo.latestVersion} Available
+              </span>
+              {/* Desktop detailed title */}
+              <span className="hidden sm:inline font-heading font-black uppercase tracking-wide mr-1.5">
                 New v{updateInfo.latestVersion} Available:
               </span>
               <span className="hidden sm:inline font-bold opacity-80">
                 Daily budget tracking, widgets & performance updates.
               </span>
-              <span className="sm:hidden font-bold opacity-80">
-                Tap to update
-              </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {Capacitor.isNativePlatform() ? (
               <button
+                type="button"
                 onClick={() => setModalOpen(true)}
-                className="px-3 py-1 rounded-lg bg-[#161514] hover:bg-[#252321] text-white font-black text-[11px] uppercase tracking-wider flex items-center gap-1.5 shadow-[1.5px_1.5px_0px_0px_#FAF8F5] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all"
+                className="px-2.5 sm:px-3 py-1 rounded-lg bg-[#161514] hover:bg-[#252321] text-white font-black text-[10px] sm:text-[11px] uppercase tracking-wider flex items-center gap-1 sm:gap-1.5 shadow-[1.5px_1.5px_0px_0px_#FAF8F5] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all"
               >
                 <Download className="h-3 w-3 text-[#CEF431]" />
-                <span>Update Now</span>
+                <span className="sm:hidden">Update</span>
+                <span className="hidden sm:inline">Update Now</span>
               </button>
             ) : (
               <button
+                type="button"
                 onClick={() => window.location.reload()}
-                className="px-3 py-1 rounded-lg bg-[#161514] hover:bg-[#252321] text-white font-black text-[11px] uppercase tracking-wider flex items-center gap-1.5 shadow-[1.5px_1.5px_0px_0px_#FAF8F5] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all"
+                className="px-2.5 sm:px-3 py-1 rounded-lg bg-[#161514] hover:bg-[#252321] text-white font-black text-[10px] sm:text-[11px] uppercase tracking-wider flex items-center gap-1 sm:gap-1.5 shadow-[1.5px_1.5px_0px_0px_#FAF8F5] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer transition-all"
               >
                 <RefreshCw className="h-3 w-3 text-[#CEF431]" />
-                <span>Reload ⚡</span>
+                <span className="sm:hidden">Reload</span>
+                <span className="hidden sm:inline">Reload ⚡</span>
               </button>
             )}
 
             <button
+              type="button"
               onClick={handleDismiss}
               aria-label="Dismiss update alert"
               className="p-1 rounded-md text-[#161514]/70 hover:text-[#161514] hover:bg-black/10 transition-colors cursor-pointer"

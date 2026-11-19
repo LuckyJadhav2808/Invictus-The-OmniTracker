@@ -366,8 +366,9 @@ export function WalletCardDeck({
           {/* Card Footer: Split Income vs Spent (Belanje Signature Metaphor) */}
           <div className="grid grid-cols-2 gap-2 pt-3 border-t border-[#E2E8F0] dark:border-white/10 relative z-10">
             <div>
-              <span className="text-[10px] font-mono uppercase tracking-wider text-[#64748B] dark:text-stone-400 block">
-                Income this month
+              <span className="text-[10px] font-mono uppercase tracking-wider text-[#64748B] dark:text-stone-400 block truncate">
+                <span className="sm:hidden">Income</span>
+                <span className="hidden sm:inline">Income this month</span>
               </span>
               <span className="text-xs sm:text-sm font-mono font-bold text-[#047857] dark:text-[#03D26F] tabular-nums flex items-center gap-1">
                 <TrendingUp className="size-3 stroke-[2.5]" />
@@ -376,8 +377,9 @@ export function WalletCardDeck({
             </div>
 
             <div>
-              <span className="text-[10px] font-mono uppercase tracking-wider text-[#64748B] dark:text-stone-400 block">
-                Spent this month
+              <span className="text-[10px] font-mono uppercase tracking-wider text-[#64748B] dark:text-stone-400 block truncate">
+                <span className="sm:hidden">Spent</span>
+                <span className="hidden sm:inline">Spent this month</span>
               </span>
               <span className="text-xs sm:text-sm font-mono font-bold text-rose-600 dark:text-rose-400 tabular-nums flex items-center gap-1">
                 <TrendingDown className="size-3 stroke-[2.5]" />

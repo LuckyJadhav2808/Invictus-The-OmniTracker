@@ -758,35 +758,40 @@ export default function SettingsPage() {
         )}
 
         {/* 🌟 FLOATING 5-TAB SUB-NAVIGATION DOCK */}
-        <div className="sticky top-2 z-20 bg-white/90 dark:bg-[#161514]/90 backdrop-blur-md rounded-2xl p-1.5 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex items-center justify-between gap-1 overflow-x-auto scrollbar-none">
+        <div className="sticky top-2 z-20 bg-white/90 dark:bg-[#161514]/90 backdrop-blur-md rounded-2xl p-1.5 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex items-center justify-between gap-1 overflow-x-auto no-scrollbar scroll-smooth snap-x touch-pan-x [mask-image:linear-gradient(to_right,black_calc(100%-28px),transparent)] sm:[mask-image:none]">
           <button
+            type="button"
             onClick={() => setActiveTab("preferences")}
             className={cn(
-              "flex-1 py-2 px-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 whitespace-nowrap font-heading",
+              "flex-1 py-2 px-2 sm:px-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 whitespace-nowrap font-heading shrink-0 snap-start",
               activeTab === "preferences"
                 ? "bg-[#161514] text-white dark:bg-white dark:text-[#161514] shadow-xs"
                 : "text-[#161514]/70 dark:text-[#FAF8F5]/60 hover:text-[#161514] dark:hover:text-white hover:bg-[#FAF8F5] dark:hover:bg-[#1C1A18]"
             )}
           >
             <Sliders className="h-3.5 w-3.5 stroke-[2.5]" />
-            <span>Preferences</span>
+            <span className="sm:hidden">General</span>
+            <span className="hidden sm:inline">Preferences</span>
           </button>
           <button
+            type="button"
             onClick={() => setActiveTab("modules")}
             className={cn(
-              "flex-1 py-2 px-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 whitespace-nowrap font-heading",
+              "flex-1 py-2 px-2 sm:px-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 whitespace-nowrap font-heading shrink-0 snap-start",
               activeTab === "modules"
                 ? "bg-[#161514] text-white dark:bg-white dark:text-[#161514] shadow-xs"
                 : "text-[#161514]/70 dark:text-[#FAF8F5]/60 hover:text-[#161514] dark:hover:text-white hover:bg-[#FAF8F5] dark:hover:bg-[#1C1A18]"
             )}
           >
             <LayoutGrid className="h-3.5 w-3.5 stroke-[2.5]" />
-            <span>Workspaces</span>
+            <span className="sm:hidden">Spaces</span>
+            <span className="hidden sm:inline">Workspaces</span>
           </button>
           <button
+            type="button"
             onClick={() => setActiveTab("reminders")}
             className={cn(
-              "flex-1 py-2 px-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 whitespace-nowrap font-heading",
+              "flex-1 py-2 px-2 sm:px-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 whitespace-nowrap font-heading shrink-0 snap-start",
               activeTab === "reminders"
                 ? "bg-[#161514] text-white dark:bg-white dark:text-[#161514] shadow-xs"
                 : "text-[#161514]/70 dark:text-[#FAF8F5]/60 hover:text-[#161514] dark:hover:text-white hover:bg-[#FAF8F5] dark:hover:bg-[#1C1A18]"
@@ -796,28 +801,32 @@ export default function SettingsPage() {
             <span>Alerts</span>
           </button>
           <button
+            type="button"
             onClick={() => setActiveTab("security")}
             className={cn(
-              "flex-1 py-2 px-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 whitespace-nowrap font-heading",
+              "flex-1 py-2 px-2 sm:px-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 whitespace-nowrap font-heading shrink-0 snap-start",
               activeTab === "security"
                 ? "bg-[#161514] text-white dark:bg-white dark:text-[#161514] shadow-xs"
                 : "text-[#161514]/70 dark:text-[#FAF8F5]/60 hover:text-[#161514] dark:hover:text-white hover:bg-[#FAF8F5] dark:hover:bg-[#1C1A18]"
             )}
           >
             <ShieldCheck className="h-3.5 w-3.5 stroke-[2.5]" />
-            <span>Security & SMS</span>
+            <span className="sm:hidden">SMS &amp; Sync</span>
+            <span className="hidden sm:inline">Security &amp; SMS</span>
           </button>
           <button
+            type="button"
             onClick={() => setActiveTab("datavault")}
             className={cn(
-              "flex-1 py-2 px-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 whitespace-nowrap font-heading",
+              "flex-1 py-2 px-2 sm:px-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 whitespace-nowrap font-heading shrink-0 snap-start",
               activeTab === "datavault"
                 ? "bg-[#161514] text-white dark:bg-white dark:text-[#161514] shadow-xs"
                 : "text-[#161514]/70 dark:text-[#FAF8F5]/60 hover:text-[#161514] dark:hover:text-white hover:bg-[#FAF8F5] dark:hover:bg-[#1C1A18]"
             )}
           >
             <Database className="h-3.5 w-3.5 stroke-[2.5]" />
-            <span>Data Vault</span>
+            <span className="sm:hidden">Vault</span>
+            <span className="hidden sm:inline">Data Vault</span>
           </button>
         </div>
 
