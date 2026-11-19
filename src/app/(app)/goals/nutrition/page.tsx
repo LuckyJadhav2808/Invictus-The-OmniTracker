@@ -3,10 +3,15 @@
 import React from "react";
 import { Utensils, Apple } from "lucide-react";
 import { MealTracker } from "@/components/goals/MealTracker";
+import { SegmentedSubNav } from "@/components/mobile/SegmentedSubNav";
 
 export default function NutritionPage() {
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
+    <div className="space-y-4 animate-in fade-in duration-300">
+      <div className="max-w-xl mx-auto w-full">
+        <SegmentedSubNav />
+      </div>
+
       {/* 1. Harmonized Macro & Fuel Header */}
       <div className="bg-white dark:bg-[#161514] border border-[#E8E5DF] dark:border-[#2A2724] rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">

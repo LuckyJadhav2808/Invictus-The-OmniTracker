@@ -4,13 +4,18 @@ import React from "react";
 import { Dumbbell, Timer } from "lucide-react";
 import { GymRoutineTracker } from "@/components/goals/GymRoutineTracker";
 import { useLiveActivityStore } from "@/store/live-activity-store";
+import { SegmentedSubNav } from "@/components/mobile/SegmentedSubNav";
 
 export default function GymPage() {
   const { activeActivity, gymRest } = useLiveActivityStore();
   const isRestActive = activeActivity === "gym_rest" && gymRest.secondsLeft > 0;
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
+    <div className="space-y-4 animate-in fade-in duration-300">
+      <div className="max-w-xl mx-auto w-full">
+        <SegmentedSubNav />
+      </div>
+
       {/* 1. Harmonized Gym Studio Header */}
       <div className="bg-white dark:bg-[#161514] border border-[#E8E5DF] dark:border-[#2A2724] rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">

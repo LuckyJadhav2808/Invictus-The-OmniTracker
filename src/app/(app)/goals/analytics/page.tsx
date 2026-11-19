@@ -8,6 +8,7 @@ import { WeeklyOverviewWidget } from "@/components/goals/WeeklyOverviewWidget";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isSameDay, subWeeks } from "date-fns";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from "recharts";
 import { cn } from "@/lib/utils";
+import { SegmentedSubNav } from "@/components/mobile/SegmentedSubNav";
 
 export default function GoalsAnalyticsPage() {
   const { data: habits = [] } = useHabits();
@@ -68,7 +69,11 @@ export default function GoalsAnalyticsPage() {
   }, [totalHabits, fourWeekLogs]);
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
+    <div className="space-y-4 animate-in fade-in duration-300">
+      <div className="max-w-xl mx-auto w-full">
+        <SegmentedSubNav />
+      </div>
+
       {/* 1. Dedicated Analytics Hero Header */}
       <div className="bg-white dark:bg-[#161514] border border-[#E8E5DF] dark:border-[#2A2724] rounded-2xl p-4 sm:p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
