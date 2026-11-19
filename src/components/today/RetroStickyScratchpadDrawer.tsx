@@ -357,7 +357,7 @@ export function RetroStickyScratchpadDrawer({
         }}
         className={cn(
           "fixed right-4 sm:right-6 z-40",
-          "bottom-[calc(7.75rem+env(safe-area-inset-bottom,0px))] lg:bottom-6",
+          "bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] lg:bottom-6",
           "bg-white dark:bg-[#161514] hover:bg-[#FAF8F5] dark:hover:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#2A2724]",
           "size-11 sm:size-auto sm:px-3.5 sm:py-2.5 rounded-xl shadow-xs",
           "active:scale-95 flex items-center justify-center sm:gap-2",

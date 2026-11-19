@@ -94,7 +94,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       {/* Main Content Viewport */}
       <main
         id="main-scroll-container"
-        className="flex-1 pb-36 lg:pb-0 min-h-screen relative overflow-y-visible lg:overflow-y-auto flex flex-col"
+        className="flex-1 pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0 min-h-screen relative overflow-y-visible lg:overflow-y-auto flex flex-col"
       >
         {/* Proactive Auto-Update Notification Banner */}
         <AutoUpdateBanner />

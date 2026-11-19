@@ -115,88 +115,90 @@ function BottomNavContent() {
     <>
       <nav
         aria-label="Mobile Primary Navigation"
-        className="fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom,0px))] left-1/2 -translate-x-1/2 w-[95%] max-w-[430px] h-[60px] bg-[#161514]/94 dark:bg-[#1C1A18]/96 backdrop-blur-2xl border-2 border-[#161514] dark:border-[#38332E] rounded-3xl px-2 flex items-center justify-between shadow-[0px_4px_20px_rgba(0,0,0,0.3)] z-40 lg:hidden transition-all duration-200"
+        className="fixed bottom-0 left-0 right-0 w-full z-40 lg:hidden bg-[#161514] dark:bg-[#161514] border-t-2 border-[#161514] dark:border-[#2A2724] shadow-[0px_-4px_20px_rgba(0,0,0,0.25)] transition-all duration-200 select-none"
       >
-        {/* Left Nav Tabs: Today, Habits */}
-        <div className="flex items-center flex-1 justify-around">
-          {leftNavItems.map((item) => {
-            const isActive = isLinkActive(item.href);
-            const Icon = item.icon;
+        <div className="w-full max-w-md mx-auto px-2 pt-1.5 pb-[max(0.625rem,env(safe-area-inset-bottom,0px))] flex items-center justify-between relative">
+          {/* Left Nav Tabs: Today, Habits */}
+          <div className="flex items-center flex-1 justify-around">
+            {leftNavItems.map((item) => {
+              const isActive = isLinkActive(item.href);
+              const Icon = item.icon;
 
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                prefetch={true}
-                onClick={(e) => handleNavClick(e, item, isActive)}
-                className={cn(
-                  "flex flex-col items-center justify-center py-1 px-1.5 rounded-xl cursor-pointer transition-all duration-150 active:scale-95 select-none relative min-w-[52px]",
-                  isActive
-                    ? "bg-[#CEF431] text-[#161514] font-black shadow-[1px_1px_0px_0px_#161514]"
-                    : "text-white/70 hover:text-white"
-                )}
-              >
-                <Icon
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  prefetch={true}
+                  onClick={(e) => handleNavClick(e, item, isActive)}
                   className={cn(
-                    "size-4 stroke-[2.2]",
-                    isActive ? "text-[#161514]" : "text-white/75"
+                    "flex flex-col items-center justify-center py-1 px-2.5 rounded-xl cursor-pointer transition-all duration-150 active:scale-95 select-none relative min-w-[56px] min-h-[46px]",
+                    isActive
+                      ? "bg-[#CEF431] text-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_#161514]"
+                      : "text-white/70 hover:text-white"
                   )}
-                />
-                <span className="text-[10px] font-heading tracking-tight mt-0.5 leading-none">
-                  {item.label}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
+                >
+                  <Icon
+                    className={cn(
+                      "size-4 stroke-[2.2]",
+                      isActive ? "text-[#161514]" : "text-white/75"
+                    )}
+                  />
+                  <span className="text-[10px] font-heading font-bold tracking-tight mt-0.5 leading-none">
+                    {item.label}
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
 
-        {/* Center-Docked Notch FAB (Belanje/Routinr Benchmark) */}
-        <div className="relative -top-3 px-1 shrink-0">
-          <button
-            type="button"
-            onClick={() => {
-              soundFX.playPop();
-              soundFX.vibrate(25);
-              setIsActionSheetOpen(true);
-            }}
-            aria-label="Open Quick Action Sheet"
-            className="size-11 sm:size-12 rounded-2xl bg-[#CEF431] text-[#161514] border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none flex items-center justify-center cursor-pointer transition-transform hover:scale-105"
-          >
-            <Plus className="size-6 stroke-[3]" />
-          </button>
-        </div>
+          {/* Center-Docked Notch FAB (Belanje/Routinr Benchmark) */}
+          <div className="relative -top-3.5 px-1 shrink-0">
+            <button
+              type="button"
+              onClick={() => {
+                soundFX.playPop();
+                soundFX.vibrate(25);
+                setIsActionSheetOpen(true);
+              }}
+              aria-label="Open Quick Action Sheet"
+              className="size-12 rounded-2xl bg-[#CEF431] text-[#161514] border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none flex items-center justify-center cursor-pointer transition-transform hover:scale-105"
+            >
+              <Plus className="size-6 stroke-[3]" />
+            </button>
+          </div>
 
-        {/* Right Nav Tabs: Study, Tasks, Money */}
-        <div className="flex items-center flex-1 justify-around">
-          {rightNavItems.map((item) => {
-            const isActive = isLinkActive(item.href);
-            const Icon = item.icon;
+          {/* Right Nav Tabs: Tasks, Money */}
+          <div className="flex items-center flex-1 justify-around">
+            {rightNavItems.map((item) => {
+              const isActive = isLinkActive(item.href);
+              const Icon = item.icon;
 
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                prefetch={true}
-                onClick={(e) => handleNavClick(e, item, isActive)}
-                className={cn(
-                  "flex flex-col items-center justify-center py-1 px-1.5 rounded-xl cursor-pointer transition-all duration-150 active:scale-95 select-none relative min-w-[50px]",
-                  isActive
-                    ? "bg-[#CEF431] text-[#161514] font-black shadow-[1px_1px_0px_0px_#161514]"
-                    : "text-white/70 hover:text-white"
-                )}
-              >
-                <Icon
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  prefetch={true}
+                  onClick={(e) => handleNavClick(e, item, isActive)}
                   className={cn(
-                    "size-4 stroke-[2.2]",
-                    isActive ? "text-[#161514]" : "text-white/75"
+                    "flex flex-col items-center justify-center py-1 px-2.5 rounded-xl cursor-pointer transition-all duration-150 active:scale-95 select-none relative min-w-[56px] min-h-[46px]",
+                    isActive
+                      ? "bg-[#CEF431] text-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_#161514]"
+                      : "text-white/70 hover:text-white"
                   )}
-                />
-                <span className="text-[10px] font-heading tracking-tight mt-0.5 leading-none">
-                  {item.label}
-                </span>
-              </Link>
-            );
-          })}
+                >
+                  <Icon
+                    className={cn(
+                      "size-4 stroke-[2.2]",
+                      isActive ? "text-[#161514]" : "text-white/75"
+                    )}
+                  />
+                  <span className="text-[10px] font-heading font-bold tracking-tight mt-0.5 leading-none">
+                    {item.label}
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
         </div>
       </nav>
 
