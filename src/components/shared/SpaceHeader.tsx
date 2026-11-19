@@ -157,7 +157,7 @@ export function SpaceHeader() {
 
   const subrouteInfo = getSubrouteInfo(pathname);
 
-  const isMobileAppBarRoute = pathname.startsWith("/goals") || pathname.startsWith("/money") || pathname.startsWith("/today");
+  const isMobileAppBarRoute = pathname.startsWith("/goals") || pathname.startsWith("/money");
 
   return (
     <header className={cn("sticky top-0 w-full bg-white/95 dark:bg-[#161514]/95 backdrop-blur-md border-b border-[#E8E5DF] dark:border-[#2A2724] select-none transition-colors shadow-xs", isProfileMenuOpen ? "z-[60]" : "z-40", isMobileAppBarRoute && "hidden lg:block")}>
@@ -222,8 +222,8 @@ export function SpaceHeader() {
           </div>
         </div>
 
-        {/* Center: Desktop Dynamic Island Live Activity Dock (Header Integrated, Zero Collision) */}
-        <div className="hidden lg:flex flex-1 justify-center items-center px-4 min-w-0">
+        {/* Center: Dynamic Island Live Activity Dock (Header Integrated, Zero Collision) */}
+        <div className="flex flex-1 justify-center items-center px-1 sm:px-4 min-w-0">
           <DynamicIslandDock variant="header" floatOnScroll={false} />
         </div>
 

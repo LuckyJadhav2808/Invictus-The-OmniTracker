@@ -42,44 +42,30 @@ async function run() {
     const screens = (scrollHeight / 844).toFixed(2);
     console.log(`Mobile Scroll Height: ${scrollHeight}px (${screens} screens)`);
 
-    await page.screenshot({ path: path.join(outDir, "today_redesign_mobile_top.png") });
+    await page.screenshot({ path: path.join(outDir, "today_header_preserved_mobile.png") });
 
-    // Verify MobileAppBar title and dynamic island
-    const title = await page.locator("header h1").first().textContent();
-    console.log("Mobile App Bar Title:", title);
+    // Verify SpaceHeader presence: Cloud Sync button, Theme Toggle, Profile Button
+    const hasSyncBtn = await page.locator("header button[title*='Sync']").count();
+    const hasThemeToggle = await page.locator("header button[aria-label*='theme' i], header button:has(.lucide-sun, .lucide-moon)").count();
+    const hasProfileBtn = await page.locator("header button[aria-label*='User' i]").count();
+    console.log("Header Controls Check:", { hasSyncBtn, hasThemeToggle, hasProfileBtn });
 
-    // Verify 4 Door Tiles exist
-    const doorTiles = page.locator("button:has-text('Notes'), button:has-text('Review'), button:has-text('Water'), button:has-text('Limit')");
-    const doorTileCount = await doorTiles.count();
-    console.log("Door Tiles Count:", doorTileCount);
+    // Click profile dropdown to verify menu opens
+    const profileBtn = page.locator("header button[aria-label*='User' i]").first();
+    await profileBtn.click();
+    await page.waitForTimeout(400);
+    await page.screenshot({ path: path.join(outDir, "today_profile_dropdown_mobile.png") });
+    console.log("Profile dropdown opened and captured");
 
-    // Click 'Notes' door tile to verify Scratchpad Drawer opens
-    const notesTile = page.locator("button:has-text('Notes')").first();
-    await notesTile.click();
-    await page.waitForTimeout(500);
-    await page.screenshot({ path: path.join(outDir, "today_door_notes_drawer.png") });
-    console.log("Clicked Notes Door Tile -> Scratchpad drawer captured");
-
-    // Close drawer via Escape or backdrop
+    // Close profile dropdown
     await page.keyboard.press("Escape");
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(300);
 
-    // Click 'Water' door tile to verify Water Sheet opens
-    const waterTile = page.locator("button:has-text('Water')").first();
-    await waterTile.click();
-    await page.waitForTimeout(500);
-    await page.screenshot({ path: path.join(outDir, "today_door_water_sheet.png") });
-    console.log("Clicked Water Door Tile -> Water sheet captured");
-
-    // Close water sheet
-    await page.keyboard.press("Escape");
-    await page.waitForTimeout(500);
-
-    // Scroll down to check scroll behavior and verify NO floating island
-    await page.evaluate(() => window.scrollBy(0, 600));
-    await page.waitForTimeout(500);
-    await page.screenshot({ path: path.join(outDir, "today_redesign_mobile_scrolled.png") });
-    console.log("Mobile Scrolled view captured");
+    // Scroll down to verify header stays sticky and NO floating island
+    await page.evaluate(() => window.scrollBy(0, 500));
+    await page.waitForTimeout(400);
+    await page.screenshot({ path: path.join(outDir, "today_header_scrolled_mobile.png") });
+    console.log("Mobile scrolled view captured");
 
     await page.close();
   }
@@ -91,20 +77,14 @@ async function run() {
     await page.goto("http://localhost:3000/today", { waitUntil: "networkidle" });
     await page.waitForTimeout(1000);
 
-    await page.screenshot({ path: path.join(outDir, "today_redesign_desktop_top.png") });
-    console.log("Desktop Laptop Bento view captured");
-
-    // Scroll down desktop
-    await page.evaluate(() => window.scrollBy(0, 400));
-    await page.waitForTimeout(500);
-    await page.screenshot({ path: path.join(outDir, "today_redesign_desktop_scrolled.png") });
-    console.log("Desktop Scrolled view captured");
+    await page.screenshot({ path: path.join(outDir, "today_header_preserved_desktop.png") });
+    console.log("Desktop header preserved view captured");
 
     await page.close();
   }
 
   await browser.close();
-  console.log("✅ All Today verification checks completed successfully!");
+  console.log("✅ All Today header preservation checks completed successfully!");
 }
 
 run().catch((err) => {

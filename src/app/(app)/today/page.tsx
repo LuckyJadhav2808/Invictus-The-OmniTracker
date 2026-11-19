@@ -31,7 +31,6 @@ import {
 } from "date-fns";
 
 // 5-Slot Architecture Components
-import { MobileAppBar } from "@/components/mobile/MobileAppBar";
 import { SegmentedSubNav, type SubNavTab } from "@/components/mobile/SegmentedSubNav";
 import { TodayHeroPager } from "@/components/today/TodayHeroPager";
 import { HorizonWeekStrip } from "@/components/today/HorizonWeekStrip";
@@ -44,7 +43,6 @@ import { WaterTracker } from "@/components/goals/WaterTracker";
 import { useTodayCockpitViewModel, computeDailyConquestScore } from "@/components/today/useTodayCockpitViewModel";
 import { useSyncNativeQuickLogs } from "@/lib/native/useSyncNativeQuickLogs";
 import type { StrobiState } from "@/components/mascot/StrobiCompanion";
-import { DropdownMenuItem, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
 
 // Dynamic imports for heavy drawers and modals to optimize initial bundle
 const TodayQuickExpenseModal = dynamic(
@@ -456,58 +454,8 @@ export default function TodayPage() {
 
   return (
     <div className="w-full max-w-xl lg:max-w-5xl xl:max-w-6xl mx-auto select-none space-y-3 sm:space-y-4 px-1 sm:px-3 pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
-      {/* ================= SLOT 1: SLIM TOP APP BAR (48-56px, Mobile Only) ================= */}
-      <MobileAppBar
-        title="Today"
-        selectedDate={selectedDate}
-        onSelectDate={setSelectedDate}
-        customMenuItems={
-          <>
-            <DropdownMenuLabel className="text-[10px] font-mono font-bold uppercase tracking-wider text-muted-foreground px-2 py-1">
-              Quick Actions
-            </DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => {
-                soundFX.playPop();
-                setIsQuickExpenseOpen(true);
-              }}
-              className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-black cursor-pointer hover:bg-secondary focus:bg-secondary"
-            >
-              <div className="flex items-center gap-2">
-                <Plus className="size-3.5 text-[#03D26F] stroke-[2.5]" />
-                <span>Log Expense</span>
-              </div>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                soundFX.playPop();
-                setIsScratchpadDrawerOpen(true);
-              }}
-              className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-bold cursor-pointer hover:bg-secondary focus:bg-secondary"
-            >
-              <div className="flex items-center gap-2">
-                <FileText className="size-3.5 text-amber-500 stroke-[2.2]" />
-                <span>Desk Notes (⌘J)</span>
-              </div>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                soundFX.playPop();
-                setIsCloseoutDrawerOpen(true);
-              }}
-              className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-bold cursor-pointer hover:bg-secondary focus:bg-secondary"
-            >
-              <div className="flex items-center gap-2">
-                <Moon className="size-3.5 text-purple-500 stroke-[2.2]" />
-                <span>Evening Review</span>
-              </div>
-            </DropdownMenuItem>
-          </>
-        }
-      />
-
       {/* ================= SLOT 2: DESKTOP SUB-NAV (Hidden on Mobile) ================= */}
-      <div className="hidden lg:block">
+      <div className="hidden lg:block pt-1">
         <SegmentedSubNav
           tabs={TODAY_DESKTOP_SUB_NAV_TABS}
           value={desktopActiveTab}
