@@ -541,6 +541,20 @@ function GoalsPageContent() {
           </div>
         )}
 
+        {/* ================= SLOT 4c: DOOR TILE ROW (MAX 4 DOORS TO L2) ================= */}
+        <div className="py-1">
+          <DoorTileRow
+            waterAmount={waterLogged}
+            waterTarget={(waterLog as any)?.waterGoal || 2000}
+            bodyWeight={userProfile.weight || "68 kg"}
+            bodyAge={userProfile.age || "24y"}
+            onOpenWater={() => setIsWaterSheetOpen(true)}
+            onOpenBodyProfile={openProfileSheet}
+            onOpenReminders={() => setIsRemindersSheetOpen(true)}
+            onOpenRecovery={() => setIsRecoverySheetOpen(true)}
+          />
+        </div>
+
         {/* ================= SLOT 5: PRIMARY HABIT LIST ================= */}
         <div id="habits-section" className="space-y-1">
           {habitsLoading ? (
@@ -722,19 +736,7 @@ function GoalsPageContent() {
           )}
         </div>
 
-        {/* ================= SLOT 6: DOOR TILE ROW (MAX 4 TILES) ================= */}
-        <div className="pt-2">
-          <DoorTileRow
-            waterAmount={waterLogged}
-            waterTarget={(waterLog as any)?.waterGoal || 2000}
-            bodyWeight={userProfile.weight || "68 kg"}
-            bodyAge={userProfile.age || "24y"}
-            onOpenWater={() => setIsWaterSheetOpen(true)}
-            onOpenBodyProfile={openProfileSheet}
-            onOpenReminders={() => setIsRemindersSheetOpen(true)}
-            onOpenRecovery={() => setIsRecoverySheetOpen(true)}
-          />
-        </div>
+
       </div>
 
       {/* ================= L2/L3 BOTTOM SHEETS ================= */}
