@@ -1,4 +1,4 @@
-name: 📱 Build Android APK
+name: 📱 Build & Publish Android APK
 
 on:
   push:
@@ -9,21 +9,24 @@ on:
       - 'capacitor.config.ts'
       - '.github/workflows/build-apk.yml'
       - 'src/config/version.ts'
+      - 'package.json'
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  build-android:
-    name: 🤖 Compile Android APK
+  build-and-release:
+    name: 🤖 Compile Android APK & Publish Release
     runs-on: ubuntu-latest
 
     steps:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: ☕ Setup Java JDK
+      - name: ☕ Setup Java JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -35,43 +38,95 @@ jobs:
         with:
           node-version: 22
 
+      - name: 🏷️ Extract Dynamic Version & Changelog
+        id: version_info
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          BUILD_CODE=$(grep 'versionCode' android/app/build.gradle | head -1 | awk '{print $2}')
+          TAG="v$VERSION"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "build_code=$BUILD_CODE" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "release_name=Invictus Android v$VERSION" >> $GITHUB_OUTPUT
+
+          # Extract changelog bullets from src/config/version.ts
+          node -e "
+            const fs = require('fs');
+            const content = fs.readFileSync('src/config/version.ts', 'utf8');
+            const match = content.match(/changelog:\s*\[([\s\S]*?)\]/);
+            let notes = '## 📱 Invictus for Android v$VERSION (Build $BUILD_CODE)\nOfficial standalone APK release for Android devices.\n\n### ✨ What\'s Included:\n';
+            if (match && match[1]) {
+              const bullets = match[1].split('\n')
+                .map(l => l.trim())
+                .filter(l => l.startsWith('\"') || l.startsWith('\''))
+                .map(l => '- ' + l.replace(/^[\"']|[\"'],?$/g, '').trim());
+              notes += bullets.join('\n');
+            } else {
+              notes += '- Performance improvements and stability enhancements';
+            }
+            notes += '\n\n### 📥 Direct APK Installation:\nDownload \`Invictus.apk\` below and tap to install/update seamlessly.';
+            fs.writeFileSync('RELEASE_NOTES.md', notes);
+          "
+          echo "✅ Extracted Version: $VERSION (Build: $BUILD_CODE) -> $TAG"
+
       - name: ⚡ Install Native Android Bridge Plugins
         run: npm install @capacitor/core @capacitor/cli @capacitor/android @capacitor/local-notifications @capacitor/haptics @capacitor/splash-screen @capacitor/status-bar --no-audit --no-fund
 
       - name: 🔑 Grant Execute Permission for Gradlew
         run: chmod +x android/gradlew
 
-      - name: 🏗️ Build Debug APK with Gradle
+      - name: 🏗️ Compile Android APK with Gradle
         run: |
           cd android
           ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: 🛡️ Verify Compiled APK Bytecode & Generate SHA-256
+        run: |
+          APK_PATH="android/app/build/outputs/apk/debug/Invictus.apk"
+          if [ ! -f "$APK_PATH" ]; then
+            echo "❌ APK build failed! $APK_PATH not found."
+            exit 1
+          fi
+
+          # Compute SHA-256 Checksum
+          cd android/app/build/outputs/apk/debug
+          sha256sum Invictus.apk > Invictus.apk.sha256
+          echo "SHA256: $(cat Invictus.apk.sha256)"
+          cd -
+
+          # Verify bytecode versionName inside APK matches target version
+          node -e "
+            const { validateApkBinaryVersion } = require('./scripts/lib/apk-binary-validator.mjs');
+            const expected = '${{ steps.version_info.outputs.version }}';
+            const res = validateApkBinaryVersion('$APK_PATH', expected);
+            console.log('Bytecode verification result:', res);
+            if (!res.valid) {
+              console.error('❌ Bytecode version mismatch!', res.reason);
+              process.exit(1);
+            }
+          "
 
       - name: 📤 Upload Installable APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Invictus-Android-App
-          path: android/app/build/outputs/apk/debug/Invictus.apk
+          path: |
+            android/app/build/outputs/apk/debug/Invictus.apk
+            android/app/build/outputs/apk/debug/Invictus.apk.sha256
           retention-days: 30
 
-      - name: 🚀 Publish GitHub Release with APK
+      - name: 🚀 Publish Dynamic GitHub Release with APK
         uses: softprops/action-gh-release@v2
         if: github.ref == 'refs/heads/main'
         with:
-          tag_name: v1.2.0
-          name: Invictus Android v1.2.0
-          files: android/app/build/outputs/apk/debug/Invictus.apk
+          tag_name: ${{ steps.version_info.outputs.tag }}
+          name: ${{ steps.version_info.outputs.release_name }}
+          body_path: RELEASE_NOTES.md
+          files: |
+            android/app/build/outputs/apk/debug/Invictus.apk
+            android/app/build/outputs/apk/debug/Invictus.apk.sha256
           draft: false
           prerelease: false
-          body: |
-            ## 📱 Invictus for Android v1.2.0
-            Official standalone APK release for Android devices.
-
-            ### ✨ What's Included:
-            - ⚡ 1-Tap Native Android Shortcuts (Expenses, Habits, Gym, Study)
-            - 💳 High-Performance Money & Ledger Workspace
-            - 🎨 Single-Row Tab Rail with Horizontal Momentum Swipe
-            - 🧮 Neobrutalist Quick Calculator
-            - 🛡️ Streak Freeze & Missed Log Protection Tokens
-            - ✨ Native Haptic Feedback & Offline Cache Sync
+          make_latest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
