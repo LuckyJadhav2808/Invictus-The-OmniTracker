@@ -160,8 +160,15 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
       : "ambient";
 
   // On mobile, show active live activities or ambient telemetry (if not dismissed)
-  if (variant === "mobile" && currentMode === "ambient" && isAmbientDismissed) {
-    return null;
+  if (variant === "mobile" && (isAmbientDismissed || pathname?.startsWith("/goals"))) {
+    // If on /goals, MobileAppBar already embeds DynamicIslandDock variant="header".
+    // Suppress floating variant to eliminate duplicate overlapping islands.
+    if (pathname?.startsWith("/goals")) {
+      return null;
+    }
+    if (currentMode === "ambient") {
+      return null;
+    }
   }
 
   // Hide ambient pill if dismissed by user or on initial splash

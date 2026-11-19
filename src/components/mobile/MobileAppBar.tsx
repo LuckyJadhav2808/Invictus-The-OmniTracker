@@ -55,9 +55,9 @@ export function MobileAppBar({
   const [soundMuted, setSoundMuted] = useState(soundFX.isMuted());
 
   const todayStr = format(new Date(), "yyyy-MM-dd");
-  const formattedDate = selectedDate
-    ? format(new Date(selectedDate), "EEE, MMM d")
-    : format(new Date(), "EEE, MMM d");
+  const dateObj = selectedDate ? new Date(selectedDate) : new Date();
+  const shortDate = format(dateObj, "MMM d");
+  const fullDate = format(dateObj, "EEE, MMM d");
   const isViewingToday = !selectedDate || selectedDate === todayStr;
 
   const handleToggleSound = () => {
@@ -79,7 +79,8 @@ export function MobileAppBar({
           {title}
         </h1>
         <span className="text-[10px] sm:text-[11px] font-mono font-bold text-muted-foreground bg-secondary px-1.5 sm:px-2 py-0.5 rounded-md border border-border shrink-0">
-          {formattedDate}
+          <span className="sm:hidden">{shortDate}</span>
+          <span className="hidden sm:inline">{fullDate}</span>
         </span>
       </div>
 
