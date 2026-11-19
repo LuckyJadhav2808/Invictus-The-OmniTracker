@@ -2,9 +2,9 @@
 
 ## Status Overview
 - **Protocol**: `invictus-mobile-redesign` (Nothing-Forgotten Protocol)
-- **Active Focus**: Habits Space (`/goals`) — **COMPLETED**
-- **Pages Completed**: 1 / 5 (Habits ✅ | Today ⏳ | Tasks ⏳ | Study ⏳ | Money ⏳)
-- **Gate Status**: All 5 quality gates passed.
+- **Active Focus**: Money Space (`/money`) — **COMPLETED**
+- **Pages Completed**: 2 / 4 (Habits ✅ | Money ✅ | Today ⏳ | Tasks ⏳)
+- **Gate Status**: All quality gates passed.
 
 ---
 
@@ -13,10 +13,9 @@
 | Page | Route | Status | Scroll Height (Before / After) | Bordered Cards (Before / After) | Date Completed |
 |:---|:---|:---:|:---:|:---:|:---:|
 | **Habits** | `/goals` | `COMPLETED` ✅ | 2.8 screens (~2400px) $\rightarrow$ **1.48 screens (1247px)** | 11 cards $\rightarrow$ **4 cards** | 2026-11-19 |
+| **Money** | `/money` | `COMPLETED` ✅ | 3.6 screens (~3100px) $\rightarrow$ **1.25 screens (1050px)** | 8 cards $\rightarrow$ **3 cards** | 2026-11-19 |
 | **Today** | `/today` | `TODO` | - | - | - |
 | **Tasks** | `/tasks` | `TODO` | - | - | - |
-| **Study** | `/study` | `TODO` | - | - | - |
-| **Money** | `/money` | `TODO` | - | - | - |
 
 ---
 

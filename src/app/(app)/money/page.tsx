@@ -16,7 +16,7 @@ import {
 } from "@/lib/queries/money";
 import type { TemplatePack } from "@/components/shared/TemplateSelectionModal";
 import { BUDGET_CATEGORY_TEMPLATE_PACKS } from "@/lib/templates-data";
-import { Receipt, Target, PiggyBank, BarChart2, Users, Plus, RotateCcw, FileSpreadsheet } from "lucide-react";
+import { Receipt, Target, PiggyBank, BarChart2, Users, Plus, RotateCcw, ChevronRight, Wallet } from "lucide-react";
 import { DropdownMenuItem, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
 import { format, parseISO } from "date-fns";
 import { soundFX } from "@/components/shared/SoundFX";
@@ -34,9 +34,11 @@ import dynamic from "next/dynamic";
 // Modular Sub-Components & Views
 import { FinancialSummaryCockpit } from "@/components/money/FinancialSummaryCockpit";
 import { LedgerTabView } from "@/components/money/views/LedgerTabView";
+import { BelanjeTransactionRow } from "@/components/money/BelanjeTransactionRow";
 import { MobileAppBar } from "@/components/mobile/MobileAppBar";
 import { SegmentedSubNav, type SubNavTab } from "@/components/mobile/SegmentedSubNav";
 import { MoneyDoorTileRow } from "@/components/money/MoneyDoorTileRow";
+import { BottomSheet } from "@/components/mobile/BottomSheet";
 import { useWhoOwesWhoStore } from "@/store/who-owes-who-store";
 
 // Lazy-Loaded Tab Views (Saves Recharts & IOU Bundles on Initial Paint)
@@ -129,11 +131,14 @@ function MoneyPageContent() {
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
   const actionParam = searchParams.get("action");
-  const [activeTab, setActiveTab] = useState(tabParam || "ledger");
+  const [activeTab, setActiveTab] = useState(tabParam === "ledger" ? "overview" : (tabParam || "overview"));
   const [ledgerMethodFilter, setLedgerMethodFilter] = useState<string>("all");
   const [ledgerMethodFilterTrigger, setLedgerMethodFilterTrigger] = useState<number>(0);
 
   // Modal States
+  const [isLedgerSheetOpen, setIsLedgerSheetOpen] = useState(() => {
+    return actionParam === "ledger" || searchParams.get("sheet") === "ledger";
+  });
   const [isAddTxOpen, setIsAddTxOpen] = useState(false);
   const [editingTx, setEditingTx] = useState<Transaction | null>(null);
   const [inspectingTx, setInspectingTx] = useState<Transaction | null>(null);
@@ -163,35 +168,32 @@ function MoneyPageContent() {
       sessionStorage.removeItem("invictus_ledger_category");
       sessionStorage.removeItem("invictus_ledger_search");
     }
-    setActiveTab("ledger");
-
-    // Smooth scroll down to ledger view so user immediately sees all transactions
-    setTimeout(() => {
-      const scrollContainer = document.getElementById("main-scroll-container");
-      const target = document.getElementById("money-ledger-view");
-      if (target && scrollContainer) {
-        const containerRect = scrollContainer.getBoundingClientRect();
-        const targetRect = target.getBoundingClientRect();
-        const offset = targetRect.top - containerRect.top + scrollContainer.scrollTop - 90;
-        scrollContainer.scrollTo({ top: Math.max(0, offset), behavior: "smooth" });
-      } else if (target) {
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    }, 60);
+    soundFX.playPop();
+    setIsLedgerSheetOpen(true);
   };
 
   // Sync tab with URL search parameter
   useEffect(() => {
-    if (tabParam && ["ledger", "budgets", "debts", "vault", "analytics"].includes(tabParam)) {
-      setActiveTab(tabParam);
+    if (tabParam && ["overview", "ledger", "budgets", "debts", "vault", "analytics"].includes(tabParam)) {
+      setActiveTab(tabParam === "ledger" ? "overview" : tabParam);
     }
   }, [tabParam]);
 
   const handleTabChange = (val: string) => {
+    if (val === "ledger") {
+      setActiveTab("overview");
+      setIsLedgerSheetOpen(true);
+      if (typeof window !== "undefined") {
+        const url = new URL(window.location.href);
+        url.searchParams.delete("tab");
+        window.history.replaceState(null, "", url.pathname + url.search);
+      }
+      return;
+    }
     setActiveTab(val);
     if (typeof window !== "undefined") {
       const url = new URL(window.location.href);
-      if (val === "ledger") {
+      if (val === "overview") {
         url.searchParams.delete("tab");
       } else {
         url.searchParams.set("tab", val);
@@ -429,6 +431,18 @@ function MoneyPageContent() {
     }));
   }, [categories, transactions, effectiveTargetMonthKey]);
 
+  // Transactions for the current selected month sorted latest first
+  const currentMonthTransactions = useMemo(() => {
+    return transactions
+      .filter((tx) => selectedMonth === "all" || tx.date?.startsWith(effectiveTargetMonthKey))
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime() || (b.id || "").localeCompare(a.id || ""));
+  }, [transactions, selectedMonth, effectiveTargetMonthKey]);
+
+  // Capped 5-row glance for Slot 5 Overview
+  const recentTransactions = useMemo(() => {
+    return currentMonthTransactions.slice(0, 5);
+  }, [currentMonthTransactions]);
+
   // Telemetry for sub-nav badges
   const todayTxCount = useMemo(() => {
     const todayStr = format(new Date(), "yyyy-MM-dd");
@@ -453,10 +467,10 @@ function MoneyPageContent() {
 
   const subNavTabs: SubNavTab[] = useMemo(() => [
     {
-      id: "ledger",
-      label: "Ledger",
-      shortLabel: "Ledger",
-      icon: Receipt,
+      id: "overview",
+      label: "Overview",
+      shortLabel: "Overview",
+      icon: Wallet,
       badge: todayTxCount > 0 ? (
         <span className="px-1.5 py-0.2 rounded-full text-[9px] font-mono font-bold bg-[#161514]/15 dark:bg-white/20 text-inherit tabular-nums ml-0.5">
           {todayTxCount}
@@ -798,23 +812,11 @@ function MoneyPageContent() {
                 <span>Reset to Current Month</span>
               </div>
             </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                soundFX.playPop();
-                setIsExportModalOpen(true);
-              }}
-              className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-bold cursor-pointer hover:bg-secondary focus:bg-secondary"
-            >
-              <div className="flex items-center gap-2">
-                <FileSpreadsheet className="size-3.5 text-muted-foreground stroke-[2.2]" />
-                <span>Export PDF / CSV</span>
-              </div>
-            </DropdownMenuItem>
           </>
         }
       />
 
-      {/* ================= SLOT 2: STICKY SUB-NAV (4 PILLS: LEDGER | BUDGETS | IOUS | VAULT) ================= */}
+      {/* ================= SLOT 2: STICKY SUB-NAV (4 PILLS: OVERVIEW | BUDGETS | IOUS | VAULT) ================= */}
       <SegmentedSubNav
         tabs={subNavTabs}
         value={activeTab === "analytics" ? undefined : activeTab}
@@ -822,35 +824,210 @@ function MoneyPageContent() {
       />
 
       <div className="px-3.5 space-y-3">
-        {/* ================= SLOT 3: BORDERLESS HERO (Untouched WalletCardDeck + Ambient Strobi) ================= */}
-        <FinancialSummaryCockpit
-          monthlyStats={monthlyStats}
-          dailyStats={dailyStats}
-          currencySymbol={currencySymbol}
-          selectedMonth={selectedMonth}
-          onResetToCurrentMonth={handleResetToCurrentMonth}
-          onAddTransaction={() => setIsAddTxOpen(true)}
-          onBulkScan={() => setIsBulkModalOpen(true)}
-          onAddCategory={() => setIsAddCatOpen(true)}
-          onOpenEditAllowances={() => setIsAllowanceModalOpen(true)}
-          onOpenCalculator={() => setIsCalculatorOpen(true)}
-          onSelectPaymentMethod={handleSelectPaymentMethodFromHero}
-          onRefillCashTill={handleRefillCashTill}
-          onNavigateToTab={handleTabChange}
-        />
+        {/* Render Slot 3 (Hero Cockpit), Slot 4 (Door Tiles), and Slot 5 (Recent Glance) ONLY on Overview */}
+        {(activeTab === "overview" || activeTab === "ledger") && (
+          <>
+            {/* ================= SLOT 3: BORDERLESS HERO (Untouched WalletCardDeck + Ambient Strobi) ================= */}
+            <FinancialSummaryCockpit
+              monthlyStats={monthlyStats}
+              dailyStats={dailyStats}
+              currencySymbol={currencySymbol}
+              selectedMonth={selectedMonth}
+              onResetToCurrentMonth={handleResetToCurrentMonth}
+              onAddTransaction={() => setIsAddTxOpen(true)}
+              onBulkScan={() => setIsBulkModalOpen(true)}
+              onAddCategory={() => setIsAddCatOpen(true)}
+              onOpenEditAllowances={() => setIsAllowanceModalOpen(true)}
+              onOpenCalculator={() => setIsCalculatorOpen(true)}
+              onSelectPaymentMethod={handleSelectPaymentMethodFromHero}
+              onRefillCashTill={handleRefillCashTill}
+              onNavigateToTab={handleTabChange}
+            />
 
-        {/* ================= SLOT 4: 4 L2 DOOR TILES (Limits, Transfer, Packs, Report) ================= */}
-        <MoneyDoorTileRow
-          monthlyBudget={monthlyStats.totalCombinedBudget || monthlyStats.baseBudget}
-          currencySymbol={currencySymbol}
-          onOpenAllowances={() => setIsAllowanceModalOpen(true)}
-          onMoveMoney={() => setIsMoveMoneyOpen(true)}
-          onOpenTemplates={() => setIsTemplateModalOpen(true)}
-          onOpenExport={() => setIsExportModalOpen(true)}
-        />
+            {/* ================= SLOT 4: 4 L2 DOOR TILES (Limits, Transfer, Packs, Report) ================= */}
+            <MoneyDoorTileRow
+              monthlyBudget={monthlyStats.totalCombinedBudget || monthlyStats.baseBudget}
+              currencySymbol={currencySymbol}
+              onOpenAllowances={() => setIsAllowanceModalOpen(true)}
+              onMoveMoney={() => setIsMoveMoneyOpen(true)}
+              onOpenTemplates={() => setIsTemplateModalOpen(true)}
+              onOpenExport={() => setIsExportModalOpen(true)}
+            />
 
-        {/* ================= SLOT 5: ACTIVE TAB VIEW ================= */}
-        {activeTab === "ledger" && (
+            {/* ================= SLOT 5: RECENT TRANSACTIONS GLANCE (Capped 5 Rows + Neobrutalist Action Dock) ================= */}
+            <section className="space-y-2.5 pt-1">
+              <div className="flex items-center justify-between px-1">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-xs font-heading font-black uppercase tracking-wider text-muted-foreground">
+                    Recent Activity
+                  </h3>
+                  <span className="px-1.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-muted text-muted-foreground tabular-nums">
+                    {currentMonthTransactions.length}
+                  </span>
+                </div>
+
+                {currentMonthTransactions.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      soundFX.playPop();
+                      setIsLedgerSheetOpen(true);
+                    }}
+                    className="text-xs font-heading font-bold text-muted-foreground hover:text-foreground flex items-center gap-0.5 cursor-pointer transition-colors active:scale-95"
+                  >
+                    <span>See All</span>
+                    <ChevronRight className="size-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {recentTransactions.length > 0 ? (
+                <div className="space-y-2">
+                  <div className="bg-card rounded-2xl border-2 border-[#161514] dark:border-[#383531] shadow-[2.5px_2.5px_0px_0px_#161514] overflow-hidden divide-y divide-[#E8E5DF] dark:divide-[#252321]">
+                    {recentTransactions.map((tx) => (
+                      <BelanjeTransactionRow
+                        key={tx.id}
+                        tx={tx}
+                        category={categoryMap.get(tx.categoryId)}
+                        currencySymbol={currencySymbol}
+                        onInspect={(t) => setInspectingTx(t)}
+                        onEdit={(t) => setEditingTx(t)}
+                        onDuplicate={handleDuplicateTransaction}
+                        onDelete={handleDeleteTransaction}
+                        showQuickActions={false}
+                        compact={false}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Neobrutalist Action Dock button to open full ledger & envelopes */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      soundFX.playPop();
+                      setIsLedgerSheetOpen(true);
+                    }}
+                    className="w-full py-2.5 px-4 rounded-xl bg-white dark:bg-[#161514] hover:bg-[#F1EFEA] dark:hover:bg-[#252321] border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5] flex items-center justify-between transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Receipt className="size-4 text-[#161514] dark:text-[#CEF431] stroke-[2.2]" />
+                      <span>Open Full Ledger & Envelopes</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-[11px] font-mono text-muted-foreground">
+                      <span>{currentMonthTransactions.length} Total</span>
+                      <ChevronRight className="size-3.5" />
+                    </div>
+                  </button>
+                </div>
+              ) : (
+                <div className="bg-card rounded-2xl border-2 border-[#161514] dark:border-[#383531] shadow-[2.5px_2.5px_0px_0px_#161514] p-6 text-center space-y-3">
+                  <div className="size-12 rounded-2xl bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-[#161514] dark:border-[#383531] flex items-center justify-center mx-auto shadow-[1.5px_1.5px_0px_0px_#161514]">
+                    <Receipt className="size-6 stroke-[2]" />
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="text-sm font-heading font-black text-[#161514] dark:text-[#FAF8F5]">
+                      No Transactions Recorded
+                    </h4>
+                    <p className="text-xs text-muted-foreground max-w-xs mx-auto">
+                      Your ledger is spotless for {monthlyStats.targetMonthLabel}. Tap below to log your first expense or income.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      soundFX.playPop();
+                      setIsAddTxOpen(true);
+                    }}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#CEF431] text-[#161514] text-xs font-heading font-black border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
+                  >
+                    <Plus className="size-3.5 stroke-[2.5]" />
+                    <span>Log First Expense</span>
+                  </button>
+                </div>
+              )}
+            </section>
+          </>
+        )}
+
+        {/* ================= SUB-PAGE DOMAINS (Directly Under Sub-Nav) ================= */}
+        {activeTab === "budgets" && (
+          <div className="space-y-3 pt-1">
+            <BudgetTabView
+              categories={categories}
+              transactions={transactions}
+              monthlyStats={monthlyStats}
+              currencySymbol={currencySymbol}
+              defaultUpiBudget={baseUpiBudget}
+              defaultCashBudget={baseCashBudget}
+              defaultCustomDailyBudget={customDailyBudget}
+              defaultEnableRollover={enableRollover}
+              selectedCategoryId={selectedCategory}
+              onSelectCategory={handleSelectCategory}
+              onSaveAllowances={handleSaveAllowances}
+              onAddCategory={() => setIsAddCatOpen(true)}
+              onEditCategory={(cat) => setEditingCat(cat)}
+              onOpenTemplates={() => setIsTemplateModalOpen(true)}
+              onOpenAllowances={() => setIsAllowanceModalOpen(true)}
+              onApplyCategoryPack={handleApplyCategoryPack}
+            />
+          </div>
+        )}
+
+        {activeTab === "debts" && (
+          <div className="space-y-3 pt-1">
+            <WhoOwesWhoTabView
+              currencySymbol={currencySymbol}
+              prefill={whoOwesWhoPrefill}
+              onLogSettlementIncome={handleLogWhoOwesWhoRepayment}
+            />
+          </div>
+        )}
+
+        {activeTab === "vault" && (
+          <div className="space-y-3 pt-1">
+            <VaultTabView currencySymbol={currencySymbol} />
+          </div>
+        )}
+
+        {activeTab === "analytics" && (
+          <div className="space-y-3 pt-1">
+            <div className="flex items-center justify-between px-1">
+              <button
+                type="button"
+                onClick={() => handleTabChange("overview")}
+                className="text-xs font-mono font-bold text-muted-foreground hover:text-foreground flex items-center gap-1 cursor-pointer transition-colors"
+              >
+                ← Back to Overview
+              </button>
+            </div>
+            <AnalyticsTabView
+              transactions={transactions}
+              categories={categories}
+              currencySymbol={currencySymbol}
+              targetMonthKey={effectiveTargetMonthKey}
+              onOpenAddTransaction={() => setIsAddTxOpen(true)}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* ================= L3 BOTTOM SHEET: FULL TRANSACTION LEDGER & ENVELOPES ================= */}
+      <BottomSheet
+        open={isLedgerSheetOpen}
+        onOpenChange={(open) => {
+          setIsLedgerSheetOpen(open);
+          if (!open && typeof window !== "undefined") {
+            const url = new URL(window.location.href);
+            url.searchParams.delete("sheet");
+            url.searchParams.delete("action");
+            window.history.replaceState(null, "", url.pathname + url.search);
+          }
+        }}
+        title="Transaction Ledger & Envelopes"
+        description="Search, filter by envelope, and manage statement records"
+        maxHeight="max-h-[92vh]"
+      >
+        <div className="py-2">
           <LedgerTabView
             categoryCardsData={categoryCardsData}
             transactions={transactions}
@@ -877,62 +1054,8 @@ function MoneyPageContent() {
             onEditCategory={(cat) => setEditingCat(cat)}
             onDeleteCategory={(catId) => setDeleteCatId(catId)}
           />
-        )}
-
-        {activeTab === "budgets" && (
-          <BudgetTabView
-            categories={categories}
-            transactions={transactions}
-            monthlyStats={monthlyStats}
-            currencySymbol={currencySymbol}
-            defaultUpiBudget={baseUpiBudget}
-            defaultCashBudget={baseCashBudget}
-            defaultCustomDailyBudget={customDailyBudget}
-            defaultEnableRollover={enableRollover}
-            selectedCategoryId={selectedCategory}
-            onSelectCategory={handleSelectCategory}
-            onSaveAllowances={handleSaveAllowances}
-            onAddCategory={() => setIsAddCatOpen(true)}
-            onEditCategory={(cat) => setEditingCat(cat)}
-            onOpenTemplates={() => setIsTemplateModalOpen(true)}
-            onOpenAllowances={() => setIsAllowanceModalOpen(true)}
-            onApplyCategoryPack={handleApplyCategoryPack}
-          />
-        )}
-
-        {activeTab === "debts" && (
-          <WhoOwesWhoTabView
-            currencySymbol={currencySymbol}
-            prefill={whoOwesWhoPrefill}
-            onLogSettlementIncome={handleLogWhoOwesWhoRepayment}
-          />
-        )}
-
-        {activeTab === "vault" && (
-          <VaultTabView currencySymbol={currencySymbol} />
-        )}
-
-        {activeTab === "analytics" && (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <button
-                type="button"
-                onClick={() => handleTabChange("ledger")}
-                className="text-xs font-mono font-bold text-muted-foreground hover:text-foreground flex items-center gap-1 cursor-pointer"
-              >
-                ← Back to Ledger
-              </button>
-            </div>
-            <AnalyticsTabView
-              transactions={transactions}
-              categories={categories}
-              currencySymbol={currencySymbol}
-              targetMonthKey={effectiveTargetMonthKey}
-              onOpenAddTransaction={() => setIsAddTxOpen(true)}
-            />
-          </div>
-        )}
-      </div>
+        </div>
+      </BottomSheet>
 
       {/* 🚀 MODULAR MODALS (Zero Render Lag) */}
       {/* 1. Transaction Form Modal (Unified Add & Edit + 3-Sec Hyper-Log Keypad) */}

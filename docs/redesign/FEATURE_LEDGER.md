@@ -128,33 +128,33 @@
 |:---|:---|:---|:---|:---|:---|:---:|:---:|:---:|
 | **M-01** | `MONEY` | `/money` | Page Title "Money" + Live Date | `MobileAppBar` | `MobileAppBar`: "Money" + compact date | L1 | `INLINE` | `KEPT` |
 | **M-02** | `MONEY` | `/money` | Calendar jump / Month selector | `MobileAppBar` right | Jump to current month / today | L1 | `INLINE` | `KEPT` |
-| **M-03** | `MONEY` | `/money` | Money Sub-Nav (Ledger, Budgets, IOUs, Vault) | Old tab strip | `SegmentedSubNav` (4 pills: Ledger, Budgets, IOUs, Vault) | L1 | `TAB` | `KEPT` |
-| **M-04** | `MONEY` | `/money` | WalletCardDeck 3D physical card deck | `WalletCardDeck.tsx` | Main hero component (**kept 100% as it is**) sitting directly on canvas | L1 | `INLINE` | `KEPT` |
+| **M-03** | `MONEY` | `/money` | Money Sub-Nav (Overview, Budgets, IOUs, Vault) | Old tab strip | `SegmentedSubNav` (4 pills: Overview, Budgets, IOUs, Vault) | L1 | `TAB` | `KEPT` |
+| **M-04** | `MONEY` | `/money` | WalletCardDeck 3D physical card deck | `WalletCardDeck.tsx` | Main hero component (**kept 100% as it is**) rendered strictly on Overview tab | L1 | `INLINE` | `KEPT` |
 | **M-05** | `MONEY` | `/money` | Balance privacy toggle & masking | In `WalletCardDeck` | Untouched in `WalletCardDeck` | L1 | `INLINE` | `KEPT` |
 | **M-06** | `MONEY` | `/money` | Squircle quick launchers (Scan, Add, Calc, Refill) | In `WalletCardDeck` | Untouched in `WalletCardDeck` | L1 | `INLINE` | `KEPT` |
 | **M-07** | `MONEY` | `/money` | Cash Till Refill quick action | In `WalletCardDeck` | Untouched in `WalletCardDeck` | L1 | `INLINE` | `KEPT` |
 | **M-08** | `MONEY` | `/money` | Strobi pace companion telemetry | Heavy bordered card box | Sleek ambient telemetry ribbon (no border fatigue) | L1 | `INLINE` | `REFINED` |
-| **M-09** | `MONEY` | `/money` | Duplicate RecentAccountFeed in hero | Hero card bottom | Removed from hero; card taps filter primary Ledger | L1 | `INLINE` | `REMOVED` |
+| **M-09** | `MONEY` | `/money` | Duplicate RecentAccountFeed in hero | Hero card bottom | Removed from hero; card taps filter & open Full Ledger BottomSheet | L1 | `INLINE` | `REMOVED` |
 | **M-10** | `MONEY` | `/money` | Door Tile 1: Limits & Allowances | In-page button | `MoneyDoorTileRow` tile 1 $\rightarrow$ `AllowanceSettingsModal` | L2 | `SHEET` | `MOVED` |
 | **M-11** | `MONEY` | `/money` | Door Tile 2: Financial Analytics & Trends | In-page button / 5th tab | `MoneyDoorTileRow` tile 2 $\rightarrow$ `AnalyticsTabView` | L2 | `SCREEN` | `MOVED` |
 | **M-12** | `MONEY` | `/money` | Door Tile 3: Neobrutalist Calculator | In-page button | `MoneyDoorTileRow` tile 3 $\rightarrow$ `NeobrutalistCalculator` | L2 | `SHEET` | `MOVED` |
-| **M-13** | `MONEY` | `/money` | Door Tile 4: Export Statement PDF & CSV | In-page button | `MoneyDoorTileRow` tile 4 $\rightarrow$ `PDFExportModal` | L2 | `SHEET` | `MOVED` |
-| **M-14** | `MONEY` | `/money` | Category Envelopes chip filter rail | Top of ledger view | Capped rail with active filter pills in `LedgerTabView` | L1 | `INLINE` | `KEPT` |
-| **M-15** | `MONEY` | `/money` | Envelope Studio page-in-page drawer | In `LedgerTabView` | In-situ category budget drawer when envelope selected | L2 | `INLINE` | `KEPT` |
-| **M-16** | `MONEY` | `/money` | Belanje Transaction Rows (squircle rows) | In `LedgerTabView` | Squircle transaction rows with category icon & time | L1 | `INLINE` | `KEPT` |
+| **M-13** | `MONEY` | `/money` | Door Tile 4: Export Statement PDF & CSV | In-page button | `MoneyDoorTileRow` tile 4 $\rightarrow$ `PDFExportModal` (redundant menu entry removed) | L2 | `SHEET` | `MOVED` |
+| **M-14** | `MONEY` | `/money` | Category Envelopes chip filter rail | Top of ledger view | Capped rail with active filter pills in `LedgerTabView` (inside L3 BottomSheet) | L3 | `SHEET` | `MOVED` |
+| **M-15** | `MONEY` | `/money` | Envelope Studio page-in-page drawer | In `LedgerTabView` | In-situ category budget drawer inside `LedgerTabView` (L3 BottomSheet) | L3 | `SHEET` | `MOVED` |
+| **M-16** | `MONEY` | `/money` | Recent Activity Glance (5-Row Feed) | Uncapped list | Slot 5 capped at 5 recent rows with `BelanjeTransactionRow` + Neobrutalist Action Dock | L1 | `INLINE` | `REFINED` |
 | **M-17** | `MONEY` | `/money` | Transaction Inspection modal | `TransactionDetailModal` | Inspection modal with receipt breakdown | L3 | `SHEET` | `KEPT` |
 | **M-18** | `MONEY` | `/money` | Transaction Form Modal (Add / Edit) | `TransactionFormModal` | Add/Edit modal with rapid keypad logging | L3 | `SHEET` | `KEPT` |
 | **M-19** | `MONEY` | `/money` | Duplicate Transaction 1-Tap Action | In transaction row menu | Instant duplicate mutation with sound FX | L1 | `INLINE` | `KEPT` |
 | **M-20** | `MONEY` | `/money` | Delete Transaction Safeguard Modal | `DeleteConfirmationModal` | Destructive deletion confirmation dialog | L3 | `SHEET` | `KEPT` |
-| **M-21** | `MONEY` | `/money` | Capped Transaction Feed (5 groups + Load More) | Uncapped list | Initial render capped at 5 date groups + Load Earlier button | L1 | `INLINE` | `REFINED` |
-| **M-22** | `MONEY` | `/money` | Ledger Search & Multi-Filter Bar | In `LedgerTabView` | Responsive search input + method / type filters | L1 | `INLINE` | `KEPT` |
-| **M-23** | `MONEY` | `/money` | Monthly Statement Summary Strip | In `LedgerTabView` | Statement record count and total expense readout | L1 | `INLINE` | `KEPT` |
-| **M-24** | `MONEY` | `/money` | First-run zero-state onboarding cockpit | In `LedgerTabView` | 1-tap starter expense presets | L1 | `INLINE` | `KEPT` |
-| **M-25** | `MONEY` | `/money` | No search results empty state | In `LedgerTabView` | Reset filter shortcut button | L1 | `INLINE` | `KEPT` |
-| **M-26** | `MONEY` | `/money` | Budgets Tab: Category envelopes & caps | `BudgetTabView` | Progress bars, category caps & edit drawer | L1 | `TAB` | `KEPT` |
-| **M-27** | `MONEY` | `/money` | Budgets Tab: Template Packs selector | `BudgetTabView` | Student & minimalist pack picker modal | L2 | `SHEET` | `KEPT` |
-| **M-28** | `MONEY` | `/money` | IOUs Tab: Who Owes Who debt tracker | `WhoOwesWhoTabView` | Student debt tracker, split bills & settlement | L1 | `TAB` | `KEPT` |
-| **M-29** | `MONEY` | `/money` | Vault Tab: Savings Goals & Lockups | `VaultTabView` | Target milestone cards & emergency fund telemetry | L1 | `TAB` | `KEPT` |
+| **M-21** | `MONEY` | `/money` | Full Ledger BottomSheet (`money.ledger-sheet`) | Inline monolithic page | Dedicated L3 `BottomSheet` with search, category envelopes rail, payment method filters | L3 | `SHEET` | `MOVED` |
+| **M-22** | `MONEY` | `/money` | Ledger Search & Multi-Filter Bar | In `LedgerTabView` | Responsive search input + method / type filters inside `LedgerTabView` | L3 | `SHEET` | `MOVED` |
+| **M-23** | `MONEY` | `/money` | Monthly Statement Summary Strip | In `LedgerTabView` | Statement record count and total expense readout inside `LedgerTabView` | L3 | `SHEET` | `MOVED` |
+| **M-24** | `MONEY` | `/money` | First-run zero-state onboarding cockpit | In `LedgerTabView` | 1-tap starter expense presets on Overview Slot 5 & inside Ledger sheet | L1 | `INLINE` | `KEPT` |
+| **M-25** | `MONEY` | `/money` | No search results empty state | In `LedgerTabView` | Reset filter shortcut button inside `LedgerTabView` | L3 | `SHEET` | `MOVED` |
+| **M-26** | `MONEY` | `/money` | Budgets Sub-Page: Category envelopes & caps | `BudgetTabView` | Standalone domain canvas under sub-nav (no card deck on top) | L1 | `TAB` | `REFINED` |
+| **M-27** | `MONEY` | `/money` | Budgets Sub-Page: Template Packs selector | `BudgetTabView` | Student & minimalist pack picker modal | L2 | `SHEET` | `KEPT` |
+| **M-28** | `MONEY` | `/money` | IOUs Sub-Page: Who Owes Who debt tracker | `WhoOwesWhoTabView` | Standalone domain canvas under sub-nav with 3-pillar metric strip | L1 | `TAB` | `REFINED` |
+| **M-29** | `MONEY` | `/money` | Vault Sub-Page: Savings Goals & Lockups | `VaultTabView` | Standalone domain canvas under sub-nav for subscriptions & savings | L1 | `TAB` | `REFINED` | |
 | **M-30** | `MONEY` | `/money` | Docked FAB Financial Actions | Old floating buttons | Contextual `ActionSheet` (Log Expense, Log Income, Transfer, Split) | L1 | `SHEET` | `MERGED` |
 
 ---
