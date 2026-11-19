@@ -780,16 +780,6 @@ function MoneyPageContent() {
       {/* ================= SLOT 1: SLIM TOP APP BAR (48-56px) ================= */}
       <MobileAppBar
         title="Money"
-        selectedDate={effectiveTargetMonthKey}
-        dateLabel={monthlyStats.targetMonthLabel}
-        dateShortLabel={format(new Date(effectiveTargetMonthKey + "-01"), "MMM yy")}
-        onSelectDate={handleResetToCurrentMonth}
-        isCalendarActive={!monthlyStats.isCurrentCalendarMonth}
-        calendarTooltip={
-          monthlyStats.isCurrentCalendarMonth
-            ? "Viewing current month"
-            : "Jump back to current month"
-        }
         customMenuItems={
           <>
             <DropdownMenuLabel className="text-[10px] font-mono font-bold uppercase tracking-wider text-muted-foreground px-2 py-1">

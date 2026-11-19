@@ -169,6 +169,11 @@
   --radius-lg: 16px;
   --radius-xl: 20px;
 
+  /* Hardware-Calibrated Mobile Safe Insets */
+  --native-status-bar-height: 0px;
+  --safe-area-top: max(env(safe-area-inset-top, 0px), var(--native-status-bar-height, 0px));
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+
   /* Dynamic Primary Action & Brand Persona Tokens (Classic Cyberpunk by default) */
   --btn-primary-bg: #CEF431;
   --btn-primary-fg: #161514;
@@ -1029,3 +1034,15 @@ body:has([aria-modal="true"][data-state="open"]) nav[aria-label="Mobile Primary 
   opacity: 0 !important;
   pointer-events: none !important;
 }
+
+/* Mobile Status Bar Inset Clearance */
+.safe-top-pad {
+  padding-top: max(env(safe-area-inset-top, 0px), var(--native-status-bar-height, 0px));
+}
+
+@media (min-width: 1024px) {
+  .safe-top-pad {
+    padding-top: 0px;
+  }
+}
+

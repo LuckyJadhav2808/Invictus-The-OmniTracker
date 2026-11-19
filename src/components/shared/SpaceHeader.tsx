@@ -164,7 +164,7 @@ export function SpaceHeader() {
     pathname.startsWith("/settings");
 
   return (
-    <header className={cn("sticky top-0 w-full bg-white/95 dark:bg-[#161514]/95 backdrop-blur-md border-b border-[#E8E5DF] dark:border-[#2A2724] select-none transition-colors shadow-xs", isProfileMenuOpen ? "z-[60]" : "z-40", isMobileAppBarRoute && "hidden lg:block")}>
+    <header className={cn("sticky top-0 w-full bg-white/95 dark:bg-[#161514]/95 backdrop-blur-md border-b border-[#E8E5DF] dark:border-[#2A2724] select-none transition-colors shadow-xs safe-top-pad", isProfileMenuOpen ? "z-[60]" : "z-40", isMobileAppBarRoute && "hidden lg:block")}>
       {/* Optional Announcement Banner */}
       {announcement && announcement.message && !dismissedAnn && (
         <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] px-4 py-2 text-xs font-medium border-b border-[#E8E5DF] dark:border-[#2A2724] flex items-center justify-between transition-colors">

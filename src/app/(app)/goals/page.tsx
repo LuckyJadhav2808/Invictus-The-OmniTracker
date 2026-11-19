@@ -500,8 +500,6 @@ function GoalsPageContent() {
       {/* ================= SLOT 1: SLIM TOP APP BAR (48-56px) ================= */}
       <MobileAppBar
         title="Habits"
-        selectedDate={selectedDate}
-        onSelectDate={setSelectedDate}
         onCheckAllDue={handleCheckAllDue}
         isAllDueCompleted={isAllDueCompleted}
         dueCount={dueTodayHabits.length}

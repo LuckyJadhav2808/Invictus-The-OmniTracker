@@ -71,9 +71,9 @@ export function MobileAppBar({
   const [soundMuted, setSoundMuted] = useState(soundFX.isMuted());
 
   const todayStr = format(new Date(), "yyyy-MM-dd");
-  const dateObj = selectedDate ? new Date(selectedDate.length === 7 ? `${selectedDate}-01` : selectedDate) : new Date();
-  const shortDate = dateShortLabel || format(dateObj, "MMM d");
-  const fullDate = dateLabel || format(dateObj, "EEE, MMM d");
+  const dateObj = selectedDate ? new Date(selectedDate.length === 7 ? `${selectedDate}-01` : selectedDate) : null;
+  const shortDate = dateShortLabel || (dateObj ? format(dateObj, "MMM d") : null);
+  const fullDate = dateLabel || (dateObj ? format(dateObj, "EEE, MMM d") : null);
   const isViewingToday = isCalendarActive !== undefined ? !isCalendarActive : (!selectedDate || selectedDate === todayStr);
 
   const handleToggleSound = () => {
@@ -85,7 +85,7 @@ export function MobileAppBar({
   return (
     <header
       className={cn(
-        "sticky top-0 z-30 w-full h-[52px] px-3.5 bg-[#FAF8F5]/90 dark:bg-[#161514]/90 backdrop-blur-md border-b border-[#161514]/10 dark:border-white/10 flex items-center justify-between select-none transition-colors lg:hidden",
+        "sticky top-0 z-30 w-full min-h-[52px] safe-top-pad px-3.5 bg-[#FAF8F5]/90 dark:bg-[#161514]/90 backdrop-blur-md border-b border-[#161514]/10 dark:border-white/10 flex items-center justify-between select-none transition-colors lg:hidden",
         className
       )}
     >
@@ -116,10 +116,12 @@ export function MobileAppBar({
         <h1 className="font-heading font-black text-lg sm:text-xl tracking-tight text-foreground truncate">
           {title}
         </h1>
-        <span className="text-[10px] sm:text-[11px] font-mono font-bold text-muted-foreground bg-secondary px-1.5 sm:px-2 py-0.5 rounded-md border border-border shrink-0">
-          <span className="sm:hidden">{shortDate}</span>
-          <span className="hidden sm:inline">{fullDate}</span>
-        </span>
+        {shortDate && (
+          <span className="text-[10px] sm:text-[11px] font-mono font-bold text-muted-foreground bg-secondary px-1.5 sm:px-2 py-0.5 rounded-md border border-border shrink-0">
+            <span className="sm:hidden">{shortDate}</span>
+            <span className="hidden sm:inline">{fullDate || shortDate}</span>
+          </span>
+        )}
       </div>
 
       {/* Center: Dynamic Island Live Activity Dock (Header Integrated, Stays in Header) */}

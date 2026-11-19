@@ -17,6 +17,7 @@ import { safeModeWatchdog } from "@/lib/runtime/safe-mode-watchdog";
 import { SafeModeScreen } from "@/components/shared/SafeModeScreen";
 import { migrationEngine } from "@/lib/offline/migration-engine";
 import { NativeBackHandler } from "@/components/shared/NativeBackHandler";
+import { initNativeStatusBar } from "@/lib/native/status-bar";
 import { cn } from "@/lib/utils";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -41,6 +42,25 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     // Run safe client storage migration in background
     migrationEngine.runMigrations().catch(() => {});
 
+    // Calibrate native mobile status bar to eliminate collisions
+    let cleanupStatusBarListener: (() => void) | undefined;
+    if (typeof window !== "undefined") {
+      const isDark = document.documentElement.classList.contains("dark");
+      initNativeStatusBar(isDark).catch(() => {});
+
+      const onThemeChange = (e: Event) => {
+        const customEvent = e as CustomEvent<{ resolved?: "light" | "dark" }>;
+        const isCurrentlyDark = customEvent.detail?.resolved
+          ? customEvent.detail.resolved === "dark"
+          : document.documentElement.classList.contains("dark");
+        initNativeStatusBar(isCurrentlyDark).catch(() => {});
+      };
+      window.addEventListener("invictus-theme-change", onThemeChange);
+      cleanupStatusBarListener = () => {
+        window.removeEventListener("invictus-theme-change", onThemeChange);
+      };
+    }
+
     const isGuest = localStorage.getItem("invictus_guest_mode") === "true";
     const session = getCustomSession();
     if (session || isGuest) {
@@ -49,6 +69,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
     return () => {
       clearTimeout(healthyTimer);
+      cleanupStatusBarListener?.();
       unsub();
     };
   }, []);
