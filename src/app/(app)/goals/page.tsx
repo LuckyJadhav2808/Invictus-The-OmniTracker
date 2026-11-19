@@ -146,11 +146,18 @@ function GoalsPageContent() {
         openPortal(p);
       }
     };
+    const handleOpenReflectionEvent = () => {
+      soundFX.playPop();
+      soundFX.vibrate(15);
+      setIsRecoverySheetOpen(true);
+    };
     window.addEventListener("popstate", handlePopState);
     window.addEventListener("invictus:goals-open-portal", handleOpenPortalEvent);
+    window.addEventListener("invictus:goals-open-reflection", handleOpenReflectionEvent);
     return () => {
       window.removeEventListener("popstate", handlePopState);
       window.removeEventListener("invictus:goals-open-portal", handleOpenPortalEvent);
+      window.removeEventListener("invictus:goals-open-reflection", handleOpenReflectionEvent);
     };
   }, [openPortal]);
 
@@ -596,10 +603,11 @@ function GoalsPageContent() {
             waterTarget={(waterLog as any)?.waterGoal || 2000}
             bodyWeight={userProfile.weight || "68 kg"}
             bodyAge={userProfile.age || "24y"}
-            onOpenWater={() => setIsWaterSheetOpen(true)}
+            onOpenNewHabit={() => setIsChoiceOpen(true)}
             onOpenGym={() => openPortal("gym")}
             onOpenNutrition={() => openPortal("nutrition")}
             onOpenStats={() => openPortal("stats")}
+            onOpenWater={() => setIsWaterSheetOpen(true)}
             onOpenBodyProfile={openProfileSheet}
             onOpenReminders={() => setIsRemindersSheetOpen(true)}
             onOpenRecovery={() => setIsRecoverySheetOpen(true)}

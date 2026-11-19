@@ -21,6 +21,9 @@ import {
   Users,
   CheckCircle2,
   Kanban,
+  Moon,
+  Wallet,
+  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
@@ -53,50 +56,14 @@ export function HalfFlowerMenu({
   const toggleBtnRef = useRef<HTMLButtonElement>(null);
   const petalRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
-  // Context-aware petals based on active space
+  // Context-aware petals based on active space (High-Frequency Micro-Actions)
   const getPetals = useCallback((): FlowerPetalItem[] => {
     // 1. Habits Space
     if (pathname.startsWith("/goals")) {
       return [
         {
-          id: "new-habit",
-          label: "New Habit",
-          shortLabel: "Habit",
-          icon: CheckSquare,
-          bgClass: "bg-[#CEF431]",
-          textClass: "text-[#161514]",
-          borderClass: "border-[#161514]",
-          onClick: () => {
-            window.dispatchEvent(new CustomEvent("invictus:open-new-habit"));
-          },
-        },
-        {
-          id: "log-workout",
-          label: "Log Workout",
-          shortLabel: "Workout",
-          icon: Dumbbell,
-          bgClass: "bg-[#03D26F]",
-          textClass: "text-[#161514]",
-          borderClass: "border-[#161514]",
-          onClick: () => {
-            window.dispatchEvent(new CustomEvent("invictus:goals-open-portal", { detail: { portal: "gym" } }));
-          },
-        },
-        {
-          id: "log-meal",
-          label: "Log Meal",
-          shortLabel: "Meal",
-          icon: Utensils,
-          bgClass: "bg-[#F59E0B]",
-          textClass: "text-[#161514]",
-          borderClass: "border-[#161514]",
-          onClick: () => {
-            window.dispatchEvent(new CustomEvent("invictus:goals-open-portal", { detail: { portal: "nutrition" } }));
-          },
-        },
-        {
           id: "log-water",
-          label: "Log Water",
+          label: "Quick Water",
           shortLabel: "+250ml",
           icon: Droplet,
           bgClass: "bg-[#38BDF8]",
@@ -106,6 +73,42 @@ export function HalfFlowerMenu({
             window.dispatchEvent(
               new CustomEvent("invictus:quick-log-water", { detail: { amount: 250 } })
             );
+          },
+        },
+        {
+          id: "log-meal",
+          label: "Log Meal",
+          shortLabel: "Meal",
+          icon: Utensils,
+          bgClass: "bg-[#03D26F]",
+          textClass: "text-[#161514]",
+          borderClass: "border-[#161514]",
+          onClick: () => {
+            window.dispatchEvent(new CustomEvent("invictus:goals-open-portal", { detail: { portal: "nutrition" } }));
+          },
+        },
+        {
+          id: "log-workout",
+          label: "Log Workout",
+          shortLabel: "Workout",
+          icon: Dumbbell,
+          bgClass: "bg-[#CEF431]",
+          textClass: "text-[#161514]",
+          borderClass: "border-[#161514]",
+          onClick: () => {
+            window.dispatchEvent(new CustomEvent("invictus:goals-open-portal", { detail: { portal: "gym" } }));
+          },
+        },
+        {
+          id: "stoic-reflection",
+          label: "Stoic Mood",
+          shortLabel: "Mood",
+          icon: Moon,
+          bgClass: "bg-[#C084FC]",
+          textClass: "text-[#161514]",
+          borderClass: "border-[#161514]",
+          onClick: () => {
+            window.dispatchEvent(new CustomEvent("invictus:goals-open-reflection"));
           },
         },
       ];
@@ -127,23 +130,11 @@ export function HalfFlowerMenu({
           },
         },
         {
-          id: "new-income",
-          label: "Log Income",
-          shortLabel: "Income",
-          icon: TrendingUp,
-          bgClass: "bg-[#03D26F]",
-          textClass: "text-[#161514]",
-          borderClass: "border-[#161514]",
-          onClick: () => {
-            window.dispatchEvent(new CustomEvent("invictus:money-new-income"));
-          },
-        },
-        {
           id: "split-bill",
           label: "Split / IOU",
           shortLabel: "Split",
           icon: Users,
-          bgClass: "bg-[#F59E0B]",
+          bgClass: "bg-[#03D26F]",
           textClass: "text-[#161514]",
           borderClass: "border-[#161514]",
           onClick: () => {
@@ -151,15 +142,27 @@ export function HalfFlowerMenu({
           },
         },
         {
-          id: "transfer",
-          label: "Transfer",
-          shortLabel: "Transfer",
-          icon: ArrowRightLeft,
-          bgClass: "bg-[#C084FC]",
+          id: "cash-till",
+          label: "Cash Refill",
+          shortLabel: "Cash",
+          icon: Wallet,
+          bgClass: "bg-[#38BDF8]",
           textClass: "text-[#161514]",
           borderClass: "border-[#161514]",
           onClick: () => {
-            window.dispatchEvent(new CustomEvent("invictus:money-transfer"));
+            window.dispatchEvent(new CustomEvent("invictus:money-cash-till"));
+          },
+        },
+        {
+          id: "quick-entry",
+          label: "Quick Entry",
+          shortLabel: "Quick",
+          icon: Sparkles,
+          bgClass: "bg-[#F59E0B]",
+          textClass: "text-[#161514]",
+          borderClass: "border-[#161514]",
+          onClick: () => {
+            window.dispatchEvent(new CustomEvent("invictus:money-quick-cash"));
           },
         },
       ];
@@ -236,15 +239,15 @@ export function HalfFlowerMenu({
         },
       },
       {
-        id: "today-habit",
-        label: "New Habit",
-        shortLabel: "Habit",
-        icon: CheckSquare,
+        id: "today-expense",
+        label: "Log Expense",
+        shortLabel: "Expense",
+        icon: Receipt,
         bgClass: "bg-[#03D26F]",
         textClass: "text-[#161514]",
         borderClass: "border-[#161514]",
         onClick: () => {
-          window.dispatchEvent(new CustomEvent("invictus:open-new-habit"));
+          window.dispatchEvent(new CustomEvent("invictus:money-new-expense"));
         },
       },
       {
@@ -262,15 +265,15 @@ export function HalfFlowerMenu({
         },
       },
       {
-        id: "today-expense",
-        label: "Log Expense",
-        shortLabel: "Expense",
-        icon: Receipt,
-        bgClass: "bg-[#F59E0B]",
+        id: "today-reflection",
+        label: "Reflection",
+        shortLabel: "Review",
+        icon: Moon,
+        bgClass: "bg-[#C084FC]",
         textClass: "text-[#161514]",
         borderClass: "border-[#161514]",
         onClick: () => {
-          window.dispatchEvent(new CustomEvent("invictus:money-new-expense"));
+          window.dispatchEvent(new CustomEvent("invictus:today-open-reflection"));
         },
       },
     ];

@@ -223,11 +223,19 @@ function MoneyPageContent() {
     const handleSplit = () => {
       setIsWhoOwesWhoOpen(true);
     };
+    const handleCashTill = () => {
+      setIsCashModalOpen(true);
+    };
+    const handleQuickCash = () => {
+      setIsCashModalOpen(true);
+    };
 
     window.addEventListener("invictus:money-new-expense", handleNewExpense);
     window.addEventListener("invictus:money-new-income", handleNewIncome);
     window.addEventListener("invictus:money-transfer", handleTransfer);
     window.addEventListener("invictus:money-split", handleSplit);
+    window.addEventListener("invictus:money-cash-till", handleCashTill);
+    window.addEventListener("invictus:money-quick-cash", handleQuickCash);
     window.addEventListener("invictus:open-new-transaction", handleNewExpense);
 
     return () => {
@@ -235,6 +243,8 @@ function MoneyPageContent() {
       window.removeEventListener("invictus:money-new-income", handleNewIncome);
       window.removeEventListener("invictus:money-transfer", handleTransfer);
       window.removeEventListener("invictus:money-split", handleSplit);
+      window.removeEventListener("invictus:money-cash-till", handleCashTill);
+      window.removeEventListener("invictus:money-quick-cash", handleQuickCash);
       window.removeEventListener("invictus:open-new-transaction", handleNewExpense);
     };
   }, []);
@@ -868,13 +878,13 @@ function MoneyPageContent() {
               onNavigateToTab={handleTabChange}
             />
 
-            {/* ================= SLOT 4: 4 L2 DOOR TILES (Budgets, IOUs, Vault, Ledger) ================= */}
+            {/* ================= SLOT 4: 4 L2 DOOR TILES (Budgets, Income, Vault, Ledger) ================= */}
             <MoneyDoorTileRow
               monthlyBudget={monthlyStats.totalCombinedBudget || monthlyStats.baseBudget}
               activeIouCount={pendingIous.length}
               currencySymbol={currencySymbol}
               onOpenBudgets={() => handleTabChange("budgets")}
-              onOpenIous={() => handleTabChange("ious")}
+              onOpenIncome={() => setIsAllowanceModalOpen(true)}
               onOpenVault={() => handleTabChange("vault")}
               onOpenLedger={() => setIsLedgerSheetOpen(true)}
             />

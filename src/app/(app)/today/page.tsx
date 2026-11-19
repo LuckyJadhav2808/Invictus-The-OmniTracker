@@ -123,6 +123,17 @@ export default function TodayPage() {
     }
   }, [user]);
 
+  // Contextual Event Listeners for Flower Arc FAB
+  useEffect(() => {
+    const handleOpenReflection = () => {
+      soundFX.playPop();
+      soundFX.vibrate(15);
+      setIsCloseoutDrawerOpen(true);
+    };
+    window.addEventListener("invictus:today-open-reflection", handleOpenReflection);
+    return () => window.removeEventListener("invictus:today-open-reflection", handleOpenReflection);
+  }, []);
+
   const currencySymbol = useMemo(() => {
     switch (currency) {
       case "USD": return "$";

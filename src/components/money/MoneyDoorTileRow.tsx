@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { PiggyBank, Users, ShieldCheck, ReceiptText } from "lucide-react";
+import { PiggyBank, TrendingUp, ShieldCheck, ReceiptText, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
 
@@ -10,9 +10,10 @@ export interface MoneyDoorTileRowProps {
   activeIouCount?: number;
   currencySymbol?: string;
   onOpenBudgets?: () => void;
-  onOpenIous?: () => void;
+  onOpenIncome?: () => void;
   onOpenVault?: () => void;
   onOpenLedger?: () => void;
+  onOpenIous?: () => void;
   // Legacy compatibility props
   onOpenAllowances?: () => void;
   onMoveMoney?: () => void;
@@ -26,9 +27,10 @@ export function MoneyDoorTileRow({
   activeIouCount = 0,
   currencySymbol = "₹",
   onOpenBudgets,
-  onOpenIous,
+  onOpenIncome,
   onOpenVault,
   onOpenLedger,
+  onOpenIous,
   onOpenAllowances,
   onMoveMoney,
   onOpenTemplates,
@@ -47,14 +49,14 @@ export function MoneyDoorTileRow({
       title: "Category Envelopes & Monthly Spend Limits",
     },
     {
-      id: "ious",
-      label: "IOUs",
-      value: activeIouCount > 0 ? `${activeIouCount} Active` : "Split & Debts",
-      icon: Users,
+      id: "income",
+      label: "Income",
+      value: "Allowances",
+      icon: TrendingUp,
       iconColor: "text-amber-600 dark:text-amber-400",
       bgClass: "hover:border-amber-500/50",
-      onClick: onOpenIous || onMoveMoney || (() => {}),
-      title: "Who Owes Who & Group Expense Splits",
+      onClick: onOpenIncome || onOpenAllowances || onOpenIous || (() => {}),
+      title: "Log Monthly Salary, Allowances & Base Budget",
     },
     {
       id: "vault",

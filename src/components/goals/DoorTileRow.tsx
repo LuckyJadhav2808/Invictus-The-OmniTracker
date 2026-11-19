@@ -1,19 +1,20 @@
 "use client";
 
 import React from "react";
-import { Droplet, Dumbbell, Utensils, BarChart2 } from "lucide-react";
+import { Target, Dumbbell, Utensils, BarChart2, Droplet } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
 
 export interface DoorTileRowProps {
-  waterAmount: number;
-  waterTarget: number;
+  waterAmount?: number;
+  waterTarget?: number;
   bodyWeight?: string;
   bodyAge?: string;
-  onOpenWater: () => void;
+  onOpenNewHabit?: () => void;
   onOpenGym?: () => void;
   onOpenNutrition?: () => void;
   onOpenStats?: () => void;
+  onOpenWater?: () => void;
   onOpenBodyProfile?: () => void;
   onOpenReminders?: () => void;
   onOpenRecovery?: () => void;
@@ -21,20 +22,31 @@ export interface DoorTileRowProps {
 }
 
 export function DoorTileRow({
-  waterAmount,
-  waterTarget,
+  waterAmount = 0,
+  waterTarget = 2000,
   bodyWeight = "68 kg",
   bodyAge = "24y",
-  onOpenWater,
+  onOpenNewHabit,
   onOpenGym,
   onOpenNutrition,
   onOpenStats,
+  onOpenWater,
   onOpenBodyProfile,
   onOpenReminders,
   onOpenRecovery,
   className,
 }: DoorTileRowProps) {
   const tiles = [
+    {
+      id: "new-habit",
+      label: "New Habit",
+      value: "Add Routine",
+      icon: Target,
+      iconColor: "text-lime-600 dark:text-[#CEF431]",
+      bgClass: "hover:border-[#CEF431]/60",
+      onClick: onOpenNewHabit || onOpenWater || (() => {}),
+      title: "Create New Atomic Habit or Pick Presets",
+    },
     {
       id: "gym",
       label: "Gym",
@@ -54,16 +66,6 @@ export function DoorTileRow({
       bgClass: "hover:border-amber-500/50",
       onClick: onOpenNutrition || onOpenRecovery || (() => {}),
       title: "Open Nutrition, Calories & Macro Balance",
-    },
-    {
-      id: "water",
-      label: "Water",
-      value: `${waterAmount}/${waterTarget}ml`,
-      icon: Droplet,
-      iconColor: "text-sky-500 fill-sky-500",
-      bgClass: "hover:border-sky-500/50",
-      onClick: onOpenWater,
-      title: "Log Hydration & Daily Water Target",
     },
     {
       id: "stats",
