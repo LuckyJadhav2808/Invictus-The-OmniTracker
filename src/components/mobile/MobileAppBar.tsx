@@ -28,6 +28,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
+import { DynamicIslandDock } from "@/components/shared/DynamicIslandDock";
 import { cn } from "@/lib/utils";
 
 export interface MobileAppBarProps {
@@ -73,13 +74,18 @@ export function MobileAppBar({
       )}
     >
       {/* Left: Title + Date Badge */}
-      <div className="flex items-center gap-2.5 min-w-0">
+      <div className="flex items-center gap-2 min-w-0 shrink-0">
         <h1 className="font-heading font-black text-lg sm:text-xl tracking-tight text-foreground truncate">
           {title}
         </h1>
-        <span className="text-[11px] font-mono font-bold text-muted-foreground bg-secondary px-2 py-0.5 rounded-md border border-border shrink-0">
+        <span className="text-[10px] sm:text-[11px] font-mono font-bold text-muted-foreground bg-secondary px-1.5 sm:px-2 py-0.5 rounded-md border border-border shrink-0">
           {formattedDate}
         </span>
+      </div>
+
+      {/* Center: Dynamic Island Live Activity Dock (Header Integrated) */}
+      <div className="flex-1 flex items-center justify-center min-w-0 px-1">
+        <DynamicIslandDock variant="header" />
       </div>
 
       {/* Right: Max 2 Icons (Calendar + Overflow Menu) */}

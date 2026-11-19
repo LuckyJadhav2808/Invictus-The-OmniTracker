@@ -443,7 +443,7 @@ function GoalsPageContent() {
       : dailyCompletionPercent;
 
   return (
-    <div className="w-full max-w-xl mx-auto pb-28 select-none space-y-2 sm:space-y-3">
+    <div className="w-full max-w-xl mx-auto pb-6 sm:pb-8 select-none space-y-2 sm:space-y-3">
       {/* ================= SLOT 1: SLIM TOP APP BAR (48-56px) ================= */}
       <MobileAppBar
         title="Habits"

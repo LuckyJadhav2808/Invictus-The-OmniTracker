@@ -159,21 +159,17 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
       ? "pomodoro"
       : "ambient";
 
-  // Apple HIG Dynamic Island Law:
-  // On mobile (variant === "mobile"), never float a static ambient pill over interactive content.
-  // Reserve the mobile floating dock strictly for ACTIVE live activities (Gym Rest timer or Pomodoro focus).
-  if (variant === "mobile" && currentMode === "ambient") {
+  // On mobile, show active live activities or ambient telemetry (if not dismissed)
+  if (variant === "mobile" && currentMode === "ambient" && isAmbientDismissed) {
     return null;
   }
 
-  // On desktop (variant === "header"), hide ambient pill if dismissed by user or on initial splash
+  // Hide ambient pill if dismissed by user or on initial splash
   if (
     currentMode === "ambient" &&
     (isAmbientDismissed ||
       pathname === "/today" ||
       pathname === "/" ||
-      pathname?.startsWith("/money") ||
-      pathname?.startsWith("/goals") ||
       pathname?.startsWith("/quick-log"))
   ) {
     return null;
@@ -192,7 +188,7 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
         "select-none transition-all duration-300 ease-out",
         variant === "header"
           ? "relative flex items-center justify-center"
-          : "lg:hidden fixed bottom-20 left-1/2 -translate-x-1/2 z-40"
+          : "lg:hidden fixed top-2.5 left-1/2 -translate-x-1/2 z-50 pointer-events-auto"
       )}
       role="region"
       aria-label="Live Activity Dynamic Island"
@@ -332,7 +328,7 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
             "bg-white dark:bg-[#1C1A18] rounded-2xl border border-[#E8E5DF] dark:border-[#383531] shadow-2xl p-4 sm:p-5 space-y-3.5 animate-in fade-in-0 zoom-in-95 duration-200 z-50",
             variant === "header"
               ? "absolute top-full mt-2 left-1/2 -translate-x-1/2 w-[390px] max-w-[92vw]"
-              : "fixed bottom-20 left-1/2 -translate-x-1/2 w-[calc(100vw-28px)] max-w-md"
+              : "fixed top-14 left-1/2 -translate-x-1/2 w-[calc(100vw-28px)] max-w-md"
           )}
         >
           {/* Header Bar */}

@@ -110,7 +110,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Minimalist Production Status Footer */}
-        <footer className={cn("mt-auto border-t border-[#E8E5DF] dark:border-[#2A2724] py-3 px-4 sm:px-6 lg:pr-64 flex-col sm:flex-row items-center justify-between max-w-6xl mx-auto w-full text-[#8C8882] dark:text-[#A8A29E] text-[11px] font-medium gap-2 sm:gap-4 select-none transition-colors", pathname.startsWith("/goals") ? "hidden lg:flex" : "flex")}>
+        <footer className="mt-auto border-t border-[#E8E5DF] dark:border-[#2A2724] py-3 px-4 sm:px-6 lg:pr-64 flex flex-col sm:flex-row items-center justify-between max-w-6xl mx-auto w-full text-[#8C8882] dark:text-[#A8A29E] text-[11px] font-medium gap-2 sm:gap-4 select-none transition-colors">
           <div className="flex items-center justify-center sm:justify-start gap-2">
             <span className="font-heading font-bold text-[#161514] dark:text-[#FAF8F5]">Invictus OS</span>
             <span>•</span>
