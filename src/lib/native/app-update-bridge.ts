@@ -79,7 +79,12 @@ export const NativeAppUpdater = {
         });
       }
 
-      const res = await AppUpdateBridge.downloadAndInstallApk({ url: safeUrl });
+      // Append cache-buster so neither local HTTP stack nor proxy serves a stale APK
+      const cacheBuster = `cb=${Date.now()}`;
+      const sep = safeUrl.includes("?") ? "&" : "?";
+      const downloadTargetUrl = `${safeUrl}${sep}${cacheBuster}`;
+
+      const res = await AppUpdateBridge.downloadAndInstallApk({ url: downloadTargetUrl });
       return res;
     } finally {
       if (progressListener && typeof progressListener.remove === "function") {

@@ -138,20 +138,19 @@ Download \`Invictus.apk\` below and tap to install/update seamlessly.
     console.log(`  ✅ Verified APK bytecode contains authentic version '${version}' (${validation.packageName})`);
     apkBuffer = fs.readFileSync(apkPath);
   } else {
-    // Download the latest compiled APK from the release v1.2.0 where CI uploaded it
-    console.log("  ⬇️ Local APK not found. Fetching CI-compiled APK from release v1.2.0 asset...");
-    const ciAssetRes = await fetch(`https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/download/v1.2.0/Invictus.apk`);
-    if (!ciAssetRes.ok) {
-      throw new Error(`Failed to download compiled APK from CI release asset [${ciAssetRes.status}]`);
+    console.log(`  ⬇️ Local APK not found for v${version}. Attempting to pull latest compiled CI artifact...`);
+    const { execSync } = await import("node:child_process");
+    try {
+      execSync("node scripts/sync-compiled-apk.mjs", { stdio: "inherit" });
+      if (fs.existsSync(candidates[0])) {
+        apkBuffer = fs.readFileSync(candidates[0]);
+      }
+    } catch (syncErr) {
+      throw new Error(`Failed to automatically sync compiled APK for v${version}: ${syncErr.message}`);
     }
-    const arrayBuffer = await ciAssetRes.arrayBuffer();
-    apkBuffer = Buffer.from(arrayBuffer);
-    console.log(`  ✓ Successfully fetched CI-compiled APK (${(apkBuffer.length / (1024 * 1024)).toFixed(2)} MB)`);
-    
-    // Save to local build path so it's cached
-    const dir = path.dirname(apkPath);
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(apkPath, apkBuffer);
+    if (!apkBuffer) {
+      throw new Error(`Compiled APK for v${version} was not found locally or in recent CI builds.`);
+    }
   }
 
   // 5. Check if Invictus.apk is already attached to this release

@@ -62,41 +62,7 @@ export async function GET(request: Request) {
       console.warn("Self-hosted manifest lookup skipped DB, using static version config:", dbErr);
     }
 
-    // 2. Check local self-hosted public/downloads/Invictus.apk
-    const localApkPath = path.join(process.cwd(), "public", "downloads", "Invictus.apk");
-    const localFileExists = fs.existsSync(localApkPath);
-    if (localFileExists) {
-      if (!apkDownloadUrl || apkDownloadUrl.includes("github.com") || apkDownloadUrl === "/api/download/android") {
-        apkDownloadUrl = "/downloads/Invictus.apk";
-      }
-      if (!apkSizeBytes) {
-        try {
-          const stat = fs.statSync(localApkPath);
-          apkSizeBytes = stat.size;
-        } catch {}
-      }
-      if (!apkSha256) {
-        try {
-          const fileBuf = fs.readFileSync(localApkPath);
-          apkSha256 = crypto.createHash("sha256").update(fileBuf).digest("hex");
-        } catch {}
-      }
-    }
-
-    // Check version.json if sha256 still empty
-    if (!apkSha256) {
-      try {
-        const versionJsonPath = path.join(process.cwd(), "public", "version.json");
-        if (fs.existsSync(versionJsonPath)) {
-          const vData = JSON.parse(fs.readFileSync(versionJsonPath, "utf8"));
-          if (vData.apk?.sha256) {
-            apkSha256 = vData.apk.sha256;
-          }
-        }
-      } catch {}
-    }
-
-    // 3. Resolve absolute server origin for native mobile bridges (Guarantees protocol)
+    // 2. Resolve absolute server origin for native mobile bridges (Guarantees protocol)
     const reqUrl = new URL(request.url);
     const forwardedHost = request.headers.get("x-forwarded-host");
     const forwardedProto = request.headers.get("x-forwarded-proto") || "https";
@@ -117,10 +83,51 @@ export async function GET(request: Request) {
       releaseNotes = APP_VERSION_CONFIG.changelog;
     }
 
-    // If local file is missing on this server instance (e.g. Vercel serverless), point directly to the exact target release APK
-    if (!localFileExists && (!apkDownloadUrl || apkDownloadUrl.includes("/downloads/Invictus.apk"))) {
+    // 3. Check local self-hosted public/downloads/Invictus.apk & verify bytecode version parity
+    const localApkPath = path.join(process.cwd(), "public", "downloads", "Invictus.apk");
+    const localFileExists = fs.existsSync(localApkPath);
+    let localApkMatchesTarget = false;
+
+    // Check version.json for verified APK metadata
+    try {
+      const versionJsonPath = path.join(process.cwd(), "public", "version.json");
+      if (fs.existsSync(versionJsonPath)) {
+        const vData = JSON.parse(fs.readFileSync(versionJsonPath, "utf8"));
+        if (vData.apk?.binaryVersion === effectiveTargetVersion && vData.apk?.isVersionVerified !== false) {
+          localApkMatchesTarget = true;
+        }
+        if (vData.apk?.sha256 && !apkSha256) {
+          apkSha256 = vData.apk.sha256;
+        }
+        if (vData.apk?.sizeBytes && !apkSizeBytes) {
+          apkSizeBytes = vData.apk.sizeBytes;
+        }
+      }
+    } catch {}
+
+    // Only serve local APK if it genuinely exists AND matches the target version
+    if (localFileExists && localApkMatchesTarget) {
+      if (!apkDownloadUrl || apkDownloadUrl.includes("github.com") || apkDownloadUrl === "/api/download/android") {
+        apkDownloadUrl = "/downloads/Invictus.apk";
+      }
+      if (!apkSizeBytes) {
+        try {
+          const stat = fs.statSync(localApkPath);
+          apkSizeBytes = stat.size;
+        } catch {}
+      }
+      if (!apkSha256) {
+        try {
+          const fileBuf = fs.readFileSync(localApkPath);
+          apkSha256 = crypto.createHash("sha256").update(fileBuf).digest("hex");
+        } catch {}
+      }
+    } else {
+      // Local file is either missing or stale! Route directly to the immutable GitHub Release binary
       apkDownloadUrl = `https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v${effectiveTargetVersion}/Invictus.apk`;
-    } else if (apkDownloadUrl && apkDownloadUrl.startsWith("/")) {
+    }
+
+    if (apkDownloadUrl && apkDownloadUrl.startsWith("/")) {
       apkDownloadUrl = `${serverOrigin}${apkDownloadUrl}`;
     }
 

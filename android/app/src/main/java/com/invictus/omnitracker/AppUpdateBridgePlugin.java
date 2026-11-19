@@ -98,9 +98,13 @@ public class AppUpdateBridgePlugin extends Plugin {
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setConnectTimeout(25000);
                 connection.setReadTimeout(60000);
+                connection.setUseCaches(false);
+                connection.setDefaultUseCaches(false);
                 connection.setRequestProperty("User-Agent", APP_USER_AGENT);
                 connection.setRequestProperty("Accept", "*/*");
                 connection.setRequestProperty("Accept-Encoding", "identity");
+                connection.setRequestProperty("Cache-Control", "no-cache, no-store, must-revalidate");
+                connection.setRequestProperty("Pragma", "no-cache");
                 connection.connect();
 
                 int responseCode = connection.getResponseCode();
@@ -119,9 +123,13 @@ public class AppUpdateBridgePlugin extends Plugin {
                         connection = (HttpURLConnection) url.openConnection();
                         connection.setConnectTimeout(25000);
                         connection.setReadTimeout(60000);
+                        connection.setUseCaches(false);
+                        connection.setDefaultUseCaches(false);
                         connection.setRequestProperty("User-Agent", APP_USER_AGENT);
                         connection.setRequestProperty("Accept", "*/*");
                         connection.setRequestProperty("Accept-Encoding", "identity");
+                        connection.setRequestProperty("Cache-Control", "no-cache, no-store, must-revalidate");
+                        connection.setRequestProperty("Pragma", "no-cache");
                         connection.connect();
                         responseCode = connection.getResponseCode();
                     }
@@ -194,6 +202,17 @@ public class AppUpdateBridgePlugin extends Plugin {
 
                 if (downloadedVersionCode < currentVersionCode) {
                     call.reject("Downloaded APK (v" + packageInfo.versionName + ", build " + downloadedVersionCode + ") is older than your installed app (build " + currentVersionCode + "). Update aborted to prevent invalid package downgrade.");
+                    return;
+                }
+
+                if (downloadedVersionCode == currentVersionCode && 
+                    packageInfo.versionName != null && 
+                    packageInfo.versionName.equals(currentAppInfo.versionName)) {
+                    JSObject ret = new JSObject();
+                    ret.put("success", true);
+                    ret.put("alreadyUpToDate", true);
+                    ret.put("message", "Invictus is already running the latest version (v" + packageInfo.versionName + ").");
+                    call.resolve(ret);
                     return;
                 }
 

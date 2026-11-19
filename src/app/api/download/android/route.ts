@@ -18,9 +18,21 @@ export async function GET(request: Request) {
     let directDownloadUrl = `https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v${targetVer}/Invictus.apk`;
     let sha256 = "";
 
-    // 1. Check local self-hosted public/downloads/Invictus.apk first (100% GitHub-free)
+    // 1. Check local self-hosted public/downloads/Invictus.apk (only if verified to match requested version)
     const localApkPath = path.join(process.cwd(), "public", "downloads", "Invictus.apk");
-    if (fs.existsSync(localApkPath)) {
+    let localApkMatchesTarget = false;
+    try {
+      const versionJsonPath = path.join(process.cwd(), "public", "version.json");
+      if (fs.existsSync(versionJsonPath)) {
+        const vData = JSON.parse(fs.readFileSync(versionJsonPath, "utf8"));
+        if (vData.apk?.binaryVersion === targetVer && vData.apk?.isVersionVerified !== false) {
+          localApkMatchesTarget = true;
+          if (vData.apk?.sha256) sha256 = vData.apk.sha256;
+        }
+      }
+    } catch {}
+
+    if (fs.existsSync(localApkPath) && localApkMatchesTarget) {
       directDownloadUrl = "/downloads/Invictus.apk";
     }
 

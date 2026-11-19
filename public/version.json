@@ -1,46 +1,46 @@
 {
   "application": "Invictus Life OS & Omni-Tracker",
-  "version": "1.8.0",
-  "buildNumber": 31,
+  "version": "1.8.1",
+  "buildNumber": 32,
   "channel": "stable",
-  "releaseDate": "November 4, 2026",
+  "releaseDate": "November 19, 2026",
   "minSupportedVersion": "1.0.0",
   "git": {
-    "commitHash": "e94a84d3324b0d026e3ca38f053ca58cea7e1e6a",
-    "shortHash": "e94a84d",
+    "commitHash": "4a2273c10db3fdfda561989ffb5438864d0f50a9",
+    "shortHash": "4a2273c",
     "branch": "main",
     "commitAuthor": "Lucky Manoj Jadhav",
-    "commitDate": "2026-11-04 17:19:24 +0530",
-    "commitMessage": "fix(release): compile authentic v1.8.0 APK binary (build 31) and synchronize checksums across registry"
+    "commitDate": "2026-11-19 13:49:50 +0530",
+    "commitMessage": "feat(release): bump version to v1.8.1, sync login telemetry, optimize mobile performance, and complete app-wide text unslop"
   },
   "apk": {
     "exists": true,
     "isVersionVerified": true,
-    "binaryVersion": "1.8.0",
+    "binaryVersion": "1.8.1",
     "fileName": "Invictus.apk",
-    "sha256": "bd1620ac8389bd3464dfda12abf08a23a91ab308d33c5d5b2634bb9b718b8209",
-    "sizeBytes": 4400558,
-    "sizeFormatted": "4.20 MB",
+    "sha256": "76ded46cd28aba69edf9144df61685961bf7054fc8fe2c67668cc28ea7c619fc",
+    "sizeBytes": 4418750,
+    "sizeFormatted": "4.21 MB",
     "directDownloadUrl": "https://invictus-the-omni-tracker.vercel.app/downloads/Invictus.apk",
-    "githubReleaseAssetUrl": "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v1.8.0/Invictus.apk"
+    "githubReleaseAssetUrl": "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v1.8.1/Invictus.apk"
   },
   "changelog": [
+    "🌅 Unified Daily Command Deck & Chronological Agenda: Streamlined Today cockpit with 7-day horizon scrubber, live Strobi companion directives, Safe Spend pacing, and morning/workload/evening agenda groups",
+    "⚡ High-Performance Mobile Runtime & Dynamic Code Splitting: Lazy-loaded heavy offscreen modals and analytics views, enabled link prefetching for 0ms tab transitions, and eliminated DOM mutation observation overhead",
+    "🎨 Dark Mode Contrast & App-Wide Text Hygiene: Hardened semantic dark theme tokens across all cockpit buttons and chips, eliminating roleplay jargon across all workspaces in favor of calm, high-utility production copy",
     "🏛️ Sovereign Roman Monolith Asset Synchronizer: Unified Roman Monolith 'I' geometry across Web, PWA, and Android launcher mipmaps, adaptive foregrounds, splash screens, widget previews, and notification silhouettes",
-    "💎 Financial Cockpit & Wallet Architecture: Slashed vertical height by 65%, removed visual clutter, introduced a 34px high-speed horizontal category wallet filter rail, and isolated the floating calculator",
-    "🔔 Proactive Calm Reminder Banner: Replaced fluorescent yellow modal with calm #1C1A18 obsidian HUD, persistent localStorage dismissals, and non-intrusive timing",
-    "⚡ Production Database Scaling: Added MongoDB connection pooling (maxPoolSize: 10, minPoolSize: 2, socketTimeoutMS: 45000), compound ESR indexes (userId + isExpense + date), and eliminated the N+1 findOne query loop",
-    "📦 Resilient In-App APK Updater: Version Dump Engine with direct self-hosted streaming, multi-hop redirect resolution, and zero-404 air-gapped GitHub fallback"
+    "💎 Financial Cockpit & Wallet Architecture: Slashed vertical height by 65%, removed visual clutter, introduced a 34px high-speed horizontal category wallet filter rail, and isolated the floating calculator"
   ],
   "links": {
     "repoUrl": "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker",
     "latestReleaseUrl": "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/latest",
     "inAppDownloadUrl": "https://invictus-the-omni-tracker.vercel.app/downloads/Invictus.apk",
-    "githubAssetDownloadUrl": "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v1.8.0/Invictus.apk"
+    "githubAssetDownloadUrl": "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v1.8.1/Invictus.apk"
   },
   "environment": {
     "nodeVersion": "v24.12.0",
     "platform": "win32",
     "arch": "x64",
-    "generatedAt": "2026-11-04T11:54:48.216Z"
+    "generatedAt": "2026-11-19T08:35:45.730Z"
   }
 }

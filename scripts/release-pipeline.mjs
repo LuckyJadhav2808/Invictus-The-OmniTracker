@@ -195,7 +195,11 @@ async function main() {
   fs.writeFileSync(tempZip, zipBuffer);
 
   fs.mkdirSync(tempExtract, { recursive: true });
-  execSync(`powershell -Command "Expand-Archive -Path '${tempZip}' -DestinationPath '${tempExtract}' -Force"`);
+  try {
+    execSync(`tar -xf "${tempZip}" -C "${tempExtract}"`);
+  } catch {
+    execSync(`powershell -Command "Expand-Archive -Path '${tempZip}' -DestinationPath '${tempExtract}' -Force"`);
+  }
 
   const apkFile = fs.readdirSync(tempExtract).find((f) => f.endsWith(".apk"));
   if (!apkFile) {

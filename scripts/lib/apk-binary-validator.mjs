@@ -21,16 +21,23 @@ export function extractManifestStringsFromApk(apkPath) {
   }
 
   const tempDir = path.join(process.cwd(), `.temp-apk-inspect-${Date.now()}`);
-  const tempZip = path.join(process.cwd(), `.temp-apk-${Date.now()}.zip`);
 
   try {
-    fs.copyFileSync(apkPath, tempZip);
     fs.mkdirSync(tempDir, { recursive: true });
 
-    execSync(
-      `powershell -Command "Expand-Archive -Path '${tempZip}' -DestinationPath '${tempDir}' -Force"`,
-      { stdio: "ignore" }
-    );
+    // Extract only AndroidManifest.xml for sub-200ms performance
+    try {
+      execSync(`tar -xf "${apkPath}" -C "${tempDir}" AndroidManifest.xml`, { stdio: "ignore" });
+    } catch {
+      if (process.platform === "win32") {
+        execSync(
+          `powershell -Command "Expand-Archive -Path '${apkPath}' -DestinationPath '${tempDir}' -Force"`,
+          { stdio: "ignore" }
+        );
+      } else {
+        execSync(`unzip -q -o "${apkPath}" AndroidManifest.xml -d "${tempDir}"`, { stdio: "ignore" });
+      }
+    }
 
     const manifestPath = path.join(tempDir, "AndroidManifest.xml");
     if (!fs.existsSync(manifestPath)) {
@@ -71,9 +78,6 @@ export function extractManifestStringsFromApk(apkPath) {
   } catch (err) {
     return { exists: true, strings: [], error: err.message };
   } finally {
-    if (fs.existsSync(tempZip)) {
-      try { fs.unlinkSync(tempZip); } catch {}
-    }
     if (fs.existsSync(tempDir)) {
       try { fs.rmSync(tempDir, { recursive: true, force: true }); } catch {}
     }

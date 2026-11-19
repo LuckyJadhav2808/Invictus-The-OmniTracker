@@ -7,6 +7,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import { execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -115,6 +116,13 @@ function bump(target) {
   tsContent = tsContent.replace(/releaseDate:\s*"[^"]+"/, `releaseDate: "${today}"`);
   fs.writeFileSync(versionConfigPath, tsContent);
   console.log("  ✓ Updated src/config/version.ts");
+
+  // 4. Synchronize version dump telemetry
+  try {
+    execSync("node scripts/version-dump.mjs", { cwd: rootDir, stdio: "inherit" });
+  } catch (dumpErr) {
+    console.warn("  ⚠️ Version dump skipped:", dumpErr.message);
+  }
 
   console.log(`\n🎉 Success! Invictus synchronized to v${newVer} (Build ${newBuild})`);
 }

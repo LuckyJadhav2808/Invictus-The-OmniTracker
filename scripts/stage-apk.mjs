@@ -77,9 +77,15 @@ async function main() {
   const sizeBytes = fileBuffer.length;
   const sizeMB = (sizeBytes / (1024 * 1024)).toFixed(2);
 
-  // 5. Read version info from package.json
+  // 5. Read version info from package.json and build.gradle
   const pkg = JSON.parse(fs.readFileSync(path.join(rootDir, "package.json"), "utf8"));
   const version = pkg.version;
+  let buildNumber = 32;
+  try {
+    const gradle = fs.readFileSync(path.join(rootDir, "android", "app", "build.gradle"), "utf8");
+    const m = gradle.match(/versionCode\s+(\d+)/);
+    if (m) buildNumber = parseInt(m[1], 10);
+  } catch {}
 
   console.log("\n✨ APK Staged Successfully for Self-Hosted Distribution:");
   console.log(`  • Target File:    public/downloads/Invictus.apk`);
@@ -114,7 +120,7 @@ async function main() {
           {
             $set: {
               version,
-              buildNumber: 23,
+              buildNumber,
               releaseDate: new Date().toISOString(),
               channel: "stable",
               apkDownloadUrl: "/downloads/Invictus.apk",
