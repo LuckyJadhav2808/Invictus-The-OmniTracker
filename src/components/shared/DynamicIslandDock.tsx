@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import {
   Timer,
@@ -23,9 +23,13 @@ import { cn } from "@/lib/utils";
 
 interface DynamicIslandDockProps {
   variant?: "header" | "mobile";
+  floatOnScroll?: boolean;
 }
 
-export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps) {
+export function DynamicIslandDock({
+  variant = "header",
+  floatOnScroll = true,
+}: DynamicIslandDockProps) {
   const router = useRouter();
   const pathname = usePathname();
 
@@ -53,6 +57,42 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
   const islandRef = useRef<HTMLDivElement>(null);
   const prevGymSecondsRef = useRef<number | null>(null);
   const prevPomoSecondsRef = useRef<number | null>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  // Scroll detection to elevate Dynamic Island into floating state when user scrolls
+  useEffect(() => {
+    if (!floatOnScroll) return;
+
+    const checkScroll = () => {
+      const container = document.getElementById("main-scroll-container");
+      const containerScroll = container ? container.scrollTop : 0;
+      const windowScroll =
+        typeof window !== "undefined"
+          ? window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0
+          : 0;
+      const scrollPos = Math.max(containerScroll, windowScroll);
+      setIsScrolled(scrollPos > 20);
+    };
+
+    checkScroll();
+
+    const container = document.getElementById("main-scroll-container");
+    if (container) {
+      container.addEventListener("scroll", checkScroll, { passive: true });
+    }
+    window.addEventListener("scroll", checkScroll, { passive: true });
+    document.addEventListener("scroll", checkScroll, { passive: true });
+
+    return () => {
+      if (container) {
+        container.removeEventListener("scroll", checkScroll);
+      }
+      window.removeEventListener("scroll", checkScroll);
+      document.removeEventListener("scroll", checkScroll);
+    };
+  }, [floatOnScroll, pathname]);
+
+  const isFloating = (floatOnScroll && isScrolled) || variant === "mobile";
 
   // 1. Unified Background Ticker Loop for Live Activities
   useEffect(() => {
@@ -194,16 +234,22 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
       className={cn(
         "select-none transition-all duration-300 ease-out",
         variant === "header"
-          ? "relative flex items-center justify-center"
+          ? "relative flex items-center justify-center min-w-0"
           : "lg:hidden fixed top-2.5 left-1/2 -translate-x-1/2 z-50 pointer-events-auto"
       )}
       role="region"
       aria-label="Live Activity Dynamic Island"
     >
+      {/* Ghost layout placeholder inside header when floating to preserve header balance */}
+      {isFloating && variant === "header" && (
+        <div className="h-8 w-24 sm:w-32 invisible pointer-events-none shrink-0" aria-hidden="true" />
+      )}
+
       {/* ================= COMPACT PILL MODE ================= */}
       {!isExpanded && (
         <div
           role="button"
+          data-slot="dynamic-island-pill"
           tabIndex={0}
           onClick={handlePillClick}
           onKeyDown={(e) => {
@@ -213,12 +259,16 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
             }
           }}
           className={cn(
-            "group h-8 px-3 py-1 rounded-full border flex items-center gap-2 cursor-pointer shadow-xs",
-            "hover:border-[#161514]/20 dark:hover:border-white/20 transition-all duration-200 shrink-0",
+            "group h-8 px-3 py-1 rounded-full flex items-center gap-2 cursor-pointer shrink-0 select-none transition-all duration-300 ease-out motion-reduce:transition-none",
+            isFloating
+              ? "fixed top-2 sm:top-2.5 left-1/2 -translate-x-1/2 z-50 pointer-events-auto border-2 border-[#161514] dark:border-[#38332E] shadow-[0_8px_24px_rgba(0,0,0,0.35)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.7)] backdrop-blur-md scale-[1.03]"
+              : "relative border shadow-xs hover:border-[#161514]/20 dark:hover:border-white/20",
             currentMode === "gym_rest"
               ? "bg-[#161514] text-white border-neutral-700"
               : currentMode === "pomodoro"
               ? "bg-[#161514] text-white border-neutral-700"
+              : isFloating
+              ? "bg-[#FAF8F5]/95 dark:bg-[#161514]/95 text-[#161514] dark:text-[#FAF8F5]"
               : "bg-[#F1EFEA] dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] border-[#E8E5DF] dark:border-[#383531]"
           )}
         >
@@ -331,11 +381,12 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
       {/* ================= EXPANDED HUD MODE ================= */}
       {isExpanded && (
         <div
+          data-slot="dynamic-island-hud"
           className={cn(
-            "bg-white dark:bg-[#1C1A18] rounded-2xl border border-[#E8E5DF] dark:border-[#383531] shadow-2xl p-4 sm:p-5 space-y-3.5 animate-in fade-in-0 zoom-in-95 duration-200 z-50",
-            variant === "header"
-              ? "absolute top-full mt-2 left-1/2 -translate-x-1/2 w-[390px] max-w-[92vw]"
-              : "fixed top-14 left-1/2 -translate-x-1/2 w-[calc(100vw-28px)] max-w-md"
+            "bg-white dark:bg-[#1C1A18] rounded-2xl border-2 border-[#161514] dark:border-[#38332E] shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#000000] p-4 sm:p-5 space-y-3.5 animate-in fade-in-0 zoom-in-95 duration-200 z-50",
+            isFloating
+              ? "fixed top-14 left-1/2 -translate-x-1/2 w-[calc(100vw-28px)] max-w-md"
+              : "absolute top-full mt-2 left-1/2 -translate-x-1/2 w-[390px] max-w-[92vw]"
           )}
         >
           {/* Header Bar */}

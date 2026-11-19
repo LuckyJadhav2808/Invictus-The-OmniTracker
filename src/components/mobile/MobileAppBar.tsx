@@ -84,9 +84,9 @@ export function MobileAppBar({
         </span>
       </div>
 
-      {/* Center: Dynamic Island Live Activity Dock (Header Integrated) */}
-      <div className="flex-1 flex items-center justify-center min-w-0 px-1">
-        <DynamicIslandDock variant="header" />
+      {/* Center: Dynamic Island Live Activity Dock (Header Integrated, Floats on Scroll) */}
+      <div className="flex-1 flex items-center justify-center min-w-0 px-1 h-8">
+        <DynamicIslandDock variant="header" floatOnScroll={true} />
       </div>
 
       {/* Right: Max 2 Icons (Calendar + Overflow Menu) */}
