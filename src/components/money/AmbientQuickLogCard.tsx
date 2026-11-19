@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Zap, Smartphone, CheckCircle2, Sliders, ArrowUpRight } from "lucide-react";
+import { Zap, Smartphone, CheckCircle2, Sliders, ArrowUpRight, Bell, ShieldCheck, ToggleLeft, ToggleRight, Sparkles } from "lucide-react";
 import { NativeQuickLogBridge } from "@/lib/native/quick-log-bridge";
 import { soundFX } from "@/components/shared/SoundFX";
 import { toast } from "sonner";
@@ -18,6 +18,7 @@ export function AmbientQuickLogCard({
 }: AmbientQuickLogCardProps) {
   const [isEnabled, setIsEnabled] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [hasNotifPermission, setHasNotifPermission] = useState<boolean | null>(null);
   const isNative = NativeQuickLogBridge.isSupported();
 
   useEffect(() => {
@@ -36,16 +37,35 @@ export function AmbientQuickLogCard({
     soundFX.playPop();
     const nextState = !isEnabled;
     if (nextState && NativeQuickLogBridge.isSupported()) {
-      await NativeQuickLogBridge.requestNotificationPermission();
+      const granted = await NativeQuickLogBridge.requestNotificationPermission();
+      setHasNotifPermission(granted);
     }
     setIsEnabled(nextState);
     await NativeQuickLogBridge.setAmbientDockEnabled(nextState);
 
     if (nextState) {
-      toast.success("Ambient Quick-Log Dock pinned to Notification Shade! ⚡");
+      toast.success("Notification Logger Active! ⚡", {
+        description: "Pinned live safe spend dock to Android Notification Shade.",
+      });
       await NativeQuickLogBridge.syncBudgetTelemetry(safeDailyPace);
     } else {
-      toast.info("Ambient Quick-Log Dock unpinned from Notification Shade.");
+      toast.info("Notification Logger Unpinned", {
+        description: "Removed ambient dock from Android Notification Shade.",
+      });
+    }
+  };
+
+  const handleRequestPermission = async () => {
+    soundFX.playClick();
+    const granted = await NativeQuickLogBridge.requestNotificationPermission();
+    setHasNotifPermission(granted);
+    if (granted) {
+      toast.success("Notification Permission Granted! 🔔");
+      await NativeQuickLogBridge.syncBudgetTelemetry(safeDailyPace);
+    } else {
+      toast.error("Permission not granted", {
+        description: "Please allow notifications in Android App Info settings.",
+      });
     }
   };
 
@@ -63,19 +83,24 @@ export function AmbientQuickLogCard({
   };
 
   return (
-    <div className="bg-[#FAF8F5] dark:bg-[#1A1816] border-2 border-[#161514] dark:border-[#38332E] rounded-2xl p-4 sm:p-5 shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] space-y-4">
-      {/* Header */}
+    <div className="bg-[#FAF8F5] dark:bg-[#1A1816] border-2 border-[#161514] dark:border-[#38332E] rounded-3xl p-5 sm:p-6 shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] space-y-5">
+      {/* 1. Header Section */}
       <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-2.5">
-          <div className="size-9 rounded-xl bg-[#161514] text-[#CEF431] flex items-center justify-center shrink-0 shadow-2xs">
-            <Zap className="size-4.5 stroke-[2.2]" />
+        <div className="flex items-center gap-3">
+          <div className="size-10 rounded-2xl bg-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:text-[#161514] border-2 border-[#161514] flex items-center justify-center shrink-0 shadow-2xs">
+            <Zap className="size-5 stroke-[2.4]" />
           </div>
           <div>
-            <h3 className="text-sm font-black text-[#161514] dark:text-[#FAF8F5] tracking-tight">
-              Ambient Zero-App Quick-Log
-            </h3>
-            <p className="text-xs text-[#161514]/60 dark:text-[#FAF8F5]/60 font-medium">
-              Notification shade dock &amp; floating micro-dialog
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm sm:text-base font-black text-[#161514] dark:text-[#FAF8F5] tracking-tight font-heading">
+                Notification Logger &amp; Android Tile
+              </h3>
+              <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[9px] font-mono font-black uppercase bg-[#DCFAE5] text-[#04250e] border border-[#03D26F]/40">
+                Native
+              </span>
+            </div>
+            <p className="text-xs text-[#161514]/70 dark:text-[#FAF8F5]/60 font-sans font-medium">
+              Zero-app overhead: log expenses from notification shade or Quick Settings tile.
             </p>
           </div>
         </div>
@@ -83,7 +108,7 @@ export function AmbientQuickLogCard({
         {/* Live Badge */}
         <span
           className={cn(
-            "inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono font-black border uppercase tracking-wider tabular-nums",
+            "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[10px] font-mono font-black border uppercase tracking-wider tabular-nums shrink-0 shadow-2xs",
             isEnabled
               ? "bg-[#CEF431] text-[#161514] border-[#161514]"
               : "bg-stone-200 dark:bg-stone-800 text-[#161514]/60 dark:text-[#FAF8F5]/60 border-[#161514]/20"
@@ -95,60 +120,88 @@ export function AmbientQuickLogCard({
               isEnabled ? "bg-[#161514] animate-pulse" : "bg-stone-400"
             )}
           />
-          {isEnabled ? "Shade Dock Active" : "Disabled"}
+          {isEnabled ? "Shade Dock ON" : "Muted"}
         </span>
       </div>
 
-      {/* Telemetry pill */}
-      <div className="bg-white dark:bg-[#121110] border border-[#161514]/20 dark:border-white/10 rounded-xl p-3 flex items-center justify-between gap-2">
-        <div className="space-y-0.5">
-          <span className="text-[10px] font-black uppercase text-[#161514]/60 dark:text-[#FAF8F5]/60 block tracking-wider">
-            Live Telemetry Pushed to Shade
-          </span>
-          <span className="text-xs font-mono font-bold text-[#161514] dark:text-[#FAF8F5]">
-            Remaining Safe Spend: {currencySymbol}{Math.round(safeDailyPace).toLocaleString()}/day
-          </span>
+      {/* 2. Notification Logger Dock Toggle Box */}
+      <div className="bg-white dark:bg-[#121110] border-2 border-[#161514] dark:border-[#38332E] rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <Bell className="size-4 text-amber-500 stroke-[2.2]" />
+            <span className="text-xs font-black uppercase text-[#161514] dark:text-[#FAF8F5] font-heading tracking-wide">
+              Persistent Notification Logger
+            </span>
+          </div>
+          <p className="text-[11px] text-[#161514]/70 dark:text-[#FAF8F5]/60 font-sans">
+            Pins a silent 1-tap card in your pull-down shade showing:
+          </p>
+          <div className="inline-flex items-center gap-1.5 bg-[#FAF8F5] dark:bg-[#1C1A18] px-2.5 py-1 rounded-lg border border-[#161514]/20 dark:border-white/10 font-mono text-xs font-bold text-[#161514] dark:text-[#FAF8F5]">
+            <span>⚡ Safe Spend Remaining:</span>
+            <span className="text-emerald-600 dark:text-[#03D26F]">
+              {currencySymbol}{Math.round(safeDailyPace).toLocaleString()}
+            </span>
+          </div>
         </div>
 
         <button
+          type="button"
           onClick={handleToggle}
           className={cn(
-            "px-3 py-1.5 rounded-lg text-xs font-black border transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs",
+            "px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider border-2 transition-all cursor-pointer flex items-center gap-2 shadow-2xs active:scale-95 shrink-0",
             isEnabled
-              ? "bg-[#161514] text-white border-[#161514] dark:bg-white dark:text-[#161514]"
-              : "bg-white dark:bg-[#161514] text-[#161514] dark:text-white border-[#161514]/40"
+              ? "bg-[#161514] text-[#CEF431] border-[#161514] dark:bg-[#CEF431] dark:text-[#161514] dark:border-[#CEF431]"
+              : "bg-white dark:bg-[#161514] text-[#161514] dark:text-white border-[#161514] dark:border-[#38332E]"
           )}
         >
-          {isEnabled ? "Enabled" : "Enable"}
+          {isEnabled ? "Dock Enabled" : "Enable Dock"}
         </button>
       </div>
 
-      {/* Feature Bullet Points & Test Trigger */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
-        <div className="text-[11px] text-[#161514]/75 dark:text-[#FAF8F5]/75 space-y-1">
-          <p className="flex items-center gap-1.5">
-            <CheckCircle2 className="size-3 text-emerald-600 shrink-0" />
-            <span>Pull down notification shade or Quick Settings tile anytime.</span>
-          </p>
-          <p className="flex items-center gap-1.5">
-            <CheckCircle2 className="size-3 text-emerald-600 shrink-0" />
-            <span>Floating micro-dialog opens over whatever app you are using.</span>
-          </p>
-          <p className="flex items-center gap-1.5">
-            <CheckCircle2 className="size-3 text-emerald-600 shrink-0" />
-            <span>Log expenses with mechanical numpad in under 1.5 seconds.</span>
-          </p>
+      {/* 3. Android Quick Settings Tile ("Beside WiFi & Bluetooth") */}
+      <div className="bg-white dark:bg-[#121110] border-2 border-[#161514] dark:border-[#38332E] rounded-2xl p-4 space-y-3 shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <Smartphone className="size-4 text-sky-500 stroke-[2.2]" />
+            <span className="text-xs font-black uppercase text-[#161514] dark:text-[#FAF8F5] font-heading tracking-wide">
+              Native Android Quick Settings Button
+            </span>
+          </div>
+          <span className="px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-[#F1EFEA] dark:bg-[#252220] border border-[#161514]/20 text-[#161514] dark:text-[#FAF8F5]">
+            Beside Wi-Fi &amp; Bluetooth
+          </span>
         </div>
 
-        <button
-          onClick={handleTestTrigger}
-          disabled={isSyncing}
-          className="px-3.5 py-2 rounded-xl text-xs font-black bg-[#CEF431] hover:bg-[#bce028] text-[#161514] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
-        >
-          <Smartphone className="size-3.5 stroke-[2.2]" />
-          <span>Test Micro-Dialog</span>
-          <ArrowUpRight className="size-3" />
-        </button>
+        <div className="bg-[#FAF8F5] dark:bg-[#1A1816] rounded-xl p-3 border border-[#161514]/15 dark:border-white/10 space-y-2 text-xs text-[#161514]/80 dark:text-[#FAF8F5]/80">
+          <p className="font-bold flex items-center gap-1.5 text-foreground">
+            <Sparkles className="size-3.5 text-amber-500 shrink-0" />
+            <span>How to add to your Android Quick Settings bar:</span>
+          </p>
+          <ol className="list-decimal list-inside space-y-1 text-[11px] font-sans leading-relaxed pl-1 text-[#161514]/70 dark:text-[#FAF8F5]/70">
+            <li>Swipe down <strong>twice</strong> from the top of your Android screen (next to Wi-Fi, Bluetooth &amp; Torch).</li>
+            <li>Tap the <strong>Edit / Pencil icon (✏️)</strong> in the pull-down control center.</li>
+            <li>Scroll down and drag the <strong>&quot;+ Log Expense&quot;</strong> tile into your active top row!</li>
+          </ol>
+        </div>
+
+        {/* Action Row: Test Trigger & Permission Check */}
+        <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1">
+          <p className="text-[11px] text-muted-foreground font-sans">
+            Tapping the tile pops the translucent micro-dialog over any open app.
+          </p>
+
+          <button
+            type="button"
+            onClick={handleTestTrigger}
+            disabled={isSyncing}
+            className="px-3.5 py-2 rounded-xl text-xs font-black bg-[#CEF431] hover:bg-[#bce028] text-[#161514] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
+            title="Launch translucent micro-dialog"
+          >
+            <Zap className="size-3.5 fill-[#161514] text-[#161514]" />
+            <span>Test Micro-Dialog ⚡</span>
+            <ArrowUpRight className="size-3" />
+          </button>
+        </div>
       </div>
     </div>
   );

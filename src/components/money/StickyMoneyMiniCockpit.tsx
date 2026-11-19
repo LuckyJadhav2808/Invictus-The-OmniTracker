@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import { Plus, ArrowUp, Zap, Wallet } from "lucide-react";
 import { soundFX } from "@/components/shared/SoundFX";
 import { cn } from "@/lib/utils";
-import { StrobiCompanion } from "@/components/mascot/StrobiCompanion";
 
 export interface StickyMoneyMiniCockpitProps {
   visible?: boolean;
@@ -101,12 +100,6 @@ export function StickyMoneyMiniCockpit({
       <div className="bg-white dark:bg-[#161514] border-2 border-[#161514] dark:border-[#38332E] rounded-2xl px-3.5 sm:px-4 py-1.5 sm:py-2 shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] flex items-center justify-between gap-2 sm:gap-4">
         {/* 1. Left: Remaining Budget Telemetry */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-          <StrobiCompanion
-            size={26}
-            gear="money"
-            state={remainingBudget <= 0 ? "fire" : "idle"}
-            onClick={handleAddTx}
-          />
           <div className="inline-flex items-center gap-1 bg-[#DCFAE5] dark:bg-[#04250e] text-[#04250e] dark:text-[#A7F3D0] font-mono font-medium text-xs px-2 py-0.5 rounded-lg border border-[#03D26F]/30">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#03D26F] opacity-75" />

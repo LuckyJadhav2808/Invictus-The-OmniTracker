@@ -38,6 +38,7 @@ import { TodayTopHabitsMomentum } from "@/components/today/TodayTopHabitsMomentu
 import { StickyIslandMiniCockpit } from "@/components/today/StickyIslandMiniCockpit";
 import { FirstRunQuickStartDeck } from "@/components/today/FirstRunQuickStartDeck";
 import { useTodayCockpitViewModel, computeDailyConquestScore } from "@/components/today/useTodayCockpitViewModel";
+import { useSyncNativeQuickLogs } from "@/lib/native/useSyncNativeQuickLogs";
 
 // Dynamic imports for heavy drawers and modals to optimize mobile initial bundle & navigation
 const TodayQuickExpenseModal = dynamic(
@@ -314,6 +315,9 @@ export default function TodayPage() {
       currencySymbol,
     });
   }, [transactions, categories, currentDateObj, baseUpiBudget, baseCashBudget, enableRollover, currencySymbol]);
+
+  // ⚡ Bi-Directional Native Android Ambient Quick-Log Sync
+  useSyncNativeQuickLogs(budgetStats.dailySafeToSpend);
 
   // Derived Daily Conquest Telemetry
   const conquestMetrics = useMemo(() => {

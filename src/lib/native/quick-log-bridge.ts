@@ -2,11 +2,22 @@
 
 import { Capacitor, registerPlugin } from "@capacitor/core";
 
+export interface PendingQuickExpense {
+  id: string;
+  amount: number;
+  category: string;
+  note: string;
+  date?: string;
+  timestamp?: number;
+}
+
 export interface QuickLogBridgePluginType {
-  syncBudgetTelemetry(options: { safeToSpend: number }): Promise<{ success: boolean; safeToSpend: number }>;
+  syncBudgetTelemetry(options: { safeToSpend: number; userId?: string }): Promise<{ success: boolean; safeToSpend: number }>;
   setAmbientDockEnabled(options: { enabled: boolean }): Promise<{ success: boolean; enabled: boolean }>;
   isAmbientDockEnabled(): Promise<{ enabled: boolean }>;
   launchQuickLogDialog(): Promise<{ success: boolean }>;
+  getPendingExpenses(): Promise<{ success: boolean; expenses: PendingQuickExpense[] }>;
+  clearPendingExpenses(): Promise<{ success: boolean }>;
 }
 
 const QuickLogBridge = registerPlugin<QuickLogBridgePluginType>("QuickLogBridge");
@@ -26,10 +37,11 @@ export const NativeQuickLogBridge = {
     return Capacitor.isNativePlatform() && Capacitor.getPlatform() === "android";
   },
 
-  async syncBudgetTelemetry(safeToSpend: number): Promise<{ success: boolean; safeToSpend: number }> {
+  async syncBudgetTelemetry(safeToSpend: number, userId?: string): Promise<{ success: boolean; safeToSpend: number }> {
     const storage = getLocalStorage();
     if (storage) {
       storage.setItem("invictus_ambient_dock_budget", String(safeToSpend));
+      if (userId) storage.setItem("invictus_ambient_user_id", userId);
     }
 
     if (!this.isSupported()) {
@@ -37,7 +49,7 @@ export const NativeQuickLogBridge = {
     }
 
     try {
-      return await QuickLogBridge.syncBudgetTelemetry({ safeToSpend });
+      return await QuickLogBridge.syncBudgetTelemetry({ safeToSpend, userId });
     } catch (err) {
       console.warn("[QuickLogBridge] syncBudgetTelemetry native fallback", err);
       return { success: false, safeToSpend };
@@ -92,6 +104,34 @@ export const NativeQuickLogBridge = {
       const res = await QuickLogBridge.launchQuickLogDialog();
       return res.success;
     } catch {
+      return false;
+    }
+  },
+
+  async getPendingExpenses(): Promise<PendingQuickExpense[]> {
+    if (!this.isSupported()) {
+      return [];
+    }
+
+    try {
+      const res = await QuickLogBridge.getPendingExpenses();
+      return res?.expenses || [];
+    } catch (err) {
+      console.warn("[QuickLogBridge] getPendingExpenses failed", err);
+      return [];
+    }
+  },
+
+  async clearPendingExpenses(): Promise<boolean> {
+    if (!this.isSupported()) {
+      return true;
+    }
+
+    try {
+      const res = await QuickLogBridge.clearPendingExpenses();
+      return res?.success ?? true;
+    } catch (err) {
+      console.warn("[QuickLogBridge] clearPendingExpenses failed", err);
       return false;
     }
   },

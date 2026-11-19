@@ -1581,6 +1581,14 @@ export default function SettingsPage() {
                 </button>
               </div>
             </div>
+
+            {/* Ambient Zero-App Quick-Log & Pull-Down Notification Shade Configuration */}
+            <div className="border-t border-[#E8E5DF] dark:border-[#2A2724] pt-4">
+              <AmbientQuickLogCard
+                safeDailyPace={cloudBudgetPrefs?.customDailyBudget || 657}
+                currencySymbol={currencySymbol}
+              />
+            </div>
           </div>
         )}
 

@@ -51,4 +51,13 @@ describe("NativeQuickLogBridge", () => {
     const isEnabledAgain = await NativeQuickLogBridge.isAmbientDockEnabled();
     expect(isEnabledAgain).toBe(true);
   });
+
+  it("should handle getPendingExpenses and clearPendingExpenses gracefully in fallback mode", async () => {
+    const pending = await NativeQuickLogBridge.getPendingExpenses();
+    expect(Array.isArray(pending)).toBe(true);
+    expect(pending.length).toBe(0);
+
+    const cleared = await NativeQuickLogBridge.clearPendingExpenses();
+    expect(cleared).toBe(true);
+  });
 });

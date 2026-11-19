@@ -179,7 +179,7 @@ export const MasterTodayHero = React.memo(function MasterTodayHero({
                 <button
                   type="button"
                   onClick={() => handleInteractiveClick(onOpenScratchpad)}
-                  className="px-2.5 py-1 rounded-lg border-2 border-[#161514] dark:border-[#38332E] bg-secondary text-secondary-foreground text-2xs font-mono font-bold shadow-2xs hover:bg-[#CEF431] dark:hover:bg-[#CEF431] dark:hover:text-[#161514] transition-colors cursor-pointer"
+                  className="px-2.5 py-1 rounded-lg border-2 border-[#161514] dark:border-[#38332E] bg-[#F1EFEA] dark:bg-[#25221F] text-[#161514] dark:text-[#FAF8F5] text-2xs font-mono font-bold shadow-2xs hover:bg-[#CEF431] dark:hover:bg-[#CEF431] dark:hover:text-[#161514] transition-colors cursor-pointer"
                   title="Open Scratchpad (⌘J)"
                 >
                   <FileText className="size-3 inline-block mr-1 stroke-[2]" />
@@ -190,7 +190,7 @@ export const MasterTodayHero = React.memo(function MasterTodayHero({
                 <button
                   type="button"
                   onClick={() => handleInteractiveClick(onOpenCloseoutDrawer)}
-                  className="px-2.5 py-1 rounded-lg border-2 border-[#161514] dark:border-[#38332E] bg-secondary text-secondary-foreground text-2xs font-mono font-bold shadow-2xs hover:bg-[#CEF431] dark:hover:bg-[#CEF431] dark:hover:text-[#161514] transition-colors cursor-pointer"
+                  className="px-2.5 py-1 rounded-lg border-2 border-[#161514] dark:border-[#38332E] bg-[#F1EFEA] dark:bg-[#25221F] text-[#161514] dark:text-[#FAF8F5] text-2xs font-mono font-bold shadow-2xs hover:bg-[#CEF431] dark:hover:bg-[#CEF431] dark:hover:text-[#161514] transition-colors cursor-pointer"
                   title="Evening Review"
                 >
                   <Moon className="size-3 inline-block mr-1 stroke-[2]" />

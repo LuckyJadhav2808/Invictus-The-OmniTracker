@@ -6,7 +6,6 @@ import { Zap, Play, Pause, ArrowUp, Plus, Clock } from "lucide-react";
 import { type DailyConquestMetrics } from "@/components/today/useTodayCockpitViewModel";
 import { soundFX } from "@/components/shared/SoundFX";
 import { cn } from "@/lib/utils";
-import { StrobiCompanion } from "@/components/mascot/StrobiCompanion";
 
 interface StickyIslandMiniCockpitProps {
   metrics: DailyConquestMetrics;
@@ -71,16 +70,15 @@ export function StickyIslandMiniCockpit({
       <div className="bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#38332E] rounded-2xl px-3 sm:px-4 py-1.5 sm:py-2 shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] flex items-center justify-between gap-2 sm:gap-4">
         {/* 1. Left: Overall Progress Score + Date */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-          <StrobiCompanion
-            size={28}
-            state={metrics.overallScore >= 100 ? "celebrate" : isTimerRunning ? "focus" : "idle"}
-            gear="tasks"
+          <button
+            type="button"
             onClick={handleTopClick}
-          />
-          <div className="inline-flex items-center gap-1 bg-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:text-[#161514] border-2 border-[#161514] font-mono font-black text-xs px-2.5 py-0.5 rounded-xl shadow-2xs">
+            className="inline-flex items-center gap-1 bg-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:text-[#161514] border-2 border-[#161514] font-mono font-black text-xs px-2.5 py-0.5 rounded-xl shadow-2xs hover:opacity-90 active:scale-95 transition-all cursor-pointer"
+            title="Scroll to top"
+          >
             <Zap className="size-3 text-[#CEF431] dark:text-[#161514] stroke-[3]" />
             <span className="tabular-nums font-black">{metrics.overallScore}%</span>
-          </div>
+          </button>
 
           <span className="font-mono font-bold text-xs text-foreground whitespace-nowrap hidden xs:inline">
             {format(currentDateObj, "EEE, MMM d")}

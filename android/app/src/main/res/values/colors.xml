@@ -12,4 +12,6 @@
     <color name="widget_accent_emerald">#037A48</color>
     <color name="widget_accent_amber">#D97706</color>
     <color name="widget_accent_red">#B42318</color>
+    <color name="widget_btn_bg">#F1EFEA</color>
+    <color name="widget_btn_pressed">#E8E5DF</color>
 </resources>

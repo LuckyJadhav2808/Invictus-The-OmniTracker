@@ -147,7 +147,7 @@ export const TodayCommandDeck = React.memo(function TodayCommandDeck({
 
           {/* Streak Shield */}
           {streakFreezeTokens > 0 && (
-            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 border-[#161514] dark:border-[#38332E] bg-secondary text-xs font-heading font-bold text-foreground shadow-2xs">
+            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 border-[#161514] dark:border-[#38332E] bg-[#F1EFEA] dark:bg-[#25221F] text-xs font-heading font-bold text-[#161514] dark:text-[#FAF8F5] shadow-2xs">
               <Shield className="size-3.5 text-muted-foreground" />
               <span>{streakFreezeTokens}</span>
             </div>
@@ -158,7 +158,7 @@ export const TodayCommandDeck = React.memo(function TodayCommandDeck({
             <button
               type="button"
               onClick={() => handleActionClick(onOpenScratchpad)}
-              className="px-3 py-1.5 rounded-xl border-2 border-[#161514] dark:border-[#38332E] bg-secondary text-secondary-foreground text-xs font-heading font-black shadow-2xs hover:bg-[#CEF431] hover:text-[#161514] dark:hover:bg-[#CEF431] dark:hover:text-[#161514] transition-all cursor-pointer active:scale-95"
+              className="px-3 py-1.5 rounded-xl border-2 border-[#161514] dark:border-[#38332E] bg-[#F1EFEA] dark:bg-[#25221F] text-[#161514] dark:text-[#FAF8F5] text-xs font-heading font-black shadow-2xs hover:bg-[#CEF431] hover:text-[#161514] dark:hover:bg-[#CEF431] dark:hover:text-[#161514] transition-all cursor-pointer active:scale-95"
               title="Open Scratchpad (⌘J)"
             >
               <FileText className="size-3.5 inline-block mr-1 stroke-[2]" />
@@ -171,7 +171,7 @@ export const TodayCommandDeck = React.memo(function TodayCommandDeck({
             <button
               type="button"
               onClick={() => handleActionClick(onOpenCloseoutDrawer)}
-              className="px-3 py-1.5 rounded-xl border-2 border-[#161514] dark:border-[#38332E] bg-secondary text-secondary-foreground text-xs font-heading font-black shadow-2xs hover:bg-[#CEF431] hover:text-[#161514] dark:hover:bg-[#CEF431] dark:hover:text-[#161514] transition-all cursor-pointer active:scale-95"
+              className="px-3 py-1.5 rounded-xl border-2 border-[#161514] dark:border-[#38332E] bg-[#F1EFEA] dark:bg-[#25221F] text-[#161514] dark:text-[#FAF8F5] text-xs font-heading font-black shadow-2xs hover:bg-[#CEF431] hover:text-[#161514] dark:hover:bg-[#CEF431] dark:hover:text-[#161514] transition-all cursor-pointer active:scale-95"
               title="Daily Review & Closeout"
             >
               <Moon className="size-3.5 inline-block mr-1 stroke-[2]" />

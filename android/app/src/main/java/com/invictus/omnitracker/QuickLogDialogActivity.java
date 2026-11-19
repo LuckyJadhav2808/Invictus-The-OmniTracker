@@ -273,6 +273,26 @@ public class QuickLogDialogActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         prefs.edit().putFloat("safe_to_spend", (float) updatedRemaining).apply();
 
+        // Queue pending quick log for in-app state synchronization
+        try {
+            org.json.JSONArray pendingArray;
+            String pendingRaw = prefs.getString("pending_quick_logs", "[]");
+            pendingArray = new org.json.JSONArray(pendingRaw);
+
+            JSONObject txObj = new JSONObject();
+            txObj.put("id", "tx_native_" + System.currentTimeMillis());
+            txObj.put("amount", finalAmount);
+            txObj.put("category", finalCategory);
+            txObj.put("note", finalNote);
+            txObj.put("date", todayDate);
+            txObj.put("timestamp", System.currentTimeMillis());
+
+            pendingArray.put(txObj);
+            prefs.edit().putString("pending_quick_logs", pendingArray.toString()).apply();
+        } catch (Exception e) {
+            Log.w(TAG, "Failed to queue pending quick log locally", e);
+        }
+
         // Update Notification Shade balance
         QuickLogNotificationManager.showAmbientNotification(this, updatedRemaining);
 
@@ -288,8 +308,9 @@ public class QuickLogDialogActivity extends AppCompatActivity {
 
     private void dispatchToCloud(double amount, String category, String note, String date) {
         try {
+            SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
             SharedPreferences smsPrefs = getSharedPreferences(SMS_PREFS_NAME, Context.MODE_PRIVATE);
-            String targetUserId = smsPrefs.getString("userId", DEFAULT_USER_ID);
+            String targetUserId = prefs.getString("userId", smsPrefs.getString("userId", DEFAULT_USER_ID));
             String targetEndpoint = smsPrefs.getString("endpoint", SYNC_ENDPOINT);
 
             JSONObject payload = new JSONObject();

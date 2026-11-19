@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import { Plus, ArrowUp, Flame, Sparkles } from "lucide-react";
 import { soundFX } from "@/components/shared/SoundFX";
 import { cn } from "@/lib/utils";
-import { StrobiCompanion } from "@/components/mascot/StrobiCompanion";
 
 export interface StickyHabitsMiniCockpitProps {
   visible?: boolean;
@@ -107,12 +106,6 @@ export function StickyHabitsMiniCockpit({
           onClick={handleScrollTop}
           className="flex items-center gap-2 cursor-pointer hover:opacity-85 transition-opacity"
         >
-          <StrobiCompanion
-            size={28}
-            state={isAllConquered ? "celebrate" : longestStreak >= 3 ? "fire" : "idle"}
-            gear="fitness"
-            onClick={onOpenNewHabit}
-          />
           {/* Mini Ring Badge */}
           <div
             className={cn(

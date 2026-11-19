@@ -188,7 +188,7 @@ export function WalletCardDeck({
     if (diff === 0) {
       // Front active card
       return {
-        zIndex: 30,
+        zIndex: 4,
         transform: `translate3d(${dragOffset}px, 0, 0) rotate(${dragOffset * 0.03}deg) scale(1)`,
         opacity: 1,
         pointerEvents: "auto",
@@ -199,7 +199,7 @@ export function WalletCardDeck({
       const peekX = 18;
       const extraPull = dragOffset < 0 ? Math.min(10, Math.abs(dragOffset) * 0.15) : 0;
       return {
-        zIndex: 20,
+        zIndex: 3,
         transform: `translate3d(${peekX - extraPull}px, 0, 0) scale(0.96)`,
         opacity: 0.88,
         pointerEvents: "auto",
@@ -209,7 +209,7 @@ export function WalletCardDeck({
       // 2nd stacked card peeking further
       const peekX = 32;
       return {
-        zIndex: 10,
+        zIndex: 2,
         transform: `translate3d(${peekX}px, 0, 0) scale(0.92)`,
         opacity: 0.5,
         pointerEvents: "auto",
@@ -218,7 +218,7 @@ export function WalletCardDeck({
     } else {
       // Hidden tucked behind
       return {
-        zIndex: 0,
+        zIndex: 1,
         transform: `translate3d(40px, 0, 0) scale(0.88)`,
         opacity: 0,
         pointerEvents: "none",

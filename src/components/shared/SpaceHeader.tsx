@@ -168,7 +168,7 @@ export function SpaceHeader() {
   const subrouteInfo = getSubrouteInfo(pathname);
 
   return (
-    <header className="sticky top-0 z-30 w-full bg-white/80 dark:bg-[#161514]/85 backdrop-blur-md border-b border-[#E8E5DF] dark:border-[#2A2724] select-none transition-colors">
+    <header className={cn("sticky top-0 w-full bg-white/80 dark:bg-[#161514]/85 backdrop-blur-md border-b border-[#E8E5DF] dark:border-[#2A2724] select-none transition-colors", isProfileMenuOpen ? "z-[60]" : "z-40")}>
       {/* Optional Announcement Banner */}
       {announcement && announcement.message && !dismissedAnn && (
         <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] px-4 py-2 text-xs font-medium border-b border-[#E8E5DF] dark:border-[#2A2724] flex items-center justify-between transition-colors">
@@ -320,10 +320,10 @@ export function SpaceHeader() {
             {isProfileMenuOpen && (
               <>
                 <div
-                  className="fixed inset-0 z-40"
+                  className="fixed inset-0 z-50"
                   onClick={() => setIsProfileMenuOpen(false)}
                 />
-                <div className="absolute right-0 mt-1.5 w-56 bg-white dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] shadow-xl rounded-xl py-1 z-50 animate-in fade-in-50 zoom-in-95">
+                <div className="absolute right-0 mt-1.5 w-56 bg-white dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#38332E] shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#000000] rounded-xl py-1 z-[60] animate-in fade-in-50 zoom-in-95">
                   <div className="px-3 py-2 border-b border-[#E8E5DF] dark:border-[#2A2724]">
                     <p className="text-xs font-medium text-[#161514] dark:text-[#FAF8F5] truncate">
                       {user?.displayName || "Invictus User"}
