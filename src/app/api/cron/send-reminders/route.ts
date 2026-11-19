@@ -90,29 +90,7 @@ async function handleCronReminders(req: NextRequest) {
           });
         }
 
-        // 3. Study Session & PYQ Check-in
-        if (sub.studyEnabled && isReminderDue(sub.studyTime, "study")) {
-          const key = `study_${todayDateStr}`;
-          notificationsToSend.push({
-            key,
-            title: "📚 Study Session & PYQ Check-in!",
-            body: "Log your study hours and PYQs solved today in Study Space.",
-            url: "/study",
-          });
-        }
-
-        // 4. Morning Exam Prep & Syllabus Review
-        if (sub.examEnabled && isReminderDue(sub.examTime, "exam")) {
-          const key = `exam_${todayDateStr}`;
-          notificationsToSend.push({
-            key,
-            title: "⚡ Review Today's Exam Syllabus Targets!",
-            body: "Stay ahead of your target date. Review study topics in Study Space.",
-            url: "/study",
-          });
-        }
-
-        // 5. Debt Due Date Reminders (Checked in morning slot around 09:00 - 10:00 or current slot)
+        // 3. Debt Due Date Reminders (Checked in morning slot around 09:00 - 10:00 or current slot)
         if (sub.userId && sub.userId !== "guest") {
           try {
             const pendingDebts = await DebtModel.find({

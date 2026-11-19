@@ -13,14 +13,6 @@ export interface SubrouteInfo {
  * Returns null if the pathname is a root-level primary space.
  */
 export function getSubrouteInfo(pathname: string): SubrouteInfo | null {
-  if (pathname.startsWith("/study/") && pathname !== "/study") {
-    const parts = pathname.split("/").filter(Boolean);
-    if (parts.length > 2) {
-      return { parentHref: `/study/${parts[1]}`, parentLabel: "Subject" };
-    }
-    return { parentHref: "/study", parentLabel: "Study" };
-  }
-
   if (pathname.startsWith("/goals/") && pathname !== "/goals") {
     return { parentHref: "/goals", parentLabel: "Habits" };
   }

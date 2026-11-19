@@ -12,10 +12,6 @@ export interface IPushSubscription extends Document {
   moneyTime: string;
   habitsEnabled: boolean;
   habitsTime: string;
-  studyEnabled: boolean;
-  studyTime: string;
-  examEnabled: boolean;
-  examTime: string;
   soundEnabled: boolean;
   lastSentKeys: Record<string, string>;
   createdAt: Date;
@@ -35,10 +31,6 @@ const PushSubscriptionSchema = new Schema<IPushSubscription>(
     moneyTime: { type: String, default: "20:00" },
     habitsEnabled: { type: Boolean, default: false },
     habitsTime: { type: String, default: "21:00" },
-    studyEnabled: { type: Boolean, default: false },
-    studyTime: { type: String, default: "18:00" },
-    examEnabled: { type: Boolean, default: false },
-    examTime: { type: String, default: "10:00" },
     soundEnabled: { type: Boolean, default: true },
     lastSentKeys: { type: Schema.Types.Mixed, default: {} },
   },

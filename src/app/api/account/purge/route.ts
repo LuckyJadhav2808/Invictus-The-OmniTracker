@@ -9,9 +9,6 @@ import { Diet } from "@/models/Diet";
 import { Macros } from "@/models/Macros";
 import { Transaction } from "@/models/Transaction";
 import { Category } from "@/models/Category";
-import { Subject } from "@/models/Subject";
-import { Topic } from "@/models/Topic";
-import { StudySession } from "@/models/StudySession";
 import { MoodLog } from "@/models/MoodLog";
 import { SavingsGoal } from "@/models/SavingsGoal";
 import { Subscription } from "@/models/Subscription";
@@ -57,9 +54,6 @@ export async function POST(req: Request) {
       Macros.deleteMany(query),
       Transaction.deleteMany(query),
       Category.deleteMany(query),
-      Subject.deleteMany(query),
-      Topic.deleteMany(query),
-      StudySession.deleteMany(query),
       MoodLog.deleteMany(query),
       SavingsGoal.deleteMany(query),
       Subscription.deleteMany(query),

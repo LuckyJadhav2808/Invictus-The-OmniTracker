@@ -6,8 +6,6 @@ import {
   Flame,
   Shield,
   Plus,
-  Play,
-  Pause,
   FileText,
   Moon,
   Sparkles,
@@ -41,12 +39,6 @@ export interface TodayCommandDeckProps {
   dailySafeToSpend: number;
   currencySymbol: string;
   onOpenQuickExpense: () => void;
-  // Focus timer
-  todayStudyMinutes: number;
-  studyTargetHours?: number;
-  isTimerRunning: boolean;
-  stopwatchSeconds: number;
-  onToggleTimer: () => void;
   // Quick Drawers
   onOpenScratchpad?: () => void;
   onOpenCloseoutDrawer?: () => void;
@@ -75,11 +67,6 @@ export const TodayCommandDeck = React.memo(function TodayCommandDeck({
   dailySafeToSpend,
   currencySymbol,
   onOpenQuickExpense,
-  todayStudyMinutes,
-  studyTargetHours = 4.0,
-  isTimerRunning,
-  stopwatchSeconds,
-  onToggleTimer,
   onOpenScratchpad,
   onOpenCloseoutDrawer,
   className,
@@ -87,7 +74,6 @@ export const TodayCommandDeck = React.memo(function TodayCommandDeck({
   // Strobi state
   const getStrobiState = (): StrobiState => {
     if (allHabitsConquered && totalHabitsCount > 0) return "celebrate";
-    if (isTimerRunning) return "focus";
     const hour = new Date().getHours();
     if (hour >= 23 || hour < 5) return "sleep";
     if (streakDays >= 3) return "fire";
@@ -101,14 +87,6 @@ export const TodayCommandDeck = React.memo(function TodayCommandDeck({
     if (totalCount === 0) return 100;
     return Math.min(100, Math.round((completedCount / totalCount) * 100));
   }, [completedCount, totalCount]);
-
-  const todayStudyHours = (todayStudyMinutes / 60).toFixed(1);
-
-  const formatTimerDigits = (totalSeconds: number) => {
-    const mins = Math.floor(totalSeconds / 60);
-    const secs = totalSeconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-  };
 
   const handleActionClick = (cb?: () => void) => {
     soundFX.playPop();
@@ -260,36 +238,23 @@ export const TodayCommandDeck = React.memo(function TodayCommandDeck({
               </span>
             </div>
 
-            {/* Sector 3: Deep Work */}
+            {/* Sector 3: Active Streak */}
             <div className="min-w-0">
               <span className="text-[11px] sm:text-xs font-heading font-bold text-muted-foreground uppercase tracking-wider block truncate">
-                Deep Work
+                Streak
               </span>
-              <div className="flex items-center justify-between gap-1 mt-1">
-                <span className="font-heading font-black text-base sm:text-xl text-foreground tabular-nums truncate">
-                  {isTimerRunning ? formatTimerDigits(stopwatchSeconds) : `${todayStudyHours}h`}
+              <div className="flex items-baseline gap-1 mt-1">
+                <span className="font-heading font-black text-base sm:text-xl text-foreground tabular-nums">
+                  {streakDays}d
                 </span>
-                <button
-                  type="button"
-                  onClick={() => handleActionClick(onToggleTimer)}
-                  className={cn(
-                    "size-6 rounded-lg border-2 border-[#161514] dark:border-[#38332E] flex items-center justify-center transition-colors cursor-pointer shadow-2xs active:scale-95 shrink-0",
-                    isTimerRunning
-                      ? "bg-amber-400 text-[#161514] dark:bg-amber-400 dark:text-[#161514]"
-                      : "bg-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:text-[#161514]"
-                  )}
-                  title={isTimerRunning ? "Pause Focus Timer" : "Start Focus Timer"}
-                >
-                  {isTimerRunning ? (
-                    <Pause className="size-3 fill-current" />
-                  ) : (
-                    <Play className="size-3 fill-current ml-0.5" />
-                  )}
-                </button>
+                <span className="text-[11px] sm:text-xs font-heading font-bold text-amber-500">
+                  🔥
+                </span>
               </div>
               <span className="text-[11px] sm:text-xs font-sans font-medium text-muted-foreground block truncate mt-1">
-                <span className="sm:hidden">{studyTargetHours.toFixed(1)}h goal</span>
-                <span className="hidden sm:inline">{studyTargetHours.toFixed(1)}h daily goal</span>
+                {streakFreezeTokens > 0
+                  ? `${streakFreezeTokens} shield${streakFreezeTokens > 1 ? "s" : ""} left`
+                  : "Preserve today"}
               </span>
             </div>
           </div>
@@ -300,8 +265,6 @@ export const TodayCommandDeck = React.memo(function TodayCommandDeck({
             <p className="font-heading font-bold text-xs sm:text-sm text-foreground line-clamp-2 leading-snug">
               {strobiState === "celebrate"
                 ? "All caught up for today! Outstanding focus and discipline."
-                : isTimerRunning
-                ? "Deep focus sprint in progress. Stay in the zone!"
                 : pendingCount > 0
                 ? `${pendingCount} ${pendingCount === 1 ? "task" : "tasks"} remaining today. Keep the momentum going!`
                 : "Ready when you are. Check off your first task to ignite momentum!"}

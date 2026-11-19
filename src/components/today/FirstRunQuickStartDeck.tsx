@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { Wallet, CheckSquare, GraduationCap, X, Check, ArrowRight } from "lucide-react";
+import { Wallet, CheckSquare, Kanban, X, Check, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
 import { triggerHaptic } from "@/lib/native/haptics";
@@ -11,9 +11,8 @@ interface FirstRunQuickStartDeckProps {
   totalHabitsCount: number;
   completedHabitsCount: number;
   hasBudgetOrExpenses: boolean;
-  hasStudySessions: boolean;
+  hasTasks?: boolean;
   onOpenDailyLimitModal: () => void;
-  onStartStudySprint: () => void;
 }
 
 const FIRST_RUN_DISMISSED_KEY = "invictus_first_run_dismissed";
@@ -22,9 +21,8 @@ export function FirstRunQuickStartDeck({
   totalHabitsCount,
   completedHabitsCount,
   hasBudgetOrExpenses,
-  hasStudySessions,
+  hasTasks = false,
   onOpenDailyLimitModal,
-  onStartStudySprint,
 }: FirstRunQuickStartDeckProps) {
   const [isDismissed, setIsDismissed] = useState(true);
   const [mounted, setMounted] = useState(false);
@@ -62,21 +60,17 @@ export function FirstRunQuickStartDeck({
         href: "/goals?action=quick-habit",
       },
       {
-        id: "study",
-        title: "Start First Focus Sprint",
-        subtitle: "Launch a 25-minute Pomodoro timer or log study",
-        completed: hasStudySessions,
-        actionLabel: "Start Timer",
-        icon: GraduationCap,
-        accent: "bg-[#C084FC] text-[#161514]",
-        onClick: () => {
-          soundFX.playPop();
-          triggerHaptic("light");
-          onStartStudySprint();
-        },
+        id: "tasks",
+        title: "Capture First Task",
+        subtitle: "Add your top priority task or project deliverable",
+        completed: hasTasks,
+        actionLabel: "View Tasks",
+        icon: Kanban,
+        accent: "bg-[#F59E0B] text-[#161514]",
+        href: "/tasks",
       },
     ];
-  }, [hasBudgetOrExpenses, totalHabitsCount, hasStudySessions, onOpenDailyLimitModal, onStartStudySprint]);
+  }, [hasBudgetOrExpenses, totalHabitsCount, hasTasks, onOpenDailyLimitModal]);
 
   const completedCount = steps.filter((s) => s.completed).length;
   const progressPercent = Math.round((completedCount / steps.length) * 100);

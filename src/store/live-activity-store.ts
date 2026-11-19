@@ -190,7 +190,7 @@ export const useLiveActivityStore = create<LiveActivityStoreState>()(
             totalSeconds,
             isPaused: false,
             targetEndTime,
-            subjectName: subjectName || (phase === "focus" ? "Deep Study" : "Quick Break"),
+            subjectName: subjectName || (phase === "focus" ? "Deep Focus" : "Quick Break"),
             phase,
           },
         });

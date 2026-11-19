@@ -49,14 +49,6 @@ export async function POST(req: NextRequest) {
       title = "🔥 Keep Your Habit Streaks Glowing!";
       messageBody = "Don't lose your streak! Check off today's habits in Life Space.";
       url = "/goals";
-    } else if (type === "study") {
-      title = "📚 Study Session & PYQ Check-in!";
-      messageBody = "Log your study hours and PYQs solved today in Study Space.";
-      url = "/study";
-    } else if (type === "exam") {
-      title = "⚡ Review Today's Exam Syllabus Targets!";
-      messageBody = "Stay ahead of your target date. Review study topics in Study Space.";
-      url = "/study";
     }
 
     const payload = JSON.stringify({

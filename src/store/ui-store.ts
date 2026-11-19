@@ -9,8 +9,8 @@ const getLocalSystemToday = (): string => {
   return `${year}-${month}-${day}`;
 };
 
-type ActiveTab = "today" | "goals" | "study" | "money" | "tasks" | "profile";
-type ActiveTracker = "life" | "study" | "money" | "tasks";
+type ActiveTab = "today" | "goals" | "money" | "tasks" | "profile";
+type ActiveTracker = "life" | "money" | "tasks";
 type HabitLayoutStyle = "cards" | "compact" | "matrix";
 type WidgetVariantStyle = "classic" | "expanded" | "dark";
 

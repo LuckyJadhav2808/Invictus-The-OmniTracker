@@ -2,7 +2,7 @@
 
 import React from "react";
 import { format } from "date-fns";
-import { Zap, Play, Pause, ArrowUp, Plus, Clock } from "lucide-react";
+import { Zap, ArrowUp, Plus, CheckCircle2 } from "lucide-react";
 import { type DailyConquestMetrics } from "@/components/today/useTodayCockpitViewModel";
 import { soundFX } from "@/components/shared/SoundFX";
 import { cn } from "@/lib/utils";
@@ -10,9 +10,6 @@ import { cn } from "@/lib/utils";
 interface StickyIslandMiniCockpitProps {
   metrics: DailyConquestMetrics;
   currentDateObj: Date;
-  isTimerRunning: boolean;
-  stopwatchSeconds: number;
-  onToggleTimer: () => void;
   onOpenExpenseModal: () => void;
   onScrollToTop: () => void;
   visible: boolean;
@@ -22,30 +19,15 @@ interface StickyIslandMiniCockpitProps {
 export function StickyIslandMiniCockpit({
   metrics,
   currentDateObj,
-  isTimerRunning,
-  stopwatchSeconds,
-  onToggleTimer,
   onOpenExpenseModal,
   onScrollToTop,
   visible,
   className,
 }: StickyIslandMiniCockpitProps) {
-  const formatStopwatch = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
-  };
-
   const handleTopClick = () => {
     soundFX.playPop();
     soundFX.vibrate(15);
     onScrollToTop();
-  };
-
-  const handleToggleTimer = () => {
-    soundFX.playPop();
-    soundFX.vibrate(20);
-    onToggleTimer();
   };
 
   const handleExpenseClick = () => {
@@ -85,31 +67,12 @@ export function StickyIslandMiniCockpit({
           </span>
         </div>
 
-        {/* 2. Center: Live Focus Stopwatch Ticker */}
+        {/* 2. Center: Habits Progress Telemetry Pill */}
         <div className="flex items-center gap-1.5 shrink-0">
-          {isTimerRunning ? (
-            <button
-              type="button"
-              onClick={handleToggleTimer}
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-500 hover:bg-amber-600 border-2 border-[#161514] text-xs font-mono font-black text-white shadow-2xs transition-all cursor-pointer active:translate-x-0.5 active:translate-y-0.5"
-              title="Pause Focus Sprint"
-            >
-              <span className="inline-block size-1.5 rounded-full bg-white animate-ping" />
-              <span className="tabular-nums">{formatStopwatch(stopwatchSeconds)}</span>
-              <Pause className="size-3 stroke-[2.5]" />
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={handleToggleTimer}
-              className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-[#CEF431] hover:bg-[#bce028] border-2 border-[#161514] text-xs font-heading font-black text-[#161514] shadow-2xs transition-all cursor-pointer active:translate-x-0.5 active:translate-y-0.5"
-              title="Start Focus Sprint"
-            >
-              <Clock className="size-3 stroke-[2.5]" />
-              <span className="hidden sm:inline">Focus</span>
-              <Play className="size-2.5 fill-current" />
-            </button>
-          )}
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#03D26F]/15 text-[#03D26F] border border-[#03D26F]/30 text-xs font-mono font-black shadow-2xs">
+            <CheckCircle2 className="size-3 stroke-[2.5]" />
+            <span>{metrics.completedHabitsCount}/{metrics.totalHabitsCount} Habits</span>
+          </span>
         </div>
 
         {/* 3. Right: Quick Expense + Smooth Jump to Top */}

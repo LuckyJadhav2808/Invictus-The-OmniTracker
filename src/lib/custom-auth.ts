@@ -39,7 +39,7 @@ export function getRegisteredUsers(): User[] {
       weekStartsOn: 1,
       currency: "INR",
       onboarded: true,
-      modulesEnabled: { goals: true, study: true, money: true },
+      modulesEnabled: { goals: true, tasks: true, money: true },
       createdAt: new Date().toISOString(),
       lastLogin: new Date().toISOString(),
     };
@@ -117,7 +117,7 @@ export async function customRegisterUser(payload: {
     weekStartsOn: 1,
     currency: "INR",
     onboarded: true,
-    modulesEnabled: { goals: true, study: true, money: true },
+    modulesEnabled: { goals: true, tasks: true, money: true },
     createdAt: new Date().toISOString(),
     lastLogin: new Date().toISOString(),
   };
@@ -186,7 +186,7 @@ export async function customLoginUser(payload: {
           weekStartsOn: data.user.weekStartsOn || 1,
           currency: data.user.currency || "INR",
           onboarded: true,
-          modulesEnabled: data.user.modulesEnabled || { goals: true, study: true, money: true },
+          modulesEnabled: data.user.modulesEnabled || { goals: true, tasks: true, money: true },
           createdAt: data.user.createdAt || new Date().toISOString(),
           lastLogin: new Date().toISOString(),
         };
@@ -273,7 +273,7 @@ export function getCustomSession(): User | null {
       weekStartsOn: 1,
       currency: "INR",
       onboarded: true,
-      modulesEnabled: { goals: true, study: true, money: true },
+      modulesEnabled: { goals: true, tasks: true, money: true },
       ...guestProfile,
     };
   }

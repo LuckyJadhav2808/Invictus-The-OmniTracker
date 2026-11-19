@@ -2,22 +2,6 @@ import { describe, it, expect } from "vitest";
 import { getSubrouteInfo, resolveBackAction } from "@/lib/page-flow/page-flow-resolver";
 
 describe("Page Flow: Subroute Breadcrumbs & Header Morphing", () => {
-  it("identifies study subroutes and maps to parent study space", () => {
-    const info = getSubrouteInfo("/study/physics-101");
-    expect(info).toEqual({
-      parentHref: "/study",
-      parentLabel: "Study",
-    });
-  });
-
-  it("identifies nested chapter subroutes and maps to subject space", () => {
-    const info = getSubrouteInfo("/study/physics-101/chapter-5");
-    expect(info).toEqual({
-      parentHref: "/study/physics-101",
-      parentLabel: "Subject",
-    });
-  });
-
   it("identifies habits/goals detail routes", () => {
     const info = getSubrouteInfo("/goals/gym-cardio");
     expect(info).toEqual({
@@ -44,7 +28,6 @@ describe("Page Flow: Subroute Breadcrumbs & Header Morphing", () => {
   it("returns null for top-level primary spaces (no back button needed)", () => {
     expect(getSubrouteInfo("/today")).toBeNull();
     expect(getSubrouteInfo("/goals")).toBeNull();
-    expect(getSubrouteInfo("/study")).toBeNull();
     expect(getSubrouteInfo("/tasks")).toBeNull();
     expect(getSubrouteInfo("/money")).toBeNull();
     expect(getSubrouteInfo("/analytics")).toBeNull();
@@ -53,7 +36,7 @@ describe("Page Flow: Subroute Breadcrumbs & Header Morphing", () => {
 
 describe("Page Flow: Native Backstack Priority Resolver", () => {
   it("Priority 1: Closes open modal dialogs before changing routes", () => {
-    const action = resolveBackAction("/study/physics-101", true, 0, 1000);
+    const action = resolveBackAction("/goals/gym-cardio", true, 0, 1000);
     expect(action).toEqual({ type: "close_modal" });
 
     const rootAction = resolveBackAction("/today", true, 0, 1000);
@@ -61,7 +44,7 @@ describe("Page Flow: Native Backstack Priority Resolver", () => {
   });
 
   it("Priority 2: Pops subroutes and secondary pages back to parent", () => {
-    const action1 = resolveBackAction("/study/physics", false, 0, 1000);
+    const action1 = resolveBackAction("/goals/gym-cardio", false, 0, 1000);
     expect(action1).toEqual({ type: "navigate_back" });
 
     const action2 = resolveBackAction("/settings", false, 0, 1000);
@@ -73,7 +56,6 @@ describe("Page Flow: Native Backstack Priority Resolver", () => {
 
   it("Priority 3: Returns non-today root spaces back to /today cockpit", () => {
     expect(resolveBackAction("/goals", false, 0, 1000)).toEqual({ type: "navigate_today" });
-    expect(resolveBackAction("/study", false, 0, 1000)).toEqual({ type: "navigate_today" });
     expect(resolveBackAction("/tasks", false, 0, 1000)).toEqual({ type: "navigate_today" });
     expect(resolveBackAction("/money", false, 0, 1000)).toEqual({ type: "navigate_today" });
     expect(resolveBackAction("/analytics", false, 0, 1000)).toEqual({ type: "navigate_today" });

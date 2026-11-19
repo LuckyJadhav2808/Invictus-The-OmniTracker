@@ -3,7 +3,6 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { format, subDays } from "date-fns";
 import { useHabits, useMonthHabitLogs } from "@/lib/queries/goals";
-import { useStudySessions, useSubjects } from "@/lib/queries/study";
 import { useTransactions, useCategories } from "@/lib/queries/money";
 import {
   generateYearlyMatrixData,
@@ -55,8 +54,6 @@ export function YearlyActivityMatrix({
   // Data Queries
   const { data: habits = [] } = useHabits();
   const { data: habitLogs = [], isLoading: logsLoading } = useMonthHabitLogs(rangeStartStr, todayStr);
-  const { data: studySessions = [], isLoading: studyLoading } = useStudySessions();
-  const { data: subjects = [] } = useSubjects();
   const { data: transactions = [], isLoading: txLoading } = useTransactions();
   const { data: categories = [] } = useCategories();
 
@@ -76,27 +73,17 @@ export function YearlyActivityMatrix({
     return map;
   }, [categories]);
 
-  const subjectsMap = useMemo(() => {
-    const map: Record<string, string> = {};
-    subjects.forEach((s) => {
-      map[s.id] = s.name;
-    });
-    return map;
-  }, [subjects]);
-
   // Generate Matrix Structure & Summary Stats
   const { weeks, stats, maxScore } = useMemo(() => {
     return generateYearlyMatrixData(
       habitLogs,
-      studySessions,
       transactions,
       filter,
       range,
       habitsMap,
-      categoriesMap,
-      subjectsMap
+      categoriesMap
     );
-  }, [habitLogs, studySessions, transactions, filter, range, habitsMap, categoriesMap, subjectsMap]);
+  }, [habitLogs, transactions, filter, range, habitsMap, categoriesMap]);
 
   // Auto-scroll to current day (right side of grid) on initial load & range change
   useEffect(() => {
@@ -142,17 +129,6 @@ export function YearlyActivityMatrix({
           return "bg-emerald-400 dark:bg-emerald-600 border-[#161514] font-bold shadow-xs hover:brightness-95";
         case 4:
           return "bg-[#03D26F] border-[#161514] font-black shadow-xs ring-1 ring-[#161514] hover:brightness-95";
-      }
-    } else if (filterType === "study") {
-      switch (intensity) {
-        case 1:
-          return "bg-purple-100 dark:bg-purple-950/60 border-purple-400/50 hover:brightness-95";
-        case 2:
-          return "bg-purple-300 dark:bg-purple-800/70 border-purple-600/70 hover:brightness-95";
-        case 3:
-          return "bg-[#C084FC] border-[#161514] font-bold shadow-xs hover:brightness-95";
-        case 4:
-          return "bg-[#A855F7] border-[#161514] font-black shadow-xs ring-1 ring-[#161514] text-white hover:brightness-95";
       }
     } else {
       // Money
@@ -216,7 +192,6 @@ export function YearlyActivityMatrix({
         {[
           { id: "all" as const, label: "All Combined", Icon: Layers, count: stats.totalActions },
           { id: "habits" as const, label: "Habits", Icon: CheckCircle2, count: stats.totalHabitsCompleted },
-          { id: "study" as const, label: "Study Sessions", Icon: BookOpen, count: `${Math.round(stats.totalStudyMinutes / 60)}h` },
           { id: "money" as const, label: "Financial Ledger", Icon: Wallet, count: stats.totalTransactions },
         ].map((tab) => (
           <button
@@ -403,10 +378,10 @@ export function YearlyActivityMatrix({
           {/* Breakdown Items List */}
           {selectedDay.totalScore === 0 ? (
             <p className="text-xs text-[#161514]/60 dark:text-[#FAF8F5]/60 font-bold italic py-1">
-              Rest or recovery day — no logged habits, study, or expenses on this date.
+              Rest or recovery day — no logged habits or expenses on this date.
             </p>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1 text-xs">
               
               {/* Habits */}
               <div className="bg-white dark:bg-[#1C1A18] rounded-xl p-3 border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] space-y-1">
@@ -423,24 +398,6 @@ export function YearlyActivityMatrix({
                   </div>
                 ) : (
                   <p className="text-[10px] text-[#161514]/40 dark:text-[#FAF8F5]/40 font-bold">None logged</p>
-                )}
-              </div>
-
-              {/* Study */}
-              <div className="bg-white dark:bg-[#1C1A18] rounded-xl p-3 border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] space-y-1">
-                <span className="text-[9px] font-black uppercase text-purple-800 dark:text-purple-400 block">
-                  Study ({selectedDay.studyMinutes}m)
-                </span>
-                {selectedDay.studyTopics.length > 0 ? (
-                  <div className="space-y-0.5 max-h-24 overflow-y-auto no-scrollbar">
-                    {selectedDay.studyTopics.map((t, idx) => (
-                      <p key={idx} className="text-[11px] font-bold text-[#161514] dark:text-[#FAF8F5] truncate flex items-center gap-1">
-                        <span className="text-purple-600 dark:text-purple-400 font-black">•</span> {t}
-                      </p>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-[10px] text-[#161514]/40 dark:text-[#FAF8F5]/40 font-bold">0 minutes</p>
                 )}
               </div>
 

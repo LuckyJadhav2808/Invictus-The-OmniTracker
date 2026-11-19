@@ -11,8 +11,7 @@ export interface IUser extends Document {
   currency: string;
   weekStartsOn: number;
   onboarded: boolean;
-  modulesEnabled: { goals: boolean; study: boolean; money: boolean };
-  studyTarget?: { examName?: string; examDate?: string };
+  modulesEnabled: { goals: boolean; tasks: boolean; money: boolean };
   budgetPreferences?: {
     upiBudget: number;
     cashBudget: number;
@@ -40,12 +39,8 @@ const UserSchema = new Schema<IUser>(
     onboarded: { type: Boolean, default: true },
     modulesEnabled: {
       goals: { type: Boolean, default: true },
-      study: { type: Boolean, default: true },
+      tasks: { type: Boolean, default: true },
       money: { type: Boolean, default: true },
-    },
-    studyTarget: {
-      examName: { type: String },
-      examDate: { type: String },
     },
     budgetPreferences: {
       upiBudget: { type: Number, default: 0 },

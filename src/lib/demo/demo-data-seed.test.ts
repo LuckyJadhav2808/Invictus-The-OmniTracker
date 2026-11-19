@@ -69,13 +69,7 @@ describe("Evaluator Demo Data Seed Engine", () => {
       expect(data.nutritionTargets.calories).toBe(2200);
       expect(data.mealPlans.length).toBe(4);
 
-      // 4. Study Space
-      expect(data.subjects.length).toBe(2);
-      expect(data.topics.length).toBe(3);
-      expect(data.studySessions.length).toBeGreaterThanOrEqual(1);
-      expect(data.tests.length).toBe(1);
-
-      // 5. Money Space
+      // 4. Money Space
       expect(data.categories.length).toBeGreaterThanOrEqual(6);
       expect(data.transactions.length).toBe(5);
       const cashTx = data.transactions.find((tx) => tx.paymentMethod?.toLowerCase() === "cash");
@@ -109,10 +103,6 @@ describe("Evaluator Demo Data Seed Engine", () => {
       expect(mockStorage["invictus_gym_routines"]).toBeDefined();
       expect(mockStorage["invictus_nutrition_targets"]).toBeDefined();
       expect(mockStorage["invictus_meal_plans"]).toBeDefined();
-      expect(mockStorage["invictus_subjects"]).toBeDefined();
-      expect(mockStorage["invictus_topics"]).toBeDefined();
-      expect(mockStorage["invictus_study_sessions"]).toBeDefined();
-      expect(mockStorage["invictus_tests"]).toBeDefined();
       expect(mockStorage["invictus_categories"]).toBeDefined();
       expect(mockStorage["invictus_transactions"]).toBeDefined();
       expect(mockStorage["invictus_debts"]).toBeDefined();
@@ -148,10 +138,6 @@ describe("Evaluator Demo Data Seed Engine", () => {
       expect(mockStorage["invictus_gym_routines"]).toBeUndefined();
       expect(mockStorage["invictus_nutrition_targets"]).toBeUndefined();
       expect(mockStorage["invictus_meal_plans"]).toBeUndefined();
-      expect(mockStorage["invictus_subjects"]).toBeUndefined();
-      expect(mockStorage["invictus_topics"]).toBeUndefined();
-      expect(mockStorage["invictus_study_sessions"]).toBeUndefined();
-      expect(mockStorage["invictus_tests"]).toBeUndefined();
       expect(mockStorage["invictus_categories"]).toBeUndefined();
       expect(mockStorage["invictus_transactions"]).toBeUndefined();
       expect(mockStorage["invictus_debts"]).toBeUndefined();

@@ -364,7 +364,7 @@ export function DynamicIslandDock({
                   e.stopPropagation();
                   soundFX.playPop();
                   dismissAmbient();
-                  toast.info("Ambient dock minimized until your next workout or study session.");
+                  toast.info("Ambient dock minimized until your next workout or focus session.");
                 }}
                 className="size-4 rounded-full hover:bg-[#E8E5DF] dark:hover:bg-[#383531] flex items-center justify-center text-[#8C8882] hover:text-[#161514] dark:hover:text-[#FAF8F5] transition-colors ml-0.5 cursor-pointer"
                 title="Dismiss ambient pill"
@@ -610,11 +610,11 @@ export function DynamicIslandDock({
                 onClick={() => {
                   soundFX.playPop();
                   setIsExpanded(false);
-                  router.push("/study");
+                  router.push("/tasks");
                 }}
                 className="w-full bg-[#161514] dark:bg-[#C084FC] hover:bg-neutral-800 dark:hover:bg-[#a855f7] text-white dark:text-[#161514] font-medium text-xs py-2.5 rounded-lg shadow-xs flex items-center justify-center gap-1.5 cursor-pointer transition-colors font-heading font-black"
               >
-                <span>Jump to Study Space</span>
+                <span>Jump to Tasks</span>
                 <ArrowUpRight className="size-3.5 stroke-[1.75]" />
               </button>
             </div>

@@ -7,7 +7,6 @@ import { Suspense, useRef } from "react";
 import {
   SunMedium,
   CheckSquare,
-  GraduationCap,
   Kanban,
   Wallet,
   BarChart2,
@@ -42,13 +41,6 @@ function SidebarContent() {
       icon: CheckSquare,
       value: "life",
       accent: "bg-[#03D26F]",
-    },
-    {
-      href: "/study",
-      label: "Study & Exams",
-      icon: GraduationCap,
-      value: "study",
-      accent: "bg-[#8B5CF6]",
     },
     {
       href: "/tasks",

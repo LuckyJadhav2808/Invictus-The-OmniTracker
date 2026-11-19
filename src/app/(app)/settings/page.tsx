@@ -25,6 +25,7 @@ import { playCompletionSound, type SoundEffectType } from "@/lib/utils/completio
 import { enableWebPushNotifications, triggerTestPushNotification } from "@/lib/utils/push-client";
 import {
   Target,
+  Kanban,
   BookOpen,
   Wallet,
   Globe,
@@ -226,12 +227,9 @@ export default function SettingsPage() {
   const [currency, setCurrency] = useState("INR");
   const [modulesEnabled, setModulesEnabled] = useState({
     goals: true,
-    study: true,
+    tasks: true,
     money: true,
   });
-  const [hasExam, setHasExam] = useState(false);
-  const [examName, setExamName] = useState("");
-  const [examDate, setExamDate] = useState("");
 
   // Cloud Budget Preferences & Daily Spending Limit State
   const { data: cloudBudgetPrefs } = useBudgetPreferences();
@@ -375,7 +373,7 @@ export default function SettingsPage() {
     setDeferredPrompt(null);
   };
 
-  const downloadCSVReport = (reportType: "habits" | "finance" | "study" | "bundle") => {
+  const downloadCSVReport = (reportType: "habits" | "finance" | "tasks" | "bundle") => {
     let csvContent = "";
     const fileName = `invictus_${reportType}_report.csv`;
 
@@ -390,9 +388,9 @@ export default function SettingsPage() {
       csvContent += "Expense,Groceries,450,UPI,2026-07-25\n";
       csvContent += "Income,Salary,120000,Bank,2026-07-01\n";
     }
-    if (reportType === "study" || reportType === "bundle") {
-      csvContent += "Subject,Topic,DurationMinutes,Date\n";
-      csvContent += "Computer Science,Data Structures,90,2026-07-26\n";
+    if (reportType === "tasks" || reportType === "bundle") {
+      csvContent += "Title,Priority,Status,DueDate\n";
+      csvContent += "Launch MVP,p1,in_progress,2026-11-20\n";
     }
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
@@ -425,10 +423,7 @@ export default function SettingsPage() {
           setTimezone(data.timezone || "Asia/Kolkata");
           setWeekStartsOn(data.weekStartsOn ?? 1);
           setCurrency(data.currency || "INR");
-          setModulesEnabled(data.modulesEnabled || { goals: true, study: true, money: true });
-          setExamName(data.studyTarget?.examName || "");
-          setExamDate(data.studyTarget?.examDate || "");
-          setHasExam(!!data.studyTarget?.examName);
+          setModulesEnabled(data.modulesEnabled || { goals: true, tasks: true, money: true });
         } catch {}
       }
     } else {
@@ -436,10 +431,7 @@ export default function SettingsPage() {
       setTimezone(user.timezone || "Asia/Kolkata");
       setWeekStartsOn(user.weekStartsOn ?? 1);
       setCurrency(user.currency || "INR");
-      setModulesEnabled(user.modulesEnabled || { goals: true, study: true, money: true });
-      setExamName(user.studyTarget?.examName || "");
-      setExamDate(user.studyTarget?.examDate || "");
-      setHasExam(!!user.studyTarget?.examName);
+      setModulesEnabled(user.modulesEnabled || { goals: true, tasks: true, money: true });
     }
 
     const savedWake = localStorage.getItem("invictus_wakeup_time");
@@ -480,13 +472,6 @@ export default function SettingsPage() {
         weekStartsOn,
         currency,
         modulesEnabled,
-        studyTarget:
-          modulesEnabled.study && hasExam
-            ? {
-                examName: examName || "",
-                examDate: examDate || undefined,
-              }
-            : undefined,
       };
 
       customUpdateUser(user.uid, settingsData);
@@ -527,7 +512,7 @@ export default function SettingsPage() {
     }
   };
 
-  const toggleModule = (mod: "goals" | "study" | "money") => {
+  const toggleModule = (mod: "goals" | "tasks" | "money") => {
     setModulesEnabled((prev) => ({ ...prev, [mod]: !prev[mod] }));
   };
 
@@ -612,9 +597,6 @@ export default function SettingsPage() {
         const [
           habitsRes,
           logsRes,
-          subjectsRes,
-          sessionsRes,
-          testsRes,
           txRes,
           catRes,
           debtsRes,
@@ -623,9 +605,6 @@ export default function SettingsPage() {
         ] = await Promise.allSettled([
           fetch(`/api/goals/habits?userId=${uid}`).then((r) => (r.ok ? r.json() : null)),
           fetch(`/api/goals/logs?userId=${uid}`).then((r) => (r.ok ? r.json() : null)),
-          fetch(`/api/study/subjects?userId=${uid}`).then((r) => (r.ok ? r.json() : null)),
-          fetch(`/api/study/sessions?userId=${uid}`).then((r) => (r.ok ? r.json() : null)),
-          fetch(`/api/study/tests?userId=${uid}`).then((r) => (r.ok ? r.json() : null)),
           fetch(`/api/money/transactions?userId=${uid}`).then((r) => (r.ok ? r.json() : null)),
           fetch(`/api/money/categories?userId=${uid}`).then((r) => (r.ok ? r.json() : null)),
           fetch(`/api/money/debts?userId=${uid}`).then((r) => (r.ok ? r.json() : null)),
@@ -636,9 +615,6 @@ export default function SettingsPage() {
         cloudData = {
           habits: habitsRes.status === "fulfilled" ? habitsRes.value : null,
           habitLogs: logsRes.status === "fulfilled" ? logsRes.value : null,
-          subjects: subjectsRes.status === "fulfilled" ? subjectsRes.value : null,
-          studySessions: sessionsRes.status === "fulfilled" ? sessionsRes.value : null,
-          tests: testsRes.status === "fulfilled" ? testsRes.value : null,
           transactions: txRes.status === "fulfilled" ? txRes.value : null,
           categories: catRes.status === "fulfilled" ? catRes.value : null,
           debts: debtsRes.status === "fulfilled" ? debtsRes.value : null,
@@ -1088,7 +1064,7 @@ export default function SettingsPage() {
             <div className="space-y-3">
               {[
                 { key: "goals" as const, label: "Goals & Habits Space", desc: "Streaks, gym tracking & nutrition", Icon: Target },
-                { key: "study" as const, label: "Study & Exam Space", desc: "Focus sessions, exams & flashcards", Icon: BookOpen },
+                { key: "tasks" as const, label: "Tasks & Projects Space", desc: "Kanban board, priorities & subtasks", Icon: Kanban },
                 { key: "money" as const, label: "Money & Ledger Space", desc: "Daily spending, budgets & SMS telemetry", Icon: Wallet },
               ].map(({ key, label, desc, Icon }) => (
                 <button
@@ -1129,51 +1105,6 @@ export default function SettingsPage() {
                 </button>
               ))}
             </div>
-
-            {/* Target Exam Countdown (If Study space is active) */}
-            {modulesEnabled.study && (
-              <div className="space-y-3 border-t border-[#E8E5DF] dark:border-[#2A2724] pt-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-xs font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] font-heading">
-                      Target Exam Countdown
-                    </h3>
-                    <p className="text-[10px] text-[#161514]/70 dark:text-[#FAF8F5]/60 font-bold">
-                      Shows daily days-remaining countdown in your study cockpit
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setHasExam(!hasExam)}
-                    className={cn(
-                      "px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider border transition-all cursor-pointer shadow-xs",
-                      hasExam
-                        ? "bg-[#CEF431] text-[#161514] border-[#161514]"
-                        : "border-[#E8E5DF] dark:border-[#2A2724] bg-[#FAF8F5] dark:bg-[#1C1A18] text-[#161514]/60 dark:text-[#FAF8F5]/50"
-                    )}
-                  >
-                    {hasExam ? "Exam Active" : "No Exam"}
-                  </button>
-                </div>
-                {hasExam && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                    <input
-                      type="text"
-                      value={examName}
-                      onChange={(e) => setExamName(e.target.value)}
-                      placeholder="e.g. JEE, GATE, USMLE, CFA..."
-                      className="w-full rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] bg-[#FAF8F5] dark:bg-[#1C1A18] py-2.5 px-3 text-xs font-bold text-[#161514] dark:text-[#FAF8F5] outline-none shadow-xs"
-                    />
-                    <input
-                      type="date"
-                      value={examDate}
-                      onChange={(e) => setExamDate(e.target.value)}
-                      className="w-full rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] bg-[#FAF8F5] dark:bg-[#1C1A18] py-2.5 px-3 text-xs font-bold text-[#161514] dark:text-[#FAF8F5] outline-none shadow-xs"
-                    />
-                  </div>
-                )}
-              </div>
-            )}
 
             {/* Daily Spending Limit Pace (Android Widget & Ledger) */}
             {modulesEnabled.money && (
@@ -1457,16 +1388,9 @@ export default function SettingsPage() {
                         Money: {reminderConfig.moneyTime}
                       </span>
                     )}
-                    {reminderConfig?.studyEnabled && (
-                      <span className="px-2 py-0.5 bg-white dark:bg-[#252220] border border-[#E8E5DF] dark:border-[#2A2724] rounded-md text-[9px] font-black uppercase text-[#161514] dark:text-[#FAF8F5]">
-                        Study: {reminderConfig.studyTime}
-                      </span>
-                    )}
                     {(!reminderConfig ||
                       (!reminderConfig.habitsEnabled &&
-                        !reminderConfig.moneyEnabled &&
-                        !reminderConfig.studyEnabled &&
-                        !reminderConfig.examEnabled)) && (
+                        !reminderConfig.moneyEnabled)) && (
                       <span className="text-[10px] text-[#161514]/60 dark:text-[#FAF8F5]/50 font-bold uppercase">
                         No reminders active • Tap to set times
                       </span>
@@ -1728,7 +1652,7 @@ export default function SettingsPage() {
                         <li>Your user profile and login credentials</li>
                         <li>All habits, streaks, and habit logs</li>
                         <li>Health profile, workouts, and nutrition logs</li>
-                        <li>All study subjects, topics, and focus sessions</li>
+                        <li>All tasks, kanban boards, and project priorities</li>
                         <li>All financial transactions and custom categories</li>
                         <li>All local browser data for this account</li>
                       </ul>
@@ -1859,7 +1783,7 @@ export default function SettingsPage() {
                   </span>
                 </div>
                 <p className="text-[10px] text-[#161514]/70 dark:text-[#FAF8F5]/60 font-bold">
-                  Seed full realistic mock data across all modules (Tasks, Habits, Gym Hypertrophy, Meal Tracker, Study Spaces, and Money Tracker) or wipe clean for a fresh evaluation slate.
+                  Seed full realistic mock data across all modules (Tasks, Habits, Gym Hypertrophy, Meal Tracker, and Money Tracker) or wipe clean for a fresh evaluation slate.
                 </p>
                 <div className="flex items-center gap-2 pt-1 flex-wrap">
                   <Button
@@ -1955,7 +1879,7 @@ export default function SettingsPage() {
                       Data Export (CSV)
                     </h4>
                     <p className="text-[10px] text-[#161514]/70 dark:text-[#FAF8F5]/60 font-bold">
-                      Export habits, finance ledger, and study sessions to CSV spreadsheet
+                      Export habits, finance ledger, and tasks to CSV spreadsheet
                     </p>
                   </div>
                 </div>
@@ -2176,7 +2100,7 @@ export default function SettingsPage() {
                       Delete Cloud Database
                     </h4>
                     <p className="text-[10px] text-rose-900/70 dark:text-rose-300/70 font-bold">
-                      Permanently wipe all habits, study logs, transactions, and settings
+                      Permanently wipe all habits, tasks, transactions, and settings
                     </p>
                   </div>
                   <Button
@@ -2391,7 +2315,7 @@ export default function SettingsPage() {
           open={isCSVModalOpen}
           onOpenChange={setIsCSVModalOpen}
           title="Data Export (CSV)"
-          description="Export your habit logs, finances, and study sessions to CSV spreadsheet."
+          description="Export your habit logs, finances, and tasks to CSV spreadsheet."
         >
           <div className="space-y-3 pt-2">
             {[
@@ -2406,9 +2330,9 @@ export default function SettingsPage() {
                 type: "finance" as const,
               },
               {
-                title: "📚 Study Sessions CSV Report",
-                desc: "Export study stopwatch sessions, subjects, and topic focus minutes",
-                type: "study" as const,
+                title: "📋 Tasks & Projects CSV Report",
+                desc: "Export tasks, priorities, kanban status, and due dates",
+                type: "tasks" as const,
               },
               {
                 title: "📦 Lifetime Master Bundle CSV",

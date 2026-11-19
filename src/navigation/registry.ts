@@ -1,7 +1,7 @@
 /**
  * Invictus OS Universal Navigation & Domain Registry
  * Strictly enforces Container Types (TAB | SCREEN | SHEET | INLINE)
- * and Domain Clusters (HABITS CORE | BODY & GYM | NUTRITION | RECOVERY | MONEY | STUDY | SYSTEM).
+ * and Domain Clusters (HABITS CORE | BODY & GYM | NUTRITION | RECOVERY | MONEY | SYSTEM).
  */
 
 export type NavigationContainerType = "TAB" | "SCREEN" | "SHEET" | "INLINE";
@@ -12,7 +12,6 @@ export type NavigationDomain =
   | "NUTRITION"
   | "RECOVERY"
   | "MONEY"
-  | "STUDY"
   | "SYSTEM";
 
 export interface NavigationItem {
@@ -213,8 +212,6 @@ export function getDomainHome(domain: NavigationDomain): string {
       return "/goals?sheet=recovery";
     case "MONEY":
       return "/money";
-    case "STUDY":
-      return "/study";
     case "SYSTEM":
       return "/settings";
     default:

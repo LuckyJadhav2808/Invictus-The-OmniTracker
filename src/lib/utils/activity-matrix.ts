@@ -1,9 +1,8 @@
 import { format, subDays, startOfWeek, addDays, isSameDay, isToday as checkIsToday, parseISO, differenceInDays } from "date-fns";
 import { HabitLog } from "@/lib/schemas/goals";
-import { StudySession } from "@/lib/schemas/study";
 import { Transaction } from "@/lib/schemas/money";
 
-export type MatrixFilterType = "all" | "habits" | "study" | "money";
+export type MatrixFilterType = "all" | "habits" | "money";
 export type MatrixRangeType = "3m" | "6m" | "1y";
 
 export interface ActivityDayDetail {
@@ -18,15 +17,12 @@ export interface ActivityDayDetail {
 
   // Counts
   habitCount: number;
-  studyMinutes: number;
-  studySessionCount: number;
   transactionCount: number;
   totalScore: number;
   intensity: 0 | 1 | 2 | 3 | 4;
 
   // Log breakdown labels
   habitTitles: string[];
-  studyTopics: string[];
   transactionSummaries: string[];
 }
 
@@ -45,29 +41,26 @@ export interface MatrixSummaryStats {
   longestStreak: number;
   peakDayName: string;
   peakDayCount: number;
-  totalStudyMinutes: number;
   totalHabitsCompleted: number;
   totalTransactions: number;
 }
 
 export interface YearlyMatrixResult {
   weeks: ActivityWeek[];
-  stats: MatrixSummaryStats;
   maxScore: number;
+  stats: MatrixSummaryStats;
 }
 
 /**
- * Aggregates logs across Habits, Study, and Money for the given date range (default: 365 days / 52 weeks)
+ * Aggregates logs across Habits and Money for the given date range (default: 365 days / 52 weeks)
  */
 export function generateYearlyMatrixData(
   habitLogs: HabitLog[] = [],
-  studySessions: StudySession[] = [],
   transactions: Transaction[] = [],
   filter: MatrixFilterType = "all",
   range: MatrixRangeType = "1y",
   habitsMap: Record<string, string> = {},
-  categoriesMap: Record<string, string> = {},
-  subjectsMap: Record<string, string> = {}
+  categoriesMap: Record<string, string> = {}
 ): YearlyMatrixResult {
   const today = new Date();
   today.setHours(23, 59, 59, 999);
@@ -86,18 +79,6 @@ export function generateYearlyMatrixData(
     habitMap[d].count += 1;
     const title = habitsMap[l.habitId] || "Habit Completed";
     habitMap[d].titles.push(title);
-  });
-
-  const studyMap: Record<string, { minutes: number; sessionCount: number; topics: string[] }> = {};
-  studySessions.forEach((s) => {
-    if (!s.date) return;
-    const d = s.date.slice(0, 10);
-    if (!studyMap[d]) studyMap[d] = { minutes: 0, sessionCount: 0, topics: [] };
-    studyMap[d].minutes += s.durationMinutes || 0;
-    studyMap[d].sessionCount += 1;
-    const subjectName = subjectsMap[s.subjectId] || "Study Focus";
-    const typeLabel = s.type ? s.type.charAt(0).toUpperCase() + s.type.slice(1) : "Focus";
-    studyMap[d].topics.push(`${subjectName} (${typeLabel}, ${s.durationMinutes}m)`);
   });
 
   const moneyMap: Record<string, { count: number; summaries: string[] }> = {};
@@ -120,18 +101,13 @@ export function generateYearlyMatrixData(
     const isFuture = current > today;
 
     const hData = habitMap[dateStr] || { count: 0, titles: [] };
-    const sData = studyMap[dateStr] || { minutes: 0, sessionCount: 0, topics: [] };
     const mData = moneyMap[dateStr] || { count: 0, summaries: [] };
 
     let totalScore = 0;
     if (filter === "all") {
-      // Habits count as 1, each 30 mins of study as 1, transactions as 1
-      totalScore = hData.count + Math.round(sData.minutes / 30) + mData.count;
+      totalScore = hData.count + mData.count;
     } else if (filter === "habits") {
       totalScore = hData.count;
-    } else if (filter === "study") {
-      // 1 point per 30 minutes of study
-      totalScore = Math.round(sData.minutes / 30);
     } else if (filter === "money") {
       totalScore = mData.count;
     }
@@ -146,13 +122,10 @@ export function generateYearlyMatrixData(
       isToday: checkIsToday(current),
       isFuture,
       habitCount: hData.count,
-      studyMinutes: sData.minutes,
-      studySessionCount: sData.sessionCount,
       transactionCount: mData.count,
       totalScore,
       intensity: 0, // Computed below
       habitTitles: hData.titles,
-      studyTopics: sData.topics,
       transactionSummaries: mData.summaries,
     });
   }
@@ -164,11 +137,6 @@ export function generateYearlyMatrixData(
   allDays.forEach((d) => {
     if (d.totalScore === 0) {
       d.intensity = 0;
-    } else if (filter === "study") {
-      if (d.studyMinutes >= 180) d.intensity = 4; // 3h+
-      else if (d.studyMinutes >= 120) d.intensity = 3; // 2h+
-      else if (d.studyMinutes >= 60) d.intensity = 2; // 1h+
-      else d.intensity = 1; // 15-45m
     } else {
       if (d.totalScore >= 6) d.intensity = 4;
       else if (d.totalScore >= 4) d.intensity = 3;
@@ -209,7 +177,6 @@ export function generateYearlyMatrixData(
   // --- COMPUTE SUMMARY STATS ---
   let totalActions = 0;
   let activeDaysCount = 0;
-  let totalStudyMinutes = 0;
   let totalHabitsCompleted = 0;
   let totalTransactions = 0;
 
@@ -231,7 +198,6 @@ export function generateYearlyMatrixData(
     if (d.totalScore > 0) {
       if (streakCountingActive) currentStreak += 1;
     } else {
-      // If today is empty, allow streak to continue from yesterday
       if (d.isToday) {
         // don't break current streak yet
       } else {
@@ -245,7 +211,6 @@ export function generateYearlyMatrixData(
     if (d.isFuture) return;
 
     totalActions += d.totalScore;
-    totalStudyMinutes += d.studyMinutes;
     totalHabitsCompleted += d.habitCount;
     totalTransactions += d.transactionCount;
 
@@ -284,7 +249,6 @@ export function generateYearlyMatrixData(
       longestStreak: Math.max(longestStreak, currentStreak),
       peakDayName,
       peakDayCount,
-      totalStudyMinutes,
       totalHabitsCompleted,
       totalTransactions,
     },

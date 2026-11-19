@@ -32,22 +32,6 @@ export const NOTIFICATION_CHANNELS: Channel[] = [
     vibration: true,
   },
   {
-    id: "invictus_study",
-    name: "Study & Revision Log",
-    description: "Reminders to log study sessions and PYQs solved",
-    importance: 5,
-    visibility: 1,
-    vibration: true,
-  },
-  {
-    id: "invictus_exam",
-    name: "Exam Targets & Milestones",
-    description: "Milestone reviews and target exam syllabus countdowns",
-    importance: 5,
-    visibility: 1,
-    vibration: true,
-  },
-  {
     id: "invictus_alerts",
     name: "System Alerts & Reminders",
     description: "System notifications, priority alerts, and test alarms",
@@ -113,7 +97,7 @@ export async function initNativeNotificationBridge(router?: any): Promise<void> 
       try {
         const { getReminderConfig } = await import("@/lib/utils/reminder-scheduler");
         const config = getReminderConfig();
-        if (config.habitsEnabled || config.moneyEnabled || config.studyEnabled || config.examEnabled) {
+        if (config.habitsEnabled || config.moneyEnabled) {
           await scheduleAllNativeAlarms(config, { silent: true });
         }
       } catch (e) {
@@ -285,10 +269,6 @@ export interface NativeAlarmConfig {
   moneyTime?: string;
   habitsEnabled?: boolean;
   habitsTime?: string;
-  studyEnabled?: boolean;
-  studyTime?: string;
-  examEnabled?: boolean;
-  examTime?: string;
 }
 
 /**
@@ -369,52 +349,6 @@ export async function scheduleAllNativeAlarms(
           smallIcon: "ic_stat_icon",
           iconColor: "#03D26F",
           extra: { url: "/money", type: "money" },
-        });
-      }
-    }
-
-    // Study Session Alarm (ID: 103)
-    if (config.studyEnabled && config.studyTime) {
-      const parsed = parseTimeString(config.studyTime);
-      if (parsed) {
-        notificationsToSchedule.push({
-          id: 103,
-          channelId: "invictus_study",
-          title: "Study & PYQ Review",
-          body: "Log completed focus hours and solved past-year questions.",
-          schedule: {
-            on: {
-              hour: parsed.hour,
-              minute: parsed.minute,
-            },
-            allowWhileIdle: true,
-          },
-          smallIcon: "ic_stat_icon",
-          iconColor: "#FED7AA",
-          extra: { url: "/study", type: "study" },
-        });
-      }
-    }
-
-    // Exam Review Alarm (ID: 104)
-    if (config.examEnabled && config.examTime) {
-      const parsed = parseTimeString(config.examTime);
-      if (parsed) {
-        notificationsToSchedule.push({
-          id: 104,
-          channelId: "invictus_exam",
-          title: "Exam Syllabus Targets",
-          body: "Review today's target topics and countdown milestones.",
-          schedule: {
-            on: {
-              hour: parsed.hour,
-              minute: parsed.minute,
-            },
-            allowWhileIdle: true,
-          },
-          smallIcon: "ic_stat_icon",
-          iconColor: "#FFE4E6",
-          extra: { url: "/study", type: "exam" },
         });
       }
     }

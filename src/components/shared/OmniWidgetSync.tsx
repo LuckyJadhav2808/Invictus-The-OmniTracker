@@ -173,18 +173,7 @@ export function OmniWidgetSync() {
       }
     }
 
-    // 2. Check study target from user profile
-    if ((user as any)?.studyTarget) {
-      return {
-        id: "goal_study",
-        title: (user as any).studyTarget.examName || "Exam Preparation",
-        progressPercentage: 60,
-        icon: "📚",
-        targetDate: (user as any).studyTarget.examDate,
-      };
-    }
-
-    // 3. Fallback inspiring goal
+    // 2. Fallback inspiring goal
     return {
       id: "goal_default",
       title: "Daily Focus & Goals",

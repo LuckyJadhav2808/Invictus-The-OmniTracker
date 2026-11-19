@@ -6,7 +6,6 @@ import {
   Lock,
   Sparkles,
   CheckCircle2,
-  GraduationCap,
   Wallet,
   Award,
   Zap,
@@ -137,8 +136,8 @@ export function GladiatorCloseoutCard({
         </div>
       </div>
 
-      {/* 2. Tri-Pillar Telemetry Summary */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+      {/* 2. Dual-Pillar Telemetry Summary */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
         {/* Habits */}
         <div className="bg-white dark:bg-[#252321] border-2 border-[#161514] dark:border-[#383531] rounded-xl p-3 shadow-[1.5px_1.5px_0px_#161514] dark:shadow-[1.5px_1.5px_0px_#000000] space-y-1">
           <div className="flex items-center justify-between text-xs font-mono font-bold text-[#161514] dark:text-[#FAF8F5]">
@@ -150,20 +149,6 @@ export function GladiatorCloseoutCard({
           </div>
           <p className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5]">
             <span className="font-mono tabular-nums">{metrics.completedHabitsCount}/{metrics.totalHabitsCount}</span> Completed
-          </p>
-        </div>
-
-        {/* Study Sprint */}
-        <div className="bg-white dark:bg-[#252321] border-2 border-[#161514] dark:border-[#383531] rounded-xl p-3 shadow-[1.5px_1.5px_0px_#161514] dark:shadow-[1.5px_1.5px_0px_#000000] space-y-1">
-          <div className="flex items-center justify-between text-xs font-mono font-bold text-[#161514] dark:text-[#FAF8F5]">
-            <span className="flex items-center gap-1">
-              <GraduationCap className="size-3.5 text-[#C084FC]" />
-              <span>Study Focus</span>
-            </span>
-            <span className="text-[#C084FC] font-black tabular-nums">{metrics.studyPercent}%</span>
-          </div>
-          <p className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5]">
-            <span className="font-mono tabular-nums">{metrics.studyHoursFormatted} / {metrics.studyTargetHoursFormatted}</span> Logged
           </p>
         </div>
 

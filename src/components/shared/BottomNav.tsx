@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import {
   SunMedium,
   CheckSquare,
-  GraduationCap,
   Kanban,
   Wallet,
   Plus,
@@ -49,12 +48,6 @@ function BottomNavContent() {
   ];
 
   const rightNavItems = [
-    {
-      href: "/study",
-      icon: GraduationCap,
-      label: "Study",
-      value: "study",
-    },
     {
       href: "/tasks",
       icon: Kanban,

@@ -8,10 +8,6 @@ export interface ReminderConfig {
   moneyTime: string; // e.g. "20:00"
   habitsEnabled: boolean;
   habitsTime: string; // e.g. "21:00"
-  studyEnabled: boolean;
-  studyTime: string; // e.g. "18:00"
-  examEnabled: boolean;
-  examTime: string; // e.g. "10:00"
   soundEnabled: boolean;
 }
 
@@ -23,10 +19,6 @@ export const DEFAULT_REMINDER_CONFIG: ReminderConfig = {
   moneyTime: "20:00", // 8:00 PM
   habitsEnabled: false,
   habitsTime: "21:00", // 9:00 PM
-  studyEnabled: false,
-  studyTime: "18:00", // 6:00 PM
-  examEnabled: false,
-  examTime: "10:00", // 10:00 AM
   soundEnabled: true,
 };
 
@@ -124,27 +116,7 @@ export function initReminderScheduler() {
       );
     }
 
-    // 3. Study Session & Exam Syllabus Reminder
-    if (config.studyEnabled && config.studyTime === currentTimeStr) {
-      await triggerReminder(
-        "study",
-        "Study & PYQ Review",
-        "Log completed focus hours and solved past-year questions.",
-        "/study"
-      );
-    }
-
-    // 4. Morning Exam Prep & Target Review Reminder
-    if (config.examEnabled && config.examTime === currentTimeStr) {
-      await triggerReminder(
-        "exam",
-        "Exam Syllabus Targets",
-        "Review today's target topics and countdown milestones.",
-        "/study"
-      );
-    }
-
-    // 5. Debt Due Date Reminders (Lent & Borrowed Due Today - Triggers STRICTLY ONCE PER DAY per debt)
+    // 3. Debt Due Date Reminders (Lent & Borrowed Due Today - Triggers STRICTLY ONCE PER DAY per debt)
     try {
       const localDebtsStr = localStorage.getItem("invictus_debts");
       if (localDebtsStr) {

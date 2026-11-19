@@ -49,7 +49,7 @@ describe("useLiveActivityStore", () => {
     expect(current.gymRest.secondsLeft).toBe(0);
   });
 
-  it("should start and control a Pomodoro study session", () => {
+  it("should start and control a Pomodoro focus session", () => {
     const store = useLiveActivityStore.getState();
     store.startPomodoro(25, "Organic Chemistry", "focus");
 

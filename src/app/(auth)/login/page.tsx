@@ -108,13 +108,13 @@ function LoginForm() {
 
           <div className="space-y-1">
             <h1 className="font-heading font-black text-2xl sm:text-3xl lg:text-4xl text-[#161514] dark:text-[#FAF8F5] tracking-tight leading-tight">
-              Life, study & money.
+              Life, habits & money.
               <span className="block text-[#6B6B6B] dark:text-[#A8A29E] text-lg sm:text-2xl font-bold">
                 In one focused cockpit.
               </span>
             </h1>
             <p className="text-xs sm:text-sm font-medium text-[#6B6B6B] dark:text-[#A8A29E] leading-relaxed max-w-md mx-auto md:mx-0">
-              Personal operating system for disciplined tasks, atomic habits, deep study sprints, and calm money tracking.
+              Personal operating system for disciplined tasks, atomic habits, workout telemetry, and calm money tracking.
             </p>
           </div>
         </div>
@@ -210,19 +210,19 @@ function LoginForm() {
             </div>
           </div>
 
-          {/* Bento Card 3: Study & Syllabus Engine */}
+          {/* Bento Card 3: Tasks & Execution Engine */}
           <div className="bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#2A2724] rounded-2xl p-3.5 shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#2A2724] text-left transition-all hover:-translate-y-0.5 space-y-2 flex flex-col justify-between">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="size-7 rounded-lg bg-[#C084FC] text-[#161514] flex items-center justify-center border border-[#161514] shadow-[1px_1px_0px_0px_#161514] shrink-0">
+                <div className="size-7 rounded-lg bg-[#F59E0B] text-[#161514] flex items-center justify-center border border-[#161514] shadow-[1px_1px_0px_0px_#161514] shrink-0">
                   <Zap className="size-4 stroke-[2.5]" />
                 </div>
                 <div>
                   <span className="font-heading font-black text-xs uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] block">
-                    Study Engine
+                    Tasks Engine
                   </span>
                   <span className="font-mono text-[10px] text-[#6B6B6B] dark:text-[#A8A29E]">
-                    Spaced Repetition
+                    Kanban & Priorities
                   </span>
                 </div>
               </div>
@@ -232,15 +232,15 @@ function LoginForm() {
             <div className="bg-white dark:bg-[#1C1A18] rounded-xl p-2.5 border border-[#161514]/15 dark:border-[#2A2724] space-y-1.5">
               <div className="flex items-center justify-between text-[11px] font-mono">
                 <span className="flex items-center gap-1 text-[#161514] dark:text-[#FAF8F5] font-bold">
-                  <Clock className="size-3 text-[#C084FC]" />
-                  <span>25m Focus Block</span>
+                  <CheckCircle2 className="size-3 text-[#F59E0B]" />
+                  <span>3 High Priority</span>
                 </span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-400 font-bold">
-                  14 Due
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-400 font-bold">
+                  Active
                 </span>
               </div>
               <div className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E] truncate">
-                Queue: OS Virtual Memory
+                Queue: Ship production release
               </div>
             </div>
           </div>

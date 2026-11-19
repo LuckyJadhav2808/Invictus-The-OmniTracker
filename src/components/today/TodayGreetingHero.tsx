@@ -36,8 +36,6 @@ interface TodayGreetingHeroProps {
   streakFreezeTokens: number;
   completedHabitsCount: number;
   totalHabitsCount: number;
-  studyMinutesToday: number;
-  isStudyingActive: boolean;
   allHabitsConquered: boolean;
   daypartMode?: DaypartMode;
   effectiveDaypart?: EffectiveDaypart;
@@ -57,8 +55,6 @@ export function TodayGreetingHero({
   streakFreezeTokens,
   completedHabitsCount,
   totalHabitsCount,
-  studyMinutesToday,
-  isStudyingActive,
   allHabitsConquered,
   daypartMode = 'auto',
   effectiveDaypart = 'dawn',
@@ -67,7 +63,6 @@ export function TodayGreetingHero({
   // Determine companion avatar state based on live telemetry
   const getStrobiState = (): StrobiState => {
     if (allHabitsConquered && totalHabitsCount > 0) return 'celebrate';
-    if (isStudyingActive) return 'focus';
     const hour = new Date().getHours();
     if (hour >= 23 || hour < 5) return 'sleep';
     if (streakDays >= 3) return 'fire';

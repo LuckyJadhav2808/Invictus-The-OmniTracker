@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils";
 import {
   SunMedium,
   CheckSquare,
-  GraduationCap,
   Kanban,
   Wallet,
   BarChart2,
@@ -87,15 +86,6 @@ export function SpaceHeader() {
         subtitle: "Routines, Streaks & Wellness",
         icon: CheckSquare,
         accentColor: "bg-[#03D26F] text-[#161514]",
-      };
-    }
-    if (pathname.startsWith("/study")) {
-      return {
-        title: "Study & Exams",
-        shortTitle: "Study",
-        subtitle: "Syllabus, Sessions & Mock Tests",
-        icon: GraduationCap,
-        accentColor: "bg-[#C084FC] text-[#161514]",
       };
     }
     if (pathname.startsWith("/tasks")) {

@@ -9,7 +9,6 @@ import {
   Frown,
   Moon,
   CheckCircle2,
-  GraduationCap,
   Wallet,
   Calendar,
   Lock,
@@ -162,12 +161,12 @@ export function EveningCloseoutDrawer({
         <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl p-3 border border-[#E8E5DF] dark:border-[#2A2724] flex items-start gap-2.5 text-xs text-[#161514]/80 dark:text-[#FAF8F5]/80">
           <Moon className="size-4 text-purple-600 dark:text-purple-400 shrink-0 mt-0.5" />
           <p className="leading-snug">
-            <strong>Day Closeout:</strong> Seals today&apos;s habits, study focus, and spending into your permanent streak history so you wake up tomorrow with zero cognitive clutter.
+            <strong>Day Closeout:</strong> Seals today&apos;s habits and spending into your permanent streak history so you wake up tomorrow with zero cognitive clutter.
           </p>
         </div>
 
         {/* 2. Compact Review Summary */}
-        <div className="grid grid-cols-3 gap-2 sm:gap-3">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3">
           {/* Habits */}
           <div className="bg-[#FBF9F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] rounded-xl p-2.5 sm:p-3 text-center space-y-0.5">
             <div className="flex items-center justify-center gap-1 text-xs text-[#6B6B6B] dark:text-[#FAF8F5]/60">
@@ -176,17 +175,6 @@ export function EveningCloseoutDrawer({
             </div>
             <p className="text-xs sm:text-sm font-semibold text-[#161514] dark:text-[#FAF8F5]">
               <span className="font-mono tabular-nums">{metrics.completedHabitsCount}/{metrics.totalHabitsCount}</span>
-            </p>
-          </div>
-
-          {/* Study */}
-          <div className="bg-[#FBF9F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] rounded-xl p-2.5 sm:p-3 text-center space-y-0.5">
-            <div className="flex items-center justify-center gap-1 text-xs text-[#6B6B6B] dark:text-[#FAF8F5]/60">
-              <GraduationCap className="size-3 text-[#161514] dark:text-[#FAF8F5]" />
-              <span>Focus</span>
-            </div>
-            <p className="text-xs sm:text-sm font-semibold text-[#161514] dark:text-[#FAF8F5]">
-              <span className="font-mono tabular-nums">{metrics.studyHoursFormatted}</span>
             </p>
           </div>
 

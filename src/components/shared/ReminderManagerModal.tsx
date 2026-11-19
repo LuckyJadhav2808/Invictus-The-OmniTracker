@@ -9,7 +9,7 @@ import {
   DEFAULT_REMINDER_CONFIG,
 } from "@/lib/utils/reminder-scheduler";
 import { requestNotificationPermission, sendNativeNotification } from "@/lib/utils/notifications";
-import { Bell, Clock, Wallet, CheckSquare, GraduationCap, Target, Volume2, VolumeX, CheckCircle2 } from "lucide-react";
+import { Bell, Clock, Wallet, CheckSquare, Volume2, VolumeX, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { NeobrutalistTimeInput } from "@/components/shared/NeobrutalistTimeInput";
@@ -22,7 +22,7 @@ import { triggerHaptic } from "@/lib/native/haptics";
 interface ReminderManagerModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  defaultSpace?: "money" | "habits" | "study" | "exam" | "all";
+  defaultSpace?: "money" | "habits" | "all";
 }
 
 export function ReminderManagerModal({
@@ -218,64 +218,6 @@ export function ReminderManagerModal({
               <NeobrutalistTimeInput
                 value={config.habitsTime}
                 onChange={(val) => setConfig({ ...config, habitsTime: val })}
-              />
-            </div>
-          )}
-        </div>
-
-        {/* 3. Study Session & Exam Syllabus Reminder */}
-        <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] p-3.5 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-2 transition-colors">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="size-8 rounded-lg bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-600 dark:text-purple-400 shrink-0">
-                <GraduationCap className="size-4 stroke-[2.2]" />
-              </div>
-              <span className="text-xs font-heading font-bold text-[#161514] dark:text-[#FAF8F5]">
-                Study Log & Review
-              </span>
-            </div>
-            <input
-              type="checkbox"
-              checked={config.studyEnabled}
-              onChange={(e) => setConfig({ ...config, studyEnabled: e.target.checked })}
-              className="h-4 w-4 rounded accent-purple-600 cursor-pointer"
-            />
-          </div>
-
-          {config.studyEnabled && (
-            <div className="pt-2 border-t border-[#E8E5DF] dark:border-[#2A2724]">
-              <NeobrutalistTimeInput
-                value={config.studyTime}
-                onChange={(val) => setConfig({ ...config, studyTime: val })}
-              />
-            </div>
-          )}
-        </div>
-
-        {/* 4. Exam Targets & Countdown Review */}
-        <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] p-3.5 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-2 transition-colors">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="size-8 rounded-lg bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-600 dark:text-rose-400 shrink-0">
-                <Target className="size-4 stroke-[2.2]" />
-              </div>
-              <span className="text-xs font-heading font-bold text-[#161514] dark:text-[#FAF8F5]">
-                Exam Target & Countdown Review
-              </span>
-            </div>
-            <input
-              type="checkbox"
-              checked={config.examEnabled}
-              onChange={(e) => setConfig({ ...config, examEnabled: e.target.checked })}
-              className="h-4 w-4 rounded accent-rose-500 cursor-pointer"
-            />
-          </div>
-
-          {config.examEnabled && (
-            <div className="pt-2 border-t border-[#E8E5DF] dark:border-[#2A2724]">
-              <NeobrutalistTimeInput
-                value={config.examTime}
-                onChange={(val) => setConfig({ ...config, examTime: val })}
               />
             </div>
           )}

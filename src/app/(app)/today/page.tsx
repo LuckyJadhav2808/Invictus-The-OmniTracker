@@ -16,7 +16,6 @@ import {
   useHealthProfile,
 } from "@/lib/queries/goals";
 import { soundFX } from "@/components/shared/SoundFX";
-import { useStudySessions, useSubjects, useAllTopics, useAddStudySession } from "@/lib/queries/study";
 import { useTransactions, useCategories, useAddTransaction, useBudgetPreferences, useUpdateBudgetPreferences } from "@/lib/queries/money";
 import { useTasks, useUpdateTask, useCreateTask } from "@/lib/queries/tasks";
 import { computeMonthlyBudgetStats } from "@/lib/utils/budget-rollover";
@@ -72,11 +71,6 @@ export default function TodayPage() {
   const { data: streaks = {} } = useStreaks();
   const { data: streakFreeze = { userId: "", tokensAvailable: 1, lastMonthlyCredit: "", frozenDates: [], autoShieldEvent: null } } = useStreakFreeze();
   const toggleHabitMutation = useToggleHabitLog();
-
-  const { data: studySessions = [] } = useStudySessions();
-  const { data: subjects = [] } = useSubjects();
-  const { data: allTopics = [] } = useAllTopics();
-  const addStudySessionMutation = useAddStudySession();
 
   const { data: transactions = [] } = useTransactions();
   const { data: categories = [] } = useCategories();
@@ -260,22 +254,6 @@ export default function TodayPage() {
     );
   }, [streaks]);
 
-  // Study metrics
-  const todayStudySessions = useMemo(
-    () => studySessions.filter((s) => s.date === selectedDate),
-    [studySessions, selectedDate]
-  );
-  const todayStudyMinutes = useMemo(
-    () => todayStudySessions.reduce((acc, s) => acc + (s.durationMinutes || 0), 0),
-    [todayStudySessions]
-  );
-  const todayStudyHours = (todayStudyMinutes / 60).toFixed(1);
-  const studyTargetHours = 4.0;
-  const studyCompletionPercent = Math.min(
-    100,
-    Math.round(((todayStudyMinutes / 60) / studyTargetHours) * 100)
-  );
-
   // Money & Safe-to-Spend metrics
   const todayTransactions = useMemo(
     () => transactions.filter((t) => t.date === selectedDate),
@@ -324,8 +302,6 @@ export default function TodayPage() {
     return computeDailyConquestScore({
       completedHabitsCount,
       totalHabitsCount,
-      studyMinutesToday: todayStudyMinutes,
-      studyTargetHours: 4.0,
       spentToday,
       dailySafeToSpend: budgetStats.dailySafeToSpend,
       currencySymbol,
@@ -333,7 +309,6 @@ export default function TodayPage() {
   }, [
     completedHabitsCount,
     totalHabitsCount,
-    todayStudyMinutes,
     spentToday,
     budgetStats.dailySafeToSpend,
     currencySymbol,
@@ -367,45 +342,6 @@ export default function TodayPage() {
       toast.success("Daily spending limit saved & synced.");
     } catch {
       toast.success("Daily limit saved locally.");
-    }
-  };
-
-  // Active Stopwatch State
-  const [stopwatchSeconds, setStopwatchSeconds] = useState(0);
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const [selectedSubjectId, setSelectedSubjectId] = useState("");
-  const [selectedTopicId, setSelectedTopicId] = useState("");
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isTimerRunning) {
-      interval = setInterval(() => {
-        setStopwatchSeconds((s) => s + 1);
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [isTimerRunning]);
-
-  const handleSaveTimerSession = async () => {
-    if (stopwatchSeconds < 60) {
-      toast.error("Sessions must be at least 1 minute to save.");
-      return;
-    }
-    const durationMinutes = Math.max(1, Math.round(stopwatchSeconds / 60));
-    try {
-      await addStudySessionMutation.mutateAsync({
-        subjectId: selectedSubjectId || (subjects[0]?.id || "general"),
-        topicId: selectedTopicId || "general",
-        durationMinutes,
-        date: selectedDate,
-        type: "practice",
-        notes: `Focus sprint recorded on ${selectedDate}`,
-      });
-      toast.success(`Logged ${durationMinutes}m focus session!`);
-      setStopwatchSeconds(0);
-      setIsTimerRunning(false);
-    } catch {
-      toast.error("Could not save session.");
     }
   };
 
@@ -475,10 +411,6 @@ export default function TodayPage() {
     const el = document.getElementById("agenda-section");
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
-  const scrollToStudy = () => {
-    const el = document.getElementById("agenda-section");
-    if (el) el.scrollIntoView({ behavior: "smooth" });
-  };
   const scrollToMoney = () => {
     const el = document.getElementById("telemetry-section");
     if (el) el.scrollIntoView({ behavior: "smooth" });
@@ -531,9 +463,6 @@ export default function TodayPage() {
       <StickyIslandMiniCockpit
         metrics={conquestMetrics}
         currentDateObj={currentDateObj}
-        isTimerRunning={isTimerRunning}
-        stopwatchSeconds={stopwatchSeconds}
-        onToggleTimer={() => setIsTimerRunning(!isTimerRunning)}
         onOpenExpenseModal={handleOpenExpenseModal}
         onScrollToTop={scrollToTop}
         visible={isStickyIslandVisible}
@@ -568,11 +497,6 @@ export default function TodayPage() {
           dailySafeToSpend={budgetStats.dailySafeToSpend}
           currencySymbol={currencySymbol}
           onOpenQuickExpense={() => setIsQuickExpenseOpen(true)}
-          todayStudyMinutes={todayStudyMinutes}
-          studyTargetHours={4.0}
-          isTimerRunning={isTimerRunning}
-          stopwatchSeconds={stopwatchSeconds}
-          onToggleTimer={() => setIsTimerRunning(!isTimerRunning)}
           onOpenScratchpad={() => setIsScratchpadDrawerOpen(true)}
           onOpenCloseoutDrawer={() => setIsCloseoutDrawerOpen(true)}
         />
@@ -583,12 +507,8 @@ export default function TodayPage() {
         totalHabitsCount={totalHabitsCount}
         completedHabitsCount={completedHabitsCount}
         hasBudgetOrExpenses={transactions.length > 0 || (Boolean(cloudBudgetPrefs?.customDailyBudget) && (cloudBudgetPrefs?.customDailyBudget ?? 0) > 0)}
-        hasStudySessions={studySessions.length > 0 || todayStudyMinutes > 0}
+        hasTasks={tasks.length > 0}
         onOpenDailyLimitModal={() => setIsDailyLimitModalOpen(true)}
-        onStartStudySprint={() => {
-          scrollToStudy();
-          setIsTimerRunning(true);
-        }}
       />
 
       {/* ZONE 3: UNIFIED CHRONOLOGICAL DAY AGENDA (Morning / Workload / Evening) */}

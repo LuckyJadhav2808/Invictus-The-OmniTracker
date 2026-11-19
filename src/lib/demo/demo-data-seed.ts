@@ -1,5 +1,5 @@
 import { format, subDays, addDays, subMonths } from "date-fns";
-import { TaskItem, Habit, Subject, Topic, StudySession, Test, Category, Transaction, Debt } from "@/types";
+import { TaskItem, Habit, Category, Transaction, Debt } from "@/types";
 
 export const DEMO_DATA_FLAG_KEY = "invictus_demo_data_active";
 
@@ -281,118 +281,7 @@ export function generateEvaluatorDemoDataset() {
   ];
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // 5. STUDY SPACE - 2 Core Subjects & 3 Topics
-  // ─────────────────────────────────────────────────────────────────────────────
-  const subjects: Subject[] = [
-    {
-      id: "demo_sub_cs",
-      name: "Computer Networks & Protocols",
-      color: "indigo",
-      icon: "Cpu",
-      archived: false,
-      createdAt: new Date(subDays(now, 10)).toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    {
-      id: "demo_sub_dbms",
-      name: "Database Management Systems",
-      color: "emerald",
-      icon: "Binary",
-      archived: false,
-      createdAt: new Date(subDays(now, 10)).toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-  ];
-
-  const topics: Topic[] = [
-    {
-      id: "demo_top_1",
-      subjectId: "demo_sub_cs",
-      title: "TCP 3-Way Handshake & Flow Control",
-      status: "completed",
-      estimatedHours: 3,
-      loggedHours: 2.5,
-      confidence: 5,
-      revisionsCount: 3,
-      easinessFactor: 2.5,
-      intervalDays: 4,
-      nextRevisionDate: format(addDays(now, 3), "yyyy-MM-dd"),
-      lastRevisedAt: yesterdayStr,
-      notes: "SYN, SYN-ACK, ACK. Sliding window buffer flow control.",
-      resourceLinks: [],
-      order: 0,
-      createdAt: new Date(subDays(now, 7)).toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    {
-      id: "demo_top_2",
-      subjectId: "demo_sub_cs",
-      title: "TCP Congestion Avoidance & Fast Recovery",
-      status: "needsRevision",
-      estimatedHours: 3,
-      loggedHours: 1.5,
-      confidence: 3,
-      revisionsCount: 2,
-      easinessFactor: 2.3,
-      intervalDays: 2,
-      nextRevisionDate: todayStr,
-      lastRevisedAt: format(subDays(now, 2), "yyyy-MM-dd"),
-      notes: "Slow start threshold (ssthresh), additive increase multiplicative decrease (AIMD).",
-      resourceLinks: [],
-      order: 1,
-      createdAt: new Date(subDays(now, 6)).toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    {
-      id: "demo_top_3",
-      subjectId: "demo_sub_dbms",
-      title: "B+ Tree Indexing & Query Execution Plans",
-      status: "completed",
-      estimatedHours: 4,
-      loggedHours: 3.5,
-      confidence: 4,
-      revisionsCount: 3,
-      easinessFactor: 2.6,
-      intervalDays: 5,
-      nextRevisionDate: format(addDays(now, 4), "yyyy-MM-dd"),
-      lastRevisedAt: format(subDays(now, 3), "yyyy-MM-dd"),
-      notes: "B+ Tree node fanout, clustered vs secondary indexing, range scan optimality.",
-      resourceLinks: [],
-      order: 0,
-      createdAt: new Date(subDays(now, 8)).toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-  ];
-
-  const studySessions: StudySession[] = [
-    {
-      id: "demo_sess_1",
-      subjectId: "demo_sub_cs",
-      topicId: "demo_top_1",
-      date: yesterdayStr,
-      durationMinutes: 60,
-      type: "revision",
-      notes: "Reviewed TCP handshake wireshark captures.",
-      createdAt: new Date(subDays(now, 1)).toISOString(),
-    },
-  ];
-
-  const tests: Test[] = [
-    {
-      id: "demo_test_1",
-      name: "Computer Networks Mid-Semester Exam",
-      date: format(addDays(now, 10), "yyyy-MM-dd"),
-      scope: ["demo_sub_cs"],
-      score: 88,
-      totalScore: 100,
-      timeTakenMinutes: 60,
-      weakAreas: ["Congestion Control Window calculations"],
-      createdAt: new Date().toISOString(),
-    },
-  ];
-
-  // ─────────────────────────────────────────────────────────────────────────────
-  // 6. MONEY SPACE - Calibrated, Normal Daily Transactions (Zero Clutter)
+  // 5. MONEY SPACE - Calibrated, Normal Daily Transactions (Zero Clutter)
   // ─────────────────────────────────────────────────────────────────────────────
   const categories: Category[] = [
     { id: "cat-salary", name: "Salary & Stipends", type: "income", icon: "DollarSign", color: "mint", archived: false },
@@ -518,10 +407,6 @@ export function generateEvaluatorDemoDataset() {
     gymRoutines,
     nutritionTargets,
     mealPlans,
-    subjects,
-    topics,
-    studySessions,
-    tests,
     categories,
     transactions,
     debts,
@@ -590,13 +475,7 @@ export function loadEvaluatorDemoData(): boolean {
     localStorage.setItem("invictus_nutrition_targets", JSON.stringify(data.nutritionTargets));
     localStorage.setItem("invictus_meal_plans", JSON.stringify(data.mealPlans));
 
-    // 4. Study
-    localStorage.setItem("invictus_subjects", JSON.stringify(data.subjects));
-    localStorage.setItem("invictus_topics", JSON.stringify(data.topics));
-    localStorage.setItem("invictus_study_sessions", JSON.stringify(data.studySessions));
-    localStorage.setItem("invictus_tests", JSON.stringify(data.tests));
-
-    // 5. Money
+    // 4. Money
     localStorage.setItem("invictus_categories", JSON.stringify(data.categories));
     localStorage.setItem("invictus_transactions", JSON.stringify(data.transactions));
     localStorage.setItem("invictus_debts", JSON.stringify(data.debts));
@@ -630,7 +509,7 @@ export function loadEvaluatorDemoData(): boolean {
           currency: "INR",
           timezone: "Asia/Kolkata",
           weekStartsOn: 1,
-          modulesEnabled: { goals: true, study: true, money: true },
+          modulesEnabled: { goals: true, tasks: true, money: true },
         })
       );
     }
@@ -676,10 +555,6 @@ export function clearEvaluatorDemoData(): boolean {
       "invictus_gym_routines",
       "invictus_nutrition_targets",
       "invictus_meal_plans",
-      "invictus_subjects",
-      "invictus_topics",
-      "invictus_study_sessions",
-      "invictus_tests",
       "invictus_categories",
       "invictus_transactions",
       "invictus_debts",

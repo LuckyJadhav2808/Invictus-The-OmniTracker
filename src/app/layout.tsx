@@ -50,9 +50,9 @@ const architectsDaughter = Architects_Daughter({
 });
 
 export const metadata: Metadata = {
-  title: "Invictus — Life, Study & Money Tracker",
+  title: "Invictus — Life, Habits & Money OS",
   description:
-    "A single, playful, all-in-one webapp to track goals, habits, study, and money.",
+    "A single, playful, all-in-one webapp to track goals, habits, tasks, and money.",
   manifest: "/manifest.json",
   icons: {
     icon: [

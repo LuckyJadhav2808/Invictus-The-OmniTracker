@@ -1,9 +1,9 @@
-import { type Habit, type Streak, type Category, type Transaction, type StudySession } from "@/types";
+import { type Habit, type Streak, type Category, type Transaction, type TaskItem } from "@/types";
 import { format } from "date-fns";
 
 export interface Insight {
   id: string;
-  module: "goals" | "study" | "money";
+  module: "goals" | "tasks" | "money";
   text: string;
   severity: "info" | "positive" | "warning";
 }
@@ -13,13 +13,13 @@ export function generateInsights({
   streaks = {},
   categories = [],
   transactions = [],
-  studySessions = [],
+  tasks = [],
 }: {
   habits?: Habit[];
   streaks?: Record<string, Streak>;
   categories?: Category[];
   transactions?: Transaction[];
-  studySessions?: StudySession[];
+  tasks?: TaskItem[];
 }): Insight[] {
   const insights: Insight[] = [];
 
@@ -36,22 +36,21 @@ export function generateInsights({
     }
   });
 
-  // 2. Study Insight
-  const totalStudyMinutes = studySessions.reduce((sum, s) => sum + s.durationMinutes, 0);
-  if (totalStudyMinutes === 0) {
+  // 2. Tasks Insight
+  const completedTasks = tasks.filter((t) => t.status === "completed").length;
+  if (completedTasks > 0) {
     insights.push({
-      id: "study-none",
-      module: "study",
-      text: "Start your first study session stopwatch today to map out topic mastery! ⏱️",
-      severity: "info",
-    });
-  } else {
-    const studyHours = (totalStudyMinutes / 60).toFixed(1);
-    insights.push({
-      id: "study-active",
-      module: "study",
-      text: `Great work! You have logged ${studyHours} hours of focused study time so far. 📖`,
+      id: "tasks-completed",
+      module: "tasks",
+      text: `Great execution! You have conquered ${completedTasks} priority tasks so far. 🎯`,
       severity: "positive",
+    });
+  } else if (tasks.length > 0) {
+    insights.push({
+      id: "tasks-backlog",
+      module: "tasks",
+      text: "You have actionable items on your board. Knock out a P1 task to build momentum! ⚡",
+      severity: "info",
     });
   }
 

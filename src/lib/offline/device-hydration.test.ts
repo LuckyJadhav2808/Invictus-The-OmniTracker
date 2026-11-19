@@ -41,7 +41,7 @@ describe("Cross-Device Data Hydration Engine", () => {
         weekStartsOn: 1,
         currency: "INR",
         onboarded: true,
-        modulesEnabled: { goals: true, study: true, money: true },
+        modulesEnabled: { goals: true, tasks: true, money: true },
         createdAt: new Date().toISOString(),
       })
     ).toBe(false);
@@ -62,7 +62,7 @@ describe("Cross-Device Data Hydration Engine", () => {
       weekStartsOn: 1,
       currency: "INR",
       onboarded: true,
-      modulesEnabled: { goals: true, study: true, money: true },
+      modulesEnabled: { goals: true, tasks: true, money: true },
       createdAt: "2026-08-09T17:52:04.181Z",
       budgetPreferences: {
         upiBudget: 10000,
@@ -109,7 +109,7 @@ describe("Cross-Device Data Hydration Engine", () => {
       weekStartsOn: 1,
       currency: "INR",
       onboarded: true,
-      modulesEnabled: { goals: true, study: true, money: true },
+      modulesEnabled: { goals: true, tasks: true, money: true },
       createdAt: new Date().toISOString(),
     };
 

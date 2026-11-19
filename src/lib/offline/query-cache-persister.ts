@@ -13,8 +13,6 @@ const PERSISTABLE_DOMAINS = new Set([
   "streaks",
   "streakFreeze",
   "tasks",
-  "studySessions",
-  "subjects",
   "transactions",
   "categories",
   "budgetPreferences",

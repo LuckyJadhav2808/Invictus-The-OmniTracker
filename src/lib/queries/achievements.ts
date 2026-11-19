@@ -1,6 +1,5 @@
 import { useHabits, useStreaks } from "@/lib/queries/goals";
 import { useTransactions, useSavingsGoals } from "@/lib/queries/money";
-import { useStudySessions } from "@/lib/queries/study";
 
 export interface AchievementBadge {
   id: string;
@@ -17,7 +16,6 @@ export function useUserAchievements() {
   const { data: streaksData = [] } = useStreaks();
   const { data: transactions = [] } = useTransactions();
   const { data: savingsGoals = [] } = useSavingsGoals();
-  const { data: studySessions = [] } = useStudySessions();
 
   // Ensure streaks is an array
   const streaksList = Array.isArray(streaksData) ? streaksData : [streaksData].filter(Boolean);
@@ -25,14 +23,10 @@ export function useUserAchievements() {
   // 1. Max Streak calculation
   const maxStreak = streaksList.reduce((max: number, s: any) => Math.max(max, s?.currentStreak || 0), 0);
 
-  // 2. Total Study Hours calculation
-  const totalStudyMinutes = studySessions.reduce((sum: number, s: any) => sum + (s?.durationMinutes || 0), 0);
-  const totalStudyHours = totalStudyMinutes / 60;
-
-  // 3. Completed Savings Goals calculation
+  // 2. Completed Savings Goals calculation
   const completedSavings = savingsGoals.filter((g: any) => (g?.currentAmount || 0) >= (g?.targetAmount || 1)).length;
 
-  // 4. Total habits count
+  // 3. Total habits count
   const activeHabitsCount = habits.filter((h: any) => !h?.archived).length;
 
   const badges: AchievementBadge[] = [
@@ -64,15 +58,6 @@ export function useUserAchievements() {
       icon: "💰",
     },
     {
-      id: "study_10_hours",
-      title: "Study Sprint",
-      desc: "Log over 10 hours of total focused study time",
-      xp: 200,
-      unlocked: totalStudyHours >= 10,
-      progressText: `${totalStudyHours.toFixed(1)} / 10 Hours`,
-      icon: "📚",
-    },
-    {
       id: "streak_30",
       title: "30-Day Streak",
       desc: "Maintain an active habit streak for 30 consecutive days",
@@ -100,7 +85,6 @@ export function useUserAchievements() {
     totalXP,
     userLevel,
     maxStreak,
-    totalStudyHours,
     completedSavings,
   };
 }

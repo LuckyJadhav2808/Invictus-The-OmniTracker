@@ -9,9 +9,6 @@ import { Diet } from "@/models/Diet";
 import { Macros } from "@/models/Macros";
 import { Transaction } from "@/models/Transaction";
 import { Category } from "@/models/Category";
-import { Subject } from "@/models/Subject";
-import { Topic } from "@/models/Topic";
-import { StudySession } from "@/models/StudySession";
 import { MoodLog } from "@/models/MoodLog";
 import { SavingsGoal } from "@/models/SavingsGoal";
 import { Subscription } from "@/models/Subscription";
@@ -63,9 +60,6 @@ export async function DELETE(req: Request) {
       Macros.deleteMany({ userId: uid }),
       Transaction.deleteMany({ userId: uid }),
       Category.deleteMany({ userId: uid }),
-      Subject.deleteMany({ userId: uid }),
-      Topic.deleteMany({ userId: uid }),
-      StudySession.deleteMany({ userId: uid }),
       MoodLog.deleteMany({ userId: uid }),
       SavingsGoal.deleteMany({ userId: uid }),
       Subscription.deleteMany({ userId: uid }),

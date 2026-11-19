@@ -120,7 +120,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       weekStartsOn: 1,
       currency: "INR",
       onboarded: true,
-      modulesEnabled: { goals: true, study: true, money: true },
+      modulesEnabled: { goals: true, tasks: true, money: true },
     };
     setUser(guestUser);
   };

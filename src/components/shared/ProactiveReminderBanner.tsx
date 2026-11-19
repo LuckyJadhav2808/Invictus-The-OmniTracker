@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 interface ProactiveReminderBannerProps {
-  space?: "today" | "money" | "goals" | "habits" | "study" | "exam" | "all";
+  space?: "today" | "money" | "goals" | "habits" | "all";
 }
 
 export function ProactiveReminderBanner({ space = "today" }: ProactiveReminderBannerProps) {
@@ -34,9 +34,7 @@ export function ProactiveReminderBanner({ space = "today" }: ProactiveReminderBa
     let isActive = false;
     if (space === "money") isActive = config.moneyEnabled;
     else if (space === "goals" || space === "habits") isActive = config.habitsEnabled;
-    else if (space === "study") isActive = config.studyEnabled;
-    else if (space === "exam") isActive = config.examEnabled;
-    else isActive = config.moneyEnabled || config.habitsEnabled || config.studyEnabled || config.examEnabled;
+    else isActive = config.moneyEnabled || config.habitsEnabled;
 
     setHasEnabledReminders(isActive);
   }, [space, dismissStorageKey]);
@@ -56,8 +54,6 @@ export function ProactiveReminderBanner({ space = "today" }: ProactiveReminderBa
     
     if (space === "money") {
       config.moneyEnabled = true;
-    } else if (space === "study" || space === "exam") {
-      config.studyEnabled = true;
     } else {
       config.habitsEnabled = true;
     }
@@ -76,7 +72,7 @@ export function ProactiveReminderBanner({ space = "today" }: ProactiveReminderBa
       );
     }
     toast.success("Daily Reminders Active", {
-      description: space === "money" ? "Evening expense log set for 8:00 PM" : space === "study" ? "Study session prompt set for 6:00 PM" : "Habit streak check-in set for 9:00 PM",
+      description: space === "money" ? "Evening expense log set for 8:00 PM" : "Habit streak check-in set for 9:00 PM",
     });
   };
 
@@ -89,13 +85,6 @@ export function ProactiveReminderBanner({ space = "today" }: ProactiveReminderBa
           description: "Get a gentle evening prompt at 9:00 PM to review and protect your streaks.",
           buttonLabel: "Enable (9:00 PM)",
         };
-      case "study":
-      case "exam":
-        return {
-          title: "Study Sprint Reminders",
-          description: "Stay consistent for exams. Evening reminder prompt at 6:00 PM.",
-          buttonLabel: "Enable (6:00 PM)",
-        };
       case "money":
         return {
           title: "Expense Logging Reminders",
@@ -105,7 +94,7 @@ export function ProactiveReminderBanner({ space = "today" }: ProactiveReminderBa
       default:
         return {
           title: "Daily Consistency Reminders",
-          description: "Gentle daily alerts for habits, study sprints, and expense logs.",
+          description: "Gentle daily alerts for habits and expense logs.",
           buttonLabel: "Enable Reminders",
         };
     }

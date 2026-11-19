@@ -33,15 +33,12 @@ export interface MasterTodayHeroProps {
   streakFreezeTokens: number;
   completedHabitsCount: number;
   totalHabitsCount: number;
-  studyMinutesToday: number;
-  isStudyingActive: boolean;
   allHabitsConquered: boolean;
   daypartMode?: DaypartMode;
   effectiveDaypart?: EffectiveDaypart;
   onSelectDaypartMode?: (mode: DaypartMode) => void;
   metrics: DailyConquestMetrics;
   onScrollToHabits?: () => void;
-  onScrollToStudy?: () => void;
   onScrollToMoney?: () => void;
   onToggleTimer?: () => void;
   onOpenExpenseModal?: () => void;
@@ -64,15 +61,12 @@ export const MasterTodayHero = React.memo(function MasterTodayHero({
   streakFreezeTokens,
   completedHabitsCount,
   totalHabitsCount,
-  studyMinutesToday,
-  isStudyingActive,
   allHabitsConquered,
   daypartMode = "auto",
   effectiveDaypart = "dawn",
   onSelectDaypartMode,
   metrics,
   onScrollToHabits,
-  onScrollToStudy,
   onScrollToMoney,
   onToggleTimer,
   onOpenExpenseModal,
@@ -83,7 +77,6 @@ export const MasterTodayHero = React.memo(function MasterTodayHero({
   // Determine companion avatar state
   const getStrobiState = (): StrobiState => {
     if (allHabitsConquered && totalHabitsCount > 0) return "celebrate";
-    if (isStudyingActive) return "focus";
     const hour = new Date().getHours();
     if (hour >= 23 || hour < 5) return "sleep";
     if (streakDays >= 3) return "fire";

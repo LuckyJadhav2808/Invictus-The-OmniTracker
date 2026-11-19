@@ -2,14 +2,13 @@
 
 import React from "react";
 import { type DailyConquestMetrics } from "@/components/today/useTodayCockpitViewModel";
-import { CheckCircle2, GraduationCap, Wallet, ChevronRight, Zap } from "lucide-react";
+import { ChevronRight, Zap } from "lucide-react";
 import { soundFX } from "@/components/shared/SoundFX";
 import { cn } from "@/lib/utils";
 
 interface GladiatorConquestHUDProps {
   metrics: DailyConquestMetrics;
   onScrollToHabits?: () => void;
-  onScrollToStudy?: () => void;
   onScrollToMoney?: () => void;
   className?: string;
 }
@@ -17,21 +16,16 @@ interface GladiatorConquestHUDProps {
 export function GladiatorConquestHUD({
   metrics,
   onScrollToHabits,
-  onScrollToStudy,
   onScrollToMoney,
   className,
 }: GladiatorConquestHUDProps) {
-  // SVG Circumferences
-  // Outer (Habits): R = 66 -> C = 2 * PI * 66 ≈ 414.69
-  const CIRC_HABITS = 414.69;
+  // SVG Circumferences for Dual-Ring Cockpit
+  // Outer (Habits): R = 62 -> C = 2 * PI * 62 ≈ 389.56
+  const CIRC_HABITS = 389.56;
   const habitOffset = CIRC_HABITS * (1 - Math.min(100, Math.max(0, metrics.habitPercent)) / 100);
 
-  // Middle (Study): R = 50 -> C = 2 * PI * 50 ≈ 314.16
-  const CIRC_STUDY = 314.16;
-  const studyOffset = CIRC_STUDY * (1 - Math.min(100, Math.max(0, metrics.studyPercent)) / 100);
-
-  // Inner (Budget): R = 34 -> C = 2 * PI * 34 ≈ 213.63
-  const CIRC_BUDGET = 213.63;
+  // Inner (Budget): R = 44 -> C = 2 * PI * 44 ≈ 276.46
+  const CIRC_BUDGET = 276.46;
   const budgetOffset = CIRC_BUDGET * (1 - Math.min(100, Math.max(0, metrics.budgetPercent)) / 100);
 
   const handleRowClick = (action?: () => void) => {
@@ -63,9 +57,9 @@ export function GladiatorConquestHUD({
         </div>
       </div>
 
-      {/* Main Cockpit Body: Rings (Left) + Interactive Rows (Right) */}
+      {/* Main Cockpit Body: Dual Concentric Rings (Left) + Interactive Rows (Right) */}
       <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-        {/* 1. Handcrafted Concentric Tri-Rings SVG */}
+        {/* 1. Dual Concentric Rings SVG */}
         <div className="relative size-36 sm:size-40 shrink-0 flex items-center justify-center">
           <svg
             className="size-full -rotate-90 overflow-visible"
@@ -76,48 +70,22 @@ export function GladiatorConquestHUD({
             <circle
               cx="80"
               cy="80"
-              r="66"
+              r="62"
               fill="none"
               stroke="#03D26F"
-              strokeWidth="9"
+              strokeWidth="10"
               opacity="0.18"
             />
             <circle
               cx="80"
               cy="80"
-              r="66"
+              r="62"
               fill="none"
               stroke="#03D26F"
-              strokeWidth="9"
+              strokeWidth="10"
               strokeLinecap="round"
               strokeDasharray={CIRC_HABITS}
               strokeDashoffset={habitOffset}
-              style={{
-                transition: "stroke-dashoffset 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)",
-                willChange: "stroke-dashoffset",
-              }}
-            />
-
-            {/* Middle Ring: Study Focus (🟣 #C084FC) */}
-            <circle
-              cx="80"
-              cy="80"
-              r="50"
-              fill="none"
-              stroke="#C084FC"
-              strokeWidth="9"
-              opacity="0.22"
-            />
-            <circle
-              cx="80"
-              cy="80"
-              r="50"
-              fill="none"
-              stroke="#C084FC"
-              strokeWidth="9"
-              strokeLinecap="round"
-              strokeDasharray={CIRC_STUDY}
-              strokeDashoffset={studyOffset}
               style={{
                 transition: "stroke-dashoffset 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)",
                 willChange: "stroke-dashoffset",
@@ -128,19 +96,19 @@ export function GladiatorConquestHUD({
             <circle
               cx="80"
               cy="80"
-              r="34"
+              r="44"
               fill="none"
               stroke="#CEF431"
-              strokeWidth="9"
+              strokeWidth="10"
               opacity="0.25"
             />
             <circle
               cx="80"
               cy="80"
-              r="34"
+              r="44"
               fill="none"
               stroke="#CEF431"
-              strokeWidth="9"
+              strokeWidth="10"
               strokeLinecap="round"
               strokeDasharray={CIRC_BUDGET}
               strokeDashoffset={budgetOffset}
@@ -162,17 +130,17 @@ export function GladiatorConquestHUD({
           </div>
         </div>
 
-        {/* 2. Three Interactive Drill-Down Metric Rows */}
-        <div className="w-full flex-1 flex flex-col gap-2">
+        {/* 2. Interactive Drill-Down Metric Rows */}
+        <div className="w-full flex-1 flex flex-col gap-2.5">
           {/* Habits Conquest Row */}
           <button
             type="button"
             onClick={() => handleRowClick(onScrollToHabits)}
-            className="w-full bg-[#FAF8F5] hover:bg-[#F3EFEA] active:translate-x-0.5 border-2 border-[#161514] rounded-xl px-3 py-2 shadow-[2px_2px_0px_#161514] flex items-center justify-between text-left transition-all cursor-pointer group"
+            className="w-full bg-[#FAF8F5] hover:bg-[#F3EFEA] active:translate-x-0.5 border-2 border-[#161514] rounded-xl px-3.5 py-2.5 shadow-[2px_2px_0px_#161514] flex items-center justify-between text-left transition-all cursor-pointer group"
             title="Jump to Habits"
           >
-            <div className="flex items-center gap-2 min-w-0">
-              <span className="size-2.5 rounded-full border border-[#161514] bg-[#03D26F] shrink-0" />
+            <div className="flex items-center gap-2.5 min-w-0">
+              <span className="size-3 rounded-full border border-[#161514] bg-[#03D26F] shrink-0" />
               <span className="font-heading font-black text-xs text-[#161514] uppercase tracking-wide truncate">
                 Habits
               </span>
@@ -185,36 +153,15 @@ export function GladiatorConquestHUD({
             </div>
           </button>
 
-          {/* Study Sprint Focus Row */}
-          <button
-            type="button"
-            onClick={() => handleRowClick(onScrollToStudy)}
-            className="w-full bg-[#FAF8F5] hover:bg-[#F3EFEA] active:translate-x-0.5 border-2 border-[#161514] rounded-xl px-3 py-2 shadow-[2px_2px_0px_#161514] flex items-center justify-between text-left transition-all cursor-pointer group"
-            title="Jump to Study Sprint"
-          >
-            <div className="flex items-center gap-2 min-w-0">
-              <span className="size-2.5 rounded-full border border-[#161514] bg-[#C084FC] shrink-0" />
-              <span className="font-heading font-black text-xs text-[#161514] uppercase tracking-wide truncate">
-                Study Sprint
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5 shrink-0">
-              <span className="font-mono font-black text-xs text-purple-900">
-                {metrics.studyHoursFormatted}/{metrics.studyTargetHoursFormatted} ({metrics.studyPercent}%)
-              </span>
-              <ChevronRight className="size-3.5 text-[#161514]/40 group-hover:text-[#161514] group-hover:translate-x-0.5 transition-all" />
-            </div>
-          </button>
-
           {/* Safe-to-Spend Financial Row */}
           <button
             type="button"
             onClick={() => handleRowClick(onScrollToMoney)}
-            className="w-full bg-[#FAF8F5] hover:bg-[#F3EFEA] active:translate-x-0.5 border-2 border-[#161514] rounded-xl px-3 py-2 shadow-[2px_2px_0px_#161514] flex items-center justify-between text-left transition-all cursor-pointer group"
+            className="w-full bg-[#FAF8F5] hover:bg-[#F3EFEA] active:translate-x-0.5 border-2 border-[#161514] rounded-xl px-3.5 py-2.5 shadow-[2px_2px_0px_#161514] flex items-center justify-between text-left transition-all cursor-pointer group"
             title="Jump to Safe-to-Spend Ledger"
           >
-            <div className="flex items-center gap-2 min-w-0">
-              <span className="size-2.5 rounded-full border border-[#161514] bg-[#CEF431] shrink-0" />
+            <div className="flex items-center gap-2.5 min-w-0">
+              <span className="size-3 rounded-full border border-[#161514] bg-[#CEF431] shrink-0" />
               <span className="font-heading font-black text-xs text-[#161514] uppercase tracking-wide truncate">
                 Safe Spend
               </span>

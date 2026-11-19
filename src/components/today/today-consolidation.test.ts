@@ -7,17 +7,14 @@ describe("The Gladiator Coliseum: Today Dashboard Architecture", () => {
     const metrics = computeDailyConquestScore({
       completedHabitsCount: 4,
       totalHabitsCount: 5,
-      studyMinutesToday: 150, // 2.5 hours
-      studyTargetHours: 4.0,
       spentToday: 150,
       dailySafeToSpend: 600,
       currencySymbol: "₹",
     });
 
     expect(metrics.habitPercent).toBe(80);
-    expect(metrics.studyPercent).toBe(63); // 2.5 / 4.0 ≈ 62.5% -> 63%
     expect(metrics.budgetPercent).toBe(75); // (600 - 150) / 600 = 75%
-    expect(metrics.overallScore).toBe(73); // Math.round(80 * 0.4 + 63 * 0.35 + 75 * 0.25) = 32 + 22.05 + 18.75 = 72.8 -> 73%
+    expect(metrics.overallScore).toBe(78); // Math.round(80 * 0.5 + 75 * 0.5) = 40 + 37.5 = 77.5 -> 78%
     expect(metrics.remainingSafeToSpend).toBe(450);
   });
 
