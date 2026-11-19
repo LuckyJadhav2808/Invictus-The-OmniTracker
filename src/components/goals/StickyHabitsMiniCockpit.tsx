@@ -130,10 +130,10 @@ export function StickyHabitsMiniCockpit({
               {isAllConquered ? (
                 <>
                   <Sparkles className="size-2.5 text-[#03D26F]" />
-                  <span className="text-[#03D26F]">Conquered</span>
+                  <span className="text-[#03D26F]">Completed</span>
                 </>
               ) : (
-                "Routines Due"
+                "Habits Due"
               )}
             </span>
             <span className="text-xs font-mono font-black text-foreground tabular-nums">

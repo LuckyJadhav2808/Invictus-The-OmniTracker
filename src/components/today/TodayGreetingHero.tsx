@@ -123,7 +123,7 @@ export function TodayGreetingHero({
           {/* Strobi Companion Avatar */}
           <StrobiCompanion
             state={strobiState}
-            gear="gladiator"
+            gear="tasks"
             size={34}
             streakDays={streakDays}
           />

@@ -20,29 +20,29 @@ export interface StrobiPartnerStageProps {
 
 const DEFAULT_QUIPS: Record<StrobiGear, string[]> = {
   gladiator: [
-    "Armor up, Gladiator! Victory is won in the morning.",
-    "Discipline is the shield; consistency is your blade.",
-    "The mind wants comfort; the champion chooses momentum.",
-    "One focus block at a time. Total conquest!",
+    "Good morning! Win the day with small consistent steps.",
+    "Discipline and consistency build lasting habits.",
+    "The mind seeks comfort; consistency builds momentum.",
+    "One focus block at a time. Steady progress!",
   ],
   fitness: [
     "Discipline beats motivation every single day. Let's get these reps!",
-    "Your streak is your fortress. Defend it at all costs!",
-    "Small daily habits compound into unstoppable identity.",
-    "An unconquered day begins with checking that first habit.",
+    "Your streak is your foundation. Keep it going!",
+    "Small daily habits compound into lasting progress.",
+    "Start your day strong by checking off that first habit.",
   ],
   tasks: [
-    "Prioritize ruthlessly. Knock out your P1 targets first!",
-    "Action cures anxiety. Start with the smallest subtask.",
-    "Clear checklist, clear mind. Let's conquer the queue!",
+    "Prioritize ruthlessly. Knock out your top priorities first!",
+    "Action cures hesitation. Start with the smallest subtask.",
+    "Clear checklist, clear mind. Let's clear the queue!",
   ],
   study: [
-    "Deep work protocol active. Lock in and protect your focus block.",
+    "Deep work session active. Lock in and protect your focus block.",
     "Active recall over passive reading. Test your understanding!",
     "25 minutes of unbroken focus is worth 2 hours of distraction.",
   ],
   money: [
-    "Every Rupee saved is a soldier fighting for your freedom.",
+    "Every Rupee saved builds financial flexibility.",
     "Stay within your safe daily pace — protect your envelope!",
     "Mindful cashflow beats impulsive spending every time.",
   ],
@@ -59,7 +59,7 @@ export function StrobiPartnerStage({
   size = 76,
   moodBadge,
   quip,
-  subtitle = "Tactical Companion",
+  subtitle = "Daily Companion",
   streakDays = 0,
   onClick,
   className,
@@ -80,14 +80,14 @@ export function StrobiPartnerStage({
   const isFiery = state === "fire" || streakDays >= 3;
 
   const defaultMoodBadge = isCelebratory
-    ? "🏆 ALL CONQUERED"
+    ? "🏆 ALL COMPLETED"
     : isFiery
     ? `🔥 ${streakDays}D STREAK ON FIRE`
     : state === "focus"
     ? "⚡ DEEP FOCUS"
     : state === "sleep"
     ? "😴 REST & RECHARGE"
-    : "🛡️ READY FOR BATTLE";
+    : "⚡ READY TO FOCUS";
 
   return (
     <div

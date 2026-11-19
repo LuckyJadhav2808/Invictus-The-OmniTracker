@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { InvictusLogo } from "@/components/shared/InvictusLogo";
+import { APP_VERSION_CONFIG } from "@/config/version";
 import { cn } from "@/lib/utils";
 
 function LoginForm() {
@@ -52,7 +53,7 @@ function LoginForm() {
     try {
       if (activeTab === "login") {
         const loggedUser = await login(email.trim(), password);
-        toast.success(`Welcome back, ${loggedUser.displayName || "Champion"}!`);
+        toast.success(`Welcome back, ${loggedUser.displayName || "Friend"}!`);
         router.push("/today");
       } else {
         if (password.length < 4) {
@@ -75,7 +76,7 @@ function LoginForm() {
 
   const handleGuestLogin = () => {
     enterGuestMode("Guest Explorer");
-    toast.success("Welcome, Explorer! Exploring Invictus in offline mode 🚀");
+    toast.success("Welcome! Exploring Invictus in offline mode.");
     router.push("/today");
   };
 
@@ -85,7 +86,7 @@ function LoginForm() {
     if (activeTab === "signup") {
       setName("Alex Morgan");
     }
-    toast.info("Demo credentials populated! Click Submit to enter. ⚡");
+    toast.info("Demo credentials populated. Click Enter Vault to continue.");
   };
 
   return (
@@ -97,7 +98,7 @@ function LoginForm() {
           <div className="flex items-center justify-center md:justify-start gap-2.5">
             <InvictusLogo size="md" variant="full" href="/" />
             <span className="bg-[#FAF8F5] dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] text-[10px] font-mono font-medium px-2 py-0.5 rounded-full border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs">
-              v1.7.8 • Offline-First OS
+              v{APP_VERSION_CONFIG.version} • Offline-First OS
             </span>
           </div>
 
@@ -109,8 +110,8 @@ function LoginForm() {
               </span>
             </h1>
             <p className="text-xs sm:text-sm font-medium text-[#6B6B6B] dark:text-[#A8A29E] leading-relaxed pt-0.5">
-              A high-precision operating system designed for relentless daily execution,
-              unbreakable habits, exam mastery, and zero financial leaks.
+              A focused personal operating system for daily tasks, consistent habits,
+              deep study, and intentional spending.
             </p>
           </div>
         </div>
@@ -123,8 +124,8 @@ function LoginForm() {
               <CheckCircle2 className="size-4 stroke-[2]" />
             </div>
             <div className="flex flex-col text-left min-w-0">
-              <span className="font-sans font-semibold text-xs text-[#161514] dark:text-[#FAF8F5] truncate">Daily Execution</span>
-              <span className="font-mono text-[10px] text-[#6B6B6B] dark:text-[#A8A29E]">Timeblocks & Live Dock</span>
+              <span className="font-sans font-semibold text-xs text-[#161514] dark:text-[#FAF8F5] truncate">Today Cockpit</span>
+              <span className="font-mono text-[10px] text-[#6B6B6B] dark:text-[#A8A29E]">Agenda & Live Dock</span>
             </div>
           </div>
 
@@ -157,7 +158,7 @@ function LoginForm() {
             </div>
             <div className="flex flex-col text-left min-w-0">
               <span className="font-sans font-semibold text-xs text-[#161514] dark:text-[#FAF8F5] truncate">Cashflow Ledger</span>
-              <span className="font-mono text-[10px] text-[#6B6B6B] dark:text-[#A8A29E]">UPI & Cash Till</span>
+              <span className="font-mono text-[10px] text-[#6B6B6B] dark:text-[#A8A29E]">UPI & Cash Envelopes</span>
             </div>
           </div>
         </div>
@@ -170,7 +171,7 @@ function LoginForm() {
               100% Private & Air-Gapped
             </span>
             <p className="text-[11px] text-[#6B6B6B] dark:text-[#A8A29E] leading-relaxed">
-              Your journals, syllabus masteries, and financial receipts remain encrypted on this device. Zero ads, zero trackers, and zero cloud surveillance.
+              Your daily logs, syllabus progress, and financial transactions remain encrypted on this device. Zero ads, zero trackers, and zero cloud surveillance.
             </p>
           </div>
         </div>

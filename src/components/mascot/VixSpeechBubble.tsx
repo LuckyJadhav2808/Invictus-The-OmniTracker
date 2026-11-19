@@ -13,14 +13,14 @@ interface VixSpeechBubbleProps {
   className?: string;
 }
 
-const GLADIATOR_QUIPS = [
-  'Armor up, Gladiator! Today is won in the morning.',
-  'Discipline is the shield; ruthless consistency is your blade.',
-  'An unconquered day begins with one checked habit.',
-  'Victory is not an event — it is a daily discipline.',
-  'Your streak is your fortress. Defend it at all costs!',
-  'The mind wants comfort; the champion chooses momentum.',
-  'One focus block at a time. Total conquest!',
+const FOCUS_QUIPS = [
+  'Good morning! Start small and build momentum.',
+  'Discipline and consistency lead to real progress.',
+  'A productive day begins with checking off your first habit.',
+  'Consistency is not an event — it is a daily practice.',
+  'Your streak is your foundation. Keep it alive today!',
+  'Focus on what matters most and finish the task.',
+  'One focus block at a time. Steady progress!',
 ];
 
 export function VixSpeechBubble({
@@ -36,23 +36,23 @@ export function VixSpeechBubble({
   // Determine dynamic message based on telemetry
   const getContextualMessage = () => {
     if (quipIndex !== null) {
-      return GLADIATOR_QUIPS[quipIndex];
+      return FOCUS_QUIPS[quipIndex];
     }
 
     if (isStudyingActive) {
-      return 'Deep focus protocol engaged. Tactical scanner active — lock in and finish the sprint!';
+      return 'Deep focus session active. Lock in and finish strong!';
     }
 
     if (totalHabitsCount > 0 && completedHabitsCount === totalHabitsCount) {
-      return 'Glorious conquest! All scheduled habits for today are cleared. You are truly Invictus!';
+      return 'Outstanding! All scheduled habits for today are cleared. Great job staying consistent!';
     }
 
     const hour = new Date().getHours();
     if (hour >= 5 && hour < 12) {
       if (completedHabitsCount === 0) {
-        return `Morning Kickoff, Champion! ${totalHabitsCount} habits and your daily targets await your command.`;
+        return `Morning kickoff! ${totalHabitsCount} habits and your daily targets are ready for today.`;
       }
-      return `Solid start! You have conquered ${completedHabitsCount} of ${totalHabitsCount} habits so far.`;
+      return `Solid start! You have completed ${completedHabitsCount} of ${totalHabitsCount} habits so far.`;
     } else if (hour >= 12 && hour < 18) {
       if (studyMinutesToday > 0) {
         return `Midday momentum! ${studyMinutesToday}m logged in the books. Ready for the afternoon push?`;
@@ -62,14 +62,14 @@ export function VixSpeechBubble({
       if (streakDays > 0) {
         return `Evening debrief. Your ${streakDays}-day streak is secured. Review your safe-to-spend budget and rest up!`;
       }
-      return 'Day wrap-up time. Tally your victories, reflect on lessons, and prepare tomorrow\'s armor.';
+      return "Day wrap-up time. Log your habits, review today's spending, and set up tomorrow's priorities.";
     }
   };
 
   const handleNextQuip = () => {
     setQuipIndex((prev) => {
       if (prev === null) return 0;
-      return (prev + 1) % GLADIATOR_QUIPS.length;
+      return (prev + 1) % FOCUS_QUIPS.length;
     });
   };
 

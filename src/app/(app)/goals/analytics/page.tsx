@@ -213,7 +213,7 @@ export default function GoalsAnalyticsPage() {
             <span className="size-3 rounded-sm bg-[#A7F3D0] dark:bg-emerald-800/50 border border-emerald-400 dark:border-emerald-700/50" /> 50%+
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="size-3 rounded-sm bg-[#03D26F] border border-[#03D26F]" /> 100% Conquered
+            <span className="size-3 rounded-sm bg-[#03D26F] border border-[#03D26F]" /> 100% Completed
           </span>
         </div>
       </div>

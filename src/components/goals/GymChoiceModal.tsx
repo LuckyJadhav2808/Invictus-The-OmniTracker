@@ -561,7 +561,7 @@ export function GymChoiceModal({
         {view === "presets" && (
           <div className="space-y-3">
             <p className="text-xs font-bold text-[#161514]/70 dark:text-[#A8A29E]">
-              Select a battle-tested training pack to instantly load into {selectedDay}:
+              Select a curated training routine to load into {selectedDay}:
             </p>
             <div className="grid grid-cols-1 gap-2.5 max-h-[50vh] overflow-y-auto pr-1">
               {GYM_TEMPLATE_PACKS.map((pack) => (

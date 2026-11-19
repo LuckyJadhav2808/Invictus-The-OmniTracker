@@ -7,9 +7,18 @@ import { soundFX } from "@/components/shared/SoundFX";
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
 import { TemplatePack } from "@/components/shared/TemplateSelectionModal";
 import { MEAL_TEMPLATE_PACKS } from "@/lib/templates-data";
-import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
-import { NutritionChoiceModal, MEAL_TYPES, MealTypeOption } from "@/components/goals/NutritionChoiceModal";
+import { MEAL_TYPES, type MealTypeOption } from "@/components/goals/NutritionChoiceModal";
 import { Button } from "@/components/ui/button";
+import dynamic from "next/dynamic";
+
+const NutritionChoiceModal = dynamic(
+  () => import("@/components/goals/NutritionChoiceModal").then((m) => m.NutritionChoiceModal),
+  { ssr: false }
+);
+const DeleteConfirmationModal = dynamic(
+  () => import("@/components/shared/DeleteConfirmationModal").then((m) => m.DeleteConfirmationModal),
+  { ssr: false }
+);
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { useMealPlans, useAddMealPlan, useUpdateMealPlan, useDeleteMealPlan } from "@/lib/queries/gym";
@@ -417,11 +426,11 @@ export function MealTracker() {
           <span>
             {totalProtein >= targets.protein ? (
               <span className="text-emerald-700 dark:text-emerald-400 font-bold">
-                🔥 ANABOLIC OPTIMIZED: {totalProtein}g/{targets.protein}g Protein Target Conquered!
+                🎯 PROTEIN TARGET MET: {totalProtein}g/{targets.protein}g reached!
               </span>
             ) : (
               <span>
-                Need <strong className="text-[#161514] dark:text-stone-200 font-bold">{targets.protein - totalProtein}g</strong> more protein to conquer today&apos;s target.
+                Need <strong className="text-[#161514] dark:text-stone-200 font-bold">{targets.protein - totalProtein}g</strong> more protein to hit today&apos;s target.
               </span>
             )}
           </span>
@@ -501,7 +510,7 @@ export function MealTracker() {
           {/* 1-Tap Curated Meal Packs Grid */}
           <div className="space-y-2 pt-1">
             <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6B6B6B] dark:text-[#A8A29E]">
-              Quick-Load Battle-Tested Meal Plans
+              Quick-Load Curated Meal Plans
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
               {MEAL_TEMPLATE_PACKS.map((pack) => (

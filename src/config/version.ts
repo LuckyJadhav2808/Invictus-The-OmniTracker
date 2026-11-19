@@ -10,19 +10,19 @@ export interface AppVersionInfo {
 }
 
 export const APP_VERSION_CONFIG: AppVersionInfo = {
-  version: "1.8.0",
-  buildNumber: 31,
-  releaseDate: "November 4, 2026",
+  version: "1.8.1",
+  buildNumber: 32,
+  releaseDate: "November 19, 2026",
   channel: "stable",
   minSupportedVersion: "1.0.0",
   githubRepoUrl: "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker",
   latestReleaseApiUrl: "https://api.github.com/repos/LuckyJadhav2808/Invictus-The-OmniTracker/releases/latest",
   changelog: [
+    "🌅 Unified Daily Command Deck & Chronological Agenda: Streamlined Today cockpit with 7-day horizon scrubber, live Strobi companion directives, Safe Spend pacing, and morning/workload/evening agenda groups",
+    "⚡ High-Performance Mobile Runtime & Dynamic Code Splitting: Lazy-loaded heavy offscreen modals and analytics views, enabled link prefetching for 0ms tab transitions, and eliminated DOM mutation observation overhead",
+    "🎨 Dark Mode Contrast & App-Wide Text Hygiene: Hardened semantic dark theme tokens across all cockpit buttons and chips, eliminating roleplay jargon across all workspaces in favor of calm, high-utility production copy",
     "🏛️ Sovereign Roman Monolith Asset Synchronizer: Unified Roman Monolith 'I' geometry across Web, PWA, and Android launcher mipmaps, adaptive foregrounds, splash screens, widget previews, and notification silhouettes",
     "💎 Financial Cockpit & Wallet Architecture: Slashed vertical height by 65%, removed visual clutter, introduced a 34px high-speed horizontal category wallet filter rail, and isolated the floating calculator",
-    "🔔 Proactive Calm Reminder Banner: Replaced fluorescent yellow modal with calm #1C1A18 obsidian HUD, persistent localStorage dismissals, and non-intrusive timing",
-    "⚡ Production Database Scaling: Added MongoDB connection pooling (maxPoolSize: 10, minPoolSize: 2, socketTimeoutMS: 45000), compound ESR indexes (userId + isExpense + date), and eliminated the N+1 findOne query loop",
-    "📦 Resilient In-App APK Updater: Version Dump Engine with direct self-hosted streaming, multi-hop redirect resolution, and zero-404 air-gapped GitHub fallback",
   ],
 };
 

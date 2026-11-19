@@ -163,10 +163,11 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
   if (
     currentMode === "ambient" &&
     (isAmbientDismissed ||
+      pathname === "/today" ||
+      pathname === "/" ||
       pathname?.startsWith("/money") ||
       pathname?.startsWith("/goals") ||
-      pathname?.startsWith("/quick-log") ||
-      (variant === "mobile" && pathname !== "/today"))
+      pathname?.startsWith("/quick-log"))
   ) {
     return null;
   }
@@ -343,7 +344,7 @@ export function DynamicIslandDock({ variant = "header" }: DynamicIslandDockProps
               <div>
                 <h4 className="text-xs font-semibold text-[#161514] dark:text-[#FAF8F5] tracking-tight">
                   {currentMode === "gym_rest"
-                    ? "Gladiator Rest HUD"
+                    ? "Gym Rest Recovery"
                     : currentMode === "pomodoro"
                     ? "Pomodoro Deep Work"
                     : "Invictus Telemetry Dock"}

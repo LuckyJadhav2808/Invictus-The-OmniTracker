@@ -2285,7 +2285,7 @@ export default function SettingsPage() {
           open={isAchievementsOpen}
           onOpenChange={setIsAchievementsOpen}
           title="🏆 Achievements & Badges"
-          description="Unlock milestone badges by maintaining streaks and completing daily habits"
+          description="Earn milestone badges by maintaining streaks and completing daily habits"
         >
           <div className="space-y-4 pt-2">
             <div className="bg-amber-100 dark:bg-amber-950/40 rounded-2xl p-4 border border-amber-300 dark:border-amber-800/40 flex items-center justify-between shadow-xs">

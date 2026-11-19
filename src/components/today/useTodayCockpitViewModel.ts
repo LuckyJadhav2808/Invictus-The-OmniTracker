@@ -35,7 +35,7 @@ export const DAYPART_CONFIGS: Record<EffectiveDaypart, DaypartConfig> = {
     id: "forge",
     title: "Afternoon Focus",
     greeting: "Afternoon Focus",
-    subtitle: "Deep work sessions, budget defense, and key tasks",
+    subtitle: "Deep work sessions, safe spending, and key tasks",
     accentBg: "bg-white",
     badgeBg: "bg-[#C084FC]",
     textColor: "text-[#161514]",

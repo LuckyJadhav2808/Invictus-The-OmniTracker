@@ -395,7 +395,7 @@ export function HabitsMatrixBoard({
                                   : "bg-secondary/40 border-border hover:border-[#161514] dark:hover:border-white/40 hover:bg-secondary"
                               )}
                               title={`${habit.title} • ${day.dayName} ${day.dayNum} • ${
-                                isDone ? "Conquered ⚡" : isToday ? "Due Today" : "Not Done"
+                                isDone ? "Completed ⚡" : isToday ? "Due Today" : "Not Done"
                               }`}
                             >
                               {isDone ? (
@@ -433,7 +433,7 @@ export function HabitsMatrixBoard({
                 <tr className="border-t-2 border-[#161514] dark:border-[#38332E] bg-muted/40 font-mono font-bold text-xs">
                   <td className="sticky left-0 z-20 bg-[#FAF8F5] dark:bg-[#161514] p-3 border-r-2 border-[#161514] dark:border-[#38332E]">
                     <span className="text-[11px] font-mono font-black uppercase text-foreground">
-                      Conquered / Day
+                      Completed / Day
                     </span>
                   </td>
                   {dailyTotals.map((tot) => (
@@ -471,7 +471,7 @@ export function HabitsMatrixBoard({
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-1.5">
                 <div className="size-3 rounded-sm bg-[#03D26F] border border-[#161514]" />
-                <span className="text-[11px] font-bold text-muted-foreground">Conquered</span>
+                <span className="text-[11px] font-bold text-muted-foreground">Completed</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <div className="size-3 rounded-sm bg-[#CEF431] border border-[#161514]" />
@@ -541,7 +541,7 @@ export function HabitsMatrixBoard({
                 <div className="space-y-1.5 pt-1 border-t border-[#161514]/10 dark:border-white/10">
                   <div className="flex items-center justify-between text-[9px] font-mono font-bold text-muted-foreground uppercase tracking-wider">
                     <span>4-Week Momentum</span>
-                    <span>{completedCount}/{daysList.length} Conquered</span>
+                    <span>{completedCount}/{daysList.length} Completed</span>
                   </div>
 
                   {/* 7-Col Grid */}
@@ -565,7 +565,7 @@ export function HabitsMatrixBoard({
                               ? "border-2 border-dashed border-[#161514] dark:border-[#CEF431] bg-secondary"
                               : "bg-secondary border-border text-muted-foreground hover:border-[#161514]"
                           )}
-                          title={`${day.dayName} ${day.dayNum} • ${isDone ? "Conquered" : "Pending"}`}
+                          title={`${day.dayName} ${day.dayNum} • ${isDone ? "Completed" : "Pending"}`}
                         >
                           {isDone ? "✓" : day.dayNum}
                         </button>

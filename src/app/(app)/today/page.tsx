@@ -19,10 +19,10 @@ import { soundFX } from "@/components/shared/SoundFX";
 import { useStudySessions, useSubjects, useAllTopics, useAddStudySession } from "@/lib/queries/study";
 import { useTransactions, useCategories, useAddTransaction, useBudgetPreferences, useUpdateBudgetPreferences } from "@/lib/queries/money";
 import { useTasks, useUpdateTask, useCreateTask } from "@/lib/queries/tasks";
-import { computeMonthlyBudgetStats, computeDailyBudgetStats } from "@/lib/utils/budget-rollover";
-import { AllowanceSettingsModal } from "@/components/money/modals/AllowanceSettingsModal";
+import { computeMonthlyBudgetStats } from "@/lib/utils/budget-rollover";
 import { toast } from "sonner";
 import { Shield } from "lucide-react";
+import dynamic from "next/dynamic";
 import {
   format,
   parseISO,
@@ -31,18 +31,35 @@ import {
   isToday as checkIsToday,
 } from "date-fns";
 
-// Modular Today Cockpit Architecture (Candidate Coliseum)
-import { MasterTodayHero } from "@/components/today/MasterTodayHero";
-import { HabitMomentumCard } from "@/components/today/HabitMomentumCard";
-import { StudySprintWidget } from "@/components/today/StudySprintWidget";
-import { SafeToSpendGauge } from "@/components/today/SafeToSpendGauge";
-import { TaskBattleQueue } from "@/components/today/TaskBattleQueue";
-import { RetroStickyScratchpadDrawer } from "@/components/today/RetroStickyScratchpadDrawer";
-import { EveningCloseoutDrawer } from "@/components/today/EveningCloseoutDrawer";
+// Modular Today Cockpit Architecture (Benchmark Executive Dashboard)
+import { TodayCommandDeck } from "@/components/today/TodayCommandDeck";
+import { TodayChronologicalAgenda } from "@/components/today/TodayChronologicalAgenda";
+import { TodayTopHabitsMomentum } from "@/components/today/TodayTopHabitsMomentum";
 import { StickyIslandMiniCockpit } from "@/components/today/StickyIslandMiniCockpit";
-import { ConfettiCelebration } from "@/components/common/ConfettiCelebration";
 import { FirstRunQuickStartDeck } from "@/components/today/FirstRunQuickStartDeck";
 import { useTodayCockpitViewModel, computeDailyConquestScore } from "@/components/today/useTodayCockpitViewModel";
+
+// Dynamic imports for heavy drawers and modals to optimize mobile initial bundle & navigation
+const TodayQuickExpenseModal = dynamic(
+  () => import("@/components/today/TodayQuickExpenseModal").then((m) => m.TodayQuickExpenseModal),
+  { ssr: false }
+);
+const RetroStickyScratchpadDrawer = dynamic(
+  () => import("@/components/today/RetroStickyScratchpadDrawer").then((m) => m.RetroStickyScratchpadDrawer),
+  { ssr: false }
+);
+const EveningCloseoutDrawer = dynamic(
+  () => import("@/components/today/EveningCloseoutDrawer").then((m) => m.EveningCloseoutDrawer),
+  { ssr: false }
+);
+const AllowanceSettingsModal = dynamic(
+  () => import("@/components/money/modals/AllowanceSettingsModal").then((m) => m.AllowanceSettingsModal),
+  { ssr: false }
+);
+const ConfettiCelebration = dynamic(
+  () => import("@/components/common/ConfettiCelebration").then((m) => m.ConfettiCelebration),
+  { ssr: false }
+);
 
 export default function TodayPage() {
   const { user } = useAuth();
@@ -195,6 +212,23 @@ export default function TodayPage() {
   const totalHabitsCount = activeHabits.length;
   const completedHabitsCount = completedHabitLogs.length;
   const allHabitsConquered = totalHabitsCount > 0 && completedHabitsCount === totalHabitsCount;
+
+  // Task metrics for Today's Executive Telemetry
+  const todayTasks = useMemo(() => {
+    return tasks.filter((t) => {
+      if (t.status === "completed") {
+        return !t.dueDate || t.dueDate === selectedDate;
+      }
+      return !t.dueDate || t.dueDate === selectedDate || t.priority === "p1";
+    });
+  }, [tasks, selectedDate]);
+  const completedTasksCount = useMemo(() => {
+    return todayTasks.filter((t) => t.status === "completed").length;
+  }, [todayTasks]);
+  const totalTasksCount = todayTasks.length;
+  const totalItemsCount = totalHabitsCount + totalTasksCount;
+  const completedItemsCount = completedHabitsCount + completedTasksCount;
+  const pendingItemsCount = Math.max(0, totalItemsCount - completedItemsCount);
 
   // Trigger confetti when hitting 100% completion during active session
   useEffect(() => {
@@ -434,15 +468,15 @@ export default function TodayPage() {
 
   // Smooth scroll helpers
   const scrollToHabits = () => {
-    const el = document.getElementById("habits-section");
+    const el = document.getElementById("agenda-section");
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
   const scrollToStudy = () => {
-    const el = document.getElementById("study-section");
+    const el = document.getElementById("agenda-section");
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
   const scrollToMoney = () => {
-    const el = document.getElementById("money-section");
+    const el = document.getElementById("telemetry-section");
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
   const handleOpenExpenseModal = () => {
@@ -507,35 +541,38 @@ export default function TodayPage() {
       {/* Milestone Confetti Celebration */}
       <ConfettiCelebration active={showConfetti} onComplete={() => setShowConfetti(false)} />
 
-      {/* ZONE 1: TRUE GLADIATOR HERO SECTION (MasterTodayHero) */}
-      <MasterTodayHero
-        userName={user?.displayName}
-        currentDateObj={currentDateObj}
-        selectedDate={selectedDate}
-        isToday={isCurrentDayToday}
-        onPrevDay={handlePrevDay}
-        onNextDay={handleNextDay}
-        onJumpToToday={handleJumpToToday}
-        onSelectDate={setSelectedDate}
-        streakDays={streakDays}
-        streakFreezeTokens={streakFreeze.tokensAvailable || 0}
-        completedHabitsCount={completedHabitsCount}
-        totalHabitsCount={totalHabitsCount}
-        studyMinutesToday={todayStudyMinutes}
-        isStudyingActive={isTimerRunning}
-        allHabitsConquered={allHabitsConquered}
-        daypartMode={daypartMode}
-        effectiveDaypart={effectiveDaypart}
-        onSelectDaypartMode={setDaypartMode}
-        metrics={conquestMetrics}
-        onScrollToHabits={scrollToHabits}
-        onScrollToStudy={scrollToStudy}
-        onScrollToMoney={scrollToMoney}
-        onToggleTimer={() => setIsTimerRunning(!isTimerRunning)}
-        onOpenExpenseModal={handleOpenExpenseModal}
-        onOpenCloseoutDrawer={() => setIsCloseoutDrawerOpen(true)}
-        onOpenScratchpad={() => setIsScratchpadDrawerOpen(true)}
-      />
+      {/* ZONE 1: SIGNATURE DAILY COMMAND DECK (Creative + Production Level + Clean) */}
+      <div id="command-deck-section">
+        <TodayCommandDeck
+          userName={user?.displayName}
+          currentDateObj={currentDateObj}
+          selectedDate={selectedDate}
+          isToday={isCurrentDayToday}
+          onPrevDay={handlePrevDay}
+          onNextDay={handleNextDay}
+          onJumpToToday={handleJumpToToday}
+          onSelectDate={setSelectedDate}
+          streakDays={streakDays}
+          streakFreezeTokens={streakFreeze.tokensAvailable || 0}
+          allHabitsConquered={allHabitsConquered}
+          totalHabitsCount={totalHabitsCount}
+          completedCount={completedItemsCount}
+          pendingCount={pendingItemsCount}
+          totalCount={totalItemsCount}
+          remainingSafeToSpend={budgetStats.dailySafeToSpend - spentToday}
+          spentToday={spentToday}
+          dailySafeToSpend={budgetStats.dailySafeToSpend}
+          currencySymbol={currencySymbol}
+          onOpenQuickExpense={() => setIsQuickExpenseOpen(true)}
+          todayStudyMinutes={todayStudyMinutes}
+          studyTargetHours={4.0}
+          isTimerRunning={isTimerRunning}
+          stopwatchSeconds={stopwatchSeconds}
+          onToggleTimer={() => setIsTimerRunning(!isTimerRunning)}
+          onOpenScratchpad={() => setIsScratchpadDrawerOpen(true)}
+          onOpenCloseoutDrawer={() => setIsCloseoutDrawerOpen(true)}
+        />
+      </div>
 
       {/* Guided First-Run Quick Start Deck (Disappears upon dismissal or completion) */}
       <FirstRunQuickStartDeck
@@ -550,89 +587,37 @@ export default function TodayPage() {
         }}
       />
 
-      {/* ZONE 2: DAILY CORE HUB (Bento Row 1 - Habits & Study Focus - Locked Baseline) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-        {/* Habit Momentum Card (7 Cols) */}
-        <div id="habits-section" className="lg:col-span-7 h-full">
-          <HabitMomentumCard
-            className="h-full flex flex-col justify-between"
-            habits={habits}
-            logs={logs}
-            streaks={streaks}
-            selectedDate={selectedDate}
-            waterAmount={waterAmount}
-            waterTarget={waterTarget}
-            onQuickLogWater={() => handleQuickLogWater(250)}
-            onToggleHabit={(habitId, completed) => {
-              toggleHabitMutation.mutate({
-                habitId,
-                date: selectedDate,
-                completed,
-              });
-            }}
-          />
-        </div>
-
-        {/* Study Sprint Stopwatch Widget (5 Cols) */}
-        <div id="study-section" className="lg:col-span-5 h-full">
-          <StudySprintWidget
-            className="h-full flex flex-col justify-between"
-            stopwatchSeconds={stopwatchSeconds}
-            isTimerRunning={isTimerRunning}
-            onToggleTimer={() => setIsTimerRunning(!isTimerRunning)}
-            onResetTimer={() => {
-              setIsTimerRunning(false);
-              setStopwatchSeconds(0);
-            }}
-            onSaveSession={handleSaveTimerSession}
-            selectedSubjectId={selectedSubjectId}
-            onChangeSubject={setSelectedSubjectId}
-            selectedTopicId={selectedTopicId}
-            onChangeTopic={setSelectedTopicId}
-            subjects={subjects}
-            allTopics={allTopics}
-            todayStudyHours={todayStudyHours}
-            studyCompletionPercent={studyCompletionPercent}
-          />
-        </div>
+      {/* ZONE 3: UNIFIED CHRONOLOGICAL DAY AGENDA (Morning / Workload / Evening) */}
+      <div id="agenda-section">
+        <TodayChronologicalAgenda
+          habits={habits}
+          logs={logs}
+          streaks={streaks}
+          tasks={tasks}
+          selectedDate={selectedDate}
+          isToday={isCurrentDayToday}
+          onToggleHabit={(habitId, completed) => {
+            toggleHabitMutation.mutate({
+              habitId,
+              date: selectedDate,
+              completed,
+            });
+          }}
+          onToggleTask={(taskId, completed) => {
+            updateTaskMutation.mutate({
+              id: taskId,
+              updates: { status: completed ? "completed" : "todo" },
+            });
+          }}
+        />
       </div>
 
-      {/* ZONE 3: OPERATIONS HUB (Bento Row 2 - Money & Tasks - Locked Baseline) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-        {/* Safe-to-Spend Financial Gauge (6 Cols) */}
-        <div id="money-section" className="lg:col-span-6 h-full">
-          <SafeToSpendGauge
-            className="h-full flex flex-col justify-between"
-            spentToday={spentToday}
-            dailySafeToSpend={budgetStats.dailySafeToSpend}
-            customDailyBudget={customDailyBudget}
-            currencySymbol={currencySymbol}
-            transactions={todayTransactions}
-            categories={categories}
-            isQuickExpenseOpen={isQuickExpenseOpen}
-            onToggleQuickExpense={() => setIsQuickExpenseOpen(!isQuickExpenseOpen)}
-            onAddExpense={handleAddExpense}
-            isSavingExpense={isSavingExpense}
-            onOpenSetDailyLimit={() => setIsDailyLimitModalOpen(true)}
-          />
-        </div>
-
-        {/* Priority Battle Queue (6 Cols) */}
-        <div id="tasks-section" className="lg:col-span-6 h-full">
-          <TaskBattleQueue
-            className="h-full flex flex-col justify-between"
-            tasks={tasks}
-            selectedDate={selectedDate}
-            onCompleteTask={(taskId, title) => {
-              updateTaskMutation.mutate({
-                id: taskId,
-                updates: { status: "completed" },
-              });
-              toast.success(`Conquered: ${title}`);
-            }}
-          />
-        </div>
-      </div>
+      {/* ZONE 4: TOP HABITS MOMENTUM STRIP (Benchmark from Reference Image) */}
+      <TodayTopHabitsMomentum
+        habits={habits}
+        logs={logs}
+        streaks={streaks}
+      />
 
       {/* ZONE 4: ON-DEMAND SLIDE-OVER DESK SCRATCHPAD & FLOATING ACTION DOCK */}
       <RetroStickyScratchpadDrawer
@@ -704,6 +689,16 @@ export default function TodayPage() {
         defaultEnableRollover={enableRollover}
         dailySafeToSpend={budgetStats.dailySafeToSpend}
         onSave={handleSaveDailyLimit}
+      />
+
+      {/* 3-Second Quick Expense Modal (Benchmark Safe Spend) */}
+      <TodayQuickExpenseModal
+        open={isQuickExpenseOpen}
+        onOpenChange={setIsQuickExpenseOpen}
+        currencySymbol={currencySymbol}
+        categories={categories}
+        onAddExpense={handleAddExpense}
+        isSaving={isSavingExpense}
       />
     </div>
   );

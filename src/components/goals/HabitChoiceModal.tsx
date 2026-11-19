@@ -524,7 +524,7 @@ export function HabitChoiceModal({
         view === "menu"
           ? "Choose from proven atomic habits, curated split packs, or craft your bespoke routine."
           : view === "presets"
-          ? "Tap any battle-tested atomic habit to lock it directly into your daily routine."
+          ? "Tap any habit template to add it directly to your daily routine."
           : view === "custom"
           ? "Design a custom routine with tailored scheduling, icons, and reminder telemetry."
           : "Apply comprehensive lifestyle stacks engineered for peak performance."
@@ -603,7 +603,7 @@ export function HabitChoiceModal({
                     Atomic Habits Vault
                   </h4>
                   <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] mt-1 leading-snug">
-                    Battle-tested micro-habits for sleep, hydration, deep work, 10k steps, and discipline.
+                    Curated habits for sleep, hydration, deep work, 10k steps, and daily consistency.
                   </p>
                 </div>
               </div>
@@ -669,7 +669,7 @@ export function HabitChoiceModal({
                     Protocol Packs
                   </h4>
                   <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] mt-1 leading-snug">
-                    One-tap stack installs: Monk Mode, Reddit Essentials, Athletic Champ, and Morning Mastery.
+                    One-tap habit stacks: Focus Mode, Daily Essentials, Athletic Foundation, and Morning Routine.
                   </p>
                 </div>
               </div>

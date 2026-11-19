@@ -51,15 +51,15 @@ export function GladiatorConquestHUD({
       <div className="flex items-center justify-between border-b-2 border-[#161514]/15 pb-2.5 mb-3.5">
         <div className="flex items-center gap-1.5">
           <span className="font-heading font-black text-xs uppercase tracking-wider text-[#161514] flex items-center gap-1">
-            <span>⚔️</span>
-            <span>Gladiator Conquest Telemetry</span>
+            <span>⚡</span>
+            <span>Daily Progress Telemetry</span>
           </span>
         </div>
 
         {/* Overall Status Badge */}
         <div className="inline-flex items-center gap-1 bg-[#CEF431] text-[#161514] font-mono font-black text-[10px] uppercase px-2 py-0.5 rounded-lg border border-[#161514] shadow-[1px_1px_0px_#161514]">
           <Zap className="size-3 fill-[#161514]" />
-          <span>{metrics.overallScore}% CONQUERED</span>
+          <span>{metrics.overallScore}% COMPLETED</span>
         </div>
       </div>
 
@@ -70,7 +70,7 @@ export function GladiatorConquestHUD({
           <svg
             className="size-full -rotate-90 overflow-visible"
             viewBox="0 0 160 160"
-            aria-label={`Daily Conquest: ${metrics.overallScore}% complete`}
+            aria-label={`Daily Progress: ${metrics.overallScore}% complete`}
           >
             {/* Outer Ring: Habits (🟢 #03D26F) */}
             <circle

@@ -9,7 +9,7 @@ import {
   Kanban,
   Wallet,
 } from "lucide-react";
-import { useState, useEffect, useRef, Suspense } from "react";
+import { useRef, Suspense } from "react";
 import { useUIStore } from "@/store/ui-store";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
@@ -17,40 +17,7 @@ import { soundFX } from "@/components/shared/SoundFX";
 function BottomNavContent() {
   const pathname = usePathname();
   const { setActiveTracker } = useUIStore();
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const lastNavClickRef = useRef<number>(0);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    let debounceTimer: NodeJS.Timeout;
-    const checkModalOpen = () => {
-      // Only detect explicitly open modal dialogs / sheets, never generic regions or body styles
-      const hasOpenModal = !!document.querySelector(
-        '[role="dialog"][data-state="open"], [role="alertdialog"][data-state="open"], [aria-modal="true"][data-state="open"]'
-      );
-      setIsModalOpen(hasOpenModal);
-    };
-
-    checkModalOpen();
-
-    const observer = new MutationObserver(() => {
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(checkModalOpen, 100);
-    });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ["data-state", "role", "aria-modal"],
-    });
-
-    return () => {
-      clearTimeout(debounceTimer);
-      observer.disconnect();
-    };
-  }, []);
 
   const navItems = [
     {
@@ -103,10 +70,7 @@ function BottomNavContent() {
   return (
     <nav
       aria-label="Mobile Primary Navigation"
-      className={cn(
-        "fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom,0px))] left-1/2 -translate-x-1/2 w-[94%] max-w-[420px] h-[58px] bg-[#161514]/92 dark:bg-[#1C1A18]/95 backdrop-blur-2xl border border-white/10 dark:border-white/15 rounded-2xl px-1.5 flex items-center justify-between shadow-2xl z-40 lg:hidden transition-all duration-200 transform",
-        isModalOpen ? "translate-y-28 opacity-0 pointer-events-none" : "translate-y-0 opacity-100"
-      )}
+      className="fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom,0px))] left-1/2 -translate-x-1/2 w-[94%] max-w-[420px] h-[58px] bg-[#161514]/92 dark:bg-[#1C1A18]/95 backdrop-blur-2xl border border-white/10 dark:border-white/15 rounded-2xl px-1.5 flex items-center justify-between shadow-2xl z-40 lg:hidden transition-all duration-200 transform translate-y-0 opacity-100 will-change-transform"
     >
       {navItems.map((item) => {
         const isActive = isLinkActive(item.href);
@@ -116,6 +80,7 @@ function BottomNavContent() {
           <Link
             key={item.href}
             href={item.href}
+            prefetch={true}
             onClick={(e) => {
               const now = Date.now();
               if (isActive) {

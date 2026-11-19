@@ -383,7 +383,7 @@ export default function AnalyticsHubPage() {
                     No Mock Test Scores Yet
                   </h4>
                   <p className="text-xs text-[#161514]/70 dark:text-[#FAF8F5]/70 font-medium">
-                    Log your mock exams and revision test percentages to unlock your score trajectory line chart.
+                    Log your mock exams and revision test percentages to view your score trajectory chart.
                   </p>
                 </div>
                 <Link

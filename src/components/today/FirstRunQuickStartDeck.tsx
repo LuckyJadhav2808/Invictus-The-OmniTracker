@@ -91,7 +91,7 @@ export function FirstRunQuickStartDeck({
     } catch {}
   };
 
-  // Don't render if unmounted, dismissed, or already fully conquered by seasoned user
+  // Don't render if unmounted, dismissed, or already completed by seasoned user
   if (!mounted || isDismissed || (allCompleted && totalHabitsCount >= 3)) {
     return null;
   }
@@ -113,7 +113,7 @@ export function FirstRunQuickStartDeck({
             Welcome to Invictus. Let's set up your cockpit.
           </h2>
           <p className="type-caption text-[#73716D] dark:text-[#A8A29E]">
-            Complete these 3 foundational actions to unlock live daily pacing &amp; habit streaks.
+            Complete these 3 quick steps to enable live daily pacing &amp; habit streaks.
           </p>
         </div>
 

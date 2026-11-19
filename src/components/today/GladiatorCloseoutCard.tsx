@@ -89,7 +89,7 @@ export function GladiatorCloseoutCard({
       soundFX.vibrate(30);
     } catch {}
 
-    toast.success("Day Sealed! Today's conquest score minted into history.");
+    toast.success("Day Sealed! Today's progress archived into history.");
 
     if (onSealComplete) {
       onSealComplete();
@@ -111,7 +111,7 @@ export function GladiatorCloseoutCard({
         className
       )}
       role="region"
-      aria-label="Gladiator Night Closeout Ritual"
+      aria-label="Daily Evening Closeout"
     >
       {/* 1. Header Bar: Thermal Receipt Slip Identity */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-dashed border-[#161514]/20 dark:border-[#FAF8F5]/20 pb-3">
@@ -121,7 +121,7 @@ export function GladiatorCloseoutCard({
           </div>
           <div>
             <h3 className="font-heading font-black text-xs sm:text-sm text-[#161514] dark:text-[#FAF8F5] uppercase tracking-wider">
-              Gladiator Night Closeout Ritual
+              Daily Evening Closeout
             </h3>
             <p className="text-[11px] font-mono text-[#161514]/70 dark:text-[#FAF8F5]/70">
               {isToday ? "Today's Ledger Archival" : `Ledger for ${selectedDate}`}
@@ -129,11 +129,11 @@ export function GladiatorCloseoutCard({
           </div>
         </div>
 
-        {/* Telemetry Conquest Badge */}
+        {/* Telemetry Progress Badge */}
         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white dark:bg-[#252321] border-2 border-[#161514] dark:border-[#383531] shadow-[1.5px_1.5px_0px_#161514] dark:shadow-[1.5px_1.5px_0px_#000000] font-mono font-black text-xs text-[#161514] dark:text-[#FAF8F5]">
           <Zap className="size-3 fill-[#161514] dark:fill-[#CEF431] text-[#161514] dark:text-[#CEF431]" />
           <span className="tabular-nums">{metrics.overallScore}%</span>
-          <span className="text-[10px] uppercase">Conquered</span>
+          <span className="text-[10px] uppercase">Completed</span>
         </div>
       </div>
 
@@ -149,7 +149,7 @@ export function GladiatorCloseoutCard({
             <span className="text-[#03D26F] font-black tabular-nums">{metrics.habitPercent}%</span>
           </div>
           <p className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5]">
-            <span className="font-mono tabular-nums">{metrics.completedHabitsCount}/{metrics.totalHabitsCount}</span> Conquered
+            <span className="font-mono tabular-nums">{metrics.completedHabitsCount}/{metrics.totalHabitsCount}</span> Completed
           </p>
         </div>
 
@@ -230,7 +230,7 @@ export function GladiatorCloseoutCard({
                 onSaveMood();
               }
             }}
-            placeholder="One-line victory note or closing reflection..."
+            placeholder="Add a closing reflection or note for today..."
             className="flex-1 bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#161514]/30 dark:border-[#FAF8F5]/30 rounded-lg px-2.5 py-1.5 text-xs text-[#161514] dark:text-[#FAF8F5] font-medium placeholder:text-[#161514]/40 dark:placeholder:text-[#FAF8F5]/40 focus:outline-none focus:border-[#161514] dark:focus:border-[#CEF431]"
           />
           <button
@@ -263,7 +263,7 @@ export function GladiatorCloseoutCard({
                   </span>
                 </div>
                 <p className="text-[11px] text-white/80 font-mono mt-0.5">
-                  Conquest Score: <span className="tabular-nums">{sealStatus.score ?? metrics.overallScore}%</span> permanent record.
+                  Completion Score: <span className="tabular-nums">{sealStatus.score ?? metrics.overallScore}%</span> permanent record.
                 </p>
               </div>
             </div>

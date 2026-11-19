@@ -219,7 +219,7 @@ export function ThermalReceiptSlip({
           {/* Receipt Store Header */}
           <div className="text-center space-y-1 border-b-2 border-dashed border-[#161514]/30 pb-3">
             <div className="inline-flex items-center gap-1.5 font-black text-xs uppercase tracking-widest bg-[#161514] text-white px-2.5 py-0.5 rounded">
-              <span>★ INVICTUS GLADIATOR LEDGER ★</span>
+              <span>★ INVICTUS EXPENSE LEDGER ★</span>
             </div>
             <p className="text-[10px] text-[#161514]/70 tracking-wider">
               TERMINAL ID: #INV-{transaction.id.slice(0, 6).toUpperCase()}

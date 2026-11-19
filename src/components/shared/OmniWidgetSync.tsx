@@ -187,7 +187,7 @@ export function OmniWidgetSync() {
     // 3. Fallback inspiring goal
     return {
       id: "goal_default",
-      title: "Mastery & Focus",
+      title: "Daily Focus & Goals",
       progressPercentage: 65,
       icon: "🎯",
     };

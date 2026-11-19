@@ -448,7 +448,7 @@ export function BudgetTabView({
               <div className="flex items-center gap-2">
                 <Sparkles className="size-3.5 text-amber-500" />
                 <h4 className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5] uppercase tracking-wider">
-                  Battle-Tested Student Budget Packs
+                  Recommended Student Budget Packs
                 </h4>
               </div>
               <button
@@ -540,7 +540,7 @@ export function BudgetTabView({
             {/* 1-Tap Budget Starter Packs Grid */}
             <div className="space-y-2 pt-1">
               <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6B6B6B] dark:text-[#A8A29E]">
-                Quick-Load Battle-Tested Budget Frameworks:
+                Quick-Load Budget Frameworks:
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                 {BUDGET_CATEGORY_TEMPLATE_PACKS.map((pack) => (

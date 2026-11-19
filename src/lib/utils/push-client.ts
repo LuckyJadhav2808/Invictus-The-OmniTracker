@@ -81,7 +81,7 @@ export async function triggerTestPushNotification(userId: string = "guest") {
       body: JSON.stringify({
         userId,
         title: "⏰ Invictus Wake-Up & Habit Alarm",
-        body: "Your daily habits and routines are ready! Time to conquer your goals.",
+        body: "Your daily habits and routines are ready! Start your day strong.",
         url: "/goals",
       }),
     });
@@ -96,7 +96,7 @@ export async function triggerTestPushNotification(userId: string = "guest") {
           body: JSON.stringify({
             userId,
             title: "⏰ Invictus Wake-Up & Habit Alarm",
-            body: "Your daily habits and routines are ready! Time to conquer your goals.",
+            body: "Your daily habits and routines are ready! Start your day strong.",
             url: "/goals",
           }),
         });

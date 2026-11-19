@@ -82,33 +82,33 @@ export const ARCHETYPE_CONFIG: Record<
   }
 > = {
   fitness: {
-    label: "Iron Physicality",
+    label: "Fitness & Strength",
     badgeBg: "bg-rose-100 text-rose-900 border-rose-900",
-    quip: "Strength is forged in the arena. Lock in every rep!",
+    quip: "Consistency builds strength. Lock in every rep.",
     IconComponent: Dumbbell,
   },
   study: {
-    label: "Cognitive Mastery",
+    label: "Study & Focus",
     badgeBg: "bg-amber-100 text-amber-900 border-amber-900",
-    quip: "Knowledge compounds like interest. Defend your mind!",
+    quip: "Knowledge compounds with consistency. Stay focused.",
     IconComponent: BookOpen,
   },
   hydration: {
-    label: "Liquid Velocity",
+    label: "Hydration",
     badgeBg: "bg-sky-100 text-sky-900 border-sky-900",
-    quip: "Liquid fuel for muscular and cognitive output. Drink deep!",
+    quip: "Stay hydrated to keep energy and focus high.",
     IconComponent: Droplets,
   },
   wellness: {
-    label: "Deep Restoration",
+    label: "Rest & Recovery",
     badgeBg: "bg-indigo-100 text-indigo-900 border-indigo-900",
-    quip: "True warriors honor rest. Sleep fuels tomorrow's victory.",
+    quip: "Quality sleep fuels tomorrow's focus and performance.",
     IconComponent: Moon,
   },
   general: {
-    label: "Iron Discipline",
+    label: "Daily Consistency",
     badgeBg: "bg-emerald-100 text-emerald-900 border-emerald-900",
-    quip: "Small daily rituals forge an unbreakable character.",
+    quip: "Small daily habits build lasting momentum.",
     IconComponent: Compass,
   },
 };
@@ -359,14 +359,14 @@ export function HabitCompanionSprite({
           {isCelebrating && (
             <span className="text-[9px] font-heading font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-[#CEF431] text-[#161514] border border-[#161514] flex items-center gap-0.5 animate-pulse">
               <Trophy className="size-2.5" />
-              <span>Conquest Ready!</span>
+              <span>Streak Ready!</span>
             </span>
           )}
         </div>
 
         <p className="text-xs font-bold text-[#161514] mt-1 leading-snug line-clamp-2">
           {isCelebrating
-            ? "✨ Strobi: Habit forged in iron! Consistency is your sharpest weapon. Let's conquer it!"
+            ? "✨ Strobi: Great consistency! Small daily habits lead to big results."
             : `✨ Strobi: "${habitTitle ? `For '${habitTitle}': ` : ""}${config.quip}"`}
         </p>
       </div>

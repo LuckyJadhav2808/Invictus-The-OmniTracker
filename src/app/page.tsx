@@ -12,7 +12,10 @@ export default function Home() {
   useEffect(() => {
     if (loading) return;
     const target = user ? "/today" : "/login";
-    router.replace(target);
+    const timer = setTimeout(() => {
+      router.replace(target);
+    }, 0);
+    return () => clearTimeout(timer);
   }, [user, loading, router]);
 
   return <InvictusLoadingScreen />;

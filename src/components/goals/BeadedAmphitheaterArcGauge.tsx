@@ -185,7 +185,7 @@ export function BeadedAmphitheaterArcGauge({
               clampedToday === 100 ? "text-[#03D26F]" : "text-[#6B6B6B] dark:text-[#A8A29E]"
             )}
           >
-            {clampedToday === 100 ? "CONQUERED 🏆" : "% TODAY"}
+            {clampedToday === 100 ? "COMPLETED 🏆" : "% TODAY"}
           </text>
         </g>
       </svg>

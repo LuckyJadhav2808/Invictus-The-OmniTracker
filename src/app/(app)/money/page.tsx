@@ -34,12 +34,26 @@ import dynamic from "next/dynamic";
 // Modular Sub-Components & Views
 import { FinancialSummaryCockpit } from "@/components/money/FinancialSummaryCockpit";
 import { LedgerTabView } from "@/components/money/views/LedgerTabView";
-import { BudgetTabView } from "@/components/money/views/BudgetTabView";
-import { VaultTabView } from "@/components/money/views/VaultTabView";
-import { AnalyticsTabView } from "@/components/money/views/AnalyticsTabView";
-import { WhoOwesWhoTabView } from "@/components/money/views/WhoOwesWhoTabView";
 import { StickyMoneyMiniCockpit } from "@/components/money/StickyMoneyMiniCockpit";
 import { useWhoOwesWhoStore } from "@/store/who-owes-who-store";
+
+// Lazy-Loaded Tab Views (Saves Recharts & IOU Bundles on Initial Paint)
+const BudgetTabView = dynamic(
+  () => import("@/components/money/views/BudgetTabView").then((mod) => mod.BudgetTabView),
+  { ssr: false }
+);
+const VaultTabView = dynamic(
+  () => import("@/components/money/views/VaultTabView").then((mod) => mod.VaultTabView),
+  { ssr: false }
+);
+const AnalyticsTabView = dynamic(
+  () => import("@/components/money/views/AnalyticsTabView").then((mod) => mod.AnalyticsTabView),
+  { ssr: false }
+);
+const WhoOwesWhoTabView = dynamic(
+  () => import("@/components/money/views/WhoOwesWhoTabView").then((mod) => mod.WhoOwesWhoTabView),
+  { ssr: false }
+);
 
 // Lazy-Loaded Heavy Modals (Zero TBT & Fast Initial Paint)
 const TransactionFormModal = dynamic(

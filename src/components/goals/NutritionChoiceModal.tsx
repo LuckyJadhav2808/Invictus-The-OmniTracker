@@ -129,7 +129,7 @@ export function NutritionChoiceModal({
           ? "Search dishes, inspect calories & protein, and 1-tap log."
           : view === "custom"
           ? "Enter your own ingredients, takeout meals, or custom shake recipes."
-          : "Apply battle-tested high-protein, bulking, or cutting meal packs."
+          : "Apply curated high-protein, bulking, or cutting meal plans."
       }
     >
       <div className="space-y-4 pt-1">
@@ -494,7 +494,7 @@ export function NutritionChoiceModal({
         {view === "presets" && (
           <div className="space-y-3">
             <p className="text-xs font-medium text-[#6B6B6B] dark:text-[#A8A29E]">
-              Select a battle-tested nutrition pack to instantly load into today&apos;s diet:
+              Select a nutrition plan to load into today&apos;s diet:
             </p>
             <div className="grid grid-cols-1 gap-2.5 max-h-[50vh] overflow-y-auto pr-1">
               {MEAL_TEMPLATE_PACKS.map((pack) => (

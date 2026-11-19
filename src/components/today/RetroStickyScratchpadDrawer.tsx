@@ -319,7 +319,7 @@ export function RetroStickyScratchpadDrawer({
       } catch {}
     }
 
-    toast.success(`Conquered ${batchTasks.length + batchExpenses.length} items!`);
+    toast.success(`Added ${batchTasks.length + batchExpenses.length} items!`);
   };
 
   const handleClearConverted = () => {
@@ -370,7 +370,7 @@ export function RetroStickyScratchpadDrawer({
           <FileText className="size-4 text-[#161514] dark:text-[#FAF8F5] stroke-[2]" />
         </div>
         <span className="hidden sm:inline">Scratchpad</span>
-        <kbd className="hidden sm:inline-block font-mono text-[10px] bg-[#F1EFEA] dark:bg-[#252220] border border-[#E8E5DF] dark:border-[#2A2724] px-1.5 py-0.5 rounded text-[#161514] dark:text-[#FAF8F5]">
+        <kbd className="hidden sm:inline-block font-heading font-bold text-[10px] bg-[#F1EFEA] dark:bg-[#252220] border border-[#E8E5DF] dark:border-[#2A2724] px-1.5 py-0.5 rounded text-[#161514] dark:text-[#FAF8F5]">
           ⌘J
         </kbd>
         {activeLinesCount > 0 && (

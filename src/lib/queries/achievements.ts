@@ -47,7 +47,7 @@ export function useUserAchievements() {
     },
     {
       id: "habits_5_day",
-      title: "Monk Mode Warrior",
+      title: "Habit Builder",
       desc: "Maintain 5 or more active habit routines",
       xp: 150,
       unlocked: activeHabitsCount >= 5,
@@ -56,7 +56,7 @@ export function useUserAchievements() {
     },
     {
       id: "budget_10_tx",
-      title: "Budget Optimizer",
+      title: "Budget Tracker",
       desc: "Log 10 or more transactions under your budget caps",
       xp: 120,
       unlocked: transactions.length >= 10,
@@ -65,7 +65,7 @@ export function useUserAchievements() {
     },
     {
       id: "study_10_hours",
-      title: "Syllabus Marathoner",
+      title: "Study Sprint",
       desc: "Log over 10 hours of total focused study time",
       xp: 200,
       unlocked: totalStudyHours >= 10,
@@ -74,8 +74,8 @@ export function useUserAchievements() {
     },
     {
       id: "streak_30",
-      title: "30-Day Iron Will",
-      desc: "Maintain a 30-day active habit streak across space",
+      title: "30-Day Streak",
+      desc: "Maintain an active habit streak for 30 consecutive days",
       xp: 500,
       unlocked: maxStreak >= 30,
       progressText: `${maxStreak} / 30 Days`,
@@ -83,8 +83,8 @@ export function useUserAchievements() {
     },
     {
       id: "savings_3",
-      title: "Financial Mastermind",
-      desc: "Successfully complete 3 savings target goals",
+      title: "Savings Milestone",
+      desc: "Successfully complete 3 savings goals",
       xp: 350,
       unlocked: completedSavings >= 3,
       progressText: `${completedSavings} / 3 Targets`,

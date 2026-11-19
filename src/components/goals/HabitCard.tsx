@@ -242,7 +242,7 @@ export function HabitCard({
         <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-20">
           <div className="animate-ping flex items-center gap-1 bg-[#161514] text-[#CEF431] px-3 py-1 rounded-xl font-mono text-xs font-black shadow-md border border-[#CEF431]">
             <Sparkles className="size-3.5 fill-current" />
-            <span>Rep Conquered! ⚡</span>
+            <span>Done! ⚡</span>
           </div>
         </div>
       )}
@@ -396,7 +396,7 @@ export function HabitCard({
                       ? "bg-[#CEF431] text-[#161514] border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] font-black animate-pulse"
                       : "bg-secondary text-muted-foreground border-border hover:bg-muted font-bold opacity-80"
                   )}
-                  title={`${day.dayLabel} ${day.dayNum} • ${isChecked ? "Conquered" : "Pending"}`}
+                  title={`${day.dayLabel} ${day.dayNum} • ${isChecked ? "Completed" : "Pending"}`}
                 >
                   <span className="text-[8px] uppercase tracking-wider leading-none">
                     {day.dayLabel[0]}
@@ -451,7 +451,7 @@ export function HabitCard({
                       ? "border-2 border-dashed border-[#161514] dark:border-[#CEF431] bg-secondary"
                       : "bg-secondary/40 border-border text-muted-foreground"
                   )}
-                  title={isTodayCell ? "Today" : `${idx}d ago • ${isFilled ? "Conquered" : "Pending"}`}
+                  title={isTodayCell ? "Today" : `${idx}d ago • ${isFilled ? "Completed" : "Pending"}`}
                 >
                   {isFilled ? "✓" : isTodayCell ? "•" : ""}
                 </div>

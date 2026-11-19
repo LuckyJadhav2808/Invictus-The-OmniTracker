@@ -24,13 +24,22 @@ import { calculateSM2Review } from "@/lib/utils/spaced-repetition";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
 import { StudyCockpitSkeleton, SubjectsGridSkeleton } from "@/components/shared/NeobrutalistSkeleton";
-import { TemplateSelectionModal, TemplatePack } from "@/components/shared/TemplateSelectionModal";
+import type { TemplatePack } from "@/components/shared/TemplateSelectionModal";
 import { SUBJECT_TEMPLATE_PACKS, MOCK_TEST_TEMPLATE_PACKS } from "@/lib/templates-data";
-import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
 import { StrobiCompanion } from "@/components/mascot/StrobiCompanion";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProgressRing } from "@/components/shared/ProgressRing";
+import dynamic from "next/dynamic";
+
+const TemplateSelectionModal = dynamic(
+  () => import("@/components/shared/TemplateSelectionModal").then((m) => m.TemplateSelectionModal),
+  { ssr: false }
+);
+const DeleteConfirmationModal = dynamic(
+  () => import("@/components/shared/DeleteConfirmationModal").then((m) => m.DeleteConfirmationModal),
+  { ssr: false }
+);
 import {
   BookOpen,
   Plus,

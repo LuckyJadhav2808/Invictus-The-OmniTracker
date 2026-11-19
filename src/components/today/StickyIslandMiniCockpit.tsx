@@ -74,7 +74,7 @@ export function StickyIslandMiniCockpit({
           <StrobiCompanion
             size={28}
             state={metrics.overallScore >= 100 ? "celebrate" : isTimerRunning ? "focus" : "idle"}
-            gear="gladiator"
+            gear="tasks"
             onClick={handleTopClick}
           />
           <div className="inline-flex items-center gap-1 bg-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:text-[#161514] border-2 border-[#161514] font-mono font-black text-xs px-2.5 py-0.5 rounded-xl shadow-2xs">

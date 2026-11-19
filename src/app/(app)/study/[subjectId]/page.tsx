@@ -86,7 +86,7 @@ export default function SubjectDetailPage({
         difficulty: "medium",
         notes: "",
       } as any);
-      toast.success("Topic added! Let's conquer it 🚀");
+      toast.success("Topic added! Ready for focus session.");
       setTopicTitle("");
       setEstimatedHours(1);
       setIsAddTopicOpen(false);

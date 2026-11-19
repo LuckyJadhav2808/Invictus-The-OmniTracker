@@ -5,14 +5,22 @@ import { useTasks, useCreateTask, useUpdateTask, useDeleteTask, useToggleSubtask
 import { TaskKanbanBoard } from "@/components/tasks/TaskKanbanBoard";
 import { TaskListWidget } from "@/components/tasks/TaskListWidget";
 import { EisenhowerMatrixWidget } from "@/components/tasks/EisenhowerMatrixWidget";
-import { NewTaskModal } from "@/components/tasks/NewTaskModal";
-import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
 import { StrobiCompanion } from "@/components/mascot/StrobiCompanion";
 import { TaskItem } from "@/types";
 import { CheckSquare, LayoutGrid, List, Flame, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { TasksCockpitSkeleton } from "@/components/shared/NeobrutalistSkeleton";
+import dynamic from "next/dynamic";
+
+const NewTaskModal = dynamic(
+  () => import("@/components/tasks/NewTaskModal").then((m) => m.NewTaskModal),
+  { ssr: false }
+);
+const DeleteConfirmationModal = dynamic(
+  () => import("@/components/shared/DeleteConfirmationModal").then((m) => m.DeleteConfirmationModal),
+  { ssr: false }
+);
 
 export default function TasksPage() {
   const { data: tasks = [], isLoading } = useTasks();

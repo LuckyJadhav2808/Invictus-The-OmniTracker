@@ -316,7 +316,7 @@ export function RetroStickyScratchpad({
     }
 
     toast.success(
-      `Conquered ${batchTasks.length + batchExpenses.length} items!`,
+      `Added ${batchTasks.length + batchExpenses.length} items!`,
       {
         description: `${batchTasks.length} task${batchTasks.length === 1 ? "" : "s"} & ${batchExpenses.length} expense${batchExpenses.length === 1 ? "" : "s"} recorded.`,
       }

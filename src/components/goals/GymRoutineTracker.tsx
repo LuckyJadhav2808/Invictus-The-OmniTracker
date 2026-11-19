@@ -5,11 +5,22 @@ import { Dumbbell, Plus, Trash2, Edit3, CheckCircle2, Circle, Flame, Sparkles, L
 import { AdaptiveDrawerDialog } from "@/components/shared/AdaptiveDrawerDialog";
 import { soundFX } from "@/components/shared/SoundFX";
 import { TemplatePack } from "@/components/shared/TemplateSelectionModal";
-import { GymChoiceModal } from "@/components/goals/GymChoiceModal";
 import { GYM_TEMPLATE_PACKS } from "@/lib/templates-data";
-import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
-import { ExerciseGuideModal } from "@/components/goals/ExerciseGuideModal";
 import { HumanMuscleAnatomy } from "@/components/goals/anatomy/HumanMuscleAnatomy";
+import dynamic from "next/dynamic";
+
+const GymChoiceModal = dynamic(
+  () => import("@/components/goals/GymChoiceModal").then((m) => m.GymChoiceModal),
+  { ssr: false }
+);
+const DeleteConfirmationModal = dynamic(
+  () => import("@/components/shared/DeleteConfirmationModal").then((m) => m.DeleteConfirmationModal),
+  { ssr: false }
+);
+const ExerciseGuideModal = dynamic(
+  () => import("@/components/goals/ExerciseGuideModal").then((m) => m.ExerciseGuideModal),
+  { ssr: false }
+);
 import {
   MuscleGroup,
   resolveExerciseAnatomy,
@@ -938,7 +949,7 @@ export function GymRoutineTracker() {
               No workout scheduled for {selectedDay} yet
             </h4>
             <p className="text-xs text-[#6E6B65] dark:text-[#9E9A90] max-w-md mx-auto">
-              Start your session in seconds. Apply a battle-tested routine preset in one tap or select movements from our 4,300+ exercise library.
+              Start your session in seconds. Apply a workout preset in one tap or select movements from our 4,300+ exercise library.
             </p>
           </div>
 

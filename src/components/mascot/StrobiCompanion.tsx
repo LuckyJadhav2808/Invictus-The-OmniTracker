@@ -22,12 +22,12 @@ export interface StrobiCompanionProps {
 
 const STROBI_QUIPS = [
   "Discipline beats motivation every single day.",
-  "Your streak is your fortress. Defend it!",
-  "One focus block at a time. Total conquest.",
-  "An unconquered day begins with one checked habit.",
-  "Armor up! Victory is won in the morning.",
-  "Momentum is your greatest weapon. Keep swinging!",
-  "Small daily reps turn discipline into identity.",
+  "Your streak is your foundation. Keep it going!",
+  "One focus block at a time. Steady progress.",
+  "A productive day begins with one checked habit.",
+  "Start early and set the tone for the day.",
+  "Consistency is your superpower. Keep moving forward.",
+  "Small daily actions compound into lasting results.",
 ];
 
 /**

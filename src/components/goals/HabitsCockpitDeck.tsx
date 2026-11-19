@@ -63,7 +63,7 @@ export function HabitsCockpitDeck({
   dueCount = 0,
   userLevel = 1,
   totalXP = 0,
-  userName = "Gladiator",
+  userName = "Friend",
   soundMuted,
   onToggleSound,
   weeklyAveragePercent = 85,
@@ -121,12 +121,12 @@ export function HabitsCockpitDeck({
             <span>Daily Routines & Momentum</span>
             {isConquered && (
               <span className="text-xs font-mono font-black uppercase px-2 py-0.5 rounded-full bg-[#03D26F]/20 text-[#047857] dark:text-[#03D26F] border border-[#03D26F]/40 animate-pulse">
-                All Conquered ⚡
+                All Done ⚡
               </span>
             )}
           </h1>
           <p className="text-xs text-muted-foreground font-medium">
-            Active gladiator: <span className="font-bold text-foreground">{userName}</span> • {completedCount}/{dueCount} habits done today
+            Welcome, <span className="font-bold text-foreground">{userName}</span> • {completedCount}/{dueCount} habits done today
           </p>
         </div>
 
@@ -219,17 +219,17 @@ export function HabitsCockpitDeck({
             streakDays={longestStreakValue}
             moodBadge={
               isConquered
-                ? "🏆 All Conquered"
+                ? "🏆 All Completed"
                 : completedCount > 0
                 ? `⚡ ${completedCount}/${dueCount} Done`
                 : "⚡ Ready"
             }
             quip={
               isConquered
-                ? `All ${dueCount} routines conquered today!`
+                ? `All ${dueCount} habits completed today!`
                 : completedCount > 0
-                ? `${completedCount} of ${dueCount} routines down. Keep the rhythm going!`
-                : `${dueCount} routines due today. Start with rep #1.`
+                ? `${completedCount} of ${dueCount} habits down. Keep the rhythm going!`
+                : `${dueCount} habits due today. Start with your top priority.`
             }
             onClick={onOpenNewHabit}
             className="h-full"

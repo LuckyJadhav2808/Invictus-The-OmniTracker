@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback, Suspense } from "react";
+import dynamic from "next/dynamic";
+import { useAuth } from "@/components/shared/AuthProvider";
 import {
   useHabits,
   useAddHabit,
@@ -22,21 +24,33 @@ import { HabitCard } from "@/components/goals/HabitCard";
 import { HabitsCockpitDeck } from "@/components/goals/HabitsCockpitDeck";
 import { HabitsMatrixBoard } from "@/components/goals/HabitsMatrixBoard";
 import { StickyHabitsMiniCockpit } from "@/components/goals/StickyHabitsMiniCockpit";
-import { NewHabitForm } from "@/components/goals/NewHabitForm";
 import { WaterTracker } from "@/components/goals/WaterTracker";
 import { MoodJournalWidget } from "@/components/goals/MoodJournalWidget";
 import { SleepAndActiveWidgets } from "@/components/goals/SleepAndActiveWidgets";
-import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { HabitsCockpitSkeleton, HabitsListSkeleton } from "@/components/shared/NeobrutalistSkeleton";
 import { AdaptiveDrawerDialog } from "@/components/shared/AdaptiveDrawerDialog";
 import { soundFX } from "@/components/shared/SoundFX";
 import { TemplatePack } from "@/components/shared/TemplateSelectionModal";
-import { HabitChoiceModal, AtomicHabitPreset } from "@/components/goals/HabitChoiceModal";
+import type { AtomicHabitPreset } from "@/components/goals/HabitChoiceModal";
 import { HABIT_TEMPLATE_PACKS } from "@/lib/templates-data";
 import { HabitCompanionSprite } from "@/components/mascot/HabitCompanionSprite";
 import { StrobiCompanion } from "@/components/mascot/StrobiCompanion";
 import { Button } from "@/components/ui/button";
+
+// Lazy-Loaded Heavy Modals (Zero TBT & Fast Initial Paint)
+const HabitChoiceModal = dynamic(
+  () => import("@/components/goals/HabitChoiceModal").then((m) => m.HabitChoiceModal),
+  { ssr: false }
+);
+const NewHabitForm = dynamic(
+  () => import("@/components/goals/NewHabitForm").then((m) => m.NewHabitForm),
+  { ssr: false }
+);
+const DeleteConfirmationModal = dynamic(
+  () => import("@/components/shared/DeleteConfirmationModal").then((m) => m.DeleteConfirmationModal),
+  { ssr: false }
+);
 import {
   Target,
   Plus,
@@ -67,6 +81,7 @@ import { ProactiveReminderBanner } from "@/components/shared/ProactiveReminderBa
 import { useSearchParams, useRouter } from "next/navigation";
 
 function GoalsPageContent() {
+  const { user } = useAuth();
   const { selectedDate, setSelectedDate, habitLayoutStyle, setHabitLayoutStyle } = useUIStore();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -394,7 +409,7 @@ function GoalsPageContent() {
       soundFX.playCompleteChime();
       soundFX.playBotChirp("happy");
       soundFX.vibrate([40, 60, 100]);
-      toast.success(`⚡ Conquered all ${dueTodayHabits.length} routines! Take a bow. 🏆`);
+      toast.success(`⚡ All ${dueTodayHabits.length} habits completed today! Outstanding consistency. 🏆`);
     } catch {
       toast.error("Failed to check all habits");
     }
@@ -479,7 +494,7 @@ function GoalsPageContent() {
         dueCount={dueTodayHabits.length}
         userLevel={achievements.userLevel}
         totalXP={achievements.totalXP}
-        userName="Gladiator"
+        userName={user?.displayName ? user.displayName.split(" ")[0] : "Friend"}
         soundMuted={soundMuted}
         onToggleSound={() => {
           const nextMuted = soundFX.toggleMute();

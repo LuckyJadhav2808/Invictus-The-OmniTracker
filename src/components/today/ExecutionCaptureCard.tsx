@@ -454,10 +454,10 @@ export function ExecutionCaptureCard({
                   <ShieldCheck className="size-5 text-[#161514]" />
                 </div>
                 <p className="font-heading font-black text-sm text-[#161514]">
-                  Battlefield Clear!
+                  All Priority Tasks Cleared!
                 </p>
                 <p className="text-xs text-[#161514]/65">
-                  No urgent or high-priority targets pending for today.
+                  No urgent or high-priority tasks pending for today.
                 </p>
               </div>
             ) : (
