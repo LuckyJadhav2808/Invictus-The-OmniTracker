@@ -190,7 +190,7 @@ export async function syncRecentBankSms(
 
   // 2. Determine Query Time Bounds
   let startTime = 0;
-  let endTime = options?.endTime ?? Date.now();
+  const endTime = options?.endTime ?? Date.now();
 
   if (options?.startTime !== undefined) {
     startTime = options.startTime;

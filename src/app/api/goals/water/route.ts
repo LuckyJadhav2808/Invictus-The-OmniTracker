@@ -48,8 +48,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "UserId and date required" }, { status: 400 });
     }
 
-    let waterLog = await WaterLog.findOne({ userId, date });
-    let currentAmount = waterLog ? waterLog.amount : 0;
+    const waterLog = await WaterLog.findOne({ userId, date });
+    const currentAmount = waterLog ? waterLog.amount : 0;
     let nextAmount = currentAmount;
 
     if (mode === "add") {

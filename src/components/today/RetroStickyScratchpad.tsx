@@ -27,7 +27,7 @@ import {
 } from "@/lib/utils/scratchpad-nlp";
 import { type Category } from "@/types";
 
-interface RetroStickyScratchpadProps {
+export interface RetroStickyScratchpadProps {
   categories?: Category[];
   onConvertToTask?: (task: {
     title: string;

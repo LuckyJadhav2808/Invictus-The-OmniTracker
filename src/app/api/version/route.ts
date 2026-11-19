@@ -21,7 +21,7 @@ export async function GET(request: Request) {
     let buildNumber = APP_VERSION_CONFIG.buildNumber;
     let releaseTitle = `Invictus v${APP_VERSION_CONFIG.version}`;
     let releaseNotes = APP_VERSION_CONFIG.changelog;
-    let downloadUrl = `${APP_VERSION_CONFIG.githubRepoUrl}/releases/latest`;
+    const downloadUrl = `${APP_VERSION_CONFIG.githubRepoUrl}/releases/latest`;
     let apkDownloadUrl = "/api/download/android";
     let publishedAt = APP_VERSION_CONFIG.releaseDate;
     let apkSha256 = "";

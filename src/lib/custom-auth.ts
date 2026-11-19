@@ -159,7 +159,7 @@ export async function customLoginUser(payload: {
   const normalizedEmail = payload.email.trim().toLowerCase();
   const passwordHash = await hashPassword(payload.password);
 
-  let userIndex = users.findIndex((u) => u.email.toLowerCase() === normalizedEmail);
+  const userIndex = users.findIndex((u) => u.email.toLowerCase() === normalizedEmail);
 
   // 1. When online, verify credentials against MongoDB Cloud DB first
   try {

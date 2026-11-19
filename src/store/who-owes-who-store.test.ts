@@ -69,7 +69,7 @@ describe("useWhoOwesWhoStore", () => {
     });
 
     store.updateIOU(created.id, { amount: 1200, description: "Concert tickets + Uber" });
-    let item = useWhoOwesWhoStore.getState().ious.find((i) => i.id === created.id);
+    const item = useWhoOwesWhoStore.getState().ious.find((i) => i.id === created.id);
     expect(item?.amount).toBe(1200);
     expect(item?.description).toBe("Concert tickets + Uber");
 

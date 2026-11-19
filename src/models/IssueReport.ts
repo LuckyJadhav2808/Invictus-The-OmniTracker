@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, models, model } from "mongoose";
+import { Schema, Document, models, model } from "mongoose";
 
 export interface IIssueReport extends Document {
   title: string;

@@ -39,7 +39,7 @@ const DEFAULT_FLAGS: Record<string, { value: any; description: string; category:
 
 export async function GET() {
   try {
-    let flagMap: Record<string, any> = {};
+    const flagMap: Record<string, any> = {};
 
     try {
       await connectToDatabase();

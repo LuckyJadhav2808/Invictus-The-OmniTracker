@@ -29,7 +29,7 @@ export interface WhoOwesWhoState {
 
 export const useWhoOwesWhoStore = create<WhoOwesWhoState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       ious: [],
 
       addIOU: (iouData) => {

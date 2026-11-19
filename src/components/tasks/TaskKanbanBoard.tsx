@@ -59,7 +59,7 @@ export function TaskKanbanBoard({
   const moveColumn = (task: TaskItem, direction: "prev" | "next") => {
     const statuses: TaskItem["status"][] = ["todo", "in_progress", "review", "completed"];
     const currentIdx = statuses.indexOf(task.status);
-    let nextIdx = direction === "next" ? currentIdx + 1 : currentIdx - 1;
+    const nextIdx = direction === "next" ? currentIdx + 1 : currentIdx - 1;
     if (nextIdx >= 0 && nextIdx < statuses.length) {
       onUpdateTask(task.id, { status: statuses[nextIdx] });
     }

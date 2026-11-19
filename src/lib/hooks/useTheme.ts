@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { flushSync } from "react-dom";
 
 export type ThemeMode = "light" | "dark" | "system";
@@ -14,49 +14,43 @@ const THEME_STORAGE_KEY = "theme";
 const THEME_CHANGE_EVENT = "invictus-theme-change";
 
 /**
- * Temporarily freezes CSS transitions on all elements during the theme DOM update.
- * This guarantees the View Transitions API snapshot captures the final, fully-resolved
- * styles immediately without intermediate CSS color interpolations or layout thrashing.
+ * Freezes all CSS transitions during theme switch to prevent jank/flicker
  */
 function freezeTransitionsTemporarily(): () => void {
-  if (
-    typeof document === "undefined" ||
-    typeof document.createElement !== "function" ||
-    !document.head
-  ) {
-    return () => {};
-  }
+  if (typeof document === "undefined") return () => {};
 
   const css = document.createElement("style");
-  css.setAttribute("id", "invictus-theme-freeze");
-  css.textContent = `*, *::before, *::after {
-    -webkit-transition: none !important;
-    -moz-transition: none !important;
-    -o-transition: none !important;
-    -ms-transition: none !important;
-    transition: none !important;
-  }`;
+  css.setAttribute("type", "text/css");
+  css.setAttribute("data-theme-transition-freeze", "true");
+  css.appendChild(
+    document.createTextNode(
+      `*, *::before, *::after {
+        -webkit-transition: none !important;
+        -moz-transition: none !important;
+        -o-transition: none !important;
+        -ms-transition: none !important;
+        transition: none !important;
+      }`
+    )
+  );
   document.head.appendChild(css);
 
   return () => {
-    // Force a computed style reflow so DOM evaluates new classes without transition
-    if (typeof window !== "undefined") {
-      void window.getComputedStyle(document.documentElement).opacity;
-      requestAnimationFrame(() => {
-        css.remove();
+    // Double RAF ensures new DOM layout paints before re-enabling transitions
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        document.head.removeChild(css);
       });
-    } else {
-      css.remove();
-    }
+    });
   };
 }
 
 export function getStoredTheme(): ThemeMode {
   if (typeof window === "undefined") return "system";
   try {
-    const saved = localStorage.getItem(THEME_STORAGE_KEY);
-    if (saved === "light" || saved === "dark" || saved === "system") {
-      return saved;
+    const stored = localStorage.getItem(THEME_STORAGE_KEY) as ThemeMode | null;
+    if (stored && ["light", "dark", "system"].includes(stored)) {
+      return stored;
     }
   } catch {}
   return "system";
@@ -68,11 +62,11 @@ export function getSystemTheme(): "light" | "dark" {
 }
 
 export function applyThemeToDOM(mode: ThemeMode): "light" | "dark" {
-  if (typeof window === "undefined") return "light";
-  
-  const resolved = mode === "system" ? getSystemTheme() : mode;
+  if (typeof window === "undefined" || typeof document === "undefined") return "light";
+
   const root = document.documentElement;
-  
+  const resolved = mode === "system" ? getSystemTheme() : mode;
+
   if (resolved === "dark") {
     root.classList.add("dark");
   } else {
@@ -86,59 +80,6 @@ export function useTheme() {
   const [theme, setThemeState] = useState<ThemeMode>("system");
   const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
   const [mounted, setMounted] = useState(false);
-
-  // Sync state on mount and subscribe to changes
-  useEffect(() => {
-    setMounted(true);
-    const initialTheme = getStoredTheme();
-    setThemeState(initialTheme);
-    const initialResolved = applyThemeToDOM(initialTheme);
-    setResolvedTheme(initialResolved);
-
-    // Listener for cross-component theme changes
-    const handleThemeChange = (e: Event) => {
-      const customEvent = e as CustomEvent<{ theme: ThemeMode; resolved: "light" | "dark" }>;
-      if (customEvent.detail) {
-        setThemeState(customEvent.detail.theme);
-        setResolvedTheme(customEvent.detail.resolved);
-      } else {
-        const current = getStoredTheme();
-        setThemeState(current);
-        setResolvedTheme(applyThemeToDOM(current));
-      }
-    };
-
-    window.addEventListener(THEME_CHANGE_EVENT, handleThemeChange);
-
-    // Listener for OS system theme change
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    const handleMediaChange = () => {
-      const current = getStoredTheme();
-      if (current === "system") {
-        const resolved = applyThemeToDOM("system");
-        setResolvedTheme(resolved);
-      }
-    };
-
-    mediaQuery.addEventListener("change", handleMediaChange);
-
-    // Global Keyboard Shortcut: ⌘D or Ctrl+D toggles theme
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "d") {
-        // Prevent default browser bookmark shortcut
-        e.preventDefault();
-        toggleTheme();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener(THEME_CHANGE_EVENT, handleThemeChange);
-      mediaQuery.removeEventListener("change", handleMediaChange);
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
 
   const setTheme = useCallback((newTheme: ThemeMode, coordinates?: ThemeRippleCoordinates) => {
     const applyThemeState = () => {
@@ -228,6 +169,65 @@ export function useTheme() {
     const nextTheme: "light" | "dark" = resolvedTheme === "dark" ? "light" : "dark";
     setTheme(nextTheme, coordinates);
   }, [resolvedTheme, setTheme]);
+
+  // Keep toggleTheme ref updated for listeners
+  const toggleThemeRef = useRef(toggleTheme);
+  useEffect(() => {
+    toggleThemeRef.current = toggleTheme;
+  }, [toggleTheme]);
+
+  // Sync state on mount and subscribe to changes
+  useEffect(() => {
+    setMounted(true);
+    const initialTheme = getStoredTheme();
+    setThemeState(initialTheme);
+    const initialResolved = applyThemeToDOM(initialTheme);
+    setResolvedTheme(initialResolved);
+
+    // Listener for cross-component theme changes
+    const handleThemeChange = (e: Event) => {
+      const customEvent = e as CustomEvent<{ theme: ThemeMode; resolved: "light" | "dark" }>;
+      if (customEvent.detail) {
+        setThemeState(customEvent.detail.theme);
+        setResolvedTheme(customEvent.detail.resolved);
+      } else {
+        const current = getStoredTheme();
+        setThemeState(current);
+        setResolvedTheme(applyThemeToDOM(current));
+      }
+    };
+
+    window.addEventListener(THEME_CHANGE_EVENT, handleThemeChange);
+
+    // Listener for OS system theme change
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleMediaChange = () => {
+      const current = getStoredTheme();
+      if (current === "system") {
+        const resolved = applyThemeToDOM("system");
+        setResolvedTheme(resolved);
+      }
+    };
+
+    mediaQuery.addEventListener("change", handleMediaChange);
+
+    // Global Keyboard Shortcut: ⌘D or Ctrl+D toggles theme
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "d") {
+        // Prevent default browser bookmark shortcut
+        e.preventDefault();
+        toggleThemeRef.current();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener(THEME_CHANGE_EVENT, handleThemeChange);
+      mediaQuery.removeEventListener("change", handleMediaChange);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   return {
     theme,

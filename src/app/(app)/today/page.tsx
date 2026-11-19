@@ -20,7 +20,7 @@ import { useTransactions, useCategories, useAddTransaction, useBudgetPreferences
 import { useTasks, useUpdateTask, useCreateTask } from "@/lib/queries/tasks";
 import { computeMonthlyBudgetStats } from "@/lib/utils/budget-rollover";
 import { toast } from "sonner";
-import { Shield, SunMedium, Clock, Moon, Droplet, Plus, Wallet, FileText, ArrowUpRight } from "lucide-react";
+import { Shield, SunMedium, Clock, Moon, Droplet, Plus, FileText, ArrowUpRight } from "lucide-react";
 import dynamic from "next/dynamic";
 import {
   format,
@@ -40,7 +40,7 @@ import { TodayTopHabitsMomentum } from "@/components/today/TodayTopHabitsMomentu
 import { FirstRunQuickStartDeck } from "@/components/today/FirstRunQuickStartDeck";
 import { BottomSheet } from "@/components/mobile/BottomSheet";
 import { WaterTracker } from "@/components/goals/WaterTracker";
-import { useTodayCockpitViewModel, computeDailyConquestScore } from "@/components/today/useTodayCockpitViewModel";
+import { computeDailyConquestScore } from "@/components/today/useTodayCockpitViewModel";
 import { useSyncNativeQuickLogs } from "@/lib/native/useSyncNativeQuickLogs";
 import type { StrobiState } from "@/components/mascot/StrobiCompanion";
 

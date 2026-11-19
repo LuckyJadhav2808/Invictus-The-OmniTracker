@@ -11,7 +11,6 @@ import {
   ChevronDown,
   Edit3,
   Trash2,
-  Calendar,
   ExternalLink,
   FastForward,
 } from "lucide-react";

@@ -5,8 +5,6 @@ import { useAuth } from "@/components/shared/AuthProvider";
 import {
   customUpdateUser,
   customUpdatePassword,
-  customDeleteUser,
-  customLogout,
   getGlobalAnnouncement,
   type GlobalAnnouncement,
 } from "@/lib/custom-auth";
@@ -26,32 +24,25 @@ import { enableWebPushNotifications, triggerTestPushNotification } from "@/lib/u
 import {
   Target,
   Kanban,
-  BookOpen,
   Wallet,
   Globe,
   Calendar,
   Save,
-  ArrowLeft,
   Download,
   Upload,
   Trash2,
-  AlertTriangle,
   Database,
   HardDrive,
-  Lock,
   User,
   UserX,
   Sliders,
   ShieldCheck,
   Megaphone,
   KeyRound,
-  Trophy,
   ChevronRight,
   Sparkles,
-  Folder,
   LayoutGrid,
   BarChart3,
-  Zap,
   Bell,
   Volume2,
   AlarmClock,
@@ -60,13 +51,10 @@ import {
   ChevronDown,
   ChevronUp,
   LifeBuoy,
-  Layers,
   Check,
   RefreshCw,
   Palette,
-  ExternalLink,
 } from "lucide-react";
-import Link from "next/link";
 import { toast } from "sonner";
 import { BankSmsSettingsSection } from "@/components/settings/BankSmsSettingsSection";
 import { AmbientQuickLogCard } from "@/components/money/AmbientQuickLogCard";

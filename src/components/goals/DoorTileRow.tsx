@@ -1,7 +1,6 @@
 "use client";
 
-import React from "react";
-import { Target, Dumbbell, Utensils, BarChart2, Droplet } from "lucide-react";
+import { Target, Dumbbell, Utensils, BarChart2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
 

@@ -1015,7 +1015,7 @@ export function useStreakFreeze() {
     queryFn: async () => {
       if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_streak_freeze");
-        let sf: StreakFreezeData = local
+        const sf: StreakFreezeData = local
           ? JSON.parse(local)
           : { userId: "guest", tokensAvailable: 1, lastMonthlyCredit: format(new Date(), "yyyy-MM"), frozenDates: [], autoShieldEvent: null };
 

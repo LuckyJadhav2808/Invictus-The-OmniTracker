@@ -19,14 +19,14 @@ import {
   Wallet,
   Sparkles,
   ArrowRight,
-  Clock,
   Dumbbell,
-  BookOpen,
   Receipt,
   TrendingUp,
 } from "lucide-react";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { InvictusLogo } from "@/components/shared/InvictusLogo";
+import { DoodleInvictusTitle } from "@/components/auth/DoodleInvictusTitle";
+import { DoodleArrow } from "@/components/auth/AuthDoodles";
 import { APP_VERSION_CONFIG } from "@/config/version";
 import { cn } from "@/lib/utils";
 
@@ -105,6 +105,8 @@ function LoginForm() {
               v{APP_VERSION_CONFIG.version} • Offline-First OS
             </span>
           </div>
+
+          <DoodleInvictusTitle size="lg" showSubtitle={false} className="my-1" />
 
           <div className="space-y-1">
             <h1 className="font-heading font-black text-2xl sm:text-3xl lg:text-4xl text-[#161514] dark:text-[#FAF8F5] tracking-tight leading-tight">
@@ -300,28 +302,38 @@ function LoginForm() {
       <div className="w-full md:col-span-6 lg:col-span-5 max-w-md mx-auto z-10 relative order-1 md:order-2">
         <div className="bg-white dark:bg-[#161514] rounded-2xl p-4 sm:p-6 border-2 border-[#161514] dark:border-[#2A2724] shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#2A2724] space-y-4 transition-colors">
           {/* ZERO-CONFUSION 1-TAP GUEST ON-RAMP (PRIORITY #1 ON MOBILE) */}
-          <div className="p-3.5 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#2A2724] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#2A2724] space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5 uppercase tracking-wider">
-                <Compass className="size-3.5 stroke-[2.5] text-emerald-600 dark:text-emerald-400" />
-                <span>Instant Evaluation Mode</span>
-              </span>
-              <span className="bg-[#CEF431] text-[#161514] text-[10px] font-mono font-black uppercase px-2 py-0.5 rounded border border-[#161514]">
-                1-Tap Ready
-              </span>
+          <div className="relative">
+            <div className="hidden sm:flex justify-end mb-1 pr-2">
+              <DoodleArrow
+                direction="curved-down-right"
+                label="1-tap offline evaluation"
+                className="rotate-[-4deg]"
+                color="#03D26F"
+              />
             </div>
-            <p className="text-[11px] font-medium text-[#6B6B6B] dark:text-[#A8A29E] leading-relaxed">
-              Test all workspaces, gym routines, and ledger envelopes immediately without creating an account.
-            </p>
-            <button
-              type="button"
-              onClick={handleGuestLogin}
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#CEF431] hover:bg-[#bfe628] text-[#161514] text-xs font-heading font-black uppercase tracking-wider border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
-            >
-              <Compass className="size-3.5 stroke-[2.5]" />
-              <span>Explore as Offline Guest (No Account)</span>
-              <ArrowRight className="size-3.5 stroke-[2.5]" />
-            </button>
+            <div className="p-3.5 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#2A2724] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#2A2724] space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5 uppercase tracking-wider">
+                  <Compass className="size-3.5 stroke-[2.5] text-emerald-600 dark:text-emerald-400" />
+                  <span>Instant Evaluation Mode</span>
+                </span>
+                <span className="bg-[#CEF431] text-[#161514] text-[10px] font-mono font-black uppercase px-2 py-0.5 rounded border border-[#161514]">
+                  1-Tap Ready
+                </span>
+              </div>
+              <p className="text-[11px] font-medium text-[#6B6B6B] dark:text-[#A8A29E] leading-relaxed">
+                Test all workspaces, gym routines, and ledger envelopes immediately without creating an account.
+              </p>
+              <button
+                type="button"
+                onClick={handleGuestLogin}
+                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#CEF431] hover:bg-[#bfe628] text-[#161514] text-xs font-heading font-black uppercase tracking-wider border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
+              >
+                <Compass className="size-3.5 stroke-[2.5]" />
+                <span>Explore as Offline Guest (No Account)</span>
+                <ArrowRight className="size-3.5 stroke-[2.5]" />
+              </button>
+            </div>
           </div>
 
           {/* Calm Divider */}

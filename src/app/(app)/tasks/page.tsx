@@ -9,7 +9,6 @@ import {
   useToggleSubtask,
 } from "@/lib/queries/tasks";
 import { TaskKanbanBoard } from "@/components/tasks/TaskKanbanBoard";
-import { TaskListWidget } from "@/components/tasks/TaskListWidget";
 import { EisenhowerMatrixWidget } from "@/components/tasks/EisenhowerMatrixWidget";
 import { TasksHeroPager, ProjectProgress } from "@/components/tasks/TasksHeroPager";
 import { TasksDoorTileRow } from "@/components/tasks/TasksDoorTileRow";
@@ -17,9 +16,8 @@ import { TasksPrimaryList } from "@/components/tasks/TasksPrimaryList";
 import { MobileAppBar } from "@/components/mobile/MobileAppBar";
 import { SegmentedSubNav, SubNavTab } from "@/components/mobile/SegmentedSubNav";
 import { StrobiCompanion } from "@/components/mascot/StrobiCompanion";
-import { TaskItem, Subtask } from "@/types";
+import { TaskItem } from "@/types";
 import {
-  CheckSquare,
   LayoutGrid,
   List,
   Flame,
@@ -29,9 +27,7 @@ import {
   Target,
   FolderKanban,
   CheckCircle2,
-  Clock,
   Send,
-  Calendar,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
