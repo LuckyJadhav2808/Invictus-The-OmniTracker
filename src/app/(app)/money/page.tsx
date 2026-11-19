@@ -882,8 +882,8 @@ function MoneyPageContent() {
               </div>
 
               {recentTransactions.length > 0 ? (
-                <div className="space-y-2">
-                  <div className="bg-card rounded-2xl border-2 border-[#161514] dark:border-[#383531] shadow-[2.5px_2.5px_0px_0px_#161514] overflow-hidden divide-y divide-[#E8E5DF] dark:divide-[#252321]">
+                <div className="space-y-2.5">
+                  <div className="space-y-2">
                     {recentTransactions.map((tx) => (
                       <BelanjeTransactionRow
                         key={tx.id}
