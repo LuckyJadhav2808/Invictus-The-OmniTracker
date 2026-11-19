@@ -69,12 +69,12 @@ export function LifeSpaceSubNav({ className }: LifeSpaceSubNavProps) {
   return (
     <nav
       className={cn(
-        "w-full overflow-x-auto no-scrollbar pb-1 mb-5 select-none [mask-image:linear-gradient(to_right,black_calc(100%-28px),transparent)] sm:[mask-image:none]",
+        "w-full overflow-x-auto no-scrollbar pb-1 mb-3 sm:mb-5 select-none [mask-image:linear-gradient(to_right,black_calc(100%-28px),transparent)] sm:[mask-image:none]",
         className
       )}
       aria-label="Life Space Sub Navigation"
     >
-      <div className="bg-card text-card-foreground border-2 border-[#161514] dark:border-[#38332E] rounded-2xl p-1.5 shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] flex items-center gap-1.5 w-max min-w-full sm:min-w-0 sm:w-auto">
+      <div className="bg-card text-card-foreground border-2 border-[#161514] dark:border-[#38332E] rounded-2xl p-1 sm:p-1.5 shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] flex items-center gap-1 sm:gap-1.5 w-max min-w-full sm:min-w-0 sm:w-auto">
         {LIFE_SPACE_TABS.map((tab) => {
           const active = isTabActive(tab.href);
           const Icon = tab.icon;
@@ -85,9 +85,9 @@ export function LifeSpaceSubNav({ className }: LifeSpaceSubNavProps) {
               href={tab.href}
               onClick={handleTabClick}
               className={cn(
-                "rounded-xl text-xs py-2 px-3 sm:px-3.5 border-2 transition-all flex items-center gap-1.5 shrink-0 cursor-pointer active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
+                "rounded-xl text-xs py-1.5 sm:py-2 px-2.5 sm:px-3.5 border-2 transition-all flex items-center gap-1.5 shrink-0 cursor-pointer active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
                 active
-                  ? "bg-[#161514] text-[#CEF431] border-[#161514] dark:bg-[#CEF431] dark:text-[#161514] dark:border-[#CEF431] shadow-[2px_2px_0px_0px_rgba(22,21,20,0.6)] font-black"
+                  ? "bg-[#161514] text-[#CEF431] border-[#161514] dark:bg-[#CEF431] dark:text-[#161514] dark:border-[#CEF431] shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,0.6)] font-black"
                   : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted font-bold"
               )}
               aria-current={active ? "page" : undefined}

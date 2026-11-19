@@ -89,7 +89,7 @@ export function StickyHabitsMiniCockpit({
   return (
     <div
       className={cn(
-        "fixed top-2.5 left-1/2 -translate-x-1/2 z-40 w-[94%] sm:w-auto max-w-xl transition-all duration-300 ease-out select-none",
+        "fixed top-14 sm:top-16 left-1/2 -translate-x-1/2 z-40 w-[94%] sm:w-auto max-w-xl transition-all duration-300 ease-out select-none",
         isVisible
           ? "translate-y-0 opacity-100 pointer-events-auto"
           : "-translate-y-12 opacity-0 pointer-events-none",

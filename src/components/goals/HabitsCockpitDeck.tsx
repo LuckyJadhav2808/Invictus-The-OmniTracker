@@ -16,9 +16,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
-import { StrobiCompanion } from "@/components/mascot/StrobiCompanion";
-import { StrobiPartnerStage } from "@/components/mascot/StrobiPartnerStage";
-import { BeadedAmphitheaterArcGauge } from "./BeadedAmphitheaterArcGauge";
+import { HabitsHeroPager } from "./HabitsHeroPager";
 import { type Habit, type Streak } from "@/types";
 
 export interface HabitsCockpitDeckProps {
@@ -105,9 +103,9 @@ export function HabitsCockpitDeck({
   const isConquered = dueCount > 0 && completedCount >= dueCount;
 
   return (
-    <div className="bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#38332E] rounded-3xl p-4 sm:p-6 shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#000000] space-y-5 font-sans select-none">
+    <div className="bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#38332E] rounded-3xl p-3 sm:p-5 shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] space-y-3 sm:space-y-4 font-sans select-none">
       {/* 1. Header Bar: Identity, Telemetry Badges & Primary Actions */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#161514]/10 dark:border-white/10 pb-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-2.5 sm:gap-4 border-b border-[#161514]/10 dark:border-white/10 pb-2.5 sm:pb-3">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-mono font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:text-[#161514]">
@@ -118,11 +116,11 @@ export function HabitsCockpitDeck({
             </span>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="text-xl sm:text-2xl font-heading font-black tracking-tight text-foreground">
-              Daily Routines & Momentum
+            <h1 className="text-lg sm:text-2xl font-heading font-black tracking-tight text-foreground">
+              Daily Routines &amp; Momentum
             </h1>
             {isConquered && (
-              <span className="text-[11px] font-mono font-black uppercase px-2.5 py-0.5 rounded-full bg-[#03D26F] text-[#161514] border border-[#161514] shadow-2xs shrink-0">
+              <span className="text-[10px] sm:text-[11px] font-mono font-black uppercase px-2 py-0.5 rounded-full bg-[#03D26F] text-[#161514] border border-[#161514] shadow-2xs shrink-0">
                 All Done ⚡
               </span>
             )}
@@ -133,7 +131,7 @@ export function HabitsCockpitDeck({
         </div>
 
         {/* Quick Action Badges */}
-        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+        <div className="flex items-center gap-1.5 sm:gap-2.5">
           {/* Autonomous Cryo-Shield Vault Pill */}
           <button
             type="button"
@@ -142,7 +140,7 @@ export function HabitsCockpitDeck({
               onOpenShieldInfo();
             }}
             className={cn(
-              "px-2.5 py-1.5 rounded-xl border-2 text-xs font-mono font-black flex items-center gap-1.5 transition-all cursor-pointer shadow-[2px_2px_0px_0px_rgba(22,21,20,0.5)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
+              "px-2 sm:px-2.5 py-1.5 rounded-xl border-2 text-xs font-mono font-black flex items-center gap-1.5 transition-all cursor-pointer shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,0.5)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
               streakFreeze.tokensAvailable > 0
                 ? "bg-secondary text-foreground border-border hover:bg-muted"
                 : "bg-amber-100 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 border-amber-600/40"
@@ -150,14 +148,14 @@ export function HabitsCockpitDeck({
             title="Cryo-Shield Vault protection"
           >
             <ShieldCheck className="size-3.5 text-[#03D26F] stroke-[2.2]" />
-            <span>{streakFreeze.tokensAvailable}/2 Cryo-Shields</span>
+            <span>{streakFreeze.tokensAvailable}/2 <span className="hidden sm:inline">Cryo-Shields</span></span>
           </button>
 
           {/* Longest Streak Pill */}
-          <div className="px-2.5 py-1.5 rounded-xl border-2 border-border bg-secondary text-foreground text-center flex items-center gap-1.5 shadow-[2px_2px_0px_0px_rgba(22,21,20,0.5)]">
+          <div className="px-2 sm:px-2.5 py-1.5 rounded-xl border-2 border-border bg-secondary text-foreground text-center flex items-center gap-1.5 shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,0.5)]">
             <Flame className="size-3.5 fill-orange-500 text-orange-500" />
             <span className="text-xs font-mono font-black tabular-nums">
-              {longestStreakValue}d streak
+              {longestStreakValue}d <span className="hidden sm:inline">streak</span>
             </span>
           </div>
 
@@ -165,7 +163,7 @@ export function HabitsCockpitDeck({
           <button
             type="button"
             onClick={onToggleSound}
-            className="size-9 rounded-xl border-2 border-border bg-secondary hover:bg-muted text-foreground transition-all flex items-center justify-center cursor-pointer shadow-[2px_2px_0px_0px_rgba(22,21,20,0.5)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+            className="size-8 sm:size-9 rounded-xl border-2 border-border bg-secondary hover:bg-muted text-foreground transition-all flex items-center justify-center cursor-pointer shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,0.5)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
             title={soundMuted ? "Unmute sound effects" : "Mute sound effects"}
           >
             {soundMuted ? <VolumeX className="size-3.5 stroke-[2]" /> : <Volume2 className="size-3.5 stroke-[2]" />}
@@ -189,20 +187,17 @@ export function HabitsCockpitDeck({
             >
               <CheckCheck className={cn("size-3.5 stroke-[2.5]", isConquered ? "text-muted-foreground" : "text-[#03D26F]")} />
               <span>{isConquered ? "Reset Today" : "Check All"}</span>
-              <kbd className="hidden md:inline-block text-[9px] font-mono px-1 py-0.2 bg-muted rounded border border-border text-muted-foreground">
-                ⇧⌘A
-              </kbd>
             </button>
           )}
 
-          {/* New Habit Trigger Button */}
+          {/* New Habit Trigger Button (Desktop only; on mobile, thumb-zone floating action handles this) */}
           <button
             type="button"
             onClick={() => {
               soundFX.playPop();
               onOpenNewHabit();
             }}
-            className="bg-[#CEF431] hover:bg-[#bce028] text-[#161514] font-heading font-black text-xs px-3.5 py-2 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] flex items-center gap-1.5 cursor-pointer transition-all active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+            className="hidden sm:flex bg-[#CEF431] hover:bg-[#bce028] text-[#161514] font-heading font-black text-xs px-3.5 py-2 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] items-center gap-1.5 cursor-pointer transition-all active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
           >
             <Plus className="size-3.5 stroke-[3]" />
             <span>New Habit</span>
@@ -210,109 +205,18 @@ export function HabitsCockpitDeck({
         </div>
       </div>
 
-      {/* 2. Centerpiece: Duolingo & Finch Benchmark Strobi Partner Stage & Arc Gauge */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
-        {/* Left Column (5 cols on lg): Large 76px Strobi Partner Stage */}
-        <div className="lg:col-span-5 flex flex-col">
-          <StrobiPartnerStage
-            state={isConquered ? "celebrate" : longestStreakValue >= 3 ? "fire" : "idle"}
-            gear="fitness"
-            size={76}
-            streakDays={longestStreakValue}
-            moodBadge={
-              isConquered
-                ? "🏆 All Completed"
-                : completedCount > 0
-                ? `⚡ ${completedCount}/${dueCount} Done`
-                : "⚡ Ready"
-            }
-            quip={
-              isConquered
-                ? `All ${dueCount} habits completed today!`
-                : completedCount > 0
-                ? `${completedCount} of ${dueCount} habits down. Keep the rhythm going!`
-                : `${dueCount} habits due today. Start with your top priority.`
-            }
-            onClick={onOpenNewHabit}
-            className="h-full"
-          />
-        </div>
-
-        {/* Right Column (7 cols on lg): Beaded Amphitheater Arc Gauge & Dual Telemetry */}
-        <div
-          className={cn(
-            "lg:col-span-7 border-2 rounded-2xl p-4 sm:p-5 flex flex-col items-center justify-center space-y-4 transition-all duration-300",
-            isConquered
-              ? "bg-[#FAF8F5] dark:bg-[#1C1A18] border-[#03D26F] shadow-[3px_3px_0px_0px_#03D26F]"
-              : "bg-[#FAF8F5] dark:bg-[#1C1A18] border-[#161514] dark:border-[#38332E] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]"
-          )}
-        >
-          <BeadedAmphitheaterArcGauge
-            todayPercent={dailyCompletionPercent}
-            weekPercent={weeklyAveragePercent}
-            streakPercent={streakPercent}
-          />
-
-          {/* Dual Telemetry Inset Row (Routinr Benchmark) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
-            {/* Telemetry Card 1: This Week */}
-            <div className="bg-card border-2 border-border rounded-xl p-3 shadow-2xs space-y-1.5">
-              <div className="flex items-center justify-between text-xs font-mono font-bold text-muted-foreground">
-                <span className="flex items-center gap-1 text-emerald-600 dark:text-[#03D26F]">
-                  📈 This week
-                </span>
-                <span className="text-foreground font-black">{weeklyAveragePercent}% average</span>
-              </div>
-              {/* 7 Segmented Diagonal Slash Bars */}
-              <div className="grid grid-cols-7 gap-1 h-3">
-                {Array.from({ length: 7 }).map((_, idx) => {
-                  const isBarFilled = idx < Math.round((weeklyAveragePercent / 100) * 7);
-                  return (
-                    <div
-                      key={`week-bar-${idx}`}
-                      className={cn(
-                        "rounded-sm border transition-all",
-                        isBarFilled
-                          ? "bg-[#03D26F] border-[#161514]/40 dark:border-black"
-                          : "bg-muted border-border"
-                      )}
-                    />
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Telemetry Card 2: Streak Momentum */}
-            <div className="bg-card border-2 border-border rounded-xl p-3 shadow-2xs space-y-1.5">
-              <div className="flex items-center justify-between text-xs font-mono font-bold text-muted-foreground">
-                <span className="flex items-center gap-1 text-amber-600 dark:text-[#F59E0B]">
-                  🔥 Streak
-                </span>
-                <span className="text-foreground font-black">
-                  {longestStreakValue} of {streakTarget}d
-                </span>
-              </div>
-              {/* 7 Segmented Diagonal Slash Bars */}
-              <div className="grid grid-cols-7 gap-1 h-3">
-                {Array.from({ length: 7 }).map((_, idx) => {
-                  const isBarFilled = idx < Math.round((longestStreakValue / streakTarget) * 7);
-                  return (
-                    <div
-                      key={`streak-bar-${idx}`}
-                      className={cn(
-                        "rounded-sm border transition-all",
-                        isBarFilled
-                          ? "bg-[#F59E0B] border-[#161514]/40 dark:border-black"
-                          : "bg-muted border-border"
-                      )}
-                    />
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* 2. Unified Hero Pager: Swipeable Arc Gauge + Strobi + Weekly Velocity + Streak Vault */}
+      <HabitsHeroPager
+        dailyCompletionPercent={dailyCompletionPercent}
+        weeklyAveragePercent={weeklyAveragePercent}
+        longestStreakValue={longestStreakValue}
+        streakTarget={streakTarget}
+        streakFreeze={streakFreeze}
+        completedCount={completedCount}
+        dueCount={dueCount}
+        onOpenShieldInfo={onOpenShieldInfo}
+        onOpenNewHabit={onOpenNewHabit}
+      />
 
       {/* 3. Dedicated Full-Width 7-Day Date Scrubber (Routinr Benchmark) */}
       <div className="w-full pt-1 space-y-2">
@@ -337,7 +241,7 @@ export function HabitsCockpitDeck({
                 onSelectDate(day.dateStr);
               }}
               className={cn(
-                "relative py-2 px-1 sm:px-2 rounded-2xl border-2 text-center transition-all cursor-pointer flex flex-col items-center justify-center w-full min-h-[58px]",
+                "relative py-1 sm:py-2 px-1 sm:px-2 rounded-xl sm:rounded-2xl border-2 text-center transition-all cursor-pointer flex flex-col items-center justify-center w-full min-h-[48px] sm:min-h-[56px]",
                 day.isSelected
                   ? "bg-[#CEF431] text-[#161514] border-[#161514] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] font-black scale-[1.03] z-10"
                   : day.isToday

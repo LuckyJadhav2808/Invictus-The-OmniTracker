@@ -128,52 +128,55 @@ export function HabitCard({
       <div
         onClick={onClick}
         className={cn(
-          "bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#38332E] rounded-2xl p-3 flex items-center justify-between transition-all duration-200 cursor-pointer select-none shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] hover:bg-muted active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
+          "bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#38332E] rounded-2xl p-2.5 sm:p-3 flex items-center justify-between transition-all duration-200 cursor-pointer select-none shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] hover:bg-muted active:translate-x-0.5 active:translate-y-0.5 active:shadow-none min-h-[52px]",
           isCompletedToday && "opacity-75 bg-[#F7F9F7] dark:bg-[#121613]",
           isAnimating && "scale-[0.98]"
         )}
       >
-        <div className="flex items-center gap-3 min-w-0 pr-2">
-          {/* Complete Checkbox */}
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1 pr-2">
+          {/* Primary 44px Checkbox Hit Target */}
           <button
             type="button"
             onClick={handleToggleClick}
+            aria-label={isCompletedToday ? `Mark ${habit.title} incomplete` : `Mark ${habit.title} complete`}
             className={cn(
-              "size-8 rounded-xl border-2 flex items-center justify-center shrink-0 transition-all cursor-pointer",
+              "size-9 sm:size-9 rounded-xl border-2 flex items-center justify-center shrink-0 transition-all cursor-pointer shadow-2xs active:scale-95",
               isCompletedToday
-                ? "bg-[#03D26F] border-[#161514] text-[#161514] shadow-2xs"
+                ? "bg-[#03D26F] border-[#161514] text-[#161514]"
                 : "bg-secondary border-border text-muted-foreground hover:border-[#161514]"
             )}
           >
             {isCompletedToday ? <Check className="size-4 stroke-[3]" /> : <Circle className="size-4 stroke-[2]" />}
           </button>
 
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <h4
               className={cn(
-                "font-heading font-black text-xs text-foreground truncate transition-all duration-200",
+                "font-heading font-black text-xs sm:text-sm text-foreground leading-snug line-clamp-2 transition-all duration-200",
                 isCompletedToday && "line-through text-muted-foreground opacity-75"
               )}
             >
               {habit.title}
             </h4>
-            {currentStreak > 0 && (
-              <span className="text-[10px] font-mono font-bold text-amber-600 dark:text-[#FDE68A] flex items-center gap-1 mt-0.5">
-                <Flame className={cn("size-2.5", streakTier.colorClass)} />
-                <span>{currentStreak}d streak</span>
-              </span>
-            )}
+            <div className="flex items-center gap-2 flex-wrap mt-0.5">
+              {currentStreak > 0 && (
+                <span className="text-[10px] font-mono font-bold text-amber-600 dark:text-[#FDE68A] flex items-center gap-1">
+                  <Flame className={cn("size-2.5", streakTier.colorClass)} />
+                  <span>{currentStreak}d streak</span>
+                </span>
+              )}
+              {habit.reminderTime && (
+                <span className="text-[9px] font-mono text-muted-foreground flex items-center gap-0.5">
+                  <Clock className="size-2.5" />
+                  <span>{habit.reminderTime}</span>
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
         <div className="flex items-center gap-1.5 shrink-0">
-          {habit.reminderTime && (
-            <span className="text-[10px] font-mono text-muted-foreground px-1.5 py-0.5 rounded border border-border bg-secondary flex items-center gap-1">
-              <Clock className="size-2.5" />
-              <span>{habit.reminderTime}</span>
-            </span>
-          )}
-          <span className="text-[10px] font-mono font-black px-2 py-0.5 rounded-md border border-border bg-secondary text-foreground">
+          <span className="hidden xs:inline-block text-[10px] font-mono font-black px-2 py-0.5 rounded-md border border-border bg-secondary text-foreground">
             {habit.frequency?.type || "Daily"}
           </span>
 
@@ -186,10 +189,11 @@ export function HabitCard({
                     e.stopPropagation();
                     soundFX.playPop();
                   }}
-                  className="size-7 rounded-lg border border-transparent hover:border-border text-muted-foreground hover:text-foreground hover:bg-secondary transition-all flex items-center justify-center cursor-pointer ml-1"
+                  className="size-8 rounded-lg border border-transparent hover:border-border text-muted-foreground hover:text-foreground hover:bg-secondary transition-all flex items-center justify-center cursor-pointer ml-1"
                   title="More options"
+                  aria-label="Habit options"
                 >
-                  <MoreHorizontal className="size-3.5" />
+                  <MoreHorizontal className="size-4" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#38332E] rounded-xl shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] p-1 min-w-[140px] z-50">
@@ -258,7 +262,7 @@ export function HabitCard({
           <div className="flex-1 min-w-0">
             <h4
               className={cn(
-                "font-heading font-black text-sm sm:text-base text-foreground truncate leading-tight transition-all duration-200",
+                "font-heading font-black text-sm sm:text-base text-foreground leading-snug line-clamp-2 transition-all duration-200",
                 isCompletedToday && "line-through text-muted-foreground opacity-75"
               )}
             >

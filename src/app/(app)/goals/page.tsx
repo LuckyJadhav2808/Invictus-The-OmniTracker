@@ -21,22 +21,23 @@ import {
 } from "@/lib/queries/goals";
 import { useUserAchievements } from "@/lib/queries/achievements";
 import { HabitCard } from "@/components/goals/HabitCard";
-import { HabitsCockpitDeck } from "@/components/goals/HabitsCockpitDeck";
+import { HabitListRow } from "@/components/goals/HabitListRow";
+import { HabitsHeroPager } from "@/components/goals/HabitsHeroPager";
+import { HabitsDateStrip } from "@/components/goals/HabitsDateStrip";
+import { DoorTileRow } from "@/components/goals/DoorTileRow";
 import { HabitsMatrixBoard } from "@/components/goals/HabitsMatrixBoard";
-import { StickyHabitsMiniCockpit } from "@/components/goals/StickyHabitsMiniCockpit";
 import { WaterTracker } from "@/components/goals/WaterTracker";
 import { MoodJournalWidget } from "@/components/goals/MoodJournalWidget";
 import { SleepAndActiveWidgets } from "@/components/goals/SleepAndActiveWidgets";
-import { EmptyState } from "@/components/shared/EmptyState";
+import { MobileAppBar } from "@/components/mobile/MobileAppBar";
+import { SegmentedSubNav } from "@/components/mobile/SegmentedSubNav";
+import { BottomSheet } from "@/components/mobile/BottomSheet";
 import { HabitsCockpitSkeleton, HabitsListSkeleton } from "@/components/shared/NeobrutalistSkeleton";
-import { AdaptiveDrawerDialog } from "@/components/shared/AdaptiveDrawerDialog";
 import { soundFX } from "@/components/shared/SoundFX";
 import { TemplatePack } from "@/components/shared/TemplateSelectionModal";
 import type { AtomicHabitPreset } from "@/components/goals/HabitChoiceModal";
-import { HABIT_TEMPLATE_PACKS } from "@/lib/templates-data";
-import { HabitCompanionSprite } from "@/components/mascot/HabitCompanionSprite";
-import { StrobiCompanion } from "@/components/mascot/StrobiCompanion";
 import { Button } from "@/components/ui/button";
+import { HabitCompanionSprite } from "@/components/mascot/HabitCompanionSprite";
 
 // Lazy-Loaded Heavy Modals (Zero TBT & Fast Initial Paint)
 const HabitChoiceModal = dynamic(
@@ -53,36 +54,26 @@ const DeleteConfirmationModal = dynamic(
 );
 import {
   Target,
-  Plus,
-  Flame,
   Sparkles,
-  Activity,
-  Edit3,
-  Moon,
   ShieldCheck,
-  ShieldAlert,
-  Info,
-  Volume2,
-  VolumeX,
-  Trophy,
-  Clock,
-  Check,
-  CheckCheck,
-  RotateCcw,
   Bot,
+  Flame,
+  Moon,
   RefreshCw,
+  Bell,
+  Clock,
   ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { format, getDay, startOfWeek, addDays, isSameDay } from "date-fns";
 import { toast } from "sonner";
 import { useUIStore } from "@/store/ui-store";
 import { cn } from "@/lib/utils";
-import { ProactiveReminderBanner } from "@/components/shared/ProactiveReminderBanner";
 import { useSearchParams, useRouter } from "next/navigation";
 
 function GoalsPageContent() {
   const { user } = useAuth();
-  const { selectedDate, setSelectedDate, habitLayoutStyle, setHabitLayoutStyle } = useUIStore();
+  const { selectedDate, setSelectedDate, habitLayoutStyle } = useUIStore();
   const searchParams = useSearchParams();
   const router = useRouter();
   const tabParam = searchParams.get("tab");
@@ -95,6 +86,8 @@ function GoalsPageContent() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Subtab redirect handlers
   useEffect(() => {
     if (tabParam === "gym") {
       router.replace("/goals/gym");
@@ -105,10 +98,15 @@ function GoalsPageContent() {
     }
   }, [tabParam, router]);
 
-  const [isAddOpen, setIsAddOpen] = useState(false);
+  // Modal / Sheet visibility states
   const [isChoiceOpen, setIsChoiceOpen] = useState(false);
-  const [soundMuted, setSoundMuted] = useState(soundFX.isMuted());
-  const [showRecovery, setShowRecovery] = useState(false);
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isWaterSheetOpen, setIsWaterSheetOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isRemindersSheetOpen, setIsRemindersSheetOpen] = useState(false);
+  const [isRecoverySheetOpen, setIsRecoverySheetOpen] = useState(false);
+  const [isShieldInfoOpen, setIsShieldInfoOpen] = useState(false);
+  const [showAllHabits, setShowAllHabits] = useState(false);
 
   // Health Profile & Habits Database Query hooks
   const { data: userProfile = { gender: "Female", age: "24 Years", weight: "68 kg" } } = useHealthProfile();
@@ -116,6 +114,7 @@ function GoalsPageContent() {
 
   const { data: waterLog = { id: selectedDate, date: selectedDate, amount: 0 } } = useWaterLog(selectedDate);
   const logWaterMutation = useLogWater();
+  const setWaterMutation = useSetWater();
   const waterLogged = waterLog.amount;
 
   const { data: habits = [], isLoading: habitsLoading } = useHabits();
@@ -123,7 +122,7 @@ function GoalsPageContent() {
   const { data: streakFreeze = { userId: "", tokensAvailable: 1, lastMonthlyCredit: "", frozenDates: [], autoShieldEvent: null } } = useStreakFreeze();
   const { data: logs = [] } = useHabitLogs(selectedDate);
 
-  // Active 7-Day Window Range & Logs for inline squircle status
+  // Active 7-Day Window Range & Logs
   const weekRange = useMemo(() => {
     const baseDate = new Date(selectedDate);
     const validBase = isNaN(baseDate.getTime()) ? new Date() : baseDate;
@@ -159,53 +158,6 @@ function GoalsPageContent() {
   const updateHabitMutation = useUpdateHabit();
   const deleteHabitMutation = useDeleteHabit();
   const toggleLogMutation = useToggleHabitLog();
-  const setWaterMutation = useSetWater();
-
-  // States for Health Profile Modal
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [profileForm, setProfileForm] = useState({ gender: "", age: "", weight: "" });
-
-  // 🛡️ Autonomous Streak Freeze Shield State & Notification
-  const [isShieldInfoOpen, setIsShieldInfoOpen] = useState(false);
-
-  useEffect(() => {
-    if (streakFreeze?.autoShieldEvent?.shielded && streakFreeze.autoShieldEvent.newlyFrozenDates?.length) {
-      const datesList = streakFreeze.autoShieldEvent.newlyFrozenDates.join(", ");
-      const toastKey = `invictus_streak_shield_alert_${datesList}`;
-      if (typeof window !== "undefined" && sessionStorage.getItem(toastKey)) return;
-      if (typeof window !== "undefined") sessionStorage.setItem(toastKey, "true");
-
-      try {
-        soundFX.playCompleteChime();
-        soundFX.playBotChirp("salute");
-      } catch {}
-
-      // 🛡️ Harmonized Streak Shield Toast
-      toast.custom(
-        () => (
-          <div className="bg-white dark:bg-[#161514] border border-[#E8E5DF] dark:border-[#2A2724] p-3.5 rounded-xl shadow-md flex items-center gap-3 w-full max-w-sm">
-            <div className="size-8 rounded-lg bg-[#DCFAE5] dark:bg-[#03D26F]/20 flex items-center justify-center shrink-0">
-              <ShieldCheck className="size-4 text-[#047857] dark:text-[#03D26F] stroke-[1.5]" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1.5">
-                <span className="font-semibold text-xs text-[#161514] dark:text-[#FAF8F5]">
-                  Streak Shield Protected
-                </span>
-                <span className="bg-[#DCFAE5] dark:bg-[#03D26F]/20 text-[#04250e] dark:text-[#03D26F] font-medium text-xs px-1.5 py-0.5 rounded">
-                  Saved
-                </span>
-              </div>
-              <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] leading-tight mt-0.5">
-                Protected {datesList} while you were away ({streakFreeze.tokensAvailable}/2 tokens left).
-              </p>
-            </div>
-          </div>
-        ),
-        { duration: 6000 }
-      );
-    }
-  }, [streakFreeze]);
 
   // Habit Edit/Delete states
   const [editingHabit, setEditingHabit] = useState<any | null>(null);
@@ -213,11 +165,13 @@ function GoalsPageContent() {
   const [editHabitDesc, setEditHabitDesc] = useState("");
   const [deleteHabitId, setDeleteHabitId] = useState<string | null>(null);
 
+  // Health Profile Form state
+  const [profileForm, setProfileForm] = useState({ gender: "", age: "", weight: "" });
   const [weightVal, setWeightVal] = useState("68");
   const [weightUnit, setWeightUnit] = useState("kg");
   const [ageVal, setAgeVal] = useState("");
 
-  const updateProfileStat = () => {
+  const openProfileSheet = () => {
     const rawWeight = userProfile.weight && userProfile.weight !== "Not Set" ? userProfile.weight : "68 kg";
     const unitMatch = rawWeight.match(/(lbs|kg)/i);
     const unit = unitMatch ? unitMatch[0].toLowerCase() : "kg";
@@ -254,14 +208,34 @@ function GoalsPageContent() {
     }
   };
 
-  const logWater = async (amount: number) => {
+  const logWater = useCallback(async (amount: number) => {
     try {
       soundFX.playSplash();
       await logWaterMutation.mutateAsync({ date: selectedDate, amount });
     } catch {
       toast.error("Failed to log water");
     }
-  };
+  }, [logWaterMutation, selectedDate]);
+
+  // Global listeners for contextual docked FAB actions
+  useEffect(() => {
+    const handleOpenNewHabit = () => {
+      soundFX.playPop();
+      setIsChoiceOpen(true);
+    };
+    const handleQuickWater = (e: any) => {
+      const amt = e?.detail?.amount || 250;
+      logWater(amt);
+    };
+
+    window.addEventListener("invictus:open-new-habit", handleOpenNewHabit);
+    window.addEventListener("invictus:quick-log-water", handleQuickWater);
+
+    return () => {
+      window.removeEventListener("invictus:open-new-habit", handleOpenNewHabit);
+      window.removeEventListener("invictus:quick-log-water", handleQuickWater);
+    };
+  }, [logWater]);
 
   const handleApplyHabitPack = (pack: TemplatePack) => {
     pack.items.forEach((item) => {
@@ -407,7 +381,6 @@ function GoalsPageContent() {
         )
       );
       soundFX.playCompleteChime();
-      soundFX.playBotChirp("happy");
       soundFX.vibrate([40, 60, 100]);
       toast.success(`⚡ All ${dueTodayHabits.length} habits completed today! Outstanding consistency. 🏆`);
     } catch {
@@ -422,7 +395,7 @@ function GoalsPageContent() {
     toggleLogMutation,
   ]);
 
-  // Global Keyboard Shortcut: Shift+Meta+A or Alt+A to Check All Due
+  // Global Keyboard Shortcut: Shift+Meta+A to Check All Due
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
@@ -457,178 +430,131 @@ function GoalsPageContent() {
     return true;
   });
 
-  const totalHabits = habits.length;
+  // Limit visible rows to 6 when in compact mode to ensure <= 1.5 screen viewports
+  const visibleHabits =
+    habitLayoutStyle === "compact" && !showAllHabits
+      ? displayedHabits.slice(0, 6)
+      : displayedHabits;
+
   const longestStreakValue = Object.values(streaks).reduce((max, s) => Math.max(max, s.longestStreak), 0);
+  const weeklyAveragePercent =
+    dueTodayHabits.length > 0 && weekLogs.length > 0
+      ? Math.min(100, Math.round((weekLogs.length / Math.max(1, habits.length * 7)) * 100))
+      : dailyCompletionPercent;
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300 relative pb-32 sm:pb-24">
-      {/* 0. Gliding Sticky Mini-Cockpit */}
-      <StickyHabitsMiniCockpit
-        threshold={550}
-        dailyCompletionPercent={dailyCompletionPercent}
-        completedCount={completedTodayHabits.filter((h) => !isHabitRestDay(h)).length}
-        dueCount={dueTodayHabits.length}
-        longestStreak={longestStreakValue}
-        onOpenNewHabit={() => {
-          soundFX.playPop();
-          setIsChoiceOpen(true);
-        }}
-      />
-
-      {/* 1. Master Habits Momentum Cockpit Deck */}
-      <HabitsCockpitDeck
-        habits={habits}
-        streaks={streaks}
-        streakFreeze={streakFreeze}
+    <div className="w-full max-w-xl mx-auto pb-28 select-none space-y-2 sm:space-y-3">
+      {/* ================= SLOT 1: SLIM TOP APP BAR (48-56px) ================= */}
+      <MobileAppBar
+        title="Habits"
         selectedDate={selectedDate}
         onSelectDate={setSelectedDate}
-        habitLayoutStyle={habitLayoutStyle}
-        onSelectLayoutStyle={setHabitLayoutStyle}
-        onOpenNewHabit={() => {
-          soundFX.playPop();
-          setIsChoiceOpen(true);
-        }}
-        onOpenShieldInfo={() => setIsShieldInfoOpen(true)}
-        dailyCompletionPercent={dailyCompletionPercent}
-        completedCount={completedTodayHabits.filter((h) => !isHabitRestDay(h)).length}
-        dueCount={dueTodayHabits.length}
-        userLevel={achievements.userLevel}
-        totalXP={achievements.totalXP}
-        userName={user?.displayName ? user.displayName.split(" ")[0] : "Friend"}
-        soundMuted={soundMuted}
-        onToggleSound={() => {
-          const nextMuted = soundFX.toggleMute();
-          setSoundMuted(nextMuted);
-          toast.info(nextMuted ? "Tactile audio muted" : "Tactile audio active");
-        }}
-        weeklyAveragePercent={
-          dueTodayHabits.length > 0 && weekLogs.length > 0
-            ? Math.min(100, Math.round((weekLogs.length / Math.max(1, habits.length * 7)) * 100))
-            : dailyCompletionPercent
-        }
         onCheckAllDue={handleCheckAllDue}
+        isAllDueCompleted={isAllDueCompleted}
+        dueCount={dueTodayHabits.length}
       />
 
-      {/* 2. Proactive Reminder Banner */}
-      <ProactiveReminderBanner space="goals" />
+      {/* ================= SLOT 2: STICKY SUB-NAV ================= */}
+      <SegmentedSubNav />
 
-      {/* 3. Primary Hero Workspace: Habits Checklist + Hydration */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 my-4">
-        {/* Left Column (2 cols on lg): Habits Checklist */}
-        <div id="habits-section" className="lg:col-span-2 space-y-4">
-          {/* Quick Filter Bar: Unified Neobrutalist filter dock with inline counts */}
-          {habits.length > 0 && (
-            <div className="flex items-center justify-between gap-2 bg-[#FAF8F5] dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#38332E] rounded-2xl p-1.5 shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]">
-              <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    soundFX.playPop();
-                    setHabitStatusFilter("all");
-                  }}
-                  className={cn(
-                    "px-3 py-1.5 text-xs font-mono font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5",
-                    habitStatusFilter === "all"
-                      ? "bg-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:text-[#161514] font-black shadow-[1px_1px_0px_0px_#161514]"
-                      : "text-muted-foreground hover:bg-secondary hover:text-foreground"
-                  )}
-                >
-                  <span>All</span>
-                  <span className="opacity-80">({habits.length})</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    soundFX.playPop();
-                    setHabitStatusFilter("pending");
-                  }}
-                  className={cn(
-                    "px-3 py-1.5 text-xs font-mono font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5",
-                    habitStatusFilter === "pending"
-                      ? "bg-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:text-[#161514] font-black shadow-[1px_1px_0px_0px_#161514]"
-                      : "text-muted-foreground hover:bg-secondary hover:text-foreground"
-                  )}
-                >
-                  <span>Due</span>
-                  <span
-                    className={cn(
-                      "px-1.5 py-0.2 rounded-md text-[10px] font-mono font-black",
-                      pendingTodayHabits.length > 0
-                        ? "bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300"
-                        : "bg-muted text-muted-foreground"
-                    )}
-                  >
-                    {pendingTodayHabits.length}
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    soundFX.playPop();
-                    setHabitStatusFilter("completed");
-                  }}
-                  className={cn(
-                    "px-3 py-1.5 text-xs font-mono font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5",
-                    habitStatusFilter === "completed"
-                      ? "bg-[#161514] text-[#03D26F] dark:bg-[#03D26F] dark:text-[#161514] font-black shadow-[1px_1px_0px_0px_#161514]"
-                      : "text-muted-foreground hover:bg-secondary hover:text-foreground"
-                  )}
-                >
-                  <span>Done</span>
-                  <span className="px-1.5 py-0.2 rounded-md text-[10px] font-mono font-black bg-[#DCFAE5] dark:bg-[#03D26F]/20 text-[#04250e] dark:text-[#03D26F]">
-                    {completedTodayHabits.length}
-                  </span>
-                </button>
-              </div>
+      <div className="px-3.5 space-y-3">
+        {/* ================= SLOT 3: ONE HERO CAROUSEL SLOT (~175px) ================= */}
+        <HabitsHeroPager
+          dailyCompletionPercent={dailyCompletionPercent}
+          weeklyAveragePercent={weeklyAveragePercent}
+          longestStreakValue={longestStreakValue}
+          streakFreeze={streakFreeze}
+          completedCount={completedTodayHabits.filter((h) => !isHabitRestDay(h)).length}
+          dueCount={dueTodayHabits.length}
+          userLevel={achievements.userLevel}
+          totalXP={achievements.totalXP}
+          onOpenShieldInfo={() => setIsShieldInfoOpen(true)}
+        />
 
-              <div className="flex items-center gap-2 pr-1">
-                <div className="text-[11px] font-mono font-bold text-muted-foreground hidden sm:flex items-center gap-1.5">
-                  <span className="text-foreground font-black">
-                    {completedTodayHabits.length}/{dueTodayHabits.length}
-                  </span>
-                  <span>Reps</span>
-                </div>
-                {dueTodayHabits.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={handleCheckAllDue}
-                    className={cn(
-                      "px-2.5 py-1 text-[11px] font-heading font-black rounded-xl border-2 transition-all cursor-pointer flex items-center gap-1 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
-                      isAllDueCompleted
-                        ? "bg-secondary text-muted-foreground border-border hover:border-[#161514] hover:text-foreground shadow-2xs"
-                        : "bg-[#03D26F] text-[#161514] border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] hover:bg-[#02b35e]"
-                    )}
-                    title={isAllDueCompleted ? "Reset habits for today" : "Check all due habits (Shift+⌘A)"}
-                  >
-                    {isAllDueCompleted ? (
-                      <>
-                        <RotateCcw className="size-3 stroke-[2.5]" />
-                        <span>Reset</span>
-                      </>
-                    ) : (
-                      <>
-                        <CheckCheck className="size-3 stroke-[3]" />
-                        <span>Check All</span>
-                      </>
-                    )}
-                  </button>
+        {/* ================= SLOT 4a: 7-DAY ROUTINE HORIZON SCRUBBER ================= */}
+        <HabitsDateStrip
+          selectedDate={selectedDate}
+          onSelectDate={setSelectedDate}
+        />
+
+        {/* ================= SLOT 4b: FILTER CHIP STRIP ================= */}
+        {habits.length > 0 && (
+          <div className="flex items-center justify-between gap-2 pt-0.5 pb-1">
+            {/* Filter Chips: All, Due, Done */}
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => {
+                  soundFX.playPop();
+                  setHabitStatusFilter("all");
+                }}
+                className={cn(
+                  "px-2.5 py-1 text-xs font-mono font-bold rounded-lg transition-all cursor-pointer flex items-center gap-1",
+                  habitStatusFilter === "all"
+                    ? "bg-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:text-[#161514] font-black shadow-2xs"
+                    : "text-muted-foreground hover:bg-muted"
                 )}
-              </div>
-            </div>
-          )}
+              >
+                <span>All</span>
+                <span className="opacity-80">({habits.length})</span>
+              </button>
 
+              <button
+                type="button"
+                onClick={() => {
+                  soundFX.playPop();
+                  setHabitStatusFilter("pending");
+                }}
+                className={cn(
+                  "px-2.5 py-1 text-xs font-mono font-bold rounded-lg transition-all cursor-pointer flex items-center gap-1",
+                  habitStatusFilter === "pending"
+                    ? "bg-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:text-[#161514] font-black shadow-2xs"
+                    : "text-muted-foreground hover:bg-muted"
+                )}
+              >
+                <span>Due</span>
+                <span className="opacity-80">({pendingTodayHabits.length})</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  soundFX.playPop();
+                  setHabitStatusFilter("completed");
+                }}
+                className={cn(
+                  "px-2.5 py-1 text-xs font-mono font-bold rounded-lg transition-all cursor-pointer flex items-center gap-1",
+                  habitStatusFilter === "completed"
+                    ? "bg-[#161514] text-[#03D26F] dark:bg-[#03D26F] dark:text-[#161514] font-black shadow-2xs"
+                    : "text-muted-foreground hover:bg-muted"
+                )}
+              >
+                <span>Done</span>
+                <span className="opacity-80">({completedTodayHabits.length})</span>
+              </button>
+            </div>
+
+            {/* Reps Ratio Telemetry */}
+            <span className="text-[11px] font-mono font-bold text-muted-foreground pr-1">
+              {completedTodayHabits.length}/{dueTodayHabits.length} Reps
+            </span>
+          </div>
+        )}
+
+        {/* ================= SLOT 5: PRIMARY HABIT LIST ================= */}
+        <div id="habits-section" className="space-y-1">
           {habitsLoading ? (
             <HabitsListSkeleton count={3} />
           ) : habits.length === 0 ? (
-            <div className="bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#38332E] rounded-2xl p-8 text-center space-y-4 shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000]">
-              <div className="size-12 rounded-2xl bg-[#CEF431] text-[#161514] border-2 border-[#161514] flex items-center justify-center mx-auto shadow-[2px_2px_0px_0px_#161514]">
-                <Target className="size-6 stroke-[2]" />
+            <div className="bg-card border border-border rounded-2xl p-6 text-center space-y-3">
+              <div className="size-11 rounded-2xl bg-[#CEF431] text-[#161514] border-2 border-[#161514] flex items-center justify-center mx-auto shadow-2xs">
+                <Target className="size-5 stroke-[2.2]" />
               </div>
               <div className="space-y-1">
-                <h4 className="font-heading font-black text-base text-foreground">
+                <h4 className="font-heading font-black text-sm text-foreground">
                   Build Your Daily Discipline
                 </h4>
-                <p className="text-xs font-sans text-muted-foreground max-w-sm mx-auto">
+                <p className="text-xs text-muted-foreground max-w-xs mx-auto">
                   Habits turn discipline into identity. Explore 50+ curated atomic routines or craft your custom protocol.
                 </p>
               </div>
@@ -638,18 +564,18 @@ function GoalsPageContent() {
                   soundFX.playPop();
                   setIsChoiceOpen(true);
                 }}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#CEF431] text-[#161514] font-heading font-black text-xs uppercase tracking-wider rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none active:scale-95 transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-[#CEF431] text-[#161514] font-heading font-black text-xs uppercase tracking-wider rounded-xl border border-[#161514] shadow-xs active:scale-95 transition-all cursor-pointer"
               >
                 <Sparkles className="size-3.5 stroke-[2.5]" />
-                <span>Explore Habits Vault (50+ Presets)</span>
+                <span>Explore Vault (50+ Presets)</span>
               </button>
             </div>
           ) : displayedHabits.length === 0 ? (
-            <div className="bg-white dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#383531] p-8 text-center space-y-2">
-              <Target className="size-8 text-[#6B6B6B]/40 dark:text-[#A8A29E]/40 stroke-[1.5] mx-auto" />
-              <h4 className="text-sm font-sans font-semibold text-[#161514] dark:text-[#FAF8F5]">
+            <div className="bg-card rounded-xl border border-border p-6 text-center space-y-2">
+              <Target className="size-6 text-muted-foreground/40 stroke-[1.5] mx-auto" />
+              <h4 className="text-xs font-heading font-bold text-foreground">
                 {habitStatusFilter === "pending"
-                  ? "No habits left due today! You're all caught up."
+                  ? "All caught up! Zero habits left due today."
                   : habitStatusFilter === "completed"
                   ? "No habits completed yet today. Let's tackle one!"
                   : "No habits found."}
@@ -658,7 +584,7 @@ function GoalsPageContent() {
                 <button
                   type="button"
                   onClick={() => setHabitStatusFilter("all")}
-                  className="text-xs font-medium text-[#161514] dark:text-[#FAF8F5] underline cursor-pointer hover:text-[#03D26F]"
+                  className="text-xs font-mono font-bold text-muted-foreground underline cursor-pointer hover:text-foreground"
                 >
                   Show all habits
                 </button>
@@ -682,8 +608,8 @@ function GoalsPageContent() {
                 setIsChoiceOpen(true);
               }}
             />
-          ) : (
-            <div className={cn("space-y-3", habitLayoutStyle === "compact" && "space-y-2")}>
+          ) : habitLayoutStyle === "cards" ? (
+            <div className="space-y-3">
               {displayedHabits.map((habit) => {
                 const isDone = isCompletedToday(habit.id);
                 const isRest = isHabitRestDay(habit);
@@ -713,7 +639,7 @@ function GoalsPageContent() {
                           : weekLogs.some((l) => l.habitId === habit.id && l.date === dateStr);
                       handleToggleLog(habit.id, !isDayDone, dateStr);
                     }}
-                    viewMode={habitLayoutStyle}
+                    viewMode="cards"
                     onEdit={() => {
                       setEditingHabit(habit);
                       setEditHabitTitle(habit.title);
@@ -725,12 +651,102 @@ function GoalsPageContent() {
                 );
               })}
             </div>
+          ) : (
+            /* Default Compact 56-64px List Rows (No nested heavy cards) */
+            <div className="bg-card border border-border rounded-2xl overflow-hidden divide-y divide-border/60 shadow-xs">
+              {visibleHabits.map((habit) => {
+                const isDone = isCompletedToday(habit.id);
+                const isRest = isHabitRestDay(habit);
+                const habitStreak = streaks[habit.id];
+
+                const habitWeekDays = weekDays.map((d) => ({
+                  ...d,
+                  isCompleted:
+                    d.dateStr === selectedDate
+                      ? isDone
+                      : weekLogs.some((l) => l.habitId === habit.id && l.date === d.dateStr),
+                }));
+
+                return (
+                  <HabitListRow
+                    key={habit.id}
+                    habit={habit}
+                    streak={habitStreak}
+                    isCompletedToday={isDone}
+                    isRestDay={isRest}
+                    onToggle={() => handleToggleLog(habit.id, !isDone)}
+                    weekDays={habitWeekDays}
+                    onToggleDate={(dateStr) => {
+                      const isDayDone =
+                        dateStr === selectedDate
+                          ? isDone
+                          : weekLogs.some((l) => l.habitId === habit.id && l.date === dateStr);
+                      handleToggleLog(habit.id, !isDayDone, dateStr);
+                    }}
+                    onEdit={() => {
+                      setEditingHabit(habit);
+                      setEditHabitTitle(habit.title);
+                      setEditHabitDesc(habit.reminderTime || "");
+                    }}
+                    onDelete={() => setDeleteHabitId(habit.id)}
+                    onSkip={() => handleToggleLog(habit.id, false)}
+                    onViewDetail={() => router.push(`/goals/${habit.id}`)}
+                  />
+                );
+              })}
+
+              {/* Progressive disclosure toggle if list has > 6 items */}
+              {habitLayoutStyle === "compact" && displayedHabits.length > 6 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    soundFX.playPop();
+                    setShowAllHabits((prev) => !prev);
+                  }}
+                  className="w-full py-2.5 px-3 bg-secondary/50 hover:bg-secondary text-xs font-mono font-bold text-muted-foreground hover:text-foreground flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  {showAllHabits ? (
+                    <>
+                      <ChevronUp className="size-3.5" />
+                      <span>Show Less</span>
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="size-3.5" />
+                      <span>See all {displayedHabits.length} habits</span>
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
           )}
         </div>
 
-        {/* Right Column (1 col on lg): Hydration & Health Stats */}
-        <div className="space-y-4">
-          {/* Neobrutalist Living Hydro-Tumbler */}
+        {/* ================= SLOT 6: DOOR TILE ROW (MAX 4 TILES) ================= */}
+        <div className="pt-2">
+          <DoorTileRow
+            waterAmount={waterLogged}
+            waterTarget={(waterLog as any)?.waterGoal || 2000}
+            bodyWeight={userProfile.weight || "68 kg"}
+            bodyAge={userProfile.age || "24y"}
+            onOpenWater={() => setIsWaterSheetOpen(true)}
+            onOpenBodyProfile={openProfileSheet}
+            onOpenReminders={() => setIsRemindersSheetOpen(true)}
+            onOpenRecovery={() => setIsRecoverySheetOpen(true)}
+          />
+        </div>
+      </div>
+
+      {/* ================= L2/L3 BOTTOM SHEETS ================= */}
+
+      {/* 1. Water Tracker Bottom Sheet */}
+      <BottomSheet
+        open={isWaterSheetOpen}
+        onOpenChange={setIsWaterSheetOpen}
+        title="Hydration Chamber"
+        description="Daily water intake telemetry & fast logging"
+      >
+        <div className="py-2">
           <WaterTracker
             amount={waterLogged}
             targetAmount={(waterLog as any)?.waterGoal || 2000}
@@ -743,101 +759,19 @@ function GoalsPageContent() {
               });
             }}
           />
-
-          {/* Health & Weight Telemetry Capsule */}
-          <div className="bg-white dark:bg-[#1C1A18] rounded-xl p-3.5 border border-[#E8E5DF] dark:border-[#383531] flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="size-8 rounded-lg bg-[#F1EFEA] dark:bg-[#252321] flex items-center justify-center text-[#161514] dark:text-[#FAF8F5] shrink-0">
-                <Activity className="size-4 text-[#047857] dark:text-[#03D26F] stroke-[1.5]" />
-              </div>
-              <div className="min-w-0">
-                <span className="text-[10px] font-medium text-[#6B6B6B] dark:text-[#A8A29E] block leading-tight">Body profile</span>
-                <span className="text-xs font-sans font-semibold text-[#161514] dark:text-[#FAF8F5] font-mono tabular-nums truncate block">
-                  {userProfile.weight || "68 kg"} • {userProfile.age || "24 Yrs"}
-                </span>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={updateProfileStat}
-              className="px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#252321] hover:bg-[#F5F3EF] dark:hover:bg-[#2e2b28] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#383531] font-medium text-xs transition-colors cursor-pointer flex items-center gap-1.5 shrink-0"
-            >
-              <Edit3 className="size-3 stroke-[1.5]" />
-              <span>Edit stats</span>
-            </button>
-          </div>
         </div>
-      </div>
+      </BottomSheet>
 
-      {/* 4. Evening Recovery & Reflections (Collapsible to keep daytime focus clean) */}
-      <div id="mood-section" className="border border-[#E8E5DF] dark:border-[#383531] rounded-2xl bg-white dark:bg-[#1C1A18] overflow-hidden transition-all">
-        <button
-          type="button"
-          onClick={() => {
-            soundFX.playPop();
-            setShowRecovery((prev) => !prev);
-          }}
-          className="w-full p-4 flex items-center justify-between hover:bg-[#FAF8F5] dark:hover:bg-[#252321] transition-colors cursor-pointer text-left"
-        >
-          <div className="flex items-center gap-3">
-            <div className="size-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/40 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
-              <Moon className="size-4 stroke-[1.8]" />
-            </div>
-            <div>
-              <h3 className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5] uppercase tracking-wide">
-                Evening Recovery &amp; Reflections
-              </h3>
-              <p className="text-[11px] text-[#6B6B6B] dark:text-[#A8A29E]">
-                Sleep duration, active burn, and daily mood journal
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded-md bg-[#F1EFEA] dark:bg-[#252321] text-[#6B6B6B] dark:text-[#A8A29E] border border-[#E8E5DF] dark:border-[#383531]">
-              {showRecovery ? "Collapse" : "Open"}
-            </span>
-            <ChevronDown className={cn("size-4 text-[#8C8882] transition-transform duration-200", showRecovery && "rotate-180")} />
-          </div>
-        </button>
-
-        {showRecovery && (
-          <div className="p-4 pt-0 space-y-4 border-t border-[#E8E5DF] dark:border-[#383531] mt-1 animate-in fade-in duration-200">
-            <SleepAndActiveWidgets />
-            <MoodJournalWidget dateStr={selectedDate} />
-          </div>
-        )}
-      </div>
-
-      {/* Immersive Habit Choice Modal (Atomic Presets, Custom Architect, Protocol Packs) */}
-      <HabitChoiceModal
-        open={isChoiceOpen}
-        onOpenChange={setIsChoiceOpen}
-        onSelectPreset={handleSelectPreset}
-        onAddCustomHabit={handleAddCustomHabit}
-        onApplyPresetPack={handleApplyHabitPack}
-        isPending={addHabitMutation.isPending}
-      />
-
-      {/* Add Habit Adaptive Drawer Dialog */}
-      <AdaptiveDrawerDialog
-        open={isAddOpen}
-        onOpenChange={setIsAddOpen}
-        title="Create a Habit"
-        description="Build consistency with a new daily or weekly routine"
-      >
-        <NewHabitForm onSubmit={handleAddHabit} loading={addHabitMutation.isPending} />
-      </AdaptiveDrawerDialog>
-
-      {/* Edit Health Profile Adaptive Drawer Dialog */}
-      <AdaptiveDrawerDialog
+      {/* 2. Health & Body Stats Bottom Sheet */}
+      <BottomSheet
         open={isProfileOpen}
         onOpenChange={setIsProfileOpen}
-        title="Edit Health Stats"
-        description="Update your gender, age, and weight information"
+        title="Body Profile & Health"
+        description="Physical metrics and progressive telemetry"
       >
         <form onSubmit={handleProfileSubmit} className="space-y-4 pt-1">
           <div className="space-y-1.5">
-            <label className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5]">Gender</label>
+            <label className="text-xs font-heading font-black text-foreground">Gender</label>
             <div className="grid grid-cols-2 gap-2">
               {["Female", "Male", "Non-binary", "Prefer not to say"].map((g) => (
                 <button
@@ -848,10 +782,10 @@ function GoalsPageContent() {
                     setProfileForm({ ...profileForm, gender: g });
                   }}
                   className={cn(
-                    "min-h-[44px] py-2.5 px-3 rounded-xl text-xs font-heading font-black border transition-all cursor-pointer shadow-xs",
+                    "min-h-[44px] py-2 px-3 rounded-xl text-xs font-heading font-black border transition-all cursor-pointer shadow-xs",
                     profileForm.gender === g
                       ? "bg-[#161514] dark:bg-[#FAF8F5] text-white dark:text-[#161514] border-[#161514] dark:border-[#FAF8F5]"
-                      : "bg-white dark:bg-[#1C1A18] text-[#161514]/70 dark:text-[#A8A29E] border-[#E8E5DF] dark:border-[#2A2724] hover:bg-[#FAF8F5] dark:hover:bg-[#252321]"
+                      : "bg-card text-muted-foreground border-border hover:bg-muted"
                   )}
                 >
                   {g}
@@ -861,20 +795,20 @@ function GoalsPageContent() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5]">Age (Years)</label>
+            <label className="text-xs font-heading font-black text-foreground">Age (Years)</label>
             <input
               type="number"
               min={1}
               max={120}
               value={ageVal}
               onChange={(e) => setAgeVal(e.target.value)}
-              className="w-full bg-white dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-4 py-2.5 text-base font-bold text-[#161514] dark:text-[#FAF8F5] shadow-xs outline-none focus:border-[#161514] dark:focus:border-[#FAF8F5]"
+              className="w-full bg-card rounded-xl border border-border px-4 py-2.5 text-base font-bold text-foreground shadow-xs outline-none focus:border-foreground"
               placeholder="Enter your age"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5]">Current Weight</label>
+            <label className="text-xs font-heading font-black text-foreground">Current Weight</label>
             <div className="flex gap-2">
               <input
                 type="number"
@@ -886,11 +820,11 @@ function GoalsPageContent() {
                   setWeightVal(e.target.value);
                   setProfileForm({ ...profileForm, weight: `${e.target.value} ${weightUnit}` });
                 }}
-                className="flex-1 bg-white dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-4 py-2.5 text-base font-bold text-[#161514] dark:text-[#FAF8F5] shadow-xs outline-none focus:border-[#161514] dark:focus:border-[#FAF8F5]"
+                className="flex-1 bg-card rounded-xl border border-border px-4 py-2.5 text-base font-bold text-foreground shadow-xs outline-none focus:border-foreground"
                 placeholder="Enter weight"
                 required
               />
-              <div className="flex rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] overflow-hidden shadow-xs">
+              <div className="flex rounded-xl border border-border overflow-hidden shadow-xs">
                 {["kg", "lbs"].map((u) => (
                   <button
                     key={u}
@@ -901,10 +835,10 @@ function GoalsPageContent() {
                       setProfileForm({ ...profileForm, weight: `${weightVal} ${u}` });
                     }}
                     className={cn(
-                      "min-w-[44px] min-h-[44px] px-4 py-2.5 text-xs font-heading font-black transition-all cursor-pointer flex items-center justify-center",
+                      "min-w-[44px] min-h-[44px] px-3.5 py-2 text-xs font-heading font-black transition-all cursor-pointer flex items-center justify-center",
                       weightUnit === u
                         ? "bg-[#161514] dark:bg-[#FAF8F5] text-white dark:text-[#161514]"
-                        : "bg-white dark:bg-[#1C1A18] text-[#161514]/70 dark:text-[#A8A29E] hover:bg-[#FAF8F5] dark:hover:bg-[#252321]"
+                        : "bg-card text-muted-foreground hover:bg-muted"
                     )}
                   >
                     {u}
@@ -921,10 +855,179 @@ function GoalsPageContent() {
             Save profile stats
           </Button>
         </form>
-      </AdaptiveDrawerDialog>
+      </BottomSheet>
 
-      {/* Edit Habit Adaptive Drawer Dialog */}
-      <AdaptiveDrawerDialog
+      {/* 3. Reminders Bottom Sheet */}
+      <BottomSheet
+        open={isRemindersSheetOpen}
+        onOpenChange={setIsRemindersSheetOpen}
+        title="Discipline Alerts"
+        description="Daily reminders and habitica triggers"
+      >
+        <div className="space-y-3 py-1">
+          <div className="p-3.5 rounded-2xl bg-secondary/60 border border-border space-y-1.5">
+            <div className="flex items-center gap-2">
+              <Bell className="size-4 text-amber-500" />
+              <h5 className="font-heading font-bold text-xs text-foreground">
+                Push Notifications
+              </h5>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Timely nudges for scheduled routines. Configurable per-habit or global reminders.
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <h6 className="font-heading font-black text-xs text-foreground uppercase tracking-wider">
+              Active Habit Reminders
+            </h6>
+            <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+              {habits
+                .filter((h) => h.reminderTime)
+                .map((h) => (
+                  <div
+                    key={h.id}
+                    className="p-2.5 rounded-xl bg-card border border-border flex items-center justify-between text-xs"
+                  >
+                    <span className="font-heading font-bold text-foreground truncate max-w-[200px]">
+                      {h.title}
+                    </span>
+                    <span className="font-mono text-muted-foreground flex items-center gap-1 shrink-0">
+                      <Clock className="size-3" />
+                      <span>{h.reminderTime}</span>
+                    </span>
+                  </div>
+                ))}
+            </div>
+          </div>
+        </div>
+      </BottomSheet>
+
+      {/* 4. Evening Recovery & Sleep Bottom Sheet */}
+      <BottomSheet
+        open={isRecoverySheetOpen}
+        onOpenChange={setIsRecoverySheetOpen}
+        title="Evening Recovery & Reflections"
+        description="Sleep duration, active burn, and daily mood journal"
+      >
+        <div className="space-y-4 py-1">
+          <SleepAndActiveWidgets />
+          <MoodJournalWidget dateStr={selectedDate} />
+        </div>
+      </BottomSheet>
+
+      {/* 5. Autonomous Streak Shield Bottom Sheet */}
+      <BottomSheet
+        open={isShieldInfoOpen}
+        onOpenChange={setIsShieldInfoOpen}
+        title="Autonomous Streak Freeze Shield"
+        description="Streaks & Habitica Benchmark Protection Subsystem"
+      >
+        <div className="space-y-3.5 py-1">
+          <div className="p-3 rounded-2xl border border-border bg-secondary/50 flex items-start gap-3">
+            <div className="size-9 rounded-xl bg-[#DCFAE5] dark:bg-[#03D26F]/20 flex items-center justify-center shrink-0">
+              <ShieldCheck className="size-5 text-[#047857] dark:text-[#03D26F] stroke-[2.2]" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between gap-2">
+                <h5 className="font-heading font-black text-xs text-foreground">
+                  Inventory: {streakFreeze.tokensAvailable} / 2 Shields
+                </h5>
+                <span className="bg-[#DCFAE5] dark:bg-[#03D26F]/20 text-[#04250e] dark:text-[#03D26F] font-bold text-[9px] px-2 py-0.5 rounded-md">
+                  {streakFreeze.tokensAvailable > 0 ? "Armed" : "Refills 1st"}
+                </span>
+              </div>
+              <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">
+                Autonomous monitoring ensures your hard-earned flame never gets wiped out by a missed day.
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-2 text-xs text-muted-foreground">
+            <div className="p-2.5 rounded-xl border border-border bg-card flex items-start gap-2.5">
+              <Bot className="size-4 text-foreground shrink-0 mt-0.5" />
+              <div>
+                <strong className="text-foreground font-heading font-bold block">Autonomous Activation</strong>
+                Detects missed days and automatically freezes them without manual action.
+              </div>
+            </div>
+
+            <div className="p-2.5 rounded-xl border border-border bg-card flex items-start gap-2.5">
+              <Flame className="size-4 text-rose-500 fill-rose-500 shrink-0 mt-0.5" />
+              <div>
+                <strong className="text-foreground font-heading font-bold block">Continuous Flame Calculation</strong>
+                Preserves active streak count unbroken across shielded dates.
+              </div>
+            </div>
+
+            <div className="p-2.5 rounded-xl border border-border bg-card flex items-start gap-2.5">
+              <Moon className="size-4 text-emerald-600 dark:text-[#03D26F] shrink-0 mt-0.5" />
+              <div>
+                <strong className="text-foreground font-heading font-bold block">Zero-Penalty Rest Days</strong>
+                Scheduled rest days never consume tokens or break streaks.
+              </div>
+            </div>
+
+            <div className="p-2.5 rounded-xl border border-border bg-card flex items-start gap-2.5">
+              <RefreshCw className="size-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+              <div>
+                <strong className="text-foreground font-heading font-bold block">Monthly Auto-Refill</strong>
+                1 free shield granted on the 1st of every month (max 2).
+              </div>
+            </div>
+          </div>
+
+          {/* Frozen Dates Ledger */}
+          {streakFreeze.frozenDates && streakFreeze.frozenDates.length > 0 && (
+            <div className="space-y-1.5 pt-1 border-t border-border">
+              <h6 className="font-heading font-black text-xs text-foreground">
+                Protected dates history ({streakFreeze.frozenDates.length})
+              </h6>
+              <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1">
+                {streakFreeze.frozenDates.map((dateStr) => (
+                  <span
+                    key={dateStr}
+                    className="bg-secondary text-foreground font-mono font-bold text-[11px] px-2 py-0.5 rounded-md border border-border flex items-center gap-1 shadow-2xs"
+                  >
+                    <ShieldCheck className="size-3 text-emerald-600 dark:text-emerald-400 stroke-[2.2]" />
+                    <span>{dateStr}</span>
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <Button
+            onClick={() => setIsShieldInfoOpen(false)}
+            className="w-full bg-[#161514] hover:bg-[#252321] dark:bg-[#FAF8F5] dark:hover:bg-[#E8E5DF] text-white dark:text-[#161514] font-heading font-black text-xs py-2.5 rounded-xl shadow-xs transition-all cursor-pointer"
+          >
+            Got It
+          </Button>
+        </div>
+      </BottomSheet>
+
+      {/* 6. Immersive Habit Choice Modal (Presets, Custom, Protocol Packs) */}
+      <HabitChoiceModal
+        open={isChoiceOpen}
+        onOpenChange={setIsChoiceOpen}
+        onSelectPreset={handleSelectPreset}
+        onAddCustomHabit={handleAddCustomHabit}
+        onApplyPresetPack={handleApplyHabitPack}
+        isPending={addHabitMutation.isPending}
+      />
+
+      {/* 7. Create Custom Habit Bottom Sheet */}
+      <BottomSheet
+        open={isAddOpen}
+        onOpenChange={setIsAddOpen}
+        title="Create a Habit"
+        description="Build consistency with a new daily or weekly routine"
+      >
+        <NewHabitForm onSubmit={handleAddHabit} loading={addHabitMutation.isPending} />
+      </BottomSheet>
+
+      {/* 8. Edit Habit Bottom Sheet */}
+      <BottomSheet
         open={editingHabit !== null}
         onOpenChange={(open) => {
           if (!open) setEditingHabit(null);
@@ -948,27 +1051,26 @@ function GoalsPageContent() {
           }}
           className="space-y-4 pt-1"
         >
-          {/* Companion guidance sprite in Edit mode */}
           <HabitCompanionSprite
             iconName={editingHabit?.icon || "Target"}
             habitTitle={editHabitTitle}
           />
 
           <div className="space-y-1.5">
-            <label className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5]">
+            <label className="text-xs font-heading font-black text-foreground">
               Habit Title *
             </label>
             <input
               type="text"
               value={editHabitTitle}
               onChange={(e) => setEditHabitTitle(e.target.value)}
-              className="w-full bg-white dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-4 py-2.5 text-base font-bold text-[#161514] dark:text-[#FAF8F5] shadow-xs outline-none focus:border-[#161514] dark:focus:border-[#FAF8F5]"
+              className="w-full bg-card rounded-xl border border-border px-4 py-2.5 text-base font-bold text-foreground shadow-xs outline-none focus:border-foreground"
               required
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5]">
+            <label className="text-xs font-heading font-black text-foreground">
               Reminder Time
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
@@ -989,7 +1091,7 @@ function GoalsPageContent() {
                     "min-h-[38px] py-1.5 px-2 rounded-xl text-xs font-bold border transition-all cursor-pointer flex items-center justify-center text-center shadow-xs",
                     editHabitDesc === preset.time
                       ? "bg-[#161514] dark:bg-[#FAF8F5] text-white dark:text-[#161514] font-black border-[#161514] dark:border-[#FAF8F5]"
-                      : "bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] text-[#161514]/80 dark:text-[#A8A29E] border-[#E8E5DF] dark:border-[#2A2724]"
+                      : "bg-card hover:bg-muted text-muted-foreground border-border"
                   )}
                 >
                   <span>{preset.label}</span>
@@ -1001,7 +1103,7 @@ function GoalsPageContent() {
               placeholder="Or custom: e.g. 08:00 AM"
               value={editHabitDesc}
               onChange={(e) => setEditHabitDesc(e.target.value)}
-              className="w-full bg-white dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] px-4 py-2 text-base font-bold text-[#161514] dark:text-[#FAF8F5] shadow-xs outline-none focus:border-[#161514] dark:focus:border-[#FAF8F5] mt-1"
+              className="w-full bg-card rounded-xl border border-border px-4 py-2 text-base font-bold text-foreground shadow-xs outline-none focus:border-foreground mt-1"
             />
           </div>
 
@@ -1013,9 +1115,9 @@ function GoalsPageContent() {
             {updateHabitMutation.isPending ? "Saving…" : "Save changes"}
           </Button>
         </form>
-      </AdaptiveDrawerDialog>
+      </BottomSheet>
 
-      {/* Delete Habit Confirmation Modal */}
+      {/* 9. Delete Confirmation (Centered modal for destructive action) */}
       <DeleteConfirmationModal
         open={deleteHabitId !== null}
         onOpenChange={(open) => {
@@ -1033,111 +1135,8 @@ function GoalsPageContent() {
           }
         }}
         title="Delete Habit"
-        description="Are you sure you want to delete this habit goal? This will archive your goal."
+        description="Are you sure you want to delete this habit goal? This will archive your routine."
       />
-
-      {/* Adaptive Modal for Streak Shield Intelligence */}
-      <AdaptiveDrawerDialog
-        open={isShieldInfoOpen}
-        onOpenChange={setIsShieldInfoOpen}
-        title="Autonomous Streak Freeze Shield"
-        description="Streaks & Habitica Benchmark Protection Subsystem"
-      >
-        <div className="p-4 sm:p-5 space-y-4">
-          <div className="p-3.5 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] bg-[#FAF8F5] dark:bg-[#1C1A18] shadow-xs flex items-start gap-3">
-            <div className="size-10 rounded-lg bg-[#DCFAE5] dark:bg-[#03D26F]/20 flex items-center justify-center shrink-0">
-              <ShieldCheck className="size-5 text-[#047857] dark:text-[#03D26F] stroke-[2.5]" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between gap-2">
-                <h5 className="font-heading font-black text-sm text-[#161514] dark:text-[#FAF8F5]">
-                  Inventory: {streakFreeze.tokensAvailable} / 2 Shields
-                </h5>
-                <span className="bg-[#DCFAE5] dark:bg-[#03D26F]/20 text-[#04250e] dark:text-[#03D26F] font-bold text-[9px] px-2 py-0.5 rounded-md">
-                  {streakFreeze.tokensAvailable > 0 ? "Shield armed" : "Refills 1st"}
-                </span>
-              </div>
-              <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] mt-1 leading-relaxed">
-                Autonomous monitoring ensures your hard-earned flame never gets wiped out by a single missed day.
-              </p>
-            </div>
-          </div>
-
-          <div className="space-y-2.5">
-            <h6 className="font-heading font-black text-xs text-[#161514] dark:text-[#FAF8F5]">
-              How the shield works
-            </h6>
-            <div className="space-y-2 text-xs text-[#6B6B6B] dark:text-[#A8A29E]">
-              <div className="p-2.5 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] bg-white dark:bg-[#161514] flex items-start gap-2.5">
-                <div className="size-6 rounded-md bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0">
-                  <Bot className="size-3.5 text-[#161514] dark:text-[#FAF8F5] stroke-[2.5]" />
-                </div>
-                <div>
-                  <strong className="text-[#161514] dark:text-[#FAF8F5] font-heading font-bold block">Autonomous Activation</strong>
-                  If you miss a scheduled habit, the system automatically detects it, consumes 1 shield token, and freezes the date. No manual toggle required.
-                </div>
-              </div>
-
-              <div className="p-2.5 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] bg-white dark:bg-[#161514] flex items-start gap-2.5">
-                <div className="size-6 rounded-md bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center shrink-0">
-                  <Flame className="size-3.5 text-rose-600 dark:text-rose-400 fill-rose-600 dark:fill-rose-400" />
-                </div>
-                <div>
-                  <strong className="text-[#161514] dark:text-[#FAF8F5] font-heading font-bold block">Continuous Flame Calculation</strong>
-                  Streak algorithms fold frozen days into your active streak history, bridging the gap so your count continues uninterrupted.
-                </div>
-              </div>
-
-              <div className="p-2.5 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] bg-white dark:bg-[#161514] flex items-start gap-2.5">
-                <div className="size-6 rounded-md bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
-                  <Moon className="size-3.5 text-emerald-700 dark:text-emerald-400 stroke-[2.5]" />
-                </div>
-                <div>
-                  <strong className="text-[#161514] dark:text-[#FAF8F5] font-heading font-bold block">Zero-Penalty Rest Days</strong>
-                  Custom-scheduled habits (e.g. 3 days/week) recognize rest days naturally: they never break your streak or consume freeze tokens.
-                </div>
-              </div>
-
-              <div className="p-2.5 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] bg-white dark:bg-[#161514] flex items-start gap-2.5">
-                <div className="size-6 rounded-md bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center shrink-0">
-                  <RefreshCw className="size-3.5 text-amber-700 dark:text-amber-400 stroke-[2.5]" />
-                </div>
-                <div>
-                  <strong className="text-[#161514] dark:text-[#FAF8F5] font-heading font-bold block">Monthly Auto-Refill</strong>
-                  Every month on the 1st, 1 free streak shield is granted to your inventory (maximum capacity: 2).
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Frozen Dates Ledger */}
-          {streakFreeze.frozenDates && streakFreeze.frozenDates.length > 0 && (
-            <div className="space-y-2 pt-1 border-t border-[#E8E5DF] dark:border-[#2A2724]">
-              <h6 className="font-heading font-black text-xs text-[#161514] dark:text-[#FAF8F5]">
-                Protected dates history ({streakFreeze.frozenDates.length})
-              </h6>
-              <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto p-1">
-                {streakFreeze.frozenDates.map((dateStr) => (
-                  <span
-                    key={dateStr}
-                    className="bg-[#FAF8F5] dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] font-mono font-bold text-xs px-2.5 py-1 rounded-md border border-[#E8E5DF] dark:border-[#2A2724] flex items-center gap-1 shadow-xs"
-                  >
-                    <ShieldCheck className="size-3 text-emerald-600 dark:text-emerald-400 stroke-[2.5]" />
-                    <span>{dateStr}</span>
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <Button
-            onClick={() => setIsShieldInfoOpen(false)}
-            className="w-full bg-[#161514] hover:bg-[#252321] dark:bg-[#FAF8F5] dark:hover:bg-[#E8E5DF] text-white dark:text-[#161514] font-heading font-black text-xs py-2.5 rounded-xl shadow-xs transition-all"
-          >
-            Got It
-          </Button>
-        </div>
-      </AdaptiveDrawerDialog>
     </div>
   );
 }

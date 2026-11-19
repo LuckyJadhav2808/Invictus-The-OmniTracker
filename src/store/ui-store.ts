@@ -44,7 +44,7 @@ export const useUIStore = create<UIState>()(
       setActiveTracker: (tracker) => set({ activeTracker: tracker }),
       playfulToastsEnabled: true,
       setPlayfulToastsEnabled: (enabled) => set({ playfulToastsEnabled: enabled }),
-      habitLayoutStyle: "cards",
+      habitLayoutStyle: "compact",
       setHabitLayoutStyle: (style) => set({ habitLayoutStyle: style }),
       widgetVariantStyle: "classic",
       setWidgetVariantStyle: (style) => set({ widgetVariantStyle: style }),
