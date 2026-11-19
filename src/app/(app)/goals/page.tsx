@@ -745,8 +745,8 @@ function GoalsPageContent() {
       <BottomSheet
         open={isWaterSheetOpen}
         onOpenChange={setIsWaterSheetOpen}
-        title="Hydration Chamber"
-        description="Daily water intake telemetry & fast logging"
+        title="Daily Hydration"
+        description="Fast vessel logging & target management"
       >
         <div className="py-2">
           <WaterTracker

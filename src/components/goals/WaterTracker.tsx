@@ -1,10 +1,22 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Droplet, Settings2, Sparkles } from "lucide-react";
+import {
+  Droplets,
+  Droplet,
+  Coffee,
+  GlassWater,
+  CupSoda,
+  RotateCcw,
+  Plus,
+  Minus,
+  Target,
+  Check,
+  SlidersHorizontal,
+  Sparkles,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
-import { AdaptiveDrawerDialog } from "@/components/shared/AdaptiveDrawerDialog";
 import { toast } from "sonner";
 
 export interface WaterTrackerProps {
@@ -15,10 +27,46 @@ export interface WaterTrackerProps {
   className?: string;
 }
 
-interface SplashTag {
-  id: number;
-  text: string;
+export interface VesselPreset {
+  id: string;
+  name: string;
+  subtitle: string;
+  amount: number;
+  icon: React.ElementType;
 }
+
+export const WATER_VESSELS: VesselPreset[] = [
+  {
+    id: "cup",
+    name: "Cup",
+    subtitle: "Coffee / Tea",
+    amount: 150,
+    icon: Coffee,
+  },
+  {
+    id: "glass",
+    name: "Glass",
+    subtitle: "Standard Glass",
+    amount: 250,
+    icon: GlassWater,
+  },
+  {
+    id: "mug",
+    name: "Mug / Shaker",
+    subtitle: "Large Tumbler",
+    amount: 500,
+    icon: CupSoda,
+  },
+  {
+    id: "bottle",
+    name: "Flask / Bottle",
+    subtitle: "Hydro Bottle",
+    amount: 750,
+    icon: Droplets,
+  },
+];
+
+export const TARGET_PRESETS = [1500, 2000, 2500, 3000];
 
 export function WaterTracker({
   amount,
@@ -29,244 +77,443 @@ export function WaterTracker({
 }: WaterTrackerProps) {
   const [localAmount, setLocalAmount] = useState(amount);
   const [dailyTarget, setDailyTarget] = useState(targetAmount);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [customInput, setCustomInput] = useState(String(amount));
-  const [targetInput, setTargetInput] = useState(String(targetAmount));
-  const [splashTags, setSplashTags] = useState<SplashTag[]>([]);
+  const [isCustomTargetOpen, setIsCustomTargetOpen] = useState(false);
+  const [customTargetInput, setCustomTargetInput] = useState(String(targetAmount));
+  const [isManualOverrideOpen, setIsManualOverrideOpen] = useState(false);
+  const [manualAmountInput, setManualAmountInput] = useState(String(amount));
 
   // Sync inputs when props change
   useEffect(() => {
     setLocalAmount(amount);
-    setCustomInput(String(amount));
+    setManualAmountInput(String(amount));
   }, [amount]);
 
   useEffect(() => {
     if (targetAmount) {
       setDailyTarget(targetAmount);
-      setTargetInput(String(targetAmount));
+      setCustomTargetInput(String(targetAmount));
     }
   }, [targetAmount]);
 
-  const percentage = Math.min(100, Math.round((localAmount / dailyTarget) * 100));
-  const isGoalMet = localAmount >= dailyTarget;
+  const percentage = Math.round((localAmount / (dailyTarget || 2000)) * 100);
+  const isGoalMet = localAmount >= dailyTarget && dailyTarget > 0;
+  const remaining = Math.max(0, dailyTarget - localAmount);
 
-  const handleQuickAdd = (delta: number = 250) => {
+  // Single-tap vessel logger
+  const handleQuickAdd = (delta: number) => {
     soundFX.playSplash();
     soundFX.vibrate(15);
 
-    // Instant optimistic local update
     const next = Math.max(0, localAmount + delta);
     setLocalAmount(next);
-    setCustomInput(String(next));
+    setManualAmountInput(String(next));
     onLogWater(delta);
 
-    // Spawn floating splash badge
-    const newTag: SplashTag = {
-      id: Date.now() + Math.random(),
-      text: delta > 0 ? `+${delta}ml` : `${delta}ml`,
-    };
-    setSplashTags((prev) => [...prev, newTag]);
-
-    setTimeout(() => {
-      setSplashTags((prev) => prev.filter((t) => t.id !== newTag.id));
-    }, 1200);
-
-    if (localAmount + delta >= dailyTarget && localAmount < dailyTarget) {
+    // Goal met celebratory trigger
+    if (next >= dailyTarget && localAmount < dailyTarget) {
       soundFX.playCompleteChime();
-      toast.success("Daily hydration target achieved! Outstanding discipline. 💧");
+      soundFX.vibrate([60, 60, 100]);
+      toast.success("Daily hydration goal completed! Outstanding discipline. 💧");
+    } else if (delta > 0) {
+      toast.info(`+${delta} ml logged`, {
+        description: `${Math.max(0, dailyTarget - next)} ml remaining to reach goal`,
+      });
     }
   };
 
-  const handleSaveSettings = async (e: React.FormEvent) => {
+  // Fine adjust / Undo
+  const handleAdjust = (delta: number) => {
+    soundFX.playPop();
+    soundFX.vibrate(10);
+    const next = Math.max(0, localAmount + delta);
+    setLocalAmount(next);
+    setManualAmountInput(String(next));
+    onLogWater(delta);
+  };
+
+  // Reset water for today
+  const handleReset = async () => {
+    soundFX.playPop();
+    soundFX.vibrate(20);
+    setLocalAmount(0);
+    setManualAmountInput("0");
+    try {
+      await onSetWater(0, dailyTarget);
+      toast.info("Hydration reset for today.");
+    } catch {
+      toast.error("Failed to reset water");
+    }
+  };
+
+  // Inline target selector
+  const handleSelectTarget = async (target: number) => {
+    soundFX.playPop();
+    soundFX.vibrate(15);
+    setDailyTarget(target);
+    setCustomTargetInput(String(target));
+    setIsCustomTargetOpen(false);
+    try {
+      await onSetWater(localAmount, target);
+      toast.success(`Target goal updated to ${(target / 1000).toFixed(1)}L`);
+    } catch {
+      toast.error("Failed to update hydration goal");
+    }
+  };
+
+  // Save custom target input
+  const handleSaveCustomTarget = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newAmount = parseInt(customInput, 10);
-    const newTarget = parseInt(targetInput, 10);
+    const parsed = parseInt(customTargetInput, 10);
+    if (!isNaN(parsed) && parsed >= 500) {
+      await handleSelectTarget(parsed);
+    } else {
+      toast.error("Please enter a valid goal (min 500 ml)");
+    }
+  };
 
-    const validTarget = !isNaN(newTarget) && newTarget >= 500 ? newTarget : dailyTarget;
-    setDailyTarget(validTarget);
-
-    if (!isNaN(newAmount) && newAmount >= 0) {
-      setLocalAmount(newAmount);
+  // Save manual override amount
+  const handleSaveManualAmount = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const parsed = parseInt(manualAmountInput, 10);
+    if (!isNaN(parsed) && parsed >= 0) {
+      soundFX.playPop();
+      setLocalAmount(parsed);
+      setIsManualOverrideOpen(false);
       try {
-        await onSetWater(newAmount, validTarget);
-        toast.success("Hydration settings updated!");
-        setIsEditOpen(false);
+        await onSetWater(parsed, dailyTarget);
+        toast.success(`Hydration volume set to ${parsed.toLocaleString()} ml`);
       } catch {
-        toast.error("Failed to update water intake");
+        toast.error("Failed to update water volume");
       }
     }
   };
 
   return (
-    <div
-      className={cn(
-        "bg-[#161514] dark:bg-[#1C1A18] text-white rounded-3xl border-2 border-[#161514] dark:border-[#38332E] shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] relative overflow-hidden flex items-stretch justify-between select-none min-h-[145px] sm:min-h-[155px]",
-        className
-      )}
-    >
-      {/* Floating Splash Bubbles */}
-      <div className="absolute top-2 left-1/3 pointer-events-none z-30">
-        {splashTags.map((tag) => (
-          <div
-            key={tag.id}
-            className="animate-bounce font-heading font-black text-xs text-[#0091FF] bg-white border border-[#0091FF] px-2 py-0.5 rounded-full shadow-md"
-          >
-            {tag.text}
+    <div className={cn("w-full space-y-4 select-none", className)}>
+      {/* ================= 1. HERO RESERVOIR HUD ================= */}
+      <div className="bg-white dark:bg-[#1C1A18] rounded-3xl border-2 border-[#161514] dark:border-[#38332E] p-4 sm:p-5 shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] relative overflow-hidden space-y-4">
+        {/* Top telemetry bar */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="size-8 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-800 flex items-center justify-center shrink-0">
+              <Droplets className="size-4 stroke-[2.2]" />
+            </span>
+            <div>
+              <h3 className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5] uppercase tracking-wider">
+                Daily Hydration
+              </h3>
+              <p className="text-[10px] font-mono text-muted-foreground">
+                Optimal brain & muscle telemetry
+              </p>
+            </div>
           </div>
-        ))}
+
+          {/* Goal status badge */}
+          {isGoalMet ? (
+            <span className="bg-[#CEF431] text-[#161514] border border-[#161514] font-heading font-black text-[11px] px-2.5 py-1 rounded-full shadow-[1.5px_1.5px_0px_0px_#161514] flex items-center gap-1 shrink-0 animate-in fade-in duration-200">
+              <Check className="size-3 stroke-[3]" />
+              <span>Goal Reached</span>
+            </span>
+          ) : (
+            <span className="bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 font-mono font-bold text-[11px] px-2.5 py-1 rounded-full shrink-0">
+              {remaining.toLocaleString()} ml left
+            </span>
+          )}
+        </div>
+
+        {/* Primary Numbers Stack */}
+        <div className="flex items-baseline justify-between pt-1">
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-4xl sm:text-5xl font-heading font-black tabular-nums tracking-tight text-foreground">
+              {localAmount.toLocaleString()}
+            </span>
+            <span className="text-sm sm:text-base font-mono text-muted-foreground font-bold">
+              / {dailyTarget.toLocaleString()} ml
+            </span>
+          </div>
+
+          <div className="text-right">
+            <span
+              className={cn(
+                "text-2xl sm:text-3xl font-heading font-black tabular-nums tracking-tight",
+                isGoalMet ? "text-[#03D26F]" : "text-sky-600 dark:text-sky-400"
+              )}
+            >
+              {percentage}%
+            </span>
+          </div>
+        </div>
+
+        {/* Full-width Neobrutalist Reservoir Fluid Bar */}
+        <div className="space-y-1.5 pt-0.5">
+          <div className="h-4 w-full bg-secondary/80 rounded-full border-2 border-[#161514] dark:border-[#38332E] overflow-hidden p-[2px] relative">
+            <div
+              className={cn(
+                "h-full rounded-full transition-all duration-500 ease-out relative",
+                isGoalMet
+                  ? "bg-[#03D26F]"
+                  : "bg-gradient-to-r from-sky-400 via-sky-500 to-cyan-400 dark:from-sky-500 dark:to-cyan-300"
+              )}
+              style={{ width: `${Math.min(100, Math.max(0, percentage))}%` }}
+            >
+              {/* Fluid specular top sheen */}
+              <div className="absolute top-0 inset-x-0 h-[1.5px] bg-white/40 rounded-full" />
+            </div>
+          </div>
+
+          {/* Fluid Milestone Ticks */}
+          <div className="flex justify-between items-center text-[10px] font-mono text-muted-foreground/80 px-1 font-bold">
+            <span>0ml</span>
+            <span>{(dailyTarget * 0.25).toFixed(0)}ml</span>
+            <span>{(dailyTarget * 0.5).toFixed(0)}ml</span>
+            <span>{(dailyTarget * 0.75).toFixed(0)}ml</span>
+            <span className={isGoalMet ? "text-[#03D26F] font-black" : ""}>
+              {(dailyTarget / 1000).toFixed(1)}L
+            </span>
+          </div>
+        </div>
       </div>
 
-      {/* Left Content Area: Telemetry & Actions */}
-      <div className="flex-1 p-4 sm:p-5 flex flex-col justify-between space-y-3">
-        {/* Header Row: Water Droplet & Settings Trigger */}
+      {/* ================= 2. QUICK VESSEL TACTILE DECK (WATERLLAMA-GRADE) ================= */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between px-1">
+          <span className="text-[11px] font-heading font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+            <span>Tap to Log Vessel</span>
+          </span>
+          <span className="text-[10px] font-mono text-muted-foreground">
+            Single-tap instant add
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2.5">
+          {WATER_VESSELS.map((vessel) => {
+            const Icon = vessel.icon;
+            return (
+              <button
+                key={vessel.id}
+                type="button"
+                onClick={() => handleQuickAdd(vessel.amount)}
+                className="group min-h-[58px] p-3 rounded-2xl border-2 border-[#161514] dark:border-[#38332E] bg-white dark:bg-[#1C1A18] hover:bg-sky-50/60 dark:hover:bg-sky-950/30 text-foreground flex items-center justify-between shadow-[2.5px_2.5px_0px_0px_#161514] dark:shadow-[2.5px_2.5px_0px_0px_#000000] active:translate-x-[1.5px] active:translate-y-[1.5px] active:shadow-none hover:-translate-y-0.5 transition-all cursor-pointer"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="size-9 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-800 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                    <Icon className="size-4 stroke-[2.2]" />
+                  </span>
+                  <div className="text-left min-w-0">
+                    <span className="block font-heading font-black text-xs text-foreground truncate">
+                      {vessel.name}
+                    </span>
+                    <span className="block text-[10px] font-mono text-muted-foreground truncate">
+                      {vessel.subtitle}
+                    </span>
+                  </div>
+                </div>
+
+                <span className="font-mono font-bold text-xs text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/60 px-2 py-1 rounded-lg border border-sky-200 dark:border-sky-800 shrink-0">
+                  +{vessel.amount}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ================= 3. MICRO-ADJUSTER & UNDO STRIP (ANTI-REGRET) ================= */}
+      <div className="grid grid-cols-4 gap-2 pt-1">
+        {/* Undo -250ml */}
+        <button
+          type="button"
+          disabled={localAmount === 0}
+          onClick={() => handleAdjust(-250)}
+          className={cn(
+            "min-h-[44px] py-2 px-2 rounded-xl border-2 border-[#161514] dark:border-[#38332E] font-heading font-black text-xs flex items-center justify-center gap-1 transition-all",
+            localAmount === 0
+              ? "opacity-40 cursor-not-allowed bg-secondary text-muted-foreground"
+              : "bg-white dark:bg-[#1C1A18] hover:bg-rose-50 dark:hover:bg-rose-950/30 text-[#161514] dark:text-[#FAF8F5] hover:text-rose-600 shadow-[1.5px_1.5px_0px_0px_#161514] dark:shadow-[1.5px_1.5px_0px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer"
+          )}
+          title="Undo 250ml"
+        >
+          <RotateCcw className="size-3.5 stroke-[2.2]" />
+          <span>-250</span>
+        </button>
+
+        {/* -50ml Micro Decrement */}
+        <button
+          type="button"
+          disabled={localAmount === 0}
+          onClick={() => handleAdjust(-50)}
+          className={cn(
+            "min-h-[44px] py-2 px-2 rounded-xl border-2 border-[#161514] dark:border-[#38332E] font-mono font-bold text-xs flex items-center justify-center gap-0.5 transition-all",
+            localAmount === 0
+              ? "opacity-40 cursor-not-allowed bg-secondary text-muted-foreground"
+              : "bg-white dark:bg-[#1C1A18] hover:bg-secondary text-[#161514] dark:text-[#FAF8F5] shadow-[1.5px_1.5px_0px_0px_#161514] dark:shadow-[1.5px_1.5px_0px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer"
+          )}
+          title="Decrease 50ml"
+        >
+          <Minus className="size-3 stroke-[2.5]" />
+          <span>50ml</span>
+        </button>
+
+        {/* +50ml Micro Increment */}
+        <button
+          type="button"
+          onClick={() => handleAdjust(50)}
+          className="min-h-[44px] py-2 px-2 rounded-xl border-2 border-[#161514] dark:border-[#38332E] bg-white dark:bg-[#1C1A18] hover:bg-secondary text-[#161514] dark:text-[#FAF8F5] font-mono font-bold text-xs flex items-center justify-center gap-0.5 shadow-[1.5px_1.5px_0px_0px_#161514] dark:shadow-[1.5px_1.5px_0px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer transition-all"
+          title="Add 50ml"
+        >
+          <Plus className="size-3 stroke-[2.5]" />
+          <span>50ml</span>
+        </button>
+
+        {/* Reset / Clear Today */}
+        <button
+          type="button"
+          disabled={localAmount === 0}
+          onClick={handleReset}
+          className={cn(
+            "min-h-[44px] py-2 px-2 rounded-xl border-2 border-[#161514] dark:border-[#38332E] font-heading font-black text-xs flex items-center justify-center gap-1 transition-all",
+            localAmount === 0
+              ? "opacity-40 cursor-not-allowed bg-secondary text-muted-foreground"
+              : "bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border-rose-300 dark:border-rose-900 shadow-[1.5px_1.5px_0px_0px_#161514] dark:shadow-[1.5px_1.5px_0px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer"
+          )}
+          title="Reset to 0"
+        >
+          <span>Reset</span>
+        </button>
+      </div>
+
+      {/* ================= 4. INLINE TARGET GOAL ADJUSTER (NO NESTED MODAL) ================= */}
+      <div className="p-3.5 rounded-2xl bg-secondary/50 border border-border space-y-2.5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
-            <Droplet className="size-4 text-[#0091FF] fill-[#0091FF]" />
-            <h3 className="text-sm sm:text-base font-heading font-black text-white tracking-tight">
-              Water
-            </h3>
+            <Target className="size-3.5 text-sky-500" />
+            <span className="text-[11px] font-heading font-black uppercase tracking-wider text-foreground">
+              Daily Target Goal
+            </span>
           </div>
 
           <button
             type="button"
             onClick={() => {
               soundFX.playPop();
-              setIsEditOpen(true);
+              setIsCustomTargetOpen(!isCustomTargetOpen);
             }}
-            className="size-7 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-colors flex items-center justify-center cursor-pointer"
-            title="Adjust hydration settings"
-            aria-label="Water settings"
+            className="text-[11px] font-mono font-bold text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer"
           >
-            <Settings2 className="size-3.5" />
+            <SlidersHorizontal className="size-3" />
+            <span>{isCustomTargetOpen ? "Presets" : "Custom"}</span>
           </button>
         </div>
 
-        {/* Telemetry Stack: 500 ml of 2,000 ml today */}
-        <div
-          onClick={() => {
-            soundFX.playPop();
-            setIsEditOpen(true);
-          }}
-          className="cursor-pointer group"
-        >
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-2xl sm:text-3xl font-heading font-black text-white tabular-nums tracking-tight">
-              {localAmount.toLocaleString()}
-            </span>
-            <span className="text-sm font-mono text-white/60 font-bold">
-              ml
-            </span>
-          </div>
-          <p className="text-xs text-white/50 font-mono font-medium mt-0.5">
-            of {dailyTarget.toLocaleString()} ml today
-            {isGoalMet && (
-              <span className="ml-1.5 text-[#03D26F] font-bold">✓ Goal Met</span>
-            )}
-          </p>
-        </div>
-
-        {/* Vibrant Blue Pill Action Button */}
-        <div>
-          <button
-            type="button"
-            onClick={() => handleQuickAdd(250)}
-            className="bg-[#0091FF] hover:bg-[#0080e6] active:scale-95 text-white font-heading font-black text-xs sm:text-sm py-2 px-5 rounded-full shadow-md transition-all cursor-pointer flex items-center gap-1.5"
-          >
-            <span>+250 ml</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Right Edge: Vertical Fluid Reservoir Gauge */}
-      <div className="w-10 sm:w-12 bg-white/5 dark:bg-black/40 border-l border-white/10 relative flex flex-col justify-end overflow-hidden">
-        {/* Fluid Fill Column */}
-        <div
-          className="w-full bg-[#0091FF] transition-all duration-500 ease-out relative"
-          style={{ height: `${Math.min(100, Math.max(0, percentage))}%` }}
-        >
-          {/* Fluid Top Highlight */}
-          <div className="absolute top-0 inset-x-0 h-1 bg-white/30" />
-        </div>
-      </div>
-
-      {/* Manual Volume & Target Settings Modal (AdaptiveDrawerDialog) */}
-      <AdaptiveDrawerDialog
-        open={isEditOpen}
-        onOpenChange={setIsEditOpen}
-        title="Hydration Settings"
-        description="Adjust your logged water amount or change your daily target goal."
-      >
-        <form onSubmit={handleSaveSettings} className="space-y-4 pt-1">
-          <div>
-            <label className="block text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5] uppercase tracking-wider mb-1.5">
-              Water Logged Today (ml)
-            </label>
-            <input
-              type="number"
-              min="0"
-              step="50"
-              value={customInput}
-              onChange={(e) => setCustomInput(e.target.value)}
-              className="w-full text-base font-bold bg-[#FAF8F5] dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#38332E] rounded-xl px-3.5 py-2.5 text-[#161514] dark:text-[#FAF8F5] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] focus:outline-none focus:ring-2 focus:ring-[#0091FF]"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5] uppercase tracking-wider mb-1.5">
-              Daily Target Goal (ml)
-            </label>
-            <input
-              type="number"
-              min="500"
-              step="250"
-              value={targetInput}
-              onChange={(e) => setTargetInput(e.target.value)}
-              className="w-full text-base font-bold bg-[#FAF8F5] dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#38332E] rounded-xl px-3.5 py-2.5 text-[#161514] dark:text-[#FAF8F5] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] focus:outline-none focus:ring-2 focus:ring-[#0091FF]"
-            />
-          </div>
-
-          {/* Quick Presets for Target */}
-          <div className="space-y-1">
-            <span className="text-[11px] font-bold text-[#161514]/70 dark:text-[#FAF8F5]/70">Recommended Targets:</span>
-            <div className="flex gap-2">
-              {[1500, 2000, 2500, 3000].map((t) => (
+        {/* Preset Chips */}
+        {!isCustomTargetOpen ? (
+          <div className="grid grid-cols-4 gap-2">
+            {TARGET_PRESETS.map((t) => {
+              const active = dailyTarget === t;
+              return (
                 <button
                   key={t}
                   type="button"
-                  onClick={() => {
-                    soundFX.playPop();
-                    setTargetInput(String(t));
-                  }}
+                  onClick={() => handleSelectTarget(t)}
                   className={cn(
-                    "text-xs font-bold px-2.5 py-1 rounded-lg border-2 border-[#161514] dark:border-[#38332E] cursor-pointer transition-all",
-                    targetInput === String(t)
-                      ? "bg-[#0091FF] text-white font-black shadow-[1.5px_1.5px_0px_0px_#161514] dark:shadow-[1.5px_1.5px_0px_0px_#000000]"
-                      : "bg-white dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] hover:bg-slate-100 dark:hover:bg-[#2e2b28] shadow-[1px_1px_0px_0px_#161514] dark:shadow-[1px_1px_0px_0px_#000000]"
+                    "min-h-[38px] py-1.5 px-2 rounded-xl text-xs font-heading text-center flex items-center justify-center gap-1 transition-all cursor-pointer",
+                    active
+                      ? "bg-[#CEF431] text-[#161514] border-2 border-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_#161514]"
+                      : "bg-white dark:bg-[#1C1A18] text-muted-foreground hover:text-foreground border border-border font-bold hover:bg-secondary"
                   )}
                 >
-                  {(t / 1000).toFixed(1)}L
+                  <span>{(t / 1000).toFixed(1)}L</span>
+                  {active && <Check className="size-3 stroke-[3]" />}
                 </button>
-              ))}
-            </div>
+              );
+            })}
           </div>
+        ) : (
+          /* Inline Custom Target Goal Form */
+          <form onSubmit={handleSaveCustomTarget} className="flex items-center gap-2 pt-0.5">
+            <div className="relative flex-1">
+              <input
+                type="number"
+                min="500"
+                step="100"
+                max="10000"
+                value={customTargetInput}
+                onChange={(e) => setCustomTargetInput(e.target.value)}
+                placeholder="Target in ml"
+                className="w-full h-10 px-3 bg-white dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#38332E] rounded-xl text-xs font-mono font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-[#CEF431]"
+              />
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono text-muted-foreground font-bold">
+                ml
+              </span>
+            </div>
 
-          <div className="pt-2 flex gap-2">
-            <button
-              type="button"
-              onClick={() => setIsEditOpen(false)}
-              className="flex-1 min-h-[44px] bg-white dark:bg-[#252321] hover:bg-slate-100 dark:hover:bg-[#2e2b28] border-2 border-[#161514] dark:border-[#38332E] rounded-xl text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
-            >
-              Cancel
-            </button>
             <button
               type="submit"
-              className="flex-1 min-h-[44px] bg-[#0091FF] hover:bg-[#0080e6] border-2 border-[#161514] dark:border-[#38332E] rounded-xl text-xs font-heading font-black text-white shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer"
+              className="h-10 px-4 bg-[#161514] dark:bg-[#CEF431] text-white dark:text-[#161514] border border-[#161514] rounded-xl text-xs font-heading font-black shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer"
             >
-              Save Hydration
+              Set Goal
             </button>
-          </div>
-        </form>
-      </AdaptiveDrawerDialog>
+          </form>
+        )}
+      </div>
+
+      {/* ================= 5. MANUAL VOLUME DIRECT OVERRIDE (COLLAPSIBLE) ================= */}
+      <div className="pt-0.5">
+        {!isManualOverrideOpen ? (
+          <button
+            type="button"
+            onClick={() => {
+              soundFX.playPop();
+              setIsManualOverrideOpen(true);
+            }}
+            className="w-full text-center text-[10px] font-mono font-bold text-muted-foreground hover:text-foreground py-1 cursor-pointer transition-colors"
+          >
+            Manual exact volume entry ▾
+          </button>
+        ) : (
+          <form
+            onSubmit={handleSaveManualAmount}
+            className="p-3 rounded-2xl bg-secondary/40 border border-border space-y-2 animate-in fade-in zoom-in-95 duration-150"
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-heading font-black text-foreground">
+                Set Exact Water Volume
+              </span>
+              <button
+                type="button"
+                onClick={() => setIsManualOverrideOpen(false)}
+                className="text-[10px] font-mono text-muted-foreground hover:text-foreground cursor-pointer"
+              >
+                Close ✕
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <input
+                  type="number"
+                  min="0"
+                  step="50"
+                  max="15000"
+                  value={manualAmountInput}
+                  onChange={(e) => setManualAmountInput(e.target.value)}
+                  className="w-full h-10 px-3 bg-white dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#38332E] rounded-xl text-xs font-mono font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-[#CEF431]"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono text-muted-foreground font-bold">
+                  ml
+                </span>
+              </div>
+
+              <button
+                type="submit"
+                className="h-10 px-4 bg-[#161514] dark:bg-[#CEF431] text-white dark:text-[#161514] border border-[#161514] rounded-xl text-xs font-heading font-black shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer"
+              >
+                Save
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
     </div>
   );
 }
