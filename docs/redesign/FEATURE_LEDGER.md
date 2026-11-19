@@ -187,11 +187,38 @@
 
 ---
 
+## Tasks Space (`/tasks`)
+
+| ID | Domain | Route | Feature / Control | Current Location | New Location | Depth | Container | Status |
+|:---|:---|:---|:---|:---|:---|:---:|:---:|:---:|
+| **TK-01** | `TASKS` | `/tasks` | Page Title "Tasks" + Live Date | `SpaceHeader` | `MobileAppBar` (Left) on mobile; `SpaceHeader` on PC | L1 | `INLINE` | `KEPT` |
+| **TK-02** | `TASKS` | `/tasks` | Pending Task Count Badge | Header subtitle | Compact mono badge in `MobileAppBar` / `SpaceHeader` | L1 | `INLINE` | `KEPT` |
+| **TK-03** | `SYSTEM` | `/tasks` | Dynamic Island Header Dock | `SpaceHeader` (misaligned) | Standardized in header center; zero floating on scroll | L1 | `INLINE` | `KEPT` |
+| **TK-04** | `TASKS` | `/tasks` | Desktop Sub-Nav View Switcher | Card-wrapped sub-nav | `hidden lg:block` Segmented Desktop Switcher (List, Kanban, Matrix, Projects) | L1 | `TAB` | `KEPT` |
+| **TK-05** | `TASKS` | `/tasks` | Borderless Hero Carousel (`TasksHeroPager`) | Heavy ~300px card | Borderless ~180px Hero: Slide 0 Velocity, Slide 1 Priority Radar, Slide 2 Projects | L1 | `INLINE` | `KEPT` |
+| **TK-06** | `TASKS` | `/tasks` | Quick Stats Row | Inside Hero card | 3-column stats row: `Done Ratio`, `P1 Urgent`, `In Progress` | L1 | `INLINE` | `KEPT` |
+| **TK-07** | `TASKS` | `/tasks` | Door Tile 1: 📋 Kanban Board | Full vertical page scroll | Doorway Card 1 $\rightarrow$ L2 Kanban Portal with `← Back to Tasks` | L2 | `SCREEN` | `MOVED` |
+| **TK-08** | `TASKS` | `/tasks` | Door Tile 2: 🔥 Priority Matrix | View switcher tab | Doorway Card 2 $\rightarrow$ L2 Eisenhower Matrix Portal | L2 | `SCREEN` | `MOVED` |
+| **TK-09** | `TASKS` | `/tasks` | Door Tile 3: 🎯 Project Hub | View switcher tab | Doorway Card 3 $\rightarrow$ L2 Projects Tag Group Portal | L2 | `SCREEN` | `MOVED` |
+| **TK-10** | `TASKS` | `/tasks` | Door Tile 4: ✅ Archive / Completed | Filter tab | Doorway Card 4 $\rightarrow$ L2 Completed Task History Drawer | L2 | `SHEET` | `MOVED` |
+| **TK-11** | `TASKS` | `/tasks` | Primary Task Checklist (`TasksPrimaryList`) | Hidden under Kanban | Slot 5: 56-64px single-line rows with 24px tactile checks | L1 | `INLINE` | `KEPT` |
+| **TK-12** | `TASKS` | `/tasks` | Priority Indicators (P1/P2/P3/P4) | Small text labels | Electric Lime (P1), Amber (P2), Lavender (P3) badges | L1 | `INLINE` | `KEPT` |
+| **TK-13** | `TASKS` | `/tasks` | Project / Tag Filter Chips | Hidden in modal | Horizontal scroll filter chip row (All, P1, In Progress, Dev, Study) | L1 | `INLINE` | `KEPT` |
+| **TK-14** | `TASKS` | `/tasks` | Task Search & Filter Engine | None / modal only | Compact search input + quick filter toggles | L1 | `INLINE` | `KEPT` |
+| **TK-15** | `TASKS` | `/tasks` | Subtask Checklist & Progress | Full accordion expansion | 1-tap disclosure drawer / inline subtask counter (`2/4 subtasks`) | L1/L2 | `INLINE` | `KEPT` |
+| **TK-16** | `TASKS` | `/tasks` | Task Details & Edit Drawer | `EditTaskModal` | `TaskDetailDrawer` / modal for full details & date/priority tuning | L2 | `SHEET` | `KEPT` |
+| **TK-17** | `TASKS` | `/tasks` | Unified Task Creation CTA | 5 duplicate add buttons | Primary Flower Arc FAB Petal 1 + Header "New" on desktop | L1 | `SHEET` | `MERGED` |
+| **TK-18** | `TASKS` | `/tasks` | Strobi Focus Directive & Coaching | None on tasks page | Ambient task companion card advising on highest-impact P1 item | L1 | `INLINE` | `KEPT` |
+| **TK-19** | `TASKS` | `/tasks` | Desktop Rapid Inline Task Capture | Modal only | Right bento dock input: rapid-fire enter to create tasks | L1 | `INLINE` | `KEPT` |
+| **TK-20** | `TASKS` | `/tasks` | Desktop Laptop 2-Column Bento Layout | Stacked narrow column | Full-bleed responsive 12-column grid (`max-w-6xl mx-auto`) | L1 | `INLINE` | `KEPT` |
+
+---
+
 ## Summary of Feature Audit & Protocol Verification
-- **Total Features Cataloged**: 125 features across Habits, Gym, Diet, Stats, Money, and Today.
-- **Features Kept (Direct or Refined)**: 78
-- **Features Moved to L2/L3 Sheets/Tiles/Overflow**: 30
-- **Features Merged into Unified Controls**: 16
+- **Total Features Cataloged**: 145 features across Habits, Gym, Diet, Stats, Money, Today, and Tasks.
+- **Features Kept (Direct or Refined)**: 91
+- **Features Moved to L2/L3 Sheets/Tiles/Overflow**: 35
+- **Features Merged into Unified Controls**: 17
 - **Features Removed**: 1 (floating Dynamic Island on scroll `StickyIslandMiniCockpit`, per explicit user decree).
 - **Domain Breakdown**:
   - `HABITS CORE`: 48 features

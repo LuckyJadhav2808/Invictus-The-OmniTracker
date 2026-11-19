@@ -88,8 +88,8 @@ export function TaskKanbanBoard({
         </button>
       </div>
 
-      {/* Kanban Grid (4 Columns) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
+      {/* Kanban Grid (4 Columns) - Swipeable row on mobile, grid on tablet/desktop */}
+      <div className="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 items-start overflow-x-auto no-scrollbar pb-3 snap-x snap-mandatory">
         {COLUMNS.map((col) => {
           const colTasks = tasks.filter((t) => t.status === col.id);
 
@@ -98,7 +98,7 @@ export function TaskKanbanBoard({
               key={col.id}
               onDragOver={handleDragOver}
               onDrop={(e) => handleDrop(e, col.id)}
-              className="bg-[#FAF8F5] dark:bg-[#161514] rounded-2xl p-3.5 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-3 min-h-[440px] flex flex-col justify-between"
+              className="w-[280px] sm:w-[300px] md:w-auto shrink-0 snap-center bg-[#FAF8F5] dark:bg-[#161514] rounded-2xl p-3.5 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-3 min-h-[440px] flex flex-col justify-between"
             >
               <div>
                 {/* Column Header */}
