@@ -1,10 +1,9 @@
 (function () {
   try {
     var stored = localStorage.getItem("theme");
-    var isDark =
-      stored === "dark" ||
-      (stored !== "light" &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches);
+    // Light is the default theme across onboarding, login, and all spaces
+    // unless the user has explicitly selected and saved "dark".
+    var isDark = stored === "dark";
     if (isDark) {
       document.documentElement.classList.add("dark");
     } else {

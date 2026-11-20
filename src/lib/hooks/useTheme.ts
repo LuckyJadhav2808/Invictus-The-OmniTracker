@@ -46,14 +46,15 @@ function freezeTransitionsTemporarily(): () => void {
 }
 
 export function getStoredTheme(): ThemeMode {
-  if (typeof window === "undefined") return "system";
+  if (typeof window === "undefined") return "light";
   try {
     const stored = localStorage.getItem(THEME_STORAGE_KEY) as ThemeMode | null;
-    if (stored && ["light", "dark", "system"].includes(stored)) {
-      return stored;
-    }
+    if (stored === "dark") return "dark";
+    if (stored === "light") return "light";
+    if (stored === "system") return "system";
   } catch {}
-  return "system";
+  // Default theme is strictly Light until user explicitly changes it
+  return "light";
 }
 
 export function getSystemTheme(): "light" | "dark" {
@@ -65,7 +66,8 @@ export function applyThemeToDOM(mode: ThemeMode): "light" | "dark" {
   if (typeof window === "undefined" || typeof document === "undefined") return "light";
 
   const root = document.documentElement;
-  const resolved = mode === "system" ? getSystemTheme() : mode;
+  // If explicitly set to system, respect matchMedia; otherwise default fallback is light
+  const resolved = mode === "dark" ? "dark" : mode === "system" ? getSystemTheme() : "light";
 
   if (resolved === "dark") {
     root.classList.add("dark");
@@ -77,7 +79,7 @@ export function applyThemeToDOM(mode: ThemeMode): "light" | "dark" {
 }
 
 export function useTheme() {
-  const [theme, setThemeState] = useState<ThemeMode>("system");
+  const [theme, setThemeState] = useState<ThemeMode>("light");
   const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
   const [mounted, setMounted] = useState(false);
 

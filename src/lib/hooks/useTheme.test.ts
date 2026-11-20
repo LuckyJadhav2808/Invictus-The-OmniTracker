@@ -76,8 +76,8 @@ describe("useTheme Architecture & Circular Ripple Animation Engine (animrippleth
     vi.unstubAllGlobals();
   });
 
-  it("retrieves default stored theme as system if unset", () => {
-    expect(getStoredTheme()).toBe("system");
+  it("retrieves default stored theme as light if unset", () => {
+    expect(getStoredTheme()).toBe("light");
   });
 
   it("stores and retrieves theme correctly from localStorage", () => {
@@ -108,14 +108,14 @@ describe("useTheme Architecture & Circular Ripple Animation Engine (animrippleth
     expect(classListSet.has("dark")).toBe(true);
   });
 
-  it("handles corrupted or invalid stored theme values gracefully by falling back to system", () => {
+  it("handles corrupted or invalid stored theme values gracefully by falling back to light", () => {
     mockStorage["theme"] = "invalid_mode_xyz";
-    expect(getStoredTheme()).toBe("system");
+    expect(getStoredTheme()).toBe("light");
   });
 
   it("falls back cleanly to light when window is undefined (SSR safety)", () => {
     vi.stubGlobal("window", undefined);
-    expect(getStoredTheme()).toBe("system");
+    expect(getStoredTheme()).toBe("light");
     expect(getSystemTheme()).toBe("light");
     expect(applyThemeToDOM("dark")).toBe("light");
   });
