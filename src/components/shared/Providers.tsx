@@ -116,9 +116,15 @@ export function Providers({ children }: { children: React.ReactNode }) {
         {children}
         <Toaster
           position="top-center"
-          expand
+          expand={false}
+          visibleToasts={3}
+          gap={8}
+          offset={16}
+          mobileOffset={{ top: 76, bottom: 84, left: 16, right: 16 }}
           richColors
           closeButton
+          duration={3500}
+          theme="system"
           toastOptions={{
             style: {
               borderRadius: "1rem",
@@ -126,12 +132,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
               fontSize: "0.875rem",
             },
             classNames: {
-              toast: "font-bold text-sm bg-white dark:bg-[#161514] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#2A2724] shadow-md dark:shadow-none rounded-2xl",
+              toast: "font-bold text-sm bg-white dark:bg-[#161514] text-[#161514] dark:text-[#FAF8F5] border-2 border-[#161514] dark:border-[#383531] shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] rounded-2xl",
               title: "font-heading font-black text-xs uppercase tracking-tight text-[#161514] dark:text-[#FAF8F5]",
-              description: "text-xs font-medium text-[#6B6B6B] dark:text-[#FAF8F5]/70",
-              actionButton: "bg-[#161514] dark:bg-white text-white dark:text-[#161514] font-black text-xs border border-[#161514] dark:border-white rounded-xl shadow-xs",
+              description: "text-xs font-bold text-[#6B6B6B] dark:text-[#FAF8F5]/70",
+              actionButton: "bg-[#161514] dark:bg-[#CEF431] text-white dark:text-[#161514] font-black text-xs border border-[#161514] dark:border-[#CEF431] rounded-xl shadow-xs",
               cancelButton: "bg-white dark:bg-[#252220] text-[#161514] dark:text-[#FAF8F5] font-black border border-[#E8E5DF] dark:border-[#2A2724] rounded-xl shadow-xs",
-              closeButton: "!border !border-[#E8E5DF] dark:!border-[#2A2724] !bg-white dark:!bg-[#252220] !text-[#161514] dark:!text-[#FAF8F5] !shadow-xs hover:!bg-[#FAF8F5] dark:hover:!bg-[#2e2a28]",
+              closeButton: "!border-1.5 !border-[#161514] dark:!border-[#383531] !bg-white dark:!bg-[#252220] !text-[#161514] dark:!text-[#FAF8F5] !shadow-[1px_1px_0px_0px_#161514] dark:!shadow-[1px_1px_0px_0px_#000000] hover:!bg-[#FAF8F5] dark:hover:!bg-[#2e2a28]",
             },
           }}
         />

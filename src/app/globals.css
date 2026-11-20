@@ -759,6 +759,64 @@ html[data-color-theme="cobalt"] .dark {
   box-shadow: 1.5px 1.5px 0px 0px rgba(22, 21, 20, 1) !important;
 }
 
+[data-sonner-toast] [data-close-button] {
+  background: #FAF8F5 !important;
+  color: #161514 !important;
+  border: 1.5px solid #161514 !important;
+  box-shadow: 1px 1px 0px 0px #161514 !important;
+  border-radius: 0.5rem !important;
+}
+
+/* Dark Mode Neobrutalist Sonner Overrides */
+.dark [data-sonner-toast] {
+  background: #1C1A18 !important;
+  border-color: #383531 !important;
+  color: #FAF8F5 !important;
+  box-shadow: 3px 3px 0px 0px #000000 !important;
+}
+
+.dark [data-sonner-toast][data-type="success"] {
+  background-color: #0E2316 !important;
+  border-color: #03D26F !important;
+}
+
+.dark [data-sonner-toast][data-type="error"] {
+  background-color: #2B1414 !important;
+  border-color: #F87171 !important;
+}
+
+.dark [data-sonner-toast][data-type="info"] {
+  background-color: #111C2E !important;
+  border-color: #5B7FE5 !important;
+}
+
+.dark [data-sonner-toast][data-type="warning"] {
+  background-color: #2D1E0B !important;
+  border-color: #F59E0B !important;
+}
+
+.dark [data-sonner-toast] [data-title] {
+  color: #FAF8F5 !important;
+}
+
+.dark [data-sonner-toast] [data-description] {
+  color: rgba(250, 248, 245, 0.75) !important;
+}
+
+.dark [data-sonner-toast] [data-button] {
+  background-color: #CEF431 !important;
+  color: #161514 !important;
+  border: 1.5px solid #CEF431 !important;
+  box-shadow: 1.5px 1.5px 0px 0px #000000 !important;
+}
+
+.dark [data-sonner-toast] [data-close-button] {
+  background: #252321 !important;
+  color: #FAF8F5 !important;
+  border: 1.5px solid #383531 !important;
+  box-shadow: 1px 1px 0px 0px #000000 !important;
+}
+
 /* Custom Print Styles for Clean Single-Page / Multi-Page Statement Export */
 @media print {
   body * {

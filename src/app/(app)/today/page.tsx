@@ -19,7 +19,7 @@ import { soundFX } from "@/components/shared/SoundFX";
 import { useTransactions, useCategories, useAddTransaction, useBudgetPreferences, useUpdateBudgetPreferences } from "@/lib/queries/money";
 import { useTasks, useUpdateTask, useCreateTask } from "@/lib/queries/tasks";
 import { computeMonthlyBudgetStats } from "@/lib/utils/budget-rollover";
-import { toast } from "sonner";
+import { toast, strobiToast } from "@/lib/utils/toasts";
 import { Shield, SunMedium, Clock, Moon, Droplet, Plus, FileText, ArrowUpRight } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
@@ -113,7 +113,7 @@ export default function TodayPage() {
     soundFX.playSplash();
     soundFX.vibrate(15);
     logWaterMutation.mutate({ date: selectedDate, amount });
-    toast.success(`Logged +${amount}ml water`);
+    strobiToast.today(`Logged +${amount}ml water! 💧`, { quip: "Vitality recharged! Keep pacing strong." });
   };
 
   // User Cloud Budget Preferences
@@ -301,7 +301,7 @@ export default function TodayPage() {
         sessionStorage.setItem(celebrationKey, "true");
       }
       setShowConfetti(true);
-      toast.success("All daily habits completed!");
+      strobiToast.habits("All daily habits conquered! 🏆", { quip: "Gladiator mindset! Streak blazing 🔥" });
     }
     previousConqueredRef.current = allHabitsConquered;
   }, [allHabitsConquered, selectedDate]);
@@ -421,7 +421,7 @@ export default function TodayPage() {
         note: note.trim() || "Quick expense",
         isRecurring: false,
       });
-      toast.success(`Recorded ${currencySymbol}${amount}!`);
+      strobiToast.money(`Recorded ${currencySymbol}${amount}!`, { quip: "Disciplined spend! Wallet in check 💰" });
       setIsQuickExpenseOpen(false);
     } catch {
       toast.error("Could not record expense.");
@@ -452,7 +452,7 @@ export default function TodayPage() {
         energy: 4,
         note: reflectionNote.trim(),
       });
-      toast.success("Mindset reflection saved!");
+      strobiToast.today("Mindset reflection saved! 🧠", { quip: "Introspection builds unshakeable clarity." });
     } catch {
       toast.error("Could not save reflection.");
     } finally {
@@ -962,7 +962,7 @@ export default function TodayPage() {
               description: data.description,
               subtasks: data.subtasks || [],
             } as any);
-            toast.success("Task created successfully!");
+            strobiToast.tasks("Task created successfully! ⚡", { quip: "Top priority locked in. Flow state awaits!" });
             setIsNewTaskOpen(false);
           } catch {
             toast.error("Failed to create task");

@@ -20,7 +20,7 @@ import { Receipt, Target, PiggyBank, Users, Plus, RotateCcw, ChevronRight, Walle
 import { DropdownMenuItem, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
 import { format, parseISO } from "date-fns";
 import { soundFX } from "@/components/shared/SoundFX";
-import { toast } from "sonner";
+import { toast, strobiToast } from "@/lib/utils/toasts";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { useSearchParams } from "next/navigation";
 import {
@@ -547,9 +547,10 @@ function MoneyPageContent() {
       const res = await addTxMutation.mutateAsync(payload as any);
       const newId = (res as any)?.id || (res as any)?._id;
       const cat = categoryMap.get(payload.categoryId);
-      toast.success(
+      strobiToast.money(
         `Logged ${currencySymbol}${payload.amount} for ${cat?.name || "Expense"}${payload.note ? ` • ${payload.note}` : ""}`,
         {
+          quip: "Wallet in check! Every tracked rupee counts 💰",
           action: {
             label: "Undo",
             onClick: () => {

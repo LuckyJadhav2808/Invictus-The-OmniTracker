@@ -75,7 +75,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { format, getDay, startOfWeek, addDays, isSameDay } from "date-fns";
-import { toast } from "sonner";
+import { toast, strobiToast } from "@/lib/utils/toasts";
 import { useUIStore } from "@/store/ui-store";
 import { cn } from "@/lib/utils";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -364,7 +364,11 @@ function GoalsPageContent() {
         date: dateStr,
         completed,
       });
-      toast.success(completed ? "Habit checked" : "Removed check");
+      if (completed) {
+        strobiToast.habits("Habit Checked! 🔥", { quip: "Discipline compounds daily. Streak glowing!" });
+      } else {
+        toast.info("Check removed");
+      }
     } catch {
       toast.error("Failed to update habit log");
     }

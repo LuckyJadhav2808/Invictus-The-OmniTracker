@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { TaskItem } from "@/types";
-import { toast } from "sonner";
+import { toast, strobiToast } from "@/lib/utils/toasts";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { getCustomSession } from "@/lib/custom-auth";
 import { generateKeyBetween } from "@/lib/utils/lexorank";
@@ -121,7 +121,7 @@ export function useCreateTask() {
       const userId = getActiveUserId(user);
       queryClient.setQueryData<TaskItem[]>(["tasks", userId], (old = []) => [task, ...old]);
       queryClient.setQueryData<TaskItem[]>(["tasks"], (old = []) => [task, ...old]);
-      toast.success("Task Created", { description: `"${task.title}" added to #${task.projectTag || "Dev"}.` });
+      strobiToast.tasks("Task Created", { description: `"${task.title}" added to #${task.projectTag || "Dev"}.` });
     },
   });
 }
@@ -175,7 +175,7 @@ export function useUpdateTask() {
         old.map((t) => (t.id === updatedTask.id ? updatedTask : t))
       );
       if (updatedTask.status === "completed") {
-        toast.success("Task Completed", { description: `"${updatedTask.title}" marked as done!` });
+        strobiToast.tasks("Task Conquered! ⚡", { description: `"${updatedTask.title}" marked as done!`, quip: "Queue yields to your focus 🎯" });
       } else {
         toast.success("Task Updated", { description: `"${updatedTask.title}" updated successfully.` });
       }
