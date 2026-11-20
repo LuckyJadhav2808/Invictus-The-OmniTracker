@@ -122,9 +122,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
           offset={16}
           mobileOffset={{
             top: "calc(env(safe-area-inset-top, 0px) + 64px)",
-            bottom: "calc(env(safe-area-inset-bottom, 0px) + 84px)",
-            left: "16px",
-            right: "16px",
+            bottom: "calc(env(safe-area-inset-bottom, 0px) + 78px)",
+            left: "12px",
+            right: "12px",
           }}
           swipeDirections={["top", "left", "right", "bottom"]}
           richColors
@@ -137,7 +137,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
               fontFamily: "var(--font-sans)",
               fontSize: "0.72rem",
               width: "fit-content",
-              maxWidth: "min(calc(100vw - 32px), 320px)",
+              maxWidth: "min(calc(100vw - 24px), 380px)",
               margin: "0 auto",
             },
           }}

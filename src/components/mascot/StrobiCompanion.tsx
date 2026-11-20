@@ -158,8 +158,9 @@ export function StrobiCompanion({
       onClick();
     } else {
       const quip = STROBI_QUIPS[quipIndex % STROBI_QUIPS.length];
-      toast("✨ Strobi: " + quip, {
-        duration: 2600,
+      toast(quip, {
+        icon: "✨",
+        duration: 1600,
       });
     }
   };

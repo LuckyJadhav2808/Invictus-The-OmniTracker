@@ -715,13 +715,20 @@ html.disable-transitions *::after {
   overflow: visible !important;
 }
 
+/* Mobile-First Benchmark Ergonomics: Dock toast in the thumb zone above bottom nav bar */
 @media (max-width: 600px) {
   [data-sonner-toaster] {
-    left: 16px !important;
-    right: 16px !important;
+    position: fixed !important;
+    top: auto !important;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 78px) !important;
+    left: 12px !important;
+    right: 12px !important;
     width: auto !important;
-    max-width: calc(100vw - 32px) !important;
+    max-width: calc(100vw - 24px) !important;
     transform: none !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
   }
 }
 
@@ -734,17 +741,17 @@ html.disable-transitions *::after {
   border: 2px solid #161514 !important;
   box-shadow: 2px 2px 0px 0px rgba(22, 21, 20, 1) !important;
   border-radius: 9999px !important;
-  padding: 0.35rem 0.75rem !important;
+  padding: 0.35rem 0.85rem !important;
   min-height: 32px !important;
-  max-height: 38px !important;
+  max-height: 42px !important;
   width: fit-content !important;
-  max-width: min(calc(100vw - 32px), 320px) !important;
+  max-width: min(calc(100vw - 24px), 380px) !important;
   margin: 0 auto !important;
   color: #161514 !important;
   font-weight: 700 !important;
   display: inline-flex !important;
   align-items: center !important;
-  gap: 0.4rem !important;
+  gap: 0.45rem !important;
   box-sizing: border-box !important;
   overflow: hidden !important;
 }
@@ -759,6 +766,7 @@ html.disable-transitions *::after {
   align-items: center !important;
   justify-content: center !important;
   margin: 0 !important;
+  font-size: 0.85rem !important;
 }
 
 [data-sonner-toast] [data-content] {
@@ -767,6 +775,7 @@ html.disable-transitions *::after {
   align-items: center !important;
   gap: 0.35rem !important;
   min-width: 0 !important;
+  max-width: 100% !important;
   overflow: hidden !important;
   flex: 1 1 auto !important;
 }
@@ -799,8 +808,9 @@ html.disable-transitions *::after {
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
-  flex-shrink: 0 !important;
-  max-width: 140px !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  flex: 0 1 auto !important;
 }
 
 [data-sonner-toast] [data-description] {
@@ -812,8 +822,8 @@ html.disable-transitions *::after {
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   min-width: 0 !important;
+  max-width: 100% !important;
   flex: 1 1 auto !important;
-  max-width: 150px !important;
 }
 
 [data-sonner-toast] [data-button] {
