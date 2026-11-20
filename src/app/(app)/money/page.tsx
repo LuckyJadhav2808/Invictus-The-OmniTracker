@@ -77,6 +77,11 @@ const CategoryFormModal = dynamic(
   { ssr: false }
 );
 
+const CategoryEnvelopesModal = dynamic(
+  () => import("@/components/money/modals/CategoryEnvelopesModal").then((mod) => mod.CategoryEnvelopesModal),
+  { ssr: false }
+);
+
 const AllowanceSettingsModal = dynamic(
   () => import("@/components/money/modals/AllowanceSettingsModal").then((mod) => mod.AllowanceSettingsModal),
   { ssr: false }
@@ -148,6 +153,9 @@ function MoneyPageContent() {
   const [editingTx, setEditingTx] = useState<Transaction | null>(null);
   const [inspectingTx, setInspectingTx] = useState<Transaction | null>(null);
   const [isAddCatOpen, setIsAddCatOpen] = useState(false);
+  const [isCategoryEnvelopesOpen, setIsCategoryEnvelopesOpen] = useState(() => {
+    return actionParam === "envelopes" || actionParam === "categories" || searchParams.get("sheet") === "envelopes";
+  });
   const [editingCat, setEditingCat] = useState<Category | null>(null);
   const [isAllowanceModalOpen, setIsAllowanceModalOpen] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
@@ -249,6 +257,9 @@ function MoneyPageContent() {
     const handleExport = () => {
       setIsExportModalOpen(true);
     };
+    const handleEnvelopes = () => {
+      setIsCategoryEnvelopesOpen(true);
+    };
 
     window.addEventListener("invictus:money-new-expense", handleNewExpense);
     window.addEventListener("invictus:money-new-income", handleNewIncome);
@@ -258,6 +269,7 @@ function MoneyPageContent() {
     window.addEventListener("invictus:money-quick-cash", handleQuickCash);
     window.addEventListener("invictus:money-open-ledger", handleOpenLedger);
     window.addEventListener("invictus:money-export", handleExport);
+    window.addEventListener("invictus:money-envelopes", handleEnvelopes);
     window.addEventListener("invictus:open-new-transaction", handleNewExpense);
 
     return () => {
@@ -269,6 +281,7 @@ function MoneyPageContent() {
       window.removeEventListener("invictus:money-quick-cash", handleQuickCash);
       window.removeEventListener("invictus:money-open-ledger", handleOpenLedger);
       window.removeEventListener("invictus:money-export", handleExport);
+      window.removeEventListener("invictus:money-envelopes", handleEnvelopes);
       window.removeEventListener("invictus:open-new-transaction", handleNewExpense);
     };
   }, []);
@@ -929,7 +942,7 @@ function MoneyPageContent() {
               monthlyBudget={monthlyStats.totalCombinedBudget || monthlyStats.baseBudget}
               activeIouCount={pendingIous.length}
               currencySymbol={currencySymbol}
-              onOpenCategories={() => setIsAddCatOpen(true)}
+              onOpenCategories={() => setIsCategoryEnvelopesOpen(true)}
               onOpenAnalytics={() => handleTabChange("analytics")}
               onOpenBudgets={() => handleTabChange("budgets")}
               onOpenSubscriptions={() => handleTabChange("vault")}
@@ -988,7 +1001,7 @@ function MoneyPageContent() {
                     ))}
                   </div>
 
-                  {/* Neobrutalist Action Dock button to open full ledger & envelopes */}
+                  {/* Neobrutalist Action Dock button to open full ledger */}
                   <button
                     type="button"
                     onClick={() => {
@@ -999,7 +1012,7 @@ function MoneyPageContent() {
                   >
                     <div className="flex items-center gap-2">
                       <Receipt className="size-4 text-[#161514] dark:text-[#CEF431] stroke-[2.2]" />
-                      <span>Open Full Ledger & Envelopes</span>
+                      <span>Open Full Ledger</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-[11px] font-mono text-muted-foreground">
                       <span>{currentMonthTransactions.length} Total</span>
@@ -1099,7 +1112,7 @@ function MoneyPageContent() {
         )}
       </div>
 
-      {/* ================= L3 BOTTOM SHEET: FULL TRANSACTION LEDGER & ENVELOPES ================= */}
+      {/* ================= L3 BOTTOM SHEET: FULL TRANSACTION LEDGER ================= */}
       <BottomSheet
         open={isLedgerSheetOpen}
         onOpenChange={(open) => {
@@ -1111,8 +1124,8 @@ function MoneyPageContent() {
             window.history.replaceState(null, "", url.pathname + url.search);
           }
         }}
-        title="Transaction Ledger & Envelopes"
-        description="Search, filter by envelope, and manage statement records"
+        title="Transaction Ledger"
+        description="Search, filter statement records, and manage finances"
         maxHeight="max-h-[92vh]"
       >
         <div className="py-2">
@@ -1184,6 +1197,26 @@ function MoneyPageContent() {
         prefill={whoOwesWhoPrefill}
         defaultOpenForm={true}
         onLogSettlementIncome={handleLogWhoOwesWhoRepayment}
+      />
+
+      {/* 1d. Category Envelopes Studio & Balance Modal */}
+      <CategoryEnvelopesModal
+        open={isCategoryEnvelopesOpen}
+        onOpenChange={setIsCategoryEnvelopesOpen}
+        categories={categories}
+        transactions={transactions}
+        categoryCardsData={categoryCardsData}
+        currencySymbol={currencySymbol}
+        targetMonthKey={effectiveTargetMonthKey}
+        selectedCategoryId={selectedCategory}
+        onSelectCategory={handleSelectCategory}
+        onMoveMoney={() => setIsMoveMoneyOpen(true)}
+        onSendMoney={() => setIsSendMoneyOpen(true)}
+        onAddCategory={() => setIsAddCatOpen(true)}
+        onEditCategory={(cat) => setEditingCat(cat)}
+        onDeleteCategory={(catId) => setDeleteCatId(catId)}
+        onOpenTemplates={() => setIsTemplateModalOpen(true)}
+        onApplyCategoryPack={handleApplyCategoryPack}
       />
 
       {/* 1b. 1-Tap Quick Cash Entry Modal */}

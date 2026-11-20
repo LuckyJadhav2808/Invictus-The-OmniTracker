@@ -474,186 +474,8 @@ export function LedgerTabView({
 
   return (
     <div id="money-ledger-view" className="space-y-4 scroll-mt-24">
-      {/* 🏷️ CATEGORY ENVELOPES CHIP RAIL (Contextually Scoped to Ledger) */}
-      <CategoryChipFilterRail
-        currencySymbol={currencySymbol}
-        categories={computedCategoryCardsData}
-        selectedCategoryId={selectedCategory}
-        onSelectCategory={setSelectedCategory}
-        onMoveMoney={onMoveMoney}
-        onSendMoney={onSendMoney}
-        onBulkAddExpense={onBulkAddExpense}
-        onAddCategory={onAddCategory}
-        onEditCategory={onEditCategory}
-        onDeleteCategory={onDeleteCategory}
-      />
-
-      {/* 🏷️ ENVELOPE STUDIO PAGE-IN-PAGE (Belanje In-Situ Benchmark) */}
-      {activeCategory && activeCategoryStats && (
-        <div className="bg-white dark:bg-[#161514] rounded-3xl p-4 sm:p-5 border-2 border-[#161514] dark:border-[#383531] shadow-[2.5px_2.5px_0px_0px_#161514] space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-3 min-w-0">
-              <div
-                className="size-12 rounded-2xl flex items-center justify-center border border-[#161514] text-[#161514] shrink-0 shadow-[1.5px_1.5px_0px_0px_#161514]"
-                style={{ backgroundColor: getCategoryAccent(activeCategory) }}
-              >
-                <CategoryIcon name={activeCategory.icon} className="size-6 stroke-[2]" />
-              </div>
-
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-heading font-black text-base sm:text-lg text-[#161514] dark:text-[#FAF8F5] truncate">
-                    {activeCategory.name}
-                  </h3>
-                  <span className="text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded-full bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#383531] text-[#6B6B6B] dark:text-[#A8A29E]">
-                    Envelope Studio
-                  </span>
-                </div>
-                <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] mt-0.5">
-                  {filteredTransactions.length} transaction{filteredTransactions.length === 1 ? "" : "s"} logged in this envelope
-                </p>
-              </div>
-            </div>
-
-            {/* Quick Action Buttons */}
-            <div className="flex items-center gap-1.5 flex-wrap">
-              {onMoveMoney && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    soundFX.playPop();
-                    onMoveMoney();
-                  }}
-                  className="px-3 py-1.5 rounded-xl bg-[#FAF8F5] dark:bg-[#252321] hover:bg-[#F1EFEA] dark:hover:bg-[#2E2B28] text-[#161514] dark:text-[#FAF8F5] text-xs font-heading font-bold border border-[#E8E5DF] dark:border-[#383531] shadow-xs active:scale-95 transition-all cursor-pointer flex items-center gap-1.5"
-                  title="Move money between envelopes"
-                >
-                  <ArrowRightLeft className="size-3.5 stroke-[2]" />
-                  <span>Move Funds</span>
-                </button>
-              )}
-
-              {onEditCategory && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    soundFX.playPop();
-                    onEditCategory(activeCategory);
-                  }}
-                  className="px-3 py-1.5 rounded-xl bg-[#FAF8F5] dark:bg-[#252321] hover:bg-[#F1EFEA] dark:hover:bg-[#2E2B28] text-[#161514] dark:text-[#FAF8F5] text-xs font-heading font-bold border border-[#E8E5DF] dark:border-[#383531] shadow-xs active:scale-95 transition-all cursor-pointer flex items-center gap-1.5"
-                  title="Edit category envelope"
-                >
-                  <Edit2 className="size-3.5 stroke-[2]" />
-                  <span>Edit Cap</span>
-                </button>
-              )}
-
-              <button
-                type="button"
-                onClick={() => {
-                  soundFX.playPop();
-                  setSelectedCategory("all");
-                }}
-                className="px-3 py-1.5 rounded-xl bg-[#161514] text-white dark:bg-[#CEF431] dark:text-[#161514] text-xs font-heading font-black border border-[#161514] dark:border-[#CEF431] shadow-xs active:scale-95 transition-all cursor-pointer flex items-center gap-1"
-                title="Return to global ledger"
-              >
-                <X className="size-3.5 stroke-[2.5]" />
-                <span>All Envelopes</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Budget & Daily Pace Telemetry Strip */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
-            <div className="p-3 rounded-2xl bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#383531]">
-              <span className="text-[10px] font-mono uppercase text-[#6B6B6B] dark:text-[#A8A29E] block">
-                Spent This Month
-              </span>
-              <span className="text-sm sm:text-base font-mono font-black text-rose-600 dark:text-rose-400 tabular-nums mt-0.5 block">
-                {currencySymbol}{Math.round(activeCategoryStats.spentThisMonth).toLocaleString()}
-              </span>
-            </div>
-
-            <div className="p-3 rounded-2xl bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#383531]">
-              <span className="text-[10px] font-mono uppercase text-[#6B6B6B] dark:text-[#A8A29E] block">
-                Monthly Envelope Cap
-              </span>
-              <span className="text-sm sm:text-base font-mono font-black text-[#161514] dark:text-[#FAF8F5] tabular-nums mt-0.5 block">
-                {activeCategoryStats.budget > 0 ? `${currencySymbol}${activeCategoryStats.budget.toLocaleString()}` : "No Limit"}
-              </span>
-            </div>
-
-            <div className="p-3 rounded-2xl bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#383531]">
-              <span className="text-[10px] font-mono uppercase text-[#6B6B6B] dark:text-[#A8A29E] block">
-                Remaining Cap
-              </span>
-              <span
-                className={cn(
-                  "text-sm sm:text-base font-mono font-black tabular-nums mt-0.5 block",
-                  activeCategoryStats.isOverBudget
-                    ? "text-rose-600 dark:text-rose-400"
-                    : "text-[#047857] dark:text-[#03D26F]"
-                )}
-              >
-                {activeCategoryStats.budget > 0
-                  ? activeCategoryStats.isOverBudget
-                    ? `Over by ${currencySymbol}${Math.round(activeCategoryStats.spentThisMonth - activeCategoryStats.budget).toLocaleString()}`
-                    : `${currencySymbol}${Math.round(activeCategoryStats.remainingBudget).toLocaleString()}`
-                  : "N/A"}
-              </span>
-            </div>
-
-            <div className="p-3 rounded-2xl bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#383531]">
-              <span className="text-[10px] font-mono uppercase text-[#6B6B6B] dark:text-[#A8A29E] block">
-                Safe Daily Pace
-              </span>
-              <span className="text-sm sm:text-base font-mono font-black text-amber-700 dark:text-amber-400 tabular-nums mt-0.5 block">
-                {activeCategoryStats.budget > 0 && !activeCategoryStats.isOverBudget
-                  ? `${currencySymbol}${activeCategoryStats.safeDailyPace}/day`
-                  : "—"}
-              </span>
-            </div>
-          </div>
-
-          {/* Budget Progress Bar */}
-          {activeCategoryStats.budget > 0 && (
-            <div className="space-y-1.5 pt-1">
-              <div className="flex justify-between items-center text-[11px] font-mono">
-                <span className="font-bold text-[#6B6B6B] dark:text-[#A8A29E]">
-                  Envelope Consumption
-                </span>
-                <span
-                  className={cn(
-                    "font-black",
-                    activeCategoryStats.isOverBudget
-                      ? "text-rose-600 dark:text-rose-400"
-                      : activeCategoryStats.percentUsed > 80
-                      ? "text-amber-600 dark:text-amber-400"
-                      : "text-[#047857] dark:text-[#03D26F]"
-                  )}
-                >
-                  {activeCategoryStats.percentUsed}%
-                </span>
-              </div>
-              <div className="h-2.5 w-full rounded-full bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#161514] overflow-hidden">
-                <div
-                  className={cn(
-                    "h-full transition-all duration-300",
-                    activeCategoryStats.isOverBudget
-                      ? "bg-rose-500"
-                      : activeCategoryStats.percentUsed > 80
-                      ? "bg-amber-400"
-                      : "bg-[#03D26F]"
-                  )}
-                  style={{ width: `${Math.min(100, activeCategoryStats.percentUsed)}%` }}
-                />
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
       {/* 🔍 Search & Filters Bar */}
-      <div className="bg-white dark:bg-[#1C1A18] p-4 rounded-xl border border-[#E8E5DF] dark:border-[#383531] space-y-3">
+      <div className="bg-white dark:bg-[#1C1A18] p-4 rounded-2xl border-2 border-[#161514] dark:border-[#383531] shadow-[2.5px_2.5px_0px_0px_#161514] dark:shadow-[2.5px_2.5px_0px_0px_#000000] space-y-3">
         <div className="flex flex-row gap-2 items-center justify-between">
           {/* Search Input with 1-Tap Clear */}
           <div className="relative flex-1">
@@ -698,7 +520,7 @@ export function LedgerTabView({
           </div>
 
           {/* Dedicated Month Filter Dropdown */}
-          <div className="w-auto min-w-[140px]">
+          <div className="w-auto min-w-[130px]">
             <NeobrutalistSelect
               size="sm"
               value={selectedMonth}
@@ -713,6 +535,24 @@ export function LedgerTabView({
                 })),
               ]}
               placeholder="Select month"
+            />
+          </div>
+
+          {/* Dedicated Category Filter Dropdown */}
+          <div className="w-auto min-w-[140px]">
+            <NeobrutalistSelect
+              size="sm"
+              value={selectedCategory}
+              onChange={setSelectedCategory}
+              options={[
+                { value: "all", label: "All Envelopes", icon: "Layers" },
+                ...categories.map((c) => ({
+                  value: c.id,
+                  label: c.name,
+                  icon: c.icon || "Wallet",
+                })),
+              ]}
+              placeholder="Category"
             />
           </div>
 
@@ -758,23 +598,18 @@ export function LedgerTabView({
             ))}
           </div>
 
-          {/* Category Dropdown Filter */}
-          <div className="w-auto min-w-[160px]">
-            <NeobrutalistSelect
-              size="sm"
-              value={selectedCategory}
-              onChange={setSelectedCategory}
-              options={[
-                { value: "all", label: "All Categories", icon: "Tag" },
-                ...categories.map((c) => ({
-                  value: c.id,
-                  label: c.name,
-                  icon: c.icon,
-                })),
-              ]}
-              placeholder="All Categories"
-            />
-          </div>
+          {/* Active Category Reset Chip */}
+          {selectedCategory !== "all" && (
+            <button
+              type="button"
+              onClick={() => setSelectedCategory("all")}
+              className="px-2 py-1 rounded-lg bg-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:text-[#161514] text-[11px] font-mono font-bold flex items-center gap-1 cursor-pointer active:scale-95 transition-all shadow-xs"
+              title="Clear category filter"
+            >
+              <span>{categoryMap.get(selectedCategory)?.name || "Category"}</span>
+              <X className="size-3" />
+            </button>
+          )}
 
           {isFilterActive && (
             <button
