@@ -16,6 +16,7 @@ import {
   Receipt,
   ReceiptText,
   TrendingUp,
+  FileDown,
   Users,
   CheckCircle2,
   CheckSquare,
@@ -114,7 +115,7 @@ export function HalfFlowerMenu({
       ];
     }
 
-    // 2. Money Space: log expense, log income, who owes who, ledger
+    // 2. Money Space: log expense, export ledger, who owes who, ledger
     if (pathname.startsWith("/money")) {
       return [
         {
@@ -130,15 +131,15 @@ export function HalfFlowerMenu({
           },
         },
         {
-          id: "new-income",
-          label: "Log Income",
-          shortLabel: "Income",
-          icon: TrendingUp,
+          id: "export-ledger",
+          label: "Export",
+          shortLabel: "Export",
+          icon: FileDown,
           bgClass: "bg-[#03D26F]",
           textClass: "text-[#161514]",
           borderClass: "border-[#161514]",
           onClick: () => {
-            window.dispatchEvent(new CustomEvent("invictus:money-new-income"));
+            window.dispatchEvent(new CustomEvent("invictus:money-export"));
           },
         },
         {

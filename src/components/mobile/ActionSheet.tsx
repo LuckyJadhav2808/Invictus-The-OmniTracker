@@ -11,6 +11,7 @@ import {
   TrendingUp,
   Users,
   ReceiptText,
+  FileDown,
   CheckCircle2,
   FolderKanban,
   Kanban,
@@ -47,7 +48,7 @@ export function ActionSheet({
       return customActions;
     }
 
-    // 1. Money Space: log expense, log income, who owes who, ledger
+    // 1. Money Space: log expense, export ledger, who owes who, ledger
     if (pathname.startsWith("/money")) {
       return [
         {
@@ -62,14 +63,14 @@ export function ActionSheet({
           },
         },
         {
-          id: "new-income",
-          label: "Log Income",
-          sublabel: "Salary, allowance, freelance or dividend",
-          icon: TrendingUp,
+          id: "export-ledger",
+          label: "Export Ledger",
+          sublabel: "Download statement as PDF or CSV export",
+          icon: FileDown,
           colorClass: "bg-[#03D26F] text-[#161514] border-[#161514]",
           onClick: () => {
             onOpenChange(false);
-            window.dispatchEvent(new CustomEvent("invictus:money-new-income"));
+            window.dispatchEvent(new CustomEvent("invictus:money-export"));
           },
         },
         {

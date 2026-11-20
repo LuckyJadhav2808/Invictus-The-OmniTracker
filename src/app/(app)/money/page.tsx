@@ -241,6 +241,9 @@ function MoneyPageContent() {
     const handleOpenLedger = () => {
       setIsLedgerSheetOpen(true);
     };
+    const handleExport = () => {
+      setIsExportModalOpen(true);
+    };
 
     window.addEventListener("invictus:money-new-expense", handleNewExpense);
     window.addEventListener("invictus:money-new-income", handleNewIncome);
@@ -249,6 +252,7 @@ function MoneyPageContent() {
     window.addEventListener("invictus:money-cash-till", handleCashTill);
     window.addEventListener("invictus:money-quick-cash", handleQuickCash);
     window.addEventListener("invictus:money-open-ledger", handleOpenLedger);
+    window.addEventListener("invictus:money-export", handleExport);
     window.addEventListener("invictus:open-new-transaction", handleNewExpense);
 
     return () => {
@@ -259,6 +263,7 @@ function MoneyPageContent() {
       window.removeEventListener("invictus:money-cash-till", handleCashTill);
       window.removeEventListener("invictus:money-quick-cash", handleQuickCash);
       window.removeEventListener("invictus:money-open-ledger", handleOpenLedger);
+      window.removeEventListener("invictus:money-export", handleExport);
       window.removeEventListener("invictus:open-new-transaction", handleNewExpense);
     };
   }, []);
@@ -913,7 +918,7 @@ function MoneyPageContent() {
               onNavigateToTab={handleTabChange}
             />
 
-            {/* ================= SLOT 4: 5 L2 DOOR TILES (Category, Analytics, Budget, Subs, Export) ================= */}
+            {/* ================= SLOT 4: 4 L2 DOOR TILES (Category, Analytics, Budget, Subs) ================= */}
             <MoneyDoorTileRow
               monthlyBudget={monthlyStats.totalCombinedBudget || monthlyStats.baseBudget}
               activeIouCount={pendingIous.length}

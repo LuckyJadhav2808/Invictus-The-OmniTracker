@@ -87,22 +87,12 @@ export function MoneyDoorTileRow({
       onClick: onOpenSubscriptions || onOpenVault || (() => {}),
       title: "Active Subscriptions, Reminders & Recurring Billing",
     },
-    {
-      id: "export",
-      label: "Export",
-      value: "Ledger",
-      icon: FileDown,
-      iconColor: "text-rose-500 dark:text-rose-400",
-      bgClass: "hover:border-rose-500/50",
-      onClick: onOpenExport || onOpenLedger || (() => {}),
-      title: "Export Statement Ledger (PDF / CSV Statement)",
-    },
   ];
 
   return (
     <div
       className={cn(
-        "grid grid-cols-5 gap-1 sm:gap-2 w-full select-none",
+        "grid grid-cols-4 gap-1.5 sm:gap-2.5 lg:gap-3 w-full select-none",
         className
       )}
     >
@@ -118,18 +108,18 @@ export function MoneyDoorTileRow({
               t.onClick();
             }}
             className={cn(
-              "py-2 sm:py-2.5 px-0.5 sm:px-1.5 rounded-xl sm:rounded-2xl bg-card border border-border flex flex-col items-center justify-center text-center transition-all cursor-pointer active:scale-95 shadow-2xs group min-h-[56px] sm:min-h-[64px]",
+              "py-2 sm:py-3 px-1 sm:px-2.5 rounded-xl sm:rounded-2xl bg-card border border-border flex flex-col items-center justify-center text-center transition-all cursor-pointer active:scale-95 shadow-2xs group min-h-[58px] sm:min-h-[66px]",
               t.bgClass
             )}
             title={t.title}
           >
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 sm:gap-1.5">
               <Icon className={cn("size-3.5 sm:size-4 stroke-[2]", t.iconColor)} />
-              <span className="font-heading font-black text-[10px] sm:text-xs text-foreground tracking-tight truncate">
+              <span className="font-heading font-black text-[11px] sm:text-xs text-foreground tracking-tight">
                 {t.label}
               </span>
             </div>
-            <span className="text-[8.5px] sm:text-[9.5px] font-mono font-bold uppercase tracking-tight text-muted-foreground leading-tight text-center block w-full truncate mt-0.5">
+            <span className="text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-tight text-muted-foreground leading-tight text-center block w-full truncate mt-0.5">
               {t.value}
             </span>
           </button>
