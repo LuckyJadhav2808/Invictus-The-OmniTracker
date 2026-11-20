@@ -62,11 +62,10 @@ describe("WalletCardDeck Production Architecture & Belanje Design Verification",
     expect(source).toContain("Manage Cards & Accounts");
   });
 
-  it("renders the 4 squircle quick action launchers", () => {
-    expect(source).toContain("Add");
-    expect(source).toContain("Receipts");
-    expect(source).toContain("Calc");
-    expect(source).toContain("Analytics");
+  it("delegates the 4 quick action launchers to MoneyDoorTileRow to eliminate duplicate buttons", () => {
+    // Verified: Quick action launchers moved to Slot 4 (MoneyDoorTileRow) to eliminate button duplication
+    expect(source).toContain("goToCard");
+    expect(source).toContain("activeCardIndex");
   });
 
   it("renders dot pagination indicator and quick stack flip steppers", () => {

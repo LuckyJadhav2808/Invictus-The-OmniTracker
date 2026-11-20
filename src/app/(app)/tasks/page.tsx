@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useMemo, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import {
   useTasks,
   useCreateTask,
@@ -77,15 +79,48 @@ export default function TasksPage() {
   const [quickPriority, setQuickPriority] = useState<"p1" | "p2" | "p3" | "p4">("p2");
   const [quickTag, setQuickTag] = useState("Dev");
 
-  // Popstate history listener for native mobile back gestures
+  // Popstate history listener for native mobile back gestures + Flower Menu Listeners
   useEffect(() => {
     const handlePopState = (e: PopStateEvent) => {
       if (activePortal !== "none") {
         setActivePortal("none");
       }
     };
+    const handleNewTaskEvent = () => {
+      soundFX.playPop();
+      soundFX.vibrate(15);
+      setTaskToEdit(null);
+      setIsCreateModalOpen(true);
+    };
+    const handleNewProjectEvent = () => {
+      soundFX.playPop();
+      soundFX.vibrate(15);
+      openMobilePortal("projects");
+    };
+
+    const handleQuickWaterEvent = (e: any) => {
+      const amt = e.detail?.amount || 250;
+      const todayStr = new Date().toISOString().split("T")[0];
+      try {
+        const current = Number(localStorage.getItem(`invictus_water_${todayStr}`) || 0);
+        localStorage.setItem(`invictus_water_${todayStr}`, String(current + amt));
+      } catch {}
+      soundFX.playSplash();
+      soundFX.vibrate(20);
+      toast.success(`+${amt}ml Water Logged! Hydration synced.`);
+    };
+
     window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
+    window.addEventListener("invictus:tasks-new-task", handleNewTaskEvent);
+    window.addEventListener("invictus:tasks-new-project", handleNewProjectEvent);
+    window.addEventListener("invictus:quick-log-water", handleQuickWaterEvent);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+      window.removeEventListener("invictus:tasks-new-task", handleNewTaskEvent);
+      window.removeEventListener("invictus:tasks-new-project", handleNewProjectEvent);
+      window.removeEventListener("invictus:quick-log-water", handleQuickWaterEvent);
+    };
   }, [activePortal]);
 
   const openMobilePortal = (portal: "kanban" | "matrix" | "projects" | "archive") => {

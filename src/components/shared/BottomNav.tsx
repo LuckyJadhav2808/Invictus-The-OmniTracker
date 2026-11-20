@@ -120,7 +120,7 @@ function BottomNavContent() {
       >
         <div className="w-full max-w-md mx-auto px-2 pt-1.5 pb-[max(0.625rem,env(safe-area-inset-bottom,0px))] flex items-center justify-between relative">
           {/* Left Nav Tabs: Today, Habits */}
-          <div className="flex items-center flex-1 justify-around">
+          <div className="flex items-center flex-1 justify-evenly pr-1">
             {leftNavItems.map((item) => {
               const isActive = isLinkActive(item.href);
               const Icon = item.icon;
@@ -132,7 +132,7 @@ function BottomNavContent() {
                   prefetch={true}
                   onClick={(e) => handleNavClick(e, item, isActive)}
                   className={cn(
-                    "flex flex-col items-center justify-center py-1 px-2.5 rounded-xl cursor-pointer transition-all duration-150 active:scale-95 select-none relative min-w-[56px] min-h-[46px]",
+                    "flex flex-col items-center justify-center py-1 px-2 rounded-xl cursor-pointer transition-all duration-150 active:scale-95 select-none relative min-w-[52px] min-h-[44px]",
                     isActive
                       ? "bg-[#CEF431] text-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_#161514]"
                       : "text-white/70 hover:text-white"
@@ -152,13 +152,13 @@ function BottomNavContent() {
             })}
           </div>
 
-          {/* Center-Docked Half-Flower Arc FAB (Animata-Inspired Radial Arc) */}
-          <div className="relative -top-3.5 px-1 shrink-0">
+          {/* Center-Docked Half-Flower Arc FAB (Clear Notched Breathing Room) */}
+          <div className="relative -top-3.5 mx-2.5 shrink-0 z-20">
             <HalfFlowerMenu onOpenActionSheet={() => setIsActionSheetOpen(true)} />
           </div>
 
           {/* Right Nav Tabs: Tasks, Money */}
-          <div className="flex items-center flex-1 justify-around">
+          <div className="flex items-center flex-1 justify-evenly pl-1">
             {rightNavItems.map((item) => {
               const isActive = isLinkActive(item.href);
               const Icon = item.icon;
@@ -170,7 +170,7 @@ function BottomNavContent() {
                   prefetch={true}
                   onClick={(e) => handleNavClick(e, item, isActive)}
                   className={cn(
-                    "flex flex-col items-center justify-center py-1 px-2.5 rounded-xl cursor-pointer transition-all duration-150 active:scale-95 select-none relative min-w-[56px] min-h-[46px]",
+                    "flex flex-col items-center justify-center py-1 px-2 rounded-xl cursor-pointer transition-all duration-150 active:scale-95 select-none relative min-w-[52px] min-h-[44px]",
                     isActive
                       ? "bg-[#CEF431] text-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_#161514]"
                       : "text-white/70 hover:text-white"

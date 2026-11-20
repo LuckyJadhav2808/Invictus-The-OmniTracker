@@ -46,6 +46,12 @@ const DEFAULT_QUIPS: Record<StrobiGear, string[]> = {
     "Stay within your safe daily pace — protect your envelope!",
     "Mindful cashflow beats impulsive spending every time.",
   ],
+  none: [
+    "Discipline beats motivation every single day.",
+    "Your streak is your foundation. Keep it going!",
+    "One focus block at a time. Steady progress.",
+    "Small daily actions compound into lasting results.",
+  ],
 };
 
 /**

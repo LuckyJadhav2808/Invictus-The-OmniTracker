@@ -53,15 +53,21 @@ export function TasksHeroPager({
     </div>
   );
 
-  // Top Right: Strobi Companion (Ambient Docked, 0 overlap)
+  // Top Right: Strobi Companion only when queue is empty, else telemetry chip
   const topRight = (
     <div className="flex items-center gap-2">
-      <StrobiCompanion
-        state={strobiState}
-        gear="tasks"
-        size={28}
-        className="cursor-pointer active:scale-90 transition-transform shrink-0"
-      />
+      {totalCount === 0 ? (
+        <StrobiCompanion
+          state={strobiState}
+          gear="tasks"
+          size={28}
+          className="cursor-pointer active:scale-90 transition-transform shrink-0"
+        />
+      ) : (
+        <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-[#DCFAE5] text-[#047857] border border-[#047857]/20 dark:bg-emerald-950/40 dark:text-emerald-400">
+          {completedCount}/{totalCount} Done
+        </span>
+      )}
     </div>
   );
 

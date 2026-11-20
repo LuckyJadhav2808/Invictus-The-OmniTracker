@@ -139,7 +139,9 @@ function MoneyPageContent() {
   const [isLedgerSheetOpen, setIsLedgerSheetOpen] = useState(() => {
     return actionParam === "ledger" || searchParams.get("sheet") === "ledger";
   });
-  const [isAddTxOpen, setIsAddTxOpen] = useState(false);
+  const [isAddTxOpen, setIsAddTxOpen] = useState(() => {
+    return actionParam === "new-expense" || actionParam === "add";
+  });
   const [editingTx, setEditingTx] = useState<Transaction | null>(null);
   const [inspectingTx, setInspectingTx] = useState<Transaction | null>(null);
   const [isAddCatOpen, setIsAddCatOpen] = useState(false);
@@ -868,15 +870,15 @@ function MoneyPageContent() {
               onNavigateToTab={handleTabChange}
             />
 
-            {/* ================= SLOT 4: 4 L2 DOOR TILES (Budgets, Income, Vault, Ledger) ================= */}
+            {/* ================= SLOT 4: 4 L2 DOOR TILES (Ledger, Analytics, Receipts, Calc) ================= */}
             <MoneyDoorTileRow
               monthlyBudget={monthlyStats.totalCombinedBudget || monthlyStats.baseBudget}
               activeIouCount={pendingIous.length}
               currencySymbol={currencySymbol}
-              onOpenBudgets={() => handleTabChange("budgets")}
-              onOpenIncome={() => setIsAllowanceModalOpen(true)}
-              onOpenVault={() => handleTabChange("vault")}
               onOpenLedger={() => setIsLedgerSheetOpen(true)}
+              onOpenAnalytics={() => handleTabChange("analytics")}
+              onOpenReceipts={() => setIsBulkModalOpen(true)}
+              onOpenCalc={() => setIsCalculatorOpen(true)}
             />
 
             {/* ================= SLOT 5: RECENT TRANSACTIONS GLANCE (Capped 5 Rows + Neobrutalist Action Dock) ================= */}

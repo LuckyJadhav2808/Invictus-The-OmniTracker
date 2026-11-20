@@ -28,6 +28,7 @@ export function DeleteConfirmationModal({
       onOpenChange={onOpenChange}
       title={title}
       description={description}
+      forceDialog={true}
     >
       <div className="space-y-4 pt-1">
         {/* Warning Badge Card */}

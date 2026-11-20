@@ -76,14 +76,16 @@ export function TodayHeroPager({
         </button>
       )}
 
-      {/* Strobi Companion Avatar in Corner (Ambient Docked, 0 overlap) */}
-      <StrobiCompanion
-        state={strobiState}
-        gear="tasks"
-        size={28}
-        streakDays={streakDays}
-        className="cursor-pointer active:scale-90 transition-transform shrink-0"
-      />
+      {/* Strobi Companion Avatar in Corner only when empty, guides first daily items */}
+      {totalCount === 0 && (
+        <StrobiCompanion
+          state={strobiState}
+          gear="gladiator"
+          size={28}
+          streakDays={streakDays}
+          className="cursor-pointer active:scale-90 transition-transform shrink-0"
+        />
+      )}
     </div>
   );
 

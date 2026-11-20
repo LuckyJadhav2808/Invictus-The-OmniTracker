@@ -18,6 +18,7 @@ import { soundFX } from "@/components/shared/SoundFX";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { CategoryIcon } from "@/components/money/MoneyQuickActionsAndCards";
+import { splitBill } from "@/lib/finance/money-math";
 
 interface ThermalReceiptSlipProps {
   transaction: Transaction;
@@ -46,7 +47,8 @@ export function formatReceiptShareText(
   } catch {}
 
   const totalAmount = Number(transaction.amount);
-  const perPerson = splitCount > 1 ? Math.ceil(totalAmount / splitCount) : totalAmount;
+  const splits = splitCount > 1 ? splitBill(totalAmount, splitCount) : [totalAmount];
+  const perPerson = splits[0] || totalAmount;
 
   let text = `🧾 *INVICTUS ${splitCount > 1 ? "SPLIT BILL" : "EXPENSE"} RECEIPT*
 ━━━━━━━━━━━━━━━━━━━━
@@ -102,7 +104,8 @@ export function ThermalReceiptSlip({
   } catch {}
 
   const totalAmount = Number(transaction.amount);
-  const perPersonShare = splitCount > 1 ? Math.ceil(totalAmount / splitCount) : totalAmount;
+  const splits = splitCount > 1 ? splitBill(totalAmount, splitCount) : [totalAmount];
+  const perPersonShare = splits[0] || totalAmount;
 
   const categoryName = category?.name || "General Expense";
   const categoryIcon = "";

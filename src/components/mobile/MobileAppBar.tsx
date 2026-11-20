@@ -48,6 +48,7 @@ export interface MobileAppBarProps {
   dueCount?: number;
   className?: string;
   customMenuItems?: React.ReactNode;
+  showDynamicIsland?: boolean;
 }
 
 export function MobileAppBar({
@@ -65,6 +66,7 @@ export function MobileAppBar({
   dueCount = 0,
   className,
   customMenuItems,
+  showDynamicIsland = true,
 }: MobileAppBarProps) {
   const { habitLayoutStyle, setHabitLayoutStyle } = useUIStore();
   const { isOnline, isSyncing, pendingCount } = useOfflineSync();
@@ -124,10 +126,12 @@ export function MobileAppBar({
         )}
       </div>
 
-      {/* Center: Dynamic Island Live Activity Dock (Header Integrated, Stays in Header) */}
-      <div className="flex-1 flex items-center justify-center min-w-0 px-1 h-8">
-        <DynamicIslandDock variant="header" floatOnScroll={false} />
-      </div>
+      {/* Center: Dynamic Island Live Activity Dock (Header Integrated, Stays in Header, omitted on domain pages like Habits) */}
+      {showDynamicIsland && (
+        <div className="flex-1 flex items-center justify-center min-w-0 px-1 h-8">
+          <DynamicIslandDock variant="header" floatOnScroll={false} />
+        </div>
+      )}
 
       {/* Right: Max 2 Icons (Calendar + Overflow Menu) */}
       <div className="flex items-center gap-1 shrink-0">

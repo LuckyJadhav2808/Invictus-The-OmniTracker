@@ -79,6 +79,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     
     // Hydrate device localStorage from cloud document
     hydrateDeviceFromCloud(loggedUser);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("invictus_onboarded", "true");
+    }
     
     setUser(loggedUser);
     queryClient.invalidateQueries();
@@ -94,6 +97,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     
     queryClient.clear();
     hydrateDeviceFromCloud(newUser);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("invictus_onboarded", "true");
+    }
     
     setUser(newUser);
     queryClient.invalidateQueries();
@@ -129,6 +135,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     customLogout();
     queryClient.clear();
     setUser(null);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("invictus_onboarded", "true");
+    }
   };
 
   return (

@@ -17,6 +17,7 @@ import { computeFrequentExpenses, type FrequentExpenseItem } from "@/lib/utils/f
 import { toast } from "sonner";
 import { NumberTicker } from "@/components/ui/number-ticker";
 import { TelemetryMarquee } from "@/components/ui/telemetry-marquee";
+import { StrobiCompanion } from "@/components/mascot/StrobiCompanion";
 
 interface LedgerTabViewProps {
   transactions: Transaction[];
@@ -791,21 +792,26 @@ export function LedgerTabView({
       {groupedByDate.length === 0 ? (
         transactions.length === 0 ? (
           /* ─── ZERO-CONFUSION FIRST-RUN ONBOARDING COCKPIT ─── */
-          <div className="bg-white dark:bg-[#161514] rounded-2xl p-6 sm:p-8 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="size-2 rounded-full bg-[#03D26F] animate-pulse" />
-                  <h4 className="text-sm font-heading font-black text-[#161514] dark:text-stone-100 uppercase tracking-wider">
-                    Start Your Financial Ledger 💳
-                  </h4>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border border-emerald-500/20 font-bold">
-                    1-TAP QUICK LOG
-                  </span>
+          <div className="bg-white dark:bg-[#161514] rounded-2xl p-5 sm:p-7 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-start sm:items-center gap-3.5">
+                <div className="size-14 shrink-0 flex items-center justify-center p-1 rounded-2xl bg-[#FAF8F5] dark:bg-[#201E1B] border-2 border-[#161514] dark:border-[#383531] shadow-xs">
+                  <StrobiCompanion size={52} gear="money" />
                 </div>
-                <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] max-w-lg leading-relaxed">
-                  Your ledger tracks every rupee across digital UPI and cash till envelopes. Tap any common student daily expense below to record your first transaction instantly.
-                </p>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="size-2 rounded-full bg-[#03D26F] animate-pulse" />
+                    <h4 className="text-sm font-heading font-black text-[#161514] dark:text-stone-100 uppercase tracking-wider">
+                      Start Your Financial Ledger 💳
+                    </h4>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border border-emerald-500/20 font-bold">
+                      1-TAP QUICK LOG
+                    </span>
+                  </div>
+                  <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] max-w-lg leading-relaxed">
+                    Your ledger tracks every rupee across digital UPI and cash till envelopes. Tap any common student daily expense below to record your first transaction instantly.
+                  </p>
+                </div>
               </div>
 
               <button

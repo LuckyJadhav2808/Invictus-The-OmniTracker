@@ -218,7 +218,7 @@ export function HalfFlowerMenu({
           textClass: "text-[#161514]",
           borderClass: "border-[#161514]",
           onClick: () => {
-            window.dispatchEvent(new CustomEvent("invictus:money-new-expense"));
+            router.push("/money?action=new-expense");
           },
         },
       ];

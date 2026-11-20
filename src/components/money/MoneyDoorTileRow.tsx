@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { PiggyBank, TrendingUp, ShieldCheck, ReceiptText, Users } from "lucide-react";
+import { ReceiptText, BarChart2, Sparkles, Calculator, PiggyBank, TrendingUp, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
 
@@ -9,12 +9,15 @@ export interface MoneyDoorTileRowProps {
   monthlyBudget?: number;
   activeIouCount?: number;
   currencySymbol?: string;
+  onOpenLedger?: () => void;
+  onOpenAnalytics?: () => void;
+  onOpenReceipts?: () => void;
+  onOpenCalc?: () => void;
+  // Legacy / fallback props
   onOpenBudgets?: () => void;
   onOpenIncome?: () => void;
   onOpenVault?: () => void;
-  onOpenLedger?: () => void;
   onOpenIous?: () => void;
-  // Legacy compatibility props
   onOpenAllowances?: () => void;
   onMoveMoney?: () => void;
   onOpenTemplates?: () => void;
@@ -26,10 +29,13 @@ export function MoneyDoorTileRow({
   monthlyBudget,
   activeIouCount = 0,
   currencySymbol = "₹",
+  onOpenLedger,
+  onOpenAnalytics,
+  onOpenReceipts,
+  onOpenCalc,
   onOpenBudgets,
   onOpenIncome,
   onOpenVault,
-  onOpenLedger,
   onOpenIous,
   onOpenAllowances,
   onMoveMoney,
@@ -39,36 +45,6 @@ export function MoneyDoorTileRow({
 }: MoneyDoorTileRowProps) {
   const tiles = [
     {
-      id: "budgets",
-      label: "Budgets",
-      value: monthlyBudget ? `${currencySymbol}${Math.round(monthlyBudget).toLocaleString()}` : "Envelopes",
-      icon: PiggyBank,
-      iconColor: "text-emerald-600 dark:text-[#03D26F]",
-      bgClass: "hover:border-[#03D26F]/50",
-      onClick: onOpenBudgets || onOpenAllowances || (() => {}),
-      title: "Category Envelopes & Monthly Spend Limits",
-    },
-    {
-      id: "income",
-      label: "Income",
-      value: "Allowances",
-      icon: TrendingUp,
-      iconColor: "text-amber-600 dark:text-amber-400",
-      bgClass: "hover:border-amber-500/50",
-      onClick: onOpenIncome || onOpenAllowances || onOpenIous || (() => {}),
-      title: "Log Monthly Salary, Allowances & Base Budget",
-    },
-    {
-      id: "vault",
-      label: "Vault",
-      value: "Emergency",
-      icon: ShieldCheck,
-      iconColor: "text-purple-600 dark:text-purple-400",
-      bgClass: "hover:border-purple-500/50",
-      onClick: onOpenVault || onOpenTemplates || (() => {}),
-      title: "Emergency Savings & Liquidity Vault",
-    },
-    {
       id: "ledger",
       label: "Ledger",
       value: "All Records",
@@ -76,7 +52,37 @@ export function MoneyDoorTileRow({
       iconColor: "text-sky-600 dark:text-sky-400",
       bgClass: "hover:border-sky-500/50",
       onClick: onOpenLedger || onOpenExport || (() => {}),
-      title: "Full Transaction Ledger & Search",
+      title: "Full Transaction Ledger & Search (L2 Subpage)",
+    },
+    {
+      id: "analytics",
+      label: "Analytics",
+      value: "Spend Flow",
+      icon: BarChart2,
+      iconColor: "text-purple-600 dark:text-purple-400",
+      bgClass: "hover:border-purple-500/50",
+      onClick: onOpenAnalytics || onOpenBudgets || (() => {}),
+      title: "Spending Breakdown & Visual Analytics (L2 Subpage)",
+    },
+    {
+      id: "receipts",
+      label: "Receipts",
+      value: "Smart OCR",
+      icon: Sparkles,
+      iconColor: "text-amber-600 dark:text-amber-400",
+      bgClass: "hover:border-amber-500/50",
+      onClick: onOpenReceipts || onOpenTemplates || (() => {}),
+      title: "Scan Receipt Image or Batch Log Expenses (Sheet)",
+    },
+    {
+      id: "calc",
+      label: "Calc",
+      value: "Split & Math",
+      icon: Calculator,
+      iconColor: "text-emerald-600 dark:text-[#03D26F]",
+      bgClass: "hover:border-[#03D26F]/50",
+      onClick: onOpenCalc || onOpenIncome || onOpenAllowances || (() => {}),
+      title: "Open Tactile Neobrutalist Split Calculator (Sheet)",
     },
   ];
 

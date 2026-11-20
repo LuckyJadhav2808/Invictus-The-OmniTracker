@@ -11,7 +11,16 @@ export default function Home() {
 
   useEffect(() => {
     if (loading) return;
-    const target = user ? "/today" : "/login";
+    let target = "/login";
+    if (user) {
+      target = "/today";
+    } else {
+      const isOnboarded =
+        typeof window !== "undefined" &&
+        localStorage.getItem("invictus_onboarded") === "true";
+      target = isOnboarded ? "/login" : "/onboarding";
+    }
+
     const timer = setTimeout(() => {
       router.replace(target);
     }, 0);

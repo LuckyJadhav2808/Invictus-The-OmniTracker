@@ -37,7 +37,6 @@ import { HorizonWeekStrip } from "@/components/today/HorizonWeekStrip";
 import { TodayDoorTileRow } from "@/components/today/TodayDoorTileRow";
 import { TodayChronologicalAgenda } from "@/components/today/TodayChronologicalAgenda";
 import { TodayTopHabitsMomentum } from "@/components/today/TodayTopHabitsMomentum";
-import { FirstRunQuickStartDeck } from "@/components/today/FirstRunQuickStartDeck";
 import { TelemetryMarquee } from "@/components/ui/telemetry-marquee";
 import { BottomSheet } from "@/components/mobile/BottomSheet";
 import { WaterTracker } from "@/components/goals/WaterTracker";
@@ -60,6 +59,10 @@ const EveningCloseoutDrawer = dynamic(
 );
 const AllowanceSettingsModal = dynamic(
   () => import("@/components/money/modals/AllowanceSettingsModal").then((m) => m.AllowanceSettingsModal),
+  { ssr: false }
+);
+const NewTaskModal = dynamic(
+  () => import("@/components/tasks/NewTaskModal").then((m) => m.NewTaskModal),
   { ssr: false }
 );
 const ConfettiCelebration = dynamic(
@@ -116,6 +119,7 @@ export default function TodayPage() {
   const [isCloseoutDrawerOpen, setIsCloseoutDrawerOpen] = useState(false);
   const [isScratchpadDrawerOpen, setIsScratchpadDrawerOpen] = useState(false);
   const [isWaterSheetOpen, setIsWaterSheetOpen] = useState(false);
+  const [isNewTaskOpen, setIsNewTaskOpen] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [desktopActiveTab, setDesktopActiveTab] = useState("overview");
   const previousConqueredRef = useRef(false);
@@ -143,9 +147,33 @@ export default function TodayPage() {
       soundFX.vibrate(15);
       setIsCloseoutDrawerOpen(true);
     };
+    const handleNewTask = () => {
+      soundFX.playPop();
+      soundFX.vibrate(15);
+      setIsNewTaskOpen(true);
+    };
+    const handleNewExpense = () => {
+      soundFX.playPop();
+      soundFX.vibrate(15);
+      setIsQuickExpenseOpen(true);
+    };
+    const handleQuickWater = (e: any) => {
+      const amt = e.detail?.amount || 250;
+      handleQuickLogWater(amt);
+    };
+
     window.addEventListener("invictus:today-open-reflection", handleOpenReflection);
-    return () => window.removeEventListener("invictus:today-open-reflection", handleOpenReflection);
-  }, []);
+    window.addEventListener("invictus:tasks-new-task", handleNewTask);
+    window.addEventListener("invictus:money-new-expense", handleNewExpense);
+    window.addEventListener("invictus:quick-log-water", handleQuickWater);
+
+    return () => {
+      window.removeEventListener("invictus:today-open-reflection", handleOpenReflection);
+      window.removeEventListener("invictus:tasks-new-task", handleNewTask);
+      window.removeEventListener("invictus:money-new-expense", handleNewExpense);
+      window.removeEventListener("invictus:quick-log-water", handleQuickWater);
+    };
+  }, [handleQuickLogWater]);
 
   const currencySymbol = useMemo(() => {
     switch (currency) {
@@ -466,17 +494,6 @@ export default function TodayPage() {
 
       {/* Milestone Confetti Celebration */}
       <ConfettiCelebration active={showConfetti} onComplete={() => setShowConfetti(false)} />
-
-      {/* Guided First-Run Quick Start Deck (Disappears upon dismissal or completion) */}
-      <div className="px-3.5 sm:px-0">
-        <FirstRunQuickStartDeck
-          totalHabitsCount={totalHabitsCount}
-          completedHabitsCount={completedHabitsCount}
-          hasBudgetOrExpenses={transactions.length > 0 || (Boolean(cloudBudgetPrefs?.customDailyBudget) && (cloudBudgetPrefs?.customDailyBudget ?? 0) > 0)}
-          hasTasks={tasks.length > 0}
-          onOpenDailyLimitModal={() => setIsDailyLimitModalOpen(true)}
-        />
-      </div>
 
       {/* ================= MOBILE VIEW (Single Column 5-Slot Flow) ================= */}
       <div className="lg:hidden px-3.5 space-y-3">
@@ -875,6 +892,29 @@ export default function TodayPage() {
         categories={categories}
         onAddExpense={handleAddExpense}
         isSaving={isSavingExpense}
+      />
+
+      {/* 6. Quick Task Creation Modal */}
+      <NewTaskModal
+        open={isNewTaskOpen}
+        onOpenChange={setIsNewTaskOpen}
+        onSubmit={async (data) => {
+          try {
+            await createTaskMutation.mutateAsync({
+              title: data.title,
+              priority: data.priority || "p2",
+              status: "todo",
+              dueDate: data.dueDate || selectedDate,
+              projectTag: data.projectTag || "Life",
+              description: data.description,
+              subtasks: data.subtasks || [],
+            } as any);
+            toast.success("Task created successfully!");
+            setIsNewTaskOpen(false);
+          } catch {
+            toast.error("Failed to create task");
+          }
+        }}
       />
     </div>
   );

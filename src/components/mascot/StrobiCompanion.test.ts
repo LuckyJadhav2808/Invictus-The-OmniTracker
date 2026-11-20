@@ -32,4 +32,17 @@ describe("StrobiCompanion Architecture & Rendering", () => {
     expect(element.props.gear).toBe("fitness");
     expect(element.props.streakDays).toBe(5);
   });
+
+  it("supports customizable colorTheme and expression props", () => {
+    const element = React.createElement(StrobiCompanion, {
+      colorTheme: "electric-lime",
+      expression: "shades",
+      gear: "none",
+      size: 84,
+    });
+    expect(element.props.colorTheme).toBe("electric-lime");
+    expect(element.props.expression).toBe("shades");
+    expect(element.props.gear).toBe("none");
+    expect(element.props.size).toBe(84);
+  });
 });

@@ -8,6 +8,11 @@ import {
   mapBodyPartToMuscleGroup,
   mapMuscleGroupToBodyPart,
 } from "@/components/goals/anatomy/muscle-mapping";
+import {
+  initializeExerciseIndex,
+  searchExercisesClient,
+  extractMuscleHighlights,
+} from "@/lib/search/exercise-search-index";
 import { GYM_TEMPLATE_PACKS } from "@/lib/templates-data";
 import { TemplatePack } from "@/components/shared/TemplateSelectionModal";
 import { useExerciseLibrary } from "@/lib/queries/exercises";
@@ -60,6 +65,7 @@ export function GymChoiceModal({
   const [displayLimit, setDisplayLimit] = useState(50);
   const [showBodyMapFilter, setShowBodyMapFilter] = useState(false);
   const loadMoreSentinelRef = useRef<HTMLDivElement | null>(null);
+  const [focusedExercise, setFocusedExercise] = useState<any | null>(null);
 
   // Reset display limit when query/filters change
   useEffect(() => {
@@ -72,6 +78,19 @@ export function GymChoiceModal({
     equipment: libEquipment,
     limit: displayLimit,
   });
+
+  // Initialize client-side MiniSearch index when library data loads
+  useEffect(() => {
+    if (libData?.exercises && libData.exercises.length > 0) {
+      initializeExerciseIndex(libData.exercises);
+    }
+  }, [libData?.exercises]);
+
+  // Compute dynamic real-time muscle illumination for the active exercise
+  const activeHighlight = React.useMemo(() => {
+    const target = focusedExercise || (libData?.exercises && libData.exercises[0]);
+    return target ? extractMuscleHighlights(target) : undefined;
+  }, [focusedExercise, libData?.exercises]);
 
   // Infinite scroll
   useEffect(() => {
@@ -323,6 +342,7 @@ export function GymChoiceModal({
                     size="sm"
                     interactive={true}
                     selectedMuscle={mapBodyPartToMuscleGroup(libBodyPart)}
+                    highlightedMuscles={activeHighlight}
                     onMuscleClick={(muscle) => {
                       const mappedPart = mapMuscleGroupToBodyPart(muscle);
                       setLibBodyPart(mappedPart);
@@ -376,6 +396,8 @@ export function GymChoiceModal({
                     <div
                       key={item.id}
                       onClick={() => onSelectExerciseFromLibrary(item)}
+                      onMouseEnter={() => setFocusedExercise(item)}
+                      onTouchStart={() => setFocusedExercise(item)}
                       className="p-2.5 rounded-xl bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] border border-[#E8E5DF] dark:border-[#2A2724] cursor-pointer transition-all flex items-center justify-between gap-2.5 shadow-xs active:translate-y-0.5 group"
                     >
                       <div className="flex items-center gap-2.5 min-w-0">

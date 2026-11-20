@@ -614,65 +614,6 @@ export function WalletCardDeck({
           />
         ))}
       </div>
-
-      {/* ─── 4 SQUIRCLE QUICK LAUNCHERS (Belanje Home Dashboard) ─── */}
-      <div className="grid grid-cols-4 gap-2 pt-1">
-        {/* Action 1: Add Expense / Transaction */}
-        <button
-          type="button"
-          onClick={onAddTransaction}
-          className="flex flex-col items-center justify-center gap-1.5 py-3 px-1 rounded-2xl bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] border border-[#E8E5DF] dark:border-[#383531] shadow-xs active:translate-y-0.5 transition-all cursor-pointer group"
-        >
-          <div className="size-9 rounded-xl bg-[var(--btn-primary-bg)] border border-[var(--btn-primary-border)] text-[var(--btn-primary-fg)] flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
-            <Plus className="size-4 stroke-[2.5]" />
-          </div>
-          <span className="text-[11px] font-heading font-bold text-[#161514] dark:text-[#FAF8F5]">
-            Add
-          </span>
-        </button>
-
-        {/* Action 2: OCR Receipts / Scan */}
-        <button
-          type="button"
-          onClick={onBulkScan}
-          className="flex flex-col items-center justify-center gap-1.5 py-3 px-1 rounded-2xl bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] border border-[#E8E5DF] dark:border-[#383531] shadow-xs active:translate-y-0.5 transition-all cursor-pointer group"
-        >
-          <div className="size-9 rounded-xl bg-purple-100 dark:bg-purple-950/40 border border-purple-300 dark:border-purple-800 text-purple-700 dark:text-purple-300 flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
-            <Sparkles className="size-4 stroke-[2]" />
-          </div>
-          <span className="text-[11px] font-heading font-bold text-[#161514] dark:text-[#FAF8F5]">
-            Receipts
-          </span>
-        </button>
-
-        {/* Action 3: Calculator */}
-        <button
-          type="button"
-          onClick={onOpenCalculator}
-          className="flex flex-col items-center justify-center gap-1.5 py-3 px-1 rounded-2xl bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] border border-[#E8E5DF] dark:border-[#383531] shadow-xs active:translate-y-0.5 transition-all cursor-pointer group"
-        >
-          <div className="size-9 rounded-xl bg-amber-100 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-800 dark:text-amber-300 flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
-            <Layers className="size-4 stroke-[2]" />
-          </div>
-          <span className="text-[11px] font-heading font-bold text-[#161514] dark:text-[#FAF8F5]">
-            Calc
-          </span>
-        </button>
-
-        {/* Action 4: Analytics */}
-        <button
-          type="button"
-          onClick={() => onNavigateToTab?.("analytics")}
-          className="flex flex-col items-center justify-center gap-1.5 py-3 px-1 rounded-2xl bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] border border-[#E8E5DF] dark:border-[#383531] shadow-xs active:translate-y-0.5 transition-all cursor-pointer group"
-        >
-          <div className="size-9 rounded-xl bg-blue-100 dark:bg-blue-950/40 border border-blue-300 dark:border-blue-800 text-blue-700 dark:text-blue-300 flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
-            <Target className="size-4 stroke-[2]" />
-          </div>
-          <span className="text-[11px] font-heading font-bold text-[#161514] dark:text-[#FAF8F5]">
-            Analytics
-          </span>
-        </button>
-      </div>
     </div>
   );
 }

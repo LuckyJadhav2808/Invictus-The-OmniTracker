@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import useEmblaCarousel from "embla-carousel-react";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
 
@@ -31,6 +32,7 @@ export interface HeroProps {
   onSlideChange?: (index: number) => void;
   className?: string;
   tintedBackground?: boolean; // Optional lime-tinted background zone for presence without borders
+  customPager?: (activeSlide: number, onSlideChange: (index: number) => void) => React.ReactNode;
 }
 
 export function Hero({
@@ -43,57 +45,58 @@ export function Hero({
   onSlideChange,
   className,
   tintedBackground = false,
+  customPager,
 }: HeroProps) {
   const [internalSlide, setInternalSlide] = useState(activeSlideIndex);
   const activeSlide = activeSlideIndex !== undefined ? activeSlideIndex : internalSlide;
 
-  const touchStartXRef = useRef<number | null>(null);
-  const touchDeltaXRef = useRef<number>(0);
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: false,
+    duration: 25,
+    startIndex: activeSlide,
+  });
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    const newIndex = emblaApi.selectedScrollSnap();
+    if (newIndex !== activeSlide) {
+      soundFX.vibrate(12);
+      setInternalSlide(newIndex);
+      onSlideChange?.(newIndex);
+    }
+  }, [emblaApi, activeSlide, onSlideChange]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    emblaApi.on("select", onSelect);
+    return () => {
+      emblaApi.off("select", onSelect);
+    };
+  }, [emblaApi, onSelect]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    if (activeSlide !== emblaApi.selectedScrollSnap()) {
+      emblaApi.scrollTo(activeSlide);
+    }
+  }, [emblaApi, activeSlide]);
 
   const handleSlideSelect = (idx: number) => {
     soundFX.playPop();
     soundFX.vibrate(12);
     setInternalSlide(idx);
+    emblaApi?.scrollTo(idx);
     onSlideChange?.(idx);
-  };
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartXRef.current = e.touches[0].clientX;
-    touchDeltaXRef.current = 0;
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (touchStartXRef.current !== null) {
-      touchDeltaXRef.current = e.touches[0].clientX - touchStartXRef.current;
-    }
-  };
-
-  const handleTouchEnd = () => {
-    if (touchStartXRef.current === null) return;
-    const delta = touchDeltaXRef.current;
-    const threshold = 35;
-
-    if (delta < -threshold && activeSlide < slides.length - 1) {
-      handleSlideSelect(activeSlide + 1);
-    } else if (delta > threshold && activeSlide > 0) {
-      handleSlideSelect(activeSlide - 1);
-    }
-
-    touchStartXRef.current = null;
-    touchDeltaXRef.current = 0;
   };
 
   return (
     <section
       role="region"
       aria-label={`${variant} hero summary`}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
       className={cn(
-        "w-full select-none relative overflow-hidden transition-colors flex flex-col justify-between pt-1 pb-2",
+        "w-full select-none relative overflow-visible transition-colors flex flex-col justify-start pt-0.5 pb-0.5",
         tintedBackground &&
-          "bg-gradient-to-b from-[#CEF431]/10 via-transparent to-transparent rounded-3xl pb-3",
+          "bg-gradient-to-b from-[#CEF431]/10 via-transparent to-transparent rounded-3xl pb-1.5",
         className
       )}
     >
@@ -105,50 +108,48 @@ export function Hero({
         </div>
       )}
 
-      {/* ================= FULL-WIDTH HERO SLIDES VIEWPORT ================= */}
-      <div className="relative w-full flex-1 min-h-[190px] sm:min-h-[210px] flex items-center justify-center overflow-hidden">
-        {slides.map((slide, idx) => {
-          const isActive = idx === activeSlide;
-          return (
-            <div
-              key={slide.id}
-              className={cn(
-                "w-full h-full flex flex-col items-center justify-center transition-all duration-250 ease-out",
-                isActive
-                  ? "opacity-100 scale-100 relative pointer-events-auto"
-                  : "opacity-0 scale-95 absolute inset-0 pointer-events-none"
-              )}
-              style={{ willChange: "transform, opacity" }}
-              aria-hidden={!isActive}
-            >
-              {slide.content}
-            </div>
-          );
-        })}
+      {/* ================= FULL-WIDTH HERO SLIDES EMBLA VIEWPORT ================= */}
+      <div className="w-full overflow-hidden" ref={emblaRef}>
+        <div className="flex w-full touch-pan-y">
+          {slides.map((slide) => {
+            return (
+              <div
+                key={slide.id}
+                className="min-w-0 flex-[0_0_100%] flex flex-col items-center justify-center select-none"
+              >
+                {slide.content}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      {/* ================= CAROUSEL DOTS INDICATOR ================= */}
-      {slides.length > 1 && (
-        <div className="flex items-center justify-center gap-1.5 py-1 shrink-0 z-10">
-          {slides.map((slide, idx) => (
-            <button
-              key={`dot-${slide.id}`}
-              type="button"
-              onClick={() => handleSlideSelect(idx)}
-              className="p-2 -m-2 cursor-pointer touch-manipulation flex items-center justify-center"
-              aria-label={`Go to slide ${idx + 1}: ${slide.title || slide.id}`}
-            >
-              <span
-                className={cn(
-                  "h-1.5 rounded-full transition-all duration-200",
-                  activeSlide === idx
-                    ? "w-6 bg-[#161514] dark:bg-[#CEF431]"
-                    : "w-1.5 bg-[#161514]/20 dark:bg-white/20 hover:bg-[#161514]/40"
-                )}
-              />
-            </button>
-          ))}
-        </div>
+      {/* ================= CAROUSEL INDICATOR (CUSTOM SEGMENTED OR DEFAULT DOTS) ================= */}
+      {customPager ? (
+        customPager(activeSlide, handleSlideSelect)
+      ) : (
+        slides.length > 1 && (
+          <div className="flex items-center justify-center gap-1.5 py-1 shrink-0 z-10">
+            {slides.map((slide, idx) => (
+              <button
+                key={`dot-${slide.id}`}
+                type="button"
+                onClick={() => handleSlideSelect(idx)}
+                className="p-2 -m-2 cursor-pointer touch-manipulation flex items-center justify-center"
+                aria-label={`Go to slide ${idx + 1}: ${slide.title || slide.id}`}
+              >
+                <span
+                  className={cn(
+                    "h-1.5 rounded-full transition-all duration-200",
+                    activeSlide === idx
+                      ? "w-6 bg-[#161514] dark:bg-[#CEF431]"
+                      : "w-1.5 bg-[#161514]/20 dark:bg-white/20 hover:bg-[#161514]/40"
+                  )}
+                />
+              </button>
+            ))}
+          </div>
+        )
       )}
 
       {/* ================= STATS ROW (HAIRLINE DIVIDERS, NO BOXES) ================= */}
@@ -207,3 +208,4 @@ export function Hero({
     </section>
   );
 }
+

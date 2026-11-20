@@ -22,6 +22,7 @@ import {
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
 import { SwipeActionRow } from "@/components/mobile/SwipeActionRow";
+import { EmptyState } from "@/components/shared/EmptyState";
 
 export interface TasksPrimaryListProps {
   tasks: TaskItem[];
@@ -227,15 +228,30 @@ export function TasksPrimaryList({
       {/* Task Rows List */}
       <div className="space-y-1.5">
         {filteredTasks.length === 0 ? (
-          <div className="p-6 rounded-2xl bg-card border border-dashed border-border text-center space-y-1.5">
-            <CheckSquare className="size-6 text-muted-foreground mx-auto stroke-[1.5]" />
-            <p className="text-xs font-black text-foreground uppercase tracking-wider font-heading">
-              No tasks found
-            </p>
-            <p className="text-[11px] text-muted-foreground">
-              {searchQuery ? "Try clearing search or filters" : "You're all caught up! Great work."}
-            </p>
-          </div>
+          tasks.length === 0 ? (
+            <EmptyState
+              showMascot={true}
+              mascotGear="tasks"
+              mascotQuip="Queue is clear! Capture your #1 priority for today to get into flow state."
+              title="Capture Your First Mission"
+              description="Prioritize ruthlessly. Group your tasks with P1 urgent tags and knock them out one focus block at a time."
+              ctaText="+ Capture First Task"
+              onCtaClick={() => {
+                soundFX.playPop();
+                onOpenCreateModal?.();
+              }}
+            />
+          ) : (
+            <div className="p-6 rounded-2xl bg-card border border-dashed border-border text-center space-y-1.5">
+              <CheckSquare className="size-6 text-muted-foreground mx-auto stroke-[1.5]" />
+              <p className="text-xs font-black text-foreground uppercase tracking-wider font-heading">
+                No tasks found
+              </p>
+              <p className="text-[11px] text-muted-foreground">
+                {searchQuery ? "Try clearing search or filters" : "You're all caught up! Great work."}
+              </p>
+            </div>
+          )
         ) : (
           visibleTasks.map((task) => {
             const isDone = task.status === "completed";

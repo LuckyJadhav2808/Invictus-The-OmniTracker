@@ -38,6 +38,7 @@ import { TemplatePack } from "@/components/shared/TemplateSelectionModal";
 import type { AtomicHabitPreset } from "@/components/goals/HabitChoiceModal";
 import { Button } from "@/components/ui/button";
 import { HabitCompanionSprite } from "@/components/mascot/HabitCompanionSprite";
+import { EmptyState } from "@/components/shared/EmptyState";
 
 // Lazy-Loaded Heavy Modals (Zero TBT & Fast Initial Paint)
 const HabitChoiceModal = dynamic(
@@ -503,6 +504,7 @@ function GoalsPageContent() {
         onCheckAllDue={handleCheckAllDue}
         isAllDueCompleted={isAllDueCompleted}
         dueCount={dueTodayHabits.length}
+        showDynamicIsland={false}
       />
 
       {/* ================= SLOT 2: DESKTOP SUB-NAV (Hidden on Mobile) ================= */}
@@ -510,7 +512,7 @@ function GoalsPageContent() {
         <SegmentedSubNav />
       </div>
 
-      <div className="px-3.5 space-y-3">
+      <div className="px-3.5 space-y-2">
         {/* ================= SLOT 3: ONE HERO CAROUSEL SLOT (~175px) ================= */}
         <HabitsHeroPager
           dailyCompletionPercent={dailyCompletionPercent}
@@ -617,30 +619,18 @@ function GoalsPageContent() {
           {habitsLoading ? (
             <HabitsListSkeleton count={3} />
           ) : habits.length === 0 ? (
-            <div className="bg-card border border-border rounded-2xl p-6 text-center space-y-3">
-              <div className="size-11 rounded-2xl bg-[#CEF431] text-[#161514] border-2 border-[#161514] flex items-center justify-center mx-auto shadow-2xs">
-                <Target className="size-5 stroke-[2.2]" />
-              </div>
-              <div className="space-y-1">
-                <h4 className="font-heading font-black text-sm text-foreground">
-                  Build Your Daily Discipline
-                </h4>
-                <p className="text-xs text-muted-foreground max-w-xs mx-auto">
-                  Habits turn discipline into identity. Explore 50+ curated atomic routines or craft your custom protocol.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  soundFX.playPop();
-                  setIsChoiceOpen(true);
-                }}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-[#CEF431] text-[#161514] font-heading font-black text-xs uppercase tracking-wider rounded-xl border border-[#161514] shadow-xs active:scale-95 transition-all cursor-pointer"
-              >
-                <Sparkles className="size-3.5 stroke-[2.5]" />
-                <span>Explore Vault (50+ Presets)</span>
-              </button>
-            </div>
+            <EmptyState
+              showMascot={true}
+              mascotGear="fitness"
+              mascotQuip="Discipline turns into identity! Pick your first daily habit to start your streak."
+              title="Build Your Daily Discipline"
+              description="Habits turn consistency into compounding results. Explore 50+ curated atomic routines or craft your custom protocol."
+              ctaText="Explore Vault (50+ Presets)"
+              onCtaClick={() => {
+                soundFX.playPop();
+                setIsChoiceOpen(true);
+              }}
+            />
           ) : displayedHabits.length === 0 ? (
             <div className="bg-card rounded-xl border border-border p-6 text-center space-y-2">
               <Target className="size-6 text-muted-foreground/40 stroke-[1.5] mx-auto" />

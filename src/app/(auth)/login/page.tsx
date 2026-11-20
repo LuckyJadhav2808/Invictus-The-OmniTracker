@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { InvictusLogo } from "@/components/shared/InvictusLogo";
+import { StrobiCompanion } from "@/components/mascot/StrobiCompanion";
 import { DoodleInvictusTitle } from "@/components/auth/DoodleInvictusTitle";
 import { DoodleArrow } from "@/components/auth/AuthDoodles";
 import { APP_VERSION_CONFIG } from "@/config/version";
@@ -34,6 +35,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const defaultTab = searchParams.get("tab") === "signup" ? "signup" : "login";
+  const isFromOnboarding = searchParams.get("from") === "onboarding";
 
   const { enterGuestMode, login, signup } = useAuth();
   const [activeTab, setActiveTab] = useState<"login" | "signup">(defaultTab);
@@ -301,6 +303,26 @@ function LoginForm() {
       {/* ─── RIGHT COLUMN: UNIFIED FRICTIONLESS AUTH COCKPIT (ORDER-1 ON MOBILE FOR 0-SCROLL LOGIN) ─── */}
       <div className="w-full md:col-span-6 lg:col-span-5 max-w-md mx-auto z-10 relative order-1 md:order-2">
         <div className="bg-white dark:bg-[#161514] rounded-2xl p-4 sm:p-6 border-2 border-[#161514] dark:border-[#2A2724] shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#2A2724] space-y-4 transition-colors">
+          {/* ONBOARDING BRIDGE BANNER */}
+          {isFromOnboarding && (
+            <div className="p-3 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] flex items-center gap-3 animate-in fade-in zoom-in-95">
+              <div className="size-11 shrink-0 flex items-center justify-center">
+                <StrobiCompanion size={44} gear="none" showGear={false} />
+              </div>
+              <div className="text-left space-y-0.5">
+                <div className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5">
+                  <span>Companion Calibrated!</span>
+                  <span className="text-[9px] font-mono font-black px-1.5 py-0.2 rounded bg-[#03D26F] text-[#161514]">
+                    READY
+                  </span>
+                </div>
+                <p className="text-[11px] text-muted-foreground leading-tight">
+                  Your habits and daily pace are staged. Lock them in with an account, or test offline below.
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* ZERO-CONFUSION 1-TAP GUEST ON-RAMP (PRIORITY #1 ON MOBILE) */}
           <div className="relative">
             <div className="hidden sm:flex justify-end mb-1 pr-2">

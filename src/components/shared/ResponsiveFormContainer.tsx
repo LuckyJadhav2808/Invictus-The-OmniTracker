@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -7,14 +8,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { BottomSheet } from "@/components/mobile/BottomSheet";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface ResponsiveFormContainerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  title: string;
-  description?: string;
+  title: React.ReactNode;
+  description?: React.ReactNode;
   children: React.ReactNode;
+  className?: string;
+  maxWidth?: string;
 }
 
 export function ResponsiveFormContainer({
@@ -23,20 +29,53 @@ export function ResponsiveFormContainer({
   title,
   description,
   children,
+  className,
+  maxWidth = "sm:max-w-[540px]",
 }: ResponsiveFormContainerProps) {
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // On Mobile: Render native iOS-style Vaul BottomSheet with drag handle & swipe-to-dismiss
+  if (mounted && !isDesktop) {
+    return (
+      <BottomSheet
+        open={open}
+        onOpenChange={onOpenChange}
+        title={title}
+        description={description}
+        className={className}
+      >
+        <div className="pb-4">{children}</div>
+      </BottomSheet>
+    );
+  }
+
+  // On Desktop (and during SSR initial render): Render clean centered Radix Dialog
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
-        className="w-[94vw] sm:max-w-[520px] max-h-[88vh] flex flex-col bg-white dark:bg-[#161514] rounded-2xl p-0 border border-[#E8E5DF] dark:border-[#2A2724] shadow-2xl overflow-hidden text-[#161514] dark:text-[#FAF8F5]"
+        className={cn(
+          "w-[94vw] max-h-[88vh] flex flex-col bg-white dark:bg-[#161514] rounded-2xl p-0 border border-[#E8E5DF] dark:border-[#2A2724] shadow-2xl overflow-hidden text-[#161514] dark:text-[#FAF8F5]",
+          maxWidth,
+          className
+        )}
       >
-        <DialogHeader className="shrink-0 px-5 sm:px-6 pt-4 pb-3.5 border-b border-[#E8E5DF] dark:border-[#2A2724] bg-white dark:bg-[#161514] relative">
-          <div className="pr-10">
-            <DialogTitle
-              className="text-base sm:text-lg font-heading font-black text-[#161514] dark:text-[#FAF8F5] tracking-tight"
-            >
-              {title}
-            </DialogTitle>
+        <DialogHeader className="shrink-0 px-5 sm:px-6 pt-4 pb-3.5 border-b border-[#E8E5DF] dark:border-[#2A2724] bg-white dark:bg-[#161514] relative flex flex-row items-center justify-between">
+          <div className="pr-10 min-w-0 flex-1">
+            {typeof title === "string" ? (
+              <DialogTitle className="text-base sm:text-lg font-heading font-black text-[#161514] dark:text-[#FAF8F5] tracking-tight truncate">
+                {title}
+              </DialogTitle>
+            ) : (
+              <DialogTitle className="text-base sm:text-lg font-heading font-black text-[#161514] dark:text-[#FAF8F5] tracking-tight">
+                {title}
+              </DialogTitle>
+            )}
             {description && (
               <DialogDescription className="text-xs font-normal text-[#8C8882] dark:text-[#FAF8F5]/60 mt-0.5 line-clamp-2">
                 {description}
