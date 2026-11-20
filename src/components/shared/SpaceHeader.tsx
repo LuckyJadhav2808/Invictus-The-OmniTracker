@@ -14,27 +14,29 @@ import {
   ShieldCheck,
   Bell,
   Sparkles,
-  WifiOff,
   LogOut,
-  ChevronDown,
   Megaphone,
   X,
-  Calendar,
   RefreshCw,
   ArrowLeft,
+  MoreVertical,
 } from "lucide-react";
-import { InvictusLogo } from "@/components/shared/InvictusLogo";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { getGlobalAnnouncement, type GlobalAnnouncement } from "@/lib/custom-auth";
 import { ReminderManagerModal } from "@/components/shared/ReminderManagerModal";
 import { CloudSyncDrawer } from "@/components/shared/CloudSyncDrawer";
 import { useOfflineSync } from "@/lib/offline/sync-manager";
 import { soundFX } from "@/components/shared/SoundFX";
-import { format } from "date-fns";
-import Link from "next/link";
 import { getSubrouteInfo } from "@/lib/page-flow/page-flow-resolver";
 import { DynamicIslandDock, isDynamicIslandAllowed } from "@/components/shared/DynamicIslandDock";
-import { ThemeToggle } from "@/components/shared/ThemeToggle";
+import { StrobiCompanion, type StrobiGear } from "@/components/mascot/StrobiCompanion";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 export { getSubrouteInfo };
 
 export function SpaceHeader() {
@@ -44,12 +46,10 @@ export function SpaceHeader() {
   const [announcement, setAnnouncement] = useState<GlobalAnnouncement | null>(null);
   const [dismissedAnn, setDismissedAnn] = useState(false);
   const [isReminderModalOpen, setIsReminderModalOpen] = useState(false);
-  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isSyncDrawerOpen, setIsSyncDrawerOpen] = useState(false);
   const { isOnline, isSyncing, pendingCount } = useOfflineSync();
 
   useEffect(() => {
-
     const fetchAnnouncement = async () => {
       try {
         const res = await fetch("/api/admin/announcement");
@@ -151,10 +151,15 @@ export function SpaceHeader() {
   };
 
   const space = getSpaceInfo();
-  const Icon = space.icon;
-  const todayFormatted = format(new Date(), "EEE, d MMM");
-
   const subrouteInfo = getSubrouteInfo(pathname);
+
+  const resolveGear = (): StrobiGear => {
+    if (pathname.startsWith("/goals")) return "fitness";
+    if (pathname.startsWith("/tasks")) return "tasks";
+    if (pathname.startsWith("/money")) return "money";
+    if (pathname === "/today") return "gladiator";
+    return "gladiator";
+  };
 
   const isMobileAppBarRoute =
     pathname === "/today" ||
@@ -165,7 +170,7 @@ export function SpaceHeader() {
     pathname.startsWith("/profile");
 
   return (
-    <header className={cn("sticky top-0 w-full bg-white/95 dark:bg-[#161514]/95 backdrop-blur-md border-b border-[#E8E5DF] dark:border-[#2A2724] select-none transition-colors shadow-xs safe-top-pad", isProfileMenuOpen ? "z-[60]" : "z-40", isMobileAppBarRoute && "hidden lg:block")}>
+    <header className={cn("sticky top-0 w-full bg-white/95 dark:bg-[#161514]/95 backdrop-blur-md border-b border-[#E8E5DF] dark:border-[#2A2724] select-none transition-colors shadow-xs safe-top-pad z-40", isMobileAppBarRoute && "hidden lg:block")}>
       {/* Optional Announcement Banner */}
       {announcement && announcement.message && !dismissedAnn && (
         <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] px-4 py-2 text-xs font-medium border-b border-[#E8E5DF] dark:border-[#2A2724] flex items-center justify-between transition-colors">
@@ -184,10 +189,10 @@ export function SpaceHeader() {
       )}
 
       {/* Main Header Container */}
-      <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2.5 flex items-center justify-between gap-2 sm:gap-4 relative">
-        {/* Left: Mobile Brand / Contextual Back Button & Space Breadcrumb */}
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0 max-w-[32%]">
-          {subrouteInfo ? (
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2 flex items-center justify-between gap-2 sm:gap-4 relative min-h-[52px]">
+        {/* Left: Strobi Companion (+ Back button on subroutes) */}
+        <div className="flex items-center gap-2 shrink-0 relative z-10">
+          {subrouteInfo && (
             <button
               type="button"
               onClick={() => {
@@ -206,25 +211,13 @@ export function SpaceHeader() {
               <span className="hidden sm:inline">{subrouteInfo.parentLabel}</span>
               <span className="sm:hidden text-[11px]">Back</span>
             </button>
-          ) : pathname === "/today" ? (
-            <div className="shrink-0">
-              <InvictusLogo size="sm" variant="icon-only" href="/today" />
-            </div>
-          ) : (
-            <div className="size-8 rounded-lg border border-[#E8E5DF] dark:border-[#2A2724] bg-[#F1EFEA] dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] flex items-center justify-center shrink-0 shadow-xs transition-colors">
-              <Icon className="size-4 stroke-[1.75]" />
-            </div>
           )}
 
-          <div className="min-w-0">
-            <h1 className="font-heading font-bold text-sm lg:text-[15px] leading-tight text-[#161514] dark:text-[#FAF8F5] tracking-tight truncate">
-              <span className="sm:hidden">{space.shortTitle}</span>
-              <span className="hidden sm:inline">{space.title}</span>
-            </h1>
-            <p className="hidden sm:block text-[11px] font-medium text-[#8C8882] dark:text-[#A8A29E] leading-tight mt-0.5 truncate">
-              {space.subtitle}
-            </p>
-          </div>
+          <StrobiCompanion
+            gear={resolveGear()}
+            size={36}
+            title={`Strobi Companion • ${space.title}`}
+          />
         </div>
 
         {/* Center: Dynamic Island Live Activity Dock - DEAD CENTER IN HEADER */}
@@ -239,162 +232,126 @@ export function SpaceHeader() {
         {/* Spacer between left cluster and right cluster */}
         <div className="flex-1 min-w-0 pointer-events-none" />
 
-        {/* Right: Actions, Date, Sync & User Profile */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0 max-w-[38%] justify-end">
-          {/* Date Indicator (Tablet & Desktop) */}
-          <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#F1EFEA] dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#2A2724] text-xs font-mono font-medium text-[#161514] dark:text-[#FAF8F5] transition-colors">
-            <Calendar className="size-3.5 stroke-[1.75] text-[#8C8882] dark:text-[#A8A29E]" />
-            <span>{todayFormatted}</span>
-          </div>
+        {/* Right: Only the Three Dots Menu (⋯) */}
+        <div className="flex items-center shrink-0 justify-end relative z-10">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                onClick={() => soundFX.playPop()}
+                className="size-9 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] bg-white dark:bg-[#1C1A18] hover:bg-[#F1EFEA] dark:hover:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] flex items-center justify-center transition-all cursor-pointer active:scale-95 shadow-xs"
+                title="More options & account"
+                aria-label="More options"
+              >
+                <MoreVertical className="size-4 stroke-[2]" />
+              </button>
+            </DropdownMenuTrigger>
 
-          {/* Cloud Sync Telemetry Trigger Badge */}
-          <button
-            type="button"
-            onClick={() => setIsSyncDrawerOpen(true)}
-            className={cn(
-              "flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-mono font-medium border shadow-xs transition-colors cursor-pointer",
-              !isOnline
-                ? "bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border-rose-200 dark:border-rose-900"
-                : isSyncing
-                ? "bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-900"
-                : pendingCount > 0
-                ? "bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-900"
-                : "bg-[#F1EFEA] dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] border-[#E8E5DF] dark:border-[#2A2724] hover:bg-white dark:hover:bg-[#1C1A18]"
-            )}
-            title="Inspect Cloud Data Sync & Database Latency"
-          >
-            {!isOnline ? (
-              <>
-                <WifiOff className="size-3 text-rose-600 dark:text-rose-400 shrink-0" />
-                <span className="hidden sm:inline">Offline {pendingCount > 0 ? `(${pendingCount})` : ""}</span>
-              </>
-            ) : isSyncing ? (
-              <>
-                <RefreshCw className="size-3 animate-spin text-amber-600 dark:text-amber-400 shrink-0" />
-                <span className="hidden sm:inline">Syncing...</span>
-              </>
-            ) : pendingCount > 0 ? (
-              <>
-                <span className="size-1.5 rounded-full bg-amber-500 animate-pulse shrink-0" />
-                <span className="hidden sm:inline">{pendingCount} Queued</span>
-              </>
-            ) : (
-              <>
-                <span className="size-1.5 rounded-full bg-emerald-500 shrink-0" />
-                <span className="hidden sm:inline">Synced</span>
-              </>
-            )}
-          </button>
-
-          {/* Reminder Manager Bell */}
-          <button
-            onClick={() => setIsReminderModalOpen(true)}
-            aria-label="Manage Reminders"
-            className="size-8 rounded-lg bg-white dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] hover:bg-[#F1EFEA] dark:hover:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] flex items-center justify-center transition-colors shadow-xs cursor-pointer"
-            title="Manage Reminders & Push Alerts"
-          >
-            <Bell className="size-3.5 stroke-[1.75]" />
-          </button>
-
-          {/* Neobrutalist Theme Toggle (Light / Dark) */}
-          <ThemeToggle />
-
-          {/* User Profile Avatar Dropdown */}
-          <div className="relative">
-            <button
-              onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-              aria-label="User Menu"
-              aria-expanded={isProfileMenuOpen}
-              className="flex items-center gap-1.5 p-1 pl-1.5 sm:px-2 py-1 bg-white dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] rounded-lg hover:bg-[#F1EFEA] dark:hover:bg-[#252321] transition-colors shadow-xs cursor-pointer text-[#161514] dark:text-[#FAF8F5]"
+            <DropdownMenuContent
+              align="end"
+              className="w-56 p-1.5 bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#38332E] rounded-2xl shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] z-50 animate-in fade-in zoom-in-95 duration-150"
             >
-              <div className="size-6 rounded-md bg-[#161514] dark:bg-[#FAF8F5] text-white dark:text-[#161514] flex items-center justify-center font-bold text-xs shrink-0">
-                {user?.displayName ? (
-                  user.displayName.charAt(0).toUpperCase()
-                ) : (
-                  <User className="size-3 stroke-[2]" />
-                )}
+              {/* User Account Info */}
+              <div className="px-2.5 py-2 border-b border-[#E8E5DF] dark:border-[#2A2724]">
+                <p className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5] truncate">
+                  {user?.displayName || "Invictus User"}
+                </p>
+                <p className="text-[10px] text-[#8C8882] dark:text-[#A8A29E] truncate font-mono">
+                  {user?.email || "Local Guest"}
+                </p>
               </div>
-              <span className="hidden sm:inline-block text-xs font-medium max-w-[90px] truncate text-[#161514] dark:text-[#FAF8F5]">
-                {user?.displayName || "Account"}
-              </span>
-              <ChevronDown className="size-3 stroke-[2] text-[#8C8882] dark:text-[#A8A29E]" />
-            </button>
 
-            {/* Dropdown Menu Modal */}
-            {isProfileMenuOpen && (
-              <>
-                <div
-                  className="fixed inset-0 z-50"
-                  onClick={() => setIsProfileMenuOpen(false)}
-                />
-                <div className="absolute right-0 mt-1.5 w-56 bg-white dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#38332E] shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#000000] rounded-xl py-1 z-[60] animate-in fade-in-50 zoom-in-95">
-                  <div className="px-3 py-2 border-b border-[#E8E5DF] dark:border-[#2A2724]">
-                    <p className="text-xs font-medium text-[#161514] dark:text-[#FAF8F5] truncate">
-                      {user?.displayName || "Invictus User"}
-                    </p>
-                    <p className="text-[10px] text-[#8C8882] dark:text-[#A8A29E] truncate font-mono">
-                      {user?.email || "Local Guest"}
-                    </p>
-                  </div>
+              {/* Navigation & Controls */}
+              <DropdownMenuItem
+                onClick={() => router.push("/profile")}
+                className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-heading font-bold cursor-pointer hover:bg-secondary focus:bg-secondary"
+              >
+                <User className="size-3.5 stroke-[2] text-[#8C8882] dark:text-[#A8A29E]" />
+                <span>Profile & Activity</span>
+              </DropdownMenuItem>
 
-                  <div className="py-1">
-                    <Link
-                      href="/profile"
-                      onClick={() => setIsProfileMenuOpen(false)}
-                      className="flex items-center gap-2.5 px-3 py-1.5 text-xs font-medium text-[#161514] dark:text-[#FAF8F5] hover:bg-[#F1EFEA] dark:hover:bg-[#252321] transition-colors"
-                    >
-                      <User className="size-3.5 stroke-[1.75] text-[#8C8882] dark:text-[#A8A29E]" />
-                      <span>Profile & Activity</span>
-                    </Link>
+              <DropdownMenuItem
+                onClick={() => router.push("/settings")}
+                className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-heading font-bold cursor-pointer hover:bg-secondary focus:bg-secondary"
+              >
+                <Settings className="size-3.5 stroke-[2] text-[#8C8882] dark:text-[#A8A29E]" />
+                <span>Settings & Backups</span>
+              </DropdownMenuItem>
 
-                    <Link
-                      href="/settings"
-                      onClick={() => setIsProfileMenuOpen(false)}
-                      className="flex items-center gap-2.5 px-3 py-1.5 text-xs font-medium text-[#161514] dark:text-[#FAF8F5] hover:bg-[#F1EFEA] dark:hover:bg-[#252321] transition-colors"
-                    >
-                      <Settings className="size-3.5 stroke-[1.75] text-[#8C8882] dark:text-[#A8A29E]" />
-                      <span>Settings & Backups</span>
-                    </Link>
+              <DropdownMenuItem
+                onClick={() => router.push("/analytics")}
+                className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-heading font-bold cursor-pointer hover:bg-secondary focus:bg-secondary"
+              >
+                <BarChart2 className="size-3.5 stroke-[2] text-[#8C8882] dark:text-[#A8A29E]" />
+                <span>Analytics Hub</span>
+              </DropdownMenuItem>
 
-                    <Link
-                      href="/analytics"
-                      onClick={() => setIsProfileMenuOpen(false)}
-                      className="flex items-center gap-2.5 px-3 py-1.5 text-xs font-medium text-[#161514] dark:text-[#FAF8F5] hover:bg-[#F1EFEA] dark:hover:bg-[#252321] transition-colors"
-                    >
-                      <BarChart2 className="size-3.5 stroke-[1.75] text-[#8C8882] dark:text-[#A8A29E]" />
-                      <span>Analytics Hub</span>
-                    </Link>
+              <DropdownMenuItem
+                onClick={() => setIsReminderModalOpen(true)}
+                className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-heading font-bold cursor-pointer hover:bg-secondary focus:bg-secondary"
+              >
+                <Bell className="size-3.5 stroke-[2] text-[#8C8882] dark:text-[#A8A29E]" />
+                <span>Manage Reminders</span>
+              </DropdownMenuItem>
 
-                    {(user?.role === "admin" ||
-                      user?.email?.toLowerCase() === "luckymanojjadhav@gmail.com") && (
-                      <Link
-                        href="/admin"
-                        onClick={() => setIsProfileMenuOpen(false)}
-                        className="flex items-center gap-2.5 px-3 py-1.5 text-xs font-medium text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors"
-                      >
-                        <ShieldCheck className="size-3.5 stroke-[1.75]" />
-                        <span>Admin Console</span>
-                      </Link>
-                    )}
-                  </div>
-
-                  <div className="pt-1 border-t border-[#E8E5DF] dark:border-[#2A2724]">
-                    <button
-                      onClick={async () => {
-                        setIsProfileMenuOpen(false);
-                        await signOut();
-                        router.push("/login");
-                      }}
-                      className="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50/80 dark:hover:bg-rose-950/30 transition-colors cursor-pointer text-left"
-                    >
-                      <LogOut className="size-3.5 stroke-[1.75]" />
-                      <span>Sign Out</span>
-                    </button>
-                  </div>
+              <DropdownMenuItem
+                onClick={() => setIsSyncDrawerOpen(true)}
+                className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-bold cursor-pointer hover:bg-secondary focus:bg-secondary"
+              >
+                <div className="flex items-center gap-2.5">
+                  <RefreshCw className={cn("size-3.5 stroke-[2] text-[#8C8882] dark:text-[#A8A29E]", isSyncing && "animate-spin")} />
+                  <span>Cloud Sync</span>
                 </div>
-              </>
-            )}
-          </div>
+                <span className="text-[10px] font-mono text-muted-foreground">
+                  {!isOnline ? "Offline" : isSyncing ? "Syncing" : pendingCount > 0 ? `${pendingCount} Queued` : "Synced"}
+                </span>
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator className="my-1 bg-[#E8E5DF] dark:bg-[#2A2724]" />
+
+              {/* Theme Toggle within Menu */}
+              <DropdownMenuItem
+                onClick={() => {
+                  soundFX.playPop();
+                  const isDark = document.documentElement.classList.contains("dark");
+                  const nextTheme = isDark ? "light" : "dark";
+                  document.documentElement.classList.toggle("dark", !isDark);
+                  localStorage.setItem("theme", nextTheme);
+                }}
+                className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-bold cursor-pointer hover:bg-secondary focus:bg-secondary"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Sparkles className="size-3.5 stroke-[2] text-[#03D26F]" />
+                  <span>Toggle Theme</span>
+                </div>
+                <span className="text-[10px] font-mono text-muted-foreground">Light / Dark</span>
+              </DropdownMenuItem>
+
+              {(user?.role === "admin" ||
+                user?.email?.toLowerCase() === "luckymanojjadhav@gmail.com") && (
+                <DropdownMenuItem
+                  onClick={() => router.push("/admin")}
+                  className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-heading font-bold text-amber-700 dark:text-amber-300 bg-amber-500/10 cursor-pointer"
+                >
+                  <ShieldCheck className="size-3.5 stroke-[2]" />
+                  <span>Admin Console</span>
+                </DropdownMenuItem>
+              )}
+
+              <DropdownMenuSeparator className="my-1 bg-[#E8E5DF] dark:bg-[#2A2724]" />
+
+              <DropdownMenuItem
+                onClick={async () => {
+                  await signOut();
+                  router.push("/login");
+                }}
+                className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-heading font-bold text-rose-600 dark:text-rose-400 cursor-pointer hover:bg-rose-50 dark:hover:bg-rose-950/30"
+              >
+                <LogOut className="size-3.5 stroke-[2]" />
+                <span>Sign Out</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
