@@ -36,8 +36,6 @@ describe("HabitsCockpitDeck & BeadedAmphitheaterArcGauge Architecture", () => {
       streakFreeze: { tokensAvailable: 2, frozenDates: [] },
       selectedDate: "2026-11-19",
       onSelectDate: mockOnSelectDate,
-      habitLayoutStyle: "cards",
-      onSelectLayoutStyle: mockOnSelectLayout,
       onOpenNewHabit: mockOnNewHabit,
       onOpenShieldInfo: mockOnShield,
       dailyCompletionPercent: 67,

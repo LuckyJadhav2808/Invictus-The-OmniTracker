@@ -180,8 +180,8 @@ export function SavingsGoals() {
                   key={pack.id}
                   className="bg-white dark:bg-[#22201D] p-3 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] flex items-center justify-between gap-3 hover:border-[#161514] dark:hover:border-white transition-colors"
                 >
-                  <div className="min-w-0">
-                    <span className="text-xs font-semibold text-[#161514] dark:text-[#FAF8F5] truncate block">
+                  <div className="min-w-0 flex-1">
+                    <span className="text-xs font-semibold text-[#161514] dark:text-[#FAF8F5] leading-snug break-words line-clamp-1 block">
                       {pack.name}
                     </span>
                     <span className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E] line-clamp-1">
@@ -234,7 +234,7 @@ export function SavingsGoals() {
               >
                 <div className="space-y-1">
                   <div className="flex justify-between items-start gap-2">
-                    <h5 className="font-semibold text-xs text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5 truncate">
+                    <h5 className="font-semibold text-xs text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5 leading-snug break-words line-clamp-1 sm:line-clamp-2">
                       {g.title} {isCompleted && <Trophy className="size-3.5 text-[#F59E0B] fill-[#F59E0B] shrink-0" />}
                     </h5>
                     <button

@@ -19,12 +19,10 @@ import {
   useSetWater,
 } from "@/lib/queries/goals";
 import { useUserAchievements } from "@/lib/queries/achievements";
-import { HabitCard } from "@/components/goals/HabitCard";
 import { HabitListRow } from "@/components/goals/HabitListRow";
 import { HabitsHeroPager } from "@/components/goals/HabitsHeroPager";
 import { HabitsDateStrip } from "@/components/goals/HabitsDateStrip";
 import { DoorTileRow } from "@/components/goals/DoorTileRow";
-import { HabitsMatrixBoard } from "@/components/goals/HabitsMatrixBoard";
 import { WaterTracker } from "@/components/goals/WaterTracker";
 import { MoodJournalWidget } from "@/components/goals/MoodJournalWidget";
 import { SleepAndActiveWidgets } from "@/components/goals/SleepAndActiveWidgets";
@@ -60,6 +58,10 @@ const MealTracker = dynamic(
   () => import("@/components/goals/MealTracker").then((m) => m.MealTracker),
   { ssr: false }
 );
+const WeeklyOverviewWidget = dynamic(
+  () => import("@/components/goals/WeeklyOverviewWidget").then((m) => m.WeeklyOverviewWidget),
+  { ssr: false }
+);
 import {
   Target,
   ShieldCheck,
@@ -80,7 +82,7 @@ import { cn } from "@/lib/utils";
 import { useSearchParams, useRouter } from "next/navigation";
 
 function GoalsPageContent() {
-  const { selectedDate, setSelectedDate, habitLayoutStyle } = useUIStore();
+  const { selectedDate, setSelectedDate } = useUIStore();
   const searchParams = useSearchParams();
   const router = useRouter();
   const tabParam = searchParams.get("tab");
@@ -481,9 +483,9 @@ function GoalsPageContent() {
     return true;
   });
 
-  // Limit visible rows to 6 when in compact mode to ensure <= 1.5 screen viewports
+  // Limit visible rows to 6 when not expanded to ensure <= 1.5 screen viewports
   const visibleHabits =
-    habitLayoutStyle === "compact" && !showAllHabits
+    !showAllHabits && displayedHabits.length > 6
       ? displayedHabits.slice(0, 6)
       : displayedHabits;
 
@@ -648,67 +650,6 @@ function GoalsPageContent() {
                 </button>
               )}
             </div>
-          ) : habitLayoutStyle === "matrix" ? (
-            <HabitsMatrixBoard
-              habits={displayedHabits}
-              streaks={streaks}
-              selectedDate={selectedDate}
-              onSelectDate={setSelectedDate}
-              onToggleHabitLog={handleToggleLog}
-              onEditHabit={(habit) => {
-                setEditingHabit(habit);
-                setEditHabitTitle(habit.title);
-                setEditHabitDesc(habit.reminderTime || "");
-              }}
-              onDeleteHabit={(id) => setDeleteHabitId(id)}
-              onOpenNewHabit={() => {
-                soundFX.playPop();
-                setIsChoiceOpen(true);
-              }}
-            />
-          ) : habitLayoutStyle === "cards" ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3">
-              {displayedHabits.map((habit) => {
-                const isDone = isCompletedToday(habit.id);
-                const isRest = isHabitRestDay(habit);
-                const habitStreak = streaks[habit.id];
-
-                const habitWeekDays = weekDays.map((d) => ({
-                  ...d,
-                  isCompleted:
-                    d.dateStr === selectedDate
-                      ? isDone
-                      : weekLogs.some((l) => l.habitId === habit.id && l.date === d.dateStr),
-                }));
-
-                return (
-                  <HabitCard
-                    key={habit.id}
-                    habit={habit}
-                    streak={habitStreak}
-                    isCompletedToday={isDone}
-                    isRestDay={isRest}
-                    onToggle={() => handleToggleLog(habit.id, !isDone)}
-                    weekDays={habitWeekDays}
-                    onToggleDate={(dateStr) => {
-                      const isDayDone =
-                        dateStr === selectedDate
-                          ? isDone
-                          : weekLogs.some((l) => l.habitId === habit.id && l.date === dateStr);
-                      handleToggleLog(habit.id, !isDayDone, dateStr);
-                    }}
-                    viewMode="cards"
-                    onEdit={() => {
-                      setEditingHabit(habit);
-                      setEditHabitTitle(habit.title);
-                      setEditHabitDesc(habit.reminderTime || "");
-                    }}
-                    onDelete={() => setDeleteHabitId(habit.id)}
-                    onClick={() => router.push(`/goals/${habit.id}`)}
-                  />
-                );
-              })}
-            </div>
           ) : (
             /* Default Compact 56-64px List Rows (Responsive Bento on Laptop) */
             <div className="bg-card border border-border rounded-2xl overflow-hidden divide-y divide-border/60 shadow-xs lg:bg-transparent lg:border-0 lg:divide-y-0 lg:shadow-none lg:grid lg:grid-cols-2 lg:gap-3">
@@ -758,7 +699,7 @@ function GoalsPageContent() {
               })}
 
               {/* Progressive disclosure toggle if list has > 6 items */}
-              {habitLayoutStyle === "compact" && displayedHabits.length > 6 && (
+              {displayedHabits.length > 6 && (
                 <button
                   type="button"
                   onClick={() => {
@@ -939,7 +880,7 @@ function GoalsPageContent() {
                     key={h.id}
                     className="p-2.5 rounded-xl bg-card border border-border flex items-center justify-between text-xs"
                   >
-                    <span className="font-heading font-bold text-foreground truncate max-w-[200px]">
+                    <span className="font-heading font-bold text-foreground leading-snug break-words line-clamp-1 flex-1 pr-2">
                       {h.title}
                     </span>
                     <span className="font-mono text-muted-foreground flex items-center gap-1 shrink-0">
@@ -1209,16 +1150,7 @@ function GoalsPageContent() {
           <div className="max-w-xl lg:max-w-5xl mx-auto p-3.5 space-y-4">
             {activePortal === "gym" && <GymRoutineTracker />}
             {activePortal === "nutrition" && <MealTracker />}
-            {activePortal === "stats" && (
-              <HabitsMatrixBoard
-                habits={habits}
-                streaks={streaks}
-                selectedDate={selectedDate}
-                onSelectDate={setSelectedDate}
-                onToggleHabitLog={handleToggleLog}
-                onOpenNewHabit={() => setIsChoiceOpen(true)}
-              />
-            )}
+            {activePortal === "stats" && <WeeklyOverviewWidget />}
           </div>
         </div>
       )}

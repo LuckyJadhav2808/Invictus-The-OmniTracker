@@ -89,15 +89,15 @@ export default function ProfilePage() {
         {/* User Info Card - Harmonized Neobrutalist Responsive Layout */}
         <div id="user-profile-card" className="bg-white dark:bg-[#1C1A18] rounded-3xl p-4 sm:p-6 border-2 border-[#161514] dark:border-[#383531] shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#000000] space-y-4 scroll-mt-24">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
-            <div className="flex items-center gap-3.5 min-w-0">
+            <div className="flex items-center gap-3.5 min-w-0 flex-1">
               <div className="size-13 sm:size-16 rounded-2xl bg-amber-400 border-2 border-[#161514] dark:border-[#383531] flex items-center justify-center shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] shrink-0">
                 <User className="size-6 sm:size-8 text-[#161514] stroke-[2.5]" />
               </div>
-              <div className="min-w-0">
-                <p className="font-black text-base sm:text-lg text-[#161514] dark:text-[#FAF8F5] tracking-tight font-heading truncate">
+              <div className="min-w-0 flex-1">
+                <p className="font-black text-base sm:text-lg text-[#161514] dark:text-[#FAF8F5] tracking-tight font-heading leading-tight break-words">
                   {user?.displayName || "Invictus Explorer"}
                 </p>
-                <p className="text-[#161514]/70 dark:text-[#FAF8F5]/70 text-xs font-bold truncate">{user?.email}</p>
+                <p className="text-[#161514]/70 dark:text-[#FAF8F5]/70 text-xs font-bold break-all">{user?.email}</p>
                 <span className="inline-block mt-1 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-300 border border-[#161514] dark:border-emerald-800 text-[9px] font-black px-2 py-0.5 rounded-lg shadow-[1px_1px_0px_0px_#161514]">
                   Active Session
                 </span>

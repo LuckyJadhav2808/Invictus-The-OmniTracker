@@ -505,11 +505,11 @@ export function NutritionChoiceModal({
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <span className="text-base">{pack.icon === "Target" ? "🎯" : pack.icon === "Sparkles" ? "⚡" : "🥗"}</span>
-                      <h5 className="font-heading font-black text-xs text-[#161514] dark:text-stone-100 truncate">
+                      <h5 className="font-heading font-black text-xs text-[#161514] dark:text-stone-100 leading-snug break-words">
                         {pack.name}
                       </h5>
                     </div>
-                    <p className="text-[11px] text-[#6B6B6B] dark:text-[#A8A29E] mt-0.5 line-clamp-1">
+                    <p className="text-[11px] text-[#6B6B6B] dark:text-[#A8A29E] mt-0.5 line-clamp-2 break-words">
                       {pack.tagline}
                     </p>
                     <span className="inline-block mt-1 text-[9px] font-mono font-bold text-[#161514] dark:text-stone-300 bg-[#FAF8F5] dark:bg-[#252321] px-2 py-0.5 rounded border border-[#E8E5DF] dark:border-[#2A2724]">

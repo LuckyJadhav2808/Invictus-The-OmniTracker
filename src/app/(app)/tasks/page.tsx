@@ -574,7 +574,7 @@ export default function TasksPage() {
                     #{criticalTask.projectTag || "General"}
                   </span>
                 </div>
-                <h4 className="text-xs font-heading font-black text-foreground truncate">
+                <h4 className="text-xs font-heading font-black text-foreground leading-snug break-words line-clamp-2">
                   {criticalTask.title}
                 </h4>
                 <p className="text-[11px] text-muted-foreground">
@@ -714,7 +714,7 @@ export default function TasksPage() {
                       key={t.id}
                       className="p-2 rounded-lg bg-muted/40 flex items-center justify-between text-xs"
                     >
-                      <span className="font-medium text-muted-foreground line-through truncate max-w-[200px]">
+                      <span className="font-medium text-muted-foreground line-through break-words line-clamp-1 flex-1 pr-2">
                         {t.title}
                       </span>
                       <CheckCircle2 className="size-3.5 text-emerald-500 shrink-0" />

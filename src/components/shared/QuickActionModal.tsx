@@ -483,8 +483,8 @@ export function QuickActionModal() {
                         {isDone ? <Check className="size-3.5 stroke-[2.5]" /> : null}
                       </div>
 
-                      <div className="min-w-0">
-                        <span className={cn("text-xs font-medium block truncate", isDone && "line-through opacity-70")}>
+                      <div className="min-w-0 flex-1">
+                        <span className={cn("text-xs font-medium block leading-snug break-words line-clamp-2", isDone && "line-through opacity-70")}>
                           {habit.title}
                         </span>
                         {habitStreak?.currentStreak ? (

@@ -8,9 +8,6 @@ import {
   MoreVertical,
   CheckCheck,
   RotateCcw,
-  Rows,
-  LayoutList,
-  Grid,
   Volume2,
   VolumeX,
   ArrowLeft,
@@ -63,7 +60,6 @@ export function MobileAppBar({
   customMenuItems,
   showDynamicIsland = true,
 }: MobileAppBarProps) {
-  const { habitLayoutStyle, setHabitLayoutStyle } = useUIStore();
   const [soundMuted, setSoundMuted] = useState(soundFX.isMuted());
 
   const todayStr = format(new Date(), "yyyy-MM-dd");
@@ -205,69 +201,6 @@ export function MobileAppBar({
                     <DropdownMenuSeparator className="my-1 bg-border" />
                   </>
                 )}
-
-                <DropdownMenuLabel className="text-[10px] font-mono font-bold uppercase tracking-wider text-muted-foreground px-2 py-1">
-                  Layout Density
-                </DropdownMenuLabel>
-
-                <DropdownMenuItem
-                  onClick={() => {
-                    soundFX.playPop();
-                    setHabitLayoutStyle("compact");
-                  }}
-                  className={cn(
-                    "flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-bold cursor-pointer hover:bg-secondary focus:bg-secondary",
-                    habitLayoutStyle === "compact" && "bg-secondary font-black text-foreground"
-                  )}
-                >
-                  <div className="flex items-center gap-2">
-                    <Rows className="size-3.5" />
-                    <span>Compact Rows</span>
-                  </div>
-                  {habitLayoutStyle === "compact" && (
-                    <span className="size-1.5 rounded-full bg-[#03D26F]" />
-                  )}
-                </DropdownMenuItem>
-
-                <DropdownMenuItem
-                  onClick={() => {
-                    soundFX.playPop();
-                    setHabitLayoutStyle("cards");
-                  }}
-                  className={cn(
-                    "flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-bold cursor-pointer hover:bg-secondary focus:bg-secondary",
-                    habitLayoutStyle === "cards" && "bg-secondary font-black text-foreground"
-                  )}
-                >
-                  <div className="flex items-center gap-2">
-                    <LayoutList className="size-3.5" />
-                    <span>Card View</span>
-                  </div>
-                  {habitLayoutStyle === "cards" && (
-                    <span className="size-1.5 rounded-full bg-[#03D26F]" />
-                  )}
-                </DropdownMenuItem>
-
-                <DropdownMenuItem
-                  onClick={() => {
-                    soundFX.playPop();
-                    setHabitLayoutStyle("matrix");
-                  }}
-                  className={cn(
-                    "flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-bold cursor-pointer hover:bg-secondary focus:bg-secondary",
-                    habitLayoutStyle === "matrix" && "bg-secondary font-black text-foreground"
-                  )}
-                >
-                  <div className="flex items-center gap-2">
-                    <Grid className="size-3.5" />
-                    <span>Heatmap Matrix</span>
-                  </div>
-                  {habitLayoutStyle === "matrix" && (
-                    <span className="size-1.5 rounded-full bg-[#03D26F]" />
-                  )}
-                </DropdownMenuItem>
-
-                <DropdownMenuSeparator className="my-1 bg-border" />
               </>
             )}
 

@@ -611,7 +611,7 @@ export function MealTracker() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="text-sm">{mealEmoji}</span>
-                        <h5 className="font-heading font-black text-xs sm:text-sm text-[#161514] dark:text-stone-100 truncate">
+                        <h5 className="font-heading font-black text-xs sm:text-sm text-[#161514] dark:text-stone-100 leading-snug break-words line-clamp-2">
                           {m.name}
                         </h5>
                         <span className="px-1.5 py-0.5 rounded text-[8.5px] font-mono font-bold bg-[#FAF8F5] dark:bg-[#252321] text-[#161514] dark:text-stone-300 border border-[#E8E5DF] dark:border-[#2A2724]">

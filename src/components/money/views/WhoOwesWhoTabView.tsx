@@ -226,7 +226,7 @@ export function WhoOwesWhoTabView({
                   <span className="hidden sm:inline">Student Debt Deck</span>
                 </span>
               </div>
-              <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] mt-0.5 truncate">
+              <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] mt-0.5 break-words line-clamp-2">
                 Track shared meals, borrowed cash, and 1-tap debt settlements
               </p>
             </div>
@@ -491,9 +491,9 @@ export function WhoOwesWhoTabView({
                     )}
                   </div>
 
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h4 className="font-heading font-bold text-sm text-[#161514] dark:text-[#FAF8F5] truncate">
+                      <h4 className="font-heading font-bold text-sm text-[#161514] dark:text-[#FAF8F5] leading-snug break-words">
                         {iou.personName}
                       </h4>
                       {dueStatus && (
@@ -515,7 +515,7 @@ export function WhoOwesWhoTabView({
                         )
                       )}
                     </div>
-                    <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] mt-0.5 truncate">
+                    <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] mt-0.5 break-words line-clamp-2">
                       {iou.description}
                     </p>
                   </div>
@@ -612,8 +612,8 @@ export function WhoOwesWhoTabView({
                   key={iou.id}
                   className="bg-white/60 dark:bg-[#161514]/60 p-3 rounded-xl border border-[#E8E5DF] dark:border-[#383531] flex items-center justify-between opacity-70"
                 >
-                  <div className="min-w-0 pr-2">
-                    <span className="font-heading font-bold text-xs text-[#161514] dark:text-[#FAF8F5] block truncate">
+                  <div className="min-w-0 flex-1 pr-2">
+                    <span className="font-heading font-bold text-xs text-[#161514] dark:text-[#FAF8F5] block break-words line-clamp-1">
                       {iou.personName} · {iou.description}
                     </span>
                     <span className="text-[10px] font-mono text-[#6B6B6B] dark:text-[#A8A29E]">

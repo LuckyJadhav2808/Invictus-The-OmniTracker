@@ -69,14 +69,14 @@ export function BottomSheet({
             <div className="px-4 pb-2.5 flex items-center justify-between gap-3 border-b border-[#161514]/10 dark:border-white/10 shrink-0">
               <div className="min-w-0 flex-1">
                 {typeof title === "string" ? (
-                  <Drawer.Title className="font-heading font-black text-base sm:text-lg tracking-tight text-[#161514] dark:text-[#FAF8F5] truncate">
+                  <Drawer.Title className="font-heading font-black text-base sm:text-lg tracking-tight text-[#161514] dark:text-[#FAF8F5] leading-snug break-words line-clamp-2">
                     {title}
                   </Drawer.Title>
                 ) : (
                   <div className="font-heading font-black">{title}</div>
                 )}
                 {description && (
-                  <Drawer.Description className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] font-sans line-clamp-1 mt-0.5">
+                  <Drawer.Description className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] font-sans line-clamp-2 break-words mt-0.5">
                     {description}
                   </Drawer.Description>
                 )}

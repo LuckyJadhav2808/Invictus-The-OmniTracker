@@ -11,7 +11,6 @@ const getLocalSystemToday = (): string => {
 
 type ActiveTab = "today" | "goals" | "money" | "tasks" | "profile";
 type ActiveTracker = "life" | "money" | "tasks";
-type HabitLayoutStyle = "cards" | "compact" | "matrix";
 type WidgetVariantStyle = "classic" | "expanded" | "dark";
 
 interface UIState {
@@ -25,8 +24,6 @@ interface UIState {
   setActiveTracker: (tracker: ActiveTracker) => void;
   playfulToastsEnabled: boolean;
   setPlayfulToastsEnabled: (enabled: boolean) => void;
-  habitLayoutStyle: HabitLayoutStyle;
-  setHabitLayoutStyle: (style: HabitLayoutStyle) => void;
   widgetVariantStyle: WidgetVariantStyle;
   setWidgetVariantStyle: (style: WidgetVariantStyle) => void;
 }
@@ -44,8 +41,6 @@ export const useUIStore = create<UIState>()(
       setActiveTracker: (tracker) => set({ activeTracker: tracker }),
       playfulToastsEnabled: true,
       setPlayfulToastsEnabled: (enabled) => set({ playfulToastsEnabled: enabled }),
-      habitLayoutStyle: "compact",
-      setHabitLayoutStyle: (style) => set({ habitLayoutStyle: style }),
       widgetVariantStyle: "classic",
       setWidgetVariantStyle: (style) => set({ widgetVariantStyle: style }),
     }),

@@ -74,7 +74,7 @@ export function DoorTileRow({
       iconColor: "text-purple-600 dark:text-purple-400",
       bgClass: "hover:border-purple-500/50",
       onClick: onOpenStats || onOpenReminders || (() => {}),
-      title: "Open Habit Consistency Matrix & Telemetry",
+      title: "Open Habit Analytics & Consistency Overview",
     },
   ];
 
@@ -108,7 +108,7 @@ export function DoorTileRow({
                 {t.label}
               </span>
             </div>
-            <span className="text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-wider text-muted-foreground leading-tight text-center block w-full truncate mt-0.5">
+            <span className="text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-tight text-muted-foreground leading-tight text-center block w-full truncate mt-0.5">
               {t.value}
             </span>
           </button>

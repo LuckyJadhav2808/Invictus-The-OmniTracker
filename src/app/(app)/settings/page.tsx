@@ -112,8 +112,6 @@ export default function SettingsPage() {
   const {
     playfulToastsEnabled,
     setPlayfulToastsEnabled,
-    habitLayoutStyle,
-    setHabitLayoutStyle,
   } = useUIStore();
   const queryClient = useQueryClient();
 
@@ -913,54 +911,6 @@ export default function SettingsPage() {
                     {/* Color Palette & Action Punch Theme Selector */}
                     <ThemeColorSelector className="pt-2 border-t border-[#E8E5DF]/60 dark:border-[#2A2724]/60" />
 
-                    {/* Habit Layout Style Selector */}
-                    <div className="space-y-1.5 border-t border-[#E8E5DF] dark:border-[#2A2724] pt-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <span className="text-xs font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] block font-heading">
-                            Habit Layout Style
-                          </span>
-                          <p className="text-[10px] text-[#8C8882] dark:text-[#A8A29E] font-medium mt-0.5">
-                            Rich telemetry cards or compact rows
-                          </p>
-                        </div>
-                        <div className="flex gap-1.5">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              soundFX.playPop();
-                              setHabitLayoutStyle("cards");
-                              toast.success("Habit layout set to CARDS VIEW 💳");
-                            }}
-                            className={cn(
-                              "px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider border transition-all cursor-pointer shadow-xs",
-                              habitLayoutStyle === "cards"
-                                ? "bg-[#161514] text-white dark:bg-white dark:text-[#161514] border-[#161514] dark:border-white"
-                                : "border-[#E8E5DF] dark:border-[#2A2724] bg-[#FAF8F5] dark:bg-[#1C1A18] text-[#161514]/70 dark:text-[#FAF8F5]/60"
-                            )}
-                          >
-                            Cards
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              soundFX.playPop();
-                              setHabitLayoutStyle("compact");
-                              toast.success("Habit layout set to COMPACT LIST 📑");
-                            }}
-                            className={cn(
-                              "px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider border transition-all cursor-pointer shadow-xs",
-                              habitLayoutStyle === "compact"
-                                ? "bg-[#161514] text-white dark:bg-white dark:text-[#161514] border-[#161514] dark:border-white"
-                                : "border-[#E8E5DF] dark:border-[#2A2724] bg-[#FAF8F5] dark:bg-[#1C1A18] text-[#161514]/70 dark:text-[#FAF8F5]/60"
-                            )}
-                          >
-                            Compact
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
                     {/* Completion Sound Selector */}
                     <div className="space-y-2 border-t border-[#E8E5DF] dark:border-[#2A2724] pt-4">
                       <div className="flex items-center justify-between">
@@ -1095,11 +1045,11 @@ export default function SettingsPage() {
                       >
                         <Icon className="size-5 stroke-[2.2]" />
                       </div>
-                      <div className="min-w-0">
-                        <h4 className="font-heading font-black text-xs text-[#161514] dark:text-[#FAF8F5] uppercase tracking-wide truncate">
+                      <div className="min-w-0 flex-1">
+                        <h4 className="font-heading font-black text-xs text-[#161514] dark:text-[#FAF8F5] uppercase tracking-wide leading-tight break-words">
                           {label}
                         </h4>
-                        <p className="text-[10px] text-[#8C8882] dark:text-[#A8A29E] font-medium truncate">
+                        <p className="text-[10px] text-[#8C8882] dark:text-[#A8A29E] font-medium leading-tight break-words line-clamp-1 sm:line-clamp-none">
                           {desc}
                         </p>
                       </div>
@@ -1263,8 +1213,8 @@ export default function SettingsPage() {
                   <div className="size-10 rounded-xl bg-purple-100 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800/40 flex items-center justify-center text-purple-700 dark:text-purple-400 shadow-xs shrink-0">
                     <Bell className="size-5 stroke-[2.5]" />
                   </div>
-                  <div className="min-w-0">
-                    <h4 className="font-heading font-black text-xs uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] truncate">
+                  <div className="min-w-0 flex-1">
+                    <h4 className="font-heading font-black text-xs uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] leading-snug break-words">
                       Daily Log Reminders Manager
                     </h4>
                     <div className="flex flex-wrap items-center gap-1.5 pt-1">

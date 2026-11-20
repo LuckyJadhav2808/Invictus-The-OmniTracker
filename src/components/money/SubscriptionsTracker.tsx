@@ -195,8 +195,8 @@ export function SubscriptionsTracker() {
                   key={pack.id}
                   className="bg-white dark:bg-[#22201D] p-3 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] flex items-center justify-between gap-3 hover:border-[#161514] dark:hover:border-white transition-colors"
                 >
-                  <div className="min-w-0">
-                    <span className="text-xs font-semibold text-[#161514] dark:text-[#FAF8F5] truncate block">
+                  <div className="min-w-0 flex-1">
+                    <span className="text-xs font-semibold text-[#161514] dark:text-[#FAF8F5] leading-snug break-words line-clamp-1 block">
                       {pack.name}
                     </span>
                     <span className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E] line-clamp-1">
@@ -247,9 +247,9 @@ export function SubscriptionsTracker() {
                 key={sub.id}
                 className="bg-white dark:bg-[#1C1A18] rounded-xl p-4 border border-[#E8E5DF] dark:border-[#2A2724] flex items-center justify-between gap-3 hover:bg-[#FAF8F5] dark:hover:bg-[#22201D] transition-colors shadow-none hover:shadow-xs"
               >
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <h5 className="font-semibold text-xs text-[#161514] dark:text-[#FAF8F5] truncate">{sub.name}</h5>
+                    <h5 className="font-semibold text-xs text-[#161514] dark:text-[#FAF8F5] leading-snug break-words line-clamp-1 sm:line-clamp-2">{sub.name}</h5>
                     <span className="bg-[#F1EFEA] dark:bg-[#2A2724] text-[#161514] dark:text-[#FAF8F5] text-[10px] font-medium px-2 py-0.5 rounded border border-[#E8E5DF] dark:border-[#383531]">
                       {sub.category || "General"}
                     </span>

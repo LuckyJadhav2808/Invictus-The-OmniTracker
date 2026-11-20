@@ -68,7 +68,7 @@ export function ResponsiveFormContainer({
         <DialogHeader className="shrink-0 px-5 sm:px-6 pt-4 pb-3.5 border-b border-[#E8E5DF] dark:border-[#2A2724] bg-white dark:bg-[#161514] relative flex flex-row items-center justify-between">
           <div className="pr-10 min-w-0 flex-1">
             {typeof title === "string" ? (
-              <DialogTitle className="text-base sm:text-lg font-heading font-black text-[#161514] dark:text-[#FAF8F5] tracking-tight truncate">
+              <DialogTitle className="text-base sm:text-lg font-heading font-black text-[#161514] dark:text-[#FAF8F5] tracking-tight leading-snug break-words line-clamp-2">
                 {title}
               </DialogTitle>
             ) : (

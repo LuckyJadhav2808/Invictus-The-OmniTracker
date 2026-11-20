@@ -96,7 +96,7 @@ export const TodayTopHabitsMomentum = memo(function TodayTopHabitsMomentum({
               {/* Title & Slim Progress Rail */}
               <div className="min-w-0 flex-1 space-y-1.5">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-heading font-bold text-xs sm:text-sm text-foreground truncate block leading-tight">
+                  <span className="font-heading font-bold text-xs sm:text-sm text-foreground block leading-tight break-words line-clamp-2">
                     {h.title}
                   </span>
                   <span className="font-heading text-xs font-black text-foreground tabular-nums shrink-0">

@@ -106,7 +106,7 @@ export function TasksDoorTileRow({
                 {t.label}
               </span>
             </div>
-            <span className="font-mono text-[9px] sm:text-[10px] text-muted-foreground font-bold uppercase tracking-wider truncate max-w-full leading-tight text-center block w-full mt-0.5">
+            <span className="font-mono text-[9px] sm:text-[10px] text-muted-foreground font-bold uppercase tracking-tight truncate max-w-full leading-tight text-center block w-full mt-0.5">
               {t.value}
             </span>
           </button>

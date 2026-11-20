@@ -8,9 +8,6 @@ import {
   Volume2,
   VolumeX,
   Plus,
-  LayoutList,
-  Rows,
-  Grid,
   CheckCheck,
   Calendar,
 } from "lucide-react";
@@ -30,8 +27,6 @@ export interface HabitsCockpitDeckProps {
   };
   selectedDate: string; // "yyyy-MM-dd"
   onSelectDate: (date: string) => void;
-  habitLayoutStyle: "cards" | "compact" | "matrix";
-  onSelectLayoutStyle: (style: "cards" | "compact" | "matrix") => void;
   onOpenNewHabit: () => void;
   onOpenShieldInfo: () => void;
   dailyCompletionPercent: number;
@@ -52,8 +47,6 @@ export function HabitsCockpitDeck({
   streakFreeze,
   selectedDate,
   onSelectDate,
-  habitLayoutStyle,
-  onSelectLayoutStyle,
   onOpenNewHabit,
   onOpenShieldInfo,
   dailyCompletionPercent = 0,
@@ -298,63 +291,6 @@ export function HabitsCockpitDeck({
               <span className="hidden sm:inline">Jump to Today</span>
             </button>
           )}
-        </div>
-
-        {/* 3-Way View Mode Switcher Pill */}
-        <div className="flex items-center gap-0.5 sm:gap-1 bg-secondary border-2 border-border rounded-xl p-0.5 sm:p-1 shrink-0 shadow-2xs">
-          <button
-            type="button"
-            onClick={() => {
-              soundFX.playPop();
-              onSelectLayoutStyle("cards");
-            }}
-            className={cn(
-              "px-2 sm:px-2.5 py-1 rounded-lg text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer",
-              habitLayoutStyle === "cards"
-                ? "bg-card text-foreground border border-border shadow-2xs font-black"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-            title="Card View (Detailed)"
-          >
-            <LayoutList className="size-3.5" />
-            <span className="hidden sm:inline">Cards</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              soundFX.playPop();
-              onSelectLayoutStyle("compact");
-            }}
-            className={cn(
-              "px-2 sm:px-2.5 py-1 rounded-lg text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer",
-              habitLayoutStyle === "compact"
-                ? "bg-card text-foreground border border-border shadow-2xs font-black"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-            title="Compact Rows View"
-          >
-            <Rows className="size-3.5" />
-            <span className="hidden sm:inline">Compact</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              soundFX.playPop();
-              onSelectLayoutStyle("matrix");
-            }}
-            className={cn(
-              "px-2 sm:px-2.5 py-1 rounded-lg text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer",
-              habitLayoutStyle === "matrix"
-                ? "bg-card text-foreground border border-border shadow-2xs font-black"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-            title="Contribution Heat Matrix View"
-          >
-            <Grid className="size-3.5" />
-            <span className="hidden sm:inline">Matrix</span>
-          </button>
         </div>
       </div>
     </div>

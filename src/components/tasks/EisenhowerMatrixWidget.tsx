@@ -107,7 +107,7 @@ export function EisenhowerMatrixWidget({ tasks, onUpdateTask, onOpenCreateModal 
                       className="bg-white dark:bg-[#1C1A18] rounded-xl p-3 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex items-center justify-between gap-2.5 hover:border-[#161514]/30 dark:hover:border-white/30 transition-all"
                     >
                       <div className="min-w-0 flex-1">
-                        <span className="text-xs font-bold text-[#161514] dark:text-[#FAF8F5] block truncate">{t.title}</span>
+                        <span className="text-xs font-bold text-[#161514] dark:text-[#FAF8F5] block leading-snug break-words line-clamp-2">{t.title}</span>
                         {t.dueDate && (
                           <span className="text-[10px] font-medium text-[#161514]/60 dark:text-[#FAF8F5]/60 mt-0.5 block">Due: {t.dueDate}</span>
                         )}

@@ -804,7 +804,7 @@ export function HabitChoiceModal({
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <h5 className="font-heading font-black text-xs text-[#161514] dark:text-[#FAF8F5] truncate">
+                            <h5 className="font-heading font-black text-xs text-[#161514] dark:text-[#FAF8F5] leading-snug break-words">
                               {preset.title}
                             </h5>
                             <span className="neo-badge bg-[#FAF8F5] dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#2A2724] text-[8.5px]">
@@ -817,7 +817,7 @@ export function HabitChoiceModal({
                               </span>
                             )}
                           </div>
-                          <p className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E] font-medium truncate mt-0.5">
+                          <p className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E] font-medium leading-snug break-words line-clamp-2 mt-0.5">
                             {preset.desc}
                           </p>
                         </div>

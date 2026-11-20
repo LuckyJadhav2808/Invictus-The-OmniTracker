@@ -600,11 +600,11 @@ export function GymChoiceModal({
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <span className="text-base">{pack.icon || "🏋️"}</span>
-                      <h5 className="font-heading font-black text-xs text-[#161514] dark:text-[#FAF8F5] truncate">
+                      <h5 className="font-heading font-black text-xs text-[#161514] dark:text-[#FAF8F5] leading-snug break-words">
                         {pack.name}
                       </h5>
                     </div>
-                    <p className="text-[11px] font-bold text-[#161514]/65 dark:text-[#A8A29E] mt-0.5 line-clamp-1">
+                    <p className="text-[11px] font-bold text-[#161514]/65 dark:text-[#A8A29E] mt-0.5 line-clamp-2 break-words">
                       {pack.tagline}
                     </p>
                     <span className="inline-block mt-1 text-[9px] font-mono font-black text-[#161514] dark:text-[#FAF8F5] bg-[#FAF8F5] dark:bg-[#252321] px-2 py-0.5 rounded border border-[#E8E5DF] dark:border-[#2A2724]">

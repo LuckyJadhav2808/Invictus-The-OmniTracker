@@ -294,15 +294,15 @@ export function WaterTracker({
                 onClick={() => handleQuickAdd(vessel.amount)}
                 className="group min-h-[58px] p-3 rounded-2xl border-2 border-[#161514] dark:border-[#38332E] bg-white dark:bg-[#1C1A18] hover:bg-sky-50/60 dark:hover:bg-sky-950/30 text-foreground flex items-center justify-between shadow-[2.5px_2.5px_0px_0px_#161514] dark:shadow-[2.5px_2.5px_0px_0px_#000000] active:translate-x-[1.5px] active:translate-y-[1.5px] active:shadow-none hover:-translate-y-0.5 transition-all cursor-pointer"
               >
-                <div className="flex items-center gap-2.5 min-w-0">
+                <div className="flex items-center gap-2.5 min-w-0 flex-1 pr-2">
                   <span className="size-9 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-800 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                     <Icon className="size-4 stroke-[2.2]" />
                   </span>
-                  <div className="text-left min-w-0">
-                    <span className="block font-heading font-black text-xs text-foreground truncate">
+                  <div className="text-left min-w-0 flex-1">
+                    <span className="block font-heading font-black text-xs text-foreground leading-snug break-words line-clamp-1">
                       {vessel.name}
                     </span>
-                    <span className="block text-[10px] font-mono text-muted-foreground truncate">
+                    <span className="block text-[10px] font-mono text-muted-foreground leading-snug break-words line-clamp-1">
                       {vessel.subtitle}
                     </span>
                   </div>

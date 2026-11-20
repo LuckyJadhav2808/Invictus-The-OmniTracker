@@ -159,7 +159,7 @@ export function BelanjeTransactionRow({
         )}
       >
       {/* Left: 40px Squircle Category Badge & Metadata */}
-      <div className="flex items-center gap-3 min-w-0">
+      <div className="flex items-center gap-3 min-w-0 flex-1">
         <div
           className={cn(
             "rounded-2xl border flex items-center justify-center shrink-0 shadow-xs transition-transform group-hover:scale-105",
@@ -172,21 +172,21 @@ export function BelanjeTransactionRow({
           <CategoryIcon name={category?.icon} className={compact ? "size-4 stroke-[2]" : "size-5 stroke-[2]"} />
         </div>
 
-        <div className="min-w-0 space-y-0.5">
+        <div className="min-w-0 flex-1 space-y-0.5">
           {/* Merchant / Note Heading */}
-          <h4 className="text-xs sm:text-[13.5px] font-heading font-black text-[#161514] dark:text-[#FAF8F5] truncate leading-tight">
+          <h4 className="text-xs sm:text-[13.5px] font-heading font-black text-[#161514] dark:text-[#FAF8F5] leading-tight break-words line-clamp-2">
             {tx.note || category?.name || "Transaction"}
           </h4>
 
           {/* Subtext: Account • Time • Category Tag */}
-          <div className="flex items-center gap-1.5 text-[10.5px] font-mono text-[#6B6B6B] dark:text-[#A8A29E] leading-none whitespace-nowrap overflow-hidden">
+          <div className="flex items-center gap-1.5 text-[10.5px] font-mono text-[#6B6B6B] dark:text-[#A8A29E] leading-none flex-wrap">
             <span className="font-semibold text-[#161514] dark:text-[#FAF8F5] shrink-0">{accountLabel}</span>
             <span className="shrink-0">•</span>
             <span className="shrink-0">{formattedTimeOrDate}</span>
             {category?.name && tx.note && tx.note.toLowerCase() !== category.name.toLowerCase() && (
               <>
                 <span className="shrink-0">•</span>
-                <span className="truncate max-w-[90px] sm:max-w-[140px] text-[10px] px-1 py-0.5 rounded bg-stone-100 dark:bg-[#252321] border border-stone-200 dark:border-[#383531]">
+                <span className="truncate max-w-[110px] sm:max-w-[140px] text-[10px] px-1 py-0.5 rounded bg-stone-100 dark:bg-[#252321] border border-stone-200 dark:border-[#383531]">
                   {category.name}
                 </span>
               </>
