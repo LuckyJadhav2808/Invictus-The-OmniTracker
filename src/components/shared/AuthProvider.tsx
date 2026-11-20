@@ -12,6 +12,7 @@ import {
 import { registerServiceWorker } from "@/lib/utils/notifications";
 import { loadEvaluatorDemoData, isDemoDataActive, clearEvaluatorDemoData } from "@/lib/demo/demo-data-seed";
 import { hydrateDeviceFromCloud } from "@/lib/offline/device-hydration";
+import { syncUserConfig } from "@/lib/sms/sms-sync-service";
 
 interface AuthContextType {
   user: User | null;
@@ -60,6 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const current = getCustomSession();
     if (current && current.uid !== "guest-user") {
       hydrateDeviceFromCloud(current);
+      syncUserConfig(current.uid);
     }
   }, []);
 
@@ -78,6 +80,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     
     // Hydrate device localStorage from cloud document
     hydrateDeviceFromCloud(loggedUser);
+    syncUserConfig(loggedUser.uid);
     if (typeof window !== "undefined") {
       localStorage.setItem("invictus_onboarded", "true");
     }

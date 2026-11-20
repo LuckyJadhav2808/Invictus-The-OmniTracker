@@ -114,4 +114,48 @@ describe("SMS Sync Service & On-Launch Auto-Scanner", () => {
       });
     });
   });
+
+  describe("Pending SMS Transactions Queue & Simulation", () => {
+    it("manages simulated payment alert, retrieval, and removal seamlessly", async () => {
+      const {
+        getPendingSmsTransactions,
+        simulateIncomingPaymentSms,
+        removePendingSmsTransaction,
+        clearAllPendingSmsTransactions,
+      } = await import("./sms-sync-service");
+
+      // Initial queue is empty
+      expect(await getPendingSmsTransactions()).toEqual([]);
+
+      // Simulate incoming ₹80 payment
+      const item = await simulateIncomingPaymentSms({
+        amount: 80,
+        merchant: "Chai Point",
+        bankName: "HDFC",
+        accountLast4: "1234",
+      });
+
+      expect(item.amount).toBe(80);
+      expect(item.merchant).toBe("Chai Point");
+      expect(item.bankName).toBe("HDFC");
+
+      // Verify it appears in pending queue
+      const list = await getPendingSmsTransactions();
+      expect(list.length).toBe(1);
+      expect(list[0].amount).toBe(80);
+      expect(list[0].merchant).toBe("Chai Point");
+
+      // Remove the item
+      const removed = await removePendingSmsTransaction(item.dedupSignature, item.id);
+      expect(removed).toBe(true);
+
+      const afterRemove = await getPendingSmsTransactions();
+      expect(afterRemove.length).toBe(0);
+
+      // Clear all
+      await simulateIncomingPaymentSms({ amount: 120, merchant: "Swiggy" });
+      await clearAllPendingSmsTransactions();
+      expect(await getPendingSmsTransactions()).toEqual([]);
+    });
+  });
 });

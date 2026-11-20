@@ -27,7 +27,7 @@ export interface ParsedSmsTransaction {
 }
 
 // 1. TRAI Approved Indian Bank Alphanumeric Headers & Sender Patterns (Supports +91, FinTech, & All Banks)
-export const BANK_HEADER_REGEX = /^(?:[A-Za-z0-9]{2}[-_]?)?(HDFC(?:BK)?|SBI(?:NB|PSG|UPI|INB|TXN)?|ICICI(?:B)?|AXIS(?:BK)?|KOTAK(?:B)?|INDUS(?:B)?|YES(?:BNK)?|PNB(?:SMS|TXN)?|PUNJAB|BOI(?:SMS)?|CAN(?:BNK|ARA)?|UBI(?:SMS)?|UNION(?:B)?|IDFC(?:FB)?|FED(?:BNK)?|PAYTM(?:B)?|CRED(?:BK)?|CENT(?:BK)?|BOB(?:SMS|TXN)?|MAH(?:BK|A)?|IOB|UCO(?:BNK)?|RBL(?:BNK)?|AUFIN(?:B)?|BANDH(?:N)?|IDBI(?:BK)?|SC(?:ISMS)?|AMEX(?:IN)?|AIRTEL|JIO(?:BNK)?|PHONEPE|PHONEP|GPAY|GOOGLP|BHIM|NPCI|UPI|ONECRD|ONECARD|JUPITR|FIBANK|SLICEN|SLICE|NIYO|TATANEU|AMZPAY|INDBNK|INDIANB|BOMAH|CBIN|DBS|HSBC|CITI|KVB|SIB|CSB)(?:[-_][A-Za-z0-9]+)?$/i;
+export const BANK_HEADER_REGEX = /^(?:[A-Za-z0-9]{2,4}[-_]?)?(HDFC(?:BK)?|SBI(?:NB|PSG|UPI|INB|TXN)?|ICICI(?:B)?|AXIS(?:BK)?|KOTAK(?:B)?|INDUS(?:B)?|YES(?:BNK)?|PNB(?:SMS|TXN)?|PUNJAB|BOI(?:SMS)?|CAN(?:BNK|ARA)?|UBI(?:SMS)?|UNION(?:B)?|IDFC(?:FB)?|FED(?:BNK)?|PAYTM(?:B)?|CRED(?:BK)?|CENT(?:BK)?|BOB(?:SMS|TXN)?|MAH(?:BK|A)?|IOB|UCO(?:BNK)?|RBL(?:BNK)?|AUFIN(?:B)?|BANDH(?:N)?|IDBI(?:BK)?|SC(?:ISMS)?|AMEX(?:IN)?|AIRTEL|JIO(?:BNK)?|PHONEPE|PHONEP|GPAY|GOOGLP|BHIM|NPCI|UPI|ONECRD|ONECARD|JUPITR|FIBANK|SLICEN|SLICE|NIYO|TATANEU|AMZPAY|INDBNK|INDIANB|BOMAH|CBIN|DBS|HSBC|CITI|KVB|SIB|CSB|BHARATPE|PINELAB|RAZORPAY|CASHFREE)(?:[-_][A-Za-z0-9]+)?$/i;
 
 // 2. Strict Zero-Tolerance OTP / Secret Token Dropper
 export const OTP_REGEX = /\b(otp|one time password|verification code|secret code|cvv|atm pin|upi pin|password|passcode)\b/i;
@@ -38,8 +38,8 @@ export const CREDIT_INFLOW_REGEX = /\b(credited|received|deposited|refunded|reve
 // 4. Failed Transaction Dropper (Ignore aborted/declined transactions)
 export const FAILED_TX_REGEX = /\b(failed|declined|unsuccessful|aborted|cancelled|transaction limit exceeded)\b/i;
 
-// 5. Balance Clause Stripper (Ensures available balance is NEVER extracted as spend amount)
-export const BALANCE_STRIPPER_REGEX = /(?:\.|\s)*(?:Avl\s*Bal|Avail\s*Bal|Available\s*Balance|Bal:|Total\s*Bal|Clear\s*Bal|Bal\s+INR|Bal\s+Rs).*$/i;
+// 5. Balance Clause Stripper (Ensures available balance is NEVER extracted as spend amount, without wiping following text)
+export const BALANCE_STRIPPER_REGEX = /(?:\.|\s)*(?:Avl\s*Bal|Avail\s*Bal|Available\s*Balance|Bal:|Total\s*Bal|Clear\s*Bal|Bal\s+INR|Bal\s+Rs)[:\s]*(?:Rs\.?|INR|₹)?\s*[\d,]+(?:\.\d{1,2})?(?:\s|$|\.)/gi;
 
 // 6. Spend & Debit Intent Verification (Broadened to include debit of, transferred from, txn of, payment of)
 export const DEBIT_INTENT_REGEX = /\b(debited|debit|spent|paid|sent|withdrawn|purchase|deducted|transfer to|transferred to|transferred from|transferred|payment to|payment of|txn of|transaction of|charged|auto[- ]?debit)\b/i;
@@ -285,11 +285,11 @@ export function parseBankSms(
     const isApprovedSender =
       BANK_HEADER_REGEX.test(cleanSender) ||
       BANK_HEADER_REGEX.test(rawSender.trim()) ||
-      /-(?:PNB|SBI|HDFC|ICICI|AXIS|KOTAK|BOB|BOI|CANBNK|UBI|IDFC|PAYTM|CRED|AIRTEL|JIO)$/i.test(bodyText) ||
-      /(?:Punjab National Bank|State Bank of India|HDFC Bank|ICICI Bank|Axis Bank|Kotak Bank|Bank of Baroda|Union Bank|Canara Bank|Indian Bank|Bank of Maharashtra|Paytm|PhonePe|Google Pay|CRED)/i.test(bodyText) ||
-      // Defensively allow any SMS that has clear banking debit context + account/UPI
+      /-(?:PNB|SBI|HDFC|ICICI|AXIS|KOTAK|BOB|BOI|CANBNK|UBI|IDFC|PAYTM|CRED|AIRTEL|JIO|FED|INDUS|YES|MAH|IOB|UCO|RBL|AUFIN|BANDHAN|IDBI|SC|AMEX|BHARATPE|RAZORPAY)$/i.test(bodyText) ||
+      /(?:Punjab National Bank|State Bank of India|HDFC Bank|ICICI Bank|Axis Bank|Kotak Bank|Bank of Baroda|Union Bank|Canara Bank|Indian Bank|Bank of Maharashtra|Paytm|PhonePe|Google Pay|CRED|Amazon Pay|BHIM|OneCard|Jupiter|Fi Money|Slice|Federal Bank|IndusInd|Yes Bank)/i.test(bodyText) ||
+      // Defensively allow any SMS that has clear banking debit context + financial reference or amount
       ((DEBIT_INTENT_REGEX.test(bodyText) || bodyText.toLowerCase().includes("debited")) &&
-       (ACCOUNT_MASKED_REGEX.test(bodyText) || UPI_TOKEN_REGEX.test(bodyText) || /UPI/i.test(bodyText)));
+       (ACCOUNT_MASKED_REGEX.test(bodyText) || UPI_TOKEN_REGEX.test(bodyText) || /UPI/i.test(bodyText) || AMOUNT_REGEX.test(bodyText) || /\b(ref|txn|vpa|paid to|spent on)\b/i.test(bodyText)));
 
     if (!isApprovedSender) {
       return null;

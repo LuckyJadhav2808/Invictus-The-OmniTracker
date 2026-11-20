@@ -40,6 +40,8 @@ import { SegmentedSubNav, type SubNavTab } from "@/components/mobile/SegmentedSu
 import { MoneyDoorTileRow } from "@/components/money/MoneyDoorTileRow";
 import { BottomSheet } from "@/components/mobile/BottomSheet";
 import { useWhoOwesWhoStore } from "@/store/who-owes-who-store";
+import { PendingSmsTransactionsBanner } from "@/components/money/PendingSmsTransactionsBanner";
+import { removePendingSmsTransaction } from "@/lib/sms/sms-sync-service";
 
 // Lazy-Loaded Tab Views (Saves Recharts & IOU Bundles on Initial Paint)
 const BudgetTabView = dynamic(
@@ -157,6 +159,10 @@ function MoneyPageContent() {
   const [isWhoOwesWhoOpen, setIsWhoOwesWhoOpen] = useState(false);
   const [whoOwesWhoPrefill, setWhoOwesWhoPrefill] = useState<{ amount?: number; description?: string } | null>(null);
   const [reopenTxAfterCat, setReopenTxAfterCat] = useState(false);
+  const [pendingSmsToRegister, setPendingSmsToRegister] = useState<{
+    dedupSignature: string;
+    pendingId: string;
+  } | null>(null);
 
   // Deletion Safeguard
   const [deleteCatId, setDeleteCatId] = useState<string | null>(null);
@@ -542,6 +548,11 @@ function MoneyPageContent() {
         }
       );
     }
+
+    if (pendingSmsToRegister) {
+      await removePendingSmsTransaction(pendingSmsToRegister.dedupSignature, pendingSmsToRegister.pendingId);
+      setPendingSmsToRegister(null);
+    }
   };
 
   const handleDuplicateTransaction = async (tx: Transaction) => {
@@ -853,6 +864,29 @@ function MoneyPageContent() {
       )}
 
       <div className="px-3.5 space-y-3">
+        {/* ================= INSTANT 1-TAP PENDING SMS PAYMENT ALERT DOCK ================= */}
+        <PendingSmsTransactionsBanner
+          categories={categories}
+          onOpenEditModal={(prefill) => {
+            setEditingTx({
+              id: `tx_sms_${Date.now()}`,
+              amount: prefill.amount,
+              type: "expense",
+              categoryId: prefill.categoryId || "cat-food",
+              date: prefill.date || new Date().toISOString().split("T")[0],
+              note: prefill.merchant,
+              paymentMethod: prefill.paymentMethod || "UPI",
+              dedupSignature: prefill.dedupSignature,
+              source: "bank_sms",
+            } as any);
+            setPendingSmsToRegister({
+              dedupSignature: prefill.dedupSignature,
+              pendingId: prefill.pendingId,
+            });
+            setIsAddTxOpen(true);
+          }}
+        />
+
         {/* Render Slot 3 (Hero Cockpit), Slot 4 (Door Tiles), and Slot 5 (Recent Glance) ONLY on Overview */}
         {(activeTab === "overview" || activeTab === "ledger") && (
           <>

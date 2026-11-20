@@ -25,6 +25,7 @@ import {
   syncRecentBankSms,
   getLastSmsSyncTimestamp,
   resetLastSmsSyncTimestamp,
+  simulateIncomingPaymentSms,
   SmsBridge,
 } from "@/lib/sms/sms-sync-service";
 import { parseBankSms } from "@/lib/sms/sms-local-parser";
@@ -232,6 +233,22 @@ export function BankSmsSettingsSection() {
     resetLastSmsSyncTimestamp();
     refreshSyncTime();
     toast.success("High-water mark reset. Next scan will inspect past 30 days.");
+  };
+
+  const handleSimulatePaymentAlert = async () => {
+    soundFX.play("celebrate");
+    const amt = testResult?.amount || 80;
+    const merch = testResult?.merchant || "Chai Point";
+    const bank = testResult?.bankName || "HDFC";
+    await simulateIncomingPaymentSms({
+      amount: amt,
+      merchant: merch,
+      bankName: bank,
+      accountLast4: "4321",
+    });
+    toast.success(`⚡ Simulated ₹${amt} Payment Alert created!`, {
+      description: "Switch to the Money tab to see your 1-Tap Registration card.",
+    });
   };
 
   const handlePurgeSmsBatch = async () => {
@@ -607,13 +624,23 @@ export function BankSmsSettingsSection() {
                       )}
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={handleImportTestParsed}
-                    className="px-3 py-1.5 rounded-xl bg-[#161514] dark:bg-white text-white dark:text-[#161514] hover:bg-[#2b2927] dark:hover:bg-neutral-100 text-xs font-black uppercase transition-all shadow-xs hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
-                  >
-                    + Add to Ledger
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handleSimulatePaymentAlert}
+                      className="px-3 py-1.5 rounded-xl bg-[#CEF431] text-[#161514] hover:bg-[#bce620] text-xs font-black uppercase transition-all shadow-xs hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center gap-1.5 border border-[#161514]"
+                    >
+                      <Zap className="size-3.5 fill-[#161514]" />
+                      <span>Simulate Alert</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleImportTestParsed}
+                      className="px-3 py-1.5 rounded-xl bg-[#161514] dark:bg-white text-white dark:text-[#161514] hover:bg-[#2b2927] dark:hover:bg-neutral-100 text-xs font-black uppercase transition-all shadow-xs hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+                    >
+                      + Add to Ledger
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-400/40 rounded-xl p-3 text-xs font-medium text-amber-900 dark:text-amber-300 flex items-center gap-2 shadow-xs">

@@ -14,6 +14,19 @@ import { parseBankSms, ParsedSmsTransaction } from "./sms-local-parser";
 import { categorizeMerchants } from "./constrained-categorizer";
 import { type Category, type Transaction } from "@/types";
 
+export interface PendingSmsTransaction {
+  id: string;
+  amount: number;
+  type: "expense";
+  merchant: string;
+  date: string;
+  bankName: string;
+  accountLast4?: string;
+  rawSender?: string;
+  dedupSignature: string;
+  timestamp: number;
+}
+
 export interface SmsBridgePluginInterface {
   checkPermissions(): Promise<{ smsGranted: boolean; notificationsGranted: boolean; allGranted: boolean }>;
   requestPermissions(): Promise<{ smsGranted: boolean; notificationsGranted: boolean; allGranted: boolean }>;
@@ -23,6 +36,21 @@ export interface SmsBridgePluginInterface {
     count: number;
   }>;
   setSyncConfig(options: { userId: string; endpoint?: string }): Promise<{ success: boolean }>;
+  getPendingTransactions(): Promise<{
+    transactions: PendingSmsTransaction[];
+    count: number;
+  }>;
+  removePendingTransaction(options: { dedupSignature?: string; id?: string }): Promise<{ success: boolean; removed: boolean }>;
+  clearAllPendingTransactions(): Promise<{ success: boolean }>;
+  savePendingTransaction(options: {
+    amount: number;
+    merchant: string;
+    bankName?: string;
+    date?: string;
+    accountLast4?: string;
+    rawSender?: string;
+    dedupSignature?: string;
+  }): Promise<{ success: boolean }>;
 }
 
 export const SmsBridge = registerPlugin<SmsBridgePluginInterface>("SmsBridge");
@@ -56,6 +84,133 @@ export function getLastAutoScanTimestamp(): number | null {
 export function setLastAutoScanTimestamp(timestamp: number): void {
   if (typeof window !== "undefined") {
     localStorage.setItem(LAST_AUTO_SCAN_KEY, String(timestamp));
+  }
+}
+
+export const PENDING_SMS_LOCAL_KEY = "invictus_pending_sms_transactions";
+
+export async function getPendingSmsTransactions(): Promise<PendingSmsTransaction[]> {
+  if (typeof window === "undefined") return [];
+  const isNative = await isSmsSyncAvailable();
+  if (isNative) {
+    try {
+      const res = await SmsBridge.getPendingTransactions();
+      if (res && Array.isArray(res.transactions) && res.transactions.length > 0) {
+        return res.transactions;
+      }
+    } catch (err) {
+      console.warn("[getPendingSmsTransactions] Bridge failed, checking local:", err);
+    }
+  }
+  // Web / LocalStorage fallback
+  try {
+    const raw = localStorage.getItem(PENDING_SMS_LOCAL_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export async function removePendingSmsTransaction(dedupSignature?: string, id?: string): Promise<boolean> {
+  if (typeof window === "undefined") return false;
+  const isNative = await isSmsSyncAvailable();
+  if (isNative) {
+    try {
+      await SmsBridge.removePendingTransaction({ dedupSignature, id });
+    } catch (err) {
+      console.warn("[removePendingSmsTransaction] Bridge error:", err);
+    }
+  }
+  try {
+    const raw = localStorage.getItem(PENDING_SMS_LOCAL_KEY);
+    if (!raw) return true;
+    const list: PendingSmsTransaction[] = JSON.parse(raw);
+    const filtered = list.filter((item) => {
+      if (dedupSignature && item.dedupSignature === dedupSignature) return false;
+      if (id && item.id === id) return false;
+      return true;
+    });
+    localStorage.setItem(PENDING_SMS_LOCAL_KEY, JSON.stringify(filtered));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function clearAllPendingSmsTransactions(): Promise<boolean> {
+  if (typeof window === "undefined") return false;
+  const isNative = await isSmsSyncAvailable();
+  if (isNative) {
+    try {
+      await SmsBridge.clearAllPendingTransactions();
+    } catch (err) {
+      console.warn("[clearAllPendingSmsTransactions] Bridge error:", err);
+    }
+  }
+  try {
+    localStorage.removeItem(PENDING_SMS_LOCAL_KEY);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function simulateIncomingPaymentSms(data: {
+  amount: number;
+  merchant: string;
+  bankName?: string;
+  accountLast4?: string;
+}): Promise<PendingSmsTransaction> {
+  const isNative = await isSmsSyncAvailable();
+  const today = new Date().toISOString().split("T")[0];
+  const dedupSig = `sms_dedup_sim_${Date.now()}_${today.replace(/-/g, "")}`;
+  const item: PendingSmsTransaction = {
+    id: `pending_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+    amount: data.amount,
+    type: "expense",
+    merchant: data.merchant,
+    date: today,
+    bankName: data.bankName || "HDFC",
+    accountLast4: data.accountLast4 || "4321",
+    rawSender: "SIMULATED",
+    dedupSignature: dedupSig,
+    timestamp: Date.now(),
+  };
+
+  if (isNative) {
+    try {
+      await SmsBridge.savePendingTransaction(item);
+    } catch (err) {
+      console.warn("[simulateIncomingPaymentSms] Bridge error:", err);
+    }
+  }
+
+  if (typeof window !== "undefined") {
+    try {
+      const raw = localStorage.getItem(PENDING_SMS_LOCAL_KEY);
+      const list: PendingSmsTransaction[] = raw ? JSON.parse(raw) : [];
+      list.unshift(item);
+      localStorage.setItem(PENDING_SMS_LOCAL_KEY, JSON.stringify(list.slice(0, 20)));
+    } catch (err) {
+      console.warn("[simulateIncomingPaymentSms] LocalStorage error:", err);
+    }
+  }
+
+  return item;
+}
+
+export async function syncUserConfig(userId: string): Promise<void> {
+  if (!userId || typeof window === "undefined") return;
+  const isNative = await isSmsSyncAvailable();
+  if (isNative) {
+    try {
+      await SmsBridge.setSyncConfig({
+        userId,
+        endpoint: "https://invictus-the-omni-tracker.vercel.app/api/money/sms-webhook",
+      });
+    } catch (err) {
+      console.warn("[syncUserConfig] Failed to sync userId to Android SharedPreferences:", err);
+    }
   }
 }
 

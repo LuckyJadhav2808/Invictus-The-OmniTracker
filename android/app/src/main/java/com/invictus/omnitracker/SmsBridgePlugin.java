@@ -98,11 +98,15 @@ public class SmsBridgePlugin extends Plugin {
         long startTime = call.getLong("startTime", 0L);
         long endTime = call.getLong("endTime", System.currentTimeMillis());
         long now = System.currentTimeMillis();
-        // Generous forward buffer prevents carrier telecom clock skew from cutting off today's messages
-        if (endTime >= now - 300000) {
-            endTime = now + (12 * 60 * 60 * 1000L);
+
+        // Generous 24-hr bidirectional buffers prevent carrier timezone skew from missing messages
+        if (startTime > 0) {
+            startTime = Math.max(0, startTime - (24 * 60 * 60 * 1000L));
         }
-        int limit = call.getInt("limit", 300);
+        if (endTime >= now - 300000) {
+            endTime = now + (24 * 60 * 60 * 1000L);
+        }
+        int limit = call.getInt("limit", 1000);
 
         JSArray messagesArray = new JSArray();
         ContentResolver cr = context.getContentResolver();
@@ -111,7 +115,7 @@ public class SmsBridgePlugin extends Plugin {
         String selection = "date >= ? AND date <= ?";
         String[] selectionArgs = new String[]{String.valueOf(startTime), String.valueOf(endTime)};
         String sortOrder = "date DESC";
-        int maxScanRows = 1200;
+        int maxScanRows = 3000;
         int rowsScanned = 0;
 
         try (Cursor cursor = cr.query(uri, new String[]{"_id", "address", "body", "date"}, selection, selectionArgs, sortOrder)) {
@@ -144,7 +148,8 @@ public class SmsBridgePlugin extends Plugin {
                                 || bodyUpper.contains("PAID") || bodyUpper.contains("SENT") || bodyUpper.contains("WITHDRAWN")
                                 || bodyUpper.contains("TRANSFERRED") || bodyUpper.contains("TRANSFER TO")
                                 || bodyUpper.contains("A/C") || bodyUpper.contains("ACCOUNT") || bodyUpper.contains("UPI")
-                                || bodyUpper.contains("INR") || bodyUpper.contains("RS.") || bodyUpper.contains("RS ");
+                                || bodyUpper.contains("INR") || bodyUpper.contains("RS.") || bodyUpper.contains("RS ")
+                                || bodyUpper.contains("TXN") || bodyUpper.contains("PAYMENT") || bodyUpper.contains("TRANSFER");
 
                         if (isCandidate) {
                             JSObject msgObj = new JSObject();
@@ -164,6 +169,106 @@ public class SmsBridgePlugin extends Plugin {
             call.resolve(ret);
         } catch (Exception e) {
             call.reject("Failed to query SMS inbox: " + e.getMessage(), e);
+        }
+    }
+
+    @PluginMethod
+    public void getPendingTransactions(PluginCall call) {
+        Context context = getContext();
+        android.content.SharedPreferences prefs = context.getSharedPreferences("invictus_sms_prefs", Context.MODE_PRIVATE);
+        String pendingJson = prefs.getString("pending_transactions", "[]");
+        try {
+            org.json.JSONArray array = new org.json.JSONArray(pendingJson);
+            JSArray result = new JSArray();
+            for (int i = 0; i < array.length(); i++) {
+                result.put(new JSObject(array.getJSONObject(i).toString()));
+            }
+            JSObject ret = new JSObject();
+            ret.put("transactions", result);
+            ret.put("count", result.length());
+            call.resolve(ret);
+        } catch (Exception e) {
+            JSObject ret = new JSObject();
+            ret.put("transactions", new JSArray());
+            ret.put("count", 0);
+            call.resolve(ret);
+        }
+    }
+
+    @PluginMethod
+    public void removePendingTransaction(PluginCall call) {
+        String dedupSignature = call.getString("dedupSignature");
+        String id = call.getString("id");
+        Context context = getContext();
+        android.content.SharedPreferences prefs = context.getSharedPreferences("invictus_sms_prefs", Context.MODE_PRIVATE);
+        String pendingJson = prefs.getString("pending_transactions", "[]");
+        try {
+            org.json.JSONArray array = new org.json.JSONArray(pendingJson);
+            org.json.JSONArray newArray = new org.json.JSONArray();
+            boolean removed = false;
+            for (int i = 0; i < array.length(); i++) {
+                org.json.JSONObject item = array.getJSONObject(i);
+                String itemSig = item.optString("dedupSignature");
+                String itemId = item.optString("id");
+                if ((dedupSignature != null && dedupSignature.equals(itemSig)) || (id != null && id.equals(itemId))) {
+                    removed = true;
+                    continue;
+                }
+                newArray.put(item);
+            }
+            prefs.edit().putString("pending_transactions", newArray.toString()).apply();
+            JSObject ret = new JSObject();
+            ret.put("success", true);
+            ret.put("removed", removed);
+            call.resolve(ret);
+        } catch (Exception e) {
+            call.reject("Failed to remove pending transaction", e);
+        }
+    }
+
+    @PluginMethod
+    public void clearAllPendingTransactions(PluginCall call) {
+        Context context = getContext();
+        android.content.SharedPreferences prefs = context.getSharedPreferences("invictus_sms_prefs", Context.MODE_PRIVATE);
+        prefs.edit().putString("pending_transactions", "[]").apply();
+        JSObject ret = new JSObject();
+        ret.put("success", true);
+        call.resolve(ret);
+    }
+
+    @PluginMethod
+    public void savePendingTransaction(PluginCall call) {
+        Double amount = call.getDouble("amount", 0.0);
+        String merchant = call.getString("merchant", "UPI Payment");
+        String bank = call.getString("bankName", "Bank");
+        String date = call.getString("date", new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(new java.util.Date()));
+        String acc = call.getString("accountLast4", "");
+        String sender = call.getString("rawSender", "Manual");
+        String dedupSig = call.getString("dedupSignature", "sms_sim_" + System.currentTimeMillis());
+
+        Context context = getContext();
+        android.content.SharedPreferences prefs = context.getSharedPreferences("invictus_sms_prefs", Context.MODE_PRIVATE);
+        String pendingJson = prefs.getString("pending_transactions", "[]");
+        try {
+            org.json.JSONArray array = new org.json.JSONArray(pendingJson);
+            org.json.JSONObject item = new org.json.JSONObject();
+            item.put("id", "pending_" + System.currentTimeMillis());
+            item.put("amount", amount);
+            item.put("type", "expense");
+            item.put("merchant", merchant);
+            item.put("date", date);
+            item.put("bankName", bank);
+            item.put("accountLast4", acc);
+            item.put("rawSender", sender);
+            item.put("dedupSignature", dedupSig);
+            item.put("timestamp", System.currentTimeMillis());
+            array.put(item);
+            prefs.edit().putString("pending_transactions", array.toString()).apply();
+            JSObject ret = new JSObject();
+            ret.put("success", true);
+            call.resolve(ret);
+        } catch (Exception e) {
+            call.reject("Failed to save pending transaction", e);
         }
     }
 

@@ -214,17 +214,57 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
             final String finalDedup = dedupSig;
             final String finalDate = todayDate;
 
-            // Step 8: Headless Background Sync & Notification
+            // Step 8: Headless Background Sync, Local Persistent Storage & Actionable Notification
             new Thread(new Runnable() {
                 @Override
                 public void run() {
+                    savePendingTransaction(context, finalAmount, finalType, finalMerchant, finalDate, finalBank, finalAcc, finalSender, finalDedup);
                     syncToCloud(context, finalAmount, finalType, finalMerchant, finalDate, finalBank, finalAcc, finalSender, finalDedup);
-                    showNotification(context, finalAmount, finalType, finalMerchant, finalBank);
+                    showNotification(context, finalAmount, finalType, finalMerchant, finalBank, finalDedup);
                 }
             }).start();
 
         } catch (Exception e) {
             Log.e(TAG, "Error in SMS parsing", e);
+        }
+    }
+
+    private void savePendingTransaction(Context context, double amount, String type, String merchant, String date, String bank, String acc, String sender, String dedupSig) {
+        try {
+            android.content.SharedPreferences prefs = context.getSharedPreferences("invictus_sms_prefs", Context.MODE_PRIVATE);
+            String existingJson = prefs.getString("pending_transactions", "[]");
+            org.json.JSONArray array = new org.json.JSONArray(existingJson);
+
+            // Deduplication check: do not add duplicate pending transaction
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject item = array.getJSONObject(i);
+                if (dedupSig.equals(item.optString("dedupSignature"))) {
+                    return;
+                }
+            }
+
+            JSONObject item = new JSONObject();
+            item.put("id", "pending_" + System.currentTimeMillis() + "_" + Math.abs(dedupSig.hashCode() % 10000));
+            item.put("amount", amount);
+            item.put("type", type);
+            item.put("merchant", merchant);
+            item.put("date", date);
+            item.put("bankName", bank);
+            item.put("accountLast4", acc);
+            item.put("rawSender", sender);
+            item.put("dedupSignature", dedupSig);
+            item.put("timestamp", System.currentTimeMillis());
+
+            // Enforce max 20 pending transactions queue (FIFO)
+            if (array.length() >= 20) {
+                array.remove(0);
+            }
+            array.put(item);
+
+            prefs.edit().putString("pending_transactions", array.toString()).apply();
+            Log.d(TAG, "Saved pending transaction to local prefs: " + merchant + " - " + amount);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to save pending transaction locally", e);
         }
     }
 
@@ -266,7 +306,7 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
         }
     }
 
-    private void showNotification(Context context, double amount, String type, String merchant, String bank) {
+    private void showNotification(Context context, double amount, String type, String merchant, String bank, String dedupSig) {
         try {
             NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             if (nm == null) return;
@@ -285,6 +325,8 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
             Intent tapIntent = new Intent(context, MainActivity.class);
             tapIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
             tapIntent.putExtra("target_tab", "money");
+            tapIntent.putExtra("pending_transaction_sig", dedupSig);
+            tapIntent.setData(android.net.Uri.parse("https://invictus-the-omni-tracker.vercel.app/money?pending_sms=1"));
 
             PendingIntent pendingIntent = PendingIntent.getActivity(
                     context,
@@ -297,13 +339,14 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
             String formattedAmt = (amount % 1 == 0)
                     ? String.format(Locale.getDefault(), "%,.0f", amount)
                     : String.format(Locale.getDefault(), "%,.2f", amount);
-            String title = (isExpense ? "⚡ Spent ₹" : "⚡ Received ₹") + formattedAmt;
-            String body = (isExpense ? "Paid to " : "From ") + merchant + " (" + bank + ")";
+            String title = (isExpense ? "⚡ Spent ₹" : "⚡ Received ₹") + formattedAmt + ": " + merchant;
+            String body = "Tap to register to ledger or edit details (" + bank + ")";
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                     .setSmallIcon(R.mipmap.ic_launcher)
                     .setContentTitle(title)
                     .setContentText(body)
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText("Detected bank payment of ₹" + formattedAmt + " to " + merchant + " (" + bank + "). Tap to register into your Invictus money ledger or edit details."))
                     .setAutoCancel(true)
                     .setContentIntent(pendingIntent)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
