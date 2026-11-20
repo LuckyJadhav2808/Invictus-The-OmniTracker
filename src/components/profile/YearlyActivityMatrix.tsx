@@ -277,12 +277,12 @@ export function YearlyActivityMatrix({
 
         <div
           ref={scrollContainerRef}
-          className="overflow-x-auto no-scrollbar rounded-2xl border-2 border-[#161514] dark:border-[#383531] bg-[#FAF8F5] dark:bg-[#161514] p-4 shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]"
+          className="overflow-x-auto no-scrollbar touch-pan-x rounded-2xl border-2 border-[#161514] dark:border-[#383531] bg-[#FAF8F5] dark:bg-[#161514] p-4 shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]"
         >
           <div className="min-w-max flex gap-2">
             
             {/* Day of Week Row Labels (Mon, Wed, Fri, Sun) */}
-            <div className="flex flex-col justify-between pt-5 pb-1 pr-1 text-[9px] font-black text-[#161514]/40 select-none">
+            <div className="flex flex-col justify-between pt-5 pb-1 pr-1 text-[9px] font-black text-[#161514]/40 dark:text-[#FAF8F5]/40 select-none">
               {dayRowLabels.map((lbl, idx) => (
                 <span key={idx} className="h-3 leading-3">{lbl}</span>
               ))}
@@ -294,7 +294,7 @@ export function YearlyActivityMatrix({
               {/* Month Header Labels Row */}
               <div className="flex gap-1 h-4">
                 {weeks.map((week, wIdx) => (
-                  <div key={wIdx} className="w-3 text-[9px] font-black text-[#161514]/80 tracking-tighter">
+                  <div key={wIdx} className="w-3 text-[9px] font-black text-[#161514]/80 dark:text-[#FAF8F5]/80 tracking-tighter">
                     {week.monthLabel ? week.monthLabel.slice(0, 3) : ""}
                   </div>
                 ))}

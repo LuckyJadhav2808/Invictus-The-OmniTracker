@@ -1030,7 +1030,7 @@ html[data-color-theme="cobalt"] .dark {
 body:has([role="dialog"][data-state="open"]) nav[aria-label="Mobile Primary Navigation"],
 body:has([role="alertdialog"][data-state="open"]) nav[aria-label="Mobile Primary Navigation"],
 body:has([aria-modal="true"][data-state="open"]) nav[aria-label="Mobile Primary Navigation"] {
-  transform: translate(-50%, 7rem) !important;
+  transform: translateY(7rem) !important;
   opacity: 0 !important;
   pointer-events: none !important;
 }

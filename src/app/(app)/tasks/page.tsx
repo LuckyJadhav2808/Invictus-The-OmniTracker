@@ -365,27 +365,29 @@ export default function TasksPage() {
   // MAIN VIEW: MOBILE 5-SLOT BUDGET + DESKTOP 2-COLUMN BENTO
   // =========================================================================
   return (
-    <div className="w-full max-w-xl lg:max-w-6xl mx-auto px-2 sm:px-4 py-2 sm:py-4 space-y-3 sm:space-y-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] select-none">
+    <div className="w-full max-w-xl lg:max-w-6xl mx-auto px-2 sm:px-4 py-2 sm:py-4 space-y-3 sm:space-y-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] select-none max-w-full overflow-x-hidden">
       {/* ================= SLOT 1: MOBILE APP BAR (Mobile Only) ================= */}
-      <MobileAppBar
-        title="Tasks"
-        dueCount={p1UrgentTasks}
-        dateShortLabel={`${completedTasks}/${totalTasks}`}
-        onCheckAllDue={() => {
-          soundFX.playPop();
-          soundFX.vibrate(25);
-          // Mark all pending tasks as completed
-          tasks.forEach((t) => {
-            if (t.status !== "completed") {
-              updateTaskMutation.mutate({
-                id: t.id,
-                updates: { status: "completed", completedAt: new Date().toISOString() },
-              });
-            }
-          });
-        }}
-        isAllDueCompleted={totalTasks > 0 && completedTasks === totalTasks}
-      />
+      <div className="-mx-2 -mt-2 sm:-mx-4 sm:-mt-4 lg:hidden">
+        <MobileAppBar
+          title="Tasks"
+          dueCount={p1UrgentTasks}
+          dateShortLabel={`${completedTasks}/${totalTasks}`}
+          onCheckAllDue={() => {
+            soundFX.playPop();
+            soundFX.vibrate(25);
+            // Mark all pending tasks as completed
+            tasks.forEach((t) => {
+              if (t.status !== "completed") {
+                updateTaskMutation.mutate({
+                  id: t.id,
+                  updates: { status: "completed", completedAt: new Date().toISOString() },
+                });
+              }
+            });
+          }}
+          isAllDueCompleted={totalTasks > 0 && completedTasks === totalTasks}
+        />
+      </div>
 
       {/* ================= SLOT 2: DESKTOP SUB-NAV (Desktop Only) ================= */}
       <SegmentedSubNav

@@ -411,7 +411,7 @@ export function BankSmsSettingsSection() {
         </div>
 
         {/* Feature 1: Learned Merchant Rules Modal Trigger */}
-        <div className="flex items-center justify-between bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] rounded-2xl p-3.5 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between items-start bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] rounded-2xl p-3.5 shadow-xs gap-2.5">
           <div className="flex items-center gap-3 min-w-0 pr-2">
             <div className="size-9 rounded-xl bg-purple-100 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800/40 flex items-center justify-center text-purple-700 dark:text-purple-400 shadow-xs shrink-0">
               <Sparkles className="size-4" />
@@ -431,14 +431,14 @@ export function BankSmsSettingsSection() {
               soundFX.play("pop");
               setIsDictionaryOpen(true);
             }}
-            className="px-3 py-1.5 rounded-xl border border-[#161514] dark:border-[#2A2724] bg-white dark:bg-[#252220] hover:bg-[#CEF431] dark:hover:bg-[#CEF431] text-[#161514] dark:text-[#FAF8F5] dark:hover:text-[#161514] font-black text-xs uppercase shadow-xs hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer whitespace-nowrap shrink-0"
+            className="w-full sm:w-auto px-3 py-1.5 rounded-xl border border-[#161514] dark:border-[#2A2724] bg-white dark:bg-[#252220] hover:bg-[#CEF431] dark:hover:bg-[#CEF431] text-[#161514] dark:text-[#FAF8F5] dark:hover:text-[#161514] font-black text-xs uppercase shadow-xs hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer whitespace-nowrap shrink-0 text-center"
           >
             Manage Rules
           </button>
         </div>
 
         {/* Feature 2: Targeted Date Range Scanner */}
-        <div className="flex items-center justify-between bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] rounded-2xl p-3.5 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between items-start bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] rounded-2xl p-3.5 shadow-xs gap-2.5">
           <div className="flex items-center gap-3 min-w-0 pr-2">
             <div className="size-9 rounded-xl bg-blue-100 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/40 flex items-center justify-center text-blue-800 dark:text-blue-400 shadow-xs shrink-0">
               <Calendar className="size-4" />
@@ -458,7 +458,7 @@ export function BankSmsSettingsSection() {
               soundFX.play("pop");
               setIsDateFilterOpen(true);
             }}
-            className="px-3 py-1.5 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] bg-white dark:bg-[#252220] hover:bg-neutral-50 dark:hover:bg-[#2e2a28] text-[#161514] dark:text-[#FAF8F5] font-black text-xs uppercase shadow-xs hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer whitespace-nowrap shrink-0 flex items-center gap-1.5"
+            className="w-full sm:w-auto px-3 py-1.5 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] bg-white dark:bg-[#252220] hover:bg-neutral-50 dark:hover:bg-[#2e2a28] text-[#161514] dark:text-[#FAF8F5] font-black text-xs uppercase shadow-xs hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer whitespace-nowrap shrink-0 flex items-center justify-center gap-1.5"
           >
             <Calendar className="size-3.5" />
             <span>Filter Dates</span>
@@ -466,7 +466,7 @@ export function BankSmsSettingsSection() {
         </div>
 
         {/* Feature 3: 30-Day Recovery & Rescan */}
-        <div className="flex items-center justify-between bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] rounded-2xl p-3.5 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between items-start bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] rounded-2xl p-3.5 shadow-xs gap-2.5">
           <div className="flex items-center gap-3 min-w-0 pr-2">
             <div className="size-9 rounded-xl bg-amber-100 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/40 flex items-center justify-center text-amber-800 dark:text-amber-400 shadow-xs shrink-0">
               <RotateCcw className="size-4" />
@@ -480,13 +480,13 @@ export function BankSmsSettingsSection() {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="w-full sm:w-auto flex items-center gap-2 shrink-0">
             <button
               type="button"
               disabled={isSyncing}
               onClick={handleForceFullScan}
               className={cn(
-                "px-3 py-1.5 rounded-xl border border-[#161514] font-black text-xs uppercase shadow-xs hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5",
+                "w-full sm:w-auto px-3 py-1.5 rounded-xl border border-[#161514] font-black text-xs uppercase shadow-xs hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-1.5",
                 isSyncing ? "bg-neutral-200 dark:bg-neutral-800 text-neutral-400 cursor-not-allowed border-transparent" : "bg-[#CEF431] text-[#161514] hover:bg-[#bfe627]"
               )}
             >

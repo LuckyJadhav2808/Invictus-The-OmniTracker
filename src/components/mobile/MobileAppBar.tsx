@@ -81,12 +81,12 @@ export function MobileAppBar({
   return (
     <header
       className={cn(
-        "sticky top-0 z-30 w-full min-h-[52px] safe-top-pad px-3.5 bg-[#FAF8F5]/90 dark:bg-[#161514]/90 backdrop-blur-md border-b border-[#161514]/10 dark:border-white/10 flex items-center justify-between select-none transition-colors lg:hidden",
+        "sticky top-0 z-30 w-full min-h-[52px] safe-top-pad px-3.5 bg-[#FAF8F5]/90 dark:bg-[#161514]/90 backdrop-blur-md border-b border-[#161514]/10 dark:border-white/10 relative flex items-center justify-between select-none transition-colors lg:hidden",
         className
       )}
     >
       {/* Left: Back Button + Title + Date Badge */}
-      <div className="flex items-center gap-1.5 min-w-0 shrink-0">
+      <div className="flex items-center gap-1.5 min-w-0 shrink-0 relative z-10">
         {onBack ? (
           <button
             type="button"
@@ -120,15 +120,18 @@ export function MobileAppBar({
         )}
       </div>
 
-      {/* Center: Dynamic Island Live Activity Dock (Header Integrated, Stays in Header, omitted on domain pages like Habits) */}
+      {/* Spacer between left cluster and right cluster */}
+      <div className="flex-1 min-w-0" />
+
+      {/* Center: Dynamic Island Live Activity Dock - ABSOLUTELY CENTERED ON HARDWARE SCREEN */}
       {showDynamicIsland && (
-        <div className="flex-1 flex items-center justify-center min-w-0 px-1 h-8">
+        <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-auto z-20 max-w-[calc(100%-140px)]">
           <DynamicIslandDock variant="header" floatOnScroll={false} />
         </div>
       )}
 
       {/* Right: Max 2 Icons (Calendar + Overflow Menu) */}
-      <div className="flex items-center gap-1 shrink-0">
+      <div className="flex items-center gap-1 shrink-0 relative z-10">
         {/* Icon 1: Calendar / Jump to Today */}
         {onSelectDate && (
           <button

@@ -61,12 +61,12 @@ export function SegmentedSubNav({
     <nav
       aria-label="Sub Navigation"
       className={cn(
-        sticky ? "sticky top-[52px] z-20" : "relative z-auto",
-        "w-full px-3.5 py-1.5 bg-[#FAF8F5]/90 dark:bg-[#161514]/90 backdrop-blur-md border-b border-[#161514]/10 dark:border-white/10 select-none transition-colors",
+        sticky ? "sticky top-[calc(52px+env(safe-area-inset-top,0px))] z-20" : "relative z-auto",
+        "w-full px-2.5 sm:px-3.5 py-1.5 bg-[#FAF8F5]/90 dark:bg-[#161514]/90 backdrop-blur-md border-b border-[#161514]/10 dark:border-white/10 select-none transition-colors",
         className
       )}
     >
-      <div className="w-full bg-secondary/80 border border-border rounded-xl p-1 flex items-center justify-between gap-1">
+      <div className="w-full bg-secondary/80 border border-border rounded-xl p-1 flex items-center justify-between gap-1 overflow-x-auto no-scrollbar">
         {tabs.map((tab) => {
           const active = isTabActive(tab);
           const Icon = tab.icon;
@@ -79,7 +79,7 @@ export function SegmentedSubNav({
                 onClick={() => handleTabClick(tab.id)}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex-1 py-1.5 px-2 rounded-lg text-xs font-heading text-center flex items-center justify-center gap-1 sm:gap-1.5 transition-all cursor-pointer active:scale-95 min-h-[36px]",
+                  "flex-1 min-w-0 py-1.5 px-1 sm:px-2 rounded-lg text-[11px] sm:text-xs font-heading text-center flex items-center justify-center gap-1 sm:gap-1.5 transition-all cursor-pointer active:scale-95 min-h-[36px]",
                   active
                     ? "bg-[#CEF431] text-[#161514] border border-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_#161514]"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted font-bold"
@@ -99,7 +99,7 @@ export function SegmentedSubNav({
               onClick={() => handleTabClick(tab.id)}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "flex-1 py-1.5 px-2 rounded-lg text-xs font-heading text-center flex items-center justify-center gap-1 sm:gap-1.5 transition-all cursor-pointer active:scale-95 min-h-[36px]",
+                "flex-1 min-w-0 py-1.5 px-1 sm:px-2 rounded-lg text-[11px] sm:text-xs font-heading text-center flex items-center justify-center gap-1 sm:gap-1.5 transition-all cursor-pointer active:scale-95 min-h-[36px]",
                 active
                   ? "bg-[#CEF431] text-[#161514] border border-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_#161514]"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted font-bold"

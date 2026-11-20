@@ -625,68 +625,82 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="w-full max-w-xl lg:max-w-6xl mx-auto px-2 sm:px-4 py-2 sm:py-4 space-y-3 sm:space-y-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] select-none">
+    <div className="w-full max-w-xl lg:max-w-6xl mx-auto px-2 sm:px-4 py-2 sm:py-4 space-y-3 sm:space-y-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] select-none max-w-full overflow-x-hidden">
       {/* ================= SLOT 1: MOBILE APP BAR (Mobile Only) ================= */}
-      <MobileAppBar
-        title="Settings"
-        onBack={handleBackNavigation}
-        dateShortLabel={`v${APP_VERSION_CONFIG.version}`}
-        customMenuItems={
-          <>
-            <DropdownMenuItem
-              onClick={() => {
-                soundFX.playPop();
-                handleExportBackup();
-              }}
-              className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-black cursor-pointer hover:bg-secondary focus:bg-secondary"
-            >
-              <span className="flex items-center gap-2">
-                <Download className="size-3.5 stroke-[2]" />
-                Export Vault Backup
-              </span>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                soundFX.playPop();
-                setIsDiagnosticsOpen(true);
-              }}
-              className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-black cursor-pointer hover:bg-secondary focus:bg-secondary"
-            >
-              <span className="flex items-center gap-2">
-                <ShieldCheck className="size-3.5 stroke-[2]" />
-                System Diagnostics
-              </span>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                soundFX.playPop();
-                setIsUpdateCheckOpen(true);
-              }}
-              className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-black cursor-pointer hover:bg-secondary focus:bg-secondary"
-            >
-              <span className="flex items-center gap-2">
-                <RefreshCw className="size-3.5 stroke-[2]" />
-                Check Updates
-              </span>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                soundFX.playPop();
-                setPlayfulToastsEnabled(!playfulToastsEnabled);
-              }}
-              className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-black cursor-pointer hover:bg-secondary focus:bg-secondary"
-            >
-              <span className="flex items-center gap-2">
-                <Sparkles className="size-3.5 stroke-[2]" />
-                Playful Toasts
-              </span>
-              <span className="text-[10px] font-mono text-muted-foreground">
-                {playfulToastsEnabled ? "ON" : "OFF"}
-              </span>
-            </DropdownMenuItem>
-          </>
-        }
-      />
+      <div className="-mx-2 -mt-2 sm:-mx-4 sm:-mt-4 lg:hidden">
+        <MobileAppBar
+          title="Settings"
+          onBack={handleBackNavigation}
+          dateShortLabel={`v${APP_VERSION_CONFIG.version}`}
+          customMenuItems={
+            <>
+              <DropdownMenuItem
+                onClick={() => {
+                  soundFX.playPop();
+                  setActiveTab("datavault");
+                }}
+                className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-black cursor-pointer hover:bg-secondary focus:bg-secondary"
+              >
+                <span className="flex items-center gap-2">
+                  <Database className="size-3.5 stroke-[2] text-amber-500" />
+                  Data Vault & Cloud Purge
+                </span>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  soundFX.playPop();
+                  handleExportBackup();
+                }}
+                className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-black cursor-pointer hover:bg-secondary focus:bg-secondary"
+              >
+                <span className="flex items-center gap-2">
+                  <Download className="size-3.5 stroke-[2]" />
+                  Export Vault Backup
+                </span>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  soundFX.playPop();
+                  setIsDiagnosticsOpen(true);
+                }}
+                className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-black cursor-pointer hover:bg-secondary focus:bg-secondary"
+              >
+                <span className="flex items-center gap-2">
+                  <ShieldCheck className="size-3.5 stroke-[2]" />
+                  System Diagnostics
+                </span>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  soundFX.playPop();
+                  setIsUpdateCheckOpen(true);
+                }}
+                className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-black cursor-pointer hover:bg-secondary focus:bg-secondary"
+              >
+                <span className="flex items-center gap-2">
+                  <RefreshCw className="size-3.5 stroke-[2]" />
+                  Check Updates
+                </span>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  soundFX.playPop();
+                  setPlayfulToastsEnabled(!playfulToastsEnabled);
+                }}
+                className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-black cursor-pointer hover:bg-secondary focus:bg-secondary"
+              >
+                <span className="flex items-center gap-2">
+                  <Sparkles className="size-3.5 stroke-[2]" />
+                  Playful Toasts
+                </span>
+                <span className="text-[10px] font-mono text-muted-foreground">
+                  {playfulToastsEnabled ? "ON" : "OFF"}
+                </span>
+              </DropdownMenuItem>
+            </>
+          }
+        />
+      </div>
 
       {/* Global Announcement Banner if active */}
       {activeAnnouncement && (
@@ -701,12 +715,12 @@ export default function SettingsPage() {
         </div>
       )}
 
-      {/* ================= SLOT 2: STICKY SEGMENTED SUBNAV ================= */}
+      {/* ================= SLOT 2: SEGMENTED SUBNAV ================= */}
       <SegmentedSubNav
         tabs={SETTINGS_SUBNAV_TABS}
         value={activeTab}
         onValueChange={(val) => setActiveTab(val as SettingsTab)}
-        sticky={true}
+        sticky={false}
       />
 
       {/* ================= MAIN CONTENT: RESPONSIVE BENTO ================= */}
@@ -1244,13 +1258,13 @@ export default function SettingsPage() {
               </div>
 
               {/* Daily Log Reminders Manager Trigger */}
-              <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-2xl p-4 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex items-center justify-between">
-                <div className="flex items-center gap-3">
+              <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-2xl p-4 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
                   <div className="size-10 rounded-xl bg-purple-100 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800/40 flex items-center justify-center text-purple-700 dark:text-purple-400 shadow-xs shrink-0">
                     <Bell className="size-5 stroke-[2.5]" />
                   </div>
-                  <div>
-                    <h4 className="font-heading font-black text-xs uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5]">
+                  <div className="min-w-0">
+                    <h4 className="font-heading font-black text-xs uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] truncate">
                       Daily Log Reminders Manager
                     </h4>
                     <div className="flex flex-wrap items-center gap-1.5 pt-1">
@@ -1280,7 +1294,7 @@ export default function SettingsPage() {
                     soundFX.playPop();
                     setIsRemindersOpen(true);
                   }}
-                  className="px-3 py-1.5 rounded-xl border border-[#161514] dark:border-white bg-[#161514] dark:bg-white text-white dark:text-[#161514] font-black text-xs uppercase shadow-xs hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shrink-0"
+                  className="w-full sm:w-auto px-3 py-1.5 rounded-xl border border-[#161514] dark:border-white bg-[#161514] dark:bg-white text-white dark:text-[#161514] font-black text-xs uppercase shadow-xs hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shrink-0 text-center"
                 >
                   Configure
                 </button>
@@ -1289,8 +1303,8 @@ export default function SettingsPage() {
               {/* Notification & Sync Toggles */}
               <div className="space-y-3 border-t border-[#E8E5DF] dark:border-[#2A2724] pt-4">
                 {/* Push Notifications */}
-                <div className="flex items-center justify-between p-3.5 rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] bg-[#FAF8F5] dark:bg-[#1C1A18] shadow-xs">
-                  <div>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] bg-[#FAF8F5] dark:bg-[#1C1A18] shadow-xs gap-3">
+                  <div className="min-w-0">
                     <h4 className="font-heading font-black text-xs text-[#161514] dark:text-[#FAF8F5] uppercase">
                       Web Push Notifications
                     </h4>
@@ -1298,7 +1312,7 @@ export default function SettingsPage() {
                       {pushNotifications ? "Active — OS browser notifications enabled" : "Muted"}
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 shrink-0">
                     {pushNotifications && (
                       <button
                         type="button"
@@ -1334,8 +1348,8 @@ export default function SettingsPage() {
                 </div>
 
                 {/* Smart Reminders */}
-                <div className="flex items-center justify-between p-3.5 rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] bg-[#FAF8F5] dark:bg-[#1C1A18] shadow-xs">
-                  <div>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] bg-[#FAF8F5] dark:bg-[#1C1A18] shadow-xs gap-3">
+                  <div className="min-w-0">
                     <h4 className="font-heading font-black text-xs text-[#161514] dark:text-[#FAF8F5] uppercase">
                       Smart Daily Reminders
                     </h4>
@@ -1353,7 +1367,7 @@ export default function SettingsPage() {
                       toast.success(`Smart Reminders ${nextVal ? "ENABLED ⚡" : "DISABLED"}`);
                     }}
                     className={cn(
-                      "font-black text-xs px-3.5 py-1.5 rounded-xl border transition-all cursor-pointer shadow-xs",
+                      "font-black text-xs px-3.5 py-1.5 rounded-xl border transition-all cursor-pointer shadow-xs shrink-0",
                       smartReminders
                         ? "bg-[#CEF431] text-[#161514] border-[#161514]"
                         : "border-[#E8E5DF] dark:border-[#2A2724] bg-white dark:bg-[#252220] text-[#161514]/60 dark:text-[#FAF8F5]/50"
@@ -1364,8 +1378,8 @@ export default function SettingsPage() {
                 </div>
 
                 {/* Cloud Sync */}
-                <div className="flex items-center justify-between p-3.5 rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] bg-[#FAF8F5] dark:bg-[#1C1A18] shadow-xs">
-                  <div>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] bg-[#FAF8F5] dark:bg-[#1C1A18] shadow-xs gap-3">
+                  <div className="min-w-0">
                     <h4 className="font-heading font-black text-xs text-[#161514] dark:text-[#FAF8F5] uppercase">
                       Cloud Vault Synchronization
                     </h4>
@@ -1383,7 +1397,7 @@ export default function SettingsPage() {
                       toast.success(`Cloud Sync ${nextVal ? "ENABLED (Connected) ☁️" : "DISABLED"}`);
                     }}
                     className={cn(
-                      "font-black text-xs px-3.5 py-1.5 rounded-xl border transition-all cursor-pointer shadow-xs",
+                      "font-black text-xs px-3.5 py-1.5 rounded-xl border transition-all cursor-pointer shadow-xs shrink-0",
                       cloudSync
                         ? "bg-[#CEF431] text-[#161514] border-[#161514]"
                         : "border-[#E8E5DF] dark:border-[#2A2724] bg-white dark:bg-[#252220] text-[#161514]/60 dark:text-[#FAF8F5]/50"
@@ -1489,8 +1503,8 @@ export default function SettingsPage() {
 
               {/* Danger Zone: Sign Out & Clear/Delete Account */}
               <div className="space-y-3 pt-3 border-t border-rose-200 dark:border-rose-900/40">
-                <div className="flex items-center justify-between">
-                  <div>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                  <div className="min-w-0">
                     <h4 className="font-heading font-black text-xs text-rose-600 dark:text-rose-400 uppercase">
                       Session Control
                     </h4>
@@ -1505,20 +1519,20 @@ export default function SettingsPage() {
                       soundFX.playPop();
                       signOut();
                     }}
-                    className="rounded-xl border border-rose-300 dark:border-rose-800 text-rose-600 dark:text-rose-400 bg-white dark:bg-[#252220] hover:bg-rose-50 shadow-xs cursor-pointer gap-1.5 text-xs font-black uppercase tracking-wider transition-all"
+                    className="w-full sm:w-auto rounded-xl border border-rose-300 dark:border-rose-800 text-rose-600 dark:text-rose-400 bg-white dark:bg-[#252220] hover:bg-rose-50 shadow-xs cursor-pointer gap-1.5 text-xs font-black uppercase tracking-wider transition-all shrink-0"
                   >
                     <UserX className="size-3.5 stroke-[2.5]" />
                     Sign Out
                   </Button>
                 </div>
 
-                <div className="flex items-center justify-between pt-2 border-t border-rose-100 dark:border-rose-950/40">
-                  <div>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-2 border-t border-rose-100 dark:border-rose-950/40 gap-3">
+                  <div className="min-w-0">
                     <h4 className="font-heading font-black text-xs text-rose-600 dark:text-rose-400 uppercase">
-                      {isGuestActive ? "Purge Guest Session" : "Delete Account"}
+                      {isGuestActive ? "Purge Guest Session" : "Delete Cloud Data & Account"}
                     </h4>
-                    <p className="text-[10px] text-[#8C8882] dark:text-[#A8A29E] font-medium">
-                      Permanently delete user profile and remove database records
+                    <p className="text-[10px] text-[#8C8882] dark:text-[#A8A29E] font-medium mt-0.5">
+                      Permanently wipes all user-owned cloud records and database history
                     </p>
                   </div>
                   <Button
@@ -1528,10 +1542,10 @@ export default function SettingsPage() {
                       soundFX.playPop();
                       setShowDeleteFirebase(true);
                     }}
-                    className="rounded-xl bg-rose-500 hover:bg-rose-600 text-white border border-rose-600 shadow-xs cursor-pointer gap-1.5 text-xs font-black uppercase tracking-wider transition-all"
+                    className="w-full sm:w-auto rounded-xl bg-rose-600 hover:bg-rose-700 text-white border border-rose-600 shadow-xs cursor-pointer gap-1.5 text-xs font-black uppercase tracking-wider transition-all shrink-0"
                   >
                     <Trash2 className="size-3.5 stroke-[2.5]" />
-                    {isGuestActive ? "Clear Guest" : "Delete Account"}
+                    {isGuestActive ? "Clear Guest" : "Delete Cloud Data"}
                   </Button>
                 </div>
               </div>
@@ -1680,12 +1694,12 @@ export default function SettingsPage() {
 
               {/* Data Export (CSV) */}
               <div className="space-y-2 border-t border-[#E8E5DF] dark:border-[#2A2724] pt-4">
-                <div className="flex items-center justify-between p-3.5 rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] bg-[#FAF8F5] dark:bg-[#1C1A18] shadow-xs">
-                  <div className="flex items-center gap-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] bg-[#FAF8F5] dark:bg-[#1C1A18] shadow-xs gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
                     <div className="size-9 rounded-xl bg-amber-400 border border-[#161514] flex items-center justify-center text-[#161514] shadow-xs shrink-0">
                       <BarChart3 className="size-4 stroke-[2.5]" />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <h4 className="font-heading font-black text-xs text-[#161514] dark:text-[#FAF8F5] uppercase">
                         Spreadsheet Export (CSV)
                       </h4>
@@ -1700,7 +1714,7 @@ export default function SettingsPage() {
                       soundFX.playPop();
                       setIsCSVModalOpen(true);
                     }}
-                    className="px-3 py-1.5 rounded-xl border border-[#161514] dark:border-white bg-[#161514] dark:bg-white text-white dark:text-[#161514] font-black text-xs uppercase shadow-xs hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shrink-0"
+                    className="w-full sm:w-auto px-3 py-1.5 rounded-xl border border-[#161514] dark:border-white bg-[#161514] dark:bg-white text-white dark:text-[#161514] font-black text-xs uppercase shadow-xs hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shrink-0 text-center"
                   >
                     Export CSV
                   </button>
@@ -1709,8 +1723,8 @@ export default function SettingsPage() {
 
               {/* Clear Local Cache */}
               <div className="space-y-2 border-t border-[#E8E5DF] dark:border-[#2A2724] pt-4">
-                <div className="flex items-center justify-between p-3.5 rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] bg-[#FAF8F5] dark:bg-[#1C1A18] shadow-xs">
-                  <div>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] bg-[#FAF8F5] dark:bg-[#1C1A18] shadow-xs gap-3">
+                  <div className="min-w-0">
                     <h4 className="font-heading font-black text-xs text-[#161514] dark:text-[#FAF8F5] uppercase">
                       Local Offline Cache
                     </h4>
@@ -1725,10 +1739,42 @@ export default function SettingsPage() {
                       soundFX.playPop();
                       setShowClearConfirm(true);
                     }}
-                    className="rounded-xl border border-rose-300 dark:border-rose-800 text-rose-600 dark:text-rose-400 bg-white dark:bg-[#252220] hover:bg-rose-50 shadow-xs cursor-pointer gap-1.5 text-xs font-black uppercase tracking-wider transition-all"
+                    className="w-full sm:w-auto rounded-xl border border-rose-300 dark:border-rose-800 text-rose-600 dark:text-rose-400 bg-white dark:bg-[#252220] hover:bg-rose-50 shadow-xs cursor-pointer gap-1.5 text-xs font-black uppercase tracking-wider transition-all shrink-0"
                   >
                     <Trash2 className="size-3.5 stroke-[2.5]" />
                     Clear Cache
+                  </Button>
+                </div>
+              </div>
+
+              {/* Danger Zone: Cloud Database Purge */}
+              <div className="space-y-2 border-t border-rose-200 dark:border-rose-900/40 pt-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-2xl border border-rose-300 dark:border-rose-900/60 bg-rose-50/60 dark:bg-rose-950/20 shadow-xs gap-3">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <Trash2 className="size-4 text-rose-600 dark:text-rose-400 stroke-[2.5]" />
+                      <h4 className="font-heading font-black text-xs text-rose-600 dark:text-rose-400 uppercase">
+                        Delete Cloud Data for User
+                      </h4>
+                      <span className="text-[9px] font-mono font-bold bg-rose-100 dark:bg-rose-950/80 text-rose-700 dark:text-rose-300 px-1.5 py-0.5 rounded border border-rose-200 dark:border-rose-900">
+                        IRREVERSIBLE
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-[#8C8882] dark:text-[#A8A29E] font-medium mt-1">
+                      Permanently wipes all cloud-synced habits, finances, gym workouts, and logs from the cloud database
+                    </p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      soundFX.playPop();
+                      setShowDeleteFirebase(true);
+                    }}
+                    className="w-full sm:w-auto rounded-xl border border-rose-400 dark:border-rose-800 text-white bg-rose-600 hover:bg-rose-700 shadow-xs cursor-pointer gap-1.5 text-xs font-black uppercase tracking-wider transition-all shrink-0"
+                  >
+                    <Trash2 className="size-3.5 stroke-[2.5]" />
+                    Delete Cloud Data
                   </Button>
                 </div>
               </div>
@@ -1879,16 +1925,16 @@ export default function SettingsPage() {
         </div>
       </ResponsiveFormContainer>
 
-      {/* Delete Account Confirmation Dialog */}
+      {/* Delete Account & Cloud Data Confirmation Dialog */}
       <ResponsiveFormContainer
         open={showDeleteFirebase}
         onOpenChange={setShowDeleteFirebase}
-        title="🚨 Delete Account Permanently"
-        description="Type DELETE below to confirm permanent deletion of your profile and data."
+        title="🚨 Delete Cloud Data & Account"
+        description="Type DELETE below to permanently purge all cloud database records for this account."
       >
         <div className="space-y-4 pt-2">
           <p className="text-xs text-rose-600 dark:text-rose-400 font-bold leading-relaxed">
-            This action is irreversible. All habits, tasks, finances, and journal entries will be deleted permanently.
+            This action is irreversible. All cloud-synced habits, finances, tasks, workouts, and journal entries will be deleted permanently from the database.
           </p>
           <div className="space-y-1.5">
             <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-muted-foreground">
@@ -1915,7 +1961,7 @@ export default function SettingsPage() {
               onClick={handleDeleteFirebaseData}
               className="rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-heading font-black text-xs uppercase disabled:opacity-50"
             >
-              {isDeleting ? "Deleting…" : "Permanently Delete"}
+              {isDeleting ? "Deleting…" : "Delete Cloud Data"}
             </Button>
           </div>
         </div>
