@@ -25,6 +25,22 @@ interface DynamicIslandDockProps {
   floatOnScroll?: boolean;
 }
 
+/**
+ * Strict route filter: The Dynamic Island is exclusively enabled on
+ * Today (/today), Habits (/goals), Tasks (/tasks), and Money (/money).
+ * All other routes and subpages are strictly barred from displaying it.
+ */
+export function isDynamicIslandAllowed(pathname: string | null | undefined): boolean {
+  if (!pathname) return false;
+  const normalized = pathname.replace(/\/$/, "");
+  return (
+    normalized === "/today" ||
+    normalized === "/goals" ||
+    normalized === "/tasks" ||
+    normalized === "/money"
+  );
+}
+
 export function DynamicIslandDock({
   variant = "header",
   floatOnScroll = false,
@@ -184,10 +200,14 @@ export function DynamicIslandDock({
   if (
     currentMode === "ambient" &&
     (isAmbientDismissed ||
-      pathname === "/today" ||
       pathname === "/" ||
       pathname?.startsWith("/quick-log"))
   ) {
+    return null;
+  }
+
+  // Strict route check: Only Today, Habits, Tasks, and Money may render the Dynamic Island
+  if (!isDynamicIslandAllowed(pathname)) {
     return null;
   }
 

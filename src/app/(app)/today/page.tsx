@@ -32,6 +32,8 @@ import {
 } from "date-fns";
 
 // 5-Slot Architecture Components
+import { MobileAppBar } from "@/components/mobile/MobileAppBar";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { SegmentedSubNav, type SubNavTab } from "@/components/mobile/SegmentedSubNav";
 import { TodayHeroPager } from "@/components/today/TodayHeroPager";
 import { HorizonWeekStrip } from "@/components/today/HorizonWeekStrip";
@@ -484,6 +486,47 @@ export default function TodayPage() {
 
   return (
     <div className="w-full max-w-xl lg:max-w-5xl xl:max-w-6xl mx-auto select-none space-y-3 sm:space-y-4 px-1 sm:px-3 pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
+      {/* ================= SLOT 1: MOBILE APP BAR (Mobile Only) ================= */}
+      <MobileAppBar
+        title="Today"
+        selectedDate={selectedDate || format(currentDateObj, "yyyy-MM-dd")}
+        onSelectDate={setSelectedDate}
+        dateShortLabel={isCurrentDayToday ? undefined : format(currentDateObj, "MMM d")}
+        calendarTooltip="Jump to Today"
+        showDynamicIsland={true}
+        customMenuItems={
+          <>
+            <DropdownMenuItem
+              onClick={() => {
+                soundFX.playPop();
+                setIsScratchpadDrawerOpen(true);
+              }}
+              className="flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-heading font-black cursor-pointer hover:bg-secondary focus:bg-secondary"
+            >
+              <span>Desk Notes</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                soundFX.playPop();
+                setIsCloseoutDrawerOpen(true);
+              }}
+              className="flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-heading font-black cursor-pointer hover:bg-secondary focus:bg-secondary"
+            >
+              <span>Night Closeout</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                soundFX.playPop();
+                setIsDailyLimitModalOpen(true);
+              }}
+              className="flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-heading font-black cursor-pointer hover:bg-secondary focus:bg-secondary"
+            >
+              <span>Daily Limit</span>
+            </DropdownMenuItem>
+          </>
+        }
+      />
+
       {/* ================= SLOT 2: DESKTOP SUB-NAV (Hidden on Mobile) ================= */}
       <div className="hidden lg:block pt-1">
         <SegmentedSubNav

@@ -630,6 +630,7 @@ export default function SettingsPage() {
           title="Settings"
           onBack={handleBackNavigation}
           dateShortLabel={`v${APP_VERSION_CONFIG.version}`}
+          showDynamicIsland={false}
           customMenuItems={
             <>
               <DropdownMenuItem

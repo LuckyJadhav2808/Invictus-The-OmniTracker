@@ -33,7 +33,7 @@ import { soundFX } from "@/components/shared/SoundFX";
 import { format } from "date-fns";
 import Link from "next/link";
 import { getSubrouteInfo } from "@/lib/page-flow/page-flow-resolver";
-import { DynamicIslandDock } from "@/components/shared/DynamicIslandDock";
+import { DynamicIslandDock, isDynamicIslandAllowed } from "@/components/shared/DynamicIslandDock";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
 export { getSubrouteInfo };
 
@@ -157,6 +157,7 @@ export function SpaceHeader() {
   const subrouteInfo = getSubrouteInfo(pathname);
 
   const isMobileAppBarRoute =
+    pathname === "/today" ||
     pathname.startsWith("/goals") ||
     pathname.startsWith("/money") ||
     pathname.startsWith("/tasks") ||
@@ -183,9 +184,9 @@ export function SpaceHeader() {
       )}
 
       {/* Main Header Container */}
-      <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2.5 flex items-center justify-between gap-2 sm:gap-4">
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2.5 flex items-center justify-between gap-2 sm:gap-4 relative">
         {/* Left: Mobile Brand / Contextual Back Button & Space Breadcrumb */}
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 max-w-[32%]">
           {subrouteInfo ? (
             <button
               type="button"
@@ -226,13 +227,20 @@ export function SpaceHeader() {
           </div>
         </div>
 
-        {/* Center: Dynamic Island Live Activity Dock (Header Integrated, Zero Collision) */}
-        <div className="flex flex-1 justify-center items-center px-1 sm:px-4 min-w-0">
-          <DynamicIslandDock variant="header" floatOnScroll={false} />
-        </div>
+        {/* Center: Dynamic Island Live Activity Dock - DEAD CENTER IN HEADER */}
+        {isDynamicIslandAllowed(pathname) && (
+          <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none z-20">
+            <div className="pointer-events-auto flex items-center justify-center">
+              <DynamicIslandDock variant="header" floatOnScroll={false} />
+            </div>
+          </div>
+        )}
+
+        {/* Spacer between left cluster and right cluster */}
+        <div className="flex-1 min-w-0 pointer-events-none" />
 
         {/* Right: Actions, Date, Sync & User Profile */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0 max-w-[38%] justify-end">
           {/* Date Indicator (Tablet & Desktop) */}
           <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#F1EFEA] dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#2A2724] text-xs font-mono font-medium text-[#161514] dark:text-[#FAF8F5] transition-colors">
             <Calendar className="size-3.5 stroke-[1.75] text-[#8C8882] dark:text-[#A8A29E]" />

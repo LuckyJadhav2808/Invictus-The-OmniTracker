@@ -22,7 +22,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import { DynamicIslandDock } from "@/components/shared/DynamicIslandDock";
+import { DynamicIslandDock, isDynamicIslandAllowed } from "@/components/shared/DynamicIslandDock";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 export interface MobileAppBarProps {
@@ -60,6 +61,8 @@ export function MobileAppBar({
   customMenuItems,
   showDynamicIsland = true,
 }: MobileAppBarProps) {
+  const pathname = usePathname();
+  const isAllowedRoute = isDynamicIslandAllowed(pathname);
   const [soundMuted, setSoundMuted] = useState(soundFX.isMuted());
 
   const todayStr = format(new Date(), "yyyy-MM-dd");
@@ -81,8 +84,8 @@ export function MobileAppBar({
         className
       )}
     >
-      {/* Left: Back Button + Title + Date Badge */}
-      <div className="flex items-center gap-1.5 min-w-0 shrink-0 relative z-10">
+      {/* Left: Back Button + Title + Date Badge (Protected from overlapping center) */}
+      <div className="flex items-center gap-1.5 min-w-0 max-w-[32%] shrink-0 relative z-10">
         {onBack ? (
           <button
             type="button"
@@ -109,7 +112,7 @@ export function MobileAppBar({
           {title}
         </h1>
         {shortDate && (
-          <span className="text-[10px] sm:text-[11px] font-mono font-bold text-muted-foreground bg-secondary px-1.5 sm:px-2 py-0.5 rounded-md border border-border shrink-0">
+          <span className="text-[10px] sm:text-[11px] font-mono font-bold text-muted-foreground bg-secondary px-1.5 sm:px-2 py-0.5 rounded-md border border-border shrink-0 truncate max-w-[75px]">
             <span className="sm:hidden">{shortDate}</span>
             <span className="hidden sm:inline">{fullDate || shortDate}</span>
           </span>
@@ -117,17 +120,19 @@ export function MobileAppBar({
       </div>
 
       {/* Spacer between left cluster and right cluster */}
-      <div className="flex-1 min-w-0" />
+      <div className="flex-1 min-w-0 pointer-events-none" />
 
       {/* Center: Dynamic Island Live Activity Dock - ABSOLUTELY CENTERED ON HARDWARE SCREEN */}
-      {showDynamicIsland && (
-        <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-auto z-20 max-w-[calc(100%-140px)]">
-          <DynamicIslandDock variant="header" floatOnScroll={false} />
+      {showDynamicIsland && isAllowedRoute && (
+        <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none z-20 max-w-[calc(100%-130px)]">
+          <div className="pointer-events-auto flex items-center justify-center">
+            <DynamicIslandDock variant="header" floatOnScroll={false} />
+          </div>
         </div>
       )}
 
-      {/* Right: Max 2 Icons (Calendar + Overflow Menu) */}
-      <div className="flex items-center gap-1 shrink-0 relative z-10">
+      {/* Right: Max 2 Icons (Calendar + Overflow Menu) (Protected from overlapping center) */}
+      <div className="flex items-center gap-1 max-w-[32%] shrink-0 justify-end relative z-10">
         {/* Icon 1: Calendar / Jump to Today */}
         {onSelectDate && (
           <button

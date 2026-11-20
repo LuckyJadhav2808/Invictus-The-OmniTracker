@@ -506,7 +506,7 @@ function GoalsPageContent() {
         onCheckAllDue={handleCheckAllDue}
         isAllDueCompleted={isAllDueCompleted}
         dueCount={dueTodayHabits.length}
-        showDynamicIsland={false}
+        showDynamicIsland={true}
       />
 
       {/* ================= SLOT 2: DESKTOP SUB-NAV (Hidden on Mobile) ================= */}

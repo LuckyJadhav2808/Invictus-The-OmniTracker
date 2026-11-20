@@ -34,6 +34,7 @@ export default function ProfilePage() {
           title="Profile"
           onBack={handleBack}
           dateShortLabel={`v${APP_VERSION_CONFIG.version}`}
+          showDynamicIsland={false}
           customMenuItems={
             <>
               <DropdownMenuItem
