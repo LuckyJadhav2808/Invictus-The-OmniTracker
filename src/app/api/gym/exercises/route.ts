@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import Fuse, { type IFuseOptions } from "fuse.js";
 
 export const dynamic = "force-dynamic";
 
@@ -306,6 +307,20 @@ const EVERYDAY_STAPLE_EXERCISES: GymExerciseItem[] = [
 ];
 
 let cachedExercises: GymExerciseItem[] | null = null;
+let exerciseFuseIndex: Fuse<GymExerciseItem> | null = null;
+
+const EXERCISE_FUSE_OPTIONS: IFuseOptions<GymExerciseItem> = {
+  keys: [
+    { name: "title", weight: 0.7 },
+    { name: "bodyPart", weight: 0.2 },
+    { name: "equipment", weight: 0.1 },
+  ],
+  threshold: 0.38, // Tolerant to typos (e.g. 'inclin' -> 'incline', 'dumbell' -> 'dumbbell')
+  distance: 100,
+  minMatchCharLength: 2,
+  ignoreLocation: true,
+  shouldSort: true,
+};
 
 function capitalize(str: string): string {
   if (!str) return "";
@@ -358,6 +373,7 @@ function loadExercises(): GymExerciseItem[] {
       const filteredDb = dbItems.filter((e) => !titleSet.has(e.title.toLowerCase()));
 
       cachedExercises = [...EVERYDAY_STAPLE_EXERCISES, ...filteredDb];
+      exerciseFuseIndex = new Fuse(cachedExercises, EXERCISE_FUSE_OPTIONS);
       return cachedExercises;
     }
   } catch (err) {
@@ -365,6 +381,7 @@ function loadExercises(): GymExerciseItem[] {
   }
 
   cachedExercises = EVERYDAY_STAPLE_EXERCISES;
+  exerciseFuseIndex = new Fuse(cachedExercises, EXERCISE_FUSE_OPTIONS);
   return cachedExercises;
 }
 
@@ -526,7 +543,8 @@ export async function GET(req: NextRequest) {
       const aliasTerms = SEARCH_ALIASES[query] || [];
       const searchTerms = [query, ...aliasTerms];
 
-      filtered = filtered.filter((ex) => {
+      // 1. Exact, alias, and substring matches
+      const directMatches = allExercises.filter((ex) => {
         const titleLower = ex.title.toLowerCase();
         const bodyLower = ex.bodyPart.toLowerCase();
         const equipLower = ex.equipment.toLowerCase();
@@ -540,6 +558,31 @@ export async function GET(req: NextRequest) {
             descLower.includes(term)
         );
       });
+
+      // 2. Fuse.js Typo-Tolerant Fuzzy Matches
+      const fuseMatches = exerciseFuseIndex
+        ? exerciseFuseIndex.search(query).map((res) => res.item)
+        : [];
+
+      // Deduplicate with exact matches prioritized
+      const seenIds = new Set<string>();
+      const combined: GymExerciseItem[] = [];
+
+      for (const ex of directMatches) {
+        if (!seenIds.has(ex.id)) {
+          seenIds.add(ex.id);
+          combined.push(ex);
+        }
+      }
+
+      for (const ex of fuseMatches) {
+        if (!seenIds.has(ex.id)) {
+          seenIds.add(ex.id);
+          combined.push(ex);
+        }
+      }
+
+      filtered = combined;
 
       // Boost exact staple & title matches to top
       filtered.sort((a, b) => {

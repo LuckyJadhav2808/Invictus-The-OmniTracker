@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import Fuse, { type IFuseOptions } from "fuse.js";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +20,18 @@ export interface NutritionDishItem {
 }
 
 let cachedDishes: NutritionDishItem[] | null = null;
+let dishFuseIndex: Fuse<NutritionDishItem> | null = null;
+
+const DISH_FUSE_OPTIONS: IFuseOptions<NutritionDishItem> = {
+  keys: [
+    { name: "dishName", weight: 1.0 },
+  ],
+  threshold: 0.38, // Tolerant to typos (e.g. 'paner' -> 'paneer', 'chiken' -> 'chicken')
+  distance: 100,
+  minMatchCharLength: 2,
+  ignoreLocation: true,
+  shouldSort: true,
+};
 
 function parseCSVLine(text: string): string[] {
   const result: string[] = [];
@@ -96,6 +109,7 @@ function loadDishes(): NutritionDishItem[] {
     }
 
     cachedDishes = items;
+    dishFuseIndex = new Fuse(items, DISH_FUSE_OPTIONS);
     return items;
   } catch (err) {
     console.error("Error loading Indian_Food_Nutrition_Processed.csv:", err);
@@ -113,7 +127,35 @@ export async function GET(req: NextRequest) {
 
     let filtered = allDishes;
     if (query) {
-      filtered = allDishes.filter((dish) => dish.dishName.toLowerCase().includes(query));
+      // 1. Direct exact/substring matches prioritized first
+      const directMatches = allDishes.filter((dish) =>
+        dish.dishName.toLowerCase().includes(query)
+      );
+
+      // 2. Fuzzy matches from Fuse.js for typo tolerance
+      const fuseMatches = dishFuseIndex
+        ? dishFuseIndex.search(query).map((res) => res.item)
+        : [];
+
+      // Deduplicate keeping exact matches at top
+      const seenIds = new Set<string>();
+      const combined: NutritionDishItem[] = [];
+
+      for (const dish of directMatches) {
+        if (!seenIds.has(dish.id)) {
+          seenIds.add(dish.id);
+          combined.push(dish);
+        }
+      }
+
+      for (const dish of fuseMatches) {
+        if (!seenIds.has(dish.id)) {
+          seenIds.add(dish.id);
+          combined.push(dish);
+        }
+      }
+
+      filtered = combined;
     }
 
     return NextResponse.json({
