@@ -308,7 +308,6 @@ export function SubscriptionsTracker() {
         open={isAddOpen}
         onOpenChange={setIsAddOpen}
         title="Add Subscription"
-        description="Track recurring bills and plans."
       >
         <form onSubmit={handleAddSub} className="space-y-4 pt-2">
           <div className="space-y-1">

@@ -94,7 +94,6 @@ export function QuickCashEntryModal({
       open={open}
       onOpenChange={onOpenChange}
       title="1-Tap Cash Spend"
-      description="Quickly record cash spent on chai, street food, rickshaw, or local markets."
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Amount Input */}

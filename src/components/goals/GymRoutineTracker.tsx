@@ -1204,7 +1204,6 @@ export function GymRoutineTracker() {
         open={isRoutineTitleOpen}
         onOpenChange={setIsRoutineTitleOpen}
         title={`Set ${selectedDay} Routine Title`}
-        description="Name your workout split for this day (e.g. Chest & Triceps Focus)"
       >
         <form onSubmit={handleSaveRoutineTitle} className="space-y-4 pt-2">
           <div className="space-y-1.5">
@@ -1235,7 +1234,6 @@ export function GymRoutineTracker() {
           if (!open) setEditingExercise(null);
         }}
         title="Edit Exercise Details"
-        description="Update exercise title, equipment, or muscle group"
       >
         <form onSubmit={handleUpdateExercise} className="space-y-4 pt-1">
           <div className="space-y-1.5">
@@ -1315,7 +1313,6 @@ export function GymRoutineTracker() {
         open={isSplitAnatomyOpen}
         onOpenChange={setIsSplitAnatomyOpen}
         title={`${selectedDay} Split Anatomy`}
-        description="Muscular activation and volume distribution across today's workout"
       >
         <div className="space-y-4 pt-1 pb-3 text-center">
           <div className="flex justify-center">

@@ -317,7 +317,6 @@ export function SavingsGoals() {
         open={isAddOpen}
         onOpenChange={setIsAddOpen}
         title="New Savings Goal"
-        description="Set a target amount and track your progress."
       >
         <form onSubmit={handleAddGoal} className="space-y-4 pt-2">
           <div className="space-y-1">
@@ -371,7 +370,6 @@ export function SavingsGoals() {
           if (!open) setDepositGoal(null);
         }}
         title={`Add to ${depositGoal?.title || "Goal"}`}
-        description="Add money toward this goal."
       >
         <form onSubmit={handleAddDeposit} className="space-y-4 pt-2">
           <div className="space-y-1">

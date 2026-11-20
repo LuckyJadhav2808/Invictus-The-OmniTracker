@@ -686,7 +686,6 @@ export function MealTracker() {
         open={isTargetsOpen}
         onOpenChange={setIsTargetsOpen}
         title="Edit Daily Macro Targets"
-        description="Set your caloric ceiling and nutrient goals for athletic performance."
       >
         <form onSubmit={handleSaveTargets} className="space-y-3.5 pt-1">
           <div className="space-y-1">

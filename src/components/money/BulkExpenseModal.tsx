@@ -651,7 +651,6 @@ export function BulkExpenseModal({
       open={open}
       onOpenChange={handleClose}
       title="Bulk Expenses"
-      description="Scan receipts, upload screenshots, or batch add entries."
     >
       <div className="space-y-3.5 pt-0.5">
         {/* Step Tabs (When not in review mode) */}

@@ -65,7 +65,6 @@ export function CloudSyncDrawer({ open, onOpenChange }: CloudSyncDrawerProps) {
       open={open}
       onOpenChange={onOpenChange}
       title="Cloud Sync Telemetry"
-      description="Real-time MongoDB Atlas health, latency telemetry & offline queue"
     >
       <div className="space-y-4 pt-1">
         {/* Status Hero Card */}

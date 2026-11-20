@@ -179,7 +179,6 @@ export function UpdateCheckModal({ open, onOpenChange, autoCheck = false }: Upda
       open={open}
       onOpenChange={onOpenChange}
       title="App Version & Updates"
-      description="Inspect version status, release notes, and install updates"
     >
       <div className="space-y-4 pt-2">
         {/* Version Status Hero Card */}

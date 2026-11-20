@@ -114,7 +114,6 @@ export function InAppDiagnosticsModal({ open, onOpenChange }: InAppDiagnosticsMo
       open={open}
       onOpenChange={onOpenChange}
       title="In-App Telemetry & Diagnostics"
-      description="Production self-healing, sync queue inspection, and live telemetry cockpit."
     >
       <div className="space-y-5 py-2">
         {/* Metric Cards Grid */}

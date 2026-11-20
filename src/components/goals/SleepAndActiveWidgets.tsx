@@ -93,7 +93,6 @@ export function SleepAndActiveWidgets() {
             </div>
             <div>
               <h4 className="text-[15px] font-sans font-semibold text-[#161514] dark:text-[#FAF8F5] tracking-tight">Sleep tracker</h4>
-              <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E]">Last night's sleep analysis</p>
             </div>
           </div>
           <button
@@ -154,9 +153,6 @@ export function SleepAndActiveWidgets() {
               <Moon className="size-3.5 stroke-[1.5]" />
             </div>
             <p className="text-xs font-sans font-medium text-[#161514] dark:text-[#FAF8F5]">No sleep logged for today yet</p>
-            <p className="text-[11px] text-[#6B6B6B] dark:text-[#A8A29E]">
-              Click <span className="font-semibold text-[#161514] dark:text-[#FAF8F5]">'Log sleep'</span> above to capture rest hours and recovery score.
-            </p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -166,7 +162,6 @@ export function SleepAndActiveWidgets() {
                   {sleepHours}<span className="text-xs font-normal text-[#6B6B6B] dark:text-[#A8A29E]">h </span>
                   {sleepMinutes}<span className="text-xs font-normal text-[#6B6B6B] dark:text-[#A8A29E]">m</span>
                 </span>
-                <span className="text-[11px] text-[#6B6B6B] dark:text-[#A8A29E] block">Last logged rest duration</span>
               </div>
               <div className="flex items-center gap-1.5 bg-[#DCFAE5] dark:bg-[#03D26F]/20 border border-[#03D26F]/30 px-2.5 py-1 rounded-md text-[#04250e] dark:text-[#03D26F]">
                 <Sparkles className="size-3 stroke-[1.5]" />
@@ -236,7 +231,6 @@ export function SleepAndActiveWidgets() {
             </div>
             <div>
               <h4 className="text-[15px] font-sans font-semibold text-[#161514] dark:text-[#FAF8F5] tracking-tight">Active time & calories</h4>
-              <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E]">Daily movement status</p>
             </div>
           </div>
           <button
@@ -297,9 +291,6 @@ export function SleepAndActiveWidgets() {
               <Activity className="size-3.5 stroke-[1.5]" />
             </div>
             <p className="text-xs font-sans font-medium text-[#161514] dark:text-[#FAF8F5]">No active movement logged today</p>
-            <p className="text-[11px] text-[#6B6B6B] dark:text-[#A8A29E]">
-              Click <span className="font-semibold text-[#161514] dark:text-[#FAF8F5]">'Log active'</span> above to record workout minutes and calories burnt.
-            </p>
           </div>
         ) : (
           <div className="space-y-3">

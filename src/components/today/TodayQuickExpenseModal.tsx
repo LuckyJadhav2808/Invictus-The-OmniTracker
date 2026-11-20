@@ -80,9 +80,6 @@ export function TodayQuickExpenseModal({
               Quick Log Expense
             </DialogTitle>
           </div>
-          <DialogDescription className="text-xs font-sans text-muted-foreground">
-            3-second record. Keeps your safe spend pace synced in real time.
-          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 pt-2">

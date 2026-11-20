@@ -63,7 +63,6 @@ export function ReportIssueModal({ open, onOpenChange }: ReportIssueModalProps) 
       open={open}
       onOpenChange={onOpenChange}
       title="REPORT AN ISSUE OR FEEDBACK"
-      description="Report a bug, request a feature, or submit UI feedback directly to the Invictus Admin Board"
     >
       <form onSubmit={handleSubmit} className="space-y-4 pt-1">
         <div className="space-y-1">

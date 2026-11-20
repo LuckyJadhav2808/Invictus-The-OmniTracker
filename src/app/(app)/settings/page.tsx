@@ -901,9 +901,6 @@ export default function SettingsPage() {
                         <span className="text-xs font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] block font-heading">
                           Interface Theme & Appearance
                         </span>
-                        <p className="text-[10px] text-[#8C8882] dark:text-[#A8A29E] font-medium mt-0.5">
-                          Warm cream paper, deep obsidian ink, or match OS system
-                        </p>
                       </div>
                       <ThemeToggle variant="segmented" />
                     </div>
@@ -918,9 +915,6 @@ export default function SettingsPage() {
                           <span className="text-xs font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5 font-heading">
                             <Volume2 className="h-3.5 w-3.5 stroke-[2.5]" /> Habit Audio Feedback
                           </span>
-                          <p className="text-[10px] text-[#8C8882] dark:text-[#A8A29E] font-medium mt-0.5">
-                            Tactile sound played upon completing a habit
-                          </p>
                         </div>
                       </div>
 
@@ -962,9 +956,6 @@ export default function SettingsPage() {
                     <span className="text-xs font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] block font-heading">
                       Playful Toast Feedback
                     </span>
-                    <p className="text-[10px] text-[#8C8882] dark:text-[#A8A29E] font-medium">
-                      Show energetic encouraging messages on user actions
-                    </p>
                   </div>
                   <button
                     type="button"
@@ -1049,9 +1040,6 @@ export default function SettingsPage() {
                         <h4 className="font-heading font-black text-xs text-[#161514] dark:text-[#FAF8F5] uppercase tracking-wide leading-tight break-words">
                           {label}
                         </h4>
-                        <p className="text-[10px] text-[#8C8882] dark:text-[#A8A29E] font-medium leading-tight break-words line-clamp-1 sm:line-clamp-none">
-                          {desc}
-                        </p>
                       </div>
                     </div>
                     <div
@@ -1116,9 +1104,6 @@ export default function SettingsPage() {
                       <h3 className="font-heading font-black text-xs uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5]">
                         Global Wake-Up Schedule
                       </h3>
-                      <p className="text-[10px] text-[#8C8882] dark:text-[#A8A29E] font-medium">
-                        Morning timeline & notification alarms
-                      </p>
                     </div>
                   </div>
 
@@ -1258,9 +1243,6 @@ export default function SettingsPage() {
                     <h4 className="font-heading font-black text-xs text-[#161514] dark:text-[#FAF8F5] uppercase">
                       Web Push Notifications
                     </h4>
-                    <p className="text-[10px] text-[#8C8882] dark:text-[#A8A29E] font-medium">
-                      {pushNotifications ? "Active — OS browser notifications enabled" : "Muted"}
-                    </p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     {pushNotifications && (
@@ -1303,9 +1285,6 @@ export default function SettingsPage() {
                     <h4 className="font-heading font-black text-xs text-[#161514] dark:text-[#FAF8F5] uppercase">
                       Smart Daily Reminders
                     </h4>
-                    <p className="text-[10px] text-[#8C8882] dark:text-[#A8A29E] font-medium">
-                      {smartReminders ? "Active — Periodic midday and evening check-ins" : "Muted"}
-                    </p>
                   </div>
                   <button
                     type="button"
@@ -1333,9 +1312,6 @@ export default function SettingsPage() {
                     <h4 className="font-heading font-black text-xs text-[#161514] dark:text-[#FAF8F5] uppercase">
                       Cloud Vault Synchronization
                     </h4>
-                    <p className="text-[10px] text-[#8C8882] dark:text-[#A8A29E] font-medium">
-                      {cloudSync ? "Connected — Real-time cloud sync active" : "Offline mode — Local cache only"}
-                    </p>
                   </div>
                   <button
                     type="button"
@@ -1458,9 +1434,6 @@ export default function SettingsPage() {
                     <h4 className="font-heading font-black text-xs text-rose-600 dark:text-rose-400 uppercase">
                       Session Control
                     </h4>
-                    <p className="text-[10px] text-[#8C8882] dark:text-[#A8A29E] font-medium">
-                      Sign out of active session or clear cached offline data
-                    </p>
                   </div>
                   <Button
                     variant="outline"
@@ -1481,9 +1454,6 @@ export default function SettingsPage() {
                     <h4 className="font-heading font-black text-xs text-rose-600 dark:text-rose-400 uppercase">
                       {isGuestActive ? "Purge Guest Session" : "Delete Cloud Data & Account"}
                     </h4>
-                    <p className="text-[10px] text-[#8C8882] dark:text-[#A8A29E] font-medium mt-0.5">
-                      Permanently wipes all user-owned cloud records and database history
-                    </p>
                   </div>
                   <Button
                     variant="outline"
@@ -1557,9 +1527,6 @@ export default function SettingsPage() {
                       {isDemoActive ? "Showcase Loaded" : "Blank Canvas"}
                     </span>
                   </div>
-                  <p className="text-[10px] text-[#8C8882] dark:text-[#A8A29E] font-medium">
-                    Seed realistic mock data across all modules (Tasks, Habits, Gym Hypertrophy, Meal Tracker, and Money) or wipe clean for a fresh slate.
-                  </p>
                   <div className="flex items-center gap-2 pt-1 flex-wrap">
                     <Button
                       variant="outline"
@@ -1595,9 +1562,6 @@ export default function SettingsPage() {
                       <h4 className="font-heading font-black text-xs text-[#161514] dark:text-[#FAF8F5] uppercase">
                         Export Encrypted Vault
                       </h4>
-                      <p className="text-[10px] text-[#8C8882] dark:text-[#A8A29E] font-medium mt-0.5">
-                        Single-click AES-GCM-256 encrypted snapshot of all workspaces & history
-                      </p>
                     </div>
                     <Button
                       variant="outline"
@@ -1617,9 +1581,6 @@ export default function SettingsPage() {
                       <h4 className="font-heading font-black text-xs text-[#161514] dark:text-[#FAF8F5] uppercase">
                         Restore from Vault
                       </h4>
-                      <p className="text-[10px] text-[#8C8882] dark:text-[#A8A29E] font-medium mt-0.5">
-                        Select an existing encrypted backup file to restore your entire database
-                      </p>
                     </div>
                     <Button
                       variant="outline"
@@ -1653,9 +1614,6 @@ export default function SettingsPage() {
                       <h4 className="font-heading font-black text-xs text-[#161514] dark:text-[#FAF8F5] uppercase">
                         Spreadsheet Export (CSV)
                       </h4>
-                      <p className="text-[10px] text-[#8C8882] dark:text-[#A8A29E] font-medium">
-                        Habits, finance ledger, and tasks CSV downloads
-                      </p>
                     </div>
                   </div>
                   <button
@@ -1678,9 +1636,6 @@ export default function SettingsPage() {
                     <h4 className="font-heading font-black text-xs text-[#161514] dark:text-[#FAF8F5] uppercase">
                       Local Offline Cache
                     </h4>
-                    <p className="text-[10px] text-[#8C8882] dark:text-[#A8A29E] font-medium">
-                      Wipes local device cache without affecting cloud database
-                    </p>
                   </div>
                   <Button
                     variant="outline"
@@ -1710,9 +1665,6 @@ export default function SettingsPage() {
                         IRREVERSIBLE
                       </span>
                     </div>
-                    <p className="text-[10px] text-[#8C8882] dark:text-[#A8A29E] font-medium mt-1">
-                      Permanently wipes all cloud-synced habits, finances, gym workouts, and logs from the cloud database
-                    </p>
                   </div>
                   <Button
                     variant="outline"
@@ -1747,10 +1699,6 @@ export default function SettingsPage() {
                 Healthy
               </span>
             </div>
-
-            <p className="text-xs text-[#8C8882] dark:text-[#A8A29E] font-medium">
-              Run real-time diagnostics on offline sync queues, database latency, and storage integrity.
-            </p>
 
             <div className="space-y-2">
               <Button
@@ -1813,9 +1761,6 @@ export default function SettingsPage() {
                 <h4 className="font-heading font-black text-xs uppercase text-[#161514] dark:text-[#FAF8F5]">
                   Install Invictus
                 </h4>
-                <p className="text-[10px] text-[#8C8882] dark:text-[#A8A29E] font-medium">
-                  Add to home screen or run native Android APK
-                </p>
               </div>
             </div>
 
@@ -1851,11 +1796,10 @@ export default function SettingsPage() {
         open={showClearConfirm}
         onOpenChange={setShowClearConfirm}
         title="⚠️ Clear Local Cache?"
-        description="This will clear offline cache on this device. Your cloud records remain intact."
       >
         <div className="space-y-4 pt-2">
           <p className="text-xs text-muted-foreground leading-relaxed">
-            Are you sure you want to purge local storage? This removes cached tasks, habits, and preferences on this browser.
+            Purge offline cache on this browser? Your cloud database records remain intact.
           </p>
           <div className="flex gap-2 justify-end">
             <Button
@@ -1880,11 +1824,10 @@ export default function SettingsPage() {
         open={showDeleteFirebase}
         onOpenChange={setShowDeleteFirebase}
         title="🚨 Delete Cloud Data & Account"
-        description="Type DELETE below to permanently purge all cloud database records for this account."
       >
         <div className="space-y-4 pt-2">
           <p className="text-xs text-rose-600 dark:text-rose-400 font-bold leading-relaxed">
-            This action is irreversible. All cloud-synced habits, finances, tasks, workouts, and journal entries will be deleted permanently from the database.
+            Irreversible. Permanently purges all cloud habits, finances, tasks, and workouts.
           </p>
           <div className="space-y-1.5">
             <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-muted-foreground">
@@ -1922,28 +1865,23 @@ export default function SettingsPage() {
         open={isCSVModalOpen}
         onOpenChange={setIsCSVModalOpen}
         title="Data Export (CSV)"
-        description="Export your habit logs, finances, and tasks to CSV spreadsheet."
       >
         <div className="space-y-3 pt-2">
           {[
             {
               title: "🌱 Habits & Streaks CSV Report",
-              desc: "Download full history of completed habit logs and streak records",
               type: "habits" as const,
             },
             {
               title: "💰 Financial Ledger CSV Report",
-              desc: "Export income, expense logs, payment methods, and category breakdown",
               type: "finance" as const,
             },
             {
               title: "📋 Tasks & Projects CSV Report",
-              desc: "Export tasks, priorities, kanban status, and due dates",
               type: "tasks" as const,
             },
             {
               title: "📦 Lifetime Master Bundle CSV",
-              desc: "Complete exported archive bundle containing all workspace data",
               type: "bundle" as const,
             },
           ].map((rep, idx) => (
@@ -1951,14 +1889,9 @@ export default function SettingsPage() {
               key={idx}
               className="bg-white dark:bg-[#161514] rounded-2xl p-4 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex items-center justify-between gap-3"
             >
-              <div>
-                <h5 className="font-heading font-black text-xs text-[#161514] dark:text-[#FAF8F5]">
-                  {rep.title}
-                </h5>
-                <p className="text-[10px] text-[#8C8882] dark:text-[#A8A29E] font-medium mt-0.5">
-                  {rep.desc}
-                </p>
-              </div>
+              <h5 className="font-heading font-black text-xs text-[#161514] dark:text-[#FAF8F5]">
+                {rep.title}
+              </h5>
               <button
                 type="button"
                 onClick={() => downloadCSVReport(rep.type)}

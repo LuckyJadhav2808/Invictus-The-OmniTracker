@@ -149,7 +149,6 @@ export function PDFExportModal({
       open={open}
       onOpenChange={onOpenChange}
       title="Export Statement (PDF)"
-      description="Download or print your monthly expense report."
     >
       <div className="space-y-4 pt-1">
         {/* Export Period Selector */}

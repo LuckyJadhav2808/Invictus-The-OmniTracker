@@ -23,7 +23,7 @@ export function TelemetryMarquee({
   return (
     <div
       className={cn(
-        "group relative flex w-full overflow-hidden select-none border-y-2 border-[#161514] bg-[#161514] dark:bg-[#0D0C0B] py-1.5 text-[#FAF8F5]",
+        "group relative flex w-full overflow-hidden select-none border-y-2 border-[#161514] bg-[#161514] dark:bg-[#0D0C0B] py-2 text-[#FAF8F5]",
         className
       )}
       style={

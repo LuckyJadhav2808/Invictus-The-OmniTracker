@@ -518,15 +518,6 @@ export function HabitChoiceModal({
           ? "CUSTOM HABIT ARCHITECT"
           : "CURATED PROTOCOL SPLITS"
       }
-      description={
-        view === "menu"
-          ? "Choose from proven atomic habits, curated split packs, or craft your bespoke routine."
-          : view === "presets"
-          ? "Tap any habit template to add it directly to your daily routine."
-          : view === "custom"
-          ? "Design a custom routine with tailored scheduling, icons, and reminder telemetry."
-          : "Apply comprehensive lifestyle stacks engineered for peak performance."
-      }
     >
       <div className="space-y-4 pt-2 pb-1">
         {/* Navigation Back Button if in sub-view */}
@@ -562,11 +553,8 @@ export function HabitChoiceModal({
                   <span className="text-xs">⚡</span>
                 </div>
                 <h4 className="font-heading font-black text-xs sm:text-sm text-[#161514] dark:text-[#FAF8F5]">
-                  First time building habits? Start with the Core 3
+                  Start with the Core 3 Habits
                 </h4>
-                <p className="text-[11px] text-[#6E6B65] dark:text-[#A8A29E] leading-snug">
-                  1-tap install: Morning Water (500ml), 10,000 Steps, and Wind Down by 11 PM.
-                </p>
               </div>
               <button
                 type="button"
@@ -600,9 +588,6 @@ export function HabitChoiceModal({
                   <h4 className="text-base font-heading font-black text-[#161514] dark:text-[#FAF8F5] group-hover:text-emerald-900 dark:group-hover:text-emerald-300 transition-colors">
                     Atomic Habits Vault
                   </h4>
-                  <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] mt-1 leading-snug">
-                    Curated habits for sleep, hydration, deep work, 10k steps, and daily consistency.
-                  </p>
                 </div>
               </div>
               <div className="mt-4 pt-3 border-t border-emerald-200/60 dark:border-emerald-800/30 flex items-center justify-between text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5]">
@@ -633,9 +618,6 @@ export function HabitChoiceModal({
                   <h4 className="text-base font-heading font-black text-[#161514] dark:text-[#FAF8F5] group-hover:text-amber-900 dark:group-hover:text-amber-300 transition-colors">
                     Custom Habit
                   </h4>
-                  <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] mt-1 leading-snug">
-                    Craft your own bespoke routine with custom days, reminder times, colors, and goals.
-                  </p>
                 </div>
               </div>
               <div className="mt-4 pt-3 border-t border-amber-200/60 dark:border-amber-800/30 flex items-center justify-between text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5]">
@@ -666,9 +648,6 @@ export function HabitChoiceModal({
                   <h4 className="text-base font-heading font-black text-[#161514] dark:text-[#FAF8F5] group-hover:text-purple-900 dark:group-hover:text-purple-300 transition-colors">
                     Protocol Packs
                   </h4>
-                  <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] mt-1 leading-snug">
-                    One-tap habit stacks: Focus Mode, Daily Essentials, Athletic Foundation, and Morning Routine.
-                  </p>
                 </div>
               </div>
               <div className="mt-4 pt-3 border-t border-purple-200/60 dark:border-purple-800/30 flex items-center justify-between text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5]">

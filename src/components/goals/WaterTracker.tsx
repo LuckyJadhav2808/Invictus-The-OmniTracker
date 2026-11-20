@@ -201,9 +201,6 @@ export function WaterTracker({
               <h3 className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5] uppercase tracking-wider">
                 Daily Hydration
               </h3>
-              <p className="text-[10px] font-mono text-muted-foreground">
-                Optimal brain & muscle telemetry
-              </p>
             </div>
           </div>
 

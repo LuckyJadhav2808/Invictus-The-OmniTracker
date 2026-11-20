@@ -102,7 +102,6 @@ export function ReminderManagerModal({
       open={open}
       onOpenChange={onOpenChange}
       title="Daily Reminder & Notification Settings"
-      description="Pick exact times to be reminded so you never miss a streak or budget log"
     >
       <form onSubmit={handleSave} className="space-y-4 pt-1">
         {/* Permission Banner */}

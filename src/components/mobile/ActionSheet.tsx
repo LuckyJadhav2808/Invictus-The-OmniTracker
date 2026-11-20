@@ -54,7 +54,6 @@ export function ActionSheet({
         {
           id: "new-expense",
           label: "Log Expense",
-          sublabel: "Record purchase, bill, or daily spend",
           icon: Receipt,
           colorClass: "bg-[#CEF431] text-[#161514] border-[#161514]",
           onClick: () => {
@@ -65,7 +64,6 @@ export function ActionSheet({
         {
           id: "export-ledger",
           label: "Export Ledger",
-          sublabel: "Download statement as PDF or CSV export",
           icon: FileDown,
           colorClass: "bg-[#03D26F] text-[#161514] border-[#161514]",
           onClick: () => {
@@ -76,7 +74,6 @@ export function ActionSheet({
         {
           id: "split-bill",
           label: "Who Owes Who",
-          sublabel: "Track shared bills, IOUs and repayments",
           icon: Users,
           colorClass: "bg-[#38BDF8] text-[#161514] border-[#161514]",
           onClick: () => {
@@ -87,7 +84,6 @@ export function ActionSheet({
         {
           id: "open-ledger",
           label: "Open Ledger",
-          sublabel: "View all transactions, envelopes & search",
           icon: ReceiptText,
           colorClass: "bg-[#C084FC] text-[#161514] border-[#161514]",
           onClick: () => {
@@ -104,7 +100,6 @@ export function ActionSheet({
         {
           id: "log-water",
           label: "Log Water (+250ml)",
-          sublabel: "Hydrate toward your daily 2,000ml goal",
           icon: Droplet,
           colorClass: "bg-[#38BDF8] text-[#161514] border-[#161514]",
           onClick: () => {
@@ -117,7 +112,6 @@ export function ActionSheet({
         {
           id: "log-meal",
           label: "Log Meal",
-          sublabel: "Macros, calories, and nutrition tracker",
           icon: Utensils,
           colorClass: "bg-[#03D26F] text-[#161514] border-[#161514]",
           onClick: () => {
@@ -128,7 +122,6 @@ export function ActionSheet({
         {
           id: "new-habit",
           label: "New Habit",
-          sublabel: "Pick from 50+ atomic presets or build custom",
           icon: CheckSquare,
           colorClass: "bg-[#CEF431] text-[#161514] border-[#161514]",
           onClick: () => {
@@ -139,7 +132,6 @@ export function ActionSheet({
         {
           id: "log-workout",
           label: "Log Workout",
-          sublabel: "Track sets, reps and muscle activation studio",
           icon: Dumbbell,
           colorClass: "bg-[#F59E0B] text-[#161514] border-[#161514]",
           onClick: () => {
@@ -156,7 +148,6 @@ export function ActionSheet({
         {
           id: "new-task",
           label: "New Task",
-          sublabel: "Capture next action or project milestone",
           icon: CheckCircle2,
           colorClass: "bg-[#CEF431] text-[#161514] border-[#161514]",
           onClick: () => {
@@ -167,7 +158,6 @@ export function ActionSheet({
         {
           id: "new-project",
           label: "New Project",
-          sublabel: "Organize tasks under a unified project banner",
           icon: Kanban,
           colorClass: "bg-[#03D26F] text-[#161514] border-[#161514]",
           onClick: () => {
@@ -178,7 +168,6 @@ export function ActionSheet({
         {
           id: "priority-matrix",
           label: "Eisenhower Matrix",
-          sublabel: "Urgent vs Important quadrant prioritization",
           icon: Flame,
           colorClass: "bg-[#F59E0B] text-[#161514] border-[#161514]",
           onClick: () => {
@@ -189,7 +178,6 @@ export function ActionSheet({
         {
           id: "kanban-board",
           label: "Kanban Board",
-          sublabel: "Visual pipeline columns and swimlanes",
           icon: FolderKanban,
           colorClass: "bg-[#38BDF8] text-[#161514] border-[#161514]",
           onClick: () => {
@@ -205,7 +193,6 @@ export function ActionSheet({
       {
         id: "today-task",
         label: "New Task",
-        sublabel: "Capture action item with priority and due date",
         icon: CheckCircle2,
         colorClass: "bg-[#CEF431] text-[#161514] border-[#161514]",
         onClick: () => {
@@ -216,7 +203,6 @@ export function ActionSheet({
       {
         id: "today-expense",
         label: "Log Expense",
-        sublabel: "Record purchase against daily safe-to-spend",
         icon: Receipt,
         colorClass: "bg-[#03D26F] text-[#161514] border-[#161514]",
         onClick: () => {
@@ -227,7 +213,6 @@ export function ActionSheet({
       {
         id: "today-water",
         label: "Quick Water (+250ml)",
-        sublabel: "Instant hydration rep toward 2,000ml goal",
         icon: Droplet,
         colorClass: "bg-[#38BDF8] text-[#161514] border-[#161514]",
         onClick: () => {
@@ -240,7 +225,6 @@ export function ActionSheet({
       {
         id: "today-habit",
         label: "New Habit",
-        sublabel: "Add a new routine to your daily conquest",
         icon: CheckSquare,
         colorClass: "bg-[#C084FC] text-[#161514] border-[#161514]",
         onClick: () => {
@@ -258,7 +242,6 @@ export function ActionSheet({
       open={open}
       onOpenChange={onOpenChange}
       title="Quick Actions"
-      description="Select an action to log or create"
     >
       <div className="space-y-2 py-1">
         {actions.map((act) => {
@@ -287,11 +270,6 @@ export function ActionSheet({
                 <h4 className="font-heading font-black text-sm text-foreground tracking-tight leading-tight">
                   {act.label}
                 </h4>
-                {act.sublabel && (
-                  <p className="text-xs text-muted-foreground font-sans line-clamp-1 mt-0.5">
-                    {act.sublabel}
-                  </p>
-                )}
               </div>
             </button>
           );

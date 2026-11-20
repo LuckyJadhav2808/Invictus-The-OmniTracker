@@ -101,7 +101,6 @@ export function AllowanceSettingsModal({
       open={open}
       onOpenChange={onOpenChange}
       title="Monthly Budget & Allowance Engine"
-      description="Configure monthly digital & cash allowances, customize daily spending velocity, and enable rollover."
     >
       <form onSubmit={handleSubmit} className="space-y-4 pt-1 text-[#161514] dark:text-[#FAF8F5]">
         {/* Total Overview & Dynamic Live Pace Telemetry */}
@@ -124,10 +123,6 @@ export function AllowanceSettingsModal({
               ~{currencySymbol}{estimatedDailyPace}/day
             </span>
           </div>
-
-          <p className="text-[10px] text-[#161514]/60 dark:text-[#FAF8F5]/50 leading-relaxed font-medium">
-            Based on {daysRemainingInMonth} days remaining in this month. Your Today cockpit safe-to-spend gauge adjusts dynamically based on daily actual spend.
-          </p>
         </div>
 
         {/* 1-Tap Quick Tier Presets */}
@@ -283,9 +278,6 @@ export function AllowanceSettingsModal({
               <RefreshCw className="size-3.5 text-blue-500" />
               <span>Monthly Rollover Surplus</span>
             </span>
-            <p className="text-[11px] text-[#161514]/70 dark:text-[#FAF8F5]/60 font-medium leading-tight">
-              Roll unspent savings into next month&apos;s allowance automatically
-            </p>
           </div>
           <button
             type="button"

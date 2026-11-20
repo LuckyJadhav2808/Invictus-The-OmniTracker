@@ -405,9 +405,6 @@ export function BankSmsSettingsSection() {
               <h5 className="font-black text-xs text-[#161514] dark:text-[#FAF8F5] uppercase font-heading truncate">
                 Automatic Background Sync
               </h5>
-              <p className="text-[10px] text-[#161514]/70 dark:text-[#FAF8F5]/60 font-bold truncate">
-                Silently scan today's bank SMS on app launch (Air-gapped on device)
-              </p>
             </div>
           </div>
           <button
@@ -437,9 +434,6 @@ export function BankSmsSettingsSection() {
               <h5 className="font-black text-xs text-[#161514] dark:text-[#FAF8F5] uppercase font-heading truncate">
                 Learned Merchant Dictionary
               </h5>
-              <p className="text-[10px] text-[#161514]/70 dark:text-[#FAF8F5]/60 font-bold truncate">
-                Configure merchant names, auto-categories, and fuzzy matching
-              </p>
             </div>
           </div>
           <button
@@ -464,9 +458,6 @@ export function BankSmsSettingsSection() {
               <h5 className="font-black text-xs text-[#161514] dark:text-[#FAF8F5] uppercase font-heading truncate">
                 Targeted Date Range Scanner
               </h5>
-              <p className="text-[10px] text-[#161514]/70 dark:text-[#FAF8F5]/60 font-bold truncate">
-                Scan SMS for Today, Yesterday, Past 7 Days, or a custom date window
-              </p>
             </div>
           </div>
           <button
@@ -492,9 +483,6 @@ export function BankSmsSettingsSection() {
               <h5 className="font-black text-xs text-[#161514] dark:text-[#FAF8F5] uppercase font-heading truncate">
                 Full 30-Day SMS Re-Scan
               </h5>
-              <p className="text-[10px] text-[#161514]/70 dark:text-[#FAF8F5]/60 font-bold truncate">
-                Recover missed payments from today, yesterday, or past month
-              </p>
             </div>
           </div>
           <div className="w-full sm:w-auto flex items-center gap-2 shrink-0">
@@ -524,9 +512,6 @@ export function BankSmsSettingsSection() {
                 <h5 className="font-black text-xs text-rose-700 dark:text-rose-400 uppercase font-heading truncate">
                   Purge SMS Scan Batch
                 </h5>
-                <p className="text-[10px] text-rose-900/70 dark:text-rose-300/70 font-bold truncate">
-                  Wipes SMS-imported transactions & merchant categories • Keeps manual entries
-                </p>
               </div>
             </div>
             {!showPurgeConfirm ? (
@@ -580,9 +565,6 @@ export function BankSmsSettingsSection() {
                 <h5 className="font-black text-xs text-[#161514] dark:text-[#FAF8F5] uppercase font-heading">
                   Bank SMS Parser Sandbox & Diagnostics
                 </h5>
-                <p className="text-[10px] text-[#161514]/70 dark:text-[#FAF8F5]/60 font-bold">
-                  Paste bank messages to verify regex extraction and category suggestions
-                </p>
               </div>
             </div>
             {isSandboxOpen ? <ChevronUp className="size-4 text-[#161514] dark:text-[#FAF8F5]" /> : <ChevronDown className="size-4 text-[#161514] dark:text-[#FAF8F5]" />}

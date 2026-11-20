@@ -147,7 +147,6 @@ export function ExerciseGuideModal({
       open={open}
       onOpenChange={onOpenChange}
       title="EXERCISE FORM & TECHNIQUE GUIDE"
-      description="Proper biomechanics, target muscles, and injury-prevention cues"
     >
       <div className="space-y-4 pt-1 pb-2">
         {/* Header Title Card */}
