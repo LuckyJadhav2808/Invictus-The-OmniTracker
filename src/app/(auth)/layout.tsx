@@ -6,7 +6,7 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center overflow-x-hidden bg-[#FAF8F5] dark:bg-[#0D0C0B] bg-graph-grid p-4 sm:p-6 lg:p-8 transition-colors">
+    <div className="relative min-h-[100dvh] h-[100dvh] max-h-[100dvh] w-full flex items-center justify-center overflow-hidden bg-[#FAF8F5] dark:bg-[#0D0C0B] bg-graph-grid p-2 sm:p-4 lg:p-6 transition-colors">
       {/* Background Image Layer with Adaptive Studio Atmosphere */}
       <div className="absolute inset-0 z-0 select-none pointer-events-none">
         <Image
@@ -21,7 +21,7 @@ export default function AuthLayout({
       </div>
 
       {/* Main Content Area */}
-      <div className="relative z-10 w-full max-w-5xl flex items-center justify-center">
+      <div className="relative z-10 w-full max-w-5xl h-full flex items-center justify-center">
         {children}
       </div>
     </div>

@@ -2,7 +2,6 @@
 
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { toast } from "sonner";
 import {
   LogIn,
   UserPlus,
@@ -22,14 +21,15 @@ import {
   Dumbbell,
   Receipt,
   TrendingUp,
+  Activity,
+  Heart,
 } from "lucide-react";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { InvictusLogo } from "@/components/shared/InvictusLogo";
 import { StrobiCompanion } from "@/components/mascot/StrobiCompanion";
-import { DoodleInvictusTitle } from "@/components/auth/DoodleInvictusTitle";
-import { DoodleArrow } from "@/components/auth/AuthDoodles";
 import { APP_VERSION_CONFIG } from "@/config/version";
 import { cn } from "@/lib/utils";
+import { strobiToast, toast } from "@/lib/utils/toasts";
 
 function LoginForm() {
   const router = useRouter();
@@ -58,7 +58,9 @@ function LoginForm() {
     try {
       if (activeTab === "login") {
         const loggedUser = await login(email.trim(), password);
-        toast.success(`Welcome back, ${loggedUser.displayName || "Friend"}!`);
+        strobiToast.today(`Welcome back, ${loggedUser.displayName || "Gladiator"}!`, {
+          quip: "Vault unlocked! Ready to conquer today.",
+        });
         router.push("/today");
       } else {
         if (password.length < 4) {
@@ -67,7 +69,9 @@ function LoginForm() {
           return;
         }
         const newUser = await signup(email.trim(), password, name.trim());
-        toast.success(`Account created successfully! Welcome, ${newUser.displayName}!`);
+        strobiToast.today(`Welcome, ${newUser.displayName || "Gladiator"}!`, {
+          quip: "Your personal OS is calibrated & ready.",
+        });
         router.push("/today");
       }
     } catch (error: unknown) {
@@ -81,7 +85,9 @@ function LoginForm() {
 
   const handleGuestLogin = () => {
     enterGuestMode("Guest Explorer");
-    toast.success("Welcome! Exploring Invictus in offline mode.");
+    strobiToast.today("Welcome, Explorer! 🌟", {
+      quip: "Exploring in offline-first mode. Full features unlocked!",
+    });
     router.push("/today");
   };
 
@@ -95,406 +101,343 @@ function LoginForm() {
   };
 
   return (
-    <div className="relative w-full max-w-6xl mx-auto py-3 sm:py-6 lg:py-8 px-3 sm:px-4 flex flex-col md:grid md:grid-cols-12 gap-6 lg:gap-10 items-start justify-center">
-      {/* ─── DESKTOP/TABLET BENTO DECK (ON MOBILE: PLACED SECOND TO PRESERVE 0-SCROLL LOGIN) ─── */}
-      <div className="w-full md:col-span-6 lg:col-span-7 space-y-4 sm:space-y-5 order-2 md:order-1 flex flex-col items-center md:items-start text-center md:text-left">
-        {/* Brand Monolith Header */}
-        <div className="space-y-2 w-full max-w-lg">
-          <div className="flex items-center justify-center md:justify-start gap-2.5 flex-wrap">
-            <InvictusLogo size="md" variant="full" href="/" />
-            <span className="inline-flex items-center gap-1.5 bg-[#CEF431] text-[#161514] text-[10px] font-mono font-black uppercase px-2.5 py-0.5 rounded-full border border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
-              <span className="size-1.5 rounded-full bg-[#161514] animate-pulse" />
-              v{APP_VERSION_CONFIG.version} • Offline-First OS
-            </span>
-          </div>
+    <div className="w-full max-w-5xl mx-auto flex flex-col justify-center items-center py-2 sm:py-4 px-2 sm:px-4">
+      <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-4 lg:gap-8 items-center">
+        {/* ─── DESKTOP/TABLET LEFT SHOWCASE (VISIBLE ON MD+ SCREENS) ─── */}
+        <div className="hidden md:flex md:col-span-6 lg:col-span-7 flex-col space-y-3.5 text-left">
+          {/* Brand Monolith Header */}
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2">
+              <InvictusLogo size="sm" variant="full" href="/" />
+              <span className="inline-flex items-center gap-1.5 bg-[#CEF431] text-[#161514] text-[10px] font-mono font-black uppercase px-2 py-0.5 rounded-full border border-[#161514] shadow-[1px_1px_0px_0px_#161514]">
+                <span className="size-1.5 rounded-full bg-[#161514] animate-pulse" />
+                v{APP_VERSION_CONFIG.version} • Offline-First OS
+              </span>
+            </div>
 
-          <DoodleInvictusTitle size="lg" showSubtitle={false} className="my-1" />
-
-          <div className="space-y-1">
-            <h1 className="font-heading font-black text-2xl sm:text-3xl lg:text-4xl text-[#161514] dark:text-[#FAF8F5] tracking-tight leading-tight">
+            <h1 className="font-heading font-black text-2xl lg:text-3xl text-[#161514] dark:text-[#FAF8F5] tracking-tight leading-tight">
               Life, habits & money.
-              <span className="block text-[#6B6B6B] dark:text-[#A8A29E] text-lg sm:text-2xl font-bold">
+              <span className="block text-[#6B6B6B] dark:text-[#A8A29E] text-lg lg:text-xl font-bold">
                 In one focused cockpit.
               </span>
             </h1>
-            <p className="text-xs sm:text-sm font-medium text-[#6B6B6B] dark:text-[#A8A29E] leading-relaxed max-w-md mx-auto md:mx-0">
-              Personal operating system for disciplined tasks, atomic habits, workout telemetry, and calm money tracking.
-            </p>
-          </div>
-        </div>
-
-        {/* ─── NEOBRUTALIST TACTICAL BENTO GRID ─── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg">
-          {/* Bento Card 1: Today Command Cockpit (Hero Tile) */}
-          <div className="sm:col-span-2 bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#2A2724] rounded-2xl p-3.5 shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#2A2724] text-left transition-all hover:-translate-y-0.5 space-y-2.5">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="size-7 rounded-lg bg-[#CEF431] text-[#161514] flex items-center justify-center border border-[#161514] shadow-[1px_1px_0px_0px_#161514] shrink-0">
-                  <CheckCircle2 className="size-4 stroke-[2.5]" />
-                </div>
-                <div>
-                  <span className="font-heading font-black text-xs uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] block">
-                    Today Cockpit
-                  </span>
-                  <span className="font-mono text-[10px] text-[#6B6B6B] dark:text-[#A8A29E]">
-                    Agenda & Live Dock
-                  </span>
-                </div>
-              </div>
-              <span className="text-[10px] font-mono font-bold bg-white dark:bg-[#22201D] text-[#161514] dark:text-[#FAF8F5] px-2 py-0.5 rounded-md border border-[#161514]/20 dark:border-[#2A2724]">
-                7-Day Horizon
-              </span>
-            </div>
-
-            {/* Micro-Telemetry: Mini Week Scrubber & Daily Progress */}
-            <div className="bg-white dark:bg-[#1C1A18] rounded-xl p-2.5 border border-[#161514]/15 dark:border-[#2A2724] space-y-2">
-              <div className="flex items-center justify-between gap-1 text-[10px] font-mono">
-                {["S", "M", "T", "W", "T", "F", "S"].map((day, idx) => {
-                  const isActive = idx === 3; // Wednesday
-                  return (
-                    <div
-                      key={idx}
-                      className={cn(
-                        "flex-1 flex flex-col items-center py-1 rounded-md transition-colors",
-                        isActive
-                          ? "bg-[#161514] text-[#CEF431] font-black border border-[#161514] dark:bg-[#CEF431] dark:text-[#161514]"
-                          : "text-[#6B6B6B] dark:text-[#A8A29E] bg-[#FAF8F5] dark:bg-[#22201D]"
-                      )}
-                    >
-                      <span className="text-[8px] uppercase">{day}</span>
-                      <span className="text-[10px]">{15 + idx}</span>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className="flex items-center justify-between pt-1 border-t border-[#E8E5DF] dark:border-[#2A2724] text-[11px] font-mono">
-                <span className="text-[#6B6B6B] dark:text-[#A8A29E] flex items-center gap-1.5">
-                  <span className="size-2 rounded-full bg-[#03D26F]" />
-                  <span>Daily Action: 3/5 Done</span>
-                </span>
-                <span className="font-black text-[#161514] dark:text-[#FAF8F5]">60% Conquered</span>
-              </div>
-            </div>
           </div>
 
-          {/* Bento Card 2: Habits & Gym Anatomy */}
-          <div className="bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#2A2724] rounded-2xl p-3.5 shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#2A2724] text-left transition-all hover:-translate-y-0.5 space-y-2 flex flex-col justify-between">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="size-7 rounded-lg bg-[#03D26F] text-white flex items-center justify-center border border-[#161514] shadow-[1px_1px_0px_0px_#161514] shrink-0">
-                  <Flame className="size-4 stroke-[2.5]" />
-                </div>
-                <div>
-                  <span className="font-heading font-black text-xs uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] block">
-                    Habits & Gym
-                  </span>
-                  <span className="font-mono text-[10px] text-[#6B6B6B] dark:text-[#A8A29E]">
-                    Anatomy Telemetry
-                  </span>
-                </div>
-              </div>
+          {/* Strobi Companion Dialogue Stage */}
+          <div className="p-3 rounded-2xl bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#383531] shadow-[2.5px_2.5px_0px_0px_#161514] dark:shadow-[2.5px_2.5px_0px_0px_#000000] flex items-center gap-3">
+            <div className="shrink-0">
+              <StrobiCompanion size={44} gear="gladiator" state="idle" />
             </div>
-
-            {/* Micro-Telemetry Preview */}
-            <div className="bg-white dark:bg-[#1C1A18] rounded-xl p-2.5 border border-[#161514]/15 dark:border-[#2A2724] space-y-1.5">
-              <div className="flex items-center justify-between text-[11px] font-mono">
-                <span className="flex items-center gap-1 text-[#F59E0B] font-bold">
-                  <Flame className="size-3.5 fill-[#F59E0B]" />
-                  <span>6d Streak</span>
+            <div className="text-left space-y-0.5">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] block">
+                  ✨ Strobi Companion
                 </span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-400 font-bold">
-                  Push Day
+                <span className="text-[9px] font-mono font-black px-1.5 py-0.2 bg-[#CEF431] text-[#161514] rounded">
+                  ONLINE
                 </span>
               </div>
-              <div className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E] flex items-center gap-1">
-                <Dumbbell className="size-3 text-[#161514] dark:text-[#FAF8F5]" />
-                <span>Chest & Delts • 92% Ready</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Bento Card 3: Tasks & Execution Engine */}
-          <div className="bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#2A2724] rounded-2xl p-3.5 shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#2A2724] text-left transition-all hover:-translate-y-0.5 space-y-2 flex flex-col justify-between">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="size-7 rounded-lg bg-[#F59E0B] text-[#161514] flex items-center justify-center border border-[#161514] shadow-[1px_1px_0px_0px_#161514] shrink-0">
-                  <Zap className="size-4 stroke-[2.5]" />
-                </div>
-                <div>
-                  <span className="font-heading font-black text-xs uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] block">
-                    Tasks Engine
-                  </span>
-                  <span className="font-mono text-[10px] text-[#6B6B6B] dark:text-[#A8A29E]">
-                    Kanban & Priorities
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Micro-Telemetry Preview */}
-            <div className="bg-white dark:bg-[#1C1A18] rounded-xl p-2.5 border border-[#161514]/15 dark:border-[#2A2724] space-y-1.5">
-              <div className="flex items-center justify-between text-[11px] font-mono">
-                <span className="flex items-center gap-1 text-[#161514] dark:text-[#FAF8F5] font-bold">
-                  <CheckCircle2 className="size-3 text-[#F59E0B]" />
-                  <span>3 High Priority</span>
-                </span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-400 font-bold">
-                  Active
-                </span>
-              </div>
-              <div className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E] truncate">
-                Queue: Ship production release
-              </div>
-            </div>
-          </div>
-
-          {/* Bento Card 4: Cashflow Ledger (Full Width on 2-col) */}
-          <div className="sm:col-span-2 bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#2A2724] rounded-2xl p-3.5 shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#2A2724] text-left transition-all hover:-translate-y-0.5 space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="size-7 rounded-lg bg-[#F59E0B] text-white flex items-center justify-center border border-[#161514] shadow-[1px_1px_0px_0px_#161514] shrink-0">
-                  <Wallet className="size-4 stroke-[2.5]" />
-                </div>
-                <div>
-                  <span className="font-heading font-black text-xs uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] block">
-                    Cashflow Ledger
-                  </span>
-                  <span className="font-mono text-[10px] text-[#6B6B6B] dark:text-[#A8A29E]">
-                    Safe Spend & Envelopes
-                  </span>
-                </div>
-              </div>
-              <span className="font-mono text-[10px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                <TrendingUp className="size-3" />
-                <span>On Track</span>
-              </span>
-            </div>
-
-            {/* Micro-Telemetry: Thermal Receipt Preview */}
-            <div className="bg-white dark:bg-[#1C1A18] rounded-xl p-2.5 border border-[#161514]/15 dark:border-[#2A2724] flex items-center justify-between text-xs font-mono">
-              <div className="flex items-center gap-2">
-                <Receipt className="size-3.5 text-[#F59E0B]" />
-                <span className="font-semibold text-[#161514] dark:text-[#FAF8F5]">
-                  Safe Daily Spend: <span className="font-black text-[#03D26F]">₹450/day</span>
-                </span>
-              </div>
-              <span className="text-[10px] text-[#6B6B6B] dark:text-[#A8A29E] bg-[#FAF8F5] dark:bg-[#22201D] px-2 py-0.5 rounded border border-[#161514]/10 dark:border-[#2A2724]">
-                UPI Instant Sync
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Air-gap Privacy Assurance Box */}
-        <div className="max-w-lg w-full p-3 rounded-2xl bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#2A2724] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#2A2724] flex items-start gap-2.5 text-left">
-          <ShieldCheck className="size-4 text-emerald-600 dark:text-emerald-400 stroke-[2] shrink-0 mt-0.5" />
-          <div className="space-y-0.5">
-            <span className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5] block uppercase tracking-wider">
-              100% Private & Air-Gapped
-            </span>
-            <p className="text-[11px] font-medium text-[#6B6B6B] dark:text-[#A8A29E] leading-relaxed">
-              Your daily logs, syllabus progress, and financial transactions remain encrypted on this device. Zero ads, zero trackers, and zero cloud surveillance.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* ─── RIGHT COLUMN: UNIFIED FRICTIONLESS AUTH COCKPIT (ORDER-1 ON MOBILE FOR 0-SCROLL LOGIN) ─── */}
-      <div className="w-full md:col-span-6 lg:col-span-5 max-w-md mx-auto z-10 relative order-1 md:order-2">
-        <div className="bg-white dark:bg-[#161514] rounded-2xl p-4 sm:p-6 border-2 border-[#161514] dark:border-[#2A2724] shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#2A2724] space-y-4 transition-colors">
-          {/* ONBOARDING BRIDGE BANNER */}
-          {isFromOnboarding && (
-            <div className="p-3 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] flex items-center gap-3 animate-in fade-in zoom-in-95">
-              <div className="size-11 shrink-0 flex items-center justify-center">
-                <StrobiCompanion size={44} gear="none" showGear={false} />
-              </div>
-              <div className="text-left space-y-0.5">
-                <div className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5">
-                  <span>Companion Calibrated!</span>
-                  <span className="text-[9px] font-mono font-black px-1.5 py-0.2 rounded bg-[#03D26F] text-[#161514]">
-                    READY
-                  </span>
-                </div>
-                <p className="text-[11px] text-muted-foreground leading-tight">
-                  Your habits and daily pace are staged. Lock them in with an account, or test offline below.
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* ZERO-CONFUSION 1-TAP GUEST ON-RAMP (PRIORITY #1 ON MOBILE) */}
-          <div className="relative">
-            <div className="hidden sm:flex justify-end mb-1 pr-2">
-              <DoodleArrow
-                direction="curved-down-right"
-                label="1-tap offline evaluation"
-                className="rotate-[-4deg]"
-                color="#03D26F"
-              />
-            </div>
-            <div className="p-3.5 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#2A2724] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#2A2724] space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5 uppercase tracking-wider">
-                  <Compass className="size-3.5 stroke-[2.5] text-emerald-600 dark:text-emerald-400" />
-                  <span>Instant Evaluation Mode</span>
-                </span>
-                <span className="bg-[#CEF431] text-[#161514] text-[10px] font-mono font-black uppercase px-2 py-0.5 rounded border border-[#161514]">
-                  1-Tap Ready
-                </span>
-              </div>
-              <p className="text-[11px] font-medium text-[#6B6B6B] dark:text-[#A8A29E] leading-relaxed">
-                Test all workspaces, gym routines, and ledger envelopes immediately without creating an account.
+              <p className="text-xs font-heading font-medium text-[#6B6B6B] dark:text-[#A8A29E] leading-snug">
+                &ldquo;Ready to conquer today? 1-Tap Offline Guest lets you explore without creating an account.&rdquo;
               </p>
+            </div>
+          </div>
+
+          {/* 2x2 Bento Engine Cards */}
+          <div className="grid grid-cols-2 gap-2.5">
+            {/* Tile 1: Today Command */}
+            <div className="bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#383531] rounded-xl p-2.5 shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-mono font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5">
+                  <CheckCircle2 className="size-3 text-[#03D26F]" />
+                  <span>Today Cockpit</span>
+                </span>
+                <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-400 rounded">
+                  7-Day Arc
+                </span>
+              </div>
+              <p className="text-[10.5px] font-mono text-[#6B6B6B] dark:text-[#A8A29E]">
+                3-second logging & live activity dock
+              </p>
+            </div>
+
+            {/* Tile 2: Habits & Gym */}
+            <div className="bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#383531] rounded-xl p-2.5 shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-mono font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5">
+                  <Flame className="size-3 text-[#F59E0B]" />
+                  <span>Habits & Gym</span>
+                </span>
+                <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-400 rounded">
+                  Anatomy
+                </span>
+              </div>
+              <p className="text-[10.5px] font-mono text-[#6B6B6B] dark:text-[#A8A29E]">
+                Muscle telemetry & streak protection
+              </p>
+            </div>
+
+            {/* Tile 3: Tasks Engine */}
+            <div className="bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#383531] rounded-xl p-2.5 shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-mono font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5">
+                  <Zap className="size-3 text-[#5B7FE5]" />
+                  <span>Tasks Engine</span>
+                </span>
+                <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-400 rounded">
+                  P1 Priority
+                </span>
+              </div>
+              <p className="text-[10.5px] font-mono text-[#6B6B6B] dark:text-[#A8A29E]">
+                Zero-friction kanban & flow state
+              </p>
+            </div>
+
+            {/* Tile 4: Cashflow Ledger */}
+            <div className="bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#383531] rounded-xl p-2.5 shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-mono font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5">
+                  <Wallet className="size-3 text-[#10B981]" />
+                  <span>Cashflow</span>
+                </span>
+                <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-400 rounded">
+                  Safe Spend
+                </span>
+              </div>
+              <p className="text-[10.5px] font-mono text-[#6B6B6B] dark:text-[#A8A29E]">
+                Belanje envelopes & receipt OCR
+              </p>
+            </div>
+          </div>
+
+          {/* Privacy Guarantee */}
+          <div className="flex items-center gap-2 text-[11px] font-mono text-[#6B6B6B] dark:text-[#A8A29E]">
+            <ShieldCheck className="size-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <span>100% On-Device & Encrypted • Zero cloud surveillance</span>
+          </div>
+        </div>
+
+        {/* ─── AUTH COCKPIT CARD (BENCHMARK MOBILE + DESKTOP DESIGN) ─── */}
+        <div className="col-span-1 md:col-span-6 lg:col-span-5 w-full max-w-sm sm:max-w-md mx-auto space-y-2">
+          {/* Mobile Mascot & Header Hero (Fills the blank space with benchmark personality) */}
+          <div className="flex md:hidden flex-col items-center text-center space-y-1 mb-1">
+            <div className="flex items-center gap-2">
+              <InvictusLogo size="sm" variant="icon-only" href="/" />
+              <span className="font-heading font-black text-lg tracking-tight text-[#161514] dark:text-[#FAF8F5]">
+                INVICTUS
+              </span>
+              <span className="inline-flex items-center gap-1 bg-[#CEF431] text-[#161514] text-[9px] font-mono font-black uppercase px-2 py-0.2 rounded-full border border-[#161514] shadow-xs">
+                v{APP_VERSION_CONFIG.version}
+              </span>
+            </div>
+
+            {/* Mascot Banner with Speech Bubble */}
+            <div className="w-full flex items-center justify-center gap-2.5 px-2 py-1 bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-[#161514] dark:border-[#383531] shadow-[1.5px_1.5px_0px_0px_#161514] dark:shadow-[1.5px_1.5px_0px_0px_#000000]">
+              <div className="shrink-0">
+                <StrobiCompanion size={32} gear="gladiator" state="idle" />
+              </div>
+              <span className="text-[11px] font-heading font-bold text-[#161514] dark:text-[#FAF8F5] text-left">
+                &ldquo;Ready to conquer today, Gladiator?&rdquo;
+              </span>
+            </div>
+
+            {/* Horizontal Mini Telemetry Ticker (Benchmark Apps feature bar) */}
+            <div className="w-full flex items-center justify-between gap-1 pt-0.5 text-[9.5px] font-mono">
+              <span className="flex items-center gap-1 bg-white dark:bg-[#201D1A] px-2 py-0.5 rounded border border-[#E8E5DF] dark:border-[#383531] text-[#161514] dark:text-[#FAF8F5]">
+                <Flame className="size-2.5 text-[#F59E0B]" />
+                <span>Habits</span>
+              </span>
+              <span className="flex items-center gap-1 bg-white dark:bg-[#201D1A] px-2 py-0.5 rounded border border-[#E8E5DF] dark:border-[#383531] text-[#161514] dark:text-[#FAF8F5]">
+                <Zap className="size-2.5 text-[#5B7FE5]" />
+                <span>Tasks</span>
+              </span>
+              <span className="flex items-center gap-1 bg-white dark:bg-[#201D1A] px-2 py-0.5 rounded border border-[#E8E5DF] dark:border-[#383531] text-[#161514] dark:text-[#FAF8F5]">
+                <Wallet className="size-2.5 text-[#10B981]" />
+                <span>Money</span>
+              </span>
+              <span className="flex items-center gap-1 bg-white dark:bg-[#201D1A] px-2 py-0.5 rounded border border-[#E8E5DF] dark:border-[#383531] text-[#161514] dark:text-[#FAF8F5]">
+                <ShieldCheck className="size-2.5 text-emerald-600" />
+                <span>Private</span>
+              </span>
+            </div>
+          </div>
+
+          {/* Main Auth Cockpit Container */}
+          <div className="bg-white dark:bg-[#161514] rounded-2xl p-3.5 sm:p-5 border-2 border-[#161514] dark:border-[#383531] shadow-[3.5px_3.5px_0px_0px_#161514] dark:shadow-[3.5px_3.5px_0px_0px_#000000] space-y-3 transition-colors">
+            {/* Onboarding Calibrated Badge */}
+            {isFromOnboarding && (
+              <div className="p-2 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#161514] dark:border-[#383531] flex items-center gap-2.5 animate-in fade-in">
+                <StrobiCompanion size={28} gear="none" showGear={false} />
+                <div className="text-left text-xs leading-tight">
+                  <span className="font-heading font-black text-[#161514] dark:text-[#FAF8F5]">
+                    Companion Ready!
+                  </span>
+                  <p className="text-[10px] text-muted-foreground">
+                    Preferences saved. Enter below to begin.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* 1-Tap Offline Guest On-Ramp (Hevy / Linear Benchmark) */}
+            <button
+              type="button"
+              onClick={handleGuestLogin}
+              className="w-full flex items-center justify-between py-2.5 px-3.5 rounded-xl bg-[#CEF431] hover:bg-[#bfe628] text-[#161514] text-xs font-heading font-black uppercase tracking-wider border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer group"
+            >
+              <div className="flex items-center gap-2">
+                <Compass className="size-4 stroke-[2.5]" />
+                <span>Explore Offline (No Account)</span>
+              </div>
+              <ArrowRight className="size-3.5 stroke-[2.5] group-hover:translate-x-0.5 transition-transform" />
+            </button>
+
+            {/* Clean Calm Divider */}
+            <div className="relative py-0.5">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-[#E8E5DF] dark:border-[#2A2724]" />
+              </div>
+              <div className="relative flex justify-center text-[9px] uppercase font-mono font-bold">
+                <span className="bg-white dark:bg-[#161514] px-2 text-[#6B6B6B] dark:text-[#A8A29E]">
+                  or sign in to encrypted vault
+                </span>
+              </div>
+            </div>
+
+            {/* Segmented Dual Tabs Switcher */}
+            <div className="grid grid-cols-2 p-1 bg-[#FAF8F5] dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#2A2724] rounded-xl gap-1">
               <button
                 type="button"
-                onClick={handleGuestLogin}
-                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#CEF431] hover:bg-[#bfe628] text-[#161514] text-xs font-heading font-black uppercase tracking-wider border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
+                onClick={() => setActiveTab("login")}
+                className={cn(
+                  "py-1.5 text-xs font-heading font-black uppercase tracking-wider rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5",
+                  activeTab === "login"
+                    ? "bg-[#161514] text-white dark:bg-[#FAF8F5] dark:text-[#161514] shadow-xs"
+                    : "text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5]"
+                )}
               >
-                <Compass className="size-3.5 stroke-[2.5]" />
-                <span>Explore as Offline Guest (No Account)</span>
-                <ArrowRight className="size-3.5 stroke-[2.5]" />
+                <LogIn className="size-3 stroke-[2.5]" />
+                <span>Sign In</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab("signup")}
+                className={cn(
+                  "py-1.5 text-xs font-heading font-black uppercase tracking-wider rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5",
+                  activeTab === "signup"
+                    ? "bg-[#161514] text-white dark:bg-[#FAF8F5] dark:text-[#161514] shadow-xs"
+                    : "text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5]"
+                )}
+              >
+                <UserPlus className="size-3 stroke-[2.5]" />
+                <span>Create Account</span>
+              </button>
+            </div>
+
+            {/* Form Controls */}
+            <form onSubmit={handleEmailSubmit} className="space-y-2.5">
+              {activeTab === "signup" && (
+                <div className="space-y-1">
+                  <label className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1">
+                    <User className="size-3 stroke-[2] text-[#6B6B6B] dark:text-[#A8A29E]" />
+                    <span>Full Name</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="e.g. Alex Morgan"
+                    required
+                    className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-[#161514] dark:border-[#2A2724] px-3 py-1.5 sm:py-2 text-xs font-mono font-medium text-[#161514] dark:text-[#FAF8F5] placeholder:text-[#A8A29E] focus:outline-none focus:border-[#CEF431] dark:focus:border-[#CEF431] transition-all"
+                  />
+                </div>
+              )}
+
+              <div className="space-y-1">
+                <label className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1">
+                  <Mail className="size-3 stroke-[2] text-[#6B6B6B] dark:text-[#A8A29E]" />
+                  <span>Email Address</span>
+                </label>
+                <input
+                  type="email"
+                  inputMode="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  required
+                  className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-[#161514] dark:border-[#2A2724] px-3 py-1.5 sm:py-2 text-xs font-mono font-medium text-[#161514] dark:text-[#FAF8F5] placeholder:text-[#A8A29E] focus:outline-none focus:border-[#CEF431] dark:focus:border-[#CEF431] transition-all"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1">
+                  <Lock className="size-3 stroke-[2] text-[#6B6B6B] dark:text-[#A8A29E]" />
+                  <span>Password</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder={activeTab === "signup" ? "Min 4 characters" : "Your password"}
+                    required
+                    className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border border-[#161514] dark:border-[#2A2724] px-3 py-1.5 sm:py-2 text-xs font-mono font-medium text-[#161514] dark:text-[#FAF8F5] placeholder:text-[#A8A29E] focus:outline-none focus:border-[#CEF431] dark:focus:border-[#CEF431] transition-all pr-9"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5] cursor-pointer"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
+                  </button>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-2.5 rounded-xl bg-[#161514] hover:bg-[#2A2826] text-white dark:bg-[#FAF8F5] dark:text-[#161514] dark:hover:bg-[#E8E5DF] font-heading font-black text-xs uppercase tracking-wider border-2 border-[#161514] dark:border-[#FAF8F5] shadow-[2.5px_2.5px_0px_0px_#161514] dark:shadow-[2.5px_2.5px_0px_0px_#FAF8F5] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 mt-1"
+              >
+                {loading ? (
+                  <span className="flex items-center gap-2">
+                    <span className="size-3.5 rounded-full border-2 border-white dark:border-[#161514] border-t-transparent animate-spin" />
+                    <span>Authenticating...</span>
+                  </span>
+                ) : activeTab === "login" ? (
+                  <span className="flex items-center gap-1.5">
+                    <LogIn className="size-3.5 stroke-[2.5]" />
+                    <span>Enter Vault</span>
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1.5">
+                    <UserPlus className="size-3.5 stroke-[2.5]" />
+                    <span>Create Vault</span>
+                  </span>
+                )}
+              </button>
+            </form>
+
+            {/* Quick Demo Fill Helper */}
+            <div className="pt-1.5 flex items-center justify-between text-[10px] text-[#6B6B6B] dark:text-[#A8A29E] border-t border-[#161514]/10 dark:border-[#2A2724]">
+              <span className="font-medium">Testing locally?</span>
+              <button
+                type="button"
+                onClick={handleFillDemo}
+                className="text-[10px] font-mono font-bold text-[#161514] dark:text-[#FAF8F5] hover:underline cursor-pointer flex items-center gap-1"
+              >
+                <Sparkles className="size-2.5 text-[#F59E0B]" />
+                <span>Fill Demo Credentials</span>
               </button>
             </div>
           </div>
 
-          {/* Calm Divider */}
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t-2 border-[#161514]/15 dark:border-[#2A2724]" />
-            </div>
-            <div className="relative flex justify-center text-[10px] uppercase font-mono font-bold">
-              <span className="bg-white dark:bg-[#161514] px-2.5 text-[#6B6B6B] dark:text-[#A8A29E]">
-                or sign in to synced vault
-              </span>
-            </div>
-          </div>
-
-          {/* Segmented Dual Tabs Switcher */}
-          <div className="grid grid-cols-2 p-1 bg-[#FAF8F5] dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#2A2724] rounded-xl gap-1">
-            <button
-              type="button"
-              onClick={() => setActiveTab("login")}
-              className={cn(
-                "py-2 text-xs font-heading font-black uppercase tracking-wider rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5",
-                activeTab === "login"
-                  ? "bg-[#161514] text-white dark:bg-[#FAF8F5] dark:text-[#161514] shadow-xs"
-                  : "text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5]"
-              )}
-            >
-              <LogIn className="size-3.5 stroke-[2]" />
-              <span>Sign In</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("signup")}
-              className={cn(
-                "py-2 text-xs font-heading font-black uppercase tracking-wider rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5",
-                activeTab === "signup"
-                  ? "bg-[#161514] text-white dark:bg-[#FAF8F5] dark:text-[#161514] shadow-xs"
-                  : "text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5]"
-              )}
-            >
-              <UserPlus className="size-3.5 stroke-[2]" />
-              <span>Create Account</span>
-            </button>
-          </div>
-
-          {/* Form Controls */}
-          <form onSubmit={handleEmailSubmit} className="space-y-3">
-            {activeTab === "signup" && (
-              <div className="space-y-1">
-                <label className="text-[11px] font-heading font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5">
-                  <User className="size-3.5 stroke-[2] text-[#6B6B6B] dark:text-[#A8A29E]" />
-                  <span>Full Name</span>
-                </label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Alex Morgan"
-                  required
-                  className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border-2 border-[#161514] dark:border-[#2A2724] px-3.5 py-2 text-xs font-mono font-medium text-[#161514] dark:text-[#FAF8F5] placeholder:text-[#A8A29E] focus:outline-none focus:border-[#CEF431] dark:focus:border-[#CEF431] transition-all"
-                />
-              </div>
-            )}
-
-            <div className="space-y-1">
-              <label className="text-[11px] font-heading font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5">
-                <Mail className="size-3.5 stroke-[2] text-[#6B6B6B] dark:text-[#A8A29E]" />
-                <span>Email Address</span>
-              </label>
-              <input
-                type="email"
-                inputMode="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                required
-                className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border-2 border-[#161514] dark:border-[#2A2724] px-3.5 py-2 text-xs font-mono font-medium text-[#161514] dark:text-[#FAF8F5] placeholder:text-[#A8A29E] focus:outline-none focus:border-[#CEF431] dark:focus:border-[#CEF431] transition-all"
-              />
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-[11px] font-heading font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5">
-                <Lock className="size-3.5 stroke-[2] text-[#6B6B6B] dark:text-[#A8A29E]" />
-                <span>Password</span>
-              </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder={activeTab === "signup" ? "At least 4 characters" : "Your password"}
-                  required
-                  className="w-full bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border-2 border-[#161514] dark:border-[#2A2724] px-3.5 py-2 text-xs font-mono font-medium text-[#161514] dark:text-[#FAF8F5] placeholder:text-[#A8A29E] focus:outline-none focus:border-[#CEF431] dark:focus:border-[#CEF431] transition-all pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5] cursor-pointer"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? <EyeOff className="size-3.5 stroke-[2]" /> : <Eye className="size-3.5 stroke-[2]" />}
-                </button>
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-2.5 rounded-xl bg-[#161514] hover:bg-[#2A2826] text-white dark:bg-[#FAF8F5] dark:text-[#161514] dark:hover:bg-[#E8E5DF] font-heading font-black text-xs uppercase tracking-wider border-2 border-[#161514] dark:border-[#FAF8F5] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#FAF8F5] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 mt-1"
-            >
-              {loading ? (
-                <span className="flex items-center gap-2">
-                  <span className="size-3.5 rounded-full border-2 border-white dark:border-[#161514] border-t-transparent animate-spin" />
-                  <span>Authenticating...</span>
-                </span>
-              ) : activeTab === "login" ? (
-                <span className="flex items-center gap-2">
-                  <LogIn className="size-3.5 stroke-[2.5]" />
-                  <span>Enter Vault</span>
-                </span>
-              ) : (
-                <span className="flex items-center gap-2">
-                  <UserPlus className="size-3.5 stroke-[2.5]" />
-                  <span>Create My Vault</span>
-                </span>
-              )}
-            </button>
-          </form>
-
-          {/* Quick Demo Fill Helper */}
-          <div className="pt-2 flex items-center justify-between text-[11px] text-[#6B6B6B] dark:text-[#A8A29E] border-t border-[#161514]/10 dark:border-[#2A2724]">
-            <span className="font-medium">Testing locally?</span>
-            <button
-              type="button"
-              onClick={handleFillDemo}
-              className="text-[11px] font-mono font-bold text-[#161514] dark:text-[#FAF8F5] hover:underline cursor-pointer flex items-center gap-1"
-            >
-              <Sparkles className="size-3 text-[#F59E0B]" />
-              <span>Fill Demo Credentials</span>
-            </button>
+          {/* Security & Offline Footnote */}
+          <div className="text-center pt-0.5">
+            <span className="text-[10px] font-mono text-[#6B6B6B] dark:text-[#A8A29E] inline-flex items-center justify-center gap-1 bg-[#FAF8F5] dark:bg-[#1C1A18] px-2.5 py-0.5 rounded-full border border-[#E8E5DF] dark:border-[#2A2724]">
+              <ShieldCheck className="size-3 text-emerald-600 dark:text-emerald-400" />
+              <span>100% On-Device & Encrypted • Zero trackers</span>
+            </span>
           </div>
         </div>
       </div>
