@@ -32,6 +32,7 @@ import { soundFX } from "@/components/shared/SoundFX";
 import { getSubrouteInfo } from "@/lib/page-flow/page-flow-resolver";
 import { DynamicIslandDock, isDynamicIslandAllowed } from "@/components/shared/DynamicIslandDock";
 import { StrobiCompanion, type StrobiGear } from "@/components/mascot/StrobiCompanion";
+import { useTheme } from "@/lib/hooks/useTheme";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -45,6 +46,7 @@ export function SpaceHeader() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, signOut } = useAuth();
+  const { toggleTheme, isDark } = useTheme();
   const [announcement, setAnnouncement] = useState<GlobalAnnouncement | null>(null);
   const [dismissedAnn, setDismissedAnn] = useState(false);
   const [isReminderModalOpen, setIsReminderModalOpen] = useState(false);
@@ -191,8 +193,8 @@ export function SpaceHeader() {
         </div>
       )}
 
-      {/* Main Header Container */}
-      <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2 flex items-center justify-between gap-2 sm:gap-4 relative min-h-[52px]">
+      {/* Main Header Container: Strict 52px height for dead-center alignment */}
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 h-[52px] flex items-center justify-between gap-2 sm:gap-4 relative">
         {/* Left: Strobi Companion (+ Back button on subroutes) */}
         <div className="flex items-center gap-2 shrink-0 relative z-10">
           {subrouteInfo && (
@@ -312,14 +314,15 @@ export function SpaceHeader() {
 
               <DropdownMenuSeparator className="my-1 bg-[#E8E5DF] dark:bg-[#2A2724]" />
 
-              {/* Theme Toggle within Menu */}
+              {/* Theme Toggle within Menu (Circular View Transition Ripple Animation) */}
               <DropdownMenuItem
-                onClick={() => {
+                onClick={(e) => {
                   soundFX.playPop();
-                  const isDark = document.documentElement.classList.contains("dark");
-                  const nextTheme = isDark ? "light" : "dark";
-                  document.documentElement.classList.toggle("dark", !isDark);
-                  localStorage.setItem("theme", nextTheme);
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  toggleTheme({
+                    x: rect.left + rect.width / 2,
+                    y: rect.top + rect.height / 2,
+                  });
                 }}
                 className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-bold cursor-pointer hover:bg-secondary focus:bg-secondary"
               >
@@ -327,7 +330,7 @@ export function SpaceHeader() {
                   <Sparkles className="size-3.5 stroke-[2] text-[#03D26F]" />
                   <span>Toggle Theme</span>
                 </div>
-                <span className="text-[10px] font-mono text-muted-foreground">Light / Dark</span>
+                <span className="text-[10px] font-mono text-muted-foreground">{isDark ? "Dark" : "Light"}</span>
               </DropdownMenuItem>
 
               {/* Sound FX Toggle */}

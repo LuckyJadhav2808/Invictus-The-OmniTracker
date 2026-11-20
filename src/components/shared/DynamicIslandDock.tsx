@@ -14,6 +14,10 @@ import {
   Clock,
   BookOpen,
   Wallet,
+  SunMedium,
+  CheckSquare,
+  Kanban,
+  Timer,
 } from "lucide-react";
 import { useLiveActivityStore } from "@/store/live-activity-store";
 import { soundFX } from "@/components/shared/SoundFX";
@@ -62,6 +66,7 @@ export function DynamicIslandDock({
     addGymRestSeconds,
     stopGymRest,
     tickGymRest,
+    startGymRest,
     togglePausePomodoro,
     addPomodoroMinutes,
     stopPomodoro,
@@ -592,47 +597,133 @@ export function DynamicIslandDock({
           {/* ================= AMBIENT EXPANDED CONTENT ================= */}
           {currentMode === "ambient" && (
             <div className="space-y-3">
+              {/* Telemetry Snapshot Cards */}
               <div className="grid grid-cols-2 gap-2.5">
                 {/* Daily Cash Left Card */}
-                <div className="bg-[#FAF8F5] dark:bg-[#252321] p-3 rounded-xl border border-[#E8E5DF] dark:border-[#383531]">
-                  <span className="text-[10px] font-medium text-[#8C8882] dark:text-[#A8A29E] uppercase tracking-wider block">
-                    Daily Cash Left
-                  </span>
-                  <span className="text-xl font-bold font-sans text-[#161514] dark:text-[#FAF8F5] block mt-0.5">
-                    {ambient.currencySymbol}
-                    {Math.round(ambient.dailyCashLeft || 0).toLocaleString()}
-                  </span>
-                  <span className="text-[10px] text-[#8C8882] dark:text-[#A8A29E]">Safe to spend</span>
-                </div>
-
-                {/* Habit Streak Card */}
-                <div className="bg-[#FAF8F5] dark:bg-[#252321] p-3 rounded-xl border border-[#E8E5DF] dark:border-[#383531]">
-                  <span className="text-[10px] font-medium text-[#8C8882] dark:text-[#A8A29E] uppercase tracking-wider block">
-                    Today&apos;s Habits
-                  </span>
-                  <span className="text-xl font-bold font-sans text-[#161514] dark:text-[#FAF8F5] block mt-0.5">
-                    {ambient.habitsCompleted}/{ambient.totalHabits}
-                  </span>
-                  <span className="text-[10px] text-amber-600 dark:text-amber-400 flex items-center gap-1">
-                    <Flame className="size-3 fill-amber-500 text-amber-600" />
-                    <span>{ambient.activeStreak} day streak</span>
-                  </span>
-                </div>
-              </div>
-
-              {/* Quick Launch Buttons */}
-              <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
                   onClick={() => {
                     soundFX.playPop();
                     setIsExpanded(false);
-                    startPomodoro(25, "Deep Focus", "focus");
+                    router.push("/money");
                   }}
-                  className="bg-white dark:bg-[#252321] hover:bg-[#F1EFEA] dark:hover:bg-[#2A2724] text-[#161514] dark:text-[#FAF8F5] font-medium text-xs py-2 px-3 rounded-lg border border-[#E8E5DF] dark:border-[#383531] shadow-xs flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+                  className="bg-[#FAF8F5] dark:bg-[#252321] hover:bg-[#F1EFEA] dark:hover:bg-[#2A2724] p-3 rounded-xl border-2 border-[#161514]/15 dark:border-white/15 text-left transition-all active:scale-[0.98] cursor-pointer group"
                 >
-                  <Clock className="size-3.5 stroke-[1.75]" />
-                  <span>25m Focus</span>
+                  <div className="flex items-center justify-between text-[#8C8882] dark:text-[#A8A29E] mb-0.5">
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider">
+                      Cash Left
+                    </span>
+                    <ArrowUpRight className="size-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                  <span className="text-xl font-heading font-black text-[#161514] dark:text-[#FAF8F5] block">
+                    {ambient.currencySymbol}
+                    {Math.round(ambient.dailyCashLeft || 0).toLocaleString()}
+                  </span>
+                  <span className="text-[10px] text-[#047857] dark:text-[#03D26F] font-medium flex items-center gap-1 mt-0.5">
+                    <span className="size-1.5 rounded-full bg-[#03D26F]" />
+                    <span>Safe to spend</span>
+                  </span>
+                </button>
+
+                {/* Habit Streak Card */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    soundFX.playPop();
+                    setIsExpanded(false);
+                    router.push("/goals");
+                  }}
+                  className="bg-[#FAF8F5] dark:bg-[#252321] hover:bg-[#F1EFEA] dark:hover:bg-[#2A2724] p-3 rounded-xl border-2 border-[#161514]/15 dark:border-white/15 text-left transition-all active:scale-[0.98] cursor-pointer group"
+                >
+                  <div className="flex items-center justify-between text-[#8C8882] dark:text-[#A8A29E] mb-0.5">
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider">
+                      Habits Due
+                    </span>
+                    <ArrowUpRight className="size-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                  <span className="text-xl font-heading font-black text-[#161514] dark:text-[#FAF8F5] block">
+                    {ambient.habitsCompleted}/{ambient.totalHabits}
+                  </span>
+                  <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium flex items-center gap-1 mt-0.5">
+                    <Flame className="size-3 fill-amber-500 text-amber-600" />
+                    <span>{ambient.activeStreak}d streak</span>
+                  </span>
+                </button>
+              </div>
+
+              {/* Live Timer Launchers (Working Focus & Rest Timers) */}
+              <div className="space-y-1.5">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-muted-foreground px-0.5 block">
+                  Quick Live Timers
+                </span>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      soundFX.playPop();
+                      startPomodoro(25, "Deep Focus", "focus");
+                      toast.success("25m Focus Block Started!");
+                    }}
+                    className="bg-white dark:bg-[#252321] hover:bg-[#F1EFEA] dark:hover:bg-[#2A2724] text-[#161514] dark:text-[#FAF8F5] font-heading font-black text-xs py-2.5 px-3 rounded-xl border-2 border-[#161514]/20 dark:border-white/20 shadow-xs flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95"
+                  >
+                    <Clock className="size-4 text-[#C084FC] stroke-[2]" />
+                    <span>25m Focus</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      soundFX.playPop();
+                      startGymRest(60, "Set Recovery");
+                      toast.success("60s Rest Timer Started!");
+                    }}
+                    className="bg-white dark:bg-[#252321] hover:bg-[#F1EFEA] dark:hover:bg-[#2A2724] text-[#161514] dark:text-[#FAF8F5] font-heading font-black text-xs py-2.5 px-3 rounded-xl border-2 border-[#161514]/20 dark:border-white/20 shadow-xs flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95"
+                  >
+                    <Dumbbell className="size-4 text-[#03D26F] stroke-[2]" />
+                    <span>60s Rest</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Fast Teleport Navigation Bar */}
+              <div className="pt-2 border-t border-[#161514]/10 dark:border-white/10 flex items-center justify-between gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    soundFX.playPop();
+                    setIsExpanded(false);
+                    router.push("/today");
+                  }}
+                  className="flex-1 py-1.5 px-2 rounded-lg bg-[#FAF8F5] dark:bg-[#252321] hover:bg-[#F1EFEA] dark:hover:bg-[#333] text-[11px] font-heading font-bold text-foreground flex items-center justify-center gap-1 transition-all active:scale-95 cursor-pointer"
+                >
+                  <SunMedium className="size-3 text-amber-500" />
+                  <span>Today</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    soundFX.playPop();
+                    setIsExpanded(false);
+                    router.push("/goals");
+                  }}
+                  className="flex-1 py-1.5 px-2 rounded-lg bg-[#FAF8F5] dark:bg-[#252321] hover:bg-[#F1EFEA] dark:hover:bg-[#333] text-[11px] font-heading font-bold text-foreground flex items-center justify-center gap-1 transition-all active:scale-95 cursor-pointer"
+                >
+                  <CheckSquare className="size-3 text-[#03D26F]" />
+                  <span>Habits</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    soundFX.playPop();
+                    setIsExpanded(false);
+                    router.push("/tasks");
+                  }}
+                  className="flex-1 py-1.5 px-2 rounded-lg bg-[#FAF8F5] dark:bg-[#252321] hover:bg-[#F1EFEA] dark:hover:bg-[#333] text-[11px] font-heading font-bold text-foreground flex items-center justify-center gap-1 transition-all active:scale-95 cursor-pointer"
+                >
+                  <Kanban className="size-3 text-[#F59E0B]" />
+                  <span>Tasks</span>
                 </button>
 
                 <button
@@ -642,10 +733,10 @@ export function DynamicIslandDock({
                     setIsExpanded(false);
                     router.push("/money");
                   }}
-                  className="bg-[#161514] dark:bg-[#CEF431] hover:bg-neutral-800 dark:hover:bg-[#b8dc2d] text-white dark:text-[#161514] font-medium text-xs py-2 px-3 rounded-lg shadow-xs flex items-center justify-center gap-1.5 cursor-pointer transition-colors font-heading font-black"
+                  className="flex-1 py-1.5 px-2 rounded-lg bg-[#FAF8F5] dark:bg-[#252321] hover:bg-[#F1EFEA] dark:hover:bg-[#333] text-[11px] font-heading font-bold text-foreground flex items-center justify-center gap-1 transition-all active:scale-95 cursor-pointer"
                 >
-                  <Wallet className="size-3.5 stroke-[1.75]" />
-                  <span>Money Space</span>
+                  <Wallet className="size-3 text-[#03D26F]" />
+                  <span>Money</span>
                 </button>
               </div>
             </div>

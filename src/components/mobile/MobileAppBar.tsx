@@ -36,6 +36,7 @@ import {
 import { DynamicIslandDock, isDynamicIslandAllowed } from "@/components/shared/DynamicIslandDock";
 import { StrobiCompanion, type StrobiGear, type StrobiState } from "@/components/mascot/StrobiCompanion";
 import { usePathname, useRouter } from "next/navigation";
+import { useTheme } from "@/lib/hooks/useTheme";
 import { cn } from "@/lib/utils";
 
 export interface MobileAppBarProps {
@@ -82,6 +83,7 @@ export function MobileAppBar({
   const pathname = usePathname();
   const router = useRouter();
   const { user, signOut } = useAuth();
+  const { toggleTheme, isDark } = useTheme();
   const isAllowedRoute = isDynamicIslandAllowed(pathname);
   const [soundMuted, setSoundMuted] = useState(soundFX.isMuted());
   const [isReminderModalOpen, setIsReminderModalOpen] = useState(false);
@@ -109,58 +111,60 @@ export function MobileAppBar({
   return (
     <header
       className={cn(
-        "sticky top-0 z-30 w-full min-h-[52px] safe-top-pad px-3.5 bg-[#FAF8F5]/90 dark:bg-[#161514]/90 backdrop-blur-md border-b border-[#161514]/10 dark:border-white/10 relative flex items-center justify-between select-none transition-colors lg:hidden",
+        "sticky top-0 z-30 w-full safe-top-pad bg-[#FAF8F5]/90 dark:bg-[#161514]/90 backdrop-blur-md border-b border-[#161514]/10 dark:border-white/10 select-none transition-colors lg:hidden",
         className
       )}
     >
-      {/* Left: Strobi Companion (+ Back Button on subroutes) */}
-      <div className="flex items-center gap-2 shrink-0 relative z-10">
-        {onBack ? (
-          <button
-            type="button"
-            onClick={() => {
-              soundFX.playPop();
-              onBack();
-            }}
-            className="size-8 rounded-lg border border-border bg-secondary hover:bg-muted text-foreground flex items-center justify-center transition-all cursor-pointer active:scale-95 shrink-0"
-            aria-label="Back"
-          >
-            <ArrowLeft className="size-4 stroke-[2.2]" />
-          </button>
-        ) : backHref ? (
-          <Link
-            href={backHref}
-            onClick={() => soundFX.playPop()}
-            className="size-8 rounded-lg border border-border bg-secondary hover:bg-muted text-foreground flex items-center justify-center transition-all cursor-pointer active:scale-95 shrink-0"
-            aria-label="Back"
-          >
-            <ArrowLeft className="size-4 stroke-[2.2]" />
-          </Link>
-        ) : null}
+      {/* Strict 52px Inner Bar: Centers Strobi, Dynamic Island, and 3-Dots on the exact same vertical baseline */}
+      <div className="w-full h-[52px] px-3.5 relative flex items-center justify-between">
+        {/* Left: Strobi Companion (+ Back Button on subroutes) */}
+        <div className="flex items-center gap-2 shrink-0 relative z-10">
+          {onBack ? (
+            <button
+              type="button"
+              onClick={() => {
+                soundFX.playPop();
+                onBack();
+              }}
+              className="size-8 rounded-lg border border-border bg-secondary hover:bg-muted text-foreground flex items-center justify-center transition-all cursor-pointer active:scale-95 shrink-0"
+              aria-label="Back"
+            >
+              <ArrowLeft className="size-4 stroke-[2.2]" />
+            </button>
+          ) : backHref ? (
+            <Link
+              href={backHref}
+              onClick={() => soundFX.playPop()}
+              className="size-8 rounded-lg border border-border bg-secondary hover:bg-muted text-foreground flex items-center justify-center transition-all cursor-pointer active:scale-95 shrink-0"
+              aria-label="Back"
+            >
+              <ArrowLeft className="size-4 stroke-[2.2]" />
+            </Link>
+          ) : null}
 
-        <StrobiCompanion
-          gear={resolveGear()}
-          state={strobiState || "idle"}
-          size={36}
-          onClick={onStrobiClick}
-          title={title ? `Strobi Companion • ${title}` : "Strobi Companion"}
-        />
-      </div>
-
-      {/* Spacer between left cluster and right cluster */}
-      <div className="flex-1 min-w-0 pointer-events-none" />
-
-      {/* Center: Dynamic Island Live Activity Dock - ABSOLUTELY CENTERED ON HARDWARE SCREEN */}
-      {showDynamicIsland && isAllowedRoute && (
-        <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none z-20 max-w-[calc(100%-120px)]">
-          <div className="pointer-events-auto flex items-center justify-center">
-            <DynamicIslandDock variant="header" floatOnScroll={false} />
-          </div>
+          <StrobiCompanion
+            gear={resolveGear()}
+            state={strobiState || "idle"}
+            size={36}
+            onClick={onStrobiClick}
+            title={title ? `Strobi Companion • ${title}` : "Strobi Companion"}
+          />
         </div>
-      )}
 
-      {/* Right: Unified Three Dots Overflow Menu (⋯) */}
-      <div className="flex items-center shrink-0 justify-end relative z-10">
+        {/* Spacer between left cluster and right cluster */}
+        <div className="flex-1 min-w-0 pointer-events-none" />
+
+        {/* Center: Dynamic Island Live Activity Dock - DEAD CENTER IN 52PX BAR */}
+        {showDynamicIsland && isAllowedRoute && (
+          <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none z-20 max-w-[calc(100%-120px)]">
+            <div className="pointer-events-auto flex items-center justify-center">
+              <DynamicIslandDock variant="header" floatOnScroll={false} />
+            </div>
+          </div>
+        )}
+
+        {/* Right: Unified Three Dots Overflow Menu (⋯) */}
+        <div className="flex items-center shrink-0 justify-end relative z-10">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
@@ -314,14 +318,15 @@ export function MobileAppBar({
 
             <DropdownMenuSeparator className="my-1 bg-border" />
 
-            {/* 6. Preferences: Theme & Sound */}
+            {/* 6. Preferences: Theme & Sound (Circular View Transition Ripple Animation) */}
             <DropdownMenuItem
-              onClick={() => {
+              onClick={(e) => {
                 soundFX.playPop();
-                const isDark = document.documentElement.classList.contains("dark");
-                const nextTheme = isDark ? "light" : "dark";
-                document.documentElement.classList.toggle("dark", !isDark);
-                localStorage.setItem("theme", nextTheme);
+                const rect = e.currentTarget.getBoundingClientRect();
+                toggleTheme({
+                  x: rect.left + rect.width / 2,
+                  y: rect.top + rect.height / 2,
+                });
               }}
               className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-bold cursor-pointer hover:bg-secondary focus:bg-secondary"
             >
@@ -329,7 +334,7 @@ export function MobileAppBar({
                 <Sparkles className="size-3.5 stroke-[2] text-[#03D26F]" />
                 <span>Toggle Theme</span>
               </div>
-              <span className="text-[10px] font-mono text-muted-foreground">Light / Dark</span>
+              <span className="text-[10px] font-mono text-muted-foreground">{isDark ? "Dark" : "Light"}</span>
             </DropdownMenuItem>
 
             <DropdownMenuItem
@@ -380,6 +385,7 @@ export function MobileAppBar({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+      </div>
       </div>
 
       {/* Reminder Manager Modal */}
