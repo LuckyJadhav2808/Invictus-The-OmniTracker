@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import Fuse from "fuse.js";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { type Transaction, type Category } from "@/types";
 import { cn } from "@/lib/utils";
@@ -288,6 +290,31 @@ export function LedgerTabView({
     return map;
   }, [categories]);
 
+  const [frequentParentRef] = useAutoAnimate<HTMLDivElement>();
+
+  // Memoized Fuse index for fast, typo-tolerant search across notes, categories, and methods
+  const transactionFuse = useMemo(() => {
+    const searchable = transactions.map((tx) => {
+      const cat = categoryMap.get(tx.categoryId);
+      return {
+        ...tx,
+        categoryName: cat?.name || "",
+      };
+    });
+    return new Fuse(searchable, {
+      keys: ["note", "categoryName", "paymentMethod"],
+      threshold: 0.38,
+      ignoreLocation: true,
+    });
+  }, [transactions, categoryMap]);
+
+  const fuzzyMatchingIdSet = useMemo(() => {
+    const q = searchQuery.trim();
+    if (!q) return null;
+    const results = transactionFuse.search(q);
+    return new Set(results.map((r) => r.item.id));
+  }, [searchQuery, transactionFuse]);
+
   // Filter transactions
   const filteredTransactions = useMemo(() => {
     return transactions.filter((tx) => {
@@ -300,7 +327,8 @@ export function LedgerTabView({
         const noteMatch = tx.note?.toLowerCase().includes(q);
         const cat = categoryMap.get(tx.categoryId);
         const catMatch = cat?.name.toLowerCase().includes(q);
-        if (!noteMatch && !catMatch) return false;
+        const fuzzyMatch = fuzzyMatchingIdSet ? fuzzyMatchingIdSet.has(tx.id) : false;
+        if (!noteMatch && !catMatch && !fuzzyMatch) return false;
       }
 
       if (selectedCategory !== "all" && tx.categoryId !== selectedCategory) {
@@ -318,7 +346,7 @@ export function LedgerTabView({
 
       return true;
     });
-  }, [transactions, selectedMonth, searchQuery, selectedCategory, selectedType, selectedMethod, categoryMap]);
+  }, [transactions, selectedMonth, searchQuery, selectedCategory, selectedType, selectedMethod, categoryMap, fuzzyMatchingIdSet]);
 
   // Group transactions by date
   const groupedByDate = useMemo(() => {
@@ -841,7 +869,7 @@ export function LedgerTabView({
                   </span>
                 )}
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+              <div ref={frequentParentRef} className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
                 {frequentHabits.map((item) => (
                   <button
                     key={item.name}

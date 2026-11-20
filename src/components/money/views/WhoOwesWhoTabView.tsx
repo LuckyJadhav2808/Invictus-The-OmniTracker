@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useWhoOwesWhoStore, type IOU, type IOUType } from "@/store/who-owes-who-store";
 import { soundFX } from "@/components/shared/SoundFX";
 import { cn } from "@/lib/utils";
@@ -25,6 +26,7 @@ import { parseISO, isToday, isPast, differenceInDays, startOfDay } from "date-fn
 
 export interface WhoOwesWhoTabViewProps {
   currencySymbol: string;
+  defaultOpenForm?: boolean;
   prefill?: {
     amount?: number;
     description?: string;
@@ -69,22 +71,37 @@ export function formatReminderMessage(iou: IOU, currencySymbol: string = "₹") 
 
 export function WhoOwesWhoTabView({
   currencySymbol,
+  defaultOpenForm = false,
   prefill,
   onLogSettlementIncome,
 }: WhoOwesWhoTabViewProps) {
   const { ious, addIOU, settleIOU, unsettleIOU, deleteIOU } = useWhoOwesWhoStore();
+  const [formAnimRef] = useAutoAnimate<HTMLFormElement>();
+  const [listAnimRef] = useAutoAnimate<HTMLDivElement>();
 
   // Active filter tab: "lent" (They Owe Me) vs "borrowed" (I Owe Them)
   const [activeTab, setActiveTab] = useState<IOUType>("lent");
 
   // Form states for creating a new IOU
-  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(defaultOpenForm || Boolean(prefill));
   const [personName, setPersonName] = useState("");
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [type, setType] = useState<IOUType>("lent");
   const [dueDate, setDueDate] = useState("");
   const [showSettled, setShowSettled] = useState(false);
+
+  useEffect(() => {
+    if (defaultOpenForm) {
+      setIsFormOpen(true);
+    }
+  }, [defaultOpenForm]);
+
+  // Derive top recent friends for 1-tap contact selection
+  const recentContacts = useMemo(() => {
+    const names = Array.from(new Set(ious.map((i) => i.personName.trim()))).filter(Boolean);
+    return names.slice(0, 6);
+  }, [ious]);
 
   // Apply prefill if provided
   useEffect(() => {
@@ -285,6 +302,7 @@ export function WhoOwesWhoTabView({
         {/* ─── COLLAPSIBLE ADD IOU FORM ─── */}
         {isFormOpen && (
           <form
+            ref={formAnimRef}
             onSubmit={handleCreateIOU}
             className="bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-2xl p-4 border-2 border-[#161514] dark:border-[#CEF431] shadow-[2.5px_2.5px_0px_0px_#161514] space-y-3 transition-all"
           >
@@ -325,6 +343,35 @@ export function WhoOwesWhoTabView({
               </button>
             </div>
 
+            {/* 1-Tap Recent Friends Selector */}
+            {recentContacts.length > 0 && (
+              <div className="space-y-1">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6B6B6B] dark:text-[#A8A29E] block">
+                  Recent Friends
+                </span>
+                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+                  {recentContacts.map((name) => (
+                    <button
+                      key={name}
+                      type="button"
+                      onClick={() => {
+                        soundFX.playPop();
+                        setPersonName(name);
+                      }}
+                      className={cn(
+                        "px-2.5 py-1 rounded-xl text-xs font-mono font-bold border transition-all cursor-pointer shrink-0 shadow-xs active:scale-95",
+                        personName.toLowerCase() === name.toLowerCase()
+                          ? "bg-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:text-[#161514] border-[#161514] dark:border-[#CEF431]"
+                          : "bg-white dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] border-[#E8E5DF] dark:border-[#383531] hover:border-[#161514]"
+                      )}
+                    >
+                      {name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Person Name & Amount Input */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <div>
@@ -354,6 +401,23 @@ export function WhoOwesWhoTabView({
                   onChange={(e) => setAmount(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl text-xs font-mono font-bold bg-white dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#383531] text-[#161514] dark:text-[#FAF8F5] focus:outline-none focus:ring-1 focus:ring-[#161514]"
                 />
+                {/* Quick Increment Chips */}
+                <div className="flex items-center gap-1 flex-wrap pt-1.5">
+                  {[50, 100, 200, 500, 1000].map((inc) => (
+                    <button
+                      key={inc}
+                      type="button"
+                      onClick={() => {
+                        soundFX.playPop();
+                        const curr = parseFloat(amount) || 0;
+                        setAmount(String(curr + inc));
+                      }}
+                      className="px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-white dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#383531] shadow-xs active:scale-95 transition-all cursor-pointer hover:border-[#161514]"
+                    >
+                      +{currencySymbol}{inc}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -448,7 +512,7 @@ export function WhoOwesWhoTabView({
       </div>
 
       {/* ─── PENDING IOU ITEMS LIST ─── */}
-      <div className="space-y-2.5">
+      <div ref={listAnimRef} className="space-y-2.5">
         {pendingItems.length === 0 ? (
           <div className="p-8 text-center bg-white dark:bg-[#161514] rounded-3xl border border-dashed border-[#E8E5DF] dark:border-[#383531] space-y-2">
             <span className="text-2xl">✨</span>

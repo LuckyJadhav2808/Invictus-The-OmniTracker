@@ -19,6 +19,7 @@ export function WhoOwesWhoModal({
   currencySymbol,
   prefill,
   onLogSettlementIncome,
+  defaultOpenForm = true,
 }: WhoOwesWhoModalProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -43,6 +44,7 @@ export function WhoOwesWhoModal({
           <WhoOwesWhoTabView
             currencySymbol={currencySymbol}
             prefill={prefill}
+            defaultOpenForm={defaultOpenForm}
             onLogSettlementIncome={onLogSettlementIncome}
           />
         </div>

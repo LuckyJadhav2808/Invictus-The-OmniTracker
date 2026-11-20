@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, useRef } from "react";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import {
   Sheet,
   SheetContent,
@@ -80,6 +81,13 @@ export function TransactionFormModal({
   onDelete,
 }: TransactionFormModalProps) {
   const isEditing = Boolean(initialData?.id);
+  const [internalMode, setInternalMode] = useState<"full" | "quick" | "cash">(mode);
+  const [formBodyRef] = useAutoAnimate<HTMLDivElement>();
+  const [categoryChipsRef] = useAutoAnimate<HTMLDivElement>();
+
+  useEffect(() => {
+    setInternalMode(initialData ? "full" : mode);
+  }, [mode, initialData, open]);
 
   // Form states
   const [type, setType] = useState<"expense" | "income">("expense");
@@ -237,7 +245,7 @@ export function TransactionFormModal({
       const trimmedNote = note.trim();
       const targetCatId = categoryId || filteredCategories[0]?.id || "";
 
-      const resolvedPaymentMethod = mode === "cash" ? "Cash" : paymentMethod;
+      const resolvedPaymentMethod = internalMode === "cash" ? "Cash" : paymentMethod;
 
       const savePromise = onSave({
         id: initialData?.id,
@@ -261,7 +269,7 @@ export function TransactionFormModal({
         }
       }
 
-      if (mode === "cash") {
+      if (internalMode === "cash") {
         soundFX.play("coin");
       } else {
         soundFX.playCashRegister();
@@ -302,9 +310,9 @@ export function TransactionFormModal({
 
   const modalTitle = isEditing
     ? "Edit Record"
-    : mode === "quick"
+    : internalMode === "quick"
     ? "Quick Log Expense"
-    : mode === "cash"
+    : internalMode === "cash"
     ? "1-Tap Cash Spend"
     : type === "expense"
     ? "Add Expense"
@@ -349,9 +357,48 @@ export function TransactionFormModal({
           </div>
 
           {/* ─── SCROLLABLE FORM BODY ─── */}
-          <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4 scrollbar-thin bg-white dark:bg-[#161514]">
+          <div ref={formBodyRef} className="flex-1 overflow-y-auto px-5 py-4 space-y-4 scrollbar-thin bg-white dark:bg-[#161514]">
+            {/* Quick vs Detailed Toggle (when not editing existing and not in forced cash mode) */}
+            {!isEditing && internalMode !== "cash" && (
+              <div className="flex items-center justify-center">
+                <div className="inline-flex p-1 rounded-2xl bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs gap-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      soundFX.playPop();
+                      setInternalMode("quick");
+                    }}
+                    className={cn(
+                      "px-3 py-1.5 rounded-xl text-xs font-heading font-black transition-all cursor-pointer flex items-center gap-1.5",
+                      internalMode === "quick"
+                        ? "bg-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:text-[#161514] shadow-xs"
+                        : "text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5]"
+                    )}
+                  >
+                    <Sparkles className="size-3 stroke-[2.5]" />
+                    <span>Quick 1-Tap</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      soundFX.playPop();
+                      setInternalMode("full");
+                    }}
+                    className={cn(
+                      "px-3 py-1.5 rounded-xl text-xs font-heading font-black transition-all cursor-pointer flex items-center gap-1.5",
+                      internalMode === "full"
+                        ? "bg-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:text-[#161514] shadow-xs"
+                        : "text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5]"
+                    )}
+                  >
+                    <span>Full Details</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* MODE: QUICK (Today Page 3-Second Quick Expense) */}
-            {mode === "quick" && (
+            {internalMode === "quick" && (
               <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Amount Input with Inline Math Evaluator */}
                 <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] p-4 rounded-3xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-2">
@@ -379,14 +426,58 @@ export function TransactionFormModal({
                       className="text-4xl sm:text-5xl font-mono font-black"
                     />
                   </div>
+
+                  {/* Quick Increment Chips */}
+                  <div className="flex items-center justify-center gap-1.5 flex-wrap pt-2">
+                    {QUICK_INCREMENTS.slice(0, 5).map((inc) => (
+                      <button
+                        key={inc}
+                        type="button"
+                        onClick={() => handleQuickIncrement(inc)}
+                        className="px-2.5 py-1 rounded-xl text-xs font-mono font-bold bg-white dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#383531] shadow-xs hover:border-[#161514] active:scale-95 transition-all cursor-pointer"
+                      >
+                        +{currencySymbol}{inc}
+                      </button>
+                    ))}
+                  </div>
                 </div>
+
+                {/* Dynamic Frequent Habit Shortcuts */}
+                {frequentHabits.length > 0 && (
+                  <div className="space-y-1.5">
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6B6B6B] dark:text-[#A8A29E] block">
+                      Frequent Shortcuts
+                    </span>
+                    <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+                      {frequentHabits.slice(0, 5).map((habit, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => {
+                            soundFX.playPop();
+                            soundFX.vibrate(15);
+                            setAmount(String(habit.amount));
+                            setNote(habit.name);
+                            setCategoryId(habit.categoryId);
+                          }}
+                          className="px-2.5 py-1.5 rounded-xl text-xs font-medium bg-[#FAF8F5] dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#2A2724] hover:border-[#161514] active:scale-95 transition-all shrink-0 flex items-center gap-1.5 cursor-pointer shadow-xs"
+                        >
+                          <span>{habit.name}</span>
+                          <span className="font-mono font-bold text-[#047857] dark:text-[#03D26F]">
+                            {currencySymbol}{habit.amount}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Quick Category Chips */}
                 <div className="space-y-1.5">
                   <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6B6B6B] dark:text-[#A8A29E] block">
                     Category
                   </span>
-                  <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+                  <div ref={categoryChipsRef} className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
                     {filteredCategories.map((cat) => {
                       const isSelected = (categoryId || filteredCategories[0]?.id) === cat.id;
                       return (
@@ -454,7 +545,7 @@ export function TransactionFormModal({
             )}
 
             {/* MODE: CASH (1-Tap Quick Cash Entry) */}
-            {mode === "cash" && (
+            {internalMode === "cash" && (
               <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Cash Amount Input with Inline Math Evaluator */}
                 <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] p-4 rounded-3xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-2">
@@ -576,7 +667,7 @@ export function TransactionFormModal({
             )}
 
             {/* MODE: FULL (Standard Belanje Money Page Full Form) */}
-            {mode === "full" && (
+            {internalMode === "full" && (
               <>
                 {/* 1. Segmented Pill Switcher (Expense vs Income) */}
                 <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] p-1 rounded-2xl border border-[#E8E5DF] dark:border-[#2A2724] flex gap-1 shadow-xs">

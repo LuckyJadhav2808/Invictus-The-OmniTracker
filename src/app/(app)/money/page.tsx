@@ -144,6 +144,7 @@ function MoneyPageContent() {
   const [isAddTxOpen, setIsAddTxOpen] = useState(() => {
     return actionParam === "new-expense" || actionParam === "add";
   });
+  const [txModalMode, setTxModalMode] = useState<"quick" | "full" | "cash">("quick");
   const [editingTx, setEditingTx] = useState<Transaction | null>(null);
   const [inspectingTx, setInspectingTx] = useState<Transaction | null>(null);
   const [isAddCatOpen, setIsAddCatOpen] = useState(false);
@@ -220,9 +221,13 @@ function MoneyPageContent() {
   // Listen for FAB Contextual Action Sheet events
   useEffect(() => {
     const handleNewExpense = () => {
+      setEditingTx(null);
+      setTxModalMode("quick");
       setIsAddTxOpen(true);
     };
     const handleNewIncome = () => {
+      setEditingTx(null);
+      setTxModalMode("full");
       setIsAddTxOpen(true);
     };
     const handleTransfer = () => {
@@ -1144,6 +1149,7 @@ function MoneyPageContent() {
       {/* 1. Transaction Form Modal (Unified Add & Edit + 3-Sec Hyper-Log Keypad) */}
       <TransactionFormModal
         open={isAddTxOpen || editingTx !== null}
+        mode={editingTx ? "full" : txModalMode}
         onOpenChange={(open) => {
           if (!open) {
             setIsAddTxOpen(false);
@@ -1176,6 +1182,7 @@ function MoneyPageContent() {
         onOpenChange={setIsWhoOwesWhoOpen}
         currencySymbol={currencySymbol}
         prefill={whoOwesWhoPrefill}
+        defaultOpenForm={true}
         onLogSettlementIncome={handleLogWhoOwesWhoRepayment}
       />
 
