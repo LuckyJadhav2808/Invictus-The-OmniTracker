@@ -225,7 +225,7 @@ export default function TasksPage() {
   // =========================================================================
   if (activePortal !== "none") {
     return (
-      <div className="w-full max-w-xl mx-auto min-h-screen px-2.5 py-3 space-y-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] select-none">
+      <div className="w-full max-w-xl mx-auto min-h-screen px-2.5 py-3 safe-top-pad space-y-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] select-none">
         {/* L2 Portal Header with back button */}
         <div className="flex items-center justify-between gap-2 p-2.5 bg-card border border-border rounded-2xl shadow-2xs">
           <button

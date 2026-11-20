@@ -38,8 +38,8 @@ export function DoorTileRow({
   const tiles = [
     {
       id: "new-habit",
-      label: "New Habit",
-      value: "Add Routine",
+      label: "Habits",
+      value: "Create",
       icon: Target,
       iconColor: "text-lime-600 dark:text-[#CEF431]",
       bgClass: "hover:border-[#CEF431]/60",
@@ -49,7 +49,7 @@ export function DoorTileRow({
     {
       id: "gym",
       label: "Gym",
-      value: "Workouts",
+      value: "Lifts",
       icon: Dumbbell,
       iconColor: "text-emerald-600 dark:text-[#03D26F]",
       bgClass: "hover:border-[#03D26F]/50",
@@ -59,7 +59,7 @@ export function DoorTileRow({
     {
       id: "diet",
       label: "Diet",
-      value: "Fuel & Macros",
+      value: "Macros",
       icon: Utensils,
       iconColor: "text-amber-600 dark:text-amber-400",
       bgClass: "hover:border-amber-500/50",
@@ -69,7 +69,7 @@ export function DoorTileRow({
     {
       id: "stats",
       label: "Stats",
-      value: "Consistency",
+      value: "Trends",
       icon: BarChart2,
       iconColor: "text-purple-600 dark:text-purple-400",
       bgClass: "hover:border-purple-500/50",
@@ -97,7 +97,7 @@ export function DoorTileRow({
               t.onClick();
             }}
             className={cn(
-              "py-2 sm:py-3 px-1.5 sm:px-3 rounded-xl sm:rounded-2xl bg-card border border-border flex flex-col items-center justify-center text-center transition-all cursor-pointer active:scale-95 shadow-2xs group min-h-[58px] sm:min-h-[66px]",
+              "py-2 sm:py-3 px-1 sm:px-2.5 rounded-xl sm:rounded-2xl bg-card border border-border flex flex-col items-center justify-center text-center transition-all cursor-pointer active:scale-95 shadow-2xs group min-h-[58px] sm:min-h-[66px]",
               t.bgClass
             )}
             title={t.title}
@@ -108,7 +108,7 @@ export function DoorTileRow({
                 {t.label}
               </span>
             </div>
-            <span className="text-[10px] sm:text-[11px] font-mono font-medium text-muted-foreground truncate w-full mt-0.5">
+            <span className="text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-wider text-muted-foreground leading-tight text-center block w-full truncate mt-0.5">
               {t.value}
             </span>
           </button>

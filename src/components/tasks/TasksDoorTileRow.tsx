@@ -32,7 +32,7 @@ export function TasksDoorTileRow({
     {
       id: "kanban",
       label: "Kanban",
-      value: "4 Columns",
+      value: "Board",
       icon: Kanban,
       iconColor: "text-amber-500 dark:text-amber-400",
       bgClass: "hover:border-amber-500/50",
@@ -42,7 +42,7 @@ export function TasksDoorTileRow({
     {
       id: "matrix",
       label: "Matrix",
-      value: p1UrgentCount > 0 ? `${p1UrgentCount} Urgent` : "Eisenhower",
+      value: p1UrgentCount > 0 ? `${p1UrgentCount} P1` : "Urgent",
       icon: Flame,
       iconColor: "text-rose-500 dark:text-rose-400",
       bgClass: "hover:border-rose-500/50",
@@ -52,7 +52,7 @@ export function TasksDoorTileRow({
     {
       id: "projects",
       label: "Projects",
-      value: `${projectsCount} Streams`,
+      value: `${projectsCount} Tags`,
       icon: FolderKanban,
       iconColor: "text-sky-500 dark:text-sky-400",
       bgClass: "hover:border-sky-500/50",
@@ -90,7 +90,7 @@ export function TasksDoorTileRow({
               t.onClick();
             }}
             className={cn(
-              "py-2 sm:py-3 px-1.5 sm:px-3 rounded-xl sm:rounded-2xl bg-card border border-border flex flex-col items-center justify-center text-center transition-all cursor-pointer active:scale-95 shadow-2xs group min-h-[58px] sm:min-h-[66px]",
+              "py-2 sm:py-3 px-1 sm:px-2.5 rounded-xl sm:rounded-2xl bg-card border border-border flex flex-col items-center justify-center text-center transition-all cursor-pointer active:scale-95 shadow-2xs group min-h-[58px] sm:min-h-[66px]",
               t.bgClass
             )}
             title={t.title}
@@ -107,7 +107,7 @@ export function TasksDoorTileRow({
                 {t.label}
               </span>
             </div>
-            <span className="font-mono text-[9px] sm:text-[10px] text-muted-foreground font-semibold truncate max-w-full">
+            <span className="font-mono text-[9px] sm:text-[10px] text-muted-foreground font-bold uppercase tracking-wider truncate max-w-full leading-tight text-center block w-full mt-0.5">
               {t.value}
             </span>
           </button>

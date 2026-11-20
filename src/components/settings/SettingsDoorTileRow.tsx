@@ -26,7 +26,7 @@ export function SettingsDoorTileRow({
     {
       id: "reminders",
       label: "Alerts",
-      value: "Schedules",
+      value: "Push",
       icon: Bell,
       iconColor: "text-amber-500 dark:text-amber-400",
       bgClass: "hover:border-amber-500/50",
@@ -36,7 +36,7 @@ export function SettingsDoorTileRow({
     {
       id: "theme",
       label: "Theme",
-      value: "Aesthetics",
+      value: "Style",
       icon: Palette,
       iconColor: "text-purple-500 dark:text-purple-400",
       bgClass: "hover:border-purple-500/50",
@@ -46,7 +46,7 @@ export function SettingsDoorTileRow({
     {
       id: "backup",
       label: "Backup",
-      value: storageKb > 0 ? `${storageKb} KB` : "Export",
+      value: storageKb > 0 ? `${Math.round(storageKb)}KB` : "Export",
       icon: HardDrive,
       iconColor: "text-emerald-500 dark:text-emerald-400",
       bgClass: "hover:border-emerald-500/50",
@@ -56,7 +56,7 @@ export function SettingsDoorTileRow({
     {
       id: "diagnostics",
       label: "Health",
-      value: "Air-Gap",
+      value: "Status",
       icon: ShieldCheck,
       iconColor: "text-sky-500 dark:text-sky-400",
       bgClass: "hover:border-sky-500/50",
@@ -80,7 +80,7 @@ export function SettingsDoorTileRow({
             }}
             title={tile.title}
             className={cn(
-              "group relative flex flex-col items-center justify-between p-2.5 sm:p-3 rounded-2xl bg-white dark:bg-[#161514] border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs hover:shadow-sm active:scale-95 transition-all text-center cursor-pointer min-h-[72px] sm:min-h-[80px]",
+              "group relative flex flex-col items-center justify-between p-2 sm:p-2.5 rounded-xl sm:rounded-2xl bg-white dark:bg-[#161514] border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs hover:shadow-sm active:scale-95 transition-all text-center cursor-pointer min-h-[68px] sm:min-h-[76px]",
               tile.bgClass
             )}
           >
@@ -91,7 +91,7 @@ export function SettingsDoorTileRow({
               <p className="text-[10px] sm:text-[11px] font-heading font-black text-[#161514] dark:text-[#FAF8F5] truncate leading-tight">
                 {tile.label}
               </p>
-              <p className="text-[9px] sm:text-[10px] font-mono text-muted-foreground truncate">
+              <p className="text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-wider text-muted-foreground truncate leading-tight mt-0.5">
                 {tile.value}
               </p>
             </div>

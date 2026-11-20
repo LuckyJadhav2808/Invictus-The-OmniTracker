@@ -492,7 +492,11 @@ export function WalletCardDeck({
               e.stopPropagation();
               goToCard(2);
             } else {
-              onOpenAllowances?.();
+              if (onNavigateToTab) {
+                onNavigateToTab("budgets");
+              } else {
+                onOpenAllowances?.();
+              }
             }
           }}
           style={getCardStyle(2)}

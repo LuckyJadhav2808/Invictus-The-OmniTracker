@@ -829,7 +829,7 @@ function MoneyPageContent() {
 
       {/* ================= MOBILE L2 SUB-PAGE HEADER (Back to Overview) ================= */}
       {activeTab !== "overview" && activeTab !== "ledger" && (
-        <div className="lg:hidden sticky top-0 z-30 w-full h-[52px] px-3.5 bg-[#FAF8F5]/95 dark:bg-[#161514]/95 backdrop-blur-md border-b border-[#161514]/10 dark:border-white/10 flex items-center justify-between select-none">
+        <div className="lg:hidden sticky top-0 z-30 w-full min-h-[52px] h-auto safe-top-pad py-2 px-3.5 bg-[#FAF8F5]/95 dark:bg-[#161514]/95 backdrop-blur-md border-b border-[#161514]/10 dark:border-white/10 flex items-center justify-between select-none">
           <button
             type="button"
             onClick={() => {
@@ -843,7 +843,15 @@ function MoneyPageContent() {
             <span>Overview</span>
           </button>
           <span className="font-heading font-black text-sm text-foreground">
-            {activeTab === "budgets" ? "Monthly Budgets" : activeTab === "ious" ? "IOUs & Debts" : activeTab === "vault" ? "Emergency Vault" : "Overview"}
+            {activeTab === "budgets"
+              ? "Monthly Budgets"
+              : activeTab === "analytics"
+              ? "Spend Analytics"
+              : activeTab === "debts" || activeTab === "ious"
+              ? "IOUs & Debts"
+              : activeTab === "vault"
+              ? "Emergency Vault"
+              : "Overview"}
           </span>
           <div className="w-16" />
         </div>
@@ -870,15 +878,19 @@ function MoneyPageContent() {
               onNavigateToTab={handleTabChange}
             />
 
-            {/* ================= SLOT 4: 4 L2 DOOR TILES (Ledger, Analytics, Receipts, Calc) ================= */}
+            {/* ================= SLOT 4: 4 L2 DOOR TILES (Budgets, Analytics, Ledger, Vault) ================= */}
             <MoneyDoorTileRow
               monthlyBudget={monthlyStats.totalCombinedBudget || monthlyStats.baseBudget}
               activeIouCount={pendingIous.length}
               currencySymbol={currencySymbol}
-              onOpenLedger={() => setIsLedgerSheetOpen(true)}
+              onOpenBudgets={() => handleTabChange("budgets")}
               onOpenAnalytics={() => handleTabChange("analytics")}
+              onOpenLedger={() => setIsLedgerSheetOpen(true)}
+              onOpenVault={() => handleTabChange("vault")}
+              onOpenIous={() => handleTabChange("debts")}
               onOpenReceipts={() => setIsBulkModalOpen(true)}
               onOpenCalc={() => setIsCalculatorOpen(true)}
+              onOpenAllowances={() => setIsAllowanceModalOpen(true)}
             />
 
             {/* ================= SLOT 5: RECENT TRANSACTIONS GLANCE (Capped 5 Rows + Neobrutalist Action Dock) ================= */}
@@ -1018,7 +1030,7 @@ function MoneyPageContent() {
 
         {activeTab === "analytics" && (
           <div className="space-y-3 pt-1">
-            <div className="flex items-center justify-between px-1">
+            <div className="hidden lg:flex items-center justify-between px-1">
               <button
                 type="button"
                 onClick={() => handleTabChange("overview")}

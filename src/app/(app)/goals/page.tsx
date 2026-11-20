@@ -1194,7 +1194,7 @@ function GoalsPageContent() {
       {/* ================= 10. MOBILE L2 PORTALS (Gym, Nutrition, Stats) ================= */}
       {activePortal && (
         <div className="fixed inset-0 z-50 bg-[#FAF8F5] dark:bg-[#161514] overflow-y-auto pb-28 animate-in slide-in-from-right duration-200">
-          <header className="sticky top-0 z-30 w-full h-[52px] px-3.5 bg-[#FAF8F5]/95 dark:bg-[#161514]/95 backdrop-blur-md border-b border-[#161514]/10 dark:border-white/10 flex items-center justify-between select-none">
+          <header className="sticky top-0 z-30 w-full min-h-[52px] h-auto safe-top-pad py-2 px-3.5 bg-[#FAF8F5]/95 dark:bg-[#161514]/95 backdrop-blur-md border-b border-[#161514]/10 dark:border-white/10 flex items-center justify-between select-none">
             <button
               type="button"
               onClick={closePortal}

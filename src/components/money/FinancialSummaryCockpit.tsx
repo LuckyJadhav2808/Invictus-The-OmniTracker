@@ -5,6 +5,7 @@ import { type MonthlyBudgetStats, type DailyBudgetStats } from "@/lib/utils/budg
 import { type Transaction, type Category } from "@/types";
 import { StrobiCompanion } from "@/components/mascot/StrobiCompanion";
 import { WalletCardDeck } from "@/components/money/WalletCardDeck";
+import { Sliders } from "lucide-react";
 
 interface FinancialSummaryCockpitProps {
   monthlyStats: MonthlyBudgetStats;
@@ -64,8 +65,8 @@ export function FinancialSummaryCockpit({
         onActiveCardChange={setActiveCardIndex}
       />
 
-      {/* 🧭 Ambient Strobi Financial Pace Telemetry (Sleek Ambient Ribbon, No Border Fatigue) */}
-      <div className="flex items-center justify-between gap-3 px-3 py-2 rounded-xl bg-card/60 backdrop-blur-xs border border-border/80">
+      {/* 🧭 Ambient Strobi Financial Pace Telemetry (Neobrutalist, Unclipped, Tactile) */}
+      <div className="flex items-center justify-between gap-2.5 px-3 py-2.5 rounded-xl bg-card border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] select-none">
         <div
           onClick={onAddTransaction}
           className="flex items-center gap-2.5 cursor-pointer group flex-1 min-w-0"
@@ -74,18 +75,24 @@ export function FinancialSummaryCockpit({
           <StrobiCompanion
             gear="money"
             state={dailyStats.isOverDailyBudget ? "fire" : "idle"}
-            size={28}
+            size={32}
             className="shrink-0"
           />
           <div className="min-w-0">
-            <p className="text-xs font-mono font-medium text-foreground truncate">
+            <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground font-bold leading-tight">
+              {dailyStats.isOverDailyBudget ? "Pace Exceeded" : "Daily Safe Pace"}
+            </div>
+            <p className="text-xs font-mono font-medium text-foreground leading-tight mt-0.5">
               {dailyStats.isOverDailyBudget ? (
                 <span className="text-rose-600 dark:text-rose-400 font-bold">
-                  Pace exceeded by {currencySymbol}{dailyStats.overDailyAmount.toLocaleString()} today
+                  Over by {currencySymbol}{dailyStats.overDailyAmount.toLocaleString()} today
                 </span>
               ) : (
                 <span>
-                  Daily pace: <strong className="font-bold text-[#047857] dark:text-[#03D26F]">{currencySymbol}{dailyStats.todayRemaining.toLocaleString()}</strong> remaining
+                  <strong className="font-bold text-[#047857] dark:text-[#03D26F] text-xs sm:text-sm tabular-nums">
+                    {currencySymbol}{dailyStats.todayRemaining.toLocaleString()}
+                  </strong>{" "}
+                  remaining
                 </span>
               )}
             </p>
@@ -96,9 +103,11 @@ export function FinancialSummaryCockpit({
           <button
             type="button"
             onClick={onOpenEditAllowances}
-            className="text-[11px] font-heading font-black text-muted-foreground hover:text-foreground transition-colors cursor-pointer px-2.5 py-1.5 rounded-lg border border-border/70 bg-secondary/80 hover:bg-muted shrink-0 min-h-[36px] flex items-center"
+            className="text-[10px] sm:text-[11px] font-heading font-black text-[#161514] dark:text-[#FAF8F5] bg-secondary hover:bg-muted border border-border px-2.5 py-1.5 rounded-lg active:scale-95 transition-all cursor-pointer shrink-0 min-h-[34px] flex items-center gap-1"
+            title="Adjust monthly UPI, Cash, and Daily spending limits"
           >
-            Adjust Limits
+            <Sliders className="size-3 stroke-[2.5]" />
+            <span>Limits</span>
           </button>
         )}
       </div>

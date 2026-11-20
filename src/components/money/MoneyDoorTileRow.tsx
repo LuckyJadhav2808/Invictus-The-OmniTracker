@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ReceiptText, BarChart2, Sparkles, Calculator, PiggyBank, TrendingUp, ShieldCheck } from "lucide-react";
+import { ReceiptText, BarChart2, Target, Users, Sparkles, Calculator, PiggyBank, TrendingUp, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
 
@@ -45,44 +45,44 @@ export function MoneyDoorTileRow({
 }: MoneyDoorTileRowProps) {
   const tiles = [
     {
-      id: "ledger",
-      label: "Ledger",
-      value: "All Records",
-      icon: ReceiptText,
-      iconColor: "text-sky-600 dark:text-sky-400",
-      bgClass: "hover:border-sky-500/50",
-      onClick: onOpenLedger || onOpenExport || (() => {}),
-      title: "Full Transaction Ledger & Search (L2 Subpage)",
+      id: "budgets",
+      label: "Budgets",
+      value: "Limits",
+      icon: Target,
+      iconColor: "text-emerald-600 dark:text-[#03D26F]",
+      bgClass: "hover:border-[#03D26F]/50",
+      onClick: onOpenBudgets || onOpenAllowances || (() => {}),
+      title: "Monthly Category Envelopes, Limits & Allowances (L2 Subpage)",
     },
     {
       id: "analytics",
       label: "Analytics",
-      value: "Spend Flow",
+      value: "Flow",
       icon: BarChart2,
       iconColor: "text-purple-600 dark:text-purple-400",
       bgClass: "hover:border-purple-500/50",
-      onClick: onOpenAnalytics || onOpenBudgets || (() => {}),
+      onClick: onOpenAnalytics || (() => {}),
       title: "Spending Breakdown & Visual Analytics (L2 Subpage)",
     },
     {
-      id: "receipts",
-      label: "Receipts",
-      value: "Smart OCR",
-      icon: Sparkles,
-      iconColor: "text-amber-600 dark:text-amber-400",
-      bgClass: "hover:border-amber-500/50",
-      onClick: onOpenReceipts || onOpenTemplates || (() => {}),
-      title: "Scan Receipt Image or Batch Log Expenses (Sheet)",
+      id: "ledger",
+      label: "Ledger",
+      value: "Records",
+      icon: ReceiptText,
+      iconColor: "text-sky-600 dark:text-sky-400",
+      bgClass: "hover:border-sky-500/50",
+      onClick: onOpenLedger || onOpenExport || (() => {}),
+      title: "Full Transaction Ledger & Search (L3 Bottom Sheet)",
     },
     {
-      id: "calc",
-      label: "Calc",
-      value: "Split & Math",
-      icon: Calculator,
-      iconColor: "text-emerald-600 dark:text-[#03D26F]",
-      bgClass: "hover:border-[#03D26F]/50",
-      onClick: onOpenCalc || onOpenIncome || onOpenAllowances || (() => {}),
-      title: "Open Tactile Neobrutalist Split Calculator (Sheet)",
+      id: "vault",
+      label: "Vault",
+      value: "Reserve",
+      icon: PiggyBank,
+      iconColor: "text-amber-600 dark:text-amber-400",
+      bgClass: "hover:border-amber-500/50",
+      onClick: onOpenVault || onOpenIous || onOpenCalc || (() => {}),
+      title: "Active Subscriptions, Savings Goals & Emergency Reserves (L2 Subpage)",
     },
   ];
 
@@ -105,7 +105,7 @@ export function MoneyDoorTileRow({
               t.onClick();
             }}
             className={cn(
-              "py-2 sm:py-3 px-1.5 sm:px-3 rounded-xl sm:rounded-2xl bg-card border border-border flex flex-col items-center justify-center text-center transition-all cursor-pointer active:scale-95 shadow-2xs group min-h-[58px] sm:min-h-[66px]",
+              "py-2 sm:py-3 px-1 sm:px-2.5 rounded-xl sm:rounded-2xl bg-card border border-border flex flex-col items-center justify-center text-center transition-all cursor-pointer active:scale-95 shadow-2xs group min-h-[58px] sm:min-h-[66px]",
               t.bgClass
             )}
             title={t.title}
@@ -116,7 +116,7 @@ export function MoneyDoorTileRow({
                 {t.label}
               </span>
             </div>
-            <span className="text-[10px] sm:text-[11px] font-mono font-medium text-muted-foreground truncate w-full mt-0.5">
+            <span className="text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-wider text-muted-foreground leading-tight text-center block w-full truncate mt-0.5">
               {t.value}
             </span>
           </button>
