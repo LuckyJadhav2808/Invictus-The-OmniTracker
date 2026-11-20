@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useDeferredValue, useEffect } from "react";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { Utensils, Sparkles, Check, Zap, X } from "lucide-react";
 import { AdaptiveDrawerDialog } from "@/components/shared/AdaptiveDrawerDialog";
 import { MEAL_TYPES, type MealTypeOption } from "@/components/goals/NutritionChoiceModal";
@@ -50,6 +51,10 @@ export function QuickMealModal({
   const [fat, setFat] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedDishId, setSelectedDishId] = useState<string | null>(null);
+
+  // Performance-optimized layout animations (Zero CLS)
+  const [dropdownParentRef] = useAutoAnimate<HTMLDivElement>({ duration: 150, easing: "ease-out" });
+  const [macrosParentRef] = useAutoAnimate<HTMLDivElement>({ duration: 180, easing: "ease-out" });
 
   const deferredName = useDeferredValue(name.trim());
   const shouldSearch = deferredName.length >= 2 && showSuggestions;
@@ -174,7 +179,7 @@ export function QuickMealModal({
         </div>
 
         {/* Meal Name Input with Live 1,000+ Database Autocomplete */}
-        <div className="space-y-1.5 relative">
+        <div ref={dropdownParentRef} className="space-y-1.5 relative">
           <div className="flex items-center justify-between">
             <label className="text-[11px] font-heading font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
               <span>What did you eat? *</span>
@@ -314,58 +319,60 @@ export function QuickMealModal({
         </div>
 
         {/* Optional Macros Section */}
-        {!showMacros ? (
-          <button
-            type="button"
-            onClick={() => {
-              soundFX.playPop();
-              setShowMacros(true);
-            }}
-            className="w-full text-center text-[10px] font-mono font-bold text-muted-foreground hover:text-foreground py-1 cursor-pointer transition-colors"
-          >
-            + Add protein / carbs / fat ▾
-          </button>
-        ) : (
-          <div className="space-y-1.5 p-3 rounded-2xl bg-secondary/30 border border-border animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between text-[10px] font-mono font-bold text-muted-foreground">
-              <span>Nutrient Breakdown</span>
-              <button
-                type="button"
-                onClick={() => setShowMacros(false)}
-                className="hover:text-foreground cursor-pointer"
-              >
-                Hide ✕
-              </button>
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              {([
-                { label: "Protein", value: protein, setter: setProtein, unit: "g" },
-                { label: "Carbs", value: carbs, setter: setCarbs, unit: "g" },
-                { label: "Fat", value: fat, setter: setFat, unit: "g" },
-              ] as const).map((macro) => (
-                <div key={macro.label} className="space-y-1">
-                  <label className="text-[9px] font-heading font-black uppercase tracking-wider text-muted-foreground">
-                    {macro.label}
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="number"
-                      min="0"
-                      max="500"
-                      value={macro.value}
-                      onChange={(e) => macro.setter(e.target.value)}
-                      placeholder="0"
-                      className="w-full h-9 px-2.5 pr-7 bg-white dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#38332E] rounded-lg text-xs font-mono font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-[#CEF431] placeholder:text-muted-foreground/50"
-                    />
-                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-mono text-muted-foreground font-bold">
-                      {macro.unit}
-                    </span>
+        <div ref={macrosParentRef}>
+          {!showMacros ? (
+            <button
+              type="button"
+              onClick={() => {
+                soundFX.playPop();
+                setShowMacros(true);
+              }}
+              className="w-full text-center text-[10px] font-mono font-bold text-muted-foreground hover:text-foreground py-1 cursor-pointer transition-colors"
+            >
+              + Add protein / carbs / fat ▾
+            </button>
+          ) : (
+            <div className="space-y-1.5 p-3 rounded-2xl bg-secondary/30 border border-border animate-in fade-in zoom-in-95 duration-150">
+              <div className="flex items-center justify-between text-[10px] font-mono font-bold text-muted-foreground">
+                <span>Nutrient Breakdown</span>
+                <button
+                  type="button"
+                  onClick={() => setShowMacros(false)}
+                  className="hover:text-foreground cursor-pointer"
+                >
+                  Hide ✕
+                </button>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {([
+                  { label: "Protein", value: protein, setter: setProtein, unit: "g" },
+                  { label: "Carbs", value: carbs, setter: setCarbs, unit: "g" },
+                  { label: "Fat", value: fat, setter: setFat, unit: "g" },
+                ] as const).map((macro) => (
+                  <div key={macro.label} className="space-y-1">
+                    <label className="text-[9px] font-heading font-black uppercase tracking-wider text-muted-foreground">
+                      {macro.label}
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        min="0"
+                        max="500"
+                        value={macro.value}
+                        onChange={(e) => macro.setter(e.target.value)}
+                        placeholder="0"
+                        className="w-full h-9 px-2.5 pr-7 bg-white dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#38332E] rounded-lg text-xs font-mono font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-[#CEF431] placeholder:text-muted-foreground/50"
+                      />
+                      <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-mono text-muted-foreground font-bold">
+                        {macro.unit}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Submit */}
         <button

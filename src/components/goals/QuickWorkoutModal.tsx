@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useMemo, useDeferredValue, useEffect } from "react";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { VList } from "virtua";
 import {
   Dumbbell,
   Search,
@@ -95,7 +97,7 @@ function ExerciseThumbnailAnimation({
       type="button"
       onClick={onOpenGuide}
       title="View exercise form guide"
-      className="size-12 rounded-xl border-2 border-[#161514] dark:border-[#38332E] overflow-hidden bg-white dark:bg-[#1C1A18] flex items-center justify-center shrink-0 shadow-[1.5px_1.5px_0px_0px_#161514] dark:shadow-[1.5px_1.5px_0px_0px_#000000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer group relative"
+      className="size-12 rounded-xl border-2 border-[#161514] dark:border-[#38332E] overflow-hidden bg-white dark:bg-[#1C1A18] flex items-center justify-center shrink-0 shadow-[1.5px_1.5px_0px_0px_#161514] dark:shadow-[1.5px_1.5px_0px_0px_#000000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer group relative will-change-transform"
     >
       {currentImg ? (
         /* eslint-disable-next-line @next/next/no-img-element */
@@ -109,7 +111,7 @@ function ExerciseThumbnailAnimation({
         /* High-Definition 2-Frame Repetition Animation */
         <svg
           viewBox="0 0 32 32"
-          className="size-7 text-amber-600 dark:text-amber-400 transition-all duration-300 ease-out"
+          className="size-7 text-amber-600 dark:text-amber-400 transition-all duration-300 ease-out will-change-transform"
           style={{
             transform: frame === 1 ? "scale(1.08) translateY(-2px)" : "scale(0.95) translateY(1px)",
           }}
@@ -171,6 +173,10 @@ export function QuickWorkoutModal({
   const currentRoutine = useMemo(() => {
     return routines.find((r: any) => r.dayOfWeek === selectedDay);
   }, [routines, selectedDay]);
+
+  // Performance-optimized 60fps layout animations (Zero CLS)
+  const [exercisesListRef] = useAutoAnimate<HTMLDivElement>({ duration: 180, easing: "ease-out" });
+  const [searchDeckRef] = useAutoAnimate<HTMLDivElement>({ duration: 150, easing: "ease-out" });
 
   const exercises = currentRoutine?.exercises || [];
   const completedCount = exercises.filter((ex: any) => ex.completed).length;
@@ -460,87 +466,118 @@ export function QuickWorkoutModal({
           </div>
 
           {/* ================= 3. ||| LIVE 4,300+ EXERCISE SEARCH & BUILDER DECK ================= */}
-          {showSearch && (
-            <div className="p-3 bg-white dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#38332E] rounded-2xl shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] space-y-2.5 animate-in fade-in zoom-in-95 duration-150">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-heading font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1">
-                  <Search className="size-3 text-[#161514] dark:text-[#FAF8F5]" />
-                  <span>4,300+ Exercise Database</span>
-                </span>
-                <span className="text-[10px] font-mono text-muted-foreground">
-                  {isSearching ? "Searching library…" : "Instant auto-complete"}
-                </span>
-              </div>
+          <div ref={searchDeckRef}>
+            {showSearch && (
+              <div className="p-3 bg-white dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#38332E] rounded-2xl shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] space-y-2.5 animate-in fade-in zoom-in-95 duration-150">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-heading font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+                    <Search className="size-3 text-[#161514] dark:text-[#FAF8F5]" />
+                    <span>4,300+ Exercise Database</span>
+                  </span>
+                  <span className="text-[10px] font-mono text-muted-foreground">
+                    {isSearching ? "Searching library…" : "Instant auto-complete"}
+                  </span>
+                </div>
 
-              {/* Search Input */}
-              <div className="relative">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Type exercise (e.g. Incline Bench, Squat, Lat Pulldown)..."
-                  className="w-full h-11 pl-3.5 pr-9 bg-[#FAF8F5] dark:bg-[#252321] border-2 border-[#161514] dark:border-[#38332E] rounded-xl text-sm font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-[#CEF431] placeholder:text-muted-foreground/50"
-                  autoFocus
-                />
-                {searchQuery && (
-                  <button
-                    type="button"
-                    onClick={() => setSearchQuery("")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
-                  >
-                    <X className="size-4" />
-                  </button>
-                )}
-              </div>
-
-              {/* Matched Exercises from Database */}
-              {deferredSearch.length >= 2 && (
-                <div className="space-y-1 max-h-52 overflow-y-auto pr-0.5">
-                  {libraryMatches.length > 0 ? (
-                    libraryMatches.map((item) => (
-                      <div
-                        key={item.id}
-                        className="group flex items-center justify-between p-2.5 rounded-xl hover:bg-secondary/70 dark:hover:bg-secondary/40 border border-border/80 transition-all cursor-pointer"
-                        onClick={() => handleAddFromLibrary(item)}
-                      >
-                        <div className="min-w-0 flex-1 pr-2">
-                          <span className="block font-heading font-black text-xs text-foreground group-hover:text-amber-600 transition-colors truncate">
-                            {item.title}
-                          </span>
-                          <span className="block text-[10px] font-mono text-muted-foreground truncate mt-0.5">
-                            {item.bodyPart} • {item.equipment}
-                          </span>
-                        </div>
-
-                        <button
-                          type="button"
-                          className="px-2.5 py-1 rounded-lg bg-[#CEF431] text-[#161514] font-heading font-black text-[10px] border border-[#161514] shadow-[1px_1px_0px_0px_#161514] flex items-center gap-1 shrink-0 group-hover:scale-105 transition-all"
-                        >
-                          <Plus className="size-3 stroke-[3]" />
-                          <span>Add</span>
-                        </button>
-                      </div>
-                    ))
-                  ) : (
-                    /* Fallback to Custom Exercise Entry if not present in dataset */
-                    <div className="p-3 rounded-xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 space-y-2 text-center">
-                      <p className="text-xs font-mono text-muted-foreground">
-                        No match found for &ldquo;{searchQuery}&rdquo;
-                      </p>
-                      <button
-                        type="button"
-                        onClick={handleAddCustomExercise}
-                        className="w-full py-2 px-3 bg-[#161514] dark:bg-[#FAF8F5] text-white dark:text-[#161514] rounded-xl font-heading font-black text-xs flex items-center justify-center gap-1.5 shadow-[1.5px_1.5px_0px_0px_#161514] cursor-pointer"
-                      >
-                        <Plus className="size-3.5 stroke-[3]" />
-                        <span>Add &ldquo;{searchQuery}&rdquo; as Custom Exercise</span>
-                      </button>
-                    </div>
+                {/* Search Input */}
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Type exercise (e.g. Incline Bench, Squat, Lat Pulldown)..."
+                    className="w-full h-11 pl-3.5 pr-9 bg-[#FAF8F5] dark:bg-[#252321] border-2 border-[#161514] dark:border-[#38332E] rounded-xl text-sm font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-[#CEF431] placeholder:text-muted-foreground/50"
+                    autoFocus
+                  />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery("")}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+                    >
+                      <X className="size-4" />
+                    </button>
                   )}
                 </div>
-              )}
-            </div>
-          )}
+
+                {/* Matched Exercises from Database (Virtualized for 60fps Scrolling) */}
+                {deferredSearch.length >= 2 && (
+                  <div className="space-y-1 pr-0.5">
+                    {libraryMatches.length > 0 ? (
+                      libraryMatches.length > 4 ? (
+                        <VList style={{ height: 210 }}>
+                          {libraryMatches.map((item) => (
+                            <div
+                              key={item.id}
+                              className="group flex items-center justify-between p-2.5 rounded-xl hover:bg-secondary/70 dark:hover:bg-secondary/40 border border-border/80 transition-all cursor-pointer mb-1.5"
+                              onClick={() => handleAddFromLibrary(item)}
+                            >
+                              <div className="min-w-0 flex-1 pr-2">
+                                <span className="block font-heading font-black text-xs text-foreground group-hover:text-amber-600 transition-colors truncate">
+                                  {item.title}
+                                </span>
+                                <span className="block text-[10px] font-mono text-muted-foreground truncate mt-0.5">
+                                  {item.bodyPart} • {item.equipment}
+                                </span>
+                              </div>
+
+                              <button
+                                type="button"
+                                className="px-2.5 py-1 rounded-lg bg-[#CEF431] text-[#161514] font-heading font-black text-[10px] border border-[#161514] shadow-[1px_1px_0px_0px_#161514] flex items-center gap-1 shrink-0 group-hover:scale-105 transition-all"
+                              >
+                                <Plus className="size-3 stroke-[3]" />
+                                <span>Add</span>
+                              </button>
+                            </div>
+                          ))}
+                        </VList>
+                      ) : (
+                        libraryMatches.map((item) => (
+                          <div
+                            key={item.id}
+                            className="group flex items-center justify-between p-2.5 rounded-xl hover:bg-secondary/70 dark:hover:bg-secondary/40 border border-border/80 transition-all cursor-pointer"
+                            onClick={() => handleAddFromLibrary(item)}
+                          >
+                            <div className="min-w-0 flex-1 pr-2">
+                              <span className="block font-heading font-black text-xs text-foreground group-hover:text-amber-600 transition-colors truncate">
+                                {item.title}
+                              </span>
+                              <span className="block text-[10px] font-mono text-muted-foreground truncate mt-0.5">
+                                {item.bodyPart} • {item.equipment}
+                              </span>
+                            </div>
+
+                            <button
+                              type="button"
+                              className="px-2.5 py-1 rounded-lg bg-[#CEF431] text-[#161514] font-heading font-black text-[10px] border border-[#161514] shadow-[1px_1px_0px_0px_#161514] flex items-center gap-1 shrink-0 group-hover:scale-105 transition-all"
+                            >
+                              <Plus className="size-3 stroke-[3]" />
+                              <span>Add</span>
+                            </button>
+                          </div>
+                        ))
+                      )
+                    ) : (
+                      /* Fallback to Custom Exercise Entry if not present in dataset */
+                      <div className="p-3 rounded-xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 space-y-2 text-center">
+                        <p className="text-xs font-mono text-muted-foreground">
+                          No match found for &ldquo;{searchQuery}&rdquo;
+                        </p>
+                        <button
+                          type="button"
+                          onClick={handleAddCustomExercise}
+                          className="w-full py-2 px-3 bg-[#161514] dark:bg-[#FAF8F5] text-white dark:text-[#161514] rounded-xl font-heading font-black text-xs flex items-center justify-center gap-1.5 shadow-[1.5px_1.5px_0px_0px_#161514] cursor-pointer"
+                        >
+                          <Plus className="size-3.5 stroke-[3]" />
+                          <span>Add &ldquo;{searchQuery}&rdquo; as Custom Exercise</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
 
           {/* ================= 4. PRESENT DAY'S EXERCISES LIST (CRUD) ================= */}
           <div className="space-y-2">
@@ -583,7 +620,7 @@ export function QuickWorkoutModal({
               </div>
             ) : (
               /* Exercise Cards List with Animated Miniatures, Guide, and Check/Uncheck */
-              <div className="space-y-2 max-h-[360px] overflow-y-auto pr-0.5">
+              <div ref={exercisesListRef} className="space-y-2 max-h-[360px] overflow-y-auto pr-0.5">
                 {exercises.map((ex: any) => {
                   const isDone = Boolean(ex.completed);
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { soundFX } from "@/components/shared/SoundFX";
 import { cn } from "@/lib/utils";
 import { Check } from "lucide-react";
@@ -28,6 +29,7 @@ export function HorizontalWaterBottle({
   className,
   showCustomButton = true,
 }: HorizontalWaterBottleProps) {
+  const [containerRef] = useAutoAnimate<HTMLDivElement>({ duration: 180, easing: "ease-out" });
   const [isCustomOpen, setIsCustomOpen] = useState(false);
   const [customInput, setCustomInput] = useState(
     (targetAmount / 1000).toFixed(1)
@@ -60,7 +62,7 @@ export function HorizontalWaterBottle({
   };
 
   return (
-    <div className={cn("w-full space-y-2 select-none", className)}>
+    <div ref={containerRef} className={cn("w-full space-y-2 select-none", className)}>
       {/* Bottle Assembly Row */}
       <div className="flex items-center gap-2">
         {/* Horizontal Water Bottle (Constant Dimensions) */}
