@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef } from "react";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { type Category } from "@/types";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
@@ -50,7 +51,7 @@ export function CategoryChipFilterRail({
   onSendMoney,
   onBulkAddExpense,
 }: CategoryChipFilterRailProps) {
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [scrollContainerRef] = useAutoAnimate<HTMLDivElement>({ duration: 150, easing: "ease-out" });
 
   return (
     <div className="space-y-2 bg-white dark:bg-[#1C1A18] p-3 sm:p-3.5 rounded-2xl border border-[#E8E5DF] dark:border-[#383531] shadow-xs">

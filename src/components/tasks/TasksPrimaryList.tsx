@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { TaskItem } from "@/types";
 import {
   CheckCircle2,
@@ -50,6 +51,7 @@ export function TasksPrimaryList({
   const [selectedTag, setSelectedTag] = useState<string>("All");
   const [isExpanded, setIsExpanded] = useState(showAllByDefault);
   const [expandedSubtaskId, setExpandedSubtaskId] = useState<string | null>(null);
+  const [listRef] = useAutoAnimate<HTMLDivElement>({ duration: 180, easing: "ease-out" });
 
   // Extract unique project tags
   const projectTags = useMemo(() => {
@@ -225,8 +227,8 @@ export function TasksPrimaryList({
         </div>
       </div>
 
-      {/* Task Rows List */}
-      <div className="space-y-1.5">
+      {/* Task Rows List with FLIP Layout Animation */}
+      <div ref={listRef} className="space-y-1.5">
         {filteredTasks.length === 0 ? (
           tasks.length === 0 ? (
             <EmptyState

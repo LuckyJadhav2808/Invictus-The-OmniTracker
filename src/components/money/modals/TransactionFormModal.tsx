@@ -10,6 +10,7 @@ import {
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
 import { NeobrutalistDateTimePickerModal } from "@/components/shared/NeobrutalistDateTimePickerModal";
 import { NeobrutalistCalculator } from "@/components/shared/NeobrutalistCalculator";
+import { InlineMathInput } from "@/components/ui/InlineMathInput";
 import { soundFX } from "@/components/shared/SoundFX";
 import { cn } from "@/lib/utils";
 import { format, parseISO, subDays, addDays } from "date-fns";
@@ -377,17 +378,17 @@ export function TransactionFormModal({
                 </button>
               </div>
 
-              {/* Massive Amount Input */}
+              {/* Massive Amount Input with Inline Math Evaluator (Raycast / Soulver Benchmark) */}
               <div className="py-2 text-center">
-                <input
+                <InlineMathInput
                   id="tx-hero-amount"
-                  type="number"
-                  step="any"
+                  variant="hero"
                   value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
+                  onChange={(val) => setAmount(val)}
+                  currencySymbol={currencySymbol}
                   placeholder="0.00"
                   autoFocus={!isEditing}
-                  className="w-full text-center bg-transparent text-4xl sm:text-5xl font-mono font-black text-[#161514] dark:text-[#FAF8F5] placeholder-[#161514]/30 dark:placeholder-white/30 focus:outline-none tracking-tight [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  className="text-4xl sm:text-5xl font-mono font-black"
                 />
               </div>
 

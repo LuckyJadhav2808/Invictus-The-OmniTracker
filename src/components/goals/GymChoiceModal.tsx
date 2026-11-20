@@ -4,6 +4,7 @@ import React, { useState, useDeferredValue, useRef, useEffect } from "react";
 import { Search, Plus, Sparkles, X, ChevronDown, Eye, ArrowLeft, Dumbbell, Flame, Layers } from "lucide-react";
 import { AdaptiveDrawerDialog } from "@/components/shared/AdaptiveDrawerDialog";
 import { HumanMuscleAnatomy } from "@/components/goals/anatomy/HumanMuscleAnatomy";
+import { VList } from "virtua";
 import {
   mapBodyPartToMuscleGroup,
   mapMuscleGroupToBodyPart,
@@ -387,84 +388,90 @@ export function GymChoiceModal({
               )}
             </div>
 
-            {/* Search Results List */}
+            {/* Virtualized Search Results List (virtua) */}
             {libData?.exercises && libData.exercises.length > 0 ? (
-              <div className="max-h-[50vh] overflow-y-auto space-y-2 pr-1 pt-1 divide-y divide-[#E8E5DF] dark:divide-[#2A2724] overscroll-contain">
-                {libData.exercises.map((item) => {
-                  const thumbUrl = (item.images && item.images[0]) || item.gifUrl;
-                  return (
-                    <div
-                      key={item.id}
-                      onClick={() => onSelectExerciseFromLibrary(item)}
-                      onMouseEnter={() => setFocusedExercise(item)}
-                      onTouchStart={() => setFocusedExercise(item)}
-                      className="p-2.5 rounded-xl bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] border border-[#E8E5DF] dark:border-[#2A2724] cursor-pointer transition-all flex items-center justify-between gap-2.5 shadow-xs active:translate-y-0.5 group"
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        {thumbUrl ? (
-                          <div className="h-11 w-11 rounded-lg bg-[#242220] border border-[#E8E5DF] dark:border-[#2A2724] overflow-hidden shrink-0 flex items-center justify-center">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={thumbUrl}
-                              alt={item.title}
-                              loading="lazy"
-                              onError={(e) => {
-                                (e.currentTarget as HTMLElement).style.display = "none";
+              <div className="space-y-2">
+                <VList
+                  style={{ height: "48vh" }}
+                  className="pr-1 pt-1 overscroll-contain"
+                >
+                  {libData.exercises.map((item) => {
+                    const thumbUrl = (item.images && item.images[0]) || item.gifUrl;
+                    return (
+                      <div key={item.id} className="pb-2">
+                        <div
+                          onClick={() => onSelectExerciseFromLibrary(item)}
+                          onMouseEnter={() => setFocusedExercise(item)}
+                          onTouchStart={() => setFocusedExercise(item)}
+                          className="p-2.5 rounded-xl bg-white dark:bg-[#1C1A18] hover:bg-[#FAF8F5] dark:hover:bg-[#252321] border border-[#E8E5DF] dark:border-[#2A2724] cursor-pointer transition-all flex items-center justify-between gap-2.5 shadow-xs active:translate-y-0.5 group"
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            {thumbUrl ? (
+                              <div className="h-11 w-11 rounded-lg bg-[#242220] border border-[#E8E5DF] dark:border-[#2A2724] overflow-hidden shrink-0 flex items-center justify-center">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={thumbUrl}
+                                  alt={item.title}
+                                  loading="lazy"
+                                  onError={(e) => {
+                                    (e.currentTarget as HTMLElement).style.display = "none";
+                                  }}
+                                  className="h-full w-full object-contain"
+                                />
+                              </div>
+                            ) : (
+                              <div className="h-11 w-11 rounded-lg bg-amber-100 dark:bg-amber-950/30 border border-[#E8E5DF] dark:border-[#2A2724] flex items-center justify-center text-[#161514] dark:text-[#FAF8F5] font-black text-xs shrink-0">
+                                🏋️
+                              </div>
+                            )}
+                            <div className="min-w-0 flex-1">
+                              <h5 className="font-black text-xs text-[#161514] dark:text-[#FAF8F5] leading-snug break-words group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
+                                {item.title}
+                              </h5>
+                              <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                                <span className="text-[8.5px] font-black uppercase px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-800/50">
+                                  {item.bodyPart}
+                                </span>
+                                <span className="text-[8.5px] font-black uppercase px-1.5 py-0.5 rounded bg-sky-100 dark:bg-sky-950/40 text-sky-900 dark:text-sky-200 border border-sky-300 dark:border-sky-800/50">
+                                  {item.equipment}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            {onViewGuide && (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onViewGuide(item);
+                                }}
+                                className="px-2 py-1 rounded-lg bg-[#FAF8F5] dark:bg-[#252321] hover:bg-[#F1EFEA] dark:hover:bg-[#2F2C29] text-[#161514] dark:text-[#FAF8F5] text-[9px] font-black border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex items-center gap-1 cursor-pointer transition-all active:translate-y-0.5"
+                                title="View Exercise Form Guide"
+                              >
+                                <Eye className="size-2.5 stroke-[2.5]" />
+                                <span>Guide</span>
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              disabled={isPending}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onSelectExerciseFromLibrary(item);
                               }}
-                              className="h-full w-full object-contain"
-                            />
-                          </div>
-                        ) : (
-                          <div className="h-11 w-11 rounded-lg bg-amber-100 dark:bg-amber-950/30 border border-[#E8E5DF] dark:border-[#2A2724] flex items-center justify-center text-[#161514] dark:text-[#FAF8F5] font-black text-xs shrink-0">
-                            🏋️
-                          </div>
-                        )}
-                        <div className="min-w-0 flex-1">
-                          <h5 className="font-black text-xs text-[#161514] dark:text-[#FAF8F5] leading-snug break-words group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
-                            {item.title}
-                          </h5>
-                          <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                            <span className="text-[8.5px] font-black uppercase px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-800/50">
-                              {item.bodyPart}
-                            </span>
-                            <span className="text-[8.5px] font-black uppercase px-1.5 py-0.5 rounded bg-sky-100 dark:bg-sky-950/40 text-sky-900 dark:text-sky-200 border border-sky-300 dark:border-sky-800/50">
-                              {item.equipment}
-                            </span>
+                              className="text-[9px] font-black bg-[#03D26F] hover:bg-[#02b861] active:translate-y-0.5 text-[#161514] px-2.5 py-1 rounded-lg border border-[#03D26F] shadow-xs flex items-center gap-1 cursor-pointer transition-all"
+                            >
+                              <span>USE</span>
+                              <span className="font-black">➔</span>
+                            </button>
                           </div>
                         </div>
                       </div>
-
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        {onViewGuide && (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onViewGuide(item);
-                            }}
-                            className="px-2 py-1 rounded-lg bg-[#FAF8F5] dark:bg-[#252321] hover:bg-[#F1EFEA] dark:hover:bg-[#2F2C29] text-[#161514] dark:text-[#FAF8F5] text-[9px] font-black border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex items-center gap-1 cursor-pointer transition-all active:translate-y-0.5"
-                            title="View Exercise Form Guide"
-                          >
-                            <Eye className="size-2.5 stroke-[2.5]" />
-                            <span>Guide</span>
-                          </button>
-                        )}
-                        <button
-                          type="button"
-                          disabled={isPending}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onSelectExerciseFromLibrary(item);
-                          }}
-                          className="text-[9px] font-black bg-[#03D26F] hover:bg-[#02b861] active:translate-y-0.5 text-[#161514] px-2.5 py-1 rounded-lg border border-[#03D26F] shadow-xs flex items-center gap-1 cursor-pointer transition-all"
-                        >
-                          <span>USE</span>
-                          <span className="font-black">➔</span>
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </VList>
 
                 <div ref={loadMoreSentinelRef} className="h-2 w-full" />
 

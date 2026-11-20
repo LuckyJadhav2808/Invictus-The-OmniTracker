@@ -7,6 +7,7 @@ import { soundFX } from "@/components/shared/SoundFX";
 import { Plus, Wallet, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { parseSmartIntent } from "@/lib/nlp/smart-intent-parser";
+import { InlineMathInput } from "@/components/ui/InlineMathInput";
 
 export interface TodayQuickExpenseModalProps {
   open: boolean;
@@ -85,19 +86,17 @@ export function TodayQuickExpenseModal({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 pt-2">
-          {/* Amount Input with big display */}
+          {/* Amount Input with Inline Math Evaluator (Raycast / Soulver Benchmark) */}
           <div className="bg-card border-2 border-[#161514] dark:border-[#38332E] rounded-xl p-3 shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] flex items-center gap-2">
             <span className="font-heading font-black text-2xl text-muted-foreground select-none">
               {currencySymbol}
             </span>
-            <input
-              type="number"
-              step="any"
-              autoFocus
-              placeholder="0.00"
+            <InlineMathInput
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="w-full bg-transparent font-heading font-black text-2xl text-foreground focus:outline-hidden tabular-nums"
+              onChange={(val) => setAmount(val)}
+              currencySymbol={currencySymbol}
+              placeholder="0.00"
+              autoFocus
               required
             />
           </div>
