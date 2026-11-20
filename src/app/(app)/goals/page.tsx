@@ -1084,19 +1084,11 @@ function GoalsPageContent() {
         isPending={addMealPlanMutation.isPending}
       />
 
-      {/* 6c. Quick Workout Logger Modal (Flower Menu → inline) */}
+      {/* 6c. Quick Workout & Routine Cockpit (Flower Menu → inline) */}
       <QuickWorkoutModal
         open={isQuickWorkoutOpen}
         onOpenChange={setIsQuickWorkoutOpen}
         selectedDate={selectedDate}
-        onAddWorkout={async (workout) => {
-          try {
-            await addWorkoutMutation.mutateAsync(workout);
-          } catch {
-            toast.error("Failed to log workout");
-          }
-        }}
-        isPending={addWorkoutMutation.isPending}
       />
 
       {/* 7. Create Custom Habit Bottom Sheet */}
