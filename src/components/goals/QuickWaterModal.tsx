@@ -1,7 +1,9 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { AdaptiveDrawerDialog } from "@/components/shared/AdaptiveDrawerDialog";
 import { WATER_VESSELS, type VesselPreset } from "@/components/goals/WaterTracker";
+import { HorizontalWaterBottle } from "@/components/goals/HorizontalWaterBottle";
 import { soundFX } from "@/components/shared/SoundFX";
 import { strobiToast } from "@/lib/utils/toasts";
 import { NumberTicker } from "@/components/ui/number-ticker";
@@ -11,20 +13,39 @@ interface QuickWaterModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   currentAmount: number;
-  targetAmount: number;
+  targetAmount?: number;
   onLogWater: (delta: number) => void;
+  onSetTarget?: (targetMl: number) => void;
 }
 
 export function QuickWaterModal({
   open,
   onOpenChange,
   currentAmount,
-  targetAmount,
+  targetAmount = 1000,
   onLogWater,
+  onSetTarget,
 }: QuickWaterModalProps) {
-  const percentage = Math.min(100, Math.round((currentAmount / Math.max(1, targetAmount)) * 100));
-  const remaining = Math.max(0, targetAmount - currentAmount);
-  const isGoalMet = currentAmount >= targetAmount && targetAmount > 0;
+  const [localTarget, setLocalTarget] = useState(targetAmount || 1000);
+
+  useEffect(() => {
+    if (targetAmount) {
+      setLocalTarget(targetAmount);
+    }
+  }, [targetAmount]);
+
+  const percentage = Math.min(
+    100,
+    Math.round((currentAmount / Math.max(1, localTarget)) * 100)
+  );
+  const remaining = Math.max(0, localTarget - currentAmount);
+  const isGoalMet = currentAmount >= localTarget && localTarget > 0;
+
+  const handleUpdateTarget = (newTarget: number) => {
+    setLocalTarget(newTarget);
+    onSetTarget?.(newTarget);
+    strobiToast.habits(`Bottle goal updated to ${(newTarget / 1000).toFixed(1)}L 💧`);
+  };
 
   const handleVesselTap = (vessel: VesselPreset) => {
     soundFX.playSplash();
@@ -32,10 +53,10 @@ export function QuickWaterModal({
     onLogWater(vessel.amount);
 
     const nextAmount = currentAmount + vessel.amount;
-    if (nextAmount >= targetAmount && currentAmount < targetAmount) {
+    if (nextAmount >= localTarget && currentAmount < localTarget) {
       soundFX.playCompleteChime();
       soundFX.vibrate([60, 60, 100]);
-      strobiToast.habits("Hydration goal crushed! 💧");
+      strobiToast.habits("Hydration bottle crushed! 💧");
     } else {
       strobiToast.habits(`+${vessel.amount}ml logged`);
     }
@@ -48,17 +69,17 @@ export function QuickWaterModal({
       open={open}
       onOpenChange={onOpenChange}
       title="Quick Water Log"
-      description="Tap a vessel to log instantly"
+      description="Tap a vessel to fill your 1L bottle (or tap ||| for custom L)"
     >
       <div className="space-y-4 py-1">
-        {/* Progress HUD */}
+        {/* Progress HUD Telemetry */}
         <div className="flex items-center justify-between">
           <div className="flex items-baseline gap-1.5">
             <span className="text-2xl font-heading font-black tabular-nums text-foreground">
               <NumberTicker value={currentAmount} duration={200} />
             </span>
             <span className="text-xs font-mono text-muted-foreground font-bold">
-              / {targetAmount}ml
+              / {localTarget}ml ({(localTarget / 1000).toFixed(1)}L)
             </span>
           </div>
           <span
@@ -71,24 +92,19 @@ export function QuickWaterModal({
           </span>
         </div>
 
-        {/* Progress Bar */}
-        <div className="h-3 w-full bg-secondary/80 rounded-full border-2 border-[#161514] dark:border-[#38332E] overflow-hidden p-[1.5px]">
-          <div
-            className={cn(
-              "h-full rounded-full transition-all duration-300 ease-out",
-              isGoalMet
-                ? "bg-[#03D26F]"
-                : "bg-gradient-to-r from-sky-400 via-sky-500 to-cyan-400"
-            )}
-            style={{ width: `${Math.min(100, percentage)}%` }}
-          />
-        </div>
+        {/* 1L Horizontal Water Bottle Progress Bar with ||| Custom L button */}
+        <HorizontalWaterBottle
+          currentAmount={currentAmount}
+          targetAmount={localTarget}
+          onSetTarget={handleUpdateTarget}
+          showCustomButton={true}
+        />
 
         {/* Remaining Telemetry */}
         <p className="text-center text-xs font-mono text-muted-foreground">
           {isGoalMet
-            ? "🎯 Goal reached! Extra hydration is bonus."
-            : `${remaining.toLocaleString()}ml remaining to daily target`}
+            ? "🎯 Bottle filled to the brim! Extra hydration is bonus."
+            : `${remaining.toLocaleString()}ml remaining to fill bottle (${(localTarget / 1000).toFixed(1)}L)`}
         </p>
 
         {/* 2×2 Vessel Grid — 1-tap actions */}

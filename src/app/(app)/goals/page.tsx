@@ -1055,8 +1055,19 @@ function GoalsPageContent() {
         open={isQuickWaterOpen}
         onOpenChange={setIsQuickWaterOpen}
         currentAmount={waterLogged}
-        targetAmount={(waterLog as any)?.waterGoal || 2000}
+        targetAmount={(waterLog as any)?.waterGoal || 1000}
         onLogWater={logWater}
+        onSetTarget={async (newTarget) => {
+          try {
+            await setWaterMutation.mutateAsync({
+              date: selectedDate,
+              amount: waterLogged,
+              waterGoal: newTarget,
+            });
+          } catch {
+            toast.error("Failed to update water goal");
+          }
+        }}
       />
 
       {/* 6b. Quick Meal Logger Modal (Flower Menu → inline) */}
