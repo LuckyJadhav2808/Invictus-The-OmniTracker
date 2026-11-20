@@ -317,7 +317,7 @@ export function TasksPrimaryList({
                     <div className="flex items-center gap-1.5">
                       <span
                         className={cn(
-                          "text-xs sm:text-sm font-heading font-black tracking-tight text-foreground truncate",
+                          "text-xs sm:text-sm font-heading font-black tracking-tight text-foreground leading-snug break-words line-clamp-2",
                           isDone && "line-through opacity-50"
                         )}
                       >

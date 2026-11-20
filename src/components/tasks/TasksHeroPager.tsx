@@ -274,20 +274,26 @@ export function TasksHeroPager({
     {
       id: "resolved",
       icon: <CheckCircle2 className="size-3.5 text-emerald-500" />,
-      label: "Resolved",
+      label: "RESOLVED",
       value: `${completedCount}/${totalCount}`,
+      progressPercent: totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0,
+      progressColor: "bg-emerald-500",
     },
     {
       id: "p1-urgent",
       icon: <Flame className="size-3.5 text-rose-500" />,
-      label: "P1 Urgent",
-      value: `${p1UrgentCount} Tasks`,
+      label: "P1 URGENT",
+      value: `${p1UrgentCount}`,
+      progressPercent: p1UrgentCount > 0 ? 100 : 0,
+      progressColor: "bg-rose-500",
     },
     {
       id: "in-progress",
       icon: <Clock className="size-3.5 text-amber-500" />,
-      label: "In Progress",
-      value: `${inProgressCount} Active`,
+      label: "IN PROGRESS",
+      value: `${inProgressCount}`,
+      progressPercent: inProgressCount > 0 ? Math.min(100, inProgressCount * 25) : 0,
+      progressColor: "bg-amber-500",
     },
   ];
 

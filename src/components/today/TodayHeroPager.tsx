@@ -212,14 +212,21 @@ export function TodayHeroPager({
       value: `${completedCount}/${totalCount}`,
       subValue: `${completionPercent}%`,
       progressPercent: completionPercent,
-      progressColor: "#03D26F",
+      progressColor: "bg-[#03D26F]",
     },
     {
       id: "safe-spend",
       icon: <Wallet className="size-3.5 text-blue-500" />,
-      label: "SAFE SPEND",
+      label: "SAFE",
       value: `${currencySymbol}${Math.max(0, remainingSafeToSpend).toLocaleString()}`,
       subValue: spentToday > 0 ? `-${currencySymbol}${spentToday}` : "Clear",
+      progressPercent:
+        dailySafeToSpend > 0
+          ? Math.min(100, Math.max(0, Math.round((remainingSafeToSpend / dailySafeToSpend) * 100)))
+          : remainingSafeToSpend > 0
+          ? 100
+          : 0,
+      progressColor: "bg-blue-500",
       onClick: onOpenQuickExpense,
     },
     {
@@ -228,6 +235,11 @@ export function TodayHeroPager({
       label: "STREAK",
       value: `${streakDays}d`,
       subValue: streakFreezeTokens > 0 ? `${streakFreezeTokens} 🛡️` : "Active",
+      progressPercent: Math.min(
+        100,
+        Math.max(10, Math.round(((streakDays % 7 || (streakDays > 0 ? 7 : 1)) / 7) * 100))
+      ),
+      progressColor: "bg-orange-500",
       onClick: onOpenShieldInfo,
     },
   ];

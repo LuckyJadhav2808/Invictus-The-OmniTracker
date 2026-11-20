@@ -243,26 +243,26 @@ export const TodayChronologicalAgenda = React.memo(function TodayChronologicalAg
     }
   };
 
-  // Render a clean, single-row checklist item (Benchmark matching reference image)
+  // Render a clean, bulletproof checklist item with natural wrapping and sub-row metadata (Apple / Things 3 pattern)
   const renderChecklistRow = (item: AgendaItem) => {
     return (
       <div
         key={item.id}
         onClick={() => handleItemToggle(item)}
         className={cn(
-          "group flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl transition-all cursor-pointer select-none",
+          "group flex items-start sm:items-center justify-between gap-3 px-3 py-2.5 rounded-xl transition-all cursor-pointer select-none",
           item.isCompleted
             ? "opacity-60 hover:opacity-80"
             : "hover:bg-black/4 dark:hover:bg-white/4 active:scale-[0.99]"
         )}
       >
-        <div className="flex items-center gap-3 min-w-0 flex-1">
-          {/* 24px Rounded Checkbox (Physical feel from reference) */}
+        <div className="flex items-start sm:items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+          {/* 24px Rounded Checkbox (Physical tactile feel) */}
           <button
             type="button"
             aria-label={`Toggle ${item.title}`}
             className={cn(
-              "size-5.5 sm:size-6 rounded-md border-2 flex items-center justify-center transition-all shrink-0 active:scale-95",
+              "size-5.5 sm:size-6 rounded-md border-2 flex items-center justify-center transition-all shrink-0 active:scale-95 mt-0.5 sm:mt-0",
               item.isCompleted
                 ? "bg-[#161514] border-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:border-[#CEF431] dark:text-[#161514]"
                 : "border-[#161514]/30 dark:border-white/30 bg-transparent group-hover:border-[#161514] dark:group-hover:border-white"
@@ -274,25 +274,48 @@ export const TodayChronologicalAgenda = React.memo(function TodayChronologicalAg
           </button>
 
           {/* Contextual Emoji / Icon */}
-          <span className="text-base select-none shrink-0" aria-hidden="true">
+          <span className="text-base select-none shrink-0 mt-0.5 sm:mt-0" aria-hidden="true">
             {item.icon}
           </span>
 
-          {/* Title */}
-          <span
-            className={cn(
-              "font-heading text-xs sm:text-sm tracking-tight truncate transition-all leading-snug",
-              item.isCompleted
-                ? "line-through text-muted-foreground font-normal"
-                : "text-foreground font-bold"
+          {/* Title & Mobile Sub-Row Metadata (Zero Clipping & Full Width) */}
+          <div className="flex flex-col min-w-0 flex-1">
+            <span
+              className={cn(
+                "font-heading text-xs sm:text-sm tracking-tight leading-snug break-words line-clamp-2 transition-all",
+                item.isCompleted
+                  ? "line-through text-muted-foreground font-normal"
+                  : "text-foreground font-bold"
+              )}
+            >
+              {item.title}
+            </span>
+
+            {/* Mobile Sub-metadata (Streak & Time) */}
+            {((item.streakCount !== undefined && item.streakCount > 0) || item.timeLabel) && !item.isCompleted && (
+              <div className="flex items-center gap-2 mt-0.5 text-[11px] font-mono sm:hidden">
+                {item.streakCount !== undefined && item.streakCount > 0 && (
+                  <span className="inline-flex items-center gap-0.5 font-bold text-orange-600 dark:text-orange-400 tabular-nums">
+                    <Flame className="size-3 fill-current" />
+                    {item.streakCount}d
+                  </span>
+                )}
+                {item.streakCount !== undefined && item.streakCount > 0 && item.timeLabel && (
+                  <span className="text-muted-foreground/40">•</span>
+                )}
+                {item.timeLabel && (
+                  <span className="text-muted-foreground inline-flex items-center gap-1">
+                    <Clock className="size-3" />
+                    {item.timeLabel}
+                  </span>
+                )}
+              </div>
             )}
-          >
-            {item.title}
-          </span>
+          </div>
         </div>
 
-        {/* Right Metadata: Time or Streak (Clean & Quiet) */}
-        <div className="flex items-center gap-2 shrink-0">
+        {/* Desktop Right Metadata: Streak & Time on the right for wide viewports */}
+        <div className="hidden sm:flex items-center gap-2.5 shrink-0 pl-2">
           {item.streakCount !== undefined && item.streakCount > 0 && !item.isCompleted && (
             <span className="flex items-center gap-0.5 text-xs font-heading font-bold text-orange-600 dark:text-orange-400 tabular-nums">
               <Flame className="size-3 fill-current" />

@@ -9,6 +9,7 @@ export interface HeroStatItem {
   id: string;
   icon: React.ReactNode;
   label: string;
+  shortLabel?: string;
   value: string | number;
   subValue?: string;
   progressPercent?: number; // 0 - 100
@@ -157,38 +158,44 @@ export function Hero({
         <div className="w-full mt-2 pt-2.5 border-t border-[#161514]/10 dark:border-white/10 shrink-0">
           <div
             className={cn(
-              "grid gap-2 divide-x divide-[#161514]/10 dark:divide-white/10",
+              "grid divide-x divide-[#161514]/10 dark:divide-white/10",
               stats.length === 2 && "grid-cols-2",
               stats.length === 3 && "grid-cols-3",
               stats.length >= 4 && "grid-cols-4"
             )}
           >
-            {stats.map((stat, i) => (
+            {stats.map((stat) => (
               <div
                 key={stat.id}
                 onClick={stat.onClick}
                 className={cn(
-                  "flex flex-col justify-between gap-1 px-2.5",
-                  i > 0 && "pl-3",
+                  "flex flex-col justify-between gap-0.5 px-2 sm:px-3 min-w-0",
                   stat.onClick && "cursor-pointer active:opacity-75 transition-opacity"
                 )}
               >
-                {/* Top: Icon + Label + Value */}
-                <div className="flex items-center justify-between gap-1 text-[11px] min-w-0">
-                  <div className="flex items-center gap-1 text-muted-foreground truncate">
-                    <span className="shrink-0">{stat.icon}</span>
-                    <span className="font-mono font-bold tracking-wider uppercase text-[10px] truncate">
-                      {stat.label}
-                    </span>
-                  </div>
-                  <span className="font-mono font-black text-foreground shrink-0 text-xs">
-                    {stat.value}
+                {/* Row 1: Icon + Label (Full width, zero truncation) */}
+                <div className="flex items-center gap-1 text-muted-foreground min-w-0">
+                  <span className="shrink-0">{stat.icon}</span>
+                  <span className="font-mono font-bold tracking-tight uppercase text-[9px] sm:text-[10px] text-muted-foreground truncate">
+                    {stat.label}
                   </span>
                 </div>
 
-                {/* Bottom: Mini Segment Bar */}
+                {/* Row 2: Prominent Value + Optional Subvalue */}
+                <div className="flex items-baseline justify-between gap-1 mt-0.5">
+                  <span className="font-mono font-black text-foreground text-xs sm:text-sm tracking-tight truncate">
+                    {stat.value}
+                  </span>
+                  {stat.subValue && (
+                    <span className="font-mono text-[9px] text-muted-foreground truncate hidden sm:inline">
+                      {stat.subValue}
+                    </span>
+                  )}
+                </div>
+
+                {/* Row 3: Mini Segment Bar */}
                 {stat.progressPercent !== undefined && (
-                  <div className="w-full h-1.5 bg-secondary dark:bg-muted rounded-full overflow-hidden mt-0.5">
+                  <div className="w-full h-1 sm:h-1.5 bg-secondary dark:bg-muted rounded-full overflow-hidden mt-0.5">
                     <div
                       className={cn(
                         "h-full rounded-full transition-all duration-500",
