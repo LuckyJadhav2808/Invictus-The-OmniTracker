@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { type Category } from "@/types";
 import { soundFX } from "@/components/shared/SoundFX";
 import { Plus, Wallet, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { parseSmartIntent } from "@/lib/nlp/smart-intent-parser";
+import { detectCategoryFromNote } from "@/lib/utils/merchant-categorizer";
 import { InlineMathInput } from "@/components/ui/InlineMathInput";
 
 export interface TodayQuickExpenseModalProps {
@@ -29,27 +30,45 @@ export function TodayQuickExpenseModal({
   const [amount, setAmount] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [note, setNote] = useState("");
+  const [matchedCategoryName, setMatchedCategoryName] = useState<string | null>(null);
 
-  const expenseCategories = categories.filter((c) => c.type === "expense" && !c.archived);
+  const expenseCategories = useMemo(
+    () => categories.filter((c) => c.type === "expense" && !c.archived),
+    [categories]
+  );
   const selectedCatId = categoryId || expenseCategories[0]?.id || "";
 
   const handleNoteChange = (val: string) => {
     setNote(val);
-    if (!val.trim()) return;
+    if (!val.trim()) {
+      setMatchedCategoryName(null);
+      return;
+    }
 
+    // Tier 1 & 2: Shared keyword + semantic dictionary categorizer (100+ keywords, 10 category groups)
+    const catMatch = detectCategoryFromNote(val, expenseCategories);
+    if (catMatch && catMatch.categoryId !== categoryId) {
+      soundFX.playPop();
+      setCategoryId(catMatch.categoryId);
+      setMatchedCategoryName(catMatch.categoryName);
+    }
+
+    // Amount extraction via compromise + chrono-node NLP intent parser
     const parsed = parseSmartIntent(val);
     if (parsed.domain === "MONEY_EXPENSE" && parsed.expense) {
       if (parsed.expense.amount && (!amount || amount === "0")) {
         setAmount(String(parsed.expense.amount));
         soundFX.playPop();
       }
-      if (parsed.expense.category) {
+      // Fallback: If shared categorizer didn't match, try intent parser's category heuristic
+      if (!catMatch && parsed.expense.category) {
         const catNameLower = parsed.expense.category.toLowerCase();
         const matched = expenseCategories.find((c) =>
           c.name.toLowerCase().includes(catNameLower)
         );
         if (matched && matched.id !== categoryId) {
           setCategoryId(matched.id);
+          setMatchedCategoryName(matched.name);
         }
       }
     }
@@ -131,10 +150,19 @@ export function TodayQuickExpenseModal({
               <label className="text-xs font-heading font-bold text-muted-foreground uppercase tracking-wider block">
                 Note (Optional)
               </label>
-              <span className="text-[10px] font-mono font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                <Sparkles className="size-2.5" />
-                NLP Auto-fill
-              </span>
+              {matchedCategoryName ? (
+                <div className="flex items-center gap-1 px-1.5 py-0.5 bg-[#CEF431] border border-[#161514] rounded shadow-xs">
+                  <Sparkles className="size-2 text-[#161514] stroke-[3]" />
+                  <span className="text-[9px] font-bold text-[#161514]">
+                    Auto: {matchedCategoryName}
+                  </span>
+                </div>
+              ) : (
+                <span className="text-[10px] font-mono font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                  <Sparkles className="size-2.5" />
+                  NLP Auto-fill
+                </span>
+              )}
             </div>
             <input
               type="text"

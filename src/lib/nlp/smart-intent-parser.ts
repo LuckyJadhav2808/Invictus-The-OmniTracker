@@ -35,13 +35,15 @@ export interface ParsedSmartIntent {
   task?: ParsedTask;
 }
 
-// Category heuristics for expense detection
+// Category heuristics for expense detection with comprehensive Indian & everyday merchant terms
 const EXPENSE_CATEGORY_KEYWORDS: Record<string, string[]> = {
-  Food: ["lunch", "dinner", "breakfast", "coffee", "cafe", "starbucks", "swiggy", "zomato", "groceries", "food", "pizza", "burger", "mess", "supermarket"],
-  Travel: ["uber", "ola", "cab", "auto", "metro", "flight", "petrol", "diesel", "fuel", "train", "irctc", "bus"],
-  Shopping: ["amazon", "flipkart", "myntra", "clothes", "shoes", "decathlon", "bought", "shopping", "store"],
-  Bills: ["recharge", "wifi", "broadband", "electricity", "rent", "subscription", "netflix", "spotify", "bill"],
-  Fitness: ["gym", "whey", "creatine", "supplement", "membership", "cult"],
+  Food: ["lunch", "dinner", "breakfast", "coffee", "cafe", "starbucks", "swiggy", "zomato", "groceries", "food", "pizza", "burger", "mess", "canteen", "chai", "dosa", "biryani", "supermarket"],
+  Travel: ["uber", "ola", "cab", "auto", "metro", "flight", "petrol", "diesel", "fuel", "train", "irctc", "bus", "rapido", "parking", "toll"],
+  Shopping: ["amazon", "flipkart", "myntra", "clothes", "shoes", "decathlon", "bought", "shopping", "store", "electronics", "ajio", "meesho"],
+  Bills: ["recharge", "wifi", "broadband", "electricity", "rent", "subscription", "netflix", "spotify", "bill", "bijli", "water bill"],
+  Fitness: ["gym", "whey", "creatine", "supplement", "membership", "cult", "protein", "workout"],
+  Education: ["books", "book", "stationary", "stationery", "pen", "tuition", "course", "udemy", "coaching", "exam", "college", "fees"],
+  Income: ["salary", "stipend", "paycheck", "freelance", "allowance", "cashback", "refund", "bonus", "dividend", "interest"],
 };
 
 /**
@@ -89,9 +91,13 @@ export function parseSmartIntent(input: string): ParsedSmartIntent {
   let extractedAmount: number | null = null;
 
   // Check if text mentions known expense categories (Food, Travel, Bills, etc.)
+  // Uses word-boundary matching to prevent false positives (e.g. "company" matching "pen")
   let detectedCategory: string | null = null;
   for (const [cat, keywords] of Object.entries(EXPENSE_CATEGORY_KEYWORDS)) {
-    if (keywords.some((kw) => lower.includes(kw))) {
+    if (keywords.some((kw) => {
+      if (kw.includes(" ")) return lower.includes(kw); // multi-word: substring match
+      return new RegExp(`\\b${kw}\\b`, "i").test(lower); // single-word: word boundary
+    })) {
       detectedCategory = cat;
       break;
     }
@@ -218,5 +224,104 @@ export function parseSmartIntent(input: string): ParsedSmartIntent {
       dueTime: parsedTimeStr || undefined,
       priority: isUrgent ? "high" : "medium",
     },
+  };
+}
+
+export interface ParsedTaskDetails {
+  cleanTitle: string;
+  dueDate?: string; // YYYY-MM-DD
+  dueTime?: string; // HH:mm (24h)
+  priority?: "p1" | "p2" | "p3";
+  projectTag?: "Dev" | "Work" | "Personal" | "Study" | "Health" | "Life";
+  detectedSnippet?: string;
+}
+
+/**
+ * High-precision task intent parser combining chrono-node (date/time extraction)
+ * and compromise (grammar, urgency, context categorization).
+ */
+export function parseTaskIntent(input: string): ParsedTaskDetails {
+  const text = (input || "").trim();
+  if (!text) {
+    return {
+      cleanTitle: "",
+      priority: "p2",
+      projectTag: "Dev",
+    };
+  }
+
+  const lower = text.toLowerCase();
+
+  // 1. Natural language date & time parsing via chrono-node
+  const chronoParsed = chrono.parse(text);
+  let dueDate: string | undefined;
+  let dueTime: string | undefined;
+  let detectedDateSnippet = "";
+
+  if (chronoParsed.length > 0) {
+    const first = chronoParsed[0];
+    const dateObj = first.date();
+    const yyyy = dateObj.getFullYear();
+    const mm = String(dateObj.getMonth() + 1).padStart(2, "0");
+    const dd = String(dateObj.getDate()).padStart(2, "0");
+    dueDate = `${yyyy}-${mm}-${dd}`;
+    detectedDateSnippet = first.text;
+
+    if (first.start.isCertain("hour")) {
+      const hh = String(dateObj.getHours()).padStart(2, "0");
+      const min = String(dateObj.getMinutes()).padStart(2, "0");
+      dueTime = `${hh}:${min}`;
+    }
+  }
+
+  // 2. Priority detection (compromise & urgency keywords)
+  let priority: "p1" | "p2" | "p3" = "p2";
+  if (/(urgent|asap|critical|p1|immediately|blocker|emergency|highest|important)/i.test(lower)) {
+    priority = "p1";
+  } else if (/(low priority|someday|later|whenever|p3|optional|minor)/i.test(lower)) {
+    priority = "p3";
+  }
+
+  // 3. Project tag detection
+  let projectTag: "Dev" | "Work" | "Personal" | "Study" | "Health" | "Life" = "Dev";
+  if (/(study|exam|homework|assignment|revision|lecture|syllabus|course|pyq|notes|book|read)/i.test(lower)) {
+    projectTag = "Study";
+  } else if (/(gym|workout|exercise|water|diet|meal|protein|sleep|doctor|medicine|health|run)/i.test(lower)) {
+    projectTag = "Health";
+  } else if (/(client|meeting|presentation|work|resume|interview|office|job|manager|email|pitch)/i.test(lower)) {
+    projectTag = "Work";
+  } else if (/(clean|room|laundry|groceries|buy|call|mom|dad|friend|movie|personal|bill|shop)/i.test(lower)) {
+    projectTag = "Personal";
+  } else if (/(dev|code|bug|api|test|git|feature|refactor|deploy|backend|frontend|component)/i.test(lower)) {
+    projectTag = "Dev";
+  }
+
+  // 4. Clean task title (strip time tokens like "by tomorrow 5pm", "asap", etc.)
+  let clean = text;
+  if (chronoParsed.length > 0) {
+    clean = clean.replace(chronoParsed[0].text, "").trim();
+  }
+  clean = clean
+    .replace(/\b(by|at|on|due|before)\s*$/i, "")
+    .replace(/\b(asap|urgent|critical|p1|p2|p3)\b/gi, "")
+    .replace(/^(todo:\s*|task:\s*)/i, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+
+  // Create human-readable snippet
+  const parts: string[] = [];
+  if (detectedDateSnippet) parts.push(detectedDateSnippet);
+  if (dueTime) parts.push(`at ${dueTime}`);
+  if (priority === "p1") parts.push("⚡ Urgent (P1)");
+  if (priority === "p3") parts.push("Low Priority (P3)");
+  parts.push(`Tag: ${projectTag}`);
+
+  return {
+    cleanTitle: clean || text,
+    dueDate,
+    dueTime,
+    priority,
+    projectTag,
+    detectedSnippet: parts.join(" • "),
   };
 }

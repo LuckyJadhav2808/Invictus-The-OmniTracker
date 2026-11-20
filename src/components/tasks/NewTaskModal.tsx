@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
 import { TaskItem } from "@/types";
 import { Plus, Trash2, Sparkles, Flame, AlertTriangle, CircleDot, ArrowDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
+import { parseTaskIntent } from "@/lib/nlp/smart-intent-parser";
 
 interface NewTaskModalProps {
   open: boolean;
@@ -81,6 +82,51 @@ export function NewTaskModal({ open, onOpenChange, taskToEdit, onSubmit }: NewTa
   const [estimatedMinutes, setEstimatedMinutes] = useState(60);
   const [subtasks, setSubtasks] = useState<{ id: string; title: string; completed: boolean }[]>([]);
   const [newSubtaskTitle, setNewSubtaskTitle] = useState("");
+  const [nlpSnippet, setNlpSnippet] = useState<string | null>(null);
+
+  // Debounce ref for NLP parsing to avoid running on every keystroke
+  const nlpDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // NLP-powered auto-fill: extracts due date, time, priority, and project tag from title
+  const handleTitleChangeWithNLP = useCallback((val: string) => {
+    setTitle(val);
+    // Skip NLP when editing an existing task (user already set fields explicitly)
+    if (taskToEdit) return;
+
+    if (nlpDebounceRef.current) clearTimeout(nlpDebounceRef.current);
+    nlpDebounceRef.current = setTimeout(() => {
+      if (!val.trim() || val.trim().length < 4) {
+        setNlpSnippet(null);
+        return;
+      }
+      const parsed = parseTaskIntent(val);
+      let changed = false;
+
+      if (parsed.dueDate) {
+        setDueDate(parsed.dueDate);
+        changed = true;
+      }
+      if (parsed.dueTime) {
+        setDueTime(parsed.dueTime);
+        changed = true;
+      }
+      if (parsed.priority && parsed.priority !== priority) {
+        setPriority(parsed.priority);
+        changed = true;
+      }
+      if (parsed.projectTag && parsed.projectTag !== projectTag) {
+        setProjectTag(parsed.projectTag);
+        changed = true;
+      }
+
+      if (changed) {
+        soundFX.playPop();
+        setNlpSnippet(parsed.detectedSnippet || null);
+      } else {
+        setNlpSnippet(null);
+      }
+    }, 400);
+  }, [taskToEdit, priority, projectTag]);
 
   useEffect(() => {
     if (taskToEdit) {
@@ -93,6 +139,7 @@ export function NewTaskModal({ open, onOpenChange, taskToEdit, onSubmit }: NewTa
       setProjectTag(taskToEdit.projectTag || "Dev");
       setEstimatedMinutes(taskToEdit.estimatedMinutes || 60);
       setSubtasks(taskToEdit.subtasks || []);
+      setNlpSnippet(null);
     } else {
       setTitle("");
       setDescription("");
@@ -103,6 +150,7 @@ export function NewTaskModal({ open, onOpenChange, taskToEdit, onSubmit }: NewTa
       setProjectTag("Dev");
       setEstimatedMinutes(60);
       setSubtasks([]);
+      setNlpSnippet(null);
     }
   }, [taskToEdit, open]);
 
@@ -199,15 +247,25 @@ export function NewTaskModal({ open, onOpenChange, taskToEdit, onSubmit }: NewTa
 
         {/* Task Title */}
         <div className="space-y-1">
-          <label className="text-xs font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5]/80">
-            Task Title *
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5]/80">
+              Task Title *
+            </label>
+            {nlpSnippet && (
+              <div className="flex items-center gap-1 px-1.5 py-0.5 bg-[#CEF431] border border-[#161514] rounded shadow-xs">
+                <Sparkles className="size-2 text-[#161514] stroke-[3]" />
+                <span className="text-[9px] font-bold text-[#161514] max-w-[180px] truncate">
+                  {nlpSnippet}
+                </span>
+              </div>
+            )}
+          </div>
           <input
             type="text"
             required
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="e.g., Ship GATE Maths PYQ Revision Notes"
+            onChange={(e) => handleTitleChangeWithNLP(e.target.value)}
+            placeholder="e.g., Finish pitch deck by tomorrow 5pm urgent"
             className="w-full px-3.5 py-2.5 bg-white dark:bg-[#1C1A18] rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] text-base sm:text-sm font-medium text-[#161514] dark:text-[#FAF8F5] placeholder:text-[#161514]/40 dark:placeholder:text-[#FAF8F5]/30 shadow-xs focus:outline-none focus:ring-2 focus:ring-[#CEF431] transition-all"
           />
         </div>
