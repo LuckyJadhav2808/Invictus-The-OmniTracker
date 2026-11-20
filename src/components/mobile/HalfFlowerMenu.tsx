@@ -7,7 +7,7 @@ import React, {
   useState,
   useId,
 } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   Plus,
   Dumbbell,
@@ -50,7 +50,6 @@ export function HalfFlowerMenu({
   onOpenActionSheet,
 }: HalfFlowerMenuProps) {
   const pathname = usePathname();
-  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const menuId = useId();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -65,15 +64,13 @@ export function HalfFlowerMenu({
         {
           id: "log-water",
           label: "Log Water",
-          shortLabel: "+250ml",
+          shortLabel: "+Water",
           icon: Droplet,
           bgClass: "bg-[#38BDF8]",
           textClass: "text-[#161514]",
           borderClass: "border-[#161514]",
           onClick: () => {
-            window.dispatchEvent(
-              new CustomEvent("invictus:quick-log-water", { detail: { amount: 250 } })
-            );
+            window.dispatchEvent(new CustomEvent("invictus:open-water-modal"));
           },
         },
         {
@@ -85,7 +82,7 @@ export function HalfFlowerMenu({
           textClass: "text-[#161514]",
           borderClass: "border-[#161514]",
           onClick: () => {
-            router.push("/goals/nutrition");
+            window.dispatchEvent(new CustomEvent("invictus:open-quick-meal"));
           },
         },
         {
@@ -109,7 +106,7 @@ export function HalfFlowerMenu({
           textClass: "text-[#161514]",
           borderClass: "border-[#161514]",
           onClick: () => {
-            router.push("/goals/gym");
+            window.dispatchEvent(new CustomEvent("invictus:open-quick-workout"));
           },
         },
       ];
@@ -252,15 +249,13 @@ export function HalfFlowerMenu({
       {
         id: "today-water",
         label: "Quick Water",
-        shortLabel: "+250ml",
+        shortLabel: "+Water",
         icon: Droplet,
         bgClass: "bg-[#38BDF8]",
         textClass: "text-[#161514]",
         borderClass: "border-[#161514]",
         onClick: () => {
-          window.dispatchEvent(
-            new CustomEvent("invictus:quick-log-water", { detail: { amount: 250 } })
-          );
+          window.dispatchEvent(new CustomEvent("invictus:open-water-modal"));
         },
       },
       {
@@ -276,7 +271,7 @@ export function HalfFlowerMenu({
         },
       },
     ];
-  }, [pathname, router]);
+  }, [pathname]);
 
   const petals = getPetals();
   const petalCount = petals.length;

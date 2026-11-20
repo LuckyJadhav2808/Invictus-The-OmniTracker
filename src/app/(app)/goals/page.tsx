@@ -17,7 +17,9 @@ import {
   useWaterLog,
   useLogWater,
   useSetWater,
+  useAddWorkout,
 } from "@/lib/queries/goals";
+import { useAddMealPlan } from "@/lib/queries/gym";
 import { useUserAchievements } from "@/lib/queries/achievements";
 import { HabitListRow } from "@/components/goals/HabitListRow";
 import { HabitsHeroPager } from "@/components/goals/HabitsHeroPager";
@@ -55,6 +57,18 @@ const GymRoutineTracker = dynamic(
 );
 const MealTracker = dynamic(
   () => import("@/components/goals/MealTracker").then((m) => m.MealTracker),
+  { ssr: false }
+);
+const QuickWaterModal = dynamic(
+  () => import("@/components/goals/QuickWaterModal").then((m) => m.QuickWaterModal),
+  { ssr: false }
+);
+const QuickMealModal = dynamic(
+  () => import("@/components/goals/QuickMealModal").then((m) => m.QuickMealModal),
+  { ssr: false }
+);
+const QuickWorkoutModal = dynamic(
+  () => import("@/components/goals/QuickWorkoutModal").then((m) => m.QuickWorkoutModal),
   { ssr: false }
 );
 const WeeklyOverviewWidget = dynamic(
@@ -114,6 +128,9 @@ function GoalsPageContent() {
   const [isRemindersSheetOpen, setIsRemindersSheetOpen] = useState(false);
   const [isRecoverySheetOpen, setIsRecoverySheetOpen] = useState(false);
   const [isShieldInfoOpen, setIsShieldInfoOpen] = useState(false);
+  const [isQuickWaterOpen, setIsQuickWaterOpen] = useState(false);
+  const [isQuickMealOpen, setIsQuickMealOpen] = useState(false);
+  const [isQuickWorkoutOpen, setIsQuickWorkoutOpen] = useState(false);
   const [showAllHabits, setShowAllHabits] = useState(false);
   const [activePortal, setActivePortal] = useState<"gym" | "nutrition" | "stats" | null>(null);
 
@@ -214,6 +231,8 @@ function GoalsPageContent() {
   const updateHabitMutation = useUpdateHabit();
   const deleteHabitMutation = useDeleteHabit();
   const toggleLogMutation = useToggleHabitLog();
+  const addMealPlanMutation = useAddMealPlan();
+  const addWorkoutMutation = useAddWorkout();
 
   // Habit Edit/Delete states
   const [editingHabit, setEditingHabit] = useState<any | null>(null);
@@ -283,13 +302,31 @@ function GoalsPageContent() {
       const amt = e?.detail?.amount || 250;
       logWater(amt);
     };
+    const handleOpenWaterModal = () => {
+      soundFX.playPop();
+      setIsQuickWaterOpen(true);
+    };
+    const handleOpenQuickMeal = () => {
+      soundFX.playPop();
+      setIsQuickMealOpen(true);
+    };
+    const handleOpenQuickWorkout = () => {
+      soundFX.playPop();
+      setIsQuickWorkoutOpen(true);
+    };
 
     window.addEventListener("invictus:open-new-habit", handleOpenNewHabit);
     window.addEventListener("invictus:quick-log-water", handleQuickWater);
+    window.addEventListener("invictus:open-water-modal", handleOpenWaterModal);
+    window.addEventListener("invictus:open-quick-meal", handleOpenQuickMeal);
+    window.addEventListener("invictus:open-quick-workout", handleOpenQuickWorkout);
 
     return () => {
       window.removeEventListener("invictus:open-new-habit", handleOpenNewHabit);
       window.removeEventListener("invictus:quick-log-water", handleQuickWater);
+      window.removeEventListener("invictus:open-water-modal", handleOpenWaterModal);
+      window.removeEventListener("invictus:open-quick-meal", handleOpenQuickMeal);
+      window.removeEventListener("invictus:open-quick-workout", handleOpenQuickWorkout);
     };
   }, [logWater]);
 
@@ -1011,6 +1048,44 @@ function GoalsPageContent() {
         onAddCustomHabit={handleAddCustomHabit}
         onApplyPresetPack={handleApplyHabitPack}
         isPending={addHabitMutation.isPending}
+      />
+
+      {/* 6a. Quick Water Vessel Picker Modal (Flower Menu → 1-tap) */}
+      <QuickWaterModal
+        open={isQuickWaterOpen}
+        onOpenChange={setIsQuickWaterOpen}
+        currentAmount={waterLogged}
+        targetAmount={(waterLog as any)?.waterGoal || 2000}
+        onLogWater={logWater}
+      />
+
+      {/* 6b. Quick Meal Logger Modal (Flower Menu → inline) */}
+      <QuickMealModal
+        open={isQuickMealOpen}
+        onOpenChange={setIsQuickMealOpen}
+        onAddMeal={async (meal) => {
+          try {
+            await addMealPlanMutation.mutateAsync(meal);
+          } catch {
+            toast.error("Failed to log meal");
+          }
+        }}
+        isPending={addMealPlanMutation.isPending}
+      />
+
+      {/* 6c. Quick Workout Logger Modal (Flower Menu → inline) */}
+      <QuickWorkoutModal
+        open={isQuickWorkoutOpen}
+        onOpenChange={setIsQuickWorkoutOpen}
+        selectedDate={selectedDate}
+        onAddWorkout={async (workout) => {
+          try {
+            await addWorkoutMutation.mutateAsync(workout);
+          } catch {
+            toast.error("Failed to log workout");
+          }
+        }}
+        isPending={addWorkoutMutation.isPending}
       />
 
       {/* 7. Create Custom Habit Bottom Sheet */}
