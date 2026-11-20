@@ -14,34 +14,14 @@ const THEME_STORAGE_KEY = "theme";
 const THEME_CHANGE_EVENT = "invictus-theme-change";
 
 /**
- * Freezes all CSS transitions during theme switch to prevent jank/flicker
+ * Disables all CSS transitions during theme switch without mutating document.head style tags.
+ * Eliminates frame drops and synchronous layout reflows during the ripple animation.
  */
-function freezeTransitionsTemporarily(): () => void {
+function disableTransitionsTemporarily(): () => void {
   if (typeof document === "undefined") return () => {};
-
-  const css = document.createElement("style");
-  css.setAttribute("type", "text/css");
-  css.setAttribute("data-theme-transition-freeze", "true");
-  css.appendChild(
-    document.createTextNode(
-      `*, *::before, *::after {
-        -webkit-transition: none !important;
-        -moz-transition: none !important;
-        -o-transition: none !important;
-        -ms-transition: none !important;
-        transition: none !important;
-      }`
-    )
-  );
-  document.head.appendChild(css);
-
+  document.documentElement.classList.add("disable-transitions");
   return () => {
-    // Double RAF ensures new DOM layout paints before re-enabling transitions
-    window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => {
-        document.head.removeChild(css);
-      });
-    });
+    document.documentElement.classList.remove("disable-transitions");
   };
 }
 
@@ -130,11 +110,17 @@ export function useTheme() {
           )
         ) + 16;
 
-      const unfreeze = freezeTransitionsTemporarily();
-      const transition = (document as any).startViewTransition(() => {
+      const enableTransitions = disableTransitionsTemporarily();
+      let transition: any;
+      try {
+        transition = (document as any).startViewTransition(() => {
+          flushThemeUpdate();
+        });
+      } catch {
         flushThemeUpdate();
-        unfreeze();
-      });
+        enableTransitions();
+        return;
+      }
 
       if (transition?.ready && typeof transition.ready.then === "function") {
         transition.ready
@@ -148,22 +134,33 @@ export function useTheme() {
                   ],
                 },
                 {
-                  duration: 380,
-                  easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+                  duration: 280,
+                  easing: "cubic-bezier(0.22, 1, 0.36, 1)",
                   pseudoElement: "::view-transition-new(root)",
                 }
               );
-              return animation?.finished?.catch(() => {});
+              return animation?.finished;
             }
           })
           .catch(() => {
             // Gracefully ignore aborted/skipped transitions
+          })
+          .finally(() => {
+            enableTransitions();
           });
+      } else {
+        if (transition?.finished && typeof transition.finished.then === "function") {
+          transition.finished.finally(enableTransitions).catch(() => enableTransitions());
+        } else {
+          enableTransitions();
+        }
       }
     } else {
-      const unfreeze = freezeTransitionsTemporarily();
+      const enableTransitions = disableTransitionsTemporarily();
       applyThemeState();
-      unfreeze();
+      window.requestAnimationFrame(() => {
+        enableTransitions();
+      });
     }
   }, []);
 

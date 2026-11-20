@@ -117,21 +117,27 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <Toaster
           position="top-center"
           expand={false}
-          visibleToasts={2}
+          visibleToasts={1}
           gap={6}
-          offset={14}
-          mobileOffset={{ top: 70, bottom: 84, left: 16, right: 16 }}
+          offset={16}
+          mobileOffset={{
+            top: "calc(env(safe-area-inset-top, 0px) + 64px)",
+            bottom: "calc(env(safe-area-inset-bottom, 0px) + 84px)",
+            left: "16px",
+            right: "16px",
+          }}
+          swipeDirections={["top", "left", "right", "bottom"]}
           richColors
           closeButton={false}
-          duration={2000}
+          duration={1500}
           theme="system"
           toastOptions={{
             style: {
               borderRadius: "9999px",
               fontFamily: "var(--font-sans)",
-              fontSize: "0.75rem",
+              fontSize: "0.72rem",
               width: "fit-content",
-              maxWidth: "min(92vw, 360px)",
+              maxWidth: "min(calc(100vw - 32px), 320px)",
               margin: "0 auto",
             },
           }}

@@ -695,36 +695,80 @@ html[data-color-theme="cobalt"] .dark {
   font-weight: 400;
 }
 
+/* Zero-Jank Instant Theme Transition Helper */
+html.disable-transitions,
+html.disable-transitions *,
+html.disable-transitions *::before,
+html.disable-transitions *::after {
+  -webkit-transition: none !important;
+  -moz-transition: none !important;
+  -o-transition: none !important;
+  -ms-transition: none !important;
+  transition: none !important;
+}
+
 /* Master Neobrutalist Sonner Toast System - Compact Horizontal Pill */
 [data-sonner-toaster] {
   font-family: var(--font-sans), sans-serif !important;
   z-index: 99999 !important;
   pointer-events: none !important;
+  overflow: visible !important;
+}
+
+@media (max-width: 600px) {
+  [data-sonner-toaster] {
+    left: 16px !important;
+    right: 16px !important;
+    width: auto !important;
+    max-width: calc(100vw - 32px) !important;
+    transform: none !important;
+  }
 }
 
 [data-sonner-toast] {
   pointer-events: auto !important;
-  touch-action: pan-x pan-y !important;
+  touch-action: none !important;
   cursor: grab !important;
   user-select: none !important;
   background: #ffffff !important;
   border: 2px solid #161514 !important;
   box-shadow: 2px 2px 0px 0px rgba(22, 21, 20, 1) !important;
   border-radius: 9999px !important;
-  padding: 0.4rem 0.85rem !important;
-  min-height: unset !important;
+  padding: 0.35rem 0.75rem !important;
+  min-height: 32px !important;
+  max-height: 38px !important;
   width: fit-content !important;
-  max-width: min(92vw, 360px) !important;
+  max-width: min(calc(100vw - 32px), 320px) !important;
   margin: 0 auto !important;
   color: #161514 !important;
   font-weight: 700 !important;
-  display: flex !important;
+  display: inline-flex !important;
   align-items: center !important;
-  gap: 0.5rem !important;
+  gap: 0.4rem !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
 }
 
 [data-sonner-toast]:active {
   cursor: grabbing !important;
+}
+
+[data-sonner-toast] [data-icon] {
+  flex-shrink: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+}
+
+[data-sonner-toast] [data-content] {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 0.35rem !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  flex: 1 1 auto !important;
 }
 
 [data-sonner-toast][data-type="success"] {
@@ -749,21 +793,27 @@ html[data-color-theme="cobalt"] .dark {
 
 [data-sonner-toast] [data-title] {
   font-weight: 800 !important;
-  font-size: 0.75rem !important;
+  font-size: 0.72rem !important;
   color: #161514 !important;
   letter-spacing: -0.01em !important;
   white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  flex-shrink: 0 !important;
+  max-width: 140px !important;
 }
 
 [data-sonner-toast] [data-description] {
   font-weight: 600 !important;
-  font-size: 0.7rem !important;
+  font-size: 0.68rem !important;
   color: rgba(22, 21, 20, 0.75) !important;
-  margin-top: 0 !important;
+  margin: 0 !important;
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
-  max-width: 210px !important;
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  max-width: 150px !important;
 }
 
 [data-sonner-toast] [data-button] {
@@ -772,9 +822,10 @@ html[data-color-theme="cobalt"] .dark {
   border: 1.5px solid #161514 !important;
   border-radius: 9999px !important;
   font-weight: 900 !important;
-  font-size: 0.7rem !important;
-  padding: 0.25rem 0.6rem !important;
+  font-size: 0.68rem !important;
+  padding: 0.2rem 0.5rem !important;
   box-shadow: 1px 1px 0px 0px rgba(22, 21, 20, 1) !important;
+  white-space: nowrap !important;
 }
 
 [data-sonner-toast] [data-close-button] {
@@ -783,8 +834,8 @@ html[data-color-theme="cobalt"] .dark {
   border: 1.5px solid #161514 !important;
   box-shadow: 1px 1px 0px 0px #161514 !important;
   border-radius: 9999px !important;
-  width: 1.125rem !important;
-  height: 1.125rem !important;
+  width: 1rem !important;
+  height: 1rem !important;
 }
 
 /* Dark Mode Neobrutalist Sonner Overrides */
@@ -1071,8 +1122,7 @@ html[data-color-theme="cobalt"] .dark {
 
 /* ─── View Transition Theme Ripple Animation (animrippletheme) ─── */
 ::view-transition-group(root) {
-  animation-duration: 0.38s;
-  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  animation: none !important;
 }
 
 ::view-transition-image-pair(root) {
@@ -1081,8 +1131,8 @@ html[data-color-theme="cobalt"] .dark {
 
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
+  animation: none !important;
+  mix-blend-mode: normal !important;
   display: block;
   height: 100%;
 }
@@ -1093,7 +1143,6 @@ html[data-color-theme="cobalt"] .dark {
 
 ::view-transition-new(root) {
   z-index: 99999;
-  will-change: clip-path;
 }
 
 @media (prefers-reduced-motion: reduce) {

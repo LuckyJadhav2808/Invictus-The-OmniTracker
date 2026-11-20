@@ -196,8 +196,8 @@ export const strobiToast = {
     soundFX.vibrate(15);
     const quip = opts?.quip || "Gladiator mindset! Day conquered 🌟";
     toast.success(title, {
-      description: opts?.description ? `${opts.description} • ✨ ${quip}` : `✨ Strobi: ${quip}`,
-      duration: opts?.duration || 2000,
+      description: opts?.description ? `${opts.description} • ✨ ${quip}` : `✨ ${quip}`,
+      duration: opts?.duration || 1500,
       ...opts,
     });
   },
@@ -210,8 +210,8 @@ export const strobiToast = {
     soundFX.vibrate([15, 25]);
     const quip = opts?.quip || "Habit locked in! Streak blazing 🔥";
     toast.success(title, {
-      description: opts?.description ? `${opts.description} • ✨ ${quip}` : `✨ Strobi: ${quip}`,
-      duration: opts?.duration || 2000,
+      description: opts?.description ? `${opts.description} • ✨ ${quip}` : `✨ ${quip}`,
+      duration: opts?.duration || 1500,
       ...opts,
     });
   },
@@ -224,8 +224,8 @@ export const strobiToast = {
     soundFX.vibrate(20);
     const quip = opts?.quip || "Task conquered! Flow state unlocked ⚡";
     toast.success(title, {
-      description: opts?.description ? `${opts.description} • ✨ ${quip}` : `✨ Strobi: ${quip}`,
-      duration: opts?.duration || 2000,
+      description: opts?.description ? `${opts.description} • ✨ ${quip}` : `✨ ${quip}`,
+      duration: opts?.duration || 1500,
       ...opts,
     });
   },
@@ -238,8 +238,8 @@ export const strobiToast = {
     soundFX.vibrate([20, 40]);
     const quip = opts?.quip || "Expense tracked! Wallet in check 💰";
     toast.success(title, {
-      description: opts?.description ? `${opts.description} • ✨ ${quip}` : `✨ Strobi: ${quip}`,
-      duration: opts?.duration || 2000,
+      description: opts?.description ? `${opts.description} • ✨ ${quip}` : `✨ ${quip}`,
+      duration: opts?.duration || 1500,
       ...opts,
     });
   },
@@ -252,7 +252,7 @@ export const strobiToast = {
     soundFX.vibrate(15);
     toast.success(title, {
       description: opts?.description,
-      duration: opts?.duration || 1800,
+      duration: opts?.duration || 1500,
       ...opts,
     });
   },
@@ -265,7 +265,7 @@ export const strobiToast = {
     soundFX.vibrate([40, 60, 40]);
     toast.error(title, {
       description: opts?.description || "Strobi is checking the logs. Try again in a moment.",
-      duration: opts?.duration || 2600,
+      duration: opts?.duration || 2200,
       ...opts,
     });
   },
@@ -290,7 +290,7 @@ export const strobiToast = {
     // Instant toast render to eliminate latency
     const toastId = toast.success(title, {
       description: opts?.description || "Processing…",
-      duration: opts?.duration || 2000,
+      duration: opts?.duration || 1600,
       ...opts,
     });
 
@@ -298,8 +298,8 @@ export const strobiToast = {
     getDynamicStrobiQuip(actionText, pageContext).then(({ quip }) => {
       toast.success(title, {
         id: toastId,
-        description: opts?.description ? `${opts.description} • ✨ ${quip}` : `✨ Strobi: ${quip}`,
-        duration: opts?.duration || 2000,
+        description: opts?.description ? `${opts.description} • ✨ ${quip}` : `✨ ${quip}`,
+        duration: opts?.duration || 1600,
       });
     }).catch(() => {});
 
@@ -319,7 +319,7 @@ export const showToast = {
     const description = typeof opts === "object" ? opts.description : undefined;
     const playfulMsg = typeof opts === "object" ? opts.playfulMsg : (typeof opts === "string" ? opts : undefined);
     const action = typeof opts === "object" ? opts.action : undefined;
-    const duration = typeof opts === "object" ? opts.duration : 1800;
+    const duration = typeof opts === "object" ? opts.duration : 1500;
 
     const key = `st:success:${msg}`;
     if (isDuplicateToast(key)) return;
@@ -338,7 +338,7 @@ export const showToast = {
     const description = typeof opts === "object" ? opts.description : undefined;
     const playfulMsg = typeof opts === "object" ? opts.playfulMsg : (typeof opts === "string" ? opts : undefined);
     const action = typeof opts === "object" ? opts.action : undefined;
-    const duration = typeof opts === "object" ? opts.duration : 2600;
+    const duration = typeof opts === "object" ? opts.duration : 2200;
 
     const key = `st:error:${msg}`;
     if (isDuplicateToast(key)) return;
@@ -357,7 +357,7 @@ export const showToast = {
     const description = typeof opts === "object" ? opts.description : undefined;
     const playfulMsg = typeof opts === "object" ? opts.playfulMsg : (typeof opts === "string" ? opts : undefined);
     const action = typeof opts === "object" ? opts.action : undefined;
-    const duration = typeof opts === "object" ? opts.duration : 1800;
+    const duration = typeof opts === "object" ? opts.duration : 1500;
 
     const key = `st:info:${msg}`;
     if (isDuplicateToast(key)) return;
@@ -375,7 +375,7 @@ export const showToast = {
     const description = typeof opts === "object" ? opts.description : undefined;
     const playfulMsg = typeof opts === "object" ? opts.playfulMsg : (typeof opts === "string" ? opts : undefined);
     const action = typeof opts === "object" ? opts.action : undefined;
-    const duration = typeof opts === "object" ? opts.duration : 2200;
+    const duration = typeof opts === "object" ? opts.duration : 1800;
 
     const key = `st:warning:${msg}`;
     if (isDuplicateToast(key)) return;
