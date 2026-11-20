@@ -33,138 +33,127 @@ export function generateEnterpriseVectorPDF({
 }: VectorPDFOptions) {
   const pdf = new jsPDF("p", "mm", "a4");
 
-  // Page dimensions & margins
-  const pageWidth = pdf.internal.pageSize.getWidth(); // 210mm
-  const pageHeight = pdf.internal.pageSize.getHeight(); // 297mm
-  const margin = 14;
-  const contentWidth = pageWidth - margin * 2; // 182mm
+  const pageWidth = pdf.internal.pageSize.getWidth();   // 210mm
+  const pageHeight = pdf.internal.pageSize.getHeight();  // 297mm
+  const margin = 16;
+  const contentWidth = pageWidth - margin * 2;           // 178mm
 
   let y = margin;
 
-  // Safe currency text (Standard PDF fonts require ASCII currency text like "Rs." or "$")
-  const safeCurrency = currencySymbol === "₹" ? "Rs. " : `${currencySymbol} `;
+  // Safe currency text (Standard PDF fonts require ASCII)
+  const safeCurrency = currencySymbol === "₹" ? "Rs." : currencySymbol;
 
-  // Helper: Format currency text safely
-  const formatMoney = (val: number) => {
-    const absVal = Math.abs(val).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    return val < 0 ? `-${safeCurrency}${absVal}` : `${safeCurrency}${absVal}`;
+  const fmtMoney = (val: number): string => {
+    const abs = Math.abs(val).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return val < 0 ? `-${safeCurrency}${abs}` : `${safeCurrency}${abs}`;
   };
 
-  // Helper: Draw Neobrutalist border box
-  const drawNeobrutalistBox = (
-    x: number,
-    boxY: number,
-    w: number,
-    h: number,
-    fillColor: [number, number, number] = [255, 255, 255],
-    strokeColor: [number, number, number] = [22, 21, 20]
-  ) => {
-    pdf.setFillColor(...fillColor);
-    pdf.setDrawColor(...strokeColor);
-    pdf.setLineWidth(0.4);
-    pdf.roundedRect(x, boxY, w, h, 2, 2, "FD");
+  const fmtMoneySign = (val: number, type: string): string => {
+    const abs = Math.abs(val).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return type === "income" ? `+${safeCurrency}${abs}` : `-${safeCurrency}${abs}`;
   };
 
-  // 1. HEADER SECTION
-  // Background Hero Header Box
-  drawNeobrutalistBox(margin, y, contentWidth, 32, [250, 248, 245]);
+  // ── Color palette ──
+  const ink: [number, number, number] = [22, 21, 20];
+  const cream: [number, number, number] = [250, 248, 245];
+  const white: [number, number, number] = [255, 255, 255];
+  const lime: [number, number, number] = [206, 244, 49];
+  const greenText: [number, number, number] = [3, 140, 70];
+  const roseText: [number, number, number] = [200, 30, 60];
+  const muted: [number, number, number] = [120, 120, 120];
 
-  // Brand Badge Box
-  pdf.setFillColor(206, 244, 49); // #CEF431
-  pdf.setDrawColor(22, 21, 20);
-  pdf.setLineWidth(0.4);
-  pdf.roundedRect(margin + 4, y + 4, 10, 8, 1.5, 1.5, "FD");
+  // ── Helpers ──
+  const hairline = (x1: number, lineY: number, x2: number, color: [number, number, number] = [200, 200, 200]) => {
+    pdf.setDrawColor(...color);
+    pdf.setLineWidth(0.15);
+    pdf.line(x1, lineY, x2, lineY);
+  };
 
+  const solidLine = (x1: number, lineY: number, x2: number) => {
+    pdf.setDrawColor(...ink);
+    pdf.setLineWidth(0.5);
+    pdf.line(x1, lineY, x2, lineY);
+  };
+
+  // ═══════════════════════════════════════════════════════════════
+  // 1. MASTHEAD — Clean executive header (no heavy bordered box)
+  // ═══════════════════════════════════════════════════════════════
+
+  // Brand name
   pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(8.5);
-  pdf.setTextColor(22, 21, 20);
-  pdf.text("INV", margin + 5.2, y + 9.5);
+  pdf.setFontSize(9);
+  pdf.setTextColor(...ink);
+  pdf.text("INVICTUS", margin, y + 4);
 
-  pdf.setFontSize(11);
-  pdf.text("INVICTUS OMNITRACKER", margin + 17, y + 9.5);
-
-  // Title & Metadata
-  pdf.setFontSize(13);
-  pdf.setFont("helvetica", "bold");
-  pdf.text("LEDGER & FINANCIAL STATEMENT", margin + 4, y + 20);
-
-  pdf.setFontSize(8);
+  // Period label — right-aligned
   pdf.setFont("helvetica", "normal");
-  pdf.setTextColor(70, 70, 70);
-  const genTime = format(new Date(), "yyyy-MM-dd HH:mm");
-  const cleanUserName = sanitizeText(userName) || "Invictus Explorer";
-  pdf.text(`Account Holder: ${cleanUserName}  •  Generated: ${genTime}`, margin + 4, y + 26);
-
-  // Statement Period Badge
-  const periodBoxWidth = 54;
-  const periodBoxX = margin + contentWidth - periodBoxWidth - 4;
-  drawNeobrutalistBox(periodBoxX, y + 4, periodBoxWidth, 24, [206, 244, 49]);
-
-  pdf.setFontSize(7);
-  pdf.setFont("helvetica", "bold");
-  pdf.setTextColor(22, 21, 20);
-  pdf.text("STATEMENT PERIOD", periodBoxX + 4, y + 10);
-
-  pdf.setFontSize(8.5);
+  pdf.setFontSize(8);
+  pdf.setTextColor(...muted);
   const cleanPeriod = sanitizeText(periodLabel) || "CURRENT STATEMENT";
-  pdf.text(cleanPeriod.slice(0, 24), periodBoxX + 4, y + 18);
+  pdf.text(cleanPeriod, margin + contentWidth, y + 4, { align: "right" });
 
-  y += 38;
+  y += 7;
 
-  // 2. CASHFLOW SUMMARY KPI CARDS
+  // Title
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(16);
+  pdf.setTextColor(...ink);
+  pdf.text("Financial Statement", margin, y + 6);
+
+  y += 10;
+
+  // Metadata line
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(8);
+  pdf.setTextColor(...muted);
+  const genTime = format(new Date(), "MMMM d, yyyy 'at' h:mm a");
+  const cleanUserName = sanitizeText(userName) || "Invictus Explorer";
+  pdf.text(`${cleanUserName}  ·  Generated ${genTime}`, margin, y + 3);
+
+  y += 7;
+
+  // Thick separator
+  solidLine(margin, y, margin + contentWidth);
+  y += 6;
+
+  // ═══════════════════════════════════════════════════════════════
+  // 2. SUMMARY METRICS — 4 columns, clean flat layout
+  // ═══════════════════════════════════════════════════════════════
+
   const income = transactions.filter((t) => t.type === "income").reduce((sum, t) => sum + (t.amount || 0), 0);
   const expense = transactions.filter((t) => t.type === "expense").reduce((sum, t) => sum + (t.amount || 0), 0);
   const net = income - expense;
 
-  const cardW = (contentWidth - 9) / 4; // 4 cards
+  const colW = contentWidth / 4;
+  const metrics = [
+    { label: "INCOME", value: `+${safeCurrency}${income.toLocaleString(undefined, { minimumFractionDigits: 2 })}`, color: greenText },
+    { label: "EXPENSES", value: `-${safeCurrency}${expense.toLocaleString(undefined, { minimumFractionDigits: 2 })}`, color: roseText },
+    { label: "NET FLOW", value: fmtMoney(net), color: ink },
+    { label: "RECORDS", value: `${transactions.length}`, color: ink },
+  ];
 
-  // Card 1: Income
-  drawNeobrutalistBox(margin, y, cardW, 16, [255, 255, 255]);
-  pdf.setFontSize(7);
-  pdf.setFont("helvetica", "bold");
-  pdf.setTextColor(100, 100, 100);
-  pdf.text("INCOME (+)", margin + 3, y + 5);
-  pdf.setFontSize(9.5);
-  pdf.setTextColor(3, 160, 80); // Green
-  pdf.text(`+${safeCurrency}${income.toLocaleString(undefined, { minimumFractionDigits: 2 })}`, margin + 3, y + 12);
+  metrics.forEach((m, i) => {
+    const x = margin + colW * i;
 
-  // Card 2: Expense
-  const card2X = margin + cardW + 3;
-  drawNeobrutalistBox(card2X, y, cardW, 16, [255, 255, 255]);
-  pdf.setFontSize(7);
-  pdf.setFont("helvetica", "bold");
-  pdf.setTextColor(100, 100, 100);
-  pdf.text("EXPENSE (-)", card2X + 3, y + 5);
-  pdf.setFontSize(9.5);
-  pdf.setTextColor(225, 29, 72); // Rose
-  pdf.text(`-${safeCurrency}${expense.toLocaleString(undefined, { minimumFractionDigits: 2 })}`, card2X + 3, y + 12);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(7);
+    pdf.setTextColor(...muted);
+    pdf.text(m.label, x, y);
 
-  // Card 3: Net Flow
-  const card3X = margin + (cardW + 3) * 2;
-  const netBgColor: [number, number, number] = net >= 0 ? [206, 244, 49] : [253, 230, 138];
-  drawNeobrutalistBox(card3X, y, cardW, 16, netBgColor);
-  pdf.setFontSize(7);
-  pdf.setFont("helvetica", "bold");
-  pdf.setTextColor(22, 21, 20);
-  pdf.text("NET FLOW", card3X + 3, y + 5);
-  pdf.setFontSize(9.5);
-  pdf.setTextColor(22, 21, 20);
-  pdf.text(formatMoney(net), card3X + 3, y + 12);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(11);
+    pdf.setTextColor(...m.color);
+    pdf.text(m.value, x, y + 6);
+  });
 
-  // Card 4: Record Count
-  const card4X = margin + (cardW + 3) * 3;
-  drawNeobrutalistBox(card4X, y, cardW, 16, [255, 255, 255]);
-  pdf.setFontSize(7);
-  pdf.setFont("helvetica", "bold");
-  pdf.setTextColor(100, 100, 100);
-  pdf.text("TOTAL LOGS", card4X + 3, y + 5);
-  pdf.setFontSize(9.5);
-  pdf.setTextColor(22, 21, 20);
-  pdf.text(`${transactions.length} Records`, card4X + 3, y + 12);
+  y += 12;
+  hairline(margin, y, margin + contentWidth);
+  y += 5;
 
-  y += 22;
+  // ═══════════════════════════════════════════════════════════════
+  // 3. CATEGORY BREAKDOWN — inline pills
+  // ═══════════════════════════════════════════════════════════════
 
-  // 3. CATEGORY SPENDING BREAKDOWN
   const categoryStats = categories
     .map((cat) => {
       const catTxs = transactions.filter((t) => t.categoryId === cat.id);
@@ -175,52 +164,65 @@ export function generateEnterpriseVectorPDF({
     .sort((a, b) => b.totalAmount - a.totalAmount);
 
   if (categoryStats.length > 0) {
-    pdf.setFontSize(8.5);
     pdf.setFont("helvetica", "bold");
-    pdf.setTextColor(22, 21, 20);
-    pdf.text("CATEGORY SPENDING BREAKDOWN", margin, y);
-    y += 4;
+    pdf.setFontSize(7);
+    pdf.setTextColor(...muted);
+    pdf.text("SPENDING BY CATEGORY", margin, y);
+    y += 5;
 
     let catX = margin;
-    categoryStats.slice(0, 6).forEach((c) => {
-      const cleanCatName = sanitizeText(c.name) || "Category";
-      const label = `${cleanCatName}: ${safeCurrency}${c.totalAmount.toLocaleString()}`;
-      const textWidth = pdf.getTextWidth(label) + 6;
+    categoryStats.slice(0, 8).forEach((c) => {
+      const cleanName = sanitizeText(c.name) || "Other";
+      const label = `${cleanName}: ${safeCurrency}${c.totalAmount.toLocaleString()}`;
+      const tw = pdf.getTextWidth(label) + 5;
 
-      if (catX + textWidth > margin + contentWidth) {
+      if (catX + tw > margin + contentWidth) {
         catX = margin;
-        y += 7;
+        y += 6;
       }
 
-      drawNeobrutalistBox(catX, y, textWidth, 5.5, [250, 248, 245]);
-      pdf.setFontSize(7.5);
-      pdf.setFont("helvetica", "bold");
-      pdf.setTextColor(22, 21, 20);
-      pdf.text(label, catX + 3, y + 4);
-      catX += textWidth + 3;
+      // Light pill background
+      pdf.setFillColor(...cream);
+      pdf.setDrawColor(210, 210, 210);
+      pdf.setLineWidth(0.15);
+      pdf.roundedRect(catX, y - 3, tw, 5, 1.2, 1.2, "FD");
+
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(7);
+      pdf.setTextColor(...ink);
+      pdf.text(label, catX + 2.5, y + 0.5);
+
+      catX += tw + 2.5;
     });
 
-    y += 10;
+    y += 8;
+    hairline(margin, y, margin + contentWidth);
+    y += 5;
   }
 
-  // 4. CHRONOLOGICAL TRANSACTION TABLE
-  pdf.setFontSize(9);
-  pdf.setFont("helvetica", "bold");
-  pdf.setTextColor(22, 21, 20);
-  pdf.text("DETAILED TRANSACTION LEDGER", margin, y);
-  y += 4;
+  // ═══════════════════════════════════════════════════════════════
+  // 4. TRANSACTION TABLE — Clean bank-statement style
+  // ═══════════════════════════════════════════════════════════════
 
-  const renderTableHeader = (currentY: number) => {
-    drawNeobrutalistBox(margin, currentY, contentWidth, 7, [22, 21, 20]);
-    pdf.setFontSize(7.5);
+  // Column positions
+  const col = {
+    date: margin,
+    desc: margin + 28,
+    method: margin + contentWidth - 50,
+    amount: margin + contentWidth,
+  };
+
+  const renderTableHeader = (headerY: number): number => {
     pdf.setFont("helvetica", "bold");
-    pdf.setTextColor(255, 255, 255);
-    pdf.text("DATE", margin + 3, currentY + 4.8);
-    pdf.text("TYPE", margin + 30, currentY + 4.8);
-    pdf.text("CATEGORY & NOTE", margin + 55, currentY + 4.8);
-    pdf.text("METHOD", margin + 130, currentY + 4.8);
-    pdf.text("AMOUNT", margin + contentWidth - 3, currentY + 4.8, { align: "right" });
-    return currentY + 7;
+    pdf.setFontSize(7);
+    pdf.setTextColor(...muted);
+    pdf.text("DATE", col.date, headerY);
+    pdf.text("DESCRIPTION", col.desc, headerY);
+    pdf.text("METHOD", col.method, headerY);
+    pdf.text("AMOUNT", col.amount, headerY, { align: "right" });
+
+    solidLine(margin, headerY + 2, margin + contentWidth);
+    return headerY + 5;
   };
 
   y = renderTableHeader(y);
@@ -232,82 +234,109 @@ export function generateEnterpriseVectorPDF({
     return dB.localeCompare(dA);
   });
 
+  const rowHeight = 6;
+  const pageBottom = pageHeight - 18;
+
   sortedTxs.forEach((tx, idx) => {
-    // Check page break cutoff
-    if (y > pageHeight - 20) {
+    // Page break
+    if (y + rowHeight > pageBottom) {
       pdf.addPage();
       y = margin;
       y = renderTableHeader(y);
     }
 
     const cat = categories.find((c) => c.id === tx.categoryId);
-    const rawCatName = cat?.name || "Uncategorized";
-    const cleanCatName = sanitizeText(rawCatName) || "Uncategorized";
+    const cleanCatName = sanitizeText(cat?.name) || "Uncategorized";
     const cleanNote = sanitizeText(tx.note);
-    const noteText = cleanNote ? ` (${cleanNote})` : "";
-    const fullCatText = `${cleanCatName}${noteText}`;
-    const truncatedCatText = fullCatText.length > 38 ? fullCatText.slice(0, 35) + "..." : fullCatText;
+    const isIncome = tx.type === "income";
 
-    const rowBg: [number, number, number] = idx % 2 === 0 ? [255, 255, 255] : [248, 250, 252];
-    drawNeobrutalistBox(margin, y, contentWidth, 7, rowBg);
-
-    pdf.setFontSize(7.5);
-    pdf.setFont("helvetica", "normal");
-    pdf.setTextColor(22, 21, 20);
+    // Alternating row background
+    if (idx % 2 === 0) {
+      pdf.setFillColor(252, 252, 250);
+      pdf.rect(margin, y - 3.5, contentWidth, rowHeight, "F");
+    }
 
     // Date
     const dateStr = tx.date ? tx.date.split("T")[0] : format(new Date(), "yyyy-MM-dd");
-    pdf.text(dateStr, margin + 3, y + 4.8);
-
-    // Type Badge
-    pdf.setFont("helvetica", "bold");
-    if (tx.type === "income") {
-      pdf.setTextColor(3, 160, 80);
-      pdf.text("INCOME", margin + 30, y + 4.8);
-    } else {
-      pdf.setTextColor(225, 29, 72);
-      pdf.text("EXPENSE", margin + 30, y + 4.8);
-    }
-
-    // Category & Note
     pdf.setFont("helvetica", "normal");
-    pdf.setTextColor(22, 21, 20);
-    pdf.text(truncatedCatText, margin + 55, y + 4.8);
+    pdf.setFontSize(7.5);
+    pdf.setTextColor(...muted);
+    pdf.text(dateStr, col.date, y);
+
+    // Description: Category + note
+    let descText = cleanCatName;
+    if (cleanNote) {
+      const maxDescW = col.method - col.desc - 4;
+      const combined = `${cleanCatName} - ${cleanNote}`;
+      descText = pdf.getTextWidth(combined) > maxDescW
+        ? combined.slice(0, 42) + "..."
+        : combined;
+    }
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(7.5);
+    pdf.setTextColor(...ink);
+    pdf.text(descText, col.desc, y);
 
     // Method
     const cleanMethod = sanitizeText(tx.paymentMethod) || "UPI";
-    pdf.text(cleanMethod, margin + 130, y + 4.8);
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(7);
+    pdf.setTextColor(...muted);
+    pdf.text(cleanMethod.toUpperCase(), col.method, y);
 
-    // Amount
+    // Amount — right-aligned, color-coded
+    const amountText = fmtMoneySign(tx.amount || 0, tx.type);
     pdf.setFont("helvetica", "bold");
-    if (tx.type === "income") {
-      pdf.setTextColor(3, 160, 80);
-      pdf.text(`+${safeCurrency}${tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}`, margin + contentWidth - 3, y + 4.8, { align: "right" });
-    } else {
-      pdf.setTextColor(225, 29, 72);
-      pdf.text(`-${safeCurrency}${tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}`, margin + contentWidth - 3, y + 4.8, { align: "right" });
-    }
+    pdf.setFontSize(7.5);
+    pdf.setTextColor(...(isIncome ? greenText : roseText));
+    pdf.text(amountText, col.amount, y, { align: "right" });
 
-    y += 7;
+    y += rowHeight;
+
+    // Hairline after each row
+    hairline(margin, y - 2.5, margin + contentWidth, [235, 235, 235]);
   });
 
-  // 5. FOOTER ON ALL PAGES
+  // ═══════════════════════════════════════════════════════════════
+  // 5. CLOSING TOTALS BAR
+  // ═══════════════════════════════════════════════════════════════
+
+  if (y + 10 > pageBottom) {
+    pdf.addPage();
+    y = margin;
+  }
+
+  y += 2;
+  solidLine(margin, y, margin + contentWidth);
+  y += 5;
+
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(8);
+  pdf.setTextColor(...ink);
+  pdf.text("NET TOTAL", col.desc, y);
+
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(9);
+  pdf.setTextColor(...(net >= 0 ? greenText : roseText));
+  pdf.text(fmtMoney(net), col.amount, y, { align: "right" });
+
+  // ═══════════════════════════════════════════════════════════════
+  // 6. FOOTER ON ALL PAGES — Page X of Y
+  // ═══════════════════════════════════════════════════════════════
+
   const totalPages = pdf.getNumberOfPages();
   for (let i = 1; i <= totalPages; i++) {
     pdf.setPage(i);
-    // Subtle separator line
-    pdf.setDrawColor(22, 21, 20);
-    pdf.setLineWidth(0.2);
-    pdf.line(margin, pageHeight - 11, margin + contentWidth, pageHeight - 11);
 
-    pdf.setFontSize(7);
-    pdf.setFont("helvetica", "bold");
-    pdf.setTextColor(80, 80, 80);
-    pdf.text(`Invictus OmniTracker Statement • Page ${i} of ${totalPages}`, margin, pageHeight - 7);
+    hairline(margin, pageHeight - 12, margin + contentWidth, [180, 180, 180]);
+
     pdf.setFont("helvetica", "normal");
-    pdf.text("Confidential & Offline-Generated", margin + contentWidth, pageHeight - 7, { align: "right" });
+    pdf.setFontSize(6.5);
+    pdf.setTextColor(...muted);
+    pdf.text("Invictus · Financial Statement · Confidential", margin, pageHeight - 8);
+    pdf.text(`Page ${i} of ${totalPages}`, margin + contentWidth, pageHeight - 8, { align: "right" });
   }
 
-  // Trigger vector PDF download
+  // Trigger download
   pdf.save(filename);
 }

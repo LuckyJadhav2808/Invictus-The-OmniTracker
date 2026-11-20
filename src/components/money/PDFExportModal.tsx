@@ -155,6 +155,7 @@ export function PDFExportModal({
       open={open}
       onOpenChange={onOpenChange}
       title="Export Statement (PDF)"
+      maxWidth="sm:max-w-2xl"
     >
       <div className="space-y-4 pt-1">
         {/* 1-TAP QUICK DOWNLOAD DECK (Zero Friction) */}
@@ -347,7 +348,7 @@ export function PDFExportModal({
                   </span>
                 </div>
 
-                <div className="max-h-[340px] overflow-y-auto overflow-x-hidden rounded-2xl border-2 border-[#161514] dark:border-[#38332E] shadow-[2.5px_2.5px_0px_0px_#161514] dark:shadow-[2.5px_2.5px_0px_0px_#000000] p-1 bg-white dark:bg-[#161514]">
+                <div className="pt-1">
                   <NeobrutalistPDFStatement
                     transactions={finalExportTxs}
                     categories={categories}
