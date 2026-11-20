@@ -176,8 +176,15 @@ export function Hero({
                 {/* Row 1: Icon + Label (Full width, zero truncation) */}
                 <div className="flex items-center gap-1 text-muted-foreground min-w-0">
                   <span className="shrink-0">{stat.icon}</span>
-                  <span className="font-mono font-bold tracking-tight uppercase text-[9px] sm:text-[10px] text-muted-foreground truncate">
-                    {stat.label}
+                  <span className="font-mono font-bold tracking-tight uppercase text-[9px] sm:text-[10px] text-muted-foreground truncate whitespace-nowrap">
+                    {stat.shortLabel ? (
+                      <>
+                        <span className="hidden min-[380px]:inline">{stat.label}</span>
+                        <span className="min-[380px]:hidden">{stat.shortLabel}</span>
+                      </>
+                    ) : (
+                      stat.label
+                    )}
                   </span>
                 </div>
 

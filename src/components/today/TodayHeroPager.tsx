@@ -209,6 +209,7 @@ export function TodayHeroPager({
       id: "progress",
       icon: <CheckCircle2 className="size-3.5 text-[#03D26F]" />,
       label: "PROGRESS",
+      shortLabel: "PROG",
       value: `${completedCount}/${totalCount}`,
       subValue: `${completionPercent}%`,
       progressPercent: completionPercent,
@@ -218,6 +219,7 @@ export function TodayHeroPager({
       id: "safe-spend",
       icon: <Wallet className="size-3.5 text-blue-500" />,
       label: "SAFE",
+      shortLabel: "SAFE",
       value: `${currencySymbol}${Math.max(0, remainingSafeToSpend).toLocaleString()}`,
       subValue: spentToday > 0 ? `-${currencySymbol}${spentToday}` : "Clear",
       progressPercent:
@@ -233,6 +235,7 @@ export function TodayHeroPager({
       id: "streak",
       icon: <Flame className="size-3.5 text-orange-500 fill-orange-500" />,
       label: "STREAK",
+      shortLabel: "STREAK",
       value: `${streakDays}d`,
       subValue: streakFreezeTokens > 0 ? `${streakFreezeTokens} 🛡️` : "Active",
       progressPercent: Math.min(

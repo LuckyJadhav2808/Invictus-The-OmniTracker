@@ -24,7 +24,6 @@ import { HabitsHeroPager } from "@/components/goals/HabitsHeroPager";
 import { HabitsDateStrip } from "@/components/goals/HabitsDateStrip";
 import { DoorTileRow } from "@/components/goals/DoorTileRow";
 import { WaterTracker } from "@/components/goals/WaterTracker";
-import { MoodJournalWidget } from "@/components/goals/MoodJournalWidget";
 import { SleepAndActiveWidgets } from "@/components/goals/SleepAndActiveWidgets";
 import { MobileAppBar } from "@/components/mobile/MobileAppBar";
 import { SegmentedSubNav } from "@/components/mobile/SegmentedSubNav";
@@ -142,8 +141,12 @@ function GoalsPageContent() {
     };
     const handleOpenPortalEvent = (e: any) => {
       const p = e.detail?.portal;
-      if (p === "gym" || p === "nutrition" || p === "stats") {
-        openPortal(p);
+      if (p === "gym") {
+        router.push("/goals/gym");
+      } else if (p === "nutrition") {
+        router.push("/goals/nutrition");
+      } else if (p === "stats") {
+        router.push("/goals/analytics");
       }
     };
     const handleOpenReflectionEvent = () => {
@@ -603,9 +606,9 @@ function GoalsPageContent() {
             bodyWeight={userProfile.weight || "68 kg"}
             bodyAge={userProfile.age || "24y"}
             onOpenNewHabit={() => setIsChoiceOpen(true)}
-            onOpenGym={() => openPortal("gym")}
-            onOpenNutrition={() => openPortal("nutrition")}
-            onOpenStats={() => openPortal("stats")}
+            onOpenGym={() => router.push("/goals/gym")}
+            onOpenNutrition={() => router.push("/goals/nutrition")}
+            onOpenStats={() => router.push("/goals/analytics")}
             onOpenWater={() => setIsWaterSheetOpen(true)}
             onOpenBodyProfile={openProfileSheet}
             onOpenReminders={() => setIsRemindersSheetOpen(true)}
@@ -898,12 +901,11 @@ function GoalsPageContent() {
       <BottomSheet
         open={isRecoverySheetOpen}
         onOpenChange={setIsRecoverySheetOpen}
-        title="Evening Recovery & Reflections"
-        description="Sleep duration, active burn, and daily mood journal"
+        title="Evening Recovery & Sleep"
+        description="Sleep duration, rest tracking, and active movement"
       >
         <div className="space-y-4 py-1">
           <SleepAndActiveWidgets />
-          <MoodJournalWidget dateStr={selectedDate} />
         </div>
       </BottomSheet>
 

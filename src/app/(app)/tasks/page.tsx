@@ -109,15 +109,26 @@ export default function TasksPage() {
       toast.success(`+${amt}ml Water Logged! Hydration synced.`);
     };
 
+    const handleOpenMatrixEvent = () => {
+      openMobilePortal("matrix");
+    };
+    const handleOpenKanbanEvent = () => {
+      openMobilePortal("kanban");
+    };
+
     window.addEventListener("popstate", handlePopState);
     window.addEventListener("invictus:tasks-new-task", handleNewTaskEvent);
     window.addEventListener("invictus:tasks-new-project", handleNewProjectEvent);
+    window.addEventListener("invictus:tasks-open-matrix", handleOpenMatrixEvent);
+    window.addEventListener("invictus:tasks-open-kanban", handleOpenKanbanEvent);
     window.addEventListener("invictus:quick-log-water", handleQuickWaterEvent);
 
     return () => {
       window.removeEventListener("popstate", handlePopState);
       window.removeEventListener("invictus:tasks-new-task", handleNewTaskEvent);
       window.removeEventListener("invictus:tasks-new-project", handleNewProjectEvent);
+      window.removeEventListener("invictus:tasks-open-matrix", handleOpenMatrixEvent);
+      window.removeEventListener("invictus:tasks-open-kanban", handleOpenKanbanEvent);
       window.removeEventListener("invictus:quick-log-water", handleQuickWaterEvent);
     };
   }, [activePortal]);

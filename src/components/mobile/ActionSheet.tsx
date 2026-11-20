@@ -7,10 +7,14 @@ import {
   Dumbbell,
   Utensils,
   Droplet,
-  ArrowRightLeft,
   Receipt,
   TrendingUp,
   Users,
+  ReceiptText,
+  CheckCircle2,
+  FolderKanban,
+  Kanban,
+  Flame,
 } from "lucide-react";
 import { soundFX } from "@/components/shared/SoundFX";
 import { cn } from "@/lib/utils";
@@ -43,7 +47,7 @@ export function ActionSheet({
       return customActions;
     }
 
-    // Money Space Actions
+    // 1. Money Space: log expense, log income, who owes who, ledger
     if (pathname.startsWith("/money")) {
       return [
         {
@@ -69,33 +73,57 @@ export function ActionSheet({
           },
         },
         {
-          id: "transfer",
-          label: "Transfer Funds",
-          sublabel: "Move funds between accounts or cash till",
-          icon: ArrowRightLeft,
-          colorClass: "bg-[#C084FC] text-[#161514] border-[#161514]",
-          onClick: () => {
-            onOpenChange(false);
-            window.dispatchEvent(new CustomEvent("invictus:money-transfer"));
-          },
-        },
-        {
           id: "split-bill",
-          label: "Split Bill / IOU",
-          sublabel: "Track who owes who and settle debts",
+          label: "Who Owes Who",
+          sublabel: "Track shared bills, IOUs and repayments",
           icon: Users,
-          colorClass: "bg-[#F59E0B] text-[#161514] border-[#161514]",
+          colorClass: "bg-[#38BDF8] text-[#161514] border-[#161514]",
           onClick: () => {
             onOpenChange(false);
             window.dispatchEvent(new CustomEvent("invictus:money-split"));
           },
         },
+        {
+          id: "open-ledger",
+          label: "Open Ledger",
+          sublabel: "View all transactions, envelopes & search",
+          icon: ReceiptText,
+          colorClass: "bg-[#C084FC] text-[#161514] border-[#161514]",
+          onClick: () => {
+            onOpenChange(false);
+            window.dispatchEvent(new CustomEvent("invictus:money-open-ledger"));
+          },
+        },
       ];
     }
 
-    // Habits Space Actions
+    // 2. Habits Space: water logger, meal, habit, workout (no mood logging)
     if (pathname.startsWith("/goals")) {
       return [
+        {
+          id: "log-water",
+          label: "Log Water (+250ml)",
+          sublabel: "Hydrate toward your daily 2,000ml goal",
+          icon: Droplet,
+          colorClass: "bg-[#38BDF8] text-[#161514] border-[#161514]",
+          onClick: () => {
+            onOpenChange(false);
+            window.dispatchEvent(
+              new CustomEvent("invictus:quick-log-water", { detail: { amount: 250 } })
+            );
+          },
+        },
+        {
+          id: "log-meal",
+          label: "Log Meal",
+          sublabel: "Macros, calories, and nutrition tracker",
+          icon: Utensils,
+          colorClass: "bg-[#03D26F] text-[#161514] border-[#161514]",
+          onClick: () => {
+            onOpenChange(false);
+            router.push("/goals/nutrition");
+          },
+        },
         {
           id: "new-habit",
           label: "New Habit",
@@ -110,61 +138,113 @@ export function ActionSheet({
         {
           id: "log-workout",
           label: "Log Workout",
-          sublabel: "Track sets, reps and muscle activation",
+          sublabel: "Track sets, reps and muscle activation studio",
           icon: Dumbbell,
-          colorClass: "bg-cyan-100 dark:bg-cyan-950/60 text-cyan-900 dark:text-cyan-200 border-cyan-600/40",
+          colorClass: "bg-[#F59E0B] text-[#161514] border-[#161514]",
           onClick: () => {
             onOpenChange(false);
             router.push("/goals/gym");
           },
         },
+      ];
+    }
+
+    // 3. Tasks Space: creating task, project, matrix, kanban
+    if (pathname.startsWith("/tasks")) {
+      return [
         {
-          id: "log-meal",
-          label: "Log Meal & Macros",
-          sublabel: "Record calories, protein, carbs and fats",
-          icon: Utensils,
-          colorClass: "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-200 border-emerald-600/40",
+          id: "new-task",
+          label: "New Task",
+          sublabel: "Capture next action or project milestone",
+          icon: CheckCircle2,
+          colorClass: "bg-[#CEF431] text-[#161514] border-[#161514]",
           onClick: () => {
             onOpenChange(false);
-            router.push("/goals/nutrition");
+            window.dispatchEvent(new CustomEvent("invictus:tasks-new-task"));
           },
         },
         {
-          id: "log-water",
-          label: "Log Water (+250ml)",
-          sublabel: "Hydrate toward your daily 2,000ml goal",
-          icon: Droplet,
-          colorClass: "bg-sky-100 dark:bg-sky-950/60 text-sky-900 dark:text-sky-200 border-sky-600/40",
+          id: "new-project",
+          label: "New Project",
+          sublabel: "Organize tasks under a unified project banner",
+          icon: Kanban,
+          colorClass: "bg-[#03D26F] text-[#161514] border-[#161514]",
           onClick: () => {
             onOpenChange(false);
-            window.dispatchEvent(new CustomEvent("invictus:quick-log-water", { detail: { amount: 250 } }));
+            window.dispatchEvent(new CustomEvent("invictus:tasks-new-project"));
+          },
+        },
+        {
+          id: "priority-matrix",
+          label: "Eisenhower Matrix",
+          sublabel: "Urgent vs Important quadrant prioritization",
+          icon: Flame,
+          colorClass: "bg-[#F59E0B] text-[#161514] border-[#161514]",
+          onClick: () => {
+            onOpenChange(false);
+            window.dispatchEvent(new CustomEvent("invictus:tasks-open-matrix"));
+          },
+        },
+        {
+          id: "kanban-board",
+          label: "Kanban Board",
+          sublabel: "Visual pipeline columns and swimlanes",
+          icon: FolderKanban,
+          colorClass: "bg-[#38BDF8] text-[#161514] border-[#161514]",
+          onClick: () => {
+            onOpenChange(false);
+            window.dispatchEvent(new CustomEvent("invictus:tasks-open-kanban"));
           },
         },
       ];
     }
 
-    // Default Fallback Actions
+    // 4. Today Overview (Default): pure action buttons (task, expense, water, habit)
     return [
       {
-        id: "new-habit",
-        label: "New Habit",
-        sublabel: "Add to daily routines",
-        icon: CheckSquare,
+        id: "today-task",
+        label: "New Task",
+        sublabel: "Capture action item with priority and due date",
+        icon: CheckCircle2,
         colorClass: "bg-[#CEF431] text-[#161514] border-[#161514]",
         onClick: () => {
           onOpenChange(false);
-          window.dispatchEvent(new CustomEvent("invictus:open-new-habit"));
+          window.dispatchEvent(new CustomEvent("invictus:tasks-new-task"));
         },
       },
       {
-        id: "quick-log-water",
-        label: "Quick Water (+250ml)",
-        sublabel: "Instant hydration rep",
-        icon: Droplet,
-        colorClass: "bg-sky-100 text-sky-900 border-sky-600/40",
+        id: "today-expense",
+        label: "Log Expense",
+        sublabel: "Record purchase against daily safe-to-spend",
+        icon: Receipt,
+        colorClass: "bg-[#03D26F] text-[#161514] border-[#161514]",
         onClick: () => {
           onOpenChange(false);
-          window.dispatchEvent(new CustomEvent("invictus:quick-log-water", { detail: { amount: 250 } }));
+          window.dispatchEvent(new CustomEvent("invictus:money-new-expense"));
+        },
+      },
+      {
+        id: "today-water",
+        label: "Quick Water (+250ml)",
+        sublabel: "Instant hydration rep toward 2,000ml goal",
+        icon: Droplet,
+        colorClass: "bg-[#38BDF8] text-[#161514] border-[#161514]",
+        onClick: () => {
+          onOpenChange(false);
+          window.dispatchEvent(
+            new CustomEvent("invictus:quick-log-water", { detail: { amount: 250 } })
+          );
+        },
+      },
+      {
+        id: "today-habit",
+        label: "New Habit",
+        sublabel: "Add a new routine to your daily conquest",
+        icon: CheckSquare,
+        colorClass: "bg-[#C084FC] text-[#161514] border-[#161514]",
+        onClick: () => {
+          onOpenChange(false);
+          window.dispatchEvent(new CustomEvent("invictus:open-new-habit"));
         },
       },
     ];

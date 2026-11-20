@@ -14,10 +14,14 @@ import {
   Utensils,
   Droplet,
   Receipt,
+  ReceiptText,
+  TrendingUp,
   Users,
   CheckCircle2,
+  CheckSquare,
   Kanban,
-  Moon,
+  Flame,
+  FolderKanban,
   Wallet,
   Sparkles,
 } from "lucide-react";
@@ -54,12 +58,12 @@ export function HalfFlowerMenu({
 
   // Context-aware petals based on active space (High-Frequency Micro-Actions)
   const getPetals = useCallback((): FlowerPetalItem[] => {
-    // 1. Habits Space
+    // 1. Habits Space: water logger (simple and beautiful UX), meal, habit, workout (mood logging removed completely)
     if (pathname.startsWith("/goals")) {
       return [
         {
           id: "log-water",
-          label: "Quick Water",
+          label: "Log Water",
           shortLabel: "+250ml",
           icon: Droplet,
           bgClass: "bg-[#38BDF8]",
@@ -80,7 +84,19 @@ export function HalfFlowerMenu({
           textClass: "text-[#161514]",
           borderClass: "border-[#161514]",
           onClick: () => {
-            window.dispatchEvent(new CustomEvent("invictus:goals-open-portal", { detail: { portal: "nutrition" } }));
+            router.push("/goals/nutrition");
+          },
+        },
+        {
+          id: "new-habit",
+          label: "New Habit",
+          shortLabel: "Habit",
+          icon: CheckSquare,
+          bgClass: "bg-[#CEF431]",
+          textClass: "text-[#161514]",
+          borderClass: "border-[#161514]",
+          onClick: () => {
+            window.dispatchEvent(new CustomEvent("invictus:open-new-habit"));
           },
         },
         {
@@ -88,29 +104,17 @@ export function HalfFlowerMenu({
           label: "Log Workout",
           shortLabel: "Workout",
           icon: Dumbbell,
-          bgClass: "bg-[#CEF431]",
+          bgClass: "bg-[#F59E0B]",
           textClass: "text-[#161514]",
           borderClass: "border-[#161514]",
           onClick: () => {
-            window.dispatchEvent(new CustomEvent("invictus:goals-open-portal", { detail: { portal: "gym" } }));
-          },
-        },
-        {
-          id: "stoic-reflection",
-          label: "Stoic Mood",
-          shortLabel: "Mood",
-          icon: Moon,
-          bgClass: "bg-[#C084FC]",
-          textClass: "text-[#161514]",
-          borderClass: "border-[#161514]",
-          onClick: () => {
-            window.dispatchEvent(new CustomEvent("invictus:goals-open-reflection"));
+            router.push("/goals/gym");
           },
         },
       ];
     }
 
-    // 2. Money Space
+    // 2. Money Space: log expense, log income, who owes who, ledger
     if (pathname.startsWith("/money")) {
       return [
         {
@@ -126,11 +130,23 @@ export function HalfFlowerMenu({
           },
         },
         {
-          id: "split-bill",
-          label: "Split / IOU",
-          shortLabel: "Split",
-          icon: Users,
+          id: "new-income",
+          label: "Log Income",
+          shortLabel: "Income",
+          icon: TrendingUp,
           bgClass: "bg-[#03D26F]",
+          textClass: "text-[#161514]",
+          borderClass: "border-[#161514]",
+          onClick: () => {
+            window.dispatchEvent(new CustomEvent("invictus:money-new-income"));
+          },
+        },
+        {
+          id: "split-bill",
+          label: "Who Owes Who",
+          shortLabel: "Split/IOU",
+          icon: Users,
+          bgClass: "bg-[#38BDF8]",
           textClass: "text-[#161514]",
           borderClass: "border-[#161514]",
           onClick: () => {
@@ -138,33 +154,21 @@ export function HalfFlowerMenu({
           },
         },
         {
-          id: "cash-till",
-          label: "Cash Refill",
-          shortLabel: "Cash",
-          icon: Wallet,
-          bgClass: "bg-[#38BDF8]",
+          id: "open-ledger",
+          label: "Open Ledger",
+          shortLabel: "Ledger",
+          icon: ReceiptText,
+          bgClass: "bg-[#C084FC]",
           textClass: "text-[#161514]",
           borderClass: "border-[#161514]",
           onClick: () => {
-            window.dispatchEvent(new CustomEvent("invictus:money-cash-till"));
-          },
-        },
-        {
-          id: "quick-entry",
-          label: "Quick Entry",
-          shortLabel: "Quick",
-          icon: Sparkles,
-          bgClass: "bg-[#F59E0B]",
-          textClass: "text-[#161514]",
-          borderClass: "border-[#161514]",
-          onClick: () => {
-            window.dispatchEvent(new CustomEvent("invictus:money-quick-cash"));
+            window.dispatchEvent(new CustomEvent("invictus:money-open-ledger"));
           },
         },
       ];
     }
 
-    // 3. Tasks Space
+    // 3. Tasks Space: creating task, project, priority matrix, kanban board
     if (pathname.startsWith("/tasks")) {
       return [
         {
@@ -192,39 +196,37 @@ export function HalfFlowerMenu({
           },
         },
         {
-          id: "quick-water",
-          label: "Quick Water",
-          shortLabel: "+250ml",
-          icon: Droplet,
-          bgClass: "bg-[#38BDF8]",
-          textClass: "text-[#161514]",
-          borderClass: "border-[#161514]",
-          onClick: () => {
-            window.dispatchEvent(
-              new CustomEvent("invictus:quick-log-water", { detail: { amount: 250 } })
-            );
-          },
-        },
-        {
-          id: "quick-expense",
-          label: "Quick Expense",
-          shortLabel: "Expense",
-          icon: Receipt,
+          id: "priority-matrix",
+          label: "Eisenhower Matrix",
+          shortLabel: "Matrix",
+          icon: Flame,
           bgClass: "bg-[#F59E0B]",
           textClass: "text-[#161514]",
           borderClass: "border-[#161514]",
           onClick: () => {
-            router.push("/money?action=new-expense");
+            window.dispatchEvent(new CustomEvent("invictus:tasks-open-matrix"));
+          },
+        },
+        {
+          id: "kanban-board",
+          label: "Kanban Board",
+          shortLabel: "Board",
+          icon: FolderKanban,
+          bgClass: "bg-[#38BDF8]",
+          textClass: "text-[#161514]",
+          borderClass: "border-[#161514]",
+          onClick: () => {
+            window.dispatchEvent(new CustomEvent("invictus:tasks-open-kanban"));
           },
         },
       ];
     }
 
-    // 4. Today Overview (Default)
+    // 4. Today Overview (Default): pure action buttons (task, expense, water, habit)
     return [
       {
         id: "today-task",
-        label: "Quick Task",
+        label: "New Task",
         shortLabel: "Task",
         icon: CheckCircle2,
         bgClass: "bg-[#CEF431]",
@@ -261,19 +263,19 @@ export function HalfFlowerMenu({
         },
       },
       {
-        id: "today-reflection",
-        label: "Reflection",
-        shortLabel: "Review",
-        icon: Moon,
+        id: "today-habit",
+        label: "New Habit",
+        shortLabel: "Habit",
+        icon: CheckSquare,
         bgClass: "bg-[#C084FC]",
         textClass: "text-[#161514]",
         borderClass: "border-[#161514]",
         onClick: () => {
-          window.dispatchEvent(new CustomEvent("invictus:today-open-reflection"));
+          window.dispatchEvent(new CustomEvent("invictus:open-new-habit"));
         },
       },
     ];
-  }, [pathname]);
+  }, [pathname, router]);
 
   const petals = getPetals();
   const petalCount = petals.length;

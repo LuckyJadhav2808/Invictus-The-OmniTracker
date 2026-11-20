@@ -1,28 +1,48 @@
 "use client";
 
-import { FileText, Moon, Droplet, Sliders } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { CheckCircle2, Target, Wallet, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
 
 export interface TodayDoorTileRowProps {
-  waterAmount?: number;
-  waterTarget?: number;
+  taskCount?: number;
+  completedTasksCount?: number;
+  habitCount?: number;
+  completedHabitsCount?: number;
+  remainingSafeToSpend?: number;
   dailySafeToSpend?: number;
   currencySymbol?: string;
+  onOpenTasks?: () => void;
+  onOpenHabits?: () => void;
+  onOpenMoney?: () => void;
+  onOpenProfile?: () => void;
+  // Legacy / fallback props
+  waterAmount?: number;
+  waterTarget?: number;
   notesCount?: number;
-  onOpenScratchpad: () => void;
-  onOpenCloseout: () => void;
-  onOpenWater: () => void;
-  onOpenDailyLimit: () => void;
+  onOpenScratchpad?: () => void;
+  onOpenCloseout?: () => void;
+  onOpenWater?: () => void;
+  onOpenDailyLimit?: () => void;
   onQuickLogWater?: () => void;
   className?: string;
 }
 
 export function TodayDoorTileRow({
-  waterAmount = 0,
-  waterTarget = 2000,
+  taskCount,
+  completedTasksCount,
+  habitCount,
+  completedHabitsCount,
+  remainingSafeToSpend,
   dailySafeToSpend = 727,
   currencySymbol = "₹",
+  onOpenTasks,
+  onOpenHabits,
+  onOpenMoney,
+  onOpenProfile,
+  waterAmount,
+  waterTarget,
   notesCount,
   onOpenScratchpad,
   onOpenCloseout,
@@ -31,46 +51,57 @@ export function TodayDoorTileRow({
   onQuickLogWater,
   className,
 }: TodayDoorTileRowProps) {
+  const router = useRouter();
+
+  const safeAmount =
+    remainingSafeToSpend !== undefined ? remainingSafeToSpend : dailySafeToSpend;
+
   const tiles = [
     {
-      id: "scratchpad",
-      label: "Notes",
-      value: notesCount !== undefined && notesCount > 0 ? `${notesCount} Notes` : "Desk",
-      icon: FileText,
-      iconColor: "text-amber-600 dark:text-amber-400",
-      bgClass: "hover:border-amber-500/50",
-      onClick: onOpenScratchpad,
-      title: "Open Slide-Over Desk Scratchpad (⌘J)",
+      id: "tasks",
+      label: "Task",
+      value:
+        taskCount !== undefined
+          ? `${completedTasksCount || 0}/${taskCount}`
+          : "Work",
+      icon: CheckCircle2,
+      iconColor: "text-lime-600 dark:text-[#CEF431]",
+      bgClass: "hover:border-[#CEF431]/60",
+      onClick: onOpenTasks || (() => router.push("/tasks")),
+      title: "Open Tasks Workspace",
     },
     {
-      id: "review",
-      label: "Review",
-      value: "Daily",
-      icon: Moon,
-      iconColor: "text-purple-600 dark:text-purple-400",
-      bgClass: "hover:border-purple-500/50",
-      onClick: onOpenCloseout,
-      title: "Open Evening Closeout & Daily Mindset Reflection",
+      id: "habits",
+      label: "Habit",
+      value:
+        habitCount !== undefined
+          ? `${completedHabitsCount || 0}/${habitCount}`
+          : "Routine",
+      icon: Target,
+      iconColor: "text-orange-500 dark:text-orange-400",
+      bgClass: "hover:border-orange-500/50",
+      onClick: onOpenHabits || (() => router.push("/goals")),
+      title: "Open Habits & Routines Workspace",
     },
     {
-      id: "water",
-      label: "Water",
-      value: `${waterAmount}ml`,
-      icon: Droplet,
-      iconColor: "text-blue-500 dark:text-blue-400",
-      bgClass: "hover:border-blue-500/50",
-      onClick: onOpenWater,
-      title: "Open Daily Hydration Tracker & Target Settings",
-    },
-    {
-      id: "limit",
-      label: "Limit",
-      value: `${currencySymbol}${dailySafeToSpend >= 1000 ? Math.round(dailySafeToSpend / 1000) + "k" : dailySafeToSpend} Safe`,
-      icon: Sliders,
+      id: "money",
+      label: "Money",
+      value: `${currencySymbol}${safeAmount >= 1000 ? Math.round(safeAmount / 1000) + "k" : safeAmount} Safe`,
+      icon: Wallet,
       iconColor: "text-emerald-600 dark:text-[#03D26F]",
       bgClass: "hover:border-[#03D26F]/50",
-      onClick: onOpenDailyLimit,
-      title: "Calibrate Daily Spending Limit & Rollover Rules",
+      onClick: onOpenMoney || (() => router.push("/money")),
+      title: "Open Money Ledger & Budget Workspace",
+    },
+    {
+      id: "profile",
+      label: "Profile",
+      value: "Account",
+      icon: User,
+      iconColor: "text-purple-600 dark:text-purple-400",
+      bgClass: "hover:border-purple-500/50",
+      onClick: onOpenProfile || (() => router.push("/profile")),
+      title: "Open Profile & Preferences",
     },
   ];
 

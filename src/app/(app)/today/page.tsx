@@ -22,6 +22,7 @@ import { computeMonthlyBudgetStats } from "@/lib/utils/budget-rollover";
 import { toast } from "sonner";
 import { Shield, SunMedium, Clock, Moon, Droplet, Plus, FileText, ArrowUpRight } from "lucide-react";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 import {
   format,
   parseISO,
@@ -77,6 +78,7 @@ const TODAY_DESKTOP_SUB_NAV_TABS: SubNavTab[] = [
 ];
 
 export default function TodayPage() {
+  const router = useRouter();
   const { user } = useAuth();
   const { selectedDate, setSelectedDate } = useUIStore();
 
@@ -527,13 +529,22 @@ export default function TodayPage() {
           />
         </div>
 
-        {/* SLOT 4: ONE DOOR TILE ROW (Max 4 Doorway Cards to L2) */}
+        {/* SLOT 4: ONE DOOR TILE ROW (Max 4 Doorway Cards to L2: Task, Habit, Money, Profile) */}
         <div className="py-1">
           <TodayDoorTileRow
-            waterAmount={waterAmount}
-            waterTarget={waterTarget}
+            taskCount={todayTasks.length}
+            completedTasksCount={completedTasksCount}
+            habitCount={totalHabitsCount}
+            completedHabitsCount={completedHabitsCount}
+            remainingSafeToSpend={budgetStats.dailySafeToSpend - spentToday}
             dailySafeToSpend={budgetStats.dailySafeToSpend}
             currencySymbol={currencySymbol}
+            onOpenTasks={() => router.push("/tasks")}
+            onOpenHabits={() => router.push("/goals")}
+            onOpenMoney={() => router.push("/money")}
+            onOpenProfile={() => router.push("/profile")}
+            waterAmount={waterAmount}
+            waterTarget={waterTarget}
             onOpenScratchpad={() => setIsScratchpadDrawerOpen(true)}
             onOpenCloseout={() => setIsCloseoutDrawerOpen(true)}
             onOpenWater={() => setIsWaterSheetOpen(true)}

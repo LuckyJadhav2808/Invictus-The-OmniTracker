@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { Target, Dumbbell, Utensils, BarChart2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
@@ -35,26 +36,28 @@ export function DoorTileRow({
   onOpenRecovery,
   className,
 }: DoorTileRowProps) {
+  const router = useRouter();
+
   const tiles = [
     {
-      id: "new-habit",
-      label: "Habits",
-      value: "Create",
-      icon: Target,
-      iconColor: "text-lime-600 dark:text-[#CEF431]",
-      bgClass: "hover:border-[#CEF431]/60",
-      onClick: onOpenNewHabit || onOpenWater || (() => {}),
-      title: "Create New Atomic Habit or Pick Presets",
+      id: "stats",
+      label: "Analytics",
+      value: "Trends",
+      icon: BarChart2,
+      iconColor: "text-purple-600 dark:text-purple-400",
+      bgClass: "hover:border-purple-500/50",
+      onClick: onOpenStats || (() => router.push("/goals/analytics")),
+      title: "Open Habit Analytics & Consistency Overview (Dedicated Page)",
     },
     {
       id: "gym",
-      label: "Gym",
-      value: "Lifts",
+      label: "Workout",
+      value: "Studio",
       icon: Dumbbell,
       iconColor: "text-emerald-600 dark:text-[#03D26F]",
       bgClass: "hover:border-[#03D26F]/50",
-      onClick: onOpenGym || onOpenBodyProfile || (() => {}),
-      title: "Open Gym Workout Studio & Muscle Anatomy",
+      onClick: onOpenGym || (() => router.push("/goals/gym")),
+      title: "Open Gym Workout Studio & Muscle Anatomy (Dedicated Page)",
     },
     {
       id: "diet",
@@ -63,18 +66,20 @@ export function DoorTileRow({
       icon: Utensils,
       iconColor: "text-amber-600 dark:text-amber-400",
       bgClass: "hover:border-amber-500/50",
-      onClick: onOpenNutrition || onOpenRecovery || (() => {}),
-      title: "Open Nutrition, Calories & Macro Balance",
+      onClick: onOpenNutrition || (() => router.push("/goals/nutrition")),
+      title: "Open Nutrition, Calories & Macro Balance (Dedicated Page)",
     },
     {
-      id: "stats",
-      label: "Stats",
-      value: "Trends",
-      icon: BarChart2,
-      iconColor: "text-purple-600 dark:text-purple-400",
-      bgClass: "hover:border-purple-500/50",
-      onClick: onOpenStats || onOpenReminders || (() => {}),
-      title: "Open Habit Analytics & Consistency Overview",
+      id: "new-habit",
+      label: "Habits",
+      value: "Create",
+      icon: Target,
+      iconColor: "text-lime-600 dark:text-[#CEF431]",
+      bgClass: "hover:border-[#CEF431]/60",
+      onClick:
+        onOpenNewHabit ||
+        (() => window.dispatchEvent(new CustomEvent("invictus:open-new-habit"))),
+      title: "Create New Atomic Habit or Pick Presets",
     },
   ];
 
