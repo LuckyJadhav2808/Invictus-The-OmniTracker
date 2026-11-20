@@ -22,11 +22,12 @@ import {
   Share2,
   AlertTriangle,
 } from "lucide-react";
-import { parseISO, isToday, isPast, differenceInDays, startOfDay } from "date-fns";
+import { format, parseISO, isToday, isPast, differenceInDays, startOfDay } from "date-fns";
 
 export interface WhoOwesWhoTabViewProps {
   currencySymbol: string;
   defaultOpenForm?: boolean;
+  hideHeader?: boolean;
   prefill?: {
     amount?: number;
     description?: string;
@@ -72,6 +73,7 @@ export function formatReminderMessage(iou: IOU, currencySymbol: string = "₹") 
 export function WhoOwesWhoTabView({
   currencySymbol,
   defaultOpenForm = false,
+  hideHeader = false,
   prefill,
   onLogSettlementIncome,
 }: WhoOwesWhoTabViewProps) {
@@ -227,68 +229,69 @@ export function WhoOwesWhoTabView({
   return (
     <div className="space-y-4">
       {/* ─── IN-SITU POWER HEADER & NET DEBT COCKPIT ─── */}
-      <div className="bg-white dark:bg-[#161514] p-4 sm:p-5 rounded-3xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="size-10 rounded-2xl bg-amber-100 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-800 dark:text-amber-300 flex items-center justify-center shadow-xs shrink-0">
-              <Users className="size-5 stroke-[2.2]" />
-            </div>
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                <h3 className="text-base sm:text-lg font-heading font-black text-[#161514] dark:text-[#FAF8F5] leading-tight">
-                  Who Owes Who 🤝
-                </h3>
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700/60">
-                  <span className="sm:hidden">Debts</span>
-                  <span className="hidden sm:inline">Student Debt Deck</span>
-                </span>
+      <div className="bg-white dark:bg-[#161514] p-4 sm:p-5 rounded-3xl border-2 border-[#161514] dark:border-[#383531] shadow-[2.5px_2.5px_0px_0px_#161514] dark:shadow-[2.5px_2.5px_0px_0px_#000000] space-y-3.5">
+        {!hideHeader && (
+          <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#E8E5DF] dark:border-[#2A2724]">
+            <div className="flex items-center gap-3">
+              <div className="size-10 rounded-2xl bg-[#CEF431] border border-[#161514] text-[#161514] flex items-center justify-center shadow-xs shrink-0">
+                <Users className="size-5 stroke-[2.2]" />
               </div>
-              <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] mt-0.5 break-words line-clamp-2">
-                Track shared meals, borrowed cash, and 1-tap debt settlements
-              </p>
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                  <h3 className="text-base sm:text-lg font-heading font-black text-[#161514] dark:text-[#FAF8F5] leading-tight">
+                    Who Owes Who 🤝
+                  </h3>
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-[#CEF431]/40 text-[#161514] dark:text-[#FAF8F5] border border-[#161514]/30">
+                    Student Split Deck
+                  </span>
+                </div>
+                <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] mt-0.5 break-words line-clamp-1">
+                  Track shared meals, cab splits, and 1-tap debt settlements
+                </p>
+              </div>
             </div>
-          </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              soundFX.playPop();
-              setIsFormOpen(!isFormOpen);
-            }}
-            className="py-2 px-3.5 rounded-2xl bg-[#161514] text-white dark:bg-[#CEF431] dark:text-[#161514] text-xs font-heading font-black flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95 transition-all shrink-0 border border-[#161514] dark:border-[#CEF431]"
-          >
-            <Plus className="size-3.5 stroke-[2.5]" />
-            <span>{isFormOpen ? "Close Form" : "Track New IOU"}</span>
-          </button>
-        </div>
+            <button
+              type="button"
+              onClick={() => {
+                soundFX.playPop();
+                setIsFormOpen(!isFormOpen);
+              }}
+              className="py-2 px-3.5 rounded-2xl bg-[#161514] text-white dark:bg-[#CEF431] dark:text-[#161514] text-xs font-heading font-black flex items-center gap-1.5 cursor-pointer shadow-[2px_2px_0px_0px_#161514] active:scale-95 transition-all shrink-0 border border-[#161514] dark:border-[#CEF431]"
+            >
+              <Plus className="size-3.5 stroke-[2.5]" />
+              <span>{isFormOpen ? "Close Form" : "Track New IOU"}</span>
+            </button>
+          </div>
+        )}
 
         {/* 3-Pillar Net Debt Metric Strip */}
-        <div className="grid grid-cols-3 gap-2.5 pt-1">
-          <div className="p-3 rounded-2xl bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#383531] text-center">
-            <span className="text-[10px] font-mono uppercase text-[#6B6B6B] dark:text-[#A8A29E] block">
+        <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
+          <div className="p-2.5 sm:p-3 rounded-2xl bg-[#FAF8F5] dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] text-center">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6B6B6B] dark:text-[#A8A29E] block">
               They Owe Me
             </span>
-            <span className="text-sm sm:text-base font-mono font-black text-[#047857] dark:text-[#03D26F] tabular-nums mt-0.5 block">
+            <span className="text-sm sm:text-base font-mono font-black text-[#047857] dark:text-[#03D26F] tabular-nums mt-0.5 block truncate">
               +{currencySymbol}{totalLent.toLocaleString()}
             </span>
           </div>
 
-          <div className="p-3 rounded-2xl bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#383531] text-center">
-            <span className="text-[10px] font-mono uppercase text-[#6B6B6B] dark:text-[#A8A29E] block">
+          <div className="p-2.5 sm:p-3 rounded-2xl bg-[#FAF8F5] dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] text-center">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6B6B6B] dark:text-[#A8A29E] block">
               I Owe Them
             </span>
-            <span className="text-sm sm:text-base font-mono font-black text-rose-600 dark:text-rose-400 tabular-nums mt-0.5 block">
+            <span className="text-sm sm:text-base font-mono font-black text-rose-600 dark:text-rose-400 tabular-nums mt-0.5 block truncate">
               -{currencySymbol}{totalBorrowed.toLocaleString()}
             </span>
           </div>
 
-          <div className="p-3 rounded-2xl bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#383531] text-center">
-            <span className="text-[10px] font-mono uppercase text-[#6B6B6B] dark:text-[#A8A29E] block">
+          <div className="p-2.5 sm:p-3 rounded-2xl bg-[#FAF8F5] dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] text-center">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6B6B6B] dark:text-[#A8A29E] block">
               Net Balance
             </span>
             <span
               className={cn(
-                "text-sm sm:text-base font-mono font-black tabular-nums mt-0.5 block",
+                "text-sm sm:text-base font-mono font-black tabular-nums mt-0.5 block truncate",
                 netOwed >= 0
                   ? "text-[#047857] dark:text-[#03D26F]"
                   : "text-rose-600 dark:text-rose-400"
@@ -298,100 +301,116 @@ export function WhoOwesWhoTabView({
             </span>
           </div>
         </div>
+      </div>
 
-        {/* ─── COLLAPSIBLE ADD IOU FORM ─── */}
-        {isFormOpen && (
-          <form
-            ref={formAnimRef}
-            onSubmit={handleCreateIOU}
-            className="bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-2xl p-4 border-2 border-[#161514] dark:border-[#CEF431] shadow-[2.5px_2.5px_0px_0px_#161514] space-y-3 transition-all"
-          >
-            <div className="flex items-center justify-between pb-1 border-b border-[#E8E5DF] dark:border-[#2A2724]">
-              <span className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5]">
-                Log New Debt / Split
-              </span>
-              <span className="text-[10px] font-mono text-[#6B6B6B] dark:text-[#A8A29E]">
-                Saved offline in store
+      {/* ─── ADD IOU FORM (Clean Standalone Card) ─── */}
+      {isFormOpen && (
+        <form
+          ref={formAnimRef}
+          onSubmit={handleCreateIOU}
+          className="bg-white dark:bg-[#161514] rounded-2xl p-4 sm:p-5 border-2 border-[#161514] dark:border-[#383531] shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] space-y-3.5 transition-all"
+        >
+          <div className="flex items-center justify-between pb-2 border-b-2 border-[#161514] dark:border-[#383531]">
+            <div className="flex items-center gap-2">
+              <span className="size-2 rounded-full bg-[#03D26F] animate-pulse" />
+              <span className="text-xs sm:text-sm font-heading font-black text-[#161514] dark:text-[#FAF8F5] uppercase tracking-wide">
+                Log New Split / Debt
               </span>
             </div>
+            <span className="text-[10px] font-mono font-bold text-[#6B6B6B] dark:text-[#A8A29E]">
+              Store Synced
+            </span>
+          </div>
 
-            {/* Type Switcher */}
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => setType("lent")}
-                className={cn(
-                  "flex-1 py-1.5 rounded-xl text-xs font-heading font-bold border transition-all cursor-pointer",
-                  type === "lent"
-                    ? "bg-[#03D26F] text-[#161514] border-[#161514] shadow-xs"
-                    : "bg-white dark:bg-[#252321] text-[#6B6B6B] dark:text-[#A8A29E] border-[#E8E5DF] dark:border-[#383531]"
-                )}
-              >
-                They Owe Me (I Paid)
-              </button>
-              <button
-                type="button"
-                onClick={() => setType("borrowed")}
-                className={cn(
-                  "flex-1 py-1.5 rounded-xl text-xs font-heading font-bold border transition-all cursor-pointer",
-                  type === "borrowed"
-                    ? "bg-rose-500 text-white border-[#161514] shadow-xs"
-                    : "bg-white dark:bg-[#252321] text-[#6B6B6B] dark:text-[#A8A29E] border-[#E8E5DF] dark:border-[#383531]"
-                )}
-              >
-                I Owe Them (They Paid)
-              </button>
+          {/* Type Switcher */}
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                soundFX.playPop();
+                setType("lent");
+              }}
+              className={cn(
+                "py-2 px-2.5 rounded-xl text-xs font-heading font-black border-2 transition-all cursor-pointer flex items-center justify-center gap-1.5",
+                type === "lent"
+                  ? "bg-[#03D26F] text-[#161514] border-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-y-0.5"
+                  : "bg-[#FAF8F5] dark:bg-[#1C1A18] text-[#6B6B6B] dark:text-[#A8A29E] border-[#E8E5DF] dark:border-[#383531] hover:border-[#161514]"
+              )}
+            >
+              <ArrowUpRight className="size-3.5 stroke-[2.5]" />
+              <span>They Owe Me (I Paid)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                soundFX.playPop();
+                setType("borrowed");
+              }}
+              className={cn(
+                "py-2 px-2.5 rounded-xl text-xs font-heading font-black border-2 transition-all cursor-pointer flex items-center justify-center gap-1.5",
+                type === "borrowed"
+                  ? "bg-rose-500 text-white border-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-y-0.5"
+                  : "bg-[#FAF8F5] dark:bg-[#1C1A18] text-[#6B6B6B] dark:text-[#A8A29E] border-[#E8E5DF] dark:border-[#383531] hover:border-[#161514]"
+              )}
+            >
+              <ArrowDownLeft className="size-3.5 stroke-[2.5]" />
+              <span>I Owe Them (They Paid)</span>
+            </button>
+          </div>
+
+          {/* 1-Tap Recent Friends Selector */}
+          {recentContacts.length > 0 && (
+            <div className="space-y-1">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6B6B6B] dark:text-[#A8A29E] block">
+                1-Tap Friend
+              </span>
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+                {recentContacts.map((name) => (
+                  <button
+                    key={name}
+                    type="button"
+                    onClick={() => {
+                      soundFX.playPop();
+                      setPersonName(name);
+                    }}
+                    className={cn(
+                      "px-3 py-1.5 rounded-xl text-xs font-mono font-bold border-2 transition-all cursor-pointer shrink-0 active:scale-95",
+                      personName.toLowerCase() === name.toLowerCase()
+                        ? "bg-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:text-[#161514] border-[#161514] dark:border-[#CEF431] shadow-[1.5px_1.5px_0px_0px_#161514]"
+                        : "bg-[#FAF8F5] dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] border-[#E8E5DF] dark:border-[#383531] hover:border-[#161514]"
+                    )}
+                  >
+                    {name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Person Name & Amount Input */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6B6B6B] dark:text-[#A8A29E] block mb-1">
+                Friend&apos;s Name *
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="e.g. Rahul, Sneha, Roommate"
+                value={personName}
+                onChange={(e) => setPersonName(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl text-xs font-heading font-bold bg-[#FAF8F5] dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#383531] text-[#161514] dark:text-[#FAF8F5] focus:outline-none focus:ring-2 focus:ring-[#161514] shadow-xs"
+              />
             </div>
 
-            {/* 1-Tap Recent Friends Selector */}
-            {recentContacts.length > 0 && (
-              <div className="space-y-1">
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6B6B6B] dark:text-[#A8A29E] block">
-                  Recent Friends
+            <div>
+              <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6B6B6B] dark:text-[#A8A29E] block mb-1">
+                Amount ({currencySymbol}) *
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-mono font-black text-[#161514] dark:text-[#FAF8F5] opacity-60">
+                  {currencySymbol}
                 </span>
-                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-                  {recentContacts.map((name) => (
-                    <button
-                      key={name}
-                      type="button"
-                      onClick={() => {
-                        soundFX.playPop();
-                        setPersonName(name);
-                      }}
-                      className={cn(
-                        "px-2.5 py-1 rounded-xl text-xs font-mono font-bold border transition-all cursor-pointer shrink-0 shadow-xs active:scale-95",
-                        personName.toLowerCase() === name.toLowerCase()
-                          ? "bg-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:text-[#161514] border-[#161514] dark:border-[#CEF431]"
-                          : "bg-white dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] border-[#E8E5DF] dark:border-[#383531] hover:border-[#161514]"
-                      )}
-                    >
-                      {name}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Person Name & Amount Input */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <div>
-                <label className="text-[10px] font-mono text-[#6B6B6B] dark:text-[#A8A29E] block mb-1">
-                  Person Name *
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Rahul, Sneha, Roommate"
-                  value={personName}
-                  onChange={(e) => setPersonName(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl text-xs font-medium bg-white dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#383531] text-[#161514] dark:text-[#FAF8F5] focus:outline-none focus:ring-1 focus:ring-[#161514]"
-                />
-              </div>
-
-              <div>
-                <label className="text-[10px] font-mono text-[#6B6B6B] dark:text-[#A8A29E] block mb-1">
-                  Amount ({currencySymbol}) *
-                </label>
                 <input
                   type="number"
                   step="any"
@@ -399,77 +418,120 @@ export function WhoOwesWhoTabView({
                   placeholder="0.00"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl text-xs font-mono font-bold bg-white dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#383531] text-[#161514] dark:text-[#FAF8F5] focus:outline-none focus:ring-1 focus:ring-[#161514]"
+                  className="w-full pl-7 pr-3.5 py-2.5 rounded-xl text-xs font-mono font-black bg-[#FAF8F5] dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#383531] text-[#161514] dark:text-[#FAF8F5] focus:outline-none focus:ring-2 focus:ring-[#161514] shadow-xs"
                 />
-                {/* Quick Increment Chips */}
-                <div className="flex items-center gap-1 flex-wrap pt-1.5">
-                  {[50, 100, 200, 500, 1000].map((inc) => (
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Increment Chips */}
+          <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6B6B6B] dark:text-[#A8A29E]">
+              Quick Add:
+            </span>
+            {[50, 100, 200, 500, 1000].map((inc) => (
+              <button
+                key={inc}
+                type="button"
+                onClick={() => {
+                  soundFX.playPop();
+                  soundFX.vibrate(15);
+                  const curr = parseFloat(amount) || 0;
+                  setAmount(String(curr + inc));
+                }}
+                className="px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-[#FAF8F5] dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] border border-[#161514]/30 dark:border-[#383531] shadow-xs active:scale-95 transition-all cursor-pointer hover:border-[#161514]"
+              >
+                +{currencySymbol}{inc}
+              </button>
+            ))}
+            {amount && (
+              <button
+                type="button"
+                onClick={() => setAmount("")}
+                className="px-2 py-1 rounded-lg text-[11px] font-mono font-bold text-rose-600 hover:underline cursor-pointer"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+
+          {/* Description & Expected Repayment Date */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6B6B6B] dark:text-[#A8A29E] block mb-1">
+                Description / Note
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. Pizza split, Cab fare, Textbook"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl text-xs font-sans font-semibold bg-[#FAF8F5] dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#383531] text-[#161514] dark:text-[#FAF8F5] focus:outline-none focus:ring-2 focus:ring-[#161514] shadow-xs"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6B6B6B] dark:text-[#A8A29E] block mb-1">
+                Expected Repayment Date (Optional)
+              </label>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {[
+                  { label: "Today", days: 0 },
+                  { label: "+3d", days: 3 },
+                  { label: "+1w", days: 7 },
+                  { label: "+1m", days: 30 },
+                ].map((preset) => {
+                  const targetDateStr = format(preset.days === 0 ? new Date() : new Date(Date.now() + preset.days * 86400000), "yyyy-MM-dd");
+                  const isSelected = dueDate === targetDateStr;
+                  return (
                     <button
-                      key={inc}
+                      key={preset.label}
                       type="button"
                       onClick={() => {
                         soundFX.playPop();
-                        const curr = parseFloat(amount) || 0;
-                        setAmount(String(curr + inc));
+                        setDueDate(targetDateStr);
                       }}
-                      className="px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-white dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#383531] shadow-xs active:scale-95 transition-all cursor-pointer hover:border-[#161514]"
+                      className={cn(
+                        "px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold border transition-all cursor-pointer shadow-xs",
+                        isSelected
+                          ? "bg-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:text-[#161514] border-[#161514] dark:border-[#CEF431]"
+                          : "bg-[#FAF8F5] dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] border-[#E8E5DF] dark:border-[#383531] hover:border-[#161514]"
+                      )}
                     >
-                      +{currencySymbol}{inc}
+                      {preset.label}
                     </button>
-                  ))}
-                </div>
+                  );
+                })}
               </div>
+              <input
+                type="date"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                className="w-full mt-1 px-3 py-1.5 rounded-xl text-xs font-mono font-bold bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#161514]/30 dark:border-[#383531] text-[#161514] dark:text-[#FAF8F5] focus:outline-none shadow-xs"
+              />
             </div>
+          </div>
 
-            {/* Description & Due Date */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <div>
-                <label className="text-[10px] font-mono text-[#6B6B6B] dark:text-[#A8A29E] block mb-1">
-                  Description / Note
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. Pizza split, Cab fare, Textbook"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl text-xs font-medium bg-white dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#383531] text-[#161514] dark:text-[#FAF8F5] focus:outline-none focus:ring-1 focus:ring-[#161514]"
-                />
-              </div>
-
-              <div>
-                <label className="text-[10px] font-mono text-[#6B6B6B] dark:text-[#A8A29E] block mb-1">
-                  Expected Repayment Date (Optional)
-                </label>
-                <input
-                  type="date"
-                  value={dueDate}
-                  onChange={(e) => setDueDate(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl text-xs font-medium bg-white dark:bg-[#252321] border border-[#E8E5DF] dark:border-[#383531] text-[#161514] dark:text-[#FAF8F5] focus:outline-none focus:ring-1 focus:ring-[#161514]"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-end gap-2 pt-1">
-              <button
-                type="button"
-                onClick={() => setIsFormOpen(false)}
-                className="px-3 py-1.5 rounded-xl text-xs font-heading font-medium text-[#6B6B6B] hover:text-[#161514] dark:text-[#A8A29E] dark:hover:text-white"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-1.5 rounded-xl bg-[#161514] dark:bg-[#CEF431] text-white dark:text-[#161514] text-xs font-heading font-black shadow-xs active:scale-95 transition-all cursor-pointer border border-[#161514] dark:border-[#CEF431]"
-              >
-                Save Record
-              </button>
-            </div>
-          </form>
-        )}
-      </div>
+          <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-[#E8E5DF] dark:border-[#2A2724]">
+            <button
+              type="button"
+              onClick={() => setIsFormOpen(false)}
+              className="px-4 py-2 rounded-xl text-xs font-heading font-black border-2 border-[#161514]/30 dark:border-[#383531] text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-[#FAF8F5] hover:border-[#161514] transition-all cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-5 py-2.5 rounded-xl bg-[#161514] dark:bg-[#CEF431] text-white dark:text-[#161514] text-xs font-heading font-black border-2 border-[#161514] dark:border-[#CEF431] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
+            >
+              Save Record
+            </button>
+          </div>
+        </form>
+      )}
 
       {/* ─── SEGMENTED TAB SWITCHER: "They Owe Me" vs "I Owe Them" ─── */}
-      <div className="bg-white dark:bg-[#161514] p-1.5 rounded-2xl border border-[#E8E5DF] dark:border-[#383531] flex gap-1.5 shadow-xs">
+      <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] p-1.5 rounded-2xl border-2 border-[#161514] dark:border-[#383531] flex gap-1.5 shadow-[2px_2px_0px_0px_#161514]">
         <button
           type="button"
           onClick={() => {
@@ -479,7 +541,7 @@ export function WhoOwesWhoTabView({
           className={cn(
             "flex-1 py-2 px-3 rounded-xl text-xs font-heading font-black transition-all cursor-pointer flex items-center justify-center gap-1.5",
             activeTab === "lent"
-              ? "bg-[#161514] text-white dark:bg-[#CEF431] dark:text-[#161514] shadow-xs"
+              ? "bg-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:text-[#161514] shadow-xs"
               : "text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-white bg-transparent"
           )}
         >
@@ -499,7 +561,7 @@ export function WhoOwesWhoTabView({
           className={cn(
             "flex-1 py-2 px-3 rounded-xl text-xs font-heading font-black transition-all cursor-pointer flex items-center justify-center gap-1.5",
             activeTab === "borrowed"
-              ? "bg-[#161514] text-white dark:bg-[#CEF431] dark:text-[#161514] shadow-xs"
+              ? "bg-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:text-[#161514] shadow-xs"
               : "text-[#6B6B6B] dark:text-[#A8A29E] hover:text-[#161514] dark:hover:text-white bg-transparent"
           )}
         >

@@ -45,6 +45,7 @@ export function WhoOwesWhoModal({
             currencySymbol={currencySymbol}
             prefill={prefill}
             defaultOpenForm={defaultOpenForm}
+            hideHeader={true}
             onLogSettlementIncome={onLogSettlementIncome}
           />
         </div>

@@ -71,92 +71,92 @@ export function NeobrutalistPDFStatement({
   return (
     <div
       id="invictus-pdf-statement"
-      className="invictus-statement-print bg-[#FAF8F5] text-[#161514] p-6 sm:p-8 rounded-3xl border-4 border-[#161514] shadow-[8px_8px_0px_0px_rgba(22,21,20,1)] space-y-6 min-w-[650px] max-w-4xl mx-auto font-sans"
+      className="invictus-statement-print bg-[#FAF8F5] text-[#161514] p-4 sm:p-7 rounded-2xl sm:rounded-3xl border-3 sm:border-4 border-[#161514] shadow-[4px_4px_0px_0px_rgba(22,21,20,1)] sm:shadow-[6px_6px_0px_0px_rgba(22,21,20,1)] space-y-4 sm:space-y-6 w-full max-w-4xl mx-auto font-sans overflow-hidden"
       style={{ fontFamily: "var(--font-sans), system-ui, sans-serif" }}
     >
       {/* 1. Statement Header & Watermark */}
-      <div className="flex items-center justify-between gap-4 pb-6 border-b-4 border-[#161514]">
-        <div className="space-y-1">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 sm:pb-6 border-b-3 sm:border-b-4 border-[#161514]">
+        <div className="space-y-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="h-8 w-8 rounded-xl bg-[#CEF431] border-2 border-[#161514] flex items-center justify-center font-black text-sm shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)]">
+            <span className="size-7 sm:size-8 rounded-xl bg-[#CEF431] border-2 border-[#161514] flex items-center justify-center font-black text-xs sm:text-sm shadow-[1.5px_1.5px_0px_0px_rgba(22,21,20,1)] shrink-0">
               ⚡
             </span>
-            <span className="text-xl font-black tracking-tight uppercase" style={{ fontFamily: "var(--font-heading)" }}>
+            <span className="text-sm sm:text-base font-black tracking-tight uppercase truncate" style={{ fontFamily: "var(--font-heading)" }}>
               INVICTUS OMNITRACKER
             </span>
           </div>
-          <h2 className="text-2xl font-black uppercase text-[#161514] tracking-tight">
-            LEDGER & FINANCIAL STATEMENT
+          <h2 className="text-base sm:text-xl font-heading font-black uppercase text-[#161514] tracking-tight truncate">
+            LEDGER &amp; FINANCIAL STATEMENT
           </h2>
-          <p className="text-xs font-bold text-[#161514] opacity-70">
-            Account Holder: <strong className="text-[#161514]">{userName}</strong> • Generated: {generatedAt}
+          <p className="text-[10px] sm:text-xs font-mono font-bold text-[#161514]/70 truncate">
+            Account Holder: <strong className="text-[#161514]">{userName}</strong> • {generatedAt}
           </p>
         </div>
 
-        <div className="bg-[#CEF431] text-[#161514] px-4 py-2.5 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] text-right shrink-0">
-          <span className="text-[10px] font-black uppercase tracking-widest block opacity-80">STATEMENT PERIOD</span>
-          <span className="text-xs sm:text-sm font-black uppercase block tracking-wide">{periodLabel}</span>
+        <div className="bg-[#CEF431] text-[#161514] px-3.5 py-2 rounded-xl sm:rounded-2xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)] text-left sm:text-right shrink-0 self-start sm:self-auto">
+          <span className="text-[9px] font-mono font-black uppercase tracking-widest block opacity-75">STATEMENT PERIOD</span>
+          <span className="text-xs sm:text-sm font-heading font-black uppercase block tracking-wide truncate">{periodLabel}</span>
         </div>
       </div>
 
       {/* 2. Cashflow Overview Grid */}
-      <div className="grid grid-cols-4 gap-3">
-        <div className="bg-white p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)] space-y-1">
-          <span className="text-[10px] font-black uppercase tracking-wider text-[#161514] opacity-70 block whitespace-nowrap">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+        <div className="bg-white p-3 rounded-xl sm:rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] space-y-0.5">
+          <span className="text-[9px] sm:text-[10px] font-mono font-black uppercase tracking-wider text-[#161514]/70 block truncate">
             INCOME
           </span>
-          <span className="text-base font-black text-[#03D26F] block whitespace-nowrap">
+          <span className="text-sm sm:text-base font-mono font-black text-[#03D26F] block truncate">
             +{currencySymbol}{income.toLocaleString()}
           </span>
         </div>
 
-        <div className="bg-white p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)] space-y-1">
-          <span className="text-[10px] font-black uppercase tracking-wider text-[#161514] opacity-70 block whitespace-nowrap">
+        <div className="bg-white p-3 rounded-xl sm:rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] space-y-0.5">
+          <span className="text-[9px] sm:text-[10px] font-mono font-black uppercase tracking-wider text-[#161514]/70 block truncate">
             EXPENSE
           </span>
-          <span className="text-base font-black text-[#E11D48] block whitespace-nowrap">
+          <span className="text-sm sm:text-base font-mono font-black text-[#E11D48] block truncate">
             -{currencySymbol}{expense.toLocaleString()}
           </span>
         </div>
 
         <div className={cn(
-          "p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)] space-y-1",
+          "p-3 rounded-xl sm:rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] space-y-0.5",
           net >= 0 ? "bg-[#CEF431]" : "bg-[#FDE68A]"
         )}>
-          <span className="text-[10px] font-black uppercase tracking-wider text-[#161514] opacity-80 block whitespace-nowrap">
+          <span className="text-[9px] sm:text-[10px] font-mono font-black uppercase tracking-wider text-[#161514]/80 block truncate">
             NET FLOW
           </span>
-          <span className="text-base font-black text-[#161514] block whitespace-nowrap">
+          <span className="text-sm sm:text-base font-mono font-black text-[#161514] block truncate">
             {net < 0 ? `-${currencySymbol}${Math.abs(net).toLocaleString()}` : `+${currencySymbol}${net.toLocaleString()}`}
           </span>
         </div>
 
-        <div className="bg-white p-3.5 rounded-2xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)] space-y-1">
-          <span className="text-[10px] font-black uppercase tracking-wider text-[#161514] opacity-70 block whitespace-nowrap">
+        <div className="bg-white p-3 rounded-xl sm:rounded-2xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_rgba(22,21,20,1)] space-y-0.5">
+          <span className="text-[9px] sm:text-[10px] font-mono font-black uppercase tracking-wider text-[#161514]/70 block truncate">
             TOTAL LOGS
           </span>
-          <span className="text-base font-black text-[#161514] block whitespace-nowrap">
-            {transactions.length} {transactions.length === 1 ? "Record" : "Records"}
+          <span className="text-sm sm:text-base font-mono font-black text-[#161514] block truncate">
+            {transactions.length} Records
           </span>
         </div>
       </div>
 
       {/* 3. Category Spending Summary */}
       {categoryStats.length > 0 && (
-        <div className="bg-white p-4.5 rounded-2xl border-2 border-[#161514] shadow-[3px_3px_0px_0px_rgba(22,21,20,1)] space-y-3">
-          <h4 className="text-xs font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5">
+        <div className="bg-white p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border-2 border-[#161514] shadow-[2.5px_2.5px_0px_0px_rgba(22,21,20,1)] space-y-2.5">
+          <h4 className="text-[11px] sm:text-xs font-heading font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5">
             🏷️ Category Spending Breakdown
           </h4>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2">
             {categoryStats.map((c) => (
               <span
                 key={c.id}
-                className="px-3 py-1.5 rounded-xl border border-[#161514] bg-[#FAF8F5] text-xs font-black flex items-center gap-1.5 shadow-[1px_1px_0px_0px_rgba(22,21,20,1)]"
+                className="px-2.5 py-1 rounded-xl border-2 border-[#161514] bg-[#FAF8F5] text-[11px] font-black flex items-center gap-1.5 shadow-[1px_1px_0px_0px_rgba(22,21,20,1)]"
               >
                 <CategoryIcon name={c.icon} className="size-3.5 inline-block text-[#161514]" />
                 <span>{c.name}:</span>
-                <span className="text-[#047857] font-extrabold">{currencySymbol}{c.totalAmount.toLocaleString()}</span>
-                <span className="text-[10px] text-[#161514] opacity-60 font-bold">({c.count})</span>
+                <span className="text-[#047857] font-mono font-black">{currencySymbol}{c.totalAmount.toLocaleString()}</span>
+                <span className="text-[10px] text-[#161514]/60 font-mono">({c.count})</span>
               </span>
             ))}
           </div>
@@ -165,28 +165,28 @@ export function NeobrutalistPDFStatement({
 
       {/* 4. Chronological Day-by-Day Transaction Records */}
       <div className="space-y-4 pt-2">
-        <h4 className="text-xs font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5">
+        <h4 className="text-xs font-heading font-black uppercase tracking-wider text-[#161514] flex items-center gap-1.5">
           Itemized Transaction Ledger
         </h4>
 
         {groupedTxs.length === 0 ? (
-          <div className="p-8 text-center bg-white rounded-2xl border-2 border-[#161514]">
+          <div className="p-6 text-center bg-white rounded-2xl border-2 border-[#161514]">
             <p className="text-xs font-black text-[#161514]">No transactions found for this statement period.</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {groupedTxs.map((group) => {
               const formattedDayHeader = format(parseISO(group.dateKey), "EEEE • MMMM d, yyyy").toUpperCase();
               return (
                 <div key={group.dateKey} className="space-y-2">
                   {/* Day Header */}
-                  <div className="bg-[#161514] text-white px-4 py-2 rounded-xl border-2 border-[#161514] flex items-center justify-between">
-                    <span className="text-xs font-black tracking-wider">{formattedDayHeader}</span>
+                  <div className="bg-[#161514] text-white px-3.5 py-2 rounded-xl border-2 border-[#161514] flex items-center justify-between">
+                    <span className="text-[11px] sm:text-xs font-heading font-black tracking-wider truncate">{formattedDayHeader}</span>
                     <span className={cn(
-                      "text-[10px] font-black uppercase px-2 py-0.5 rounded-full border border-white/20",
+                      "text-[10px] font-mono font-black uppercase px-2 py-0.5 rounded-full border border-white/20 shrink-0",
                       group.dayNet >= 0 ? "bg-[#03D26F] text-[#161514]" : "bg-[#CEF431] text-[#161514]"
                     )}>
-                      {group.dayNet >= 0 ? `+${currencySymbol}${group.dayNet.toLocaleString()} Net` : `-${currencySymbol}${Math.abs(group.dayNet).toLocaleString()} Spent`}
+                      {group.dayNet >= 0 ? `+${currencySymbol}${group.dayNet.toLocaleString()}` : `-${currencySymbol}${Math.abs(group.dayNet).toLocaleString()}`}
                     </span>
                   </div>
 
@@ -198,22 +198,24 @@ export function NeobrutalistPDFStatement({
                       return (
                         <div
                           key={tx.id}
-                          className="invictus-tx-row p-3.5 flex items-center justify-between gap-3 text-xs font-bold"
+                          className="invictus-tx-row p-3 flex items-center justify-between gap-2.5 text-xs font-bold"
                           style={{ breakInside: "avoid", pageBreakInside: "avoid" }}
                         >
-                          <div className="flex items-center gap-2.5 truncate">
+                          <div className="flex items-center gap-2 min-w-0 flex-1">
                             <CategoryIcon name={category?.icon} className="size-4 shrink-0 text-[#161514]" />
-                            <div className="truncate">
-                              <span className="font-black text-[#161514]">{category?.name || "Uncategorized"}</span>
-                              {tx.note && <span className="text-[#161514] opacity-60 font-semibold truncate ml-1.5">- {tx.note}</span>}
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="font-heading font-black text-[#161514] truncate">{category?.name || "Uncategorized"}</span>
+                                {tx.note && <span className="text-[#161514]/60 font-medium text-[11px] truncate">- {tx.note}</span>}
+                              </div>
                             </div>
                           </div>
 
-                          <div className="flex items-center gap-3 shrink-0">
-                            <span className="capitalize text-[10px] font-black px-2 py-0.5 rounded bg-[#FDE68A] border border-[#161514]">
+                          <div className="flex items-center gap-2 shrink-0">
+                            <span className="uppercase text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-[#FDE68A] border border-[#161514]">
                               {tx.paymentMethod || "UPI"}
                             </span>
-                            <span className={cn("font-black text-sm", isIncome ? "text-[#03D26F]" : "text-[#E11D48]")}>
+                            <span className={cn("font-mono font-black text-xs sm:text-sm", isIncome ? "text-[#03D26F]" : "text-[#E11D48]")}>
                               {isIncome ? "+" : "-"}{currencySymbol}{tx.amount.toLocaleString()}
                             </span>
                           </div>
@@ -229,8 +231,8 @@ export function NeobrutalistPDFStatement({
       </div>
 
       {/* Statement Footer */}
-      <div className="pt-6 border-t-2 border-[#161514]/20 flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] font-extrabold text-[#161514]/60">
-        <span>Invictus Life & Money OmniTracker • Official Statement</span>
+      <div className="pt-4 border-t-2 border-[#161514]/20 flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] font-mono font-bold text-[#161514]/60">
+        <span>Invictus Life &amp; Money OmniTracker • Official Statement</span>
         <span>End of Statement</span>
       </div>
     </div>

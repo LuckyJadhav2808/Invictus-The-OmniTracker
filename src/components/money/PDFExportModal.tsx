@@ -200,10 +200,12 @@ export function PDFExportModal({
               soundFX.playPop();
               setShowAdvancedOptions(!showAdvancedOptions);
             }}
-            className="w-full py-2 px-3 rounded-xl bg-secondary/50 hover:bg-secondary text-xs font-mono font-bold text-muted-foreground hover:text-foreground flex items-center justify-between border border-border transition-colors cursor-pointer"
+            className="w-full py-2.5 px-3.5 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] hover:bg-[#F2EFE9] dark:hover:bg-[#252321] text-xs font-mono font-bold text-[#161514] dark:text-[#FAF8F5] flex items-center justify-between border-2 border-[#161514] dark:border-[#38332E] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
           >
-            <span>Statement Range, Cash Filter &amp; Preview</span>
-            <span className="font-heading font-black text-xs flex items-center gap-1">
+            <span className="text-[11px] font-heading font-black tracking-wide uppercase">
+              Statement Range, Cash Filter & Preview
+            </span>
+            <span className="font-heading font-black text-xs flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-white dark:bg-[#2A2724] border border-[#161514]/30 dark:border-white/20">
               <span>{showAdvancedOptions ? "Hide" : "Customize"}</span>
               {showAdvancedOptions ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
             </span>
@@ -212,8 +214,8 @@ export function PDFExportModal({
           {showAdvancedOptions && (
             <div className="space-y-3 pt-1 animate-in fade-in zoom-in-95 duration-150">
               {/* Export Period Selector */}
-              <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] p-3 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-1.5">
-                <label className="text-[11px] font-heading font-black uppercase tracking-wider text-muted-foreground block">
+              <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] p-3 rounded-xl border-2 border-[#161514] dark:border-[#38332E] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] space-y-1.5">
+                <label className="text-[11px] font-heading font-black uppercase tracking-wider text-[#161514]/80 dark:text-[#FAF8F5]/80 block">
                   Select Statement Range
                 </label>
                 <NeobrutalistSelect
@@ -228,17 +230,17 @@ export function PDFExportModal({
               </div>
 
               {/* 💵 GRANULAR CASH EXPENSES FILTER & PICKER */}
-              <div className="bg-amber-500/10 dark:bg-amber-950/20 rounded-xl border border-amber-500/20 dark:border-amber-800/40 p-3 shadow-xs space-y-2.5">
+              <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] rounded-xl border-2 border-[#161514] dark:border-[#38332E] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] p-3 space-y-2.5">
                 <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <div className="size-7 rounded-lg bg-amber-500/20 dark:bg-amber-400/10 border border-amber-500/30 flex items-center justify-center text-sm shrink-0">
+                  <div className="flex items-center gap-2.5">
+                    <div className="size-8 rounded-xl bg-[#FDE68A] border-2 border-[#161514] flex items-center justify-center text-sm shrink-0 shadow-[1px_1px_0px_0px_#161514]">
                       💵
                     </div>
                     <div>
-                      <span className="text-xs font-heading font-black uppercase tracking-wider text-foreground block">
+                      <span className="text-xs font-heading font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] block">
                         Include Cash Expenses?
                       </span>
-                      <span className="text-[10px] text-amber-800 dark:text-amber-300 font-bold block">
+                      <span className="text-[10px] font-mono font-bold text-[#161514]/70 dark:text-[#FAF8F5]/70 block">
                         {cashTxs.length} Cash transactions in period
                       </span>
                     </div>
@@ -246,12 +248,15 @@ export function PDFExportModal({
 
                   <button
                     type="button"
-                    onClick={() => setIncludeCashExpenses(!includeCashExpenses)}
+                    onClick={() => {
+                      soundFX.playPop();
+                      setIncludeCashExpenses(!includeCashExpenses);
+                    }}
                     className={cn(
-                      "px-3 py-1 rounded-lg text-xs font-heading font-black border shadow-xs transition-all cursor-pointer",
+                      "px-3 py-1 rounded-xl text-xs font-heading font-black border-2 border-[#161514] transition-all cursor-pointer active:translate-x-[1px] active:translate-y-[1px]",
                       includeCashExpenses
-                        ? "bg-[#CEF431] text-[#161514] border-[#161514]"
-                        : "bg-white dark:bg-[#1C1A18] text-muted-foreground border-border"
+                        ? "bg-[#CEF431] text-[#161514] shadow-[2px_2px_0px_0px_#161514]"
+                        : "bg-white dark:bg-[#252321] text-[#161514]/60 dark:text-[#FAF8F5]/60 shadow-[1px_1px_0px_0px_#161514]"
                     )}
                   >
                     {includeCashExpenses ? "YES (Included)" : "NO (Hide Cash)"}
@@ -260,12 +265,12 @@ export function PDFExportModal({
 
                 {/* Granular Individual Cash Item Selection */}
                 {includeCashExpenses && cashTxs.length > 0 && (
-                  <div className="space-y-2 pt-1 border-t border-amber-500/20 dark:border-amber-800/40">
+                  <div className="space-y-2 pt-2 border-t-2 border-[#161514]/15 dark:border-[#38332E]">
                     <div className="flex items-center justify-between">
                       <button
                         type="button"
                         onClick={() => setIsCashListExpanded(!isCashListExpanded)}
-                        className="text-[10px] font-heading font-black uppercase tracking-wider text-foreground flex items-center gap-1 hover:underline cursor-pointer"
+                        className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1 hover:underline cursor-pointer"
                       >
                         <span>Choose Cash Items ({selectedCashTxIds.size}/{cashTxs.length})</span>
                         {isCashListExpanded ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
@@ -273,45 +278,51 @@ export function PDFExportModal({
 
                       <button
                         type="button"
-                        onClick={toggleSelectAllCash}
-                        className="text-[9px] font-heading font-black uppercase px-2 py-0.5 rounded-lg bg-white dark:bg-[#1C1A18] border border-border text-foreground shadow-xs cursor-pointer"
+                        onClick={() => {
+                          soundFX.playPop();
+                          toggleSelectAllCash();
+                        }}
+                        className="text-[9px] font-heading font-black uppercase px-2 py-0.5 rounded-lg bg-white dark:bg-[#1C1A18] border-2 border-[#161514] text-[#161514] dark:text-[#FAF8F5] shadow-[1px_1px_0px_0px_#161514] cursor-pointer"
                       >
                         {selectedCashTxIds.size === cashTxs.length ? "Deselect All" : "Select All"}
                       </button>
                     </div>
 
                     {isCashListExpanded && (
-                      <div className="max-h-40 overflow-y-auto space-y-1.5 p-1 bg-white dark:bg-[#1C1A18] rounded-xl border border-border">
+                      <div className="max-h-44 overflow-y-auto space-y-1.5 p-1.5 bg-white dark:bg-[#161514] rounded-xl border-2 border-[#161514] dark:border-[#38332E]">
                         {cashTxs.map((tx) => {
                           const isChecked = selectedCashTxIds.has(tx.id);
                           const cat = categories.find((c) => c.id === tx.categoryId);
                           return (
                             <div
                               key={tx.id}
-                              onClick={() => toggleCashTxId(tx.id)}
+                              onClick={() => {
+                                soundFX.playPop();
+                                toggleCashTxId(tx.id);
+                              }}
                               className={cn(
-                                "p-2 rounded-lg border flex items-center justify-between gap-2 cursor-pointer transition-all text-xs font-bold",
+                                "p-2 rounded-xl border-2 flex items-center justify-between gap-2 cursor-pointer transition-all text-xs font-bold",
                                 isChecked
-                                  ? "bg-[#CEF431]/20 dark:bg-[#CEF431]/10 border-[#161514]/30 dark:border-[#CEF431]/40 shadow-xs"
-                                  : "bg-[#FAF8F5] dark:bg-[#252321] border-border opacity-70"
+                                  ? "bg-[#CEF431]/30 dark:bg-[#CEF431]/20 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514]"
+                                  : "bg-[#FAF8F5] dark:bg-[#252321] border-[#161514]/30 dark:border-[#38332E] opacity-70"
                               )}
                             >
                               <div className="flex items-center gap-2 min-w-0">
-                                <span className="p-0.5 text-foreground">
+                                <span className="p-0.5 text-[#161514] dark:text-[#FAF8F5]">
                                   {isChecked ? <CheckSquare className="size-4 text-[#03D26F] stroke-[2.5]" /> : <Square className="size-4 text-muted-foreground stroke-[2]" />}
                                 </span>
-                                <CategoryIcon name={cat?.icon} className="size-4 shrink-0 text-foreground" />
+                                <CategoryIcon name={cat?.icon} className="size-4 shrink-0 text-[#161514] dark:text-[#FAF8F5]" />
                                 <div className="min-w-0">
-                                  <span className="text-[11px] font-heading font-black text-foreground block truncate">
+                                  <span className="text-[11px] font-heading font-black text-[#161514] dark:text-[#FAF8F5] block truncate">
                                     {cat?.name || "Expense"} {tx.note ? `• ${tx.note}` : ""}
                                   </span>
-                                  <span className="text-[9px] font-mono text-muted-foreground block">
+                                  <span className="text-[9px] font-mono text-[#161514]/60 dark:text-[#FAF8F5]/60 block">
                                     {tx.date ? format(parseISO(tx.date), "MMM d, yyyy") : ""}
                                   </span>
                                 </div>
                               </div>
 
-                              <span className="text-xs font-heading font-black text-foreground shrink-0">
+                              <span className="text-xs font-mono font-black text-[#161514] dark:text-[#FAF8F5] shrink-0">
                                 {currencySymbol}{tx.amount.toLocaleString()}
                               </span>
                             </div>
@@ -324,19 +335,19 @@ export function PDFExportModal({
               </div>
 
               {/* Statement Preview */}
-              <div className="pt-1">
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[10px] font-heading font-black uppercase tracking-wider text-muted-foreground">
+              <div className="pt-1 space-y-1.5">
+                <div className="flex items-center justify-between px-0.5">
+                  <span className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514]/70 dark:text-[#FAF8F5]/70">
                     Statement Preview ({finalExportTxs.length} Transactions)
                   </span>
-                  <span className="text-[9px] font-mono text-muted-foreground">
+                  <span className="text-[9px] font-mono font-bold text-[#161514]/70 dark:text-[#FAF8F5]/70">
                     {includeCashExpenses
                       ? `${onlineTxs.length} Online + ${selectedCashTxIds.size} Cash`
                       : `${onlineTxs.length} Online`}
                   </span>
                 </div>
 
-                <div className="max-h-[260px] overflow-y-auto rounded-xl border border-border shadow-xs">
+                <div className="max-h-[340px] overflow-y-auto overflow-x-hidden rounded-2xl border-2 border-[#161514] dark:border-[#38332E] shadow-[2.5px_2.5px_0px_0px_#161514] dark:shadow-[2.5px_2.5px_0px_0px_#000000] p-1 bg-white dark:bg-[#161514]">
                   <NeobrutalistPDFStatement
                     transactions={finalExportTxs}
                     categories={categories}

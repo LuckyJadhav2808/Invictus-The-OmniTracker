@@ -291,11 +291,22 @@ export function generateEnterpriseVectorPDF({
     y += 7;
   });
 
-  // 5. FOOTER ON LAST PAGE
-  pdf.setFontSize(7);
-  pdf.setFont("helvetica", "normal");
-  pdf.setTextColor(120, 120, 120);
-  pdf.text(`Invictus OmniTracker Enterprise Statement • Page 1 of ${pdf.getNumberOfPages()}`, margin, pageHeight - 8);
+  // 5. FOOTER ON ALL PAGES
+  const totalPages = pdf.getNumberOfPages();
+  for (let i = 1; i <= totalPages; i++) {
+    pdf.setPage(i);
+    // Subtle separator line
+    pdf.setDrawColor(22, 21, 20);
+    pdf.setLineWidth(0.2);
+    pdf.line(margin, pageHeight - 11, margin + contentWidth, pageHeight - 11);
+
+    pdf.setFontSize(7);
+    pdf.setFont("helvetica", "bold");
+    pdf.setTextColor(80, 80, 80);
+    pdf.text(`Invictus OmniTracker Statement • Page ${i} of ${totalPages}`, margin, pageHeight - 7);
+    pdf.setFont("helvetica", "normal");
+    pdf.text("Confidential & Offline-Generated", margin + contentWidth, pageHeight - 7, { align: "right" });
+  }
 
   // Trigger vector PDF download
   pdf.save(filename);
