@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { AlertTriangle, RotateCcw, Home, ChevronDown, ChevronUp } from "lucide-react";
 import Link from "next/link";
 

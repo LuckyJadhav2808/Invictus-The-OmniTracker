@@ -2,7 +2,6 @@ import { describe, it, expect, vi } from "vitest";
 import {
   findSynonymCategory,
   ensureCategoryExists,
-  CATEGORY_BLUEPRINTS,
 } from "./category-provisioner";
 import { type Category } from "@/types";
 

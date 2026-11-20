@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback } from "react";
 import { type MonthlyBudgetStats, type DailyBudgetStats } from "@/lib/utils/budget-rollover";
 import { soundFX } from "@/components/shared/SoundFX";
 import { cn } from "@/lib/utils";
@@ -12,12 +12,10 @@ import {
   Eye,
   EyeOff,
   RotateCcw,
-  Sparkles,
   ChevronRight,
   ChevronLeft,
   TrendingUp,
   TrendingDown,
-  Layers,
 } from "lucide-react";
 
 interface WalletCardDeckProps {

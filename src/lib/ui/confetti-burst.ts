@@ -108,7 +108,6 @@ export function confettiBurst(options: ConfettiBurstOptions = {}) {
   }
 
   const startTime = performance.now();
-  let rafId: number;
 
   const render = (time: number) => {
     const elapsed = time - startTime;
@@ -161,11 +160,11 @@ export function confettiBurst(options: ConfettiBurstOptions = {}) {
     });
 
     if (progress < 1) {
-      rafId = requestAnimationFrame(render);
+      requestAnimationFrame(render);
     } else {
       canvas.remove();
     }
   };
 
-  rafId = requestAnimationFrame(render);
+  requestAnimationFrame(render);
 }

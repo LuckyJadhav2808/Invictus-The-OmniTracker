@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { type LucideIcon, Sparkles } from "lucide-react";
 import { StrobiCompanion, type StrobiGear } from "@/components/mascot/StrobiCompanion";
 import { cn } from "@/lib/utils";

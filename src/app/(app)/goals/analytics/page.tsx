@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { BarChart2, Flame, Award, Calendar, Sparkles } from "lucide-react";
 import { useHabits, useStreaks, useMonthHabitLogs } from "@/lib/queries/goals";
 import { WeeklyVelocityAndHabitMatrix } from "@/components/goals/WeeklyVelocityAndHabitMatrix";

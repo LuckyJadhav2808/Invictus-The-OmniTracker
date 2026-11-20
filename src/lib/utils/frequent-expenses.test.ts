@@ -2,7 +2,6 @@ import { describe, it, expect } from "vitest";
 import {
   computeFrequentExpenses,
   inferExpenseIcon,
-  STARTER_SUGGESTIONS,
 } from "./frequent-expenses";
 import { type Transaction, type Category } from "@/types";
 

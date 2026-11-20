@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useDeferredValue, useEffect } from "react";
-import { Search, Plus, Sparkles, X, ChevronDown, ArrowLeft, Utensils, Flame, Apple, Layers } from "lucide-react";
+import { useState, useDeferredValue, useEffect } from "react";
+import { Search, Plus, X, ChevronDown, ArrowLeft, Layers } from "lucide-react";
 import { AdaptiveDrawerDialog } from "@/components/shared/AdaptiveDrawerDialog";
 import { MEAL_TEMPLATE_PACKS } from "@/lib/templates-data";
 import { TemplatePack } from "@/components/shared/TemplateSelectionModal";

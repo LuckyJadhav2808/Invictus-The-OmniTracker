@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { type Habit, type HabitLog, type Streak, type HealthProfile, type WaterLog, type Workout, type Macros, type Diet } from "@/types";
-import { calculateStreak, evaluateAutonomousStreakFreeze, isHabitScheduledOnDate, type AutonomousShieldResult } from "@/lib/utils/streaks";
+import { calculateStreak, evaluateAutonomousStreakFreeze, isHabitScheduledOnDate } from "@/lib/utils/streaks";
 import { format } from "date-fns";
 import { executeOfflineMutation } from "@/lib/offline/offline-mutation";
 

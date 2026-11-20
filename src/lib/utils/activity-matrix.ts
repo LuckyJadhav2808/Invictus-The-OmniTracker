@@ -1,4 +1,4 @@
-import { format, subDays, startOfWeek, addDays, isSameDay, isToday as checkIsToday, parseISO, differenceInDays } from "date-fns";
+import { format, subDays, startOfWeek, addDays, isToday as checkIsToday, differenceInDays } from "date-fns";
 import { HabitLog } from "@/lib/schemas/goals";
 import { Transaction } from "@/lib/schemas/money";
 

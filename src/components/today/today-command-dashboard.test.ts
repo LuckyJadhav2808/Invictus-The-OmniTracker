@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from "vitest";
-import { type Habit, type HabitLog, type Streak } from "@/types";
+import { describe, it, expect } from "vitest";
+import { type Habit, type Streak } from "@/types";
 
 describe("Today Command Dashboard Engine & Agenda Partitioning", () => {
   // Classification heuristic helper test

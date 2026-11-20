@@ -14,7 +14,6 @@ import {
   ShieldCheck,
   Bell,
   Sparkles,
-  Wifi,
   WifiOff,
   LogOut,
   ChevronDown,

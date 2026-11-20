@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { InlineMathInput } from "./InlineMathInput";
-import { evaluateExpression, formatCleanNumber } from "@/lib/utils/calculator-engine";
+import { evaluateExpression } from "@/lib/utils/calculator-engine";
 
 describe("InlineMathInput & Arithmetic Engine", () => {
   it("exports InlineMathInput as a valid React component", () => {

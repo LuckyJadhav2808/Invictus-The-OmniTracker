@@ -57,8 +57,6 @@ export function useSyncNativeQuickLogs(remainingBudget?: number) {
       try {
         const pending = await NativeQuickLogBridge.getPendingExpenses();
         if (pending && pending.length > 0) {
-          const activeUid = getActiveUserId(user);
-
           for (const item of pending) {
             // Strictly resolve to an expense category (never income like Salary)
             const categoryId = resolveExpenseCategoryId(item.category, item.note, categories);

@@ -1,6 +1,5 @@
 // 100+ Merchant & Keyword Categorization Dataset Engine
 // Comprehensive keyword & semantic dictionary with Indian everyday terms
-import { type Category } from "@/types";
 
 export interface KeywordMapping {
   keywords: string[];

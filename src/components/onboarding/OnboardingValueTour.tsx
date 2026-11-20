@@ -1,15 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import {
   ArrowRight,
   ArrowLeft,
   ShieldCheck,
   Flame,
-  Wallet,
-  Sparkles,
-  CheckCircle2,
   Lock,
   WifiOff,
   Zap,
@@ -27,7 +23,6 @@ export function OnboardingValueTour({
   onStartSetup,
   onSkipToLogin,
 }: OnboardingValueTourProps) {
-  const router = useRouter();
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const totalSlides = 4;

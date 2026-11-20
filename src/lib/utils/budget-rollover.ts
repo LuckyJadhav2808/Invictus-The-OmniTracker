@@ -140,7 +140,6 @@ export function computeMonthlyBudgetStats({
   // Resolve Base Budgets with seamless fallback
   const effectiveUpiBudget = baseUpiBudget !== undefined ? baseUpiBudget : (baseBudget ?? 9000);
   const effectiveCashBudget = baseCashBudget ?? 0;
-  const effectiveBaseBudget = effectiveUpiBudget + effectiveCashBudget;
 
   // Format Labels
   let targetMonthLabel = targetMonthKey;

@@ -13,15 +13,10 @@ import {
   Grid,
   Volume2,
   VolumeX,
-  Wifi,
-  WifiOff,
-  RefreshCw,
-  Sparkles,
   ArrowLeft,
 } from "lucide-react";
 import { soundFX } from "@/components/shared/SoundFX";
 import { useUIStore } from "@/store/ui-store";
-import { useOfflineSync } from "@/lib/offline/sync-manager";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -69,7 +64,6 @@ export function MobileAppBar({
   showDynamicIsland = true,
 }: MobileAppBarProps) {
   const { habitLayoutStyle, setHabitLayoutStyle } = useUIStore();
-  const { isOnline, isSyncing, pendingCount } = useOfflineSync();
   const [soundMuted, setSoundMuted] = useState(soundFX.isMuted());
 
   const todayStr = format(new Date(), "yyyy-MM-dd");

@@ -1,20 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { AppVersionInfo, APP_VERSION_CONFIG } from "@/config/version";
-import { useFeatureFlags } from "@/lib/hooks/useFeatureFlags";
+import { useState, useEffect } from "react";
+import { APP_VERSION_CONFIG } from "@/config/version";
 import { InAppDiagnosticsModal } from "@/components/shared/InAppDiagnosticsModal";
 import {
-  Zap,
   Rocket,
-  ShieldCheck,
   RefreshCw,
-  Plus,
-  Terminal,
   Activity,
-  CheckCircle2,
-  AlertCircle,
-  HardDriveDownload,
   Flag,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -22,7 +14,6 @@ import { cn } from "@/lib/utils";
 
 export function InAppCicdPanel() {
   const [manifestData, setManifestData] = useState<any>(null);
-  const [manifestLoading, setManifestLoading] = useState(true);
   const [flagsList, setFlagsList] = useState<Record<string, any>>({});
   const [flagsLoading, setFlagsLoading] = useState(true);
   const [isDiagnosticsOpen, setIsDiagnosticsOpen] = useState(false);
@@ -37,7 +28,6 @@ export function InAppCicdPanel() {
   const [isMandatory, setIsMandatory] = useState(false);
 
   const fetchManifest = async () => {
-    setManifestLoading(true);
     try {
       const res = await fetch("/api/app/manifest", { cache: "no-store" });
       if (res.ok) {
@@ -46,8 +36,6 @@ export function InAppCicdPanel() {
       }
     } catch {
       // Fallback
-    } finally {
-      setManifestLoading(false);
     }
   };
 

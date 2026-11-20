@@ -14,8 +14,7 @@ import { showToast } from "@/lib/utils/toasts";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/store/ui-store";
 import { useQueryClient } from "@tanstack/react-query";
-import { useUserAchievements } from "@/lib/queries/achievements";
-import { useBudgetPreferences, useUpdateBudgetPreferences } from "@/lib/queries/money";
+import { useBudgetPreferences } from "@/lib/queries/money";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
 import { SettingsSkeleton } from "@/components/shared/NeobrutalistSkeleton";
@@ -46,7 +45,6 @@ import {
   Bell,
   Volume2,
   AlarmClock,
-  Cloud,
   Smartphone,
   ChevronDown,
   ChevronUp,
@@ -116,11 +114,8 @@ export default function SettingsPage() {
     setPlayfulToastsEnabled,
     habitLayoutStyle,
     setHabitLayoutStyle,
-    widgetVariantStyle,
-    setWidgetVariantStyle,
   } = useUIStore();
   const queryClient = useQueryClient();
-  const achievements = useUserAchievements();
 
   // Evaluator Demo Data State
   const isGuestActive =
@@ -237,10 +232,8 @@ export default function SettingsPage() {
   });
 
   // Cloud Budget Preferences & Daily Spending Limit State
+  // Cloud Budget Preferences (used for AmbientQuickLogCard)
   const { data: cloudBudgetPrefs } = useBudgetPreferences();
-  const updateBudgetMutation = useUpdateBudgetPreferences();
-  const [dailyLimitInput, setDailyLimitInput] = useState("");
-  const [savingDailyLimit, setSavingDailyLimit] = useState(false);
 
   const currencySymbol = useMemo(() => {
     switch (currency) {
@@ -257,77 +250,12 @@ export default function SettingsPage() {
     }
   }, [currency]);
 
-  useEffect(() => {
-    if (
-      cloudBudgetPrefs?.customDailyBudget !== undefined &&
-      cloudBudgetPrefs.customDailyBudget !== null
-    ) {
-      setDailyLimitInput(String(cloudBudgetPrefs.customDailyBudget));
-    } else {
-      const local =
-        typeof window !== "undefined"
-          ? localStorage.getItem("invictus_custom_daily_budget")
-          : null;
-      if (local) setDailyLimitInput(local);
-    }
-  }, [cloudBudgetPrefs]);
-
-  const handleSaveDailyLimit = async () => {
-    setSavingDailyLimit(true);
-    const num = dailyLimitInput.trim() ? Number(dailyLimitInput) : null;
-    if (num !== null && (isNaN(num) || num < 0)) {
-      showToast.error("Invalid Amount", "Please enter a valid daily amount");
-      setSavingDailyLimit(false);
-      return;
-    }
-    if (typeof window !== "undefined") {
-      try {
-        if (num !== null) {
-          localStorage.setItem("invictus_custom_daily_budget", String(num));
-        } else {
-          localStorage.removeItem("invictus_custom_daily_budget");
-        }
-      } catch {}
-    }
-    try {
-      await updateBudgetMutation.mutateAsync({
-        customDailyBudget: num,
-      });
-      showToast.success(
-        "Daily Limit Saved ⚡",
-        num
-          ? `Daily limit set to ${currencySymbol}${num}/day & synced with widget!`
-          : "Reverted to auto safe-to-spend pace!"
-      );
-    } catch {
-      showToast.success("Saved Locally ⚡", "Daily limit cached on device");
-    } finally {
-      setSavingDailyLimit(false);
-    }
-  };
-
-  const handleClearDailyLimit = async () => {
-    setDailyLimitInput("");
-    if (typeof window !== "undefined") {
-      try {
-        localStorage.removeItem("invictus_custom_daily_budget");
-      } catch {}
-    }
-    try {
-      await updateBudgetMutation.mutateAsync({ customDailyBudget: null });
-      showToast.success("Daily Limit Cleared 🟢", "Widget reverted to auto safe-to-spend pace");
-    } catch {
-      showToast.info("Cleared Locally", "Daily limit reset on device");
-    }
-  };
-
   // Password Change State
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   // Feature modals state
-  const [isAchievementsOpen, setIsAchievementsOpen] = useState(false);
   const [isCSVModalOpen, setIsCSVModalOpen] = useState(false);
   const [isReportIssueOpen, setIsReportIssueOpen] = useState(false);
   const [isUpdateCheckOpen, setIsUpdateCheckOpen] = useState(false);
@@ -339,17 +267,14 @@ export default function SettingsPage() {
   const [wakeUpAlarm, setWakeUpAlarm] = useState(true);
   const [completionSound, setCompletionSound] = useState<SoundEffectType>("tap");
   const [cloudSync, setCloudSync] = useState(true);
-  const [isAIInsightsOpen, setIsAIInsightsOpen] = useState(false);
 
   // Native 1-Tap PWA Installation Support
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-  const [isInstallable, setIsInstallable] = useState(false);
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e);
-      setIsInstallable(true);
     };
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
@@ -370,7 +295,6 @@ export default function SettingsPage() {
     const { outcome } = await deferredPrompt.userChoice;
     if (outcome === "accepted") {
       toast.success("Invictus installed to your Home Screen! 🎉");
-      setIsInstallable(false);
     }
     setDeferredPrompt(null);
   };
@@ -404,10 +328,6 @@ export default function SettingsPage() {
     URL.revokeObjectURL(url);
     toast.success(`Downloaded ${reportType.toUpperCase()} CSV report! 📊`);
   };
-
-  const [showDeleteAccount, setShowDeleteAccount] = useState(false);
-  const [deleteAccountText, setDeleteAccountText] = useState("");
-  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
   useEffect(() => {
     setActiveAnnouncement(getGlobalAnnouncement());

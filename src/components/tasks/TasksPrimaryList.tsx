@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { TaskItem } from "@/types";
 import {
@@ -10,13 +10,9 @@ import {
   Calendar,
   Clock,
   Search,
-  Filter,
-  Plus,
   ChevronDown,
   ChevronUp,
-  Tag,
   CheckSquare,
-  Sparkles,
   Edit3,
   Trash2,
 } from "lucide-react";

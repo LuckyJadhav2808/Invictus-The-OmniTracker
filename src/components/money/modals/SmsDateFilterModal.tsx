@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { format, subDays, startOfMonth, startOfDay, endOfDay } from "date-fns";
-import { Calendar, X, RefreshCw, CheckCircle2, Sliders, ArrowRight, ShieldCheck, Sparkles, Clock } from "lucide-react";
+import { Calendar, X, RefreshCw, CheckCircle2, ShieldCheck, Clock } from "lucide-react";
 import { soundFX } from "@/components/shared/SoundFX";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";

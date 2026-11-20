@@ -4,7 +4,6 @@ import { useEffect, useMemo } from "react";
 import { useCategories, useTransactions, useSavingsGoals, useBudgetPreferences } from "@/lib/queries/money";
 import { useHabits, useHabitLogs, useStreaks } from "@/lib/queries/goals";
 import { useAuth } from "@/components/shared/AuthProvider";
-import { useUIStore } from "@/store/ui-store";
 import { useWidgetSync } from "@/lib/hooks/useWidgetSync";
 import { useLiveActivityStore } from "@/store/live-activity-store";
 import { computeMonthlyBudgetStats, computeDailyBudgetStats } from "@/lib/utils/budget-rollover";

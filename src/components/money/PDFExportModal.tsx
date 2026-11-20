@@ -3,13 +3,12 @@ import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormConta
 import { NeobrutalistPDFStatement } from "@/components/money/NeobrutalistPDFStatement";
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
 import { type Transaction, type Category } from "@/types";
-import { FileText, Download, Printer, CheckCircle2, Calendar, Banknote, CheckSquare, Square, ChevronDown, ChevronUp } from "lucide-react";
+import { Download, Printer, CheckSquare, Square, ChevronDown, ChevronUp } from "lucide-react";
 import { format, subDays, parseISO } from "date-fns";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { exportElementToPDF } from "@/lib/utils/pdf-exporter";
 import { generateEnterpriseVectorPDF } from "@/lib/utils/vector-pdf-engine";
-import { isCashTransaction, isOnlineTransaction } from "@/lib/utils/budget-rollover";
+import { isCashTransaction } from "@/lib/utils/budget-rollover";
 import { CategoryIcon } from "@/components/money/MoneyQuickActionsAndCards";
 
 interface PDFExportModalProps {

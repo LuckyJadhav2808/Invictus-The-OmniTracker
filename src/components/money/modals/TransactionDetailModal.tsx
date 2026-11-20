@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
 import { type Transaction, type Category } from "@/types";
 import { cn } from "@/lib/utils";

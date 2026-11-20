@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
 import { soundFX } from "@/components/shared/SoundFX";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { type Category } from "@/types";
-import { Banknote, Sparkles, Plus, Check } from "lucide-react";
+import { Banknote, Sparkles, Check } from "lucide-react";
 import { CategoryIcon } from "@/components/money/MoneyQuickActionsAndCards";
 import { detectCategoryFromNote } from "@/lib/utils/merchant-categorizer";
 
@@ -37,7 +37,7 @@ export function QuickCashEntryModal({
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
   const [categoryId, setCategoryId] = useState("");
-  const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
+  const date = format(new Date(), "yyyy-MM-dd");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Filter only expense categories
@@ -54,7 +54,6 @@ export function QuickCashEntryModal({
 
   // Selected category object
   const activeCategoryId = categoryId || autoMatch?.categoryId || expenseCategories[0]?.id || "cat-food";
-  const activeCategory = expenseCategories.find((c) => c.id === activeCategoryId);
 
   const handleIncrement = (val: number) => {
     soundFX.play("click");

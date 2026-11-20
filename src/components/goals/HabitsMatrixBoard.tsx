@@ -1,28 +1,18 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import {
   format,
   subDays,
-  startOfWeek,
-  endOfWeek,
   eachDayOfInterval,
   isToday as checkIsToday,
-  isSameDay,
 } from "date-fns";
 import {
-  Calendar,
-  Flame,
   Sparkles,
-  Trophy,
   Check,
   Plus,
-  Zap,
   LayoutGrid,
-  Rows,
   Layers,
-  ArrowUpRight,
-  TrendingUp,
   MoreHorizontal,
   Edit3,
   Trash2,
@@ -63,7 +53,6 @@ export function HabitsMatrixBoard({
   // Time Window: 14 Days vs 28 Days (4 Weeks)
   const [windowDays, setWindowDays] = useState<14 | 28>(28);
   const [matrixStyle, setMatrixStyle] = useState<"board" | "cards">("board");
-  const [hoveredCell, setHoveredCell] = useState<{ habitTitle: string; dateStr: string; isDone: boolean } | null>(null);
 
   const today = useMemo(() => new Date(), []);
   const todayStr = useMemo(() => format(today, "yyyy-MM-dd"), [today]);
@@ -376,14 +365,6 @@ export function HabitsMatrixBoard({
                             <button
                               type="button"
                               onClick={() => handleCellClick(habit.id, day.dateStr, isDone)}
-                              onMouseEnter={() =>
-                                setHoveredCell({
-                                  habitTitle: habit.title,
-                                  dateStr: day.dateStr,
-                                  isDone,
-                                })
-                              }
-                              onMouseLeave={() => setHoveredCell(null)}
                               className={cn(
                                 "size-6 sm:size-7.5 rounded-lg border-2 flex items-center justify-center mx-auto transition-all duration-150 cursor-pointer active:scale-90",
                                 isDone

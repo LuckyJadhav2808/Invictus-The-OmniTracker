@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { connectToDatabase, resolveDatabaseForRequest, assertDatabaseSafety, PROD_DB_NAME } from "@/lib/mongodb";
+import { connectToDatabase, resolveDatabaseForRequest, assertDatabaseSafety } from "@/lib/mongodb";
 import { Habit } from "@/models/Habit";
 import { HabitLog } from "@/models/HabitLog";
 import { HealthProfile } from "@/models/HealthProfile";

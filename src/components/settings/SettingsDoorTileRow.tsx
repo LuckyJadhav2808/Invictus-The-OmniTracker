@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { Bell, Palette, HardDrive, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";

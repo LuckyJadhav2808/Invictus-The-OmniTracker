@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
 import { useOfflineSync } from "@/lib/offline/sync-manager";
 import {

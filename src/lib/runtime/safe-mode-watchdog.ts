@@ -74,6 +74,10 @@ class BootloaderWatchdog {
 
   public markBootAsHealthy() {
     try {
+      if (this.healthyTimer) {
+        clearTimeout(this.healthyTimer);
+        this.healthyTimer = null;
+      }
       localStorage.setItem(CRASH_COUNTER_KEY, "0");
       this.crashCount = 0;
       this.safeModeActive = false;

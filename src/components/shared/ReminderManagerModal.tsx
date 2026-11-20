@@ -9,7 +9,7 @@ import {
   DEFAULT_REMINDER_CONFIG,
 } from "@/lib/utils/reminder-scheduler";
 import { requestNotificationPermission, sendNativeNotification } from "@/lib/utils/notifications";
-import { Bell, Clock, Wallet, CheckSquare, Volume2, VolumeX, CheckCircle2 } from "lucide-react";
+import { Bell, Wallet, CheckSquare, Volume2, VolumeX, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { NeobrutalistTimeInput } from "@/components/shared/NeobrutalistTimeInput";

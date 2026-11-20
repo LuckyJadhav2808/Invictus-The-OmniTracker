@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Zap, Smartphone, CheckCircle2, Sliders, ArrowUpRight, Bell, ShieldCheck, ToggleLeft, ToggleRight, Sparkles } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Zap, Smartphone, ArrowUpRight, Bell, Sparkles } from "lucide-react";
 import { NativeQuickLogBridge } from "@/lib/native/quick-log-bridge";
 import { soundFX } from "@/components/shared/SoundFX";
 import { toast } from "sonner";
@@ -18,8 +18,6 @@ export function AmbientQuickLogCard({
 }: AmbientQuickLogCardProps) {
   const [isEnabled, setIsEnabled] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
-  const [hasNotifPermission, setHasNotifPermission] = useState<boolean | null>(null);
-  const isNative = NativeQuickLogBridge.isSupported();
 
   useEffect(() => {
     let mounted = true;
@@ -37,8 +35,7 @@ export function AmbientQuickLogCard({
     soundFX.playPop();
     const nextState = !isEnabled;
     if (nextState && NativeQuickLogBridge.isSupported()) {
-      const granted = await NativeQuickLogBridge.requestNotificationPermission();
-      setHasNotifPermission(granted);
+      await NativeQuickLogBridge.requestNotificationPermission();
     }
     setIsEnabled(nextState);
     await NativeQuickLogBridge.setAmbientDockEnabled(nextState);
@@ -51,20 +48,6 @@ export function AmbientQuickLogCard({
     } else {
       toast.info("Notification Logger Unpinned", {
         description: "Removed ambient dock from Android Notification Shade.",
-      });
-    }
-  };
-
-  const handleRequestPermission = async () => {
-    soundFX.playClick();
-    const granted = await NativeQuickLogBridge.requestNotificationPermission();
-    setHasNotifPermission(granted);
-    if (granted) {
-      toast.success("Notification Permission Granted! 🔔");
-      await NativeQuickLogBridge.syncBudgetTelemetry(safeDailyPace);
-    } else {
-      toast.error("Permission not granted", {
-        description: "Please allow notifications in Android App Info settings.",
       });
     }
   };

@@ -1,15 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
   Check,
-  CheckCircle2,
   Wallet,
   Coins,
   Sparkles,
-  Target,
   Edit2,
 } from "lucide-react";
 import {

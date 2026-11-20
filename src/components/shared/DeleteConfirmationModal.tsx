@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { AdaptiveDrawerDialog } from "@/components/shared/AdaptiveDrawerDialog";
 import { soundFX } from "@/components/shared/SoundFX";
 import { AlertTriangle } from "lucide-react";

@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { type Transaction, type Category } from "@/types";
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend, BarChart, Bar, XAxis, YAxis } from "recharts";
-import { TrendingUp, Plus, Calendar, BarChart2, Smartphone, Banknote, CreditCard, Store, PieChart as PieChartIcon, Sparkles, ShieldCheck, ArrowUpRight } from "lucide-react";
+import { TrendingUp, Plus, BarChart2, Smartphone, Banknote, CreditCard, Store, PieChart as PieChartIcon } from "lucide-react";
 import { format, subMonths, parseISO } from "date-fns";
 import { cn } from "@/lib/utils";
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";

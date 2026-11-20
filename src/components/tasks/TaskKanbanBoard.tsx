@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { TaskItem, Subtask } from "@/types";
-import { CheckCircle2, Clock, AlertCircle, Plus, Edit3, Trash2, ChevronRight, ChevronLeft, Sparkles, CheckSquare } from "lucide-react";
+import { TaskItem } from "@/types";
+import { CheckCircle2, Clock, Plus, Edit3, Trash2, ChevronRight, ChevronLeft, CheckSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface TaskKanbanBoardProps {

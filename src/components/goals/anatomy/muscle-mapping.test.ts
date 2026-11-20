@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { normalizeMuscleString, resolveExerciseAnatomy, MUSCLE_REGISTRY } from "./muscle-mapping";
+import { normalizeMuscleString, resolveExerciseAnatomy } from "./muscle-mapping";
 
 describe("Anatomy: Muscle String Normalizer", () => {
   it("normalizes chest variations", () => {

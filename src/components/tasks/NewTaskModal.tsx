@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
-import { TaskItem, Subtask } from "@/types";
-import { Plus, Trash2, CheckCircle2, Clock, Tag, AlertCircle, Sparkles, Flame, AlertTriangle, CircleDot, ArrowDown } from "lucide-react";
+import { TaskItem } from "@/types";
+import { Plus, Trash2, Sparkles, Flame, AlertTriangle, CircleDot, ArrowDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
 

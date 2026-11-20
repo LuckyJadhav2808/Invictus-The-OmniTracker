@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import {
   FileText,
   Trash2,
@@ -9,8 +9,6 @@ import {
   Sparkles,
   Zap,
   Calendar,
-  CheckCheck,
-  RotateCcw,
   Tag,
   ChevronDown,
 } from "lucide-react";

@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { Sparkles, MessageSquare, Zap, Trophy, Flame } from "lucide-react";
+import { useState } from "react";
+import { Sparkles, Zap, Trophy, Flame } from "lucide-react";
 import { StrobiCompanion, type StrobiState, type StrobiGear } from "./StrobiCompanion";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";

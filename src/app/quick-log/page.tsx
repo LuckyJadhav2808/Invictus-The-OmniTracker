@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { MechanicalNumpad } from "@/components/money/MechanicalNumpad";
 import { useCategories, useAddTransaction, useTransactions } from "@/lib/queries/money";

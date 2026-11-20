@@ -3,7 +3,6 @@ import React from "react";
 import { OnboardingValueTour } from "./OnboardingValueTour";
 import { OnboardingInteractiveSetup } from "./OnboardingInteractiveSetup";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { Sparkles } from "lucide-react";
 
 describe("Onboarding Components & Flow", () => {
   it("exports OnboardingValueTour as a valid functional component", () => {

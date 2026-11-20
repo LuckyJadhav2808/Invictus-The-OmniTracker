@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useWhoOwesWhoStore, type IOU, type IOUType } from "@/store/who-owes-who-store";
 import { soundFX } from "@/components/shared/SoundFX";
 import { cn } from "@/lib/utils";
@@ -12,19 +12,16 @@ import {
   CheckCircle2,
   Trash2,
   RotateCcw,
-  Calendar,
-  X,
   ArrowUpRight,
   ArrowDownLeft,
   ChevronDown,
   ChevronUp,
   MessageCircle,
   Clock,
-  Sparkles,
   Share2,
   AlertTriangle,
 } from "lucide-react";
-import { format, parseISO, isToday, isPast, differenceInDays, startOfDay } from "date-fns";
+import { parseISO, isToday, isPast, differenceInDays, startOfDay } from "date-fns";
 
 export interface WhoOwesWhoTabViewProps {
   currencySymbol: string;

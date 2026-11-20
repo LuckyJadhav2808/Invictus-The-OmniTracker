@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Clipboard, Copy, Trash2, Sparkles, Check, Tag, StickyNote, Bookmark } from "lucide-react";
+import { Copy, Trash2, Sparkles, Check, StickyNote } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 

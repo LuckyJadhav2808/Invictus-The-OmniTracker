@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { safeModeWatchdog } from "@/lib/runtime/safe-mode-watchdog";
 import { diagnosticLogger } from "@/lib/runtime/diagnostic-logger";
-import { ShieldAlert, RefreshCw, Trash2, Download, CheckCircle2 } from "lucide-react";
+import { ShieldAlert, RefreshCw, Trash2, Download } from "lucide-react";
 import { toast } from "sonner";
 
 interface SafeModeScreenProps {

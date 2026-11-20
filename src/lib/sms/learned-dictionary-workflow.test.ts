@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { parseBankSms } from "./sms-local-parser";
 import { MerchantCategoryCache } from "./merchant-cache";
 import { categorizeMerchants } from "./constrained-categorizer";
-import { ensureCategoryExists, findSynonymCategory } from "./category-provisioner";
 import { type Category } from "@/types";
 
 describe("Learned Merchant Dictionary & Dynamic Provisioning Workflow", () => {

@@ -4,16 +4,12 @@ import { useState, useMemo } from "react";
 import {
   format,
   subDays,
-  startOfWeek,
-  endOfWeek,
   eachDayOfInterval,
-  isSameDay,
   isToday as checkIsToday,
-  parseISO,
 } from "date-fns";
 import { useHabits, useMonthHabitLogs, useStreaks } from "@/lib/queries/goals";
 import * as LucideIcons from "lucide-react";
-import { Flame, Trophy, Zap, Calendar, TrendingUp, Sparkles, Award, CheckCircle2 } from "lucide-react";
+import { Flame, Trophy, Zap, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function WeeklyVelocityAndHabitMatrix() {

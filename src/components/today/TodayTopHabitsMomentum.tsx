@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useMemo } from "react";
+import { useMemo, memo } from "react";
 import Link from "next/link";
-import { ArrowUpRight, Target } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { type Habit, type HabitLog, type Streak } from "@/types";
 import { soundFX } from "@/components/shared/SoundFX";
 import { cn } from "@/lib/utils";
@@ -14,7 +14,7 @@ export interface TodayTopHabitsMomentumProps {
   className?: string;
 }
 
-export const TodayTopHabitsMomentum = React.memo(function TodayTopHabitsMomentum({
+export const TodayTopHabitsMomentum = memo(function TodayTopHabitsMomentum({
   habits,
   logs,
   streaks,

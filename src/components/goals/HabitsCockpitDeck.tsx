@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useMemo } from "react";
-import { format, startOfWeek, addDays, isSameDay } from "date-fns";
+import { useMemo } from "react";
+import { format, startOfWeek, addDays } from "date-fns";
 import {
   Flame,
   ShieldCheck,
@@ -99,7 +99,6 @@ export function HabitsCockpitDeck({
   }, [selectedDate, todayStr]);
 
   const streakTarget = 14;
-  const streakPercent = Math.min(100, Math.round((longestStreakValue / streakTarget) * 100));
   const isConquered = dueCount > 0 && completedCount >= dueCount;
 
   return (

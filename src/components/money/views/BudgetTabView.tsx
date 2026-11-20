@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { type Category, type Transaction } from "@/types";
 import { type MonthlyBudgetStats } from "@/lib/utils/budget-rollover";
 import { cn } from "@/lib/utils";
-import { Plus, Sparkles, Sliders, RefreshCw, Banknote, Target, Layers, Smartphone, Zap, X, Check } from "lucide-react";
+import { Plus, Sparkles, Sliders, RefreshCw, Banknote, Smartphone, Zap, X } from "lucide-react";
 import { CategoryIcon, getCategoryAccent } from "@/components/money/MoneyQuickActionsAndCards";
 import { BUDGET_CATEGORY_TEMPLATE_PACKS } from "@/lib/templates-data";
 import { type TemplatePack } from "@/components/shared/TemplateSelectionModal";

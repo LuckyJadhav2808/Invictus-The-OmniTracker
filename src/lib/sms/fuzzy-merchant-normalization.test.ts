@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { MerchantCategoryCache, normalizeMerchantKey } from "./merchant-cache";
+import { MerchantCategoryCache } from "./merchant-cache";
 
 describe("Fuse.js Fuzzy Merchant Normalization", () => {
   beforeEach(() => {

@@ -1,12 +1,11 @@
 "use client";
 
-import React, { useState, useDeferredValue, useEffect } from "react";
+import { useState, useDeferredValue, useEffect } from "react";
 import {
   Search,
   Plus,
   Sparkles,
   X,
-  ChevronDown,
   ArrowLeft,
   CheckSquare,
   Flame,
@@ -416,7 +415,6 @@ export function HabitChoiceModal({
 
   // Custom Habit form state
   const [customTitle, setCustomTitle] = useState("");
-  const [customCategory, setCustomCategory] = useState("Health");
   const [customIcon, setCustomIcon] = useState("Target");
   const [customColor, setCustomColor] = useState("amber");
   const [customFrequencyType, setCustomFrequencyType] = useState<"daily" | "weekly" | "customDays">("daily");

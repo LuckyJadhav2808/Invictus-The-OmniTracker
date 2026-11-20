@@ -202,11 +202,9 @@ export function BulkExpenseModal({
   const defaultCatId = expenseCategories[0]?.id || "cat-food";
 
   // --- OCR Scanner State ---
-  const [ocrImage, setOcrImage] = useState<string | null>(null);
   const [isOcrProcessing, setIsOcrProcessing] = useState(false);
   const [ocrStatusText, setOcrStatusText] = useState("");
   const [ocrProgress, setOcrProgress] = useState(0);
-  const [rawOcrText, setRawOcrText] = useState<string>("");
   const [isDragging, setIsDragging] = useState(false);
 
   const galleryInputRef = useRef<HTMLInputElement | null>(null);
@@ -231,11 +229,9 @@ export function BulkExpenseModal({
   // Reset state on close
   const handleClose = (nextOpen: boolean) => {
     if (!nextOpen) {
-      setOcrImage(null);
       setIsOcrProcessing(false);
       setOcrStatusText("");
       setOcrProgress(0);
-      setRawOcrText("");
       setIsReviewMode(false);
       setReviewItems([]);
       setSmsInputText("");
@@ -323,7 +319,6 @@ export function BulkExpenseModal({
       const reader = new FileReader();
       reader.onload = async () => {
         const dataUrl = reader.result as string;
-        setOcrImage(dataUrl);
         setIsOcrProcessing(true);
         setOcrProgress(5);
         setOcrStatusText("Optimizing image contrast & layout...");
@@ -353,7 +348,6 @@ export function BulkExpenseModal({
           await worker.terminate();
 
           const extractedText = result.data.text || "";
-          setRawOcrText(extractedText);
           setOcrProgress(100);
 
           const parsed = parseRawOCRText(extractedText, expenseCategories);

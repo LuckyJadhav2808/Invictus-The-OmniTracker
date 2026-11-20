@@ -1,7 +1,6 @@
 "use client";
 
-import React from "react";
-import { User, ShieldCheck, HardDrive, Globe, Sparkles, Sliders } from "lucide-react";
+import { User, ShieldCheck, HardDrive, Globe, Sparkles } from "lucide-react";
 import { StrobiCompanion } from "@/components/mascot/StrobiCompanion";
 import { soundFX } from "@/components/shared/SoundFX";
 import { cn } from "@/lib/utils";

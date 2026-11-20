@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
-import { Smartphone, Banknote, Zap, RefreshCw, Sparkles, Save, Info } from "lucide-react";
+import { Smartphone, Banknote, Zap, RefreshCw, Sparkles, Save } from "lucide-react";
 
 interface AllowanceSettingsModalProps {
   open: boolean;

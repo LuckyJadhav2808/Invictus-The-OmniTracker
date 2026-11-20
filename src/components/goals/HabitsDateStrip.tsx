@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useMemo } from "react";
-import { format, startOfWeek, addDays, isSameDay } from "date-fns";
+import { useMemo } from "react";
+import { format, startOfWeek, addDays } from "date-fns";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
 

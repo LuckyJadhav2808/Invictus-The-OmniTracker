@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CreditCard, Plus, Trash2, Clock, Zap, Check, Sparkles, Layers } from "lucide-react";
+import { CreditCard, Plus, Trash2, Clock, Zap, Sparkles } from "lucide-react";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
 import { TemplateSelectionModal, TemplatePack } from "@/components/shared/TemplateSelectionModal";
@@ -112,7 +112,7 @@ export function SubscriptionsTracker() {
   const [subAmount, setSubAmount] = useState("");
   const [subCycle, setSubCycle] = useState<"monthly" | "yearly">("monthly");
   const [subDate, setSubDate] = useState(new Date().toISOString().split("T")[0]);
-  const [subCategory, setSubCategory] = useState("Utilities");
+  const subCategory = "Utilities";
 
   const handleAddSub = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import {
   Sheet,
   SheetContent,
-  SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
@@ -37,7 +36,7 @@ import { CategoryIcon } from "@/components/money/MoneyQuickActionsAndCards";
 import { detectCategoryFromNote } from "@/lib/utils/merchant-categorizer";
 import { MerchantCategoryCache } from "@/lib/sms/merchant-cache";
 import { useSaveMerchantRule } from "@/lib/queries/merchant-rules";
-import { computeFrequentExpenses, type FrequentExpenseItem } from "@/lib/utils/frequent-expenses";
+import { computeFrequentExpenses } from "@/lib/utils/frequent-expenses";
 
 interface TransactionFormModalProps {
   open: boolean;
@@ -99,8 +98,8 @@ export function TransactionFormModal({
   const saveMerchantRuleMutation = useSaveMerchantRule();
 
   // Track previous open state so we ONLY initialize/reset form fields when opening modal or switching tx
-  const prevOpenRef = React.useRef(false);
-  const prevTxIdRef = React.useRef<string | undefined>(undefined);
+  const prevOpenRef = useRef(false);
+  const prevTxIdRef = useRef<string | undefined>(undefined);
 
   useEffect(() => {
     const isOpening = open && !prevOpenRef.current;
@@ -139,10 +138,6 @@ export function TransactionFormModal({
   const topCategoryTiles = useMemo(() => {
     return filteredCategories.slice(0, 11);
   }, [filteredCategories]);
-
-  const selectedCategory = useMemo(() => {
-    return categories.find((c) => c.id === categoryId);
-  }, [categories, categoryId]);
 
   // Dynamic Habit Mining: Computes frequent user expenses or graceful starter suggestions
   const frequentHabits = useMemo(() => {

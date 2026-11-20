@@ -6,7 +6,6 @@ import {
   clearConvertedLines,
 } from "./scratchpad-nlp";
 import { type Category } from "@/types";
-import { format, addDays } from "date-fns";
 
 describe("Scratchpad NLP AST Tokenizer Engine", () => {
   const mockCategories: Category[] = [

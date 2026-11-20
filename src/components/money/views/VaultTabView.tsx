@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { DraggableDashboardGrid } from "@/components/shared/DraggableDashboardGrid";
 import { SubscriptionsTracker } from "@/components/money/SubscriptionsTracker";
 import { SavingsGoals } from "@/components/money/SavingsGoals";

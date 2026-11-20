@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { X, FileText } from "lucide-react";
 import { type Category } from "@/types";
 import { type ThoughtPriority } from "@/lib/utils/scratchpad-nlp";

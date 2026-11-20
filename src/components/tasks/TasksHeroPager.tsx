@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { CheckCircle2, Flame, Clock, Calendar, FolderKanban, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { CheckCircle2, Flame, Clock, Calendar, FolderKanban } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Hero, HeroSlide, HeroStatItem } from "@/components/shared/Hero";
 import { StrobiCompanion, type StrobiState } from "@/components/mascot/StrobiCompanion";

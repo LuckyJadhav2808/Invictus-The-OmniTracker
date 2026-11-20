@@ -70,6 +70,7 @@ export async function connectToDatabase(options?: ConnectOptions): Promise<typeo
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
       family: 4,
+      dbName: targetDb,
     };
     const uri = getMongoUri();
     cached.promise = mongoose.connect(uri, opts).then((m) => m);

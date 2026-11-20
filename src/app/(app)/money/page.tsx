@@ -16,7 +16,7 @@ import {
 } from "@/lib/queries/money";
 import type { TemplatePack } from "@/components/shared/TemplateSelectionModal";
 import { BUDGET_CATEGORY_TEMPLATE_PACKS } from "@/lib/templates-data";
-import { Receipt, Target, PiggyBank, BarChart2, Users, Plus, RotateCcw, ChevronRight, Wallet, ArrowLeft } from "lucide-react";
+import { Receipt, Target, PiggyBank, Users, Plus, RotateCcw, ChevronRight, Wallet, ArrowLeft } from "lucide-react";
 import { DropdownMenuItem, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
 import { format, parseISO } from "date-fns";
 import { soundFX } from "@/components/shared/SoundFX";
@@ -473,10 +473,6 @@ function MoneyPageContent() {
     return ious.filter((i) => i.status === "pending" && i.type === "lent");
   }, [ious]);
 
-  const totalPendingLentAmount = useMemo(() => {
-    return pendingIous.reduce((sum, i) => sum + Number(i.amount || 0), 0);
-  }, [pendingIous]);
-
   const subNavTabs: SubNavTab[] = useMemo(() => [
     {
       id: "overview",
@@ -649,7 +645,6 @@ function MoneyPageContent() {
     note?: string;
   }) => {
     const dateStr = format(new Date(), "yyyy-MM-dd");
-    const cat = categoryMap.get(payload.categoryId);
 
     const res = await addTxMutation.mutateAsync({
       amount: payload.amount,

@@ -9,8 +9,6 @@ import {
   StudyCockpitSkeleton,
   TasksCockpitSkeleton,
   SettingsSkeleton,
-  SpaceHeroSkeleton,
-  TelemetryGridSkeleton,
   HabitsListSkeleton,
   SubjectsGridSkeleton,
 } from "./NeobrutalistSkeleton";

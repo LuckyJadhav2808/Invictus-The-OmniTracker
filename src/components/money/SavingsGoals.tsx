@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PiggyBank, Plus, Trophy, Trash2, Sparkles, Target } from "lucide-react";
+import { PiggyBank, Plus, Trophy, Trash2, Sparkles } from "lucide-react";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
 import { TemplateSelectionModal, TemplatePack } from "@/components/shared/TemplateSelectionModal";
 import { SAVINGS_GOAL_TEMPLATE_PACKS } from "@/lib/templates-data";

@@ -1,13 +1,12 @@
 "use client";
 
 import { useMemo } from "react";
-import { format, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, isPast, isFuture, isToday } from "date-fns";
+import { format, startOfWeek, endOfWeek, eachDayOfInterval, isPast, isFuture, isToday } from "date-fns";
 import { useHabits, useMonthHabitLogs } from "@/lib/queries/goals";
 import { cn } from "@/lib/utils";
 
 export function WeeklyOverviewWidget() {
   const today = useMemo(() => new Date(), []);
-  const todayStr = useMemo(() => format(today, "yyyy-MM-dd"), [today]);
 
   // Week Interval (Monday to Sunday)
   const weekStart = useMemo(() => startOfWeek(today, { weekStartsOn: 1 }), [today]);

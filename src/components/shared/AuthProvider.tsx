@@ -8,7 +8,6 @@ import {
   customLoginUser,
   customRegisterUser,
   customLogout,
-  setCustomSession,
 } from "@/lib/custom-auth";
 import { registerServiceWorker } from "@/lib/utils/notifications";
 import { loadEvaluatorDemoData, isDemoDataActive, clearEvaluatorDemoData } from "@/lib/demo/demo-data-seed";

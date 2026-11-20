@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import {
   Sheet,
   SheetContent,
@@ -13,9 +12,6 @@ import {
   ScanLine,
   Banknote,
   Calculator,
-  Plus,
-  ArrowRight,
-  Sparkles,
 } from "lucide-react";
 
 interface MoneyQuickActionsSheetProps {

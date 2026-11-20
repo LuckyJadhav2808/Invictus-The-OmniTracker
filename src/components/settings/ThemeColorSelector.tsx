@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { useColorTheme, ColorThemeId } from "@/lib/hooks/useColorTheme";
 import { cn } from "@/lib/utils";
 import { Check, Palette, Sparkles } from "lucide-react";

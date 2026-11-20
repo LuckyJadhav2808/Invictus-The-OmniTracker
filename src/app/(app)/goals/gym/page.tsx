@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { Dumbbell, Timer } from "lucide-react";
 import { GymRoutineTracker } from "@/components/goals/GymRoutineTracker";
 import { useLiveActivityStore } from "@/store/live-activity-store";

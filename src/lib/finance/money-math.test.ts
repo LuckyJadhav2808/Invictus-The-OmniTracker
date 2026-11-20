@@ -6,7 +6,6 @@ import {
   divideMoney,
   splitBill,
   formatMoney,
-  money,
 } from "./money-math";
 
 describe("High-Precision Money Math Engine (currency.js)", () => {

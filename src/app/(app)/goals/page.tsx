@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useMemo, useCallback, Suspense } from "react";
 import dynamic from "next/dynamic";
-import { useAuth } from "@/components/shared/AuthProvider";
 import {
   useHabits,
   useAddHabit,
@@ -63,7 +62,6 @@ const MealTracker = dynamic(
 );
 import {
   Target,
-  Sparkles,
   ShieldCheck,
   Bot,
   Flame,
@@ -82,7 +80,6 @@ import { cn } from "@/lib/utils";
 import { useSearchParams, useRouter } from "next/navigation";
 
 function GoalsPageContent() {
-  const { user } = useAuth();
   const { selectedDate, setSelectedDate, habitLayoutStyle } = useUIStore();
   const searchParams = useSearchParams();
   const router = useRouter();

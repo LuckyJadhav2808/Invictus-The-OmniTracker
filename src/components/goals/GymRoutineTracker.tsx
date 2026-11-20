@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useMemo, useEffect, useDeferredValue, useRef } from "react";
-import { Dumbbell, Plus, Trash2, Edit3, CheckCircle2, Circle, Flame, Sparkles, Layers, Search, Info, Eye, ChevronDown, ChevronUp, Timer, Play, Pause, X, RotateCcw } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Dumbbell, Plus, Trash2, Edit3, CheckCircle2, Circle, Flame, Sparkles, Layers, Eye, ChevronDown, ChevronUp, Timer, Play, Pause, X } from "lucide-react";
 import { AdaptiveDrawerDialog } from "@/components/shared/AdaptiveDrawerDialog";
 import { soundFX } from "@/components/shared/SoundFX";
 import { TemplatePack } from "@/components/shared/TemplateSelectionModal";
@@ -24,15 +24,12 @@ const ExerciseGuideModal = dynamic(
 import {
   MuscleGroup,
   resolveExerciseAnatomy,
-  mapMuscleGroupToBodyPart,
-  mapBodyPartToMuscleGroup,
 } from "@/components/goals/anatomy/muscle-mapping";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useLiveActivityStore } from "@/store/live-activity-store";
-import { useGymRoutines, useAddGymRoutine, useUpdateGymRoutine, useDeleteGymRoutine } from "@/lib/queries/gym";
-import { useExerciseLibrary } from "@/lib/queries/exercises";
+import { useGymRoutines, useAddGymRoutine, useUpdateGymRoutine } from "@/lib/queries/gym";
 import { getFriendlyWeekLabel } from "@/lib/utils/gym-rollover";
 import { useWakeLock } from "@/lib/hooks/useWakeLock";
 
@@ -80,7 +77,6 @@ export function GymRoutineTracker() {
   const { data: routines = [], isLoading } = useGymRoutines();
   const addRoutineMutation = useAddGymRoutine();
   const updateRoutineMutation = useUpdateGymRoutine();
-  const deleteRoutineMutation = useDeleteGymRoutine();
 
   // Active routine for selected day
   const currentRoutine = useMemo(() => {
@@ -91,12 +87,9 @@ export function GymRoutineTracker() {
   const [isRoutineTitleOpen, setIsRoutineTitleOpen] = useState(false);
   const [routineTitleInput, setRoutineTitleInput] = useState("");
 
-  const [isAddExerciseOpen, setIsAddExerciseOpen] = useState(false);
-  const [addModalTab, setAddModalTab] = useState<"library" | "custom">("library");
   const [isChoiceOpen, setIsChoiceOpen] = useState(false);
   const [selectedGuideExercise, setSelectedGuideExercise] = useState<any | null>(null);
   const [collapsedExercises, setCollapsedExercises] = useState<Record<string, boolean>>({});
-  const [showBodyMapFilter, setShowBodyMapFilter] = useState(false);
   const [isSplitAnatomyOpen, setIsSplitAnatomyOpen] = useState(false);
   const [isAnatomyExpanded, setIsAnatomyExpanded] = useState(true);
 
@@ -183,46 +176,6 @@ export function GymRoutineTracker() {
     }
     toast.success(`Applied ${pack.name} to ${selectedDay}!`);
   };
-  const [exerciseName, setExerciseName] = useState("");
-  const [machineName, setMachineName] = useState("");
-  const [targetMuscle, setTargetMuscle] = useState("Chest");
-  const [exerciseNotes, setExerciseNotes] = useState("");
-  const [selectedLibItem, setSelectedLibItem] = useState<any | null>(null);
-
-  // 4,300+ Exercise Library Search & Progressive Loading State
-  const [libQuery, setLibQuery] = useState("");
-  const deferredLibQuery = useDeferredValue(libQuery);
-  const [libBodyPart, setLibBodyPart] = useState("all");
-  const [libEquipment, setLibEquipment] = useState("all");
-  const [displayLimit, setDisplayLimit] = useState(50);
-  const loadMoreSentinelRef = useRef<HTMLDivElement | null>(null);
-
-  // Reset display limit to 50 whenever filter or search query changes
-  useEffect(() => {
-    setDisplayLimit(50);
-  }, [deferredLibQuery, libBodyPart, libEquipment]);
-
-  const { data: libData, isLoading: isLibLoading, isFetching: isLibFetching } = useExerciseLibrary({
-    query: deferredLibQuery,
-    bodyPart: libBodyPart,
-    equipment: libEquipment,
-    limit: displayLimit,
-  });
-
-  // Infinite scroll observer: Automatically loads more items as user scrolls near bottom
-  useEffect(() => {
-    if (!loadMoreSentinelRef.current || !libData?.hasMore) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !isLibFetching) {
-          setDisplayLimit((prev) => prev + 50);
-        }
-      },
-      { rootMargin: "200px" }
-    );
-    observer.observe(loadMoreSentinelRef.current);
-    return () => observer.disconnect();
-  }, [libData?.hasMore, isLibFetching]);
 
   const [editingExercise, setEditingExercise] = useState<any | null>(null);
   const [editExName, setEditExName] = useState("");
@@ -310,59 +263,8 @@ export function GymRoutineTracker() {
       toast.success(`Added '${item.title}' to ${selectedDay}! 💪`);
       setCollapsedExercises((prev) => ({ ...prev, [newExercise.id]: false }));
       setIsChoiceOpen(false);
-      setLibQuery("");
     } catch {
       toast.error("Failed to add exercise to routine");
-    }
-  };
-
-  // Add Custom Exercise from Form
-  const handleAddExercise = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!exerciseName.trim()) return;
-
-    const newExercise = {
-      id: `ex_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
-      name: exerciseName.trim(),
-      machineName: machineName.trim() || "Free Weights",
-      targetMuscle: targetMuscle.trim() || "Chest",
-      equipment: machineName.trim() || "Free Weights",
-      instructions: [],
-      images: [],
-      gifUrl: "",
-      secondaryMuscles: [],
-      notes: exerciseNotes.trim(),
-      sets: [
-        { id: `set_1_${Date.now()}`, setNumber: 1, weight: 20, reps: 12, completed: false },
-        { id: `set_2_${Date.now()}`, setNumber: 2, weight: 25, reps: 10, completed: false },
-        { id: `set_3_${Date.now()}`, setNumber: 3, weight: 30, reps: 8, completed: false },
-      ],
-    };
-
-    const existingExercises = currentRoutine?.exercises || [];
-    const updatedExercises = [...existingExercises, newExercise];
-
-    try {
-      if (currentRoutine) {
-        await updateRoutineMutation.mutateAsync({
-          id: currentRoutine.id,
-          exercises: updatedExercises,
-        });
-      } else {
-        await addRoutineMutation.mutateAsync({
-          dayOfWeek: selectedDay,
-          routineTitle: defaultRoutineTitles[selectedDay] || "Daily Workout Split",
-          exercises: updatedExercises,
-        });
-      }
-      toast.success(`Exercise '${exerciseName}' added to ${selectedDay}! 💪`);
-      setIsAddExerciseOpen(false);
-      setExerciseName("");
-      setMachineName("");
-      setExerciseNotes("");
-      setTargetMuscle("Chest");
-    } catch {
-      toast.error("Failed to add exercise");
     }
   };
 

@@ -17,7 +17,7 @@ export function ThemeToggle({
   className,
   size = "md",
 }: ThemeToggleProps) {
-  const { theme, resolvedTheme, setTheme, toggleTheme, isDark, mounted } = useTheme();
+  const { theme, setTheme, toggleTheme, isDark, mounted } = useTheme();
 
   const handleToggleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     soundFX.playPop();

@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { BottomSheet } from "./BottomSheet";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -8,10 +7,6 @@ import {
   Dumbbell,
   Utensils,
   Droplet,
-  Plus,
-  CheckCircle2,
-  Calendar,
-  Wallet,
   ArrowRightLeft,
   Receipt,
   TrendingUp,

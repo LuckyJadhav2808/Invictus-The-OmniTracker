@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { Flame, ShieldCheck, Wallet, Plus, Sparkles, CheckCircle2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { Flame, ShieldCheck, Wallet, Plus, CheckCircle2 } from "lucide-react";
 import { soundFX } from "@/components/shared/SoundFX";
 import { Hero, HeroSlide, HeroStatItem } from "@/components/shared/Hero";
 import { StrobiCompanion, type StrobiState } from "@/components/mascot/StrobiCompanion";

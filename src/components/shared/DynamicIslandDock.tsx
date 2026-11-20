@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import {
-  Timer,
   Play,
   Pause,
   ChevronUp,
@@ -57,9 +56,6 @@ export function DynamicIslandDock({
   const islandRef = useRef<HTMLDivElement>(null);
   const prevGymSecondsRef = useRef<number | null>(null);
   const prevPomoSecondsRef = useRef<number | null>(null);
-
-  // Dynamic Island is strictly inline in header (no floating or detaching on scroll)
-  const isFloating = false;
 
   // 1. Unified Background Ticker Loop for Live Activities
   useEffect(() => {

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Plus, ArrowUp, Flame, Sparkles } from "lucide-react";
 import { soundFX } from "@/components/shared/SoundFX";
 import { cn } from "@/lib/utils";

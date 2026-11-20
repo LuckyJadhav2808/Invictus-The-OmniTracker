@@ -10,14 +10,10 @@ import React, {
 import { usePathname, useRouter } from "next/navigation";
 import {
   Plus,
-  X,
-  CheckSquare,
   Dumbbell,
   Utensils,
   Droplet,
   Receipt,
-  TrendingUp,
-  ArrowRightLeft,
   Users,
   CheckCircle2,
   Kanban,

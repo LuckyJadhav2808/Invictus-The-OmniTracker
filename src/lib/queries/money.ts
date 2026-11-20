@@ -802,7 +802,6 @@ export function useUpdateDebt() {
 
   return useMutation({
     mutationFn: async (updatedDebt: Partial<Debt> & { id: string }) => {
-      const userId = getActiveUserId(user);
       if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_debts");
         const list = local ? JSON.parse(local) : [];
@@ -837,7 +836,6 @@ export function useSettleDebt() {
 
   return useMutation({
     mutationFn: async ({ id }: { id: string }) => {
-      const userId = getActiveUserId(user);
       if (isGuestMode(user)) {
         const local = localStorage.getItem("invictus_debts");
         const list = local ? JSON.parse(local) : [];

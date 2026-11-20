@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
-import { Button } from "@/components/ui/button";
 import {
   Sparkles,
   Download,
@@ -10,9 +9,7 @@ import {
   CheckCircle2,
   AlertCircle,
   HardDriveDownload,
-  Copy,
   Terminal,
-  ExternalLink,
 } from "lucide-react";
 import { APP_VERSION_CONFIG } from "@/config/version";
 import { toast } from "sonner";

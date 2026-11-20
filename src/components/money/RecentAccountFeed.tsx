@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { type Transaction, type Category } from "@/types";
 import { type DailyBudgetStats, type MonthlyBudgetStats } from "@/lib/utils/budget-rollover";
 import { BelanjeTransactionRow } from "@/components/money/BelanjeTransactionRow";
@@ -10,8 +10,6 @@ import {
   Receipt,
   Plus,
   SlidersHorizontal,
-  Flame,
-  ShieldCheck,
   Gauge,
 } from "lucide-react";
 

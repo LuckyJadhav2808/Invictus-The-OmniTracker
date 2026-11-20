@@ -7,7 +7,6 @@ import {
   CheckSquare,
   Kanban,
   Wallet,
-  Plus,
 } from "lucide-react";
 import { useRef, useState, useEffect, Suspense } from "react";
 import { useUIStore } from "@/store/ui-store";

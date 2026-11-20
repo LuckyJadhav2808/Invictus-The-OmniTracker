@@ -5,7 +5,7 @@ import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormConta
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { toast } from "sonner";
-import { Bug, Send, AlertTriangle } from "lucide-react";
+import { Send } from "lucide-react";
 
 interface ReportIssueModalProps {
   open: boolean;

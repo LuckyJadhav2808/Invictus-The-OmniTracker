@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Smile, Frown, Meh, Sun, Moon, Zap, PenTool, Sparkles, Check, SmilePlus } from "lucide-react";
+import { Smile, Frown, Meh, Moon, Zap, PenTool, Check, SmilePlus } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useMoodLog, useSaveMoodLog } from "@/lib/queries/goals";

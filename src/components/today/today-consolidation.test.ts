@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { computeDailyConquestScore } from "./useTodayCockpitViewModel";
-import { parseScratchpad, parseThoughtLine } from "@/lib/utils/scratchpad-nlp";
+import { parseScratchpad } from "@/lib/utils/scratchpad-nlp";
 
 describe("The Gladiator Coliseum: Today Dashboard Architecture", () => {
   it("computes unified gladiator telemetry accurately for MasterTodayHero", () => {

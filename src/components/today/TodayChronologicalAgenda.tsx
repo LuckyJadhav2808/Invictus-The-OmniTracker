@@ -60,7 +60,6 @@ export const TodayChronologicalAgenda = React.memo(function TodayChronologicalAg
   onToggleTask,
   className,
 }: TodayChronologicalAgendaProps) {
-  const [showAllItems, setShowAllItems] = useState(false);
   const [filter, setFilter] = useState<AgendaFilter>("todo");
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({
     morning: false,

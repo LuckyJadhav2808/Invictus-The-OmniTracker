@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { useLiveActivityStore } from "./live-activity-store";
 
 describe("useLiveActivityStore", () => {

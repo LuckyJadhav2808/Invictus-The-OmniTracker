@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { type MonthlyBudgetStats, type DailyBudgetStats } from "@/lib/utils/budget-rollover";
 import { type Transaction, type Category } from "@/types";
 import { StrobiCompanion } from "@/components/mascot/StrobiCompanion";

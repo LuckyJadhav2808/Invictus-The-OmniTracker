@@ -3,7 +3,6 @@ import { connectToDatabase, resolveDatabaseForRequest, assertDatabaseSafety } fr
 import { Transaction } from "@/models/Transaction";
 import { Category } from "@/models/Category";
 import { parseBankSms } from "@/lib/sms/sms-local-parser";
-import { detectCategoryFromNote } from "@/lib/utils/merchant-categorizer";
 import { resolveExpenseCategoryId } from "@/lib/utils/resolve-category";
 
 export const dynamic = "force-dynamic";

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Sparkles, Download, RefreshCw, X } from "lucide-react";
+import { Download, RefreshCw, X } from "lucide-react";
 import { Capacitor } from "@capacitor/core";
 import { App } from "@capacitor/app";
 import { APP_VERSION_CONFIG } from "@/config/version";

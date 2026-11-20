@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { Calendar, Flame, Target, BookOpen, DollarSign, Check, Plus, ShieldCheck, Zap } from "lucide-react";
+import { Calendar, Flame, Target, BookOpen, DollarSign, Check, ShieldCheck, Zap } from "lucide-react";
 
 export interface BarData {
   label?: string; // e.g. "Mon", "Tue", "Wed" or "Jan", "Feb"

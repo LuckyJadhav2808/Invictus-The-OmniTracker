@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { Utensils, Apple } from "lucide-react";
 import { MealTracker } from "@/components/goals/MealTracker";
 import { SegmentedSubNav } from "@/components/mobile/SegmentedSubNav";

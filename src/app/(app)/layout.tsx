@@ -18,7 +18,6 @@ import { SafeModeScreen } from "@/components/shared/SafeModeScreen";
 import { migrationEngine } from "@/lib/offline/migration-engine";
 import { NativeBackHandler } from "@/components/shared/NativeBackHandler";
 import { initNativeStatusBar } from "@/lib/native/status-bar";
-import { cn } from "@/lib/utils";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();

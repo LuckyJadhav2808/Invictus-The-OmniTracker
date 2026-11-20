@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import { useState } from "react";
 import * as LucideIcons from "lucide-react";
 import { type Habit, type Streak } from "@/types";
 import {

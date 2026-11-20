@@ -75,8 +75,6 @@ export interface DailyConquestMetrics {
   currencySymbol: string;
 }
 
-const SNAPSHOT_STORAGE_KEY = "invictus_today_conquest_snapshot";
-
 /**
  * Computes composite daily momentum metrics across Habits and Financial Defense.
  * Weighted: Habits (50%), Budget (50%).

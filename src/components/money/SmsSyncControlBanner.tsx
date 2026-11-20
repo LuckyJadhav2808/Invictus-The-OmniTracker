@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { soundFX } from "@/components/shared/SoundFX";
 import { cn } from "@/lib/utils";
@@ -10,7 +10,6 @@ import {
   RefreshCw,
   Sliders,
   Calendar,
-  AlertCircle,
   ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";

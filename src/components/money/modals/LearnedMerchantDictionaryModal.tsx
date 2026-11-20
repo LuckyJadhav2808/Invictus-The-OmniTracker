@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Fuse from "fuse.js";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
 import { type Category } from "@/types";
@@ -10,7 +10,7 @@ import {
   useSaveMerchantRule,
   useDeleteMerchantRule,
 } from "@/lib/queries/merchant-rules";
-import { Search, Plus, Trash2, Sparkles, Tag, Check, RefreshCw } from "lucide-react";
+import { Search, Plus, Trash2, Sparkles, Tag, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
 
@@ -25,7 +25,7 @@ export function LearnedMerchantDictionaryModal({
   onOpenChange,
   categories,
 }: LearnedMerchantDictionaryModalProps) {
-  const { data: rules = [], isLoading } = useMerchantRules();
+  const { data: rules = [] } = useMerchantRules();
   const saveMutation = useSaveMerchantRule();
   const deleteMutation = useDeleteMerchantRule();
 
@@ -40,7 +40,7 @@ export function LearnedMerchantDictionaryModal({
   }, [categories]);
 
   // Set default category for new rule
-  React.useEffect(() => {
+  useEffect(() => {
     if (expenseCategories.length > 0 && !newCategoryId) {
       setNewCategoryId(expenseCategories[0].id);
     }

@@ -1,25 +1,20 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
 import { diagnosticLogger, DiagnosticLogEntry } from "@/lib/runtime/diagnostic-logger";
 import { safeModeWatchdog } from "@/lib/runtime/safe-mode-watchdog";
 import { migrationEngine, CURRENT_TARGET_SCHEMA_VERSION } from "@/lib/offline/migration-engine";
 import { getPendingOfflineMutations, clearAllOfflineMutations } from "@/lib/offline/indexeddb-store";
 import { useFeatureFlags } from "@/lib/hooks/useFeatureFlags";
-import { APP_VERSION_CONFIG } from "@/config/version";
 import {
   Activity,
   Database,
   Trash2,
-  RefreshCw,
   Download,
   ShieldCheck,
   Zap,
   Terminal,
-  CheckCircle2,
-  AlertTriangle,
-  Clock,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -33,7 +28,6 @@ export function InAppDiagnosticsModal({ open, onOpenChange }: InAppDiagnosticsMo
   const [entries, setEntries] = useState<DiagnosticLogEntry[]>([]);
   const [pendingCount, setPendingCount] = useState<number>(0);
   const [pingLatency, setPingLatency] = useState<number | null>(null);
-  const [pingLoading, setPingLoading] = useState(false);
   const { flags } = useFeatureFlags();
   const currentSchema = migrationEngine.getCurrentVersion();
   const safeStatus = safeModeWatchdog.getStatus();
@@ -60,7 +54,6 @@ export function InAppDiagnosticsModal({ open, onOpenChange }: InAppDiagnosticsMo
   };
 
   const measurePing = async () => {
-    setPingLoading(true);
     const start = performance.now();
     try {
       const res = await fetch("/api/version?checkPing=1", { cache: "no-store" });
@@ -73,8 +66,6 @@ export function InAppDiagnosticsModal({ open, onOpenChange }: InAppDiagnosticsMo
       }
     } catch {
       setPingLatency(-1);
-    } finally {
-      setPingLoading(false);
     }
   };
 

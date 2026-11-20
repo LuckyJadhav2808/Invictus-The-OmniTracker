@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useMemo } from "react";
-import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import { useMemo } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { soundFX } from "@/components/shared/SoundFX";
 import { cn } from "@/lib/utils";
 import {

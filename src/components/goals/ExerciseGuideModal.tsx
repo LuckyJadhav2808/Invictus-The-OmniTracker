@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
-import { Dumbbell, Target, Layers, Sparkles, CheckCircle2, Play, Pause, Info, Loader2, Flame } from "lucide-react";
+import { Dumbbell, Target, Sparkles, CheckCircle2, Play, Pause, Loader2, Flame } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { HumanMuscleAnatomy } from "@/components/goals/anatomy/HumanMuscleAnatomy";
 import { resolveExerciseAnatomy } from "@/components/goals/anatomy/muscle-mapping";

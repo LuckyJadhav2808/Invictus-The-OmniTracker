@@ -1,14 +1,13 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { TaskItem, Subtask } from "@/types";
+import { TaskItem } from "@/types";
 import { toast } from "sonner";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { getCustomSession } from "@/lib/custom-auth";
-import { generateKeyBetween, generateInitialKey } from "@/lib/utils/lexorank";
+import { generateKeyBetween } from "@/lib/utils/lexorank";
 
 const TASKS_STORAGE_KEY = "invictus_tasks_db";
-const DEFAULT_SEED_TASKS: TaskItem[] = [];
 
 const isGuestMode = (user?: any) => {
   if (user?.uid && user.uid !== "guest-user") return false;

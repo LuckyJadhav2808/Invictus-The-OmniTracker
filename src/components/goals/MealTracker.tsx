@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { Utensils, Plus, Trash2, Edit3, CheckCircle2, Circle, Flame, Sparkles, Target, Apple, ChevronDown, ChevronUp } from "lucide-react";
+import { Utensils, Plus, Trash2, Edit3, CheckCircle2, Circle, Sparkles, Target } from "lucide-react";
 import { AdaptiveDrawerDialog } from "@/components/shared/AdaptiveDrawerDialog";
 import { soundFX } from "@/components/shared/SoundFX";
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
@@ -103,16 +103,6 @@ export function MealTracker() {
   const [editTime, setEditTime] = useState("");
 
   const [deleteMealId, setDeleteMealId] = useState<string | null>(null);
-
-  // Collapsed meal items (Default to collapsed receipts)
-  const [collapsedMeals, setCollapsedMeals] = useState<Record<string, boolean>>({});
-
-  const toggleMealCollapse = (id: string) => {
-    setCollapsedMeals((prev) => ({
-      ...prev,
-      [id]: !(prev[id] ?? true),
-    }));
-  };
 
   // Totals
   const totalCalories = useMemo(() => meals.reduce((sum: number, m: any) => sum + (m.calories || 0), 0), [meals]);
@@ -577,7 +567,6 @@ export function MealTracker() {
       ) : (
         <div className="space-y-2.5">
           {meals.map((m: any) => {
-            const isCollapsed = collapsedMeals[m.id] ?? true;
             const mealEmoji =
               m.mealType === "Breakfast"
                 ? "🍳"

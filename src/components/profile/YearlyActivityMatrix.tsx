@@ -13,11 +13,9 @@ import {
 import {
   Flame,
   Trophy,
-  Zap,
   Calendar,
   Sparkles,
   CheckCircle2,
-  BookOpen,
   Wallet,
   Layers,
   ArrowRight,
@@ -53,8 +51,8 @@ export function YearlyActivityMatrix({
 
   // Data Queries
   const { data: habits = [] } = useHabits();
-  const { data: habitLogs = [], isLoading: logsLoading } = useMonthHabitLogs(rangeStartStr, todayStr);
-  const { data: transactions = [], isLoading: txLoading } = useTransactions();
+  const { data: habitLogs = [] } = useMonthHabitLogs(rangeStartStr, todayStr);
+  const { data: transactions = [] } = useTransactions();
   const { data: categories = [] } = useCategories();
 
   const habitsMap = useMemo(() => {
@@ -74,7 +72,7 @@ export function YearlyActivityMatrix({
   }, [categories]);
 
   // Generate Matrix Structure & Summary Stats
-  const { weeks, stats, maxScore } = useMemo(() => {
+  const { weeks, stats } = useMemo(() => {
     return generateYearlyMatrixData(
       habitLogs,
       transactions,

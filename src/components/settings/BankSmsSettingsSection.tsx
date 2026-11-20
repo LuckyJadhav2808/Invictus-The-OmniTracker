@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import { soundFX } from "@/components/shared/SoundFX";
@@ -14,7 +14,6 @@ import {
   CheckCircle2,
   AlertTriangle,
   RotateCcw,
-  Sliders,
   ChevronDown,
   ChevronUp,
   Trash2,

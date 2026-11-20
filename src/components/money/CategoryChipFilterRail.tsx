@@ -1,8 +1,6 @@
 "use client";
 
-import React, { useRef } from "react";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { type Category } from "@/types";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
 import { CategoryIcon, getCategoryAccent } from "@/components/money/MoneyQuickActionsAndCards";
@@ -10,7 +8,6 @@ import {
   Plus,
   ArrowRightLeft,
   Send,
-  Camera,
   Edit2,
   Trash2,
   Layers,

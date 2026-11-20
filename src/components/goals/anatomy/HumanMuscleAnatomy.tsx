@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useId } from "react";
+import { useState, useId } from "react";
 import { MuscleGroup, AnatomyOrientation, MuscleHighlightMap, MUSCLE_REGISTRY } from "./muscle-mapping";
 import { soundFX } from "@/components/shared/SoundFX";
 import { cn } from "@/lib/utils";
-import { RotateCw, Sparkles, Flame, Check } from "lucide-react";
+import { RotateCw } from "lucide-react";
 
 export interface HumanMuscleAnatomyProps {
   /**

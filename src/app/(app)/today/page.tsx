@@ -275,7 +275,6 @@ export default function TodayPage() {
   const totalTasksCount = todayTasks.length;
   const totalItemsCount = totalHabitsCount + totalTasksCount;
   const completedItemsCount = completedHabitsCount + completedTasksCount;
-  const pendingItemsCount = Math.max(0, totalItemsCount - completedItemsCount);
 
   const completionPercent = useMemo(() => {
     if (totalItemsCount === 0) return 100;

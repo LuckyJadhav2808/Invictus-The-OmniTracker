@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { Moon, Flame, Activity, Clock, Sparkles, Plus, Trash2, Zap, Brain, Coffee } from "lucide-react";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
 import { predictCircadianProductivity } from "@/lib/utils/circadian-predictor";
 
 export function SleepAndActiveWidgets() {

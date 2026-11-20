@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import {
   createIdbQueryPersister,
   INVICTUS_QUERY_CACHE_KEY,

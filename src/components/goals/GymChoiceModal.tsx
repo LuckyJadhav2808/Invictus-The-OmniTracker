@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useDeferredValue, useRef, useEffect } from "react";
-import { Search, Plus, Sparkles, X, ChevronDown, Eye, ArrowLeft, Dumbbell, Flame, Layers } from "lucide-react";
+import { useState, useDeferredValue, useRef, useEffect, useMemo } from "react";
+import { Search, Plus, X, ChevronDown, Eye, ArrowLeft, Layers } from "lucide-react";
 import { AdaptiveDrawerDialog } from "@/components/shared/AdaptiveDrawerDialog";
 import { HumanMuscleAnatomy } from "@/components/goals/anatomy/HumanMuscleAnatomy";
 import { VList } from "virtua";
@@ -11,7 +11,6 @@ import {
 } from "@/components/goals/anatomy/muscle-mapping";
 import {
   initializeExerciseIndex,
-  searchExercisesClient,
   extractMuscleHighlights,
 } from "@/lib/search/exercise-search-index";
 import { GYM_TEMPLATE_PACKS } from "@/lib/templates-data";
@@ -62,7 +61,7 @@ export function GymChoiceModal({
   const [libQuery, setLibQuery] = useState("");
   const deferredLibQuery = useDeferredValue(libQuery);
   const [libBodyPart, setLibBodyPart] = useState("all");
-  const [libEquipment, setLibEquipment] = useState("all");
+  const libEquipment = "all";
   const [displayLimit, setDisplayLimit] = useState(50);
   const [showBodyMapFilter, setShowBodyMapFilter] = useState(false);
   const loadMoreSentinelRef = useRef<HTMLDivElement | null>(null);
@@ -88,7 +87,7 @@ export function GymChoiceModal({
   }, [libData?.exercises]);
 
   // Compute dynamic real-time muscle illumination for the active exercise
-  const activeHighlight = React.useMemo(() => {
+  const activeHighlight = useMemo(() => {
     const target = focusedExercise || (libData?.exercises && libData.exercises[0]);
     return target ? extractMuscleHighlights(target) : undefined;
   }, [focusedExercise, libData?.exercises]);

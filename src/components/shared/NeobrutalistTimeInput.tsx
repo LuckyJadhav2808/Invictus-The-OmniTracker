@@ -12,7 +12,7 @@ interface NeobrutalistTimeInputProps {
 
 export function NeobrutalistTimeInput({ value, onChange, label }: NeobrutalistTimeInputProps) {
   // Parse "HH:MM" into 12h format (hour12, minute, period AM/PM)
-  const { hour12, minute, period, rawHour24 } = useMemo(() => {
+  const { hour12, minute, period } = useMemo(() => {
     if (!value || !value.includes(":")) {
       return { hour12: "08", minute: "00", period: "PM", rawHour24: 20 };
     }
