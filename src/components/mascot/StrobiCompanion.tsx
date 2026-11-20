@@ -69,6 +69,16 @@ export function StrobiCompanion({
   const configuredExpression = propExpression || storeExpression || "joy";
   const themeConfig = MASCOT_COLOR_THEMES[activeColorTheme] || MASCOT_COLOR_THEMES["classic-blue"];
 
+  // Unique SVG IDs per component instance to avoid DOM collisions
+  const reactId = React.useId();
+  const uid = reactId.replace(/[^a-zA-Z0-9_-]/g, "_");
+  const groundBlurId = `strobiGroundBlur_${uid}`;
+  const customGradId = `strobi3DCustom_${uid}`;
+  const celebrateGradId = `strobi3DCelebrate_${uid}`;
+  const fireGradId = `strobi3DFire_${uid}`;
+  const specularGradId = `strobiSpecular_${uid}`;
+  const bounceGradId = `strobiBounceGrad_${uid}`;
+
   const [quipIndex, setQuipIndex] = useState(0);
   const [transientReaction, setTransientReaction] = useState<TransientReaction>(null);
   const [isBlinking, setIsBlinking] = useState(false);
@@ -210,13 +220,13 @@ export function StrobiCompanion({
       >
         <defs>
           {/* Ground Shadow Filter */}
-          <filter id="strobiGroundBlur" x="-30%" y="-30%" width="160%" height="160%">
+          <filter id={groundBlurId} x="-30%" y="-30%" width="160%" height="160%">
             <feGaussianBlur stdDeviation="2.5" />
           </filter>
 
-          {/* Dynamic User-Customized 3D Gradient */}
+          {/* Dynamic User-Customized 3D Gradient (Defaults to Electric Blue) */}
           <radialGradient
-            id="strobi3DCustom"
+            id={customGradId}
             cx="34%"
             cy="28%"
             r="68%"
@@ -230,26 +240,9 @@ export function StrobiCompanion({
             <stop offset="100%" stopColor={themeConfig.stops[4]} />
           </radialGradient>
 
-          {/* Strobi Signature 3D Volumetric Lighting (#5B7FE5 from JSON) */}
-          <radialGradient
-            id="strobi3DBody"
-            cx="34%"
-            cy="28%"
-            r="68%"
-            fx="30%"
-            fy="24%"
-          >
-            <stop offset="0%" stopColor="#A8C4FF" />
-            <stop offset="18%" stopColor="#7E9FF8" />
-            <stop offset="50%" stopColor="#5B7FE5" />
-            <stop offset="78%" stopColor="#375DC7" />
-            <stop offset="92%" stopColor="#2441A3" />
-            <stop offset="100%" stopColor="#1B3285" />
-          </radialGradient>
-
           {/* Celebratory Emerald-Lime Tinted 3D Gradient */}
           <radialGradient
-            id="strobi3DCelebrate"
+            id={celebrateGradId}
             cx="34%"
             cy="28%"
             r="68%"
@@ -265,7 +258,7 @@ export function StrobiCompanion({
 
           {/* Fiery Golden 3D Shading */}
           <radialGradient
-            id="strobi3DFire"
+            id={fireGradId}
             cx="34%"
             cy="28%"
             r="68%"
@@ -280,13 +273,13 @@ export function StrobiCompanion({
           </radialGradient>
 
           {/* Specular Soft Glow Gradient */}
-          <linearGradient id="strobiSpecular" x1="0%" y1="0%" x2="100%" y2="100%">
+          <linearGradient id={specularGradId} x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.75" />
             <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
           </linearGradient>
 
           {/* Ambient Floor Bounce Light Gradient */}
-          <linearGradient id="strobiBounceGrad" x1="50%" y1="100%" x2="50%" y2="0%">
+          <linearGradient id={bounceGradId} x1="50%" y1="100%" x2="50%" y2="0%">
             <stop offset="0%" stopColor="#A0C0FF" stopOpacity="0.45" />
             <stop offset="100%" stopColor="#A0C0FF" stopOpacity="0" />
           </linearGradient>
@@ -300,7 +293,7 @@ export function StrobiCompanion({
           ry="6"
           fill="#161514"
           opacity="0.22"
-          filter="url(#strobiGroundBlur)"
+          filter={`url(#${groundBlurId})`}
         />
         <ellipse
           cx="50"
@@ -317,21 +310,35 @@ export function StrobiCompanion({
             cx="50"
             cy="49"
             r="34"
-            fill={
-              isCelebratory
-                ? "url(#strobi3DCelebrate)"
-                : isFiery
-                ? "url(#strobi3DFire)"
-                : "url(#strobi3DCustom)"
-            }
+            fill={`url(#${customGradId})`}
             stroke="#161514"
             strokeWidth="2.2"
           />
 
+          {/* Subtle Celebration / Fiery Shimmer (preserving iconic blue core) */}
+          {isCelebratory && (
+            <circle
+              cx="50"
+              cy="49"
+              r="34"
+              fill={`url(#${celebrateGradId})`}
+              opacity="0.28"
+            />
+          )}
+          {isFiery && (
+            <circle
+              cx="50"
+              cy="49"
+              r="34"
+              fill={`url(#${fireGradId})`}
+              opacity="0.32"
+            />
+          )}
+
           {/* 3. Ambient Floor Bounce Light (Curved Lower Rim) */}
           <path
             d="M 26 66 A 34 34 0 0 0 74 66 A 32 32 0 0 1 26 66"
-            fill="url(#strobiBounceGrad)"
+            fill={`url(#${bounceGradId})`}
           />
 
           {/* 4. Glossy Specular Highlight (Apple / Pixar 3D Depth) */}
@@ -341,7 +348,7 @@ export function StrobiCompanion({
             rx="11"
             ry="6"
             transform="rotate(-32 38 31)"
-            fill="url(#strobiSpecular)"
+            fill={`url(#${specularGradId})`}
           />
           {/* Crisp Pin-Point Core Catchlight */}
           <circle cx="34" cy="27" r="2.2" fill="#FFFFFF" opacity="0.9" />

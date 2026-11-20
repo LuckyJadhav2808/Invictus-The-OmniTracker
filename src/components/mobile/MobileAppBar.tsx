@@ -11,8 +11,20 @@ import {
   Volume2,
   VolumeX,
   ArrowLeft,
+  User,
+  Settings,
+  BarChart2,
+  Bell,
+  RefreshCw,
+  Sparkles,
+  ShieldCheck,
+  LogOut,
 } from "lucide-react";
 import { soundFX } from "@/components/shared/SoundFX";
+import { useAuth } from "@/components/shared/AuthProvider";
+import { useOfflineSync } from "@/lib/offline/sync-manager";
+import { ReminderManagerModal } from "@/components/shared/ReminderManagerModal";
+import { CloudSyncDrawer } from "@/components/shared/CloudSyncDrawer";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -23,7 +35,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { DynamicIslandDock, isDynamicIslandAllowed } from "@/components/shared/DynamicIslandDock";
 import { StrobiCompanion, type StrobiGear, type StrobiState } from "@/components/mascot/StrobiCompanion";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 export interface MobileAppBarProps {
@@ -68,8 +80,13 @@ export function MobileAppBar({
   onStrobiClick,
 }: MobileAppBarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, signOut } = useAuth();
   const isAllowedRoute = isDynamicIslandAllowed(pathname);
   const [soundMuted, setSoundMuted] = useState(soundFX.isMuted());
+  const [isReminderModalOpen, setIsReminderModalOpen] = useState(false);
+  const [isSyncDrawerOpen, setIsSyncDrawerOpen] = useState(false);
+  const { isOnline, isSyncing, pendingCount } = useOfflineSync();
 
   const todayStr = format(new Date(), "yyyy-MM-dd");
   const isViewingToday = isCalendarActive !== undefined ? !isCalendarActive : (!selectedDate || selectedDate === todayStr);
@@ -142,14 +159,14 @@ export function MobileAppBar({
         </div>
       )}
 
-      {/* Right: Only the Three Dots Menu (⋯) */}
+      {/* Right: Unified Three Dots Overflow Menu (⋯) */}
       <div className="flex items-center shrink-0 justify-end relative z-10">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
               type="button"
               onClick={() => soundFX.playPop()}
-              className="size-9 rounded-xl border border-border bg-secondary hover:bg-muted text-foreground flex items-center justify-center transition-all cursor-pointer active:scale-95"
+              className="size-9 rounded-xl border border-border bg-secondary hover:bg-muted text-foreground flex items-center justify-center transition-all cursor-pointer active:scale-95 shadow-xs"
               title="More actions & view settings"
               aria-label="Overflow menu"
             >
@@ -159,9 +176,19 @@ export function MobileAppBar({
 
           <DropdownMenuContent
             align="end"
-            className="w-56 p-1.5 bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#38332E] rounded-2xl shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] z-50 animate-in fade-in zoom-in-95 duration-150"
+            className="w-64 p-1.5 bg-[#FAF8F5] dark:bg-[#161514] border-2 border-[#161514] dark:border-[#38332E] rounded-2xl shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#000000] z-50 animate-in fade-in zoom-in-95 duration-150 max-h-[85vh] overflow-y-auto"
           >
-            {/* If navigated away from today, offer Jump to Today in dropdown */}
+            {/* 1. User Account Header */}
+            <div className="px-2.5 py-2 border-b border-border mb-1">
+              <p className="text-xs font-heading font-black text-foreground truncate">
+                {user?.displayName || "Invictus User"}
+              </p>
+              <p className="text-[10px] text-muted-foreground truncate font-mono">
+                {user?.email || "Local Guest"}
+              </p>
+            </div>
+
+            {/* 2. Jump to Today (if navigated away from today) */}
             {onSelectDate && !isViewingToday && (
               <>
                 <DropdownMenuItem
@@ -169,51 +196,141 @@ export function MobileAppBar({
                     soundFX.playPop();
                     onSelectDate(todayStr);
                   }}
-                  className="flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-heading font-black cursor-pointer hover:bg-secondary focus:bg-secondary"
+                  className="flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-heading font-black cursor-pointer hover:bg-secondary focus:bg-secondary text-[#047857] dark:text-[#03D26F]"
                 >
-                  <Calendar className="size-3.5 text-[#03D26F] stroke-[2.2]" />
+                  <Calendar className="size-3.5 stroke-[2.2]" />
                   <span>Jump to Today</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="my-1 bg-border" />
               </>
             )}
 
-            {customMenuItems ? (
+            {/* 3. Page-Specific Custom Actions (Desk Notes, Night Closeout, Log Tx, etc.) */}
+            {customMenuItems && (
               <>
+                <DropdownMenuLabel className="text-[10px] font-mono font-bold uppercase tracking-wider text-muted-foreground px-2 py-0.5">
+                  Page Actions
+                </DropdownMenuLabel>
                 {customMenuItems}
                 <DropdownMenuSeparator className="my-1 bg-border" />
               </>
-            ) : (
+            )}
+
+            {/* 4. Bulk Actions (Check All Due / Reset) */}
+            {onCheckAllDue && (
               <>
-                {onCheckAllDue && (
-                  <>
-                    <DropdownMenuLabel className="text-[10px] font-mono font-bold uppercase tracking-wider text-muted-foreground px-2 py-1">
-                      Bulk Actions
-                    </DropdownMenuLabel>
-                    <DropdownMenuItem
-                      onClick={() => {
-                        soundFX.playPop();
-                        onCheckAllDue();
-                      }}
-                      className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-black cursor-pointer hover:bg-secondary focus:bg-secondary"
-                    >
-                      <div className="flex items-center gap-2">
-                        {isAllDueCompleted ? (
-                          <RotateCcw className="size-3.5 text-muted-foreground stroke-[2.2]" />
-                        ) : (
-                          <CheckCheck className="size-3.5 text-[#03D26F] stroke-[2.5]" />
-                        )}
-                        <span>{isAllDueCompleted ? "Reset Routines" : "Check All Due"}</span>
-                      </div>
-                      <span className="text-[9px] font-mono text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
-                        Shift+⌘A
-                      </span>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator className="my-1 bg-border" />
-                  </>
+                {!customMenuItems && (
+                  <DropdownMenuLabel className="text-[10px] font-mono font-bold uppercase tracking-wider text-muted-foreground px-2 py-0.5">
+                    Routines
+                  </DropdownMenuLabel>
                 )}
+                <DropdownMenuItem
+                  onClick={() => {
+                    soundFX.playPop();
+                    onCheckAllDue();
+                  }}
+                  className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-black cursor-pointer hover:bg-secondary focus:bg-secondary"
+                >
+                  <div className="flex items-center gap-2">
+                    {isAllDueCompleted ? (
+                      <RotateCcw className="size-3.5 text-muted-foreground stroke-[2.2]" />
+                    ) : (
+                      <CheckCheck className="size-3.5 text-[#03D26F] stroke-[2.5]" />
+                    )}
+                    <span>{isAllDueCompleted ? "Reset Routines" : "Check All Due"}</span>
+                  </div>
+                  <span className="text-[9px] font-mono text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                    Shift+⌘A
+                  </span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="my-1 bg-border" />
               </>
             )}
+
+            {/* 5. Core Navigation & Modals */}
+            <DropdownMenuLabel className="text-[10px] font-mono font-bold uppercase tracking-wider text-muted-foreground px-2 py-0.5">
+              System
+            </DropdownMenuLabel>
+
+            <DropdownMenuItem
+              onClick={() => {
+                soundFX.playPop();
+                router.push("/profile");
+              }}
+              className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-heading font-bold cursor-pointer hover:bg-secondary focus:bg-secondary"
+            >
+              <User className="size-3.5 stroke-[2] text-muted-foreground" />
+              <span>Profile & Activity</span>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              onClick={() => {
+                soundFX.playPop();
+                router.push("/settings");
+              }}
+              className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-heading font-bold cursor-pointer hover:bg-secondary focus:bg-secondary"
+            >
+              <Settings className="size-3.5 stroke-[2] text-muted-foreground" />
+              <span>Settings & Backups</span>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              onClick={() => {
+                soundFX.playPop();
+                router.push("/analytics");
+              }}
+              className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-heading font-bold cursor-pointer hover:bg-secondary focus:bg-secondary"
+            >
+              <BarChart2 className="size-3.5 stroke-[2] text-muted-foreground" />
+              <span>Analytics Hub</span>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              onClick={() => {
+                soundFX.playPop();
+                setIsReminderModalOpen(true);
+              }}
+              className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-heading font-bold cursor-pointer hover:bg-secondary focus:bg-secondary"
+            >
+              <Bell className="size-3.5 stroke-[2] text-muted-foreground" />
+              <span>Manage Reminders</span>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              onClick={() => {
+                soundFX.playPop();
+                setIsSyncDrawerOpen(true);
+              }}
+              className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-bold cursor-pointer hover:bg-secondary focus:bg-secondary"
+            >
+              <div className="flex items-center gap-2.5">
+                <RefreshCw className={cn("size-3.5 stroke-[2] text-muted-foreground", isSyncing && "animate-spin")} />
+                <span>Cloud Sync</span>
+              </div>
+              <span className="text-[10px] font-mono text-muted-foreground">
+                {!isOnline ? "Offline" : isSyncing ? "Syncing" : pendingCount > 0 ? `${pendingCount} Queued` : "Synced"}
+              </span>
+            </DropdownMenuItem>
+
+            <DropdownMenuSeparator className="my-1 bg-border" />
+
+            {/* 6. Preferences: Theme & Sound */}
+            <DropdownMenuItem
+              onClick={() => {
+                soundFX.playPop();
+                const isDark = document.documentElement.classList.contains("dark");
+                const nextTheme = isDark ? "light" : "dark";
+                document.documentElement.classList.toggle("dark", !isDark);
+                localStorage.setItem("theme", nextTheme);
+              }}
+              className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-bold cursor-pointer hover:bg-secondary focus:bg-secondary"
+            >
+              <div className="flex items-center gap-2.5">
+                <Sparkles className="size-3.5 stroke-[2] text-[#03D26F]" />
+                <span>Toggle Theme</span>
+              </div>
+              <span className="text-[10px] font-mono text-muted-foreground">Light / Dark</span>
+            </DropdownMenuItem>
 
             <DropdownMenuItem
               onClick={handleToggleSound}
@@ -231,9 +348,53 @@ export function MobileAppBar({
                 {soundMuted ? "Muted" : "Active"}
               </span>
             </DropdownMenuItem>
+
+            {/* 7. Admin (if applicable) */}
+            {(user?.role === "admin" ||
+              user?.email?.toLowerCase() === "luckymanojjadhav@gmail.com") && (
+              <DropdownMenuItem
+                onClick={() => {
+                  soundFX.playPop();
+                  router.push("/admin");
+                }}
+                className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-heading font-bold text-amber-700 dark:text-amber-300 bg-amber-500/10 cursor-pointer"
+              >
+                <ShieldCheck className="size-3.5 stroke-[2]" />
+                <span>Admin Console</span>
+              </DropdownMenuItem>
+            )}
+
+            <DropdownMenuSeparator className="my-1 bg-border" />
+
+            {/* 8. Sign Out */}
+            <DropdownMenuItem
+              onClick={async () => {
+                soundFX.playPop();
+                await signOut();
+                router.push("/login");
+              }}
+              className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-heading font-bold text-rose-600 dark:text-rose-400 cursor-pointer hover:bg-rose-50 dark:hover:bg-rose-950/30"
+            >
+              <LogOut className="size-3.5 stroke-[2]" />
+              <span>Sign Out</span>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
+      {/* Reminder Manager Modal */}
+      {isReminderModalOpen && (
+        <ReminderManagerModal
+          open={isReminderModalOpen}
+          onOpenChange={setIsReminderModalOpen}
+        />
+      )}
+
+      {/* Cloud Sync Telemetry Drawer */}
+      <CloudSyncDrawer
+        open={isSyncDrawerOpen}
+        onOpenChange={setIsSyncDrawerOpen}
+      />
     </header>
   );
 }

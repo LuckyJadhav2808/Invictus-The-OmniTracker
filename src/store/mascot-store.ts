@@ -112,6 +112,24 @@ interface MascotState {
   resetMascot: () => void;
 }
 
+// One-time client-side migration ensuring existing users have classic-blue default
+if (typeof window !== "undefined") {
+  try {
+    const migrated = localStorage.getItem("invictus_mascot_blue_v2");
+    if (!migrated) {
+      localStorage.setItem("invictus_mascot_blue_v2", "true");
+      const raw = localStorage.getItem("invictus_mascot_config");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed?.state) {
+          parsed.state.colorTheme = "classic-blue";
+          localStorage.setItem("invictus_mascot_config", JSON.stringify(parsed));
+        }
+      }
+    }
+  } catch {}
+}
+
 export const useMascotStore = create<MascotState>()(
   persist(
     (set) => ({
@@ -130,6 +148,20 @@ export const useMascotStore = create<MascotState>()(
     }),
     {
       name: "invictus_mascot_config",
+      version: 2,
+      migrate: (persistedState: any, version: number) => {
+        const state = (persistedState || {}) as Partial<MascotState>;
+        // Migration to v2: enforce classic-blue as default for existing users
+        if (!version || version < 2) {
+          return {
+            ...state,
+            colorTheme: "classic-blue",
+            expression: state.expression || "joy",
+            customName: state.customName || "Strobi",
+          };
+        }
+        return state as MascotState;
+      },
       storage: createJSONStorage(() => {
         if (typeof window !== "undefined" && window.localStorage) {
           return window.localStorage;

@@ -20,6 +20,8 @@ import {
   RefreshCw,
   ArrowLeft,
   MoreVertical,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { getGlobalAnnouncement, type GlobalAnnouncement } from "@/lib/custom-auth";
@@ -47,6 +49,7 @@ export function SpaceHeader() {
   const [dismissedAnn, setDismissedAnn] = useState(false);
   const [isReminderModalOpen, setIsReminderModalOpen] = useState(false);
   const [isSyncDrawerOpen, setIsSyncDrawerOpen] = useState(false);
+  const [soundMuted, setSoundMuted] = useState(soundFX.isMuted());
   const { isOnline, isSyncing, pendingCount } = useOfflineSync();
 
   useEffect(() => {
@@ -325,6 +328,28 @@ export function SpaceHeader() {
                   <span>Toggle Theme</span>
                 </div>
                 <span className="text-[10px] font-mono text-muted-foreground">Light / Dark</span>
+              </DropdownMenuItem>
+
+              {/* Sound FX Toggle */}
+              <DropdownMenuItem
+                onClick={() => {
+                  soundFX.playPop();
+                  const next = soundFX.toggleMute();
+                  setSoundMuted(next);
+                }}
+                className="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-heading font-bold cursor-pointer hover:bg-secondary focus:bg-secondary"
+              >
+                <div className="flex items-center gap-2.5">
+                  {soundMuted ? (
+                    <VolumeX className="size-3.5 text-muted-foreground" />
+                  ) : (
+                    <Volume2 className="size-3.5 text-[#03D26F]" />
+                  )}
+                  <span>Sound FX</span>
+                </div>
+                <span className="text-[10px] font-mono text-muted-foreground">
+                  {soundMuted ? "Muted" : "Active"}
+                </span>
               </DropdownMenuItem>
 
               {(user?.role === "admin" ||
