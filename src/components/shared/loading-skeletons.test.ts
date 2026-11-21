@@ -4,11 +4,15 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { InvictusLoadingScreen, InvictusInlineLoader } from "./InvictusLoadingScreen";
 import {
   SpaceCockpitSkeleton,
+  TodayCockpitSkeleton,
   MoneyCockpitSkeleton,
   HabitsCockpitSkeleton,
   StudyCockpitSkeleton,
   TasksCockpitSkeleton,
+  TasksKanbanSkeleton,
   SettingsSkeleton,
+  AnalyticsSkeleton,
+  ProfileSkeleton,
   HabitsListSkeleton,
   SubjectsGridSkeleton,
 } from "./NeobrutalistSkeleton";
@@ -81,8 +85,20 @@ describe("Loading States Architecture: Spinner vs. Skeletons", () => {
       expect(subjects).toContain("grid-cols-1 md:grid-cols-2");
     });
 
-    it("renders TasksCockpitSkeleton with 3 Kanban column wireframes", () => {
+    it("renders TodayCockpitSkeleton with 5-slot flow wireframes", () => {
+      const html = renderToStaticMarkup(React.createElement(TodayCockpitSkeleton));
+      expect(html).toContain("animate-pulse");
+      expect(html).toContain("grid-cols-2 sm:grid-cols-4");
+    });
+
+    it("renders TasksCockpitSkeleton with studio rapid dock and checklist wireframes", () => {
       const html = renderToStaticMarkup(React.createElement(TasksCockpitSkeleton));
+      expect(html).toContain("animate-pulse");
+      expect(html).toContain("grid-cols-2 sm:grid-cols-4");
+    });
+
+    it("renders TasksKanbanSkeleton with 3 Kanban column wireframes", () => {
+      const html = renderToStaticMarkup(React.createElement(TasksKanbanSkeleton));
       expect(html).toContain("grid-cols-1 md:grid-cols-3");
       expect(html).toContain("animate-pulse");
     });
@@ -91,6 +107,13 @@ describe("Loading States Architecture: Spinner vs. Skeletons", () => {
       const html = renderToStaticMarkup(React.createElement(SettingsSkeleton));
       expect(html).toContain("max-w-3xl");
       expect(html).toContain("animate-pulse");
+    });
+
+    it("renders AnalyticsSkeleton and ProfileSkeleton with Neobrutalist wireframes", () => {
+      const analytics = renderToStaticMarkup(React.createElement(AnalyticsSkeleton));
+      const profile = renderToStaticMarkup(React.createElement(ProfileSkeleton));
+      expect(analytics).toContain("animate-pulse");
+      expect(profile).toContain("animate-pulse");
     });
   });
 });
