@@ -168,11 +168,11 @@ export function NeobrutalistPDFStatement({
         ) : (
           <div className="bg-white rounded-xl border border-[#161514]/25 overflow-hidden">
             {/* Table Header */}
-            <div className="bg-[#161514] text-white px-3 py-2 text-[10px] font-mono font-bold uppercase tracking-wider flex items-center justify-between">
-              <span className="w-24 shrink-0">Date</span>
-              <span className="flex-1 min-w-0 px-2">Description &amp; Category</span>
+            <div className="bg-[#161514] text-white px-2.5 sm:px-3 py-2 text-[10px] font-mono font-bold uppercase tracking-wider flex items-center justify-between">
+              <span className="w-16 sm:w-24 shrink-0">Date</span>
+              <span className="flex-1 min-w-0 px-1.5 sm:px-2">Description &amp; Category</span>
               <span className="w-16 text-center shrink-0 hidden sm:block">Method</span>
-              <span className="w-24 text-right shrink-0">Amount</span>
+              <span className="w-16 sm:w-24 text-right shrink-0">Amount</span>
             </div>
 
             {/* Table Rows */}
@@ -181,27 +181,29 @@ export function NeobrutalistPDFStatement({
                 const category = categories.find((c) => c.id === tx.categoryId);
                 const isIncome = tx.type === "income";
                 const dateFormatted = tx.date ? format(parseISO(tx.date), "MMM d, yyyy") : "—";
+                const dateShort = tx.date ? format(parseISO(tx.date), "MMM d") : "—";
 
                 return (
                   <div
                     key={tx.id || idx}
-                    className="px-3 py-2 flex items-center justify-between text-xs hover:bg-[#FAF8F5] transition-colors"
+                    className="px-2.5 sm:px-3 py-2 flex items-center justify-between text-xs hover:bg-[#FAF8F5] transition-colors"
                   >
                     {/* Date */}
-                    <span className="w-24 text-[10px] font-mono font-bold text-[#161514]/70 shrink-0">
-                      {dateFormatted}
+                    <span className="w-16 sm:w-24 text-[10px] font-mono font-bold text-[#161514]/70 shrink-0 leading-tight">
+                      <span className="sm:hidden">{dateShort}</span>
+                      <span className="hidden sm:inline">{dateFormatted}</span>
                     </span>
 
-                    {/* Description & Category */}
-                    <div className="flex-1 min-w-0 px-2 flex items-center gap-1.5">
-                      <CategoryIcon name={category?.icon} className="size-3.5 shrink-0 text-[#161514]" />
-                      <div className="min-w-0 flex items-center gap-1.5 truncate">
-                        <span className="font-heading font-bold text-[#161514] truncate">
+                    {/* Description & Category: Stacked 2-line layout (Belanje/Apple Card benchmark) */}
+                    <div className="flex-1 min-w-0 px-1.5 sm:px-2 flex items-center gap-2">
+                      <CategoryIcon name={category?.icon} className="size-4 shrink-0 text-[#161514]" />
+                      <div className="min-w-0 flex flex-col justify-center">
+                        <span className="font-heading font-black text-xs text-[#161514] truncate leading-tight">
                           {category?.name || "Uncategorized"}
                         </span>
                         {tx.note && (
-                          <span className="text-[11px] text-[#161514]/60 truncate font-normal">
-                            • {tx.note}
+                          <span className="text-[10px] font-mono text-[#161514]/65 truncate leading-tight mt-0.5">
+                            {tx.note}
                           </span>
                         )}
                       </div>
@@ -216,10 +218,10 @@ export function NeobrutalistPDFStatement({
 
                     {/* Amount */}
                     <span className={cn(
-                      "w-24 text-right font-mono font-black text-xs shrink-0",
+                      "w-16 sm:w-24 text-right font-mono font-black text-xs shrink-0",
                       isIncome ? "text-[#03D26F]" : "text-rose-600"
                     )}>
-                      {isIncome ? "+" : "-"}{currencySymbol}{Number(tx.amount || 0).toLocaleString()}
+                      {isIncome ? "+" : "-"}{currencySymbol}{Math.round(Number(tx.amount || 0)).toLocaleString()}
                     </span>
                   </div>
                 );
