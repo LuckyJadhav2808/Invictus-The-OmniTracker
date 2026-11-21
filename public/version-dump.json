@@ -1,17 +1,17 @@
 {
   "application": "Invictus Life OS & Omni-Tracker",
-  "version": "1.8.3",
-  "buildNumber": 34,
+  "version": "1.8.4",
+  "buildNumber": 35,
   "channel": "stable",
-  "releaseDate": "November 19, 2026",
+  "releaseDate": "November 21, 2026",
   "minSupportedVersion": "1.0.0",
   "git": {
-    "commitHash": "2894891261b66669527f4fd183c4b88557032fbe",
-    "shortHash": "2894891",
+    "commitHash": "3d9cfe10711f7c91750c63a76d2f6ec677cb7c9c",
+    "shortHash": "3d9cfe1",
     "branch": "main",
     "commitAuthor": "Lucky Manoj Jadhav",
-    "commitDate": "2026-11-19 15:24:54 +0530",
-    "commitMessage": "chore(release): stage official compiled v1.8.2 APK binary and bytecode telemetry"
+    "commitDate": "2026-11-21 17:04:08 +0530",
+    "commitMessage": "feat(ui): dynamic contextual toast messages and non-clipping sonner card styling"
   },
   "apk": {
     "exists": true,
@@ -22,7 +22,7 @@
     "sizeBytes": 4420370,
     "sizeFormatted": "4.22 MB",
     "directDownloadUrl": "https://invictus-the-omni-tracker.vercel.app/downloads/Invictus.apk",
-    "githubReleaseAssetUrl": "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v1.8.3/Invictus.apk"
+    "githubReleaseAssetUrl": "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v1.8.4/Invictus.apk"
   },
   "changelog": [
     "⚡ Ambient Quick-Expense Micro-Dialog Overhaul: Fixed dark mode keypad and habit chip contrast in native Android dialog with electric lime feedback, full theme adaptability, and OEM tint immunity",
@@ -35,12 +35,12 @@
     "repoUrl": "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker",
     "latestReleaseUrl": "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/latest",
     "inAppDownloadUrl": "https://invictus-the-omni-tracker.vercel.app/downloads/Invictus.apk",
-    "githubAssetDownloadUrl": "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v1.8.3/Invictus.apk"
+    "githubAssetDownloadUrl": "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v1.8.4/Invictus.apk"
   },
   "environment": {
     "nodeVersion": "v24.12.0",
     "platform": "win32",
     "arch": "x64",
-    "generatedAt": "2026-11-19T10:17:07.415Z"
+    "generatedAt": "2026-11-21T12:01:42.114Z"
   }
 }

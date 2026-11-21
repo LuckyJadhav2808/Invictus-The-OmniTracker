@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import { create as mutate } from "mutative";
 
 export type IOUType = "lent" | "borrowed"; // lent: "They owe me", borrowed: "I owe them"
 export type IOUStatus = "pending" | "settled";
@@ -49,29 +50,25 @@ export const useWhoOwesWhoStore = create<WhoOwesWhoState>()(
 
       settleIOU: (id) => {
         set((state) => ({
-          ious: state.ious.map((item) =>
-            item.id === id
-              ? {
-                  ...item,
-                  status: "settled",
-                  settledAt: new Date().toISOString(),
-                }
-              : item
-          ),
+          ious: mutate(state.ious, (draft) => {
+            const item = draft.find((i) => i.id === id);
+            if (item) {
+              item.status = "settled";
+              item.settledAt = new Date().toISOString();
+            }
+          }),
         }));
       },
 
       unsettleIOU: (id) => {
         set((state) => ({
-          ious: state.ious.map((item) =>
-            item.id === id
-              ? {
-                  ...item,
-                  status: "pending",
-                  settledAt: undefined,
-                }
-              : item
-          ),
+          ious: mutate(state.ious, (draft) => {
+            const item = draft.find((i) => i.id === id);
+            if (item) {
+              item.status = "pending";
+              item.settledAt = undefined;
+            }
+          }),
         }));
       },
 
@@ -83,9 +80,12 @@ export const useWhoOwesWhoStore = create<WhoOwesWhoState>()(
 
       updateIOU: (id, updates) => {
         set((state) => ({
-          ious: state.ious.map((item) =>
-            item.id === id ? { ...item, ...updates } : item
-          ),
+          ious: mutate(state.ious, (draft) => {
+            const item = draft.find((i) => i.id === id);
+            if (item) {
+              Object.assign(item, updates);
+            }
+          }),
         }));
       },
 

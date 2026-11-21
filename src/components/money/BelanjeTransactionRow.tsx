@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import equal from "fast-deep-equal";
 import { type Transaction, type Category } from "@/types";
 import { cn } from "@/lib/utils";
 import { format, parseISO, isValid } from "date-fns";
@@ -85,7 +86,7 @@ export function getCategorySquircleStyle(categoryName: string = "", isIncome: bo
   };
 }
 
-export function BelanjeTransactionRow({
+function BelanjeTransactionRowInner({
   tx,
   category,
   currencySymbol,
@@ -259,3 +260,20 @@ export function BelanjeTransactionRow({
   </SwipeActionRow>
   );
 }
+
+/**
+ * High-performance memoized transaction row using fast-deep-equal.
+ * Skips 100% of re-renders when parent lists update if the transaction and category remain unchanged.
+ */
+export const BelanjeTransactionRow = React.memo(
+  BelanjeTransactionRowInner,
+  (prev, next) => {
+    return (
+      prev.currencySymbol === next.currencySymbol &&
+      prev.compact === next.compact &&
+      prev.showQuickActions === next.showQuickActions &&
+      equal(prev.tx, next.tx) &&
+      equal(prev.category, next.category)
+    );
+  }
+);

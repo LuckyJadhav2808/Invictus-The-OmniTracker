@@ -26,6 +26,7 @@ export interface ParsedSmsTransaction {
   confidence: "high" | "medium";
 }
 
+import { fastHashSync } from "@/lib/crypto/fast-hash";
 // 1. TRAI Approved Indian Bank Alphanumeric Headers & Sender Patterns (Supports +91, FinTech, & All Banks)
 export const BANK_HEADER_REGEX = /^(?:[A-Za-z0-9]{2,4}[-_]?)?(HDFC(?:BK)?|SBI(?:NB|PSG|UPI|INB|TXN)?|ICICI(?:B)?|AXIS(?:BK)?|KOTAK(?:B)?|INDUS(?:B)?|YES(?:BNK)?|PNB(?:SMS|TXN)?|PUNJAB|BOI(?:SMS)?|CAN(?:BNK|ARA)?|UBI(?:SMS)?|UNION(?:B)?|IDFC(?:FB)?|FED(?:BNK)?|PAYTM(?:B)?|CRED(?:BK)?|CENT(?:BK)?|BOB(?:SMS|TXN)?|MAH(?:BK|A)?|IOB|UCO(?:BNK)?|RBL(?:BNK)?|AUFIN(?:B)?|BANDH(?:N)?|IDBI(?:BK)?|SC(?:ISMS)?|AMEX(?:IN)?|AIRTEL|JIO(?:BNK)?|PHONEPE|PHONEP|GPAY|GOOGLP|BHIM|NPCI|UPI|ONECRD|ONECARD|JUPITR|FIBANK|SLICEN|SLICE|NIYO|TATANEU|AMZPAY|INDBNK|INDIANB|BOMAH|CBIN|DBS|HSBC|CITI|KVB|SIB|CSB|BHARATPE|PINELAB|RAZORPAY|CASHFREE)(?:[-_][A-Za-z0-9]+)?$/i;
 
@@ -56,16 +57,11 @@ export const UPI_REF_REGEX = /(?:UPI(?::|\s+Ref(?:\s+no)?[:\s]*)|\/UPI\/)([0-9]{
 export const CARD_TOKEN_REGEX = /\b(credit card|debit card|card ending|card no)\b/i;
 export const ATM_TOKEN_REGEX = /\b(atm|cash withdrawal|withdrawn at atm)\b/i;
 
-// Simple deterministic hash for deduplication
+// High-speed non-cryptographic deterministic hash for deduplication (xxhash-wasm/FNV-1a)
 export function generateDedupSignature(amount: number, merchant: string, date: string, accountLast4: string = ""): string {
   const rawKey = `${amount.toFixed(2)}_${merchant.toLowerCase().trim().replace(/[^a-z0-9]/g, "")}_${date}_${accountLast4.trim()}`;
-  let hash = 0;
-  for (let i = 0; i < rawKey.length; i++) {
-    const char = rawKey.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash |= 0; // Convert to 32bit integer
-  }
-  return `sms_dedup_${Math.abs(hash)}_${date.replace(/-/g, "")}`;
+  const hash = fastHashSync(rawKey);
+  return `sms_dedup_${hash}_${date.replace(/-/g, "")}`;
 }
 
 // Blacklisted candidate tokens that should NEVER become a merchant or auto-provisioned category

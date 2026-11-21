@@ -5,6 +5,7 @@
  */
 
 import Fuse, { type IFuseOptions } from "fuse.js";
+import QuickLRU from "quick-lru";
 
 export interface MerchantRuleItem {
   merchantPattern: string;
@@ -114,6 +115,7 @@ export function normalizeMerchantKey(merchant: string): string {
 
 export class MerchantCategoryCache {
   private static memoryCache: Record<string, MerchantRuleItem> = {};
+  private static lruCache = new QuickLRU<string, MerchantRuleItem | null>({ maxSize: 500 });
   private static isHydrated = false;
   private static fuseInstance: Fuse<MerchantRuleItem> | null = null;
 
@@ -127,6 +129,7 @@ export class MerchantCategoryCache {
 
   private static invalidateFuseIndex(): void {
     this.fuseInstance = null;
+    this.lruCache.clear();
   }
 
   private static initDefaults(): void {
@@ -190,62 +193,88 @@ export class MerchantCategoryCache {
    * Tier 4: Substring match for tokens >= 4 characters.
    */
   static get(merchant: string): MerchantRuleItem | null {
+    if (!merchant || typeof merchant !== "string") return null;
+    const rawKey = merchant.trim();
+    if (!rawKey) return null;
+
+    if (this.lruCache.has(rawKey)) {
+      return this.lruCache.get(rawKey) ?? null;
+    }
+
     this.hydrate();
-    const key = normalizeMerchantKey(merchant);
-    if (!key) return null;
+    const key = normalizeMerchantKey(rawKey);
+    if (!key) {
+      this.lruCache.set(rawKey, null);
+      return null;
+    }
+
+    let match: MerchantRuleItem | null = null;
 
     // Tier 1: Exact normalized key match
     if (this.memoryCache[key]) {
-      return this.memoryCache[key];
+      match = this.memoryCache[key];
     }
 
     // Tier 2: Token-level match (e.g. "dmart kandivali" against "dmart")
-    const words = key.split(/\s+/).filter((w) => w.length >= 3);
-    for (const word of words) {
-      if (this.memoryCache[word]) {
-        return this.memoryCache[word];
+    if (!match) {
+      const words = key.split(/\s+/).filter((w) => w.length >= 3);
+      for (const word of words) {
+        if (this.memoryCache[word]) {
+          match = this.memoryCache[word];
+          break;
+        }
       }
     }
 
     // Tier 3: Fuse.js Bitap Fuzzy Search (strict financial-grade threshold <= 0.32)
-    const fuse = this.getFuseInstance();
-    const searchResults = fuse.search(key);
-    if (searchResults.length > 0) {
-      const best = searchResults[0];
-      if (best.score !== undefined && best.score <= 0.32) {
-        return best.item;
+    if (!match) {
+      const fuse = this.getFuseInstance();
+      const searchResults = fuse.search(key);
+      if (searchResults.length > 0) {
+        const best = searchResults[0];
+        if (best.score !== undefined && best.score <= 0.32) {
+          match = best.item;
+        }
       }
-    }
 
-    // Also fuzzy search significant words from compound string (e.g. "UPI/98124/SWIGY-BLR")
-    for (const word of words) {
-      if (word.length >= 4) {
-        const wordResults = fuse.search(word);
-        if (wordResults.length > 0) {
-          const bestWord = wordResults[0];
-          const patternLen = bestWord.item.merchantPattern.length;
-          // Require strict score (<= 0.22) and close length proximity (within 2 chars)
-          // to prevent generic words like "shop" from falsely matching specific brands like "meesho"
-          if (
-            bestWord.score !== undefined &&
-            bestWord.score <= 0.22 &&
-            Math.abs(patternLen - word.length) <= 2
-          ) {
-            return bestWord.item;
+      // Also fuzzy search significant words from compound string (e.g. "UPI/98124/SWIGY-BLR")
+      if (!match) {
+        const words = key.split(/\s+/).filter((w) => w.length >= 3);
+        for (const word of words) {
+          if (word.length >= 4) {
+            const wordResults = fuse.search(word);
+            if (wordResults.length > 0) {
+              const bestWord = wordResults[0];
+              const patternLen = bestWord.item.merchantPattern.length;
+              // Require strict score (<= 0.22) and close length proximity (within 2 chars)
+              if (
+                bestWord.score !== undefined &&
+                bestWord.score <= 0.22 &&
+                Math.abs(patternLen - word.length) <= 2
+              ) {
+                match = bestWord.item;
+                break;
+              }
+            }
           }
         }
       }
     }
 
     // Tier 4: Substring test across existing rules as legacy fallback
-    for (const rule of Object.values(this.memoryCache)) {
-      const pattern = rule.merchantPattern;
-      if (pattern.length >= 4 && (key.includes(pattern) || pattern.includes(key))) {
-        return rule;
+    if (!match) {
+      for (const rule of Object.values(this.memoryCache)) {
+        const pattern = rule.merchantPattern;
+        if (pattern.length >= 4 && (key.includes(pattern) || pattern.includes(key))) {
+          match = rule;
+          break;
+        }
       }
     }
 
-    return null;
+    // Fast O(1) in-memory LRU cache store
+    this.lruCache.set(rawKey, match);
+    return match;
   }
 
   /**
