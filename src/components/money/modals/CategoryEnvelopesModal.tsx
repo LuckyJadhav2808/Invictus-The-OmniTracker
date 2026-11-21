@@ -202,36 +202,8 @@ export function CategoryEnvelopesModal({
           </div>
         </div>
 
-        {/* ─── 2. FAST ACTION PILLS ─── */}
-        <div className="flex items-center gap-1.5 flex-wrap">
-          {onMoveMoney && (
-            <button
-              type="button"
-              onClick={() => {
-                soundFX.playPop();
-                onMoveMoney();
-              }}
-              className="px-3 py-1.5 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] hover:bg-[#F2EFE9] dark:hover:bg-[#252321] text-xs font-heading font-black border-2 border-[#161514] dark:border-[#383531] shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center gap-1.5"
-            >
-              <ArrowRightLeft className="size-3.5 stroke-[2.5]" />
-              <span>Move Funds</span>
-            </button>
-          )}
-
-          {onSendMoney && (
-            <button
-              type="button"
-              onClick={() => {
-                soundFX.playPop();
-                onSendMoney();
-              }}
-              className="px-3 py-1.5 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] hover:bg-[#F2EFE9] dark:hover:bg-[#252321] text-xs font-heading font-black border-2 border-[#161514] dark:border-[#383531] shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center gap-1.5"
-            >
-              <Send className="size-3.5 stroke-[2.5]" />
-              <span>Send Payout</span>
-            </button>
-          )}
-
+        {/* ─── 2. UNIFIED ENVELOPE ACTION DOCK (Zero Redundancy) ─── */}
+        <div className="flex items-center gap-2 flex-wrap">
           {onAddCategory && (
             <button
               type="button"
@@ -239,10 +211,24 @@ export function CategoryEnvelopesModal({
                 soundFX.playPop();
                 onAddCategory();
               }}
-              className="px-3 py-1.5 rounded-xl bg-[#CEF431] text-[#161514] text-xs font-heading font-black border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center gap-1.5"
+              className="px-3.5 py-2 rounded-xl bg-[#CEF431] text-[#161514] text-xs font-heading font-black border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center gap-1.5"
             >
-              <Plus className="size-3.5 stroke-[2.5]" />
+              <Plus className="size-4 stroke-[2.5]" />
               <span>+ New Envelope</span>
+            </button>
+          )}
+
+          {onMoveMoney && (
+            <button
+              type="button"
+              onClick={() => {
+                soundFX.playPop();
+                onMoveMoney();
+              }}
+              className="px-3 py-2 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] hover:bg-[#F2EFE9] dark:hover:bg-[#252321] text-xs font-heading font-black border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer flex items-center gap-1.5"
+            >
+              <ArrowRightLeft className="size-3.5 stroke-[2.5]" />
+              <span>Move Funds</span>
             </button>
           )}
 
@@ -253,10 +239,10 @@ export function CategoryEnvelopesModal({
               setIsBrowsingTemplates(!isBrowsingTemplates);
             }}
             className={cn(
-              "px-3 py-1.5 rounded-xl text-xs font-heading font-black border-2 border-[#161514] transition-all cursor-pointer flex items-center gap-1.5 active:translate-x-[1px] active:translate-y-[1px]",
+              "px-3 py-2 rounded-xl text-xs font-heading font-black border-2 border-[#161514] dark:border-[#383531] transition-all cursor-pointer flex items-center gap-1.5 active:translate-x-[1px] active:translate-y-[1px]",
               isBrowsingTemplates
                 ? "bg-[#161514] text-white dark:bg-[#FAF8F5] dark:text-[#161514] shadow-none"
-                : "bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] shadow-[1.5px_1.5px_0px_0px_#161514]"
+                : "bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000]"
             )}
           >
             <Sparkles className="size-3.5 text-amber-500 stroke-[2.5]" />
@@ -356,11 +342,8 @@ export function CategoryEnvelopesModal({
             categories={computedCategoryCardsData}
             selectedCategoryId={selectedCategory}
             onSelectCategory={handleSelectCategory}
-            onMoveMoney={onMoveMoney}
-            onSendMoney={onSendMoney}
-            onAddCategory={onAddCategory}
-            onEditCategory={onEditCategory}
-            onDeleteCategory={onDeleteCategory}
+            hideHeader={true}
+            hideInlineActions={true}
           />
         </div>
 

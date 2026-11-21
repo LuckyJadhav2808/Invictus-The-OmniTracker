@@ -34,6 +34,8 @@ interface CategoryChipFilterRailProps {
   onMoveMoney?: () => void;
   onSendMoney?: () => void;
   onBulkAddExpense?: () => void;
+  hideHeader?: boolean;
+  hideInlineActions?: boolean;
 }
 
 export function CategoryChipFilterRail({
@@ -47,71 +49,75 @@ export function CategoryChipFilterRail({
   onMoveMoney,
   onSendMoney,
   onBulkAddExpense,
+  hideHeader = false,
+  hideInlineActions = false,
 }: CategoryChipFilterRailProps) {
   const [scrollContainerRef] = useAutoAnimate<HTMLDivElement>({ duration: 150, easing: "ease-out" });
 
   return (
-    <div className="space-y-2 bg-white dark:bg-[#1C1A18] p-3 sm:p-3.5 rounded-2xl border border-[#E8E5DF] dark:border-[#383531] shadow-xs">
-      {/* ─── TOP UTILITY DOCK: Section Title + Move / Send / Bulk Action Buttons ─── */}
-      <div className="flex items-center justify-between gap-2 flex-wrap">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5] tracking-tight flex items-center gap-1.5">
-            <Layers className="size-3.5 stroke-[2] text-[#6B6B6B] dark:text-[#A8A29E]" />
-            <span>Category Envelopes</span>
-          </span>
-          <span className="text-[10px] font-mono text-[#6B6B6B] dark:text-[#A8A29E]">
-            ({categories.length})
-          </span>
+    <div className={cn("space-y-1.5", !hideHeader && "bg-white dark:bg-[#1C1A18] p-3 sm:p-3.5 rounded-2xl border border-[#E8E5DF] dark:border-[#383531] shadow-xs")}>
+      {/* ─── TOP UTILITY DOCK (Optional when parent already has action bar) ─── */}
+      {!hideHeader && (
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5] tracking-tight flex items-center gap-1.5">
+              <Layers className="size-3.5 stroke-[2] text-[#6B6B6B] dark:text-[#A8A29E]" />
+              <span>Category Envelopes</span>
+            </span>
+            <span className="text-[10px] font-mono text-[#6B6B6B] dark:text-[#A8A29E]">
+              ({categories.length})
+            </span>
+          </div>
+
+          {/* Action Buttons: Move Money | Send Money | Bulk OCR | + Category */}
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+            {onMoveMoney && (
+              <button
+                type="button"
+                onClick={() => {
+                  soundFX.playPop();
+                  onMoveMoney();
+                }}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#FAF8F5] dark:bg-[#252321] hover:bg-[#F1EFEA] dark:hover:bg-[#2E2B28] text-[#161514] dark:text-[#FAF8F5] text-[11px] font-heading font-bold border border-[#E8E5DF] dark:border-[#383531] shadow-xs active:scale-95 transition-all cursor-pointer shrink-0"
+                title="Move Money between category envelopes"
+              >
+                <ArrowRightLeft className="size-3 stroke-[2]" />
+                <span>Move</span>
+              </button>
+            )}
+
+            {onSendMoney && (
+              <button
+                type="button"
+                onClick={() => {
+                  soundFX.playPop();
+                  onSendMoney();
+                }}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#FAF8F5] dark:bg-[#252321] hover:bg-[#F1EFEA] dark:hover:bg-[#2E2B28] text-[#161514] dark:text-[#FAF8F5] text-[11px] font-heading font-bold border border-[#E8E5DF] dark:border-[#383531] shadow-xs active:scale-95 transition-all cursor-pointer shrink-0"
+                title="Send Money payout"
+              >
+                <Send className="size-3 stroke-[2]" />
+                <span>Send</span>
+              </button>
+            )}
+
+            {onAddCategory && (
+              <button
+                type="button"
+                onClick={() => {
+                  soundFX.playPop();
+                  onAddCategory();
+                }}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#161514] dark:bg-[#CEF431] hover:bg-[#2A2826] dark:hover:bg-[#d6f64d] text-white dark:text-[#161514] text-[11px] font-heading font-bold border border-[#161514] dark:border-[#CEF431] shadow-xs active:scale-95 transition-all cursor-pointer shrink-0"
+                title="Create new category envelope"
+              >
+                <Plus className="size-3 stroke-[2.5]" />
+                <span>Envelope</span>
+              </button>
+            )}
+          </div>
         </div>
-
-        {/* Action Buttons: Move Money | Send Money | Bulk OCR | + Category */}
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-          {onMoveMoney && (
-            <button
-              type="button"
-              onClick={() => {
-                soundFX.playPop();
-                onMoveMoney();
-              }}
-              className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#FAF8F5] dark:bg-[#252321] hover:bg-[#F1EFEA] dark:hover:bg-[#2E2B28] text-[#161514] dark:text-[#FAF8F5] text-[11px] font-heading font-bold border border-[#E8E5DF] dark:border-[#383531] shadow-xs active:scale-95 transition-all cursor-pointer shrink-0"
-              title="Move Money between category envelopes"
-            >
-              <ArrowRightLeft className="size-3 stroke-[2]" />
-              <span>Move</span>
-            </button>
-          )}
-
-          {onSendMoney && (
-            <button
-              type="button"
-              onClick={() => {
-                soundFX.playPop();
-                onSendMoney();
-              }}
-              className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#FAF8F5] dark:bg-[#252321] hover:bg-[#F1EFEA] dark:hover:bg-[#2E2B28] text-[#161514] dark:text-[#FAF8F5] text-[11px] font-heading font-bold border border-[#E8E5DF] dark:border-[#383531] shadow-xs active:scale-95 transition-all cursor-pointer shrink-0"
-              title="Send Money payout"
-            >
-              <Send className="size-3 stroke-[2]" />
-              <span>Send</span>
-            </button>
-          )}
-
-          {onAddCategory && (
-            <button
-              type="button"
-              onClick={() => {
-                soundFX.playPop();
-                onAddCategory();
-              }}
-              className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#161514] dark:bg-[#CEF431] hover:bg-[#2A2826] dark:hover:bg-[#d6f64d] text-white dark:text-[#161514] text-[11px] font-heading font-bold border border-[#161514] dark:border-[#CEF431] shadow-xs active:scale-95 transition-all cursor-pointer shrink-0"
-              title="Create new category envelope"
-            >
-              <Plus className="size-3 stroke-[2.5]" />
-              <span>Envelope</span>
-            </button>
-          )}
-        </div>
-      </div>
+      )}
 
       {/* ─── SCROLLABLE HORIZONTAL TAG/CHIP RAIL (Belanje Benchmark) ─── */}
       <div
@@ -174,8 +180,8 @@ export function CategoryChipFilterRail({
                 </span>
               </button>
 
-              {/* Contextual Edit / Delete button when chip is selected */}
-              {isSelected && (onEditCategory || onDeleteCategory) && (
+              {/* Contextual Edit / Delete button when chip is selected (only when inline actions not hidden) */}
+              {!hideInlineActions && isSelected && (onEditCategory || onDeleteCategory) && (
                 <div className="flex items-center gap-0.5 ml-1">
                   {onEditCategory && (
                     <button
@@ -211,8 +217,8 @@ export function CategoryChipFilterRail({
           );
         })}
 
-        {/* "+ New Envelope" Quick Chip */}
-        {onAddCategory && (
+        {/* "+ New Envelope" Quick Chip (only when inline actions not hidden) */}
+        {!hideInlineActions && onAddCategory && (
           <button
             type="button"
             onClick={() => {

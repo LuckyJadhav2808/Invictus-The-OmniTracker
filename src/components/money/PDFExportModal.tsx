@@ -35,6 +35,7 @@ export function PDFExportModal({
   const [rangeMode, setRangeMode] = useState<"current_month" | "last_30" | "all_time">("current_month");
   const [isGenerating, setIsGenerating] = useState(false);
   const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
+  const [manualDownloadUrl, setManualDownloadUrl] = useState<string | null>(null);
 
   // Performance-optimized 60fps layout transitions (Zero CLS)
   const [optionsRef] = useAutoAnimate<HTMLDivElement>({ duration: 180, easing: "ease-out" });
@@ -120,22 +121,37 @@ export function PDFExportModal({
     e.stopPropagation();
     setIsGenerating(true);
     toast.info("Generating Enterprise Vector PDF statement... 📄");
+
+    // Allow UI thread 60ms to paint generating indicator
+    await new Promise((resolve) => setTimeout(resolve, 60));
+
     try {
       const safeLabel = periodLabel.replace(/[^a-zA-Z0-9_-]/g, "_");
-      generateEnterpriseVectorPDF({
+      const filename = `Invictus_Ledger_${safeLabel}.pdf`;
+      const result = generateEnterpriseVectorPDF({
         transactions: finalExportTxs,
         categories,
         periodLabel,
         currencySymbol,
         userName,
-        filename: `Invictus_Ledger_${safeLabel}.pdf`,
+        filename,
       });
+
+      if (result && "blobUrl" in result && typeof result.blobUrl === "string") {
+        setManualDownloadUrl(result.blobUrl);
+      }
+
+      soundFX.playPop();
       toast.success("Enterprise Vector PDF Statement downloaded! ⚡📄");
-      onOpenChange(false);
+
+      // Give browser download manager time to initiate before closing modal
+      setTimeout(() => {
+        onOpenChange(false);
+        setIsGenerating(false);
+      }, 700);
     } catch (err) {
       console.error("PDF generation error:", err);
       toast.error("PDF export encountered an error.");
-    } finally {
       setIsGenerating(false);
     }
   };
@@ -178,7 +194,7 @@ export function PDFExportModal({
               className="min-h-[46px] w-full bg-[#03D26F] hover:bg-[#02b35d] text-[#161514] font-heading font-black text-xs uppercase tracking-wider py-2.5 px-3 rounded-xl border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer transition-all flex items-center justify-center gap-2 disabled:opacity-50"
             >
               <Download className="size-4 stroke-[2.5]" />
-              <span>{isGenerating ? "Generating..." : `Download ${periodLabel.split(" ")[0]} PDF`}</span>
+              <span>{isGenerating ? "Generating PDF..." : `Download ${periodLabel.split(" ")[0]} PDF`}</span>
             </button>
 
             {/* Direct Print */}
@@ -191,6 +207,18 @@ export function PDFExportModal({
               <span>Print Direct</span>
             </button>
           </div>
+
+          {manualDownloadUrl && (
+            <div className="pt-1 text-center">
+              <a
+                href={manualDownloadUrl}
+                download={`Invictus_Ledger_${periodLabel.replace(/[^a-zA-Z0-9_-]/g, "_")}.pdf`}
+                className="text-[11px] font-mono font-bold text-[#03D26F] underline hover:text-[#02b35d]"
+              >
+                Download did not start automatically? Click here to save PDF
+              </a>
+            </div>
+          )}
         </div>
 
         {/* Collapsible Advanced Options Toggle */}
