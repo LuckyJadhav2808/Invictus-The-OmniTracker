@@ -95,42 +95,27 @@ export function TelemetryGridSkeleton({ count = 3 }: { count?: number }) {
  */
 export function SpaceCockpitSkeleton() {
   return (
-    <div className="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 animate-in fade-in duration-150 select-none">
+    <div className="space-y-4 max-w-4xl mx-auto px-2 sm:px-4 py-2 sm:py-4 animate-in fade-in duration-150 select-none">
       <SpaceHeroSkeleton />
-      <TelemetryGridSkeleton count={3} />
+      <TelemetryGridSkeleton count={4} />
 
-      {/* Main Dual-Column Content Deck */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
-        <div className="lg:col-span-8 space-y-4">
-          <SkeletonCard className="h-64 sm:h-80 flex flex-col justify-between">
-            <div className="flex items-center justify-between pb-3 border-b border-[#161514]/10 dark:border-[#383531]">
-              <SkeletonBox className="h-5 w-36" />
-              <SkeletonBox className="h-8 w-24 rounded-xl" />
-            </div>
-            <div className="space-y-3 py-4">
-              <SkeletonBox className="h-12 w-full rounded-xl" />
-              <SkeletonBox className="h-12 w-full rounded-xl" />
-              <SkeletonBox className="h-12 w-full rounded-xl" />
-            </div>
-            <div className="flex justify-between items-center pt-2">
-              <SkeletonBox className="h-4 w-32" />
-              <SkeletonBox className="h-4 w-20" />
-            </div>
-          </SkeletonCard>
-        </div>
-
-        <div className="lg:col-span-4 space-y-4">
-          <SkeletonCard className="h-64 sm:h-80 flex flex-col justify-between">
-            <div className="space-y-2 pb-3 border-b border-[#161514]/10 dark:border-[#383531]">
-              <SkeletonBox className="h-5 w-28" />
-              <SkeletonBox className="h-3.5 w-40" />
-            </div>
-            <div className="flex-1 flex items-center justify-center py-6">
-              <SkeletonBox className="size-32 rounded-full border-4 border-dashed border-[#161514]/15 dark:border-[#383531]" />
-            </div>
-            <SkeletonBox className="h-9 w-full rounded-xl bg-[#03D26F]/20 dark:bg-[#03D26F]/10" />
-          </SkeletonCard>
-        </div>
+      {/* Main Studio Content Deck */}
+      <div className="space-y-4">
+        <SkeletonCard className="h-64 sm:h-80 flex flex-col justify-between">
+          <div className="flex items-center justify-between pb-3 border-b border-[#161514]/10 dark:border-[#383531]">
+            <SkeletonBox className="h-5 w-36" />
+            <SkeletonBox className="h-8 w-24 rounded-xl" />
+          </div>
+          <div className="space-y-3 py-4">
+            <SkeletonBox className="h-12 w-full rounded-xl" />
+            <SkeletonBox className="h-12 w-full rounded-xl" />
+            <SkeletonBox className="h-12 w-full rounded-xl" />
+          </div>
+          <div className="flex justify-between items-center pt-2">
+            <SkeletonBox className="h-4 w-32" />
+            <SkeletonBox className="h-4 w-20" />
+          </div>
+        </SkeletonCard>
       </div>
     </div>
   );
@@ -386,30 +371,15 @@ export function HabitsListSkeleton({ count = 4 }: { count?: number }) {
  */
 export function StudyCockpitSkeleton() {
   return (
-    <div className="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 animate-in fade-in duration-150 select-none">
+    <div className="space-y-4 max-w-4xl mx-auto px-2 sm:px-4 py-2 sm:py-4 animate-in fade-in duration-150 select-none">
       <SpaceHeroSkeleton />
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        <div className="lg:col-span-8 space-y-4">
-          <div className="flex items-center justify-between">
-            <SkeletonBox className="h-6 w-36" />
-            <SkeletonBox className="h-9 w-28 rounded-xl bg-[#CEF431]/30 dark:bg-[#CEF431]/20" />
-          </div>
-          <SubjectsGridSkeleton count={4} />
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <SkeletonBox className="h-6 w-36" />
+          <SkeletonBox className="h-9 w-28 rounded-xl bg-[#CEF431]/30 dark:bg-[#CEF431]/20" />
         </div>
-
-        <div className="lg:col-span-4 space-y-4">
-          <SkeletonCard className="h-72 flex flex-col justify-between">
-            <div className="space-y-1">
-              <SkeletonBox className="h-5 w-32" />
-              <SkeletonBox className="h-3 w-44" />
-            </div>
-            <div className="flex justify-center my-4">
-              <SkeletonBox className="size-36 rounded-full border-4 border-dashed border-[#161514]/15 dark:border-[#383531]" />
-            </div>
-            <SkeletonBox className="h-10 w-full rounded-xl bg-rose-200 dark:bg-rose-950/40" />
-          </SkeletonCard>
-        </div>
+        <SubjectsGridSkeleton count={4} />
       </div>
     </div>
   );
