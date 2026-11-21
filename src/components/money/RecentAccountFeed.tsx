@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { type Transaction, type Category } from "@/types";
 import { type DailyBudgetStats, type MonthlyBudgetStats } from "@/lib/utils/budget-rollover";
 import { BelanjeTransactionRow } from "@/components/money/BelanjeTransactionRow";
@@ -49,6 +50,8 @@ export function RecentAccountFeed({
     categories.forEach((c) => map.set(c.id, c));
     return map;
   }, [categories]);
+
+  const [feedListRef] = useAutoAnimate<HTMLDivElement>({ duration: 180, easing: "ease-out" });
 
   // Determine current feed config based on active card in deck
   const feedConfig = useMemo(() => {
@@ -275,7 +278,7 @@ export function RecentAccountFeed({
         </div>
       ) : (
         /* Render Belanje Squircles */
-        <div className="space-y-1.5">
+        <div ref={feedListRef} className="space-y-1.5">
           {feedConfig.items.map((tx) => (
             <BelanjeTransactionRow
               key={tx.id}

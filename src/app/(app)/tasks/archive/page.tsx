@@ -1,6 +1,7 @@
 "use client";
 
 import { CheckSquare, RotateCcw, Trash2, CheckCircle2 } from "lucide-react";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { SubpageLayout } from "@/components/shared/SubpageLayout";
 import { NeobrutalistEmptyCard } from "@/components/shared/NeobrutalistEmptyCard";
 import { useTasks, useUpdateTask, useDeleteTask } from "@/lib/queries/tasks";
@@ -12,6 +13,7 @@ export default function TasksArchivePage() {
   const { data: tasks = [] } = useTasks();
   const updateTaskMutation = useUpdateTask();
   const deleteTaskMutation = useDeleteTask();
+  const [archiveListRef] = useAutoAnimate<HTMLDivElement>({ duration: 180, easing: "ease-out" });
 
   const completedTasks = tasks
     .filter((t) => t.status === "completed")
@@ -70,7 +72,7 @@ export default function TasksArchivePage() {
             actionLabel="Return to Tasks"
           />
         ) : (
-          <div className="divide-y divide-border">
+          <div ref={archiveListRef} className="divide-y divide-border">
             {completedTasks.map((t) => (
               <div
                 key={t.id}

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CheckSquare, Plus, Flame, CheckCircle2, Circle, BookOpen, Layers } from "lucide-react";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { SubpageLayout } from "@/components/shared/SubpageLayout";
 import { SubpageTwoTabs } from "@/components/shared/SubpageTwoTabs";
 import { NeobrutalistEmptyCard } from "@/components/shared/NeobrutalistEmptyCard";
@@ -17,6 +18,7 @@ export default function HabitVaultPage() {
   const { data: habits = [] } = useHabits();
   const { data: streaks = {} } = useStreaks();
   const toggleHabitMutation = useToggleHabitLog();
+  const [rosterRef] = useAutoAnimate<HTMLDivElement>({ duration: 180, easing: "ease-out" });
   const todayStr = format(new Date(), "yyyy-MM-dd");
 
   const handleToggle = (id: string, currentCompleted: boolean) => {
@@ -86,7 +88,7 @@ export default function HabitVaultPage() {
                 onAction={() => window.dispatchEvent(new CustomEvent("invictus:open-new-habit"))}
               />
             ) : (
-              <div className="divide-y divide-border">
+              <div ref={rosterRef} className="divide-y divide-border">
                 {habits.map((habit) => {
                   const streak = streaks[habit.id]?.currentStreak || 0;
                   const isCompleted = (habit as any).completedToday || false;
