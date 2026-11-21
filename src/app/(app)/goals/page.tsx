@@ -493,7 +493,7 @@ function GoalsPageContent() {
 
   return (
     <div className="w-full max-w-xl lg:max-w-5xl xl:max-w-6xl mx-auto pb-6 sm:pb-8 select-none space-y-3 sm:space-y-4 px-1 sm:px-3">
-      {/* ================= SLOT 1: SLIM TOP APP BAR (48-56px) ================= */}
+      {/* ================= SLOT 1: UNIFIED TOP APP BAR ================= */}
       <MobileAppBar
         title="Habits"
         onCheckAllDue={handleCheckAllDue}
@@ -501,11 +501,6 @@ function GoalsPageContent() {
         dueCount={dueTodayHabits.length}
         showDynamicIsland={true}
       />
-
-      {/* ================= SLOT 2: DESKTOP SUB-NAV (Hidden on Mobile) ================= */}
-      <div className="hidden lg:block">
-        <SegmentedSubNav />
-      </div>
 
       <div className="px-3.5 space-y-2">
         {/* ================= SLOT 3: ONE HERO CAROUSEL SLOT (~175px) ================= */}

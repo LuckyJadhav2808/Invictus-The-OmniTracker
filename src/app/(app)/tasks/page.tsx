@@ -379,8 +379,8 @@ export default function TasksPage() {
   // =========================================================================
   return (
     <div className="w-full max-w-xl lg:max-w-6xl mx-auto px-2 sm:px-4 py-2 sm:py-4 space-y-3 sm:space-y-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] select-none max-w-full overflow-x-hidden">
-      {/* ================= SLOT 1: MOBILE APP BAR (Mobile Only) ================= */}
-      <div className="-mx-2 -mt-2 sm:-mx-4 sm:-mt-4 lg:hidden">
+      {/* ================= SLOT 1: UNIFIED APP BAR ================= */}
+      <div className="-mx-2 -mt-2 sm:-mx-4 sm:-mt-4">
         <MobileAppBar
           title="Tasks"
           dueCount={p1UrgentTasks}
@@ -402,23 +402,12 @@ export default function TasksPage() {
         />
       </div>
 
-      {/* ================= SLOT 2: DESKTOP SUB-NAV (Desktop Only) ================= */}
-      <SegmentedSubNav
-        tabs={TASKS_DESKTOP_TABS}
-        value={activeTab}
-        onValueChange={(val) => {
-          soundFX.playPop();
-          setActiveTab(val as any);
-        }}
-        className="hidden lg:block"
-      />
-
       {/* ================= RESPONSIVE LAYOUT ENGINE ================= */}
       {/* On Mobile: Single Column 5-Slot Stack (≤ 1.4 screens)       */}
       {/* On Desktop: 2-Column Bento Grid (12 cols)                   */}
       <div className="lg:grid lg:grid-cols-12 lg:gap-6 items-start space-y-3 sm:space-y-4 lg:space-y-0">
         
-        {/* ================= LEFT COLUMN: HERO + PRIMARY VIEWS ================= */}
+        {/* ================= LEFT COLUMN: HERO + DOOR TILES + PRIMARY CHECKLIST ================= */}
         <div className="lg:col-span-7 xl:col-span-8 space-y-3 sm:space-y-4">
           
           {/* SLOT 3: BORDERLESS HERO CAROUSEL */}
@@ -442,123 +431,31 @@ export default function TasksPage() {
             }}
           />
 
-          {/* SLOT 4: DOOR TILE ROW (Mobile Only - Max 4 Tiles to L2) */}
-          <div className="lg:hidden">
-            <TasksDoorTileRow
-              totalCount={totalTasks}
-              completedCount={completedTasks}
-              p1UrgentCount={p1UrgentTasks}
-              projectsCount={projectSummaries.length}
-              onOpenKanban={() => router.push("/tasks/kanban")}
-              onOpenMatrix={() => router.push("/tasks/matrix")}
-              onOpenProjects={() => router.push("/tasks/projects")}
-              onOpenArchive={() => router.push("/tasks/archive")}
-            />
-          </div>
+          {/* SLOT 4: DOOR TILE ROW (Universal 4 Tiles to Dedicated Subpages) */}
+          <TasksDoorTileRow
+            totalCount={totalTasks}
+            completedCount={completedTasks}
+            p1UrgentCount={p1UrgentTasks}
+            projectsCount={projectSummaries.length}
+            onOpenKanban={() => router.push("/tasks/kanban")}
+            onOpenMatrix={() => router.push("/tasks/matrix")}
+            onOpenProjects={() => router.push("/tasks/projects")}
+            onOpenArchive={() => router.push("/tasks/archive")}
+          />
 
-          {/* SLOT 5 (Mobile) / ACTIVE VIEW (Desktop) */}
-          {/* Mobile always shows the fast 56-64px single-line primary checklist */}
-          <div className="block lg:hidden">
-            <TasksPrimaryList
-              tasks={tasks}
-              onUpdateTask={(id, updates) => updateTaskMutation.mutate({ id, updates })}
-              onDeleteTask={handleDeleteTask}
-              onToggleSubtask={handleToggleSubtask}
-              onEditTask={handleEditTask}
-              onOpenCreateModal={() => {
-                setTaskToEdit(null);
-                setIsCreateModalOpen(true);
-              }}
-              showAllByDefault={false}
-            />
-          </div>
-
-          {/* Desktop switches based on activeTab */}
-          <div className="hidden lg:block">
-            {activeTab === "list" && (
-              <TasksPrimaryList
-                tasks={tasks}
-                onUpdateTask={(id, updates) => updateTaskMutation.mutate({ id, updates })}
-                onDeleteTask={handleDeleteTask}
-                onToggleSubtask={handleToggleSubtask}
-                onEditTask={handleEditTask}
-                onOpenCreateModal={() => {
-                  setTaskToEdit(null);
-                  setIsCreateModalOpen(true);
-                }}
-                showAllByDefault={true}
-              />
-            )}
-
-            {activeTab === "kanban" && (
-              <TaskKanbanBoard
-                tasks={tasks}
-                onUpdateTask={(id, updates) => updateTaskMutation.mutate({ id, updates })}
-                onDeleteTask={handleDeleteTask}
-                onToggleSubtask={handleToggleSubtask}
-                onEditTask={handleEditTask}
-                onOpenCreateModal={() => {
-                  setTaskToEdit(null);
-                  setIsCreateModalOpen(true);
-                }}
-              />
-            )}
-
-            {activeTab === "matrix" && (
-              <EisenhowerMatrixWidget
-                tasks={tasks}
-                onUpdateTask={(id, updates) => updateTaskMutation.mutate({ id, updates })}
-                onOpenCreateModal={() => {
-                  setTaskToEdit(null);
-                  setIsCreateModalOpen(true);
-                }}
-              />
-            )}
-
-            {activeTab === "projects" && (
-              <div className="space-y-4">
-                <div className="p-5 bg-card border border-border rounded-2xl shadow-xs space-y-3">
-                  <h3 className="font-heading font-black text-sm text-foreground uppercase tracking-wider flex items-center gap-2">
-                    <FolderKanban className="size-4 text-sky-500" /> Project Deliverable Streams
-                  </h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    {projectSummaries.map((p) => {
-                      const pct = p.total > 0 ? Math.round((p.completed / p.total) * 100) : 0;
-                      return (
-                        <div
-                          key={p.name}
-                          className="p-3.5 rounded-xl bg-muted/40 border border-border/70 space-y-2"
-                        >
-                          <div className="flex items-center justify-between text-xs font-bold">
-                            <span className="text-foreground">#{p.name}</span>
-                            <span className="font-mono text-muted-foreground">
-                              {p.completed}/{p.total} ({pct}%)
-                            </span>
-                          </div>
-                          <div className="w-full h-2 rounded-full bg-muted overflow-hidden">
-                            <div
-                              style={{ width: `${pct}%` }}
-                              className={cn("h-full rounded-full transition-all duration-500", p.color || "bg-sky-500")}
-                            />
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <TasksPrimaryList
-                  tasks={tasks}
-                  onUpdateTask={(id, updates) => updateTaskMutation.mutate({ id, updates })}
-                  onDeleteTask={handleDeleteTask}
-                  onToggleSubtask={handleToggleSubtask}
-                  onEditTask={handleEditTask}
-                  showAllByDefault={true}
-                />
-              </div>
-            )}
-          </div>
-
+          {/* SLOT 5: PRIMARY TASK CHECKLIST */}
+          <TasksPrimaryList
+            tasks={tasks}
+            onUpdateTask={(id, updates) => updateTaskMutation.mutate({ id, updates })}
+            onDeleteTask={handleDeleteTask}
+            onToggleSubtask={handleToggleSubtask}
+            onEditTask={handleEditTask}
+            onOpenCreateModal={() => {
+              setTaskToEdit(null);
+              setIsCreateModalOpen(true);
+            }}
+            showAllByDefault={false}
+          />
         </div>
 
         {/* ================= RIGHT COLUMN: DESKTOP BENTO TELEMETRY ================= */}

@@ -198,11 +198,17 @@ export function NeobrutalistPDFStatement({
                     <div className="flex-1 min-w-0 px-1.5 sm:px-2 flex items-center gap-2">
                       <CategoryIcon name={category?.icon} className="size-4 shrink-0 text-[#161514]" />
                       <div className="min-w-0 flex flex-col justify-center">
-                        <span className="font-heading font-black text-xs text-[#161514] truncate leading-tight">
+                        <span
+                          title={category?.name || "Uncategorized"}
+                          className="font-heading font-black text-xs text-[#161514] truncate leading-tight"
+                        >
                           {category?.name || "Uncategorized"}
                         </span>
                         {tx.note && (
-                          <span className="text-[10px] font-mono text-[#161514]/65 truncate leading-tight mt-0.5">
+                          <span
+                            title={tx.note}
+                            className="text-[10px] font-mono text-[#161514]/65 truncate leading-tight mt-0.5"
+                          >
                             {tx.note}
                           </span>
                         )}

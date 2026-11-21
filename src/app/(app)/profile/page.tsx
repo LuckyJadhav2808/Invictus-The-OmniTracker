@@ -28,8 +28,8 @@ export default function ProfilePage() {
 
   return (
     <div className="w-full max-w-xl lg:max-w-4xl mx-auto px-2 sm:px-4 py-2 sm:py-6 space-y-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] bg-[#FAF8F5] dark:bg-[#161514] select-none text-[#161514] dark:text-[#FAF8F5] min-h-screen transition-colors overflow-x-hidden">
-      {/* ================= SLOT 1: MOBILE APP BAR (Mobile Only) ================= */}
-      <div className="-mx-2 -mt-2 sm:-mx-4 sm:-mt-4 lg:hidden">
+      {/* ================= SLOT 1: UNIFIED APP BAR ================= */}
+      <div className="-mx-2 -mt-2 sm:-mx-4 sm:-mt-4">
         <MobileAppBar
           title="Profile"
           onBack={handleBack}
@@ -63,30 +63,6 @@ export default function ProfilePage() {
       </div>
 
       <div className="max-w-3xl mx-auto space-y-4 sm:space-y-6">
-        
-        {/* Desktop Profile Header (Desktop Only) */}
-        <div className="hidden lg:flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-black text-[#161514] dark:text-[#FAF8F5] tracking-tight uppercase font-heading">
-              User Profile & Engine
-            </h1>
-            <p className="text-xs text-[#8C8882] dark:text-[#A8A29E] font-medium mt-0.5">
-              Account telemetry, lifetime activity matrix, and session controls
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => {
-              soundFX.playPop();
-              setIsUpdateModalOpen(true);
-            }}
-            className="bg-[#CEF431] hover:bg-[#bce022] text-[#161514] text-xs font-black uppercase px-3.5 py-1.5 rounded-xl border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] flex items-center gap-1.5 cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all"
-          >
-            <Sparkles className="h-3.5 w-3.5 stroke-[2.5]" />
-            <span>v{APP_VERSION_CONFIG.version}</span>
-          </button>
-        </div>
-
         {/* User Info Card - Harmonized Neobrutalist Responsive Layout */}
         <div id="user-profile-card" className="bg-white dark:bg-[#1C1A18] rounded-3xl p-4 sm:p-6 border-2 border-[#161514] dark:border-[#383531] shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#000000] space-y-4 scroll-mt-24">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">

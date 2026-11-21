@@ -46,6 +46,7 @@ import { Button } from "@/components/ui/button";
 import { ResponsiveFormContainer } from "@/components/shared/ResponsiveFormContainer";
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
 import { DeleteConfirmationModal } from "@/components/shared/DeleteConfirmationModal";
+import { MobileAppBar } from "@/components/mobile/MobileAppBar";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -415,6 +416,7 @@ export default function AdminDashboardPage() {
   return (
     <div className="min-h-screen bg-[#FAF8F5] pb-24 p-3 sm:p-6 md:p-8 space-y-6 w-full max-w-full overflow-x-hidden">
       <div className="max-w-5xl mx-auto space-y-6">
+        <MobileAppBar title="System Admin" showDynamicIsland={true} />
         
         {/* Admin Header Banner */}
         <div className="bg-[#161514] text-white rounded-3xl p-6 sm:p-8 border-[2.5px] border-[#161514] shadow-[5px_5px_0px_0px_#CEF431] relative overflow-hidden">

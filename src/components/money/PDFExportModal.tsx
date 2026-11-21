@@ -359,10 +359,15 @@ export function PDFExportModal({
                                 </span>
                                 <CategoryIcon name={cat?.icon} className="size-4 shrink-0 text-[#161514] dark:text-[#FAF8F5]" />
                                 <div className="min-w-0">
-                                  <span className="text-[11px] font-heading font-black text-[#161514] dark:text-[#FAF8F5] block truncate">
-                                    {cat?.name || "Expense"} {tx.note ? `• ${tx.note}` : ""}
+                                  <span className="text-[11px] font-heading font-black text-[#161514] dark:text-[#FAF8F5] block truncate leading-tight">
+                                    {cat?.name || "Expense"}
                                   </span>
-                                  <span className="text-[9px] font-mono text-[#161514]/60 dark:text-[#FAF8F5]/60 block">
+                                  {tx.note && (
+                                    <span className="text-[9px] font-mono text-[#161514]/70 dark:text-[#FAF8F5]/70 block truncate leading-tight">
+                                      {tx.note}
+                                    </span>
+                                  )}
+                                  <span className="text-[9px] font-mono text-[#161514]/50 dark:text-[#FAF8F5]/50 block leading-tight">
                                     {tx.date ? format(parseISO(tx.date), "MMM d, yyyy") : ""}
                                   </span>
                                 </div>

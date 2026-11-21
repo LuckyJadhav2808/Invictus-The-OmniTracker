@@ -855,45 +855,6 @@ function MoneyPageContent() {
         }
       />
 
-      {/* ================= SLOT 2: DESKTOP SUB-NAV (Hidden on Mobile) ================= */}
-      <div className="hidden lg:block">
-        <SegmentedSubNav
-          tabs={subNavTabs}
-          value={activeTab === "analytics" ? undefined : activeTab}
-          onValueChange={handleTabChange}
-        />
-      </div>
-
-      {/* ================= MOBILE L2 SUB-PAGE HEADER (Back to Overview) ================= */}
-      {activeTab !== "overview" && activeTab !== "ledger" && (
-        <div className="lg:hidden sticky top-0 z-30 w-full min-h-[52px] h-auto safe-top-pad py-2 px-3.5 bg-[#FAF8F5]/95 dark:bg-[#161514]/95 backdrop-blur-md border-b border-[#161514]/10 dark:border-white/10 flex items-center justify-between select-none">
-          <button
-            type="button"
-            onClick={() => {
-              soundFX.playPop();
-              soundFX.vibrate(15);
-              handleTabChange("overview");
-            }}
-            className="flex items-center gap-1.5 font-heading font-black text-xs text-[#161514] px-2.5 py-1.5 rounded-xl border-2 border-[#161514] bg-[#CEF431] shadow-[2px_2px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
-          >
-            <ArrowLeft className="size-4 stroke-[3]" />
-            <span>Overview</span>
-          </button>
-          <span className="font-heading font-black text-sm text-foreground">
-            {activeTab === "budgets"
-              ? "Monthly Budgets"
-              : activeTab === "analytics"
-              ? "Spend Analytics"
-              : activeTab === "debts" || activeTab === "ious"
-              ? "IOUs & Debts"
-              : activeTab === "vault"
-              ? "Emergency Vault"
-              : "Overview"}
-          </span>
-          <div className="w-16" />
-        </div>
-      )}
-
       <div className="px-3.5 space-y-3">
         {/* ================= INSTANT 1-TAP PENDING SMS PAYMENT ALERT DOCK ================= */}
         <PendingSmsTransactionsBanner

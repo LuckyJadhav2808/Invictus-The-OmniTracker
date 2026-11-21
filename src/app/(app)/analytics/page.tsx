@@ -11,6 +11,7 @@ import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Legend, PieC
 import { useUIStore } from "@/store/ui-store";
 import { YearlyActivityMatrix } from "@/components/profile/YearlyActivityMatrix";
 import { useAuth } from "@/components/shared/AuthProvider";
+import { MobileAppBar } from "@/components/mobile/MobileAppBar";
 
 // Custom Tactile Neobrutalist Chart Tooltip
 function NeobrutalistTooltip({ active, payload, label, unit = "" }: any) {
@@ -134,8 +135,13 @@ export default function AnalyticsHubPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-cream-bg dark:bg-[#121110] p-4 md:p-8 space-y-6">
-      <div className="max-w-5xl mx-auto space-y-6">
+    <div className="w-full max-w-xl lg:max-w-5xl xl:max-w-6xl mx-auto px-2 sm:px-4 py-2 sm:py-4 space-y-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] select-none">
+      {/* Universal Top App Bar */}
+      <div className="-mx-2 -mt-2 sm:-mx-4 sm:-mt-4">
+        <MobileAppBar title="Analytics Hub" showDynamicIsland={true} />
+      </div>
+
+      <div className="space-y-4">
         {/* Clean Neobrutalist Analytics Header Card */}
         <div className="neo-card p-5 bg-white dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#383531] shadow-[4px_4px_0px_0px_#161514] dark:shadow-[4px_4px_0px_0px_#000000] rounded-3xl flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">

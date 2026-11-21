@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { Sidebar } from "@/components/shared/Sidebar";
 import { BottomNav } from "@/components/shared/BottomNav";
-import { SpaceHeader } from "@/components/shared/SpaceHeader";
+import { GlobalAnnouncementBanner } from "@/components/shared/GlobalAnnouncementBanner";
 import { QuickActionModal } from "@/components/shared/QuickActionModal";
 import { OmniWidgetSync } from "@/components/shared/OmniWidgetSync";
 import { AutoUpdateBanner } from "@/components/shared/AutoUpdateBanner";
@@ -118,8 +118,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         {/* Proactive Auto-Update Notification Banner */}
         <AutoUpdateBanner />
 
-        {/* Clean Production Top Bar */}
-        <SpaceHeader />
+        {/* Global Admin Announcement Banner */}
+        <GlobalAnnouncementBanner />
 
         {/* Dynamic Route Content */}
         <div className="flex-1 w-full max-w-6xl mx-auto">

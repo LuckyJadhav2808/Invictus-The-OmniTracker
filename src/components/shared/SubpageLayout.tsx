@@ -42,8 +42,8 @@ export function SubpageLayout({
         className
       )}
     >
-      {/* 1. Dynamic Strobi Top App Bar (Sticky on Mobile) */}
-      <div className="-mx-2 -mt-2 sm:-mx-4 sm:-mt-4 lg:hidden">
+      {/* 1. Dynamic Strobi Top App Bar */}
+      <div className="-mx-2 -mt-2 sm:-mx-4 sm:-mt-4">
         <MobileAppBar title={appBarTitle} showDynamicIsland={true} />
       </div>
 
