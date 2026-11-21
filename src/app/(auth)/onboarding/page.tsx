@@ -40,6 +40,9 @@ export default function OnboardingPage() {
       localStorage.setItem("invictus_starter_habits", JSON.stringify(data.selectedHabitIds));
       localStorage.setItem("invictus_starter_daily_limit", String(data.dailyBudgetLimit));
       localStorage.setItem("invictus_starter_cash", String(data.initialCashBalance));
+      if (data.smsAutoFetchEnabled !== undefined) {
+        localStorage.setItem("invictus_sms_auto_fetch_enabled", String(data.smsAutoFetchEnabled));
+      }
     } catch {}
 
     toast.success("Companion calibrated! Let's lock in your vault.");

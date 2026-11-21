@@ -326,7 +326,7 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
             tapIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
             tapIntent.putExtra("target_tab", "money");
             tapIntent.putExtra("pending_transaction_sig", dedupSig);
-            tapIntent.setData(android.net.Uri.parse("https://invictus-the-omni-tracker.vercel.app/money?pending_sms=1"));
+            tapIntent.setData(android.net.Uri.parse("https://invictus-the-omni-tracker.vercel.app/money?pending_sms=1&sig=" + dedupSig));
 
             PendingIntent pendingIntent = PendingIntent.getActivity(
                     context,
@@ -335,20 +335,52 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                     PendingIntent.FLAG_UPDATE_CURRENT | (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_IMMUTABLE : 0)
             );
 
+            // Action 1: Instant 1-Tap Import to Ledger
+            Intent importIntent = new Intent(context, MainActivity.class);
+            importIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            importIntent.putExtra("target_tab", "money");
+            importIntent.putExtra("action", "import_sms");
+            importIntent.putExtra("pending_transaction_sig", dedupSig);
+            importIntent.setData(android.net.Uri.parse("https://invictus-the-omni-tracker.vercel.app/money?import_sms=1&sig=" + dedupSig));
+
+            PendingIntent importPendingIntent = PendingIntent.getActivity(
+                    context,
+                    (int) (System.currentTimeMillis() + 1),
+                    importIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT | (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_IMMUTABLE : 0)
+            );
+
+            // Action 2: Open Pre-filled Transaction Form to Edit Details
+            Intent editIntent = new Intent(context, MainActivity.class);
+            editIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            editIntent.putExtra("target_tab", "money");
+            editIntent.putExtra("action", "edit_sms");
+            editIntent.putExtra("pending_transaction_sig", dedupSig);
+            editIntent.setData(android.net.Uri.parse("https://invictus-the-omni-tracker.vercel.app/money?edit_sms=1&sig=" + dedupSig));
+
+            PendingIntent editPendingIntent = PendingIntent.getActivity(
+                    context,
+                    (int) (System.currentTimeMillis() + 2),
+                    editIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT | (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_IMMUTABLE : 0)
+            );
+
             boolean isExpense = "expense".equals(type);
             String formattedAmt = (amount % 1 == 0)
                     ? String.format(Locale.getDefault(), "%,.0f", amount)
                     : String.format(Locale.getDefault(), "%,.2f", amount);
             String title = (isExpense ? "⚡ Spent ₹" : "⚡ Received ₹") + formattedAmt + ": " + merchant;
-            String body = "Tap to register to ledger or edit details (" + bank + ")";
+            String body = "Tap to view, or 1-tap Import / Edit (" + bank + ")";
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                     .setSmallIcon(R.mipmap.ic_launcher)
                     .setContentTitle(title)
                     .setContentText(body)
-                    .setStyle(new NotificationCompat.BigTextStyle().bigText("Detected bank payment of ₹" + formattedAmt + " to " + merchant + " (" + bank + "). Tap to register into your Invictus money ledger or edit details."))
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText("Detected bank payment of ₹" + formattedAmt + " to " + merchant + " (" + bank + "). Tap to review, or select Import / Edit."))
                     .setAutoCancel(true)
                     .setContentIntent(pendingIntent)
+                    .addAction(R.drawable.ic_stat_icon, "⚡ Import", importPendingIntent)
+                    .addAction(R.drawable.ic_stat_icon, "✎ Edit", editPendingIntent)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .setDefaults(NotificationCompat.DEFAULT_ALL);
 

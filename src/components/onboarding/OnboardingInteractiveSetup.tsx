@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -9,6 +9,10 @@ import {
   Coins,
   Sparkles,
   Edit2,
+  Smartphone,
+  ShieldCheck,
+  Zap,
+  Lock,
 } from "lucide-react";
 import {
   useMascotStore,
@@ -20,6 +24,8 @@ import {
 import { StrobiCompanion } from "@/components/mascot/StrobiCompanion";
 import { soundFX } from "@/components/shared/SoundFX";
 import { cn } from "@/lib/utils";
+import { isSmsSyncAvailable, SmsBridge } from "@/lib/sms/sms-sync-service";
+import { toast } from "sonner";
 
 export interface OnboardingSetupData {
   colorTheme: MascotColorTheme;
@@ -27,6 +33,7 @@ export interface OnboardingSetupData {
   selectedHabitIds: string[];
   dailyBudgetLimit: number;
   initialCashBalance: number;
+  smsAutoFetchEnabled?: boolean;
 }
 
 interface OnboardingInteractiveSetupProps {
@@ -87,7 +94,7 @@ export function OnboardingInteractiveSetup({
   onBackToTour,
   onSkipToLogin,
 }: OnboardingInteractiveSetupProps) {
-  const [step, setStep] = useState<0 | 1 | 2>(0);
+  const [step, setStep] = useState<0 | 1 | 2 | 3>(0);
 
   // Mascot selections
   const storeColor = useMascotStore((s) => s.colorTheme);
@@ -109,7 +116,51 @@ export function OnboardingInteractiveSetup({
   const [cashBalance, setCashBalance] = useState<number>(0);
   const [isEditingCash, setIsEditingCash] = useState(false);
 
-  const totalSteps = 3;
+  // Bank SMS Telemetry Setup
+  const [smsAutoFetchEnabled, setSmsAutoFetchEnabled] = useState(true);
+  const [isNative, setIsNative] = useState(false);
+  const [hasSmsPermission, setHasSmsPermission] = useState<boolean | null>(null);
+  const [isRequestingPermission, setIsRequestingPermission] = useState(false);
+
+  useEffect(() => {
+    isSmsSyncAvailable().then(async (avail) => {
+      setIsNative(avail);
+      if (avail) {
+        try {
+          const perm = await SmsBridge.checkPermissions();
+          setHasSmsPermission(perm.smsGranted);
+        } catch {
+          setHasSmsPermission(false);
+        }
+      }
+    });
+  }, []);
+
+  const handleRequestSmsPermission = async () => {
+    soundFX.playPop();
+    setIsRequestingPermission(true);
+    try {
+      const res = await SmsBridge.requestPermissions();
+      if (res.smsGranted) {
+        soundFX.playCompleteChime();
+        setHasSmsPermission(true);
+        setSmsAutoFetchEnabled(true);
+        toast.success("SMS Permission Granted!", {
+          description: "Invictus can now detect incoming bank payments locally.",
+        });
+      } else {
+        soundFX.playPop();
+        setHasSmsPermission(false);
+        toast.info("SMS permission denied. You can enable it later in Settings.");
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Could not request SMS permission.");
+    } finally {
+      setIsRequestingPermission(false);
+    }
+  };
+
+  const totalSteps = 4;
 
   const handleToggleHabit = (id: string) => {
     soundFX.playPop();
@@ -120,8 +171,8 @@ export function OnboardingInteractiveSetup({
 
   const handleNextStep = () => {
     soundFX.playPop();
-    if (step < 2) {
-      setStep((prev) => (prev + 1) as 0 | 1 | 2);
+    if (step < 3) {
+      setStep((prev) => (prev + 1) as 0 | 1 | 2 | 3);
     } else {
       // Save mascot config in store
       setColorTheme(selectedColor);
@@ -133,6 +184,7 @@ export function OnboardingInteractiveSetup({
         selectedHabitIds,
         dailyBudgetLimit: dailyBudget,
         initialCashBalance: cashBalance,
+        smsAutoFetchEnabled,
       });
     }
   };
@@ -140,7 +192,7 @@ export function OnboardingInteractiveSetup({
   const handlePrevStep = () => {
     soundFX.playPop();
     if (step > 0) {
-      setStep((prev) => (prev - 1) as 0 | 1 | 2);
+      setStep((prev) => (prev - 1) as 0 | 1 | 2 | 3);
     } else {
       onBackToTour();
     }
@@ -177,8 +229,8 @@ export function OnboardingInteractiveSetup({
         </div>
 
         {/* Segmented Step Progress Bar */}
-        <div className="grid grid-cols-3 gap-1.5 w-full">
-          {[0, 1, 2].map((sIndex) => (
+        <div className="grid grid-cols-4 gap-1.5 w-full">
+          {[0, 1, 2, 3].map((sIndex) => (
             <div
               key={sIndex}
               className={cn(
@@ -439,6 +491,125 @@ export function OnboardingInteractiveSetup({
             </div>
           </div>
         )}
+
+        {/* STEP 4: BANK SMS AUTO-TRACKER (ZERO-KNOWLEDGE TELEMETRY) */}
+        {step === 3 && (
+          <div className="space-y-3 sm:space-y-4 animate-in fade-in zoom-in-95 duration-200">
+            <div className="space-y-1 text-center">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#CEF431] text-[#161514] border border-[#161514] text-[10px] font-mono font-black uppercase tracking-wider mb-1">
+                <Zap className="size-3 fill-[#161514]" />
+                <span>Zero-Knowledge Telemetry</span>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-heading font-black text-[#161514] dark:text-[#FAF8F5] tracking-tight">
+                Bank SMS Auto-Track
+              </h2>
+              <p className="text-xs font-medium text-muted-foreground max-w-xs mx-auto">
+                Invictus parses incoming bank SMS on-device into instant 1-tap ledger entries with NLP categorization.
+              </p>
+            </div>
+
+            {/* Live Interactive Telemetry Simulation Card */}
+            <div className="p-3.5 rounded-2xl bg-white dark:bg-[#201E1B] border-2 border-[#161514] dark:border-[#383531] shadow-[2.5px_2.5px_0px_#161514] dark:shadow-[2.5px_2.5px_0px_#000000] space-y-2.5">
+              <div className="flex items-center justify-between pb-2 border-b border-[#E8E5DF] dark:border-[#2A2724]">
+                <div className="flex items-center gap-2">
+                  <div className="size-6 rounded-lg bg-[#CEF431] text-[#161514] border border-[#161514] flex items-center justify-center font-black text-xs">
+                    ₹
+                  </div>
+                  <span className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5]">
+                    Sample Payment SMS
+                  </span>
+                </div>
+                <span className="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md border border-emerald-500/20">
+                  On-Device NLP
+                </span>
+              </div>
+
+              {/* Sample Bank SMS Box */}
+              <div className="p-2.5 rounded-xl bg-[#FAF8F5] dark:bg-[#2A2724] border border-[#E8E5DF] dark:border-[#383531] font-mono text-[11px] text-[#161514] dark:text-[#FAF8F5] leading-relaxed">
+                <span className="text-muted-foreground">HDFC Bank:</span> Paid <span className="font-bold text-rose-600 dark:text-rose-400">₹320.00</span> to <span className="font-bold">Blue Tokai Coffee</span> thru UPI on 21-Nov.
+              </div>
+
+              {/* Parsed Actionable Notification Simulation */}
+              <div className="p-2 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-700/50 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Smartphone className="size-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                  <div className="truncate">
+                    <div className="text-[11px] font-heading font-black text-[#161514] dark:text-[#FAF8F5] truncate">
+                      ⚡ Spent ₹320: Blue Tokai
+                    </div>
+                    <div className="text-[9px] font-mono text-muted-foreground">
+                      Predicted Category: Food & Dining
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <span className="px-2 py-0.5 rounded bg-[#161514] text-[#CEF431] text-[10px] font-mono font-black border border-[#161514]">
+                    ⚡ Import
+                  </span>
+                  <span className="px-1.5 py-0.5 rounded bg-white dark:bg-[#201E1B] text-[#161514] dark:text-[#FAF8F5] text-[10px] font-mono font-bold border border-border">
+                    ✎ Edit
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Privacy Badges List */}
+            <div className="grid grid-cols-2 gap-2 text-[10px] font-mono">
+              <div className="p-2 rounded-xl bg-white dark:bg-[#201E1B] border border-[#E8E5DF] dark:border-[#383531] flex items-center gap-1.5 text-muted-foreground">
+                <ShieldCheck className="size-3.5 text-emerald-500 shrink-0" />
+                <span className="truncate">Strict OTP Dropper</span>
+              </div>
+              <div className="p-2 rounded-xl bg-white dark:bg-[#201E1B] border border-[#E8E5DF] dark:border-[#383531] flex items-center gap-1.5 text-muted-foreground">
+                <Lock className="size-3.5 text-amber-500 shrink-0" />
+                <span className="truncate">Zero Cloud Telemetry</span>
+              </div>
+            </div>
+
+            {/* Native Android Permission Action or Auto-Fetch Toggle */}
+            <div className="pt-1 space-y-2">
+              {isNative && hasSmsPermission !== true ? (
+                <button
+                  type="button"
+                  onClick={handleRequestSmsPermission}
+                  disabled={isRequestingPermission}
+                  className="w-full py-2.5 px-4 rounded-xl bg-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:text-[#161514] font-heading font-black text-xs uppercase tracking-wider border border-[#161514] flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:scale-[1.01] active:scale-[0.99] transition-all"
+                >
+                  <Smartphone className="size-3.5" />
+                  <span>{isRequestingPermission ? "Requesting..." : "Grant SMS Permission"}</span>
+                </button>
+              ) : (
+                <div
+                  onClick={() => {
+                    soundFX.playPop();
+                    setSmsAutoFetchEnabled((prev) => !prev);
+                  }}
+                  className="flex items-center justify-between p-3 rounded-2xl bg-white dark:bg-[#201E1B] border-2 border-[#161514] dark:border-[#383531] shadow-[2px_2px_0px_#161514] cursor-pointer hover:bg-[#FAF8F5] transition-colors"
+                >
+                  <div className="space-y-0.5">
+                    <div className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5]">
+                      Auto-Detect Bank SMS
+                    </div>
+                    <div className="text-[10px] font-mono text-muted-foreground">
+                      {smsAutoFetchEnabled ? "Active: Background telemetry enabled" : "Paused: Manual entry only"}
+                    </div>
+                  </div>
+                  <div
+                    className={cn(
+                      "w-11 h-6 rounded-full border-2 border-[#161514] p-0.5 transition-colors duration-200 ease-in-out flex items-center",
+                      smsAutoFetchEnabled ? "bg-[#03D26F] justify-end" : "bg-[#E8E5DF] dark:bg-[#2A2724] justify-start"
+                    )}
+                  >
+                    <div className="size-4 rounded-full bg-[#161514] dark:bg-white shadow-xs" />
+                  </div>
+                </div>
+              )}
+
+              <p className="text-[10px] font-mono text-muted-foreground text-center">
+                Can be toggled or re-configured anytime in Settings &gt; Bank SMS.
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ─── BOTTOM CTA BUTTON ─── */}
@@ -448,7 +619,7 @@ export function OnboardingInteractiveSetup({
           onClick={handleNextStep}
           className="w-full py-3.5 px-6 rounded-2xl bg-[#CEF431] text-[#161514] font-heading font-black text-sm uppercase tracking-wider border-2 border-[#161514] shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center justify-center gap-2 cursor-pointer"
         >
-          <span>{step < 2 ? "Continue" : "Finish Setup & Enter Vault"}</span>
+          <span>{step < 3 ? "Continue" : "Finish Setup & Enter Vault"}</span>
           <ArrowRight className="size-4 stroke-[2.5]" />
         </button>
       </div>

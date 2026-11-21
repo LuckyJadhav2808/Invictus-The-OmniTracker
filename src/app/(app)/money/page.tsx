@@ -41,7 +41,8 @@ import { MoneyDoorTileRow } from "@/components/money/MoneyDoorTileRow";
 import { BottomSheet } from "@/components/mobile/BottomSheet";
 import { useWhoOwesWhoStore } from "@/store/who-owes-who-store";
 import { PendingSmsTransactionsBanner } from "@/components/money/PendingSmsTransactionsBanner";
-import { removePendingSmsTransaction } from "@/lib/sms/sms-sync-service";
+import { removePendingSmsTransaction, getPendingSmsTransactions } from "@/lib/sms/sms-sync-service";
+import { detectCategoryFromNote } from "@/lib/utils/merchant-categorizer";
 
 // Lazy-Loaded Tab Views (Saves Recharts & IOU Bundles on Initial Paint)
 const BudgetTabView = dynamic(
@@ -139,16 +140,20 @@ function MoneyPageContent() {
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
   const actionParam = searchParams.get("action");
+  const pendingSmsParam = searchParams.get("pending_sms");
+  const editSmsParam = searchParams.get("edit_sms") === "1" || actionParam === "edit_sms";
+  const importSmsParam = searchParams.get("import_sms") === "1" || actionParam === "import_sms";
+  const sigParam = searchParams.get("sig");
   const [activeTab, setActiveTab] = useState(tabParam === "ledger" ? "overview" : (tabParam || "overview"));
   const [ledgerMethodFilter, setLedgerMethodFilter] = useState<string>("all");
   const [ledgerMethodFilterTrigger, setLedgerMethodFilterTrigger] = useState<number>(0);
 
   // Modal States
-  const [isLedgerSheetOpen, setIsLedgerSheetOpen] = useState(() => {
+  const [isLedgerSheetOpen, setIsLedgerSheetOpen] = useState<boolean>(() => {
     return actionParam === "ledger" || searchParams.get("sheet") === "ledger";
   });
-  const [isAddTxOpen, setIsAddTxOpen] = useState(() => {
-    return actionParam === "new-expense" || actionParam === "add";
+  const [isAddTxOpen, setIsAddTxOpen] = useState<boolean>(() => {
+    return actionParam === "new-expense" || actionParam === "add" || editSmsParam || pendingSmsParam === "1";
   });
   const [txModalMode, setTxModalMode] = useState<"quick" | "full" | "cash">("quick");
   const [editingTx, setEditingTx] = useState<Transaction | null>(null);
@@ -348,6 +353,95 @@ function MoneyPageContent() {
       if (roll !== null) setEnableRollover(roll === "true");
     }
   }, []);
+
+  // Handle Incoming Deep Links for Bank SMS Notifications (⚡ Import or ✎ Edit)
+  useEffect(() => {
+    const isSmsAction = pendingSmsParam === "1" || Boolean(editSmsParam) || Boolean(importSmsParam);
+    if (!isSmsAction) return;
+
+    let isMounted = true;
+    (async () => {
+      try {
+        const pendingItems = await getPendingSmsTransactions();
+        if (!isMounted || !pendingItems || pendingItems.length === 0) return;
+
+        // Match by signature if provided, otherwise pick the newest pending transaction
+        const target = sigParam
+          ? pendingItems.find((p) => p.dedupSignature === sigParam) || pendingItems[0]
+          : pendingItems[0];
+
+        if (!target) return;
+
+        const matched = detectCategoryFromNote(target.merchant, categories);
+        const resolvedCategoryId = matched?.categoryId || "cat-food";
+        const resolvedCategoryName = matched?.categoryName || "Food & Dining";
+
+        if (importSmsParam) {
+          // Instant 1-tap import action from Android Notification
+          soundFX.playPop();
+          await addTxMutation.mutateAsync({
+            amount: target.amount,
+            type: "expense",
+            categoryId: resolvedCategoryId,
+            date: target.date || new Date().toISOString().split("T")[0],
+            note: target.merchant,
+            paymentMethod: "UPI",
+            source: "bank_sms",
+            dedupSignature: target.dedupSignature,
+            sourceMetadata: {
+              bankName: target.bankName,
+              accountMasked: target.accountLast4,
+              rawSender: target.rawSender || target.bankName,
+            },
+          } as any);
+
+          await removePendingSmsTransaction(target.dedupSignature, target.id);
+          soundFX.playCompleteChime();
+          toast.success(`⚡ Registered ₹${target.amount.toLocaleString()} to ${resolvedCategoryName}!`, {
+            description: `Auto-imported payment to ${target.merchant} (${target.bankName}).`,
+          });
+        } else if (editSmsParam || pendingSmsParam === "1") {
+          // Open TransactionFormModal prefilled with NLP-predicted category & merchant
+          soundFX.playPop();
+          setEditingTx({
+            id: `tx_sms_${Date.now()}`,
+            amount: target.amount,
+            type: "expense",
+            categoryId: resolvedCategoryId,
+            date: target.date || new Date().toISOString().split("T")[0],
+            note: target.merchant,
+            paymentMethod: "UPI",
+            dedupSignature: target.dedupSignature,
+            source: "bank_sms",
+          } as any);
+          setPendingSmsToRegister({
+            dedupSignature: target.dedupSignature,
+            pendingId: target.id,
+          });
+          setIsAddTxOpen(true);
+        }
+
+        // Clean query params from URL so reload doesn't re-trigger
+        if (typeof window !== "undefined") {
+          const cleanUrl = new URL(window.location.href);
+          cleanUrl.searchParams.delete("pending_sms");
+          cleanUrl.searchParams.delete("edit_sms");
+          cleanUrl.searchParams.delete("import_sms");
+          cleanUrl.searchParams.delete("sig");
+          if (cleanUrl.searchParams.get("action") === "import_sms" || cleanUrl.searchParams.get("action") === "edit_sms") {
+            cleanUrl.searchParams.delete("action");
+          }
+          window.history.replaceState(null, "", cleanUrl.pathname + cleanUrl.search);
+        }
+      } catch (err: any) {
+        console.warn("[MoneyPage] Error handling SMS deep link action:", err);
+      }
+    })();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [pendingSmsParam, editSmsParam, importSmsParam, sigParam, categories, addTxMutation]);
 
 
 
