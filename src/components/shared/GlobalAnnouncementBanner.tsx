@@ -32,7 +32,7 @@ export function GlobalAnnouncementBanner() {
   }
 
   return (
-    <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] px-4 py-2 text-xs font-medium border-b border-[#E8E5DF] dark:border-[#2A2724] flex items-center justify-between transition-colors z-30 select-none">
+    <div className="bg-[#FAF8F5] dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] px-4 py-2 text-xs font-medium border-b border-[#E8E5DF] dark:border-[#2A2724] flex items-center justify-between transition-colors z-30 select-none safe-top-pad">
       <div className="flex items-center gap-2 max-w-4xl mx-auto flex-1 min-w-0">
         <Megaphone className="size-4 shrink-0 stroke-[1.75] text-[#8C8882] dark:text-[#A8A29E]" />
         <span className="truncate">{announcement.message}</span>
