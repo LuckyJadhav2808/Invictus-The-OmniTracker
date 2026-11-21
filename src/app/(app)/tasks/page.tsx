@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
   useTasks,
@@ -56,6 +57,7 @@ const TASKS_DESKTOP_TABS: SubNavTab[] = [
 ];
 
 export default function TasksPage() {
+  const router = useRouter();
   const { data: tasks = [], isLoading } = useTasks();
   const createTaskMutation = useCreateTask();
   const updateTaskMutation = useUpdateTask();
@@ -447,10 +449,10 @@ export default function TasksPage() {
               completedCount={completedTasks}
               p1UrgentCount={p1UrgentTasks}
               projectsCount={projectSummaries.length}
-              onOpenKanban={() => openMobilePortal("kanban")}
-              onOpenMatrix={() => openMobilePortal("matrix")}
-              onOpenProjects={() => openMobilePortal("projects")}
-              onOpenArchive={() => openMobilePortal("archive")}
+              onOpenKanban={() => router.push("/tasks/kanban")}
+              onOpenMatrix={() => router.push("/tasks/matrix")}
+              onOpenProjects={() => router.push("/tasks/projects")}
+              onOpenArchive={() => router.push("/tasks/archive")}
             />
           </div>
 

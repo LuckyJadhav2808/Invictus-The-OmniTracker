@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Target, Dumbbell, Utensils, BarChart2 } from "lucide-react";
+import { BarChart2, Utensils, CheckSquare, Moon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
 
@@ -47,17 +47,7 @@ export function DoorTileRow({
       iconColor: "text-purple-600 dark:text-purple-400",
       bgClass: "hover:border-purple-500/50",
       onClick: onOpenStats || (() => router.push("/goals/analytics")),
-      title: "Open Habit Analytics & Consistency Overview (Dedicated Page)",
-    },
-    {
-      id: "gym",
-      label: "Workout",
-      value: "Studio",
-      icon: Dumbbell,
-      iconColor: "text-emerald-600 dark:text-[#03D26F]",
-      bgClass: "hover:border-[#03D26F]/50",
-      onClick: onOpenGym || (() => router.push("/goals/gym")),
-      title: "Open Gym Workout Studio & Muscle Anatomy (Dedicated Page)",
+      title: "Habit Analytics, Consistency Trends & Heatmap",
     },
     {
       id: "diet",
@@ -67,19 +57,27 @@ export function DoorTileRow({
       iconColor: "text-amber-600 dark:text-amber-400",
       bgClass: "hover:border-amber-500/50",
       onClick: onOpenNutrition || (() => router.push("/goals/nutrition")),
-      title: "Open Nutrition, Calories & Macro Balance (Dedicated Page)",
+      title: "Daily Macro Targets, Caloric Deficit & Weekly Distribution",
     },
     {
-      id: "new-habit",
-      label: "Habits",
-      value: "Create",
-      icon: Target,
+      id: "vault",
+      label: "Vault",
+      value: "Roster",
+      icon: CheckSquare,
       iconColor: "text-lime-600 dark:text-[#CEF431]",
       bgClass: "hover:border-[#CEF431]/60",
-      onClick:
-        onOpenNewHabit ||
-        (() => window.dispatchEvent(new CustomEvent("invictus:open-new-habit"))),
-      title: "Create New Atomic Habit or Pick Presets",
+      onClick: onOpenNewHabit || (() => router.push("/goals/habits")),
+      title: "All Habits Roster, Routine Rules & Archive",
+    },
+    {
+      id: "recovery",
+      label: "Recovery",
+      value: "Sleep",
+      icon: Moon,
+      iconColor: "text-sky-600 dark:text-sky-400",
+      bgClass: "hover:border-sky-500/50",
+      onClick: onOpenRecovery || (() => router.push("/goals/recovery")),
+      title: "Sleep Quality, Circadian Clock & Hydration Baseline",
     },
   ];
 

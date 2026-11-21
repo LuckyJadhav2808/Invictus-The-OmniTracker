@@ -166,7 +166,7 @@ export function HalfFlowerMenu({
       ];
     }
 
-    // 3. Tasks Space: creating task, project, priority matrix, kanban board
+    // 3. Tasks Space: fast capture modals (new task, new project tag, quick water, quick expense)
     if (pathname.startsWith("/tasks")) {
       return [
         {
@@ -185,7 +185,7 @@ export function HalfFlowerMenu({
           id: "new-project",
           label: "New Project",
           shortLabel: "Project",
-          icon: Kanban,
+          icon: FolderKanban,
           bgClass: "bg-[#03D26F]",
           textClass: "text-[#161514]",
           borderClass: "border-[#161514]",
@@ -194,27 +194,27 @@ export function HalfFlowerMenu({
           },
         },
         {
-          id: "priority-matrix",
-          label: "Eisenhower Matrix",
-          shortLabel: "Matrix",
-          icon: Flame,
-          bgClass: "bg-[#F59E0B]",
-          textClass: "text-[#161514]",
-          borderClass: "border-[#161514]",
-          onClick: () => {
-            window.dispatchEvent(new CustomEvent("invictus:tasks-open-matrix"));
-          },
-        },
-        {
-          id: "kanban-board",
-          label: "Kanban Board",
-          shortLabel: "Board",
-          icon: FolderKanban,
+          id: "tasks-water",
+          label: "Quick Water",
+          shortLabel: "+Water",
+          icon: Droplet,
           bgClass: "bg-[#38BDF8]",
           textClass: "text-[#161514]",
           borderClass: "border-[#161514]",
           onClick: () => {
-            window.dispatchEvent(new CustomEvent("invictus:tasks-open-kanban"));
+            window.dispatchEvent(new CustomEvent("invictus:open-water-modal"));
+          },
+        },
+        {
+          id: "tasks-expense",
+          label: "Log Expense",
+          shortLabel: "Expense",
+          icon: Receipt,
+          bgClass: "bg-[#C084FC]",
+          textClass: "text-[#161514]",
+          borderClass: "border-[#161514]",
+          onClick: () => {
+            window.dispatchEvent(new CustomEvent("invictus:money-new-expense"));
           },
         },
       ];

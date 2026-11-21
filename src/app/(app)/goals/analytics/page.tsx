@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useState, useMemo } from "react";
 import { BarChart2, Flame, Award, Calendar, Sparkles } from "lucide-react";
 import { useHabits, useStreaks, useMonthHabitLogs } from "@/lib/queries/goals";
 import { WeeklyVelocityAndHabitMatrix } from "@/components/goals/WeeklyVelocityAndHabitMatrix";
@@ -8,9 +8,11 @@ import { WeeklyOverviewWidget } from "@/components/goals/WeeklyOverviewWidget";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isSameDay, subWeeks } from "date-fns";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from "recharts";
 import { cn } from "@/lib/utils";
-import { SegmentedSubNav } from "@/components/mobile/SegmentedSubNav";
+import { SubpageHeader } from "@/components/shared/SubpageHeader";
+import { soundFX } from "@/components/shared/SoundFX";
 
 export default function GoalsAnalyticsPage() {
+  const [activeTab, setActiveTab] = useState<"heatmap" | "velocity">("heatmap");
   const { data: habits = [] } = useHabits();
   const { data: streaks = {} } = useStreaks();
 
@@ -41,11 +43,10 @@ export default function GoalsAnalyticsPage() {
   const longestStreakValue = Object.values(streaks).reduce((max, s) => Math.max(max, s.longestStreak), 0);
 
   const trackedDays = new Set(fourWeekLogs.map((l) => l.date)).size || 1;
-  const overallCompletionRate = totalHabits > 0
-    ? Math.round((fourWeekLogs.length / (totalHabits * trackedDays)) * 100)
-    : 0;
+  const overallCompletionRate =
+    totalHabits > 0 ? Math.round((fourWeekLogs.length / (totalHabits * trackedDays)) * 100) : 0;
 
-  // Real bar chart data
+  // Bar chart data
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const barChartData = useMemo(() => {
     if (totalHabits === 0) return dayNames.map((name) => ({ name, rate: 0 }));
@@ -69,202 +70,227 @@ export default function GoalsAnalyticsPage() {
   }, [totalHabits, fourWeekLogs]);
 
   return (
-    <div className="space-y-4 animate-in fade-in duration-300">
-      <div className="max-w-xl lg:max-w-5xl xl:max-w-6xl mx-auto w-full">
-        <SegmentedSubNav />
+    <div className="w-full max-w-xl lg:max-w-5xl xl:max-w-6xl mx-auto space-y-3.5 select-none animate-in fade-in duration-200 pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
+      {/* 1. Dedicated Neobrutalist Subpage Header with Back Navigation */}
+      <SubpageHeader
+        backHref="/goals"
+        backLabel="Habits"
+        title="Habit Analytics"
+        badge="Consistency Engine"
+        badgeColorClass="bg-purple-400/20 text-purple-700 dark:text-purple-300 border-purple-500/30"
+        subtitle="30-day streak heatmaps, velocity pacing & day-of-week adherence"
+        icon={BarChart2}
+        rightAction={
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] font-mono text-[11px] font-bold text-[#161514] dark:text-stone-200">
+            <Sparkles className="size-3 text-amber-500 fill-amber-400" />
+            <span>{activeStreaksList.length} FLAMES</span>
+          </div>
+        }
+      />
+
+      {/* 2. Strict 2-Tab Navigation (Max 2 Tabs Architecture) */}
+      <div className="grid grid-cols-2 p-1 bg-muted/60 dark:bg-card border-2 border-[#161514] dark:border-white/20 rounded-xl shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.15)] gap-1">
+        <button
+          type="button"
+          onClick={() => {
+            soundFX.playPop();
+            soundFX.vibrate(10);
+            setActiveTab("heatmap");
+          }}
+          className={cn(
+            "py-2 text-xs font-heading font-black rounded-lg transition-all text-center cursor-pointer",
+            activeTab === "heatmap"
+              ? "bg-[#161514] text-white dark:bg-white dark:text-[#161514] shadow-xs"
+              : "text-muted-foreground hover:text-foreground"
+          )}
+        >
+          📅 Heatmap & Streaks
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            soundFX.playPop();
+            soundFX.vibrate(10);
+            setActiveTab("velocity");
+          }}
+          className={cn(
+            "py-2 text-xs font-heading font-black rounded-lg transition-all text-center cursor-pointer",
+            activeTab === "velocity"
+              ? "bg-[#161514] text-white dark:bg-white dark:text-[#161514] shadow-xs"
+              : "text-muted-foreground hover:text-foreground"
+          )}
+        >
+          ⚡ Weekly Velocity
+        </button>
       </div>
 
-      {/* 1. Dedicated Analytics Hero Header */}
-      <div className="bg-white dark:bg-[#161514] border border-[#E8E5DF] dark:border-[#2A2724] rounded-2xl p-4 sm:p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="bg-amber-400/15 text-amber-800 dark:text-amber-300 text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border border-amber-400/30 uppercase">
-              Analytics Command Center
-            </span>
-            <span className="text-[10px] font-mono font-bold text-[#6B6B6B] dark:text-[#A8A29E]">
-              HABIT VELOCITY &amp; STREAK MATRIX
-            </span>
-          </div>
-
-          <h1 className="text-xl sm:text-2xl font-heading font-black text-[#161514] dark:text-stone-100 tracking-tight flex items-center gap-2">
-            <BarChart2 className="size-6 text-[#161514] dark:text-stone-100 stroke-[2.2]" />
-            <span>Habit Velocity &amp; Heatmap</span>
-          </h1>
-
-          <p className="text-xs text-[#6B6B6B] dark:text-[#A8A29E] max-w-xl">
-            Visualize your consistency over time with 30-day streak heatmaps and weekly completion rates.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] shrink-0 font-mono text-xs font-bold text-[#161514] dark:text-stone-200 shadow-none">
-          <Sparkles className="size-3.5 text-amber-500 fill-amber-400" />
-          <span>{activeStreaksList.length} ACTIVE FLAMES</span>
-        </div>
-      </div>
-
-      {/* 2. Leaderboard Telemetry Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-        <div className="bg-white dark:bg-[#161514] rounded-2xl p-4 sm:p-5 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex items-center gap-3.5">
-          <div className="size-11 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-600 dark:text-rose-400 shrink-0">
-            <Flame className="size-5 fill-rose-500 text-rose-500" />
-          </div>
-          <div>
-            <h5 className="text-[10px] font-mono font-bold text-[#6B6B6B] dark:text-[#A8A29E] uppercase tracking-wider">
-              Active Streaks
-            </h5>
-            <p className="text-2xl font-heading font-black text-[#161514] dark:text-stone-100 font-mono tracking-tight mt-0.5">
-              {activeStreaksList.length}
-            </p>
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-[#161514] rounded-2xl p-4 sm:p-5 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex items-center gap-3.5">
-          <div className="size-11 rounded-xl bg-amber-400/10 border border-amber-400/20 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
-            <Award className="size-5" />
-          </div>
-          <div>
-            <h5 className="text-[10px] font-mono font-bold text-[#6B6B6B] dark:text-[#A8A29E] uppercase tracking-wider">
-              Best Record
-            </h5>
-            <p className="text-2xl font-heading font-black text-[#161514] dark:text-stone-100 font-mono tracking-tight mt-0.5">
-              {longestStreakValue} <span className="text-xs font-normal text-[#6B6B6B] dark:text-[#A8A29E]">days</span>
-            </p>
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-[#161514] rounded-2xl p-4 sm:p-5 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs flex items-center gap-3.5">
-          <div className="size-11 rounded-xl bg-[#03D26F]/10 border border-[#03D26F]/20 flex items-center justify-center text-[#047857] dark:text-[#03D26F] shrink-0">
-            <BarChart2 className="size-5" />
-          </div>
-          <div>
-            <h5 className="text-[10px] font-mono font-bold text-[#6B6B6B] dark:text-[#A8A29E] uppercase tracking-wider">
-              Completion Rate
-            </h5>
-            <p className="text-2xl font-heading font-black text-[#161514] dark:text-stone-100 font-mono tracking-tight mt-0.5">
-              {overallCompletionRate}%
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* 3. 30-Day Monthly Habit Heatmap */}
-      <div className="bg-white dark:bg-[#161514] rounded-2xl p-5 sm:p-6 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-4">
-        <div className="flex items-center justify-between border-b border-[#E8E5DF] dark:border-[#2A2724] pb-3">
-          <h3 className="font-heading font-black text-sm text-[#161514] dark:text-stone-100 uppercase tracking-wider flex items-center gap-2">
-            <Calendar className="size-4 text-[#6B6B6B] dark:text-[#A8A29E]" />
-            <span>{format(today, "MMMM yyyy")} Heatmap</span>
-          </h3>
-          <span className="font-mono text-xs text-[#6B6B6B] dark:text-[#A8A29E]">
-            {daysInMonth.length} Days Tracked
-          </span>
-        </div>
-
-        {/* Day headers */}
-        <div className="grid grid-cols-7 gap-1.5 sm:gap-2 text-center text-[10px] font-mono font-bold text-[#6B6B6B] dark:text-[#A8A29E] uppercase tracking-wider">
-          <span>Sun</span>
-          <span>Mon</span>
-          <span>Tue</span>
-          <span>Wed</span>
-          <span>Thu</span>
-          <span>Fri</span>
-          <span>Sat</span>
-        </div>
-
-        {/* Grid items */}
-        <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
-          {Array.from({ length: startDayOfWeek }).map((_, i) => (
-            <div key={`empty-${i}`} className="aspect-square" />
-          ))}
-
-          {daysInMonth.map((day) => {
-            const dayStr = format(day, "yyyy-MM-dd");
-            const completion = getCompletionPercentage(dayStr);
-            const isCurrent = isSameDay(day, today);
-
-            let bgClass = "bg-[#FAF8F5] dark:bg-[#1C1A18] text-[#161514]/40 dark:text-stone-500 border-[#E8E5DF] dark:border-[#2A2724]";
-            if (completion === 100) {
-              bgClass = "bg-[#03D26F] text-[#161514] font-black border-[#03D26F] shadow-xs";
-            } else if (completion >= 50) {
-              bgClass = "bg-[#A7F3D0] dark:bg-emerald-800/50 text-emerald-950 dark:text-emerald-100 font-bold border-emerald-400 dark:border-emerald-700/50";
-            } else if (completion >= 20) {
-              bgClass = "bg-[#DCFAE5] dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 border-emerald-300 dark:border-emerald-800/40";
-            }
-
-            return (
-              <div
-                key={dayStr}
-                className={cn(
-                  "aspect-square rounded-lg border flex items-center justify-center text-xs font-mono font-bold transition-all relative select-none hover:scale-105 cursor-pointer",
-                  bgClass,
-                  isCurrent && "ring-2 ring-[#161514] dark:ring-white ring-offset-2 dark:ring-offset-[#161514]"
-                )}
-                title={`${format(day, "MMM d")}: ${completion}% complete`}
-              >
-                {format(day, "d")}
+      {/* TAB 1: Heatmap & Streaks */}
+      {activeTab === "heatmap" && (
+        <div className="space-y-3.5 animate-in fade-in duration-150">
+          {/* Telemetry Cards */}
+          <div className="grid grid-cols-3 gap-2 sm:gap-3">
+            <div className="bg-card rounded-2xl p-3 sm:p-4 border border-border shadow-xs flex items-center gap-2.5">
+              <div className="size-9 sm:size-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-600 dark:text-rose-400 shrink-0">
+                <Flame className="size-4 sm:size-5 fill-rose-500 text-rose-500" />
               </div>
-            );
-          })}
-        </div>
+              <div className="min-w-0">
+                <span className="text-[9px] font-mono font-bold text-muted-foreground uppercase block truncate">
+                  Active
+                </span>
+                <p className="text-lg sm:text-xl font-heading font-black text-foreground font-mono leading-none mt-0.5">
+                  {activeStreaksList.length}
+                </p>
+              </div>
+            </div>
 
-        {/* Heatmap Color Legend */}
-        <div className="flex items-center gap-3 sm:gap-4 pt-3 border-t border-[#E8E5DF] dark:border-[#2A2724] text-[10px] font-mono font-medium text-[#6B6B6B] dark:text-[#A8A29E] flex-wrap">
-          <span className="flex items-center gap-1.5">
-            <span className="size-3 rounded-sm bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724]" /> None
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className="size-3 rounded-sm bg-[#DCFAE5] dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800/40" /> 20%+
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className="size-3 rounded-sm bg-[#A7F3D0] dark:bg-emerald-800/50 border border-emerald-400 dark:border-emerald-700/50" /> 50%+
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className="size-3 rounded-sm bg-[#03D26F] border border-[#03D26F]" /> 100% Completed
-          </span>
-        </div>
-      </div>
+            <div className="bg-card rounded-2xl p-3 sm:p-4 border border-border shadow-xs flex items-center gap-2.5">
+              <div className="size-9 sm:size-10 rounded-xl bg-amber-400/10 border border-amber-400/20 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
+                <Award className="size-4 sm:size-5" />
+              </div>
+              <div className="min-w-0">
+                <span className="text-[9px] font-mono font-bold text-muted-foreground uppercase block truncate">
+                  Record
+                </span>
+                <p className="text-lg sm:text-xl font-heading font-black text-foreground font-mono leading-none mt-0.5 truncate">
+                  {longestStreakValue}d
+                </p>
+              </div>
+            </div>
 
-      {/* 4. Completion Rate by Day of Week BarChart */}
-      <div className="bg-white dark:bg-[#161514] rounded-2xl p-5 sm:p-6 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-4">
-        <h3 className="font-heading font-black text-sm text-[#161514] dark:text-stone-100 uppercase tracking-wider">
-          Completion Rate by Day of Week (Past 4 Weeks)
-        </h3>
-        <div className="h-60 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={barChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <XAxis dataKey="name" stroke="#888888" fontSize={11} fontWeight={600} tickLine={false} axisLine={false} />
-              <YAxis stroke="#888888" fontSize={11} fontWeight={600} tickLine={false} axisLine={false} tickFormatter={(v) => `${v}%`} domain={[0, 100]} />
-              <Tooltip
-                formatter={(v) => [`${v}%`, "Completion Rate"]}
-                contentStyle={{
-                  borderRadius: "12px",
-                  border: "1px solid #E8E5DF",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
-                  fontFamily: "var(--font-heading)",
-                  fontSize: "12px",
-                  fontWeight: 700,
-                  backgroundColor: "#FFFFFF",
-                }}
-              />
-              <Bar dataKey="rate" radius={[4, 4, 0, 0]}>
-                {barChartData.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={entry.rate >= 75 ? "#03D26F" : entry.rate >= 50 ? "#A7F3D0" : "#F1EFEA"}
-                    stroke="#E8E5DF"
-                    strokeWidth={1}
+            <div className="bg-card rounded-2xl p-3 sm:p-4 border border-border shadow-xs flex items-center gap-2.5">
+              <div className="size-9 sm:size-10 rounded-xl bg-[#03D26F]/10 border border-[#03D26F]/20 flex items-center justify-center text-[#047857] dark:text-[#03D26F] shrink-0">
+                <BarChart2 className="size-4 sm:size-5" />
+              </div>
+              <div className="min-w-0">
+                <span className="text-[9px] font-mono font-bold text-muted-foreground uppercase block truncate">
+                  Rate
+                </span>
+                <p className="text-lg sm:text-xl font-heading font-black text-foreground font-mono leading-none mt-0.5">
+                  {overallCompletionRate}%
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* 30-Day Monthly Habit Heatmap */}
+          <div className="bg-card rounded-2xl p-4 sm:p-5 border border-border shadow-xs space-y-3">
+            <div className="flex items-center justify-between border-b border-border pb-2.5">
+              <h3 className="font-heading font-black text-xs sm:text-sm text-foreground uppercase tracking-wider flex items-center gap-2">
+                <Calendar className="size-4 text-muted-foreground" />
+                <span>{format(today, "MMMM yyyy")} Heatmap</span>
+              </h3>
+              <span className="font-mono text-[11px] text-muted-foreground">
+                {daysInMonth.length} Days Tracked
+              </span>
+            </div>
+
+            <div className="grid grid-cols-7 gap-1 sm:gap-2 text-center text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">
+              <span>Sun</span>
+              <span>Mon</span>
+              <span>Tue</span>
+              <span>Wed</span>
+              <span>Thu</span>
+              <span>Fri</span>
+              <span>Sat</span>
+            </div>
+
+            <div className="grid grid-cols-7 gap-1 sm:gap-2">
+              {Array.from({ length: startDayOfWeek }).map((_, i) => (
+                <div key={`empty-${i}`} className="aspect-square" />
+              ))}
+
+              {daysInMonth.map((day) => {
+                const dayStr = format(day, "yyyy-MM-dd");
+                const completion = getCompletionPercentage(dayStr);
+                const isCurrent = isSameDay(day, today);
+
+                let bgClass = "bg-muted/40 text-muted-foreground border-border";
+                if (completion === 100) {
+                  bgClass = "bg-[#03D26F] text-[#161514] font-black border-[#03D26F] shadow-xs";
+                } else if (completion >= 50) {
+                  bgClass = "bg-[#A7F3D0] dark:bg-emerald-800/50 text-emerald-950 dark:text-emerald-100 font-bold border-emerald-400 dark:border-emerald-700/50";
+                } else if (completion >= 20) {
+                  bgClass = "bg-[#DCFAE5] dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 border-emerald-300 dark:border-emerald-800/40";
+                }
+
+                return (
+                  <div
+                    key={dayStr}
+                    className={cn(
+                      "aspect-square rounded-lg border flex items-center justify-center text-xs font-mono font-bold transition-all relative select-none hover:scale-105 cursor-pointer",
+                      bgClass,
+                      isCurrent && "ring-2 ring-foreground ring-offset-2 ring-offset-card"
+                    )}
+                    title={`${format(day, "MMM d")}: ${completion}% complete`}
+                  >
+                    {format(day, "d")}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Heatmap Legend */}
+            <div className="flex items-center gap-3 pt-2.5 border-t border-border text-[10px] font-mono font-medium text-muted-foreground flex-wrap">
+              <span className="flex items-center gap-1.5">
+                <span className="size-2.5 rounded-xs bg-muted/40 border border-border" /> 0%
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="size-2.5 rounded-xs bg-[#DCFAE5] dark:bg-emerald-950/40 border border-emerald-300" /> 20%+
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="size-2.5 rounded-xs bg-[#A7F3D0] dark:bg-emerald-800/50 border border-emerald-400" /> 50%+
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="size-2.5 rounded-xs bg-[#03D26F] border border-[#03D26F]" /> 100% Complete
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 2: Weekly Velocity */}
+      {activeTab === "velocity" && (
+        <div className="space-y-3.5 animate-in fade-in duration-150">
+          {/* Completion Rate Bar Chart */}
+          <div className="bg-card rounded-2xl p-4 sm:p-5 border border-border shadow-xs space-y-3">
+            <h3 className="font-heading font-black text-xs sm:text-sm text-foreground uppercase tracking-wider">
+              Completion Rate by Day of Week (Past 4 Weeks)
+            </h3>
+            <div className="h-52 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={barChartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+                  <XAxis dataKey="name" stroke="#888888" fontSize={11} fontWeight={600} tickLine={false} axisLine={false} />
+                  <YAxis stroke="#888888" fontSize={11} fontWeight={600} tickLine={false} axisLine={false} tickFormatter={(v) => `${v}%`} domain={[0, 100]} />
+                  <Tooltip
+                    formatter={(v) => [`${v}%`, "Rate"]}
+                    contentStyle={{
+                      borderRadius: "12px",
+                      border: "1px solid #E8E5DF",
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
+                      fontFamily: "var(--font-heading)",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      backgroundColor: "#FFFFFF",
+                    }}
                   />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+                  <Bar dataKey="rate" radius={[4, 4, 0, 0]}>
+                    {barChartData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={entry.rate >= 75 ? "#03D26F" : entry.rate >= 50 ? "#A7F3D0" : "#E8E5DF"}
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* 7-Day Habit Overview & Velocity Matrix */}
+          <WeeklyOverviewWidget />
+          <WeeklyVelocityAndHabitMatrix />
         </div>
-      </div>
-
-      {/* 5. 7-Day Habit Overview */}
-      <WeeklyOverviewWidget />
-
-      {/* 6. Weekly Velocity & Habit Matrix */}
-      <WeeklyVelocityAndHabitMatrix />
+      )}
     </div>
   );
 }

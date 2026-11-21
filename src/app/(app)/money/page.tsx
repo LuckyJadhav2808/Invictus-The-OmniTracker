@@ -22,7 +22,7 @@ import { format, parseISO } from "date-fns";
 import { soundFX } from "@/components/shared/SoundFX";
 import { toast, strobiToast } from "@/lib/utils/toasts";
 import { useAuth } from "@/components/shared/AuthProvider";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import {
   computeMonthlyBudgetStats,
   computeDailyBudgetStats,
@@ -135,6 +135,7 @@ const WhoOwesWhoModal = dynamic(
 );
 
 function MoneyPageContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
   const actionParam = searchParams.get("action");
@@ -942,17 +943,17 @@ function MoneyPageContent() {
               monthlyBudget={monthlyStats.totalCombinedBudget || monthlyStats.baseBudget}
               activeIouCount={pendingIous.length}
               currencySymbol={currencySymbol}
-              onOpenCategories={() => setIsCategoryEnvelopesOpen(true)}
-              onOpenAnalytics={() => handleTabChange("analytics")}
-              onOpenBudgets={() => handleTabChange("budgets")}
-              onOpenSubscriptions={() => handleTabChange("vault")}
+              onOpenCategories={() => router.push("/money/categories")}
+              onOpenAnalytics={() => router.push("/money/analytics")}
+              onOpenBudgets={() => router.push("/money/budgets")}
+              onOpenSubscriptions={() => router.push("/money/subscriptions")}
               onOpenExport={() => setIsExportModalOpen(true)}
               onOpenLedger={() => setIsLedgerSheetOpen(true)}
-              onOpenVault={() => handleTabChange("vault")}
-              onOpenIous={() => handleTabChange("debts")}
+              onOpenVault={() => router.push("/money/subscriptions")}
+              onOpenIous={() => setIsWhoOwesWhoOpen(true)}
               onOpenReceipts={() => setIsBulkModalOpen(true)}
               onOpenCalc={() => setIsCalculatorOpen(true)}
-              onOpenAllowances={() => setIsAllowanceModalOpen(true)}
+              onOpenAllowances={() => router.push("/money/budgets")}
             />
 
             {/* ================= SLOT 5: RECENT TRANSACTIONS GLANCE (Capped 5 Rows + Neobrutalist Action Dock) ================= */}

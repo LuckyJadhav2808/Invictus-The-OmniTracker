@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { Kanban, Flame, FolderKanban, CheckSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
@@ -9,10 +10,10 @@ export interface TasksDoorTileRowProps {
   completedCount?: number;
   p1UrgentCount?: number;
   projectsCount?: number;
-  onOpenKanban: () => void;
-  onOpenMatrix: () => void;
-  onOpenProjects: () => void;
-  onOpenArchive: () => void;
+  onOpenKanban?: () => void;
+  onOpenMatrix?: () => void;
+  onOpenProjects?: () => void;
+  onOpenArchive?: () => void;
   className?: string;
 }
 
@@ -27,6 +28,8 @@ export function TasksDoorTileRow({
   onOpenArchive,
   className,
 }: TasksDoorTileRowProps) {
+  const router = useRouter();
+
   const tiles = [
     {
       id: "kanban",
@@ -35,8 +38,8 @@ export function TasksDoorTileRow({
       icon: Kanban,
       iconColor: "text-amber-500 dark:text-amber-400",
       bgClass: "hover:border-amber-500/50",
-      onClick: onOpenKanban,
-      title: "Open Kanban Workflow Board",
+      onClick: onOpenKanban || (() => router.push("/tasks/kanban")),
+      title: "Open Kanban Workflow Board (Dedicated Page)",
     },
     {
       id: "matrix",
@@ -45,8 +48,8 @@ export function TasksDoorTileRow({
       icon: Flame,
       iconColor: "text-rose-500 dark:text-rose-400",
       bgClass: "hover:border-rose-500/50",
-      onClick: onOpenMatrix,
-      title: "Open Eisenhower Priority Matrix",
+      onClick: onOpenMatrix || (() => router.push("/tasks/matrix")),
+      title: "Open Eisenhower Priority Matrix (Dedicated Page)",
     },
     {
       id: "projects",
@@ -55,8 +58,8 @@ export function TasksDoorTileRow({
       icon: FolderKanban,
       iconColor: "text-sky-500 dark:text-sky-400",
       bgClass: "hover:border-sky-500/50",
-      onClick: onOpenProjects,
-      title: "Open Project Tags & Deliverables Hub",
+      onClick: onOpenProjects || (() => router.push("/tasks/projects")),
+      title: "Open Project Tags & Deliverables Hub (Dedicated Page)",
     },
     {
       id: "archive",
@@ -65,8 +68,8 @@ export function TasksDoorTileRow({
       icon: CheckSquare,
       iconColor: "text-emerald-500 dark:text-emerald-400",
       bgClass: "hover:border-emerald-500/50",
-      onClick: onOpenArchive,
-      title: "Open Completed Task History",
+      onClick: onOpenArchive || (() => router.push("/tasks/archive")),
+      title: "Open Completed Task History (Dedicated Page)",
     },
   ];
 

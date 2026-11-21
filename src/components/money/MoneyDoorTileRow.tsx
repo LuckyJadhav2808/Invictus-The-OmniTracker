@@ -1,6 +1,7 @@
 "use client";
 
-import { Tag, BarChart2, Target, Repeat, FileDown, ReceiptText, PiggyBank } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Tag, BarChart2, Target, Repeat } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
 
@@ -46,6 +47,8 @@ export function MoneyDoorTileRow({
   onOpenTemplates,
   className,
 }: MoneyDoorTileRowProps) {
+  const router = useRouter();
+
   const tiles = [
     {
       id: "categories",
@@ -54,8 +57,8 @@ export function MoneyDoorTileRow({
       icon: Tag,
       iconColor: "text-amber-500 dark:text-amber-400",
       bgClass: "hover:border-amber-500/50",
-      onClick: onOpenCategories || onOpenTemplates || (() => {}),
-      title: "Manage Category Envelopes, Presets & Limits",
+      onClick: onOpenCategories || (() => router.push("/money/categories")),
+      title: "Category Envelopes, Presets & Limits (Dedicated Page)",
     },
     {
       id: "analytics",
@@ -64,8 +67,8 @@ export function MoneyDoorTileRow({
       icon: BarChart2,
       iconColor: "text-purple-600 dark:text-purple-400",
       bgClass: "hover:border-purple-500/50",
-      onClick: onOpenAnalytics || (() => {}),
-      title: "Spending Breakdown, Cash Velocity & Visual Analytics",
+      onClick: onOpenAnalytics || (() => router.push("/money/analytics")),
+      title: "Spending Breakdown, Cash Velocity & Analytics (Dedicated Page)",
     },
     {
       id: "budgets",
@@ -74,8 +77,8 @@ export function MoneyDoorTileRow({
       icon: Target,
       iconColor: "text-emerald-600 dark:text-[#03D26F]",
       bgClass: "hover:border-[#03D26F]/50",
-      onClick: onOpenBudgets || onOpenAllowances || (() => {}),
-      title: "Monthly Category Envelopes, Limits & Daily Safe Pace",
+      onClick: onOpenBudgets || (() => router.push("/money/budgets")),
+      title: "Monthly Allowances, Safe Daily Pace & Caps (Dedicated Page)",
     },
     {
       id: "subscriptions",
@@ -84,8 +87,8 @@ export function MoneyDoorTileRow({
       icon: Repeat,
       iconColor: "text-sky-600 dark:text-sky-400",
       bgClass: "hover:border-sky-500/50",
-      onClick: onOpenSubscriptions || onOpenVault || (() => {}),
-      title: "Active Subscriptions, Reminders & Recurring Billing",
+      onClick: onOpenSubscriptions || (() => router.push("/money/subscriptions")),
+      title: "Active Subscriptions & Recurring Bills (Dedicated Page)",
     },
   ];
 
