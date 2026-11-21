@@ -3,6 +3,29 @@
 import { domToCanvas } from "modern-screenshot";
 import { jsPDF } from "jspdf";
 
+function triggerPdfDownload(pdf: jsPDF, filename: string) {
+  try {
+    const blob = pdf.output("blob");
+    const blobUrl = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = blobUrl;
+    link.download = filename;
+    link.style.display = "none";
+    document.body.appendChild(link);
+    link.click();
+    setTimeout(() => {
+      try {
+        if (link.parentNode) {
+          document.body.removeChild(link);
+        }
+        URL.revokeObjectURL(blobUrl);
+      } catch {}
+    }, 4000);
+  } catch {
+    pdf.save(filename);
+  }
+}
+
 export async function exportElementToPDF(elementId: string, filename: string = "Invictus_Statement.pdf") {
   if (typeof window === "undefined") return;
 
@@ -37,7 +60,7 @@ export async function exportElementToPDF(elementId: string, filename: string = "
     const xPos = (pdfWidth - imgWidth) / 2;
     const imgData = fullCanvas.toDataURL("image/jpeg", 0.82);
     pdf.addImage(imgData, "JPEG", xPos, margin, imgWidth, imgHeight);
-    pdf.save(filename);
+    triggerPdfDownload(pdf, filename);
     return;
   }
 
@@ -80,6 +103,6 @@ export async function exportElementToPDF(elementId: string, filename: string = "
     }
   }
 
-  // 4. Trigger direct PDF download
-  pdf.save(filename);
+  // 4. Bulletproof PDF download
+  triggerPdfDownload(pdf, filename);
 }

@@ -176,7 +176,8 @@ export function WalletCardDeck({
 
   const formatAmount = (val: number) => {
     if (isBalanceHidden) return "••••••";
-    return `${currencySymbol}${val.toLocaleString()}`;
+    const rounded = Math.round(Number(val) || 0);
+    return `${currencySymbol}${rounded.toLocaleString()}`;
   };
 
   // Stacked transform generator for card at position i
@@ -236,7 +237,7 @@ export function WalletCardDeck({
           <span className="text-xs sm:text-sm font-mono font-bold text-[#161514] dark:text-[#FAF8F5] tabular-nums">
             {isBalanceHidden
               ? "••••••"
-              : `${currencySymbol}${(monthlyStats.remainingBudget + monthlyStats.remainingCashBudget).toLocaleString()}`}
+              : `${currencySymbol}${Math.round((monthlyStats.remainingBudget || 0) + (monthlyStats.remainingCashBudget || 0)).toLocaleString()}`}
           </span>
         </div>
 
@@ -370,7 +371,7 @@ export function WalletCardDeck({
               </span>
               <span className="text-xs sm:text-sm font-mono font-bold text-[#047857] dark:text-[#03D26F] tabular-nums flex items-center gap-1">
                 <TrendingUp className="size-3 stroke-[2.5]" />
-                {isBalanceHidden ? "••••" : `+${currencySymbol}${monthlyStats.monthlyIncome.toLocaleString()}`}
+                {isBalanceHidden ? "••••" : `+${currencySymbol}${Math.round(monthlyStats.monthlyIncome || 0).toLocaleString()}`}
               </span>
             </div>
 
@@ -381,7 +382,7 @@ export function WalletCardDeck({
               </span>
               <span className="text-xs sm:text-sm font-mono font-bold text-rose-600 dark:text-rose-400 tabular-nums flex items-center gap-1">
                 <TrendingDown className="size-3 stroke-[2.5]" />
-                {isBalanceHidden ? "••••" : `-${currencySymbol}${monthlyStats.monthlyExpense.toLocaleString()}`}
+                {isBalanceHidden ? "••••" : `-${currencySymbol}${Math.round(monthlyStats.monthlyExpense || 0).toLocaleString()}`}
               </span>
             </div>
           </div>
@@ -477,7 +478,7 @@ export function WalletCardDeck({
                 Today Spent
               </span>
               <span className="text-xs sm:text-sm font-mono font-bold text-amber-700 dark:text-amber-300 tabular-nums">
-                -{currencySymbol}{dailyStats.todayCashExpense.toLocaleString()}
+                -{currencySymbol}{Math.round(dailyStats.todayCashExpense || 0).toLocaleString()}
               </span>
             </div>
           </div>
@@ -536,12 +537,12 @@ export function WalletCardDeck({
           {/* Card Middle: Daily Safe Pace */}
           <div className="relative z-10 my-auto">
             <div className="text-3xl sm:text-4xl font-mono font-black tracking-tight text-[#161514] dark:text-white tabular-nums leading-none">
-              ~{currencySymbol}{dailyStats.todayRemaining.toLocaleString()}
+              ~{currencySymbol}{Math.round(dailyStats.todayRemaining || 0).toLocaleString()}
               <span className="text-sm font-normal text-[#64748B] dark:text-stone-400 ml-1.5">/ day</span>
             </div>
             {monthlyStats.rolloverSurplus > 0 && (
               <span className="text-[10.5px] font-mono text-[#047857] dark:text-emerald-300 block mt-1.5">
-                +{currencySymbol}{monthlyStats.rolloverSurplus.toLocaleString()} surplus rolled over
+                +{currencySymbol}{Math.round(monthlyStats.rolloverSurplus || 0).toLocaleString()} surplus rolled over
               </span>
             )}
           </div>
@@ -551,7 +552,7 @@ export function WalletCardDeck({
             <div className="flex items-center justify-between text-[10px] font-mono text-[#64748B] dark:text-stone-400">
               <span>Budget Progress</span>
               <span className="text-[#161514] dark:text-white font-semibold">
-                {currencySymbol}{monthlyStats.onlineExpense.toLocaleString()} / {currencySymbol}{monthlyStats.totalAvailableBudget.toLocaleString()}
+                {currencySymbol}{Math.round(monthlyStats.onlineExpense || 0).toLocaleString()} / {currencySymbol}{Math.round(monthlyStats.totalAvailableBudget || 0).toLocaleString()}
               </span>
             </div>
             <div className="w-full bg-[#E2E8F0] dark:bg-white/15 h-1.5 rounded-full overflow-hidden">

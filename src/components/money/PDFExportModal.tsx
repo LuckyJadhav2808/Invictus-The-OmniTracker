@@ -8,7 +8,9 @@ import { Download, Printer, CheckSquare, Square, ChevronDown, ChevronUp } from "
 import { format, subDays, parseISO } from "date-fns";
 import { toast } from "sonner";
 import { soundFX } from "@/components/shared/SoundFX";
+import { confettiBurst } from "@/lib/ui/confetti-burst";
 import { cn } from "@/lib/utils";
+import { exportElementToPDF } from "@/lib/utils/pdf-exporter";
 import { generateEnterpriseVectorPDF } from "@/lib/utils/vector-pdf-engine";
 import { isCashTransaction } from "@/lib/utils/budget-rollover";
 import { CategoryIcon } from "@/components/money/MoneyQuickActionsAndCards";
@@ -120,39 +122,54 @@ export function PDFExportModal({
     e.preventDefault();
     e.stopPropagation();
     setIsGenerating(true);
-    toast.info("Generating Enterprise Vector PDF statement... 📄");
+    toast.info("Generating Studio PDF Statement... 📄");
 
     // Allow UI thread 60ms to paint generating indicator
     await new Promise((resolve) => setTimeout(resolve, 60));
 
+    const safeLabel = periodLabel.replace(/[^a-zA-Z0-9_-]/g, "_");
+    const filename = `Invictus_Ledger_${safeLabel}.pdf`;
+
     try {
-      const safeLabel = periodLabel.replace(/[^a-zA-Z0-9_-]/g, "_");
-      const filename = `Invictus_Ledger_${safeLabel}.pdf`;
-      const result = generateEnterpriseVectorPDF({
-        transactions: finalExportTxs,
-        categories,
-        periodLabel,
-        currencySymbol,
-        userName,
-        filename,
-      });
-
-      if (result && "blobUrl" in result && typeof result.blobUrl === "string") {
-        setManualDownloadUrl(result.blobUrl);
-      }
-
+      // 1. Primary engine: exportElementToPDF (original high-fidelity DOM snapshot engine)
+      await exportElementToPDF("invictus-pdf-statement", filename);
       soundFX.playPop();
-      toast.success("Enterprise Vector PDF Statement downloaded! ⚡📄");
+      confettiBurst();
+      toast.success("Studio PDF Statement downloaded! 📄✨");
 
-      // Give browser download manager time to initiate before closing modal
       setTimeout(() => {
         onOpenChange(false);
         setIsGenerating(false);
       }, 700);
     } catch (err) {
-      console.error("PDF generation error:", err);
-      toast.error("PDF export encountered an error.");
-      setIsGenerating(false);
+      console.warn("DOM PDF export fallback to vector engine:", err);
+      try {
+        const result = generateEnterpriseVectorPDF({
+          transactions: finalExportTxs,
+          categories,
+          periodLabel,
+          currencySymbol,
+          userName,
+          filename,
+        });
+
+        if (result && "blobUrl" in result && typeof result.blobUrl === "string") {
+          setManualDownloadUrl(result.blobUrl);
+        }
+
+        soundFX.playPop();
+        confettiBurst();
+        toast.success("Enterprise Vector PDF Statement downloaded! ⚡📄");
+
+        setTimeout(() => {
+          onOpenChange(false);
+          setIsGenerating(false);
+        }, 700);
+      } catch (vectorErr) {
+        console.error("Vector PDF export also failed:", vectorErr);
+        toast.error("PDF export encountered an error. Use 'Print Direct' -> 'Save as PDF'.");
+        setIsGenerating(false);
+      }
     }
   };
 
@@ -221,7 +238,7 @@ export function PDFExportModal({
           )}
         </div>
 
-        {/* Collapsible Advanced Options Toggle */}
+        {/* Collapsible Range & Cash Filter Customizer */}
         <div ref={optionsRef} className="space-y-3">
           <button
             type="button"
@@ -232,10 +249,10 @@ export function PDFExportModal({
             className="w-full py-2.5 px-3.5 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] hover:bg-[#F2EFE9] dark:hover:bg-[#252321] text-xs font-mono font-bold text-[#161514] dark:text-[#FAF8F5] flex items-center justify-between border-2 border-[#161514] dark:border-[#38332E] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
           >
             <span className="text-[11px] font-heading font-black tracking-wide uppercase">
-              Statement Range, Cash Filter & Preview
+              Filter Range &amp; Cash ({periodLabel.split(" ")[0]} · {includeCashExpenses ? "Cash Included" : "Online Only"})
             </span>
             <span className="font-heading font-black text-xs flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-white dark:bg-[#2A2724] border border-[#161514]/30 dark:border-white/20">
-              <span>{showAdvancedOptions ? "Hide" : "Customize"}</span>
+              <span>{showAdvancedOptions ? "Hide Filter" : "Filter Options"}</span>
               {showAdvancedOptions ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
             </span>
           </button>
@@ -352,7 +369,7 @@ export function PDFExportModal({
                               </div>
 
                               <span className="text-xs font-mono font-black text-[#161514] dark:text-[#FAF8F5] shrink-0">
-                                {currencySymbol}{tx.amount.toLocaleString()}
+                                {currencySymbol}{Math.round(Number(tx.amount || 0)).toLocaleString()}
                               </span>
                             </div>
                           );
@@ -362,32 +379,32 @@ export function PDFExportModal({
                   </div>
                 )}
               </div>
-
-              {/* Statement Preview */}
-              <div className="pt-1 space-y-1.5">
-                <div className="flex items-center justify-between px-0.5">
-                  <span className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514]/70 dark:text-[#FAF8F5]/70">
-                    Statement Preview ({finalExportTxs.length} Transactions)
-                  </span>
-                  <span className="text-[9px] font-mono font-bold text-[#161514]/70 dark:text-[#FAF8F5]/70">
-                    {includeCashExpenses
-                      ? `${onlineTxs.length} Online + ${selectedCashTxIds.size} Cash`
-                      : `${onlineTxs.length} Online`}
-                  </span>
-                </div>
-
-                <div className="pt-1">
-                  <NeobrutalistPDFStatement
-                    transactions={finalExportTxs}
-                    categories={categories}
-                    periodLabel={periodLabel}
-                    currencySymbol={currencySymbol}
-                    userName={userName}
-                  />
-                </div>
-              </div>
             </div>
           )}
+        </div>
+
+        {/* ─── LIVE STATEMENT PREVIEW (ALWAYS MOUNTED IN DOM FOR HIGH-RES SNAPSHOT) ─── */}
+        <div className="pt-1 space-y-1.5">
+          <div className="flex items-center justify-between px-0.5">
+            <span className="text-[10px] font-heading font-black uppercase tracking-wider text-[#161514]/70 dark:text-[#FAF8F5]/70">
+              Statement Preview ({finalExportTxs.length} Transactions)
+            </span>
+            <span className="text-[9px] font-mono font-bold text-[#161514]/70 dark:text-[#FAF8F5]/70">
+              {includeCashExpenses
+                ? `${onlineTxs.length} Online + ${selectedCashTxIds.size} Cash`
+                : `${onlineTxs.length} Online`}
+            </span>
+          </div>
+
+          <div className="pt-1">
+            <NeobrutalistPDFStatement
+              transactions={finalExportTxs}
+              categories={categories}
+              periodLabel={periodLabel}
+              currencySymbol={currencySymbol}
+              userName={userName}
+            />
+          </div>
         </div>
       </div>
     </ResponsiveFormContainer>

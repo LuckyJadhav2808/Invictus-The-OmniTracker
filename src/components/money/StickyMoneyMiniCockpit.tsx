@@ -116,7 +116,7 @@ export function StickyMoneyMiniCockpit({
           {safeDailyPace > 0 && (
             <div className="inline-flex items-center gap-1 bg-[#FAF8F5] dark:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] font-mono text-[11px] px-2 py-0.5 rounded-lg border border-[#E8E5DF] dark:border-[#383531] hidden xs:flex">
               <Zap className="size-3 text-amber-500 fill-amber-400" />
-              <span className="tabular-nums font-bold">~{currencySymbol}{safeDailyPace}/d</span>
+              <span className="tabular-nums font-bold">~{currencySymbol}{Math.round(safeDailyPace).toLocaleString()}/d</span>
             </div>
           )}
         </div>
