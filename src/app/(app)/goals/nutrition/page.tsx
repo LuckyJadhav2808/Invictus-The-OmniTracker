@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { Utensils, Apple, Plus, Target, Flame, Sparkles, CheckCircle2, ChevronRight, Edit3, Trash2 } from "lucide-react";
 import { SubpageHeader } from "@/components/shared/SubpageHeader";
+import { MobileAppBar } from "@/components/mobile/MobileAppBar";
 import { useMealPlans, useDeleteMealPlan } from "@/lib/queries/gym";
 import { format, subDays, eachDayOfInterval } from "date-fns";
 import { soundFX } from "@/components/shared/SoundFX";
@@ -146,7 +147,12 @@ export default function NutritionPage() {
 
   return (
     <div className="w-full max-w-xl lg:max-w-5xl xl:max-w-6xl mx-auto space-y-3.5 select-none animate-in fade-in duration-200 pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
-      {/* 1. Subpage Header with Back Navigation & Flower Menu Trigger */}
+      {/* Dynamic Strobi Top App Bar */}
+      <div className="-mx-2 -mt-2 sm:-mx-4 sm:-mt-4 lg:hidden">
+        <MobileAppBar title="Diet & Fuel" showDynamicIsland={true} />
+      </div>
+
+      {/* 1. Title Bar with inline back button & Flower Menu Trigger */}
       <SubpageHeader
         backHref="/goals"
         backLabel="Habits"

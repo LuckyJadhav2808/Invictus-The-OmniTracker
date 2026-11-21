@@ -8,6 +8,7 @@ import { WeeklyOverviewWidget } from "@/components/goals/WeeklyOverviewWidget";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isSameDay, subWeeks } from "date-fns";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from "recharts";
 import { cn } from "@/lib/utils";
+import { MobileAppBar } from "@/components/mobile/MobileAppBar";
 import { SubpageHeader } from "@/components/shared/SubpageHeader";
 import { soundFX } from "@/components/shared/SoundFX";
 
@@ -71,7 +72,12 @@ export default function GoalsAnalyticsPage() {
 
   return (
     <div className="w-full max-w-xl lg:max-w-5xl xl:max-w-6xl mx-auto space-y-3.5 select-none animate-in fade-in duration-200 pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
-      {/* 1. Dedicated Neobrutalist Subpage Header with Back Navigation */}
+      {/* Dynamic Strobi Top App Bar */}
+      <div className="-mx-2 -mt-2 sm:-mx-4 sm:-mt-4 lg:hidden">
+        <MobileAppBar title="Habit Analytics" showDynamicIsland={true} />
+      </div>
+
+      {/* 1. Title Bar with inline back button */}
       <SubpageHeader
         backHref="/goals"
         backLabel="Habits"

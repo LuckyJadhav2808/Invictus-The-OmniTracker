@@ -39,9 +39,9 @@ export function isDynamicIslandAllowed(pathname: string | null | undefined): boo
   const normalized = pathname.replace(/\/$/, "");
   return (
     normalized === "/today" ||
-    normalized === "/goals" ||
-    normalized === "/tasks" ||
-    normalized === "/money"
+    normalized.startsWith("/goals") ||
+    normalized.startsWith("/tasks") ||
+    normalized.startsWith("/money")
   );
 }
 

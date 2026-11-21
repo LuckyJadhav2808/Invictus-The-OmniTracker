@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { Tag, Plus, Layers, Wallet, Trash2, Edit3, Sparkles } from "lucide-react";
 import { SubpageHeader } from "@/components/shared/SubpageHeader";
+import { MobileAppBar } from "@/components/mobile/MobileAppBar";
 import { useCategories, useTransactions, useDeleteCategory, useAddCategory } from "@/lib/queries/money";
 import { BUDGET_CATEGORY_TEMPLATE_PACKS } from "@/lib/templates-data";
 import { soundFX } from "@/components/shared/SoundFX";
@@ -53,7 +54,12 @@ export default function CategoryEnvelopesPage() {
 
   return (
     <div className="w-full max-w-xl lg:max-w-5xl xl:max-w-6xl mx-auto space-y-3.5 select-none animate-in fade-in duration-200 pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
-      {/* 1. Subpage Header with Back Navigation */}
+      {/* Dynamic Strobi Top App Bar */}
+      <div className="-mx-2 -mt-2 sm:-mx-4 sm:-mt-4 lg:hidden">
+        <MobileAppBar title="Categories" showDynamicIsland={true} />
+      </div>
+
+      {/* 1. Title Bar with inline back button */}
       <SubpageHeader
         backHref="/money"
         backLabel="Money"

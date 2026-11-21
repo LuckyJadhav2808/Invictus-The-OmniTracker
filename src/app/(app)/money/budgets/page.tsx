@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { Target, Plus } from "lucide-react";
 import { SubpageHeader } from "@/components/shared/SubpageHeader";
+import { MobileAppBar } from "@/components/mobile/MobileAppBar";
 import { useCategories, useTransactions } from "@/lib/queries/money";
 import { BudgetTabView } from "@/components/money/views/BudgetTabView";
 import { computeMonthlyBudgetStats } from "@/lib/utils/budget-rollover";
@@ -23,7 +24,12 @@ export default function MoneyBudgetsPage() {
 
   return (
     <div className="w-full max-w-xl lg:max-w-5xl xl:max-w-6xl mx-auto space-y-3.5 select-none animate-in fade-in duration-200 pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
-      {/* 1. Subpage Header with Back Navigation */}
+      {/* Dynamic Strobi Top App Bar */}
+      <div className="-mx-2 -mt-2 sm:-mx-4 sm:-mt-4 lg:hidden">
+        <MobileAppBar title="Budgets" showDynamicIsland={true} />
+      </div>
+
+      {/* 1. Title Bar with inline back button */}
       <SubpageHeader
         backHref="/money"
         backLabel="Money"

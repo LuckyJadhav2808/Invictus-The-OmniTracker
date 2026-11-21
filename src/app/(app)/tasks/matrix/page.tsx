@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Flame, Plus, CheckCircle2 } from "lucide-react";
 import { SubpageHeader } from "@/components/shared/SubpageHeader";
+import { MobileAppBar } from "@/components/mobile/MobileAppBar";
 import { useTasks, useUpdateTask, useDeleteTask, useToggleSubtask, useCreateTask } from "@/lib/queries/tasks";
 import { EisenhowerMatrixWidget } from "@/components/tasks/EisenhowerMatrixWidget";
 import { TasksPrimaryList } from "@/components/tasks/TasksPrimaryList";
@@ -30,7 +31,12 @@ export default function TasksMatrixPage() {
 
   return (
     <div className="w-full max-w-xl lg:max-w-6xl mx-auto space-y-3.5 select-none animate-in fade-in duration-200 pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
-      {/* 1. Subpage Header with Back Navigation */}
+      {/* Dynamic Strobi Top App Bar */}
+      <div className="-mx-2 -mt-2 sm:-mx-4 sm:-mt-4 lg:hidden">
+        <MobileAppBar title="Priority Matrix" showDynamicIsland={true} />
+      </div>
+
+      {/* 1. Title Bar with inline back button */}
       <SubpageHeader
         backHref="/tasks"
         backLabel="Tasks"

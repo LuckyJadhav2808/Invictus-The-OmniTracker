@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Moon, Droplet, Plus, Sparkles, Activity } from "lucide-react";
 import { SubpageHeader } from "@/components/shared/SubpageHeader";
+import { MobileAppBar } from "@/components/mobile/MobileAppBar";
 import { SleepAndActiveWidgets } from "@/components/goals/SleepAndActiveWidgets";
 import { WaterTracker } from "@/components/goals/WaterTracker";
 import { soundFX } from "@/components/shared/SoundFX";
@@ -45,7 +46,12 @@ export default function RecoveryPage() {
 
   return (
     <div className="w-full max-w-xl lg:max-w-5xl xl:max-w-6xl mx-auto space-y-3.5 select-none animate-in fade-in duration-200 pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
-      {/* 1. Subpage Header with Back Navigation */}
+      {/* Dynamic Strobi Top App Bar */}
+      <div className="-mx-2 -mt-2 sm:-mx-4 sm:-mt-4 lg:hidden">
+        <MobileAppBar title="Recovery" showDynamicIsland={true} />
+      </div>
+
+      {/* 1. Title Bar with inline back button */}
       <SubpageHeader
         backHref="/goals"
         backLabel="Habits"
