@@ -618,7 +618,7 @@ export function WhoOwesWhoModal({
                           onClick={() => {
                             soundFX.playPop();
                             deleteIOU(iou.id);
-                            toast.info("Deleted record");
+                            toast.info(`Removed ${iou.personName} record (${currencySymbol}${iou.amount.toLocaleString()})`);
                           }}
                           className="size-8 rounded-xl bg-white dark:bg-[#252321] hover:bg-rose-50 text-rose-500 border border-[#161514]/20 flex items-center justify-center cursor-pointer active:scale-95"
                           title="Delete record"

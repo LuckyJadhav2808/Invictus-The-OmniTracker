@@ -422,7 +422,7 @@ export default function SettingsPage() {
     setIsChangingPassword(true);
     try {
       await customUpdatePassword(user.uid, newPassword);
-      toast.success("Password updated successfully! 🔒");
+      toast.success(`Security credential updated for ${user.email || "account"}! 🔒`);
       setNewPassword("");
       setConfirmPassword("");
     } catch (err: any) {

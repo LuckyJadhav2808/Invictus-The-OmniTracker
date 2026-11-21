@@ -69,8 +69,9 @@ export function ReminderManagerModal({
     // Enable Background Web Push token registration & sync schedule to MongoDB
     await enableWebPushNotifications(user?.uid || "guest", config).catch(() => {});
 
+    const activeCount = [config.moneyEnabled, config.habitsEnabled].filter(Boolean).length;
     saveReminderConfig(config);
-    toast.success("Daily reminders saved", {
+    toast.success(`Daily schedule calibrated (${activeCount} active alert${activeCount === 1 ? "" : "s"}) ⏰`, {
       description: "Hardware alarms & local schedule synchronized",
     });
     onOpenChange(false);

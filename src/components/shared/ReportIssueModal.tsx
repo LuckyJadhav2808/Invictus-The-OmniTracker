@@ -45,7 +45,9 @@ export function ReportIssueModal({ open, onOpenChange }: ReportIssueModalProps) 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to submit issue report");
 
-      toast.success("Issue report submitted to Admin! 🛠️✨");
+      toast.success(`Reported "${title.trim()}" to dev board! 🛠️✨`, {
+        description: `Logged under ${category.toUpperCase()} • Severity: ${severity.toUpperCase()}`,
+      });
       setTitle("");
       setDescription("");
       setCategory("bug");

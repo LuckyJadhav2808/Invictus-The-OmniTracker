@@ -20,19 +20,23 @@ export default function TasksArchivePage() {
     .sort((a, b) => new Date(b.completedAt || b.createdAt || 0).getTime() - new Date(a.completedAt || a.createdAt || 0).getTime());
 
   const handleRestore = (id: string) => {
+    const task = completedTasks.find((t) => t.id === id);
+    const title = task ? `"${task.title}"` : "Task";
     soundFX.playPop();
     soundFX.vibrate(15);
     updateTaskMutation.mutate({
       id,
       updates: { status: "todo", completedAt: undefined },
     });
-    toast.success("Task restored to active list!");
+    toast.success(`Restored ${title} to active workflow! 📋`);
   };
 
   const handleDelete = (id: string) => {
+    const task = completedTasks.find((t) => t.id === id);
+    const title = task ? `"${task.title}"` : "Task";
     soundFX.playPop();
     deleteTaskMutation.mutate(id);
-    toast.info("Task permanently removed from archive.");
+    toast.info(`Permanently removed ${title} from archive.`);
   };
 
   return (

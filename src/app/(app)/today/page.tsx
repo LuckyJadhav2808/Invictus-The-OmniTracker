@@ -409,9 +409,13 @@ export default function TodayPage() {
         customDailyBudget: payload.customDailyBudget,
         enableRollover: payload.enableRollover,
       });
-      toast.success("Daily spending limit saved & synced.");
+      toast.success(
+        `Daily limit set to ${currencySymbol}${payload.customDailyBudget || 500}/day 🎯`
+      );
     } catch {
-      toast.success("Daily limit saved locally.");
+      toast.success(
+        `Daily limit saved locally: ${currencySymbol}${payload.customDailyBudget || 500}/day 🎯`
+      );
     }
   };
 
@@ -421,6 +425,8 @@ export default function TodayPage() {
 
   const handleAddExpense = async (amount: number, categoryId: string, note: string) => {
     setIsSavingExpense(true);
+    const cat = categories.find((c) => c.id === categoryId);
+    const label = note.trim() || cat?.name || "Expense";
     try {
       await addTransactionMutation.mutateAsync({
         amount,
@@ -431,10 +437,12 @@ export default function TodayPage() {
         note: note.trim() || "Quick expense",
         isRecurring: false,
       });
-      strobiToast.money(`Recorded ${currencySymbol}${amount}!`, { quip: "Disciplined spend! Wallet in check 💰" });
+      strobiToast.money(`Recorded ${currencySymbol}${amount.toLocaleString()} for ${label}! 💰`, {
+        quip: "Disciplined spend! Wallet in check 💰",
+      });
       setIsQuickExpenseOpen(false);
     } catch {
-      toast.error("Could not record expense.");
+      toast.error(`Could not record ${currencySymbol}${amount} for ${label}`);
     } finally {
       setIsSavingExpense(false);
     }
@@ -816,10 +824,10 @@ export default function TodayPage() {
               description: data.description,
               subtasks: data.subtasks || [],
             } as any);
-            strobiToast.tasks("Task created successfully! ⚡", { quip: "Top priority locked in. Flow state awaits!" });
+            strobiToast.tasks(`Created task "${data.title}"! ⚡`, { quip: "Top priority locked in. Flow state awaits!" });
             setIsNewTaskOpen(false);
           } catch {
-            toast.error("Failed to create task");
+            toast.error(`Failed to create task "${data.title}"`);
           }
         }}
       />

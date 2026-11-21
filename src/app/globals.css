@@ -707,7 +707,7 @@ html.disable-transitions *::after {
   transition: none !important;
 }
 
-/* Master Neobrutalist Sonner Toast System - Compact Horizontal Pill */
+/* Master Neobrutalist Sonner Toast System - Ergonomic Non-Clipping Card */
 [data-sonner-toaster] {
   font-family: var(--font-sans), sans-serif !important;
   z-index: 99999 !important;
@@ -720,7 +720,7 @@ html.disable-transitions *::after {
   [data-sonner-toaster] {
     position: fixed !important;
     top: auto !important;
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 78px) !important;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 80px) !important;
     left: 12px !important;
     right: 12px !important;
     width: auto !important;
@@ -734,26 +734,27 @@ html.disable-transitions *::after {
 
 [data-sonner-toast] {
   pointer-events: auto !important;
-  touch-action: none !important;
-  cursor: grab !important;
+  touch-action: pan-y !important;
   user-select: none !important;
   background: #ffffff !important;
   border: 2px solid #161514 !important;
-  box-shadow: 2px 2px 0px 0px rgba(22, 21, 20, 1) !important;
-  border-radius: 9999px !important;
-  padding: 0.35rem 0.85rem !important;
-  min-height: 32px !important;
-  max-height: 42px !important;
-  width: fit-content !important;
-  max-width: min(calc(100vw - 24px), 380px) !important;
+  box-shadow: 3px 3px 0px 0px rgba(22, 21, 20, 1) !important;
+  border-radius: 1rem !important;
+  padding: 0.65rem 0.95rem !important;
+  min-height: 48px !important;
+  height: auto !important;
+  max-height: none !important;
+  width: auto !important;
+  min-width: 280px !important;
+  max-width: min(calc(100vw - 24px), 420px) !important;
   margin: 0 auto !important;
   color: #161514 !important;
   font-weight: 700 !important;
-  display: inline-flex !important;
+  display: flex !important;
   align-items: center !important;
-  gap: 0.45rem !important;
+  gap: 0.65rem !important;
   box-sizing: border-box !important;
-  overflow: hidden !important;
+  overflow: visible !important;
 }
 
 [data-sonner-toast]:active {
@@ -766,17 +767,17 @@ html.disable-transitions *::after {
   align-items: center !important;
   justify-content: center !important;
   margin: 0 !important;
-  font-size: 0.85rem !important;
+  font-size: 1rem !important;
 }
 
 [data-sonner-toast] [data-content] {
-  display: inline-flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  gap: 0.35rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  gap: 0.2rem !important;
   min-width: 0 !important;
   max-width: 100% !important;
-  overflow: hidden !important;
+  overflow: visible !important;
   flex: 1 1 auto !important;
 }
 
@@ -802,25 +803,29 @@ html.disable-transitions *::after {
 
 [data-sonner-toast] [data-title] {
   font-weight: 800 !important;
-  font-size: 0.72rem !important;
+  font-size: 0.8125rem !important;
+  line-height: 1.35 !important;
   color: #161514 !important;
   letter-spacing: -0.01em !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
+  white-space: normal !important;
+  word-break: break-word !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
   min-width: 0 !important;
   max-width: 100% !important;
   flex: 0 1 auto !important;
 }
 
 [data-sonner-toast] [data-description] {
-  font-weight: 600 !important;
-  font-size: 0.68rem !important;
+  font-weight: 500 !important;
+  font-size: 0.72rem !important;
+  line-height: 1.4 !important;
   color: rgba(22, 21, 20, 0.75) !important;
   margin: 0 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
+  white-space: normal !important;
+  word-break: break-word !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
   min-width: 0 !important;
   max-width: 100% !important;
   flex: 1 1 auto !important;
@@ -830,12 +835,20 @@ html.disable-transitions *::after {
   background-color: #161514 !important;
   color: #CEF431 !important;
   border: 1.5px solid #161514 !important;
-  border-radius: 9999px !important;
+  border-radius: 0.5rem !important;
   font-weight: 900 !important;
-  font-size: 0.68rem !important;
-  padding: 0.2rem 0.5rem !important;
-  box-shadow: 1px 1px 0px 0px rgba(22, 21, 20, 1) !important;
+  font-size: 0.72rem !important;
+  padding: 0.35rem 0.7rem !important;
+  box-shadow: 1.5px 1.5px 0px 0px rgba(22, 21, 20, 1) !important;
   white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  cursor: pointer !important;
+  transition: transform 0.1s ease, filter 0.1s ease !important;
+}
+
+[data-sonner-toast] [data-button]:active {
+  transform: translate(1px, 1px) !important;
+  box-shadow: 0.5px 0.5px 0px 0px rgba(22, 21, 20, 1) !important;
 }
 
 [data-sonner-toast] [data-close-button] {
@@ -843,9 +856,9 @@ html.disable-transitions *::after {
   color: #161514 !important;
   border: 1.5px solid #161514 !important;
   box-shadow: 1px 1px 0px 0px #161514 !important;
-  border-radius: 9999px !important;
-  width: 1rem !important;
-  height: 1rem !important;
+  border-radius: 0.5rem !important;
+  width: 1.25rem !important;
+  height: 1.25rem !important;
 }
 
 /* Dark Mode Neobrutalist Sonner Overrides */
@@ -853,7 +866,7 @@ html.disable-transitions *::after {
   background: #1C1A18 !important;
   border-color: #383531 !important;
   color: #FAF8F5 !important;
-  box-shadow: 2px 2px 0px 0px #000000 !important;
+  box-shadow: 3px 3px 0px 0px #000000 !important;
 }
 
 .dark [data-sonner-toast][data-type="success"] {
@@ -887,8 +900,8 @@ html.disable-transitions *::after {
 .dark [data-sonner-toast] [data-button] {
   background-color: #CEF431 !important;
   color: #161514 !important;
-  border: 1.5px solid #CEF431 !important;
-  box-shadow: 1px 1px 0px 0px #000000 !important;
+  border: 1.5px solid #161514 !important;
+  box-shadow: 1.5px 1.5px 0px 0px #000000 !important;
 }
 
 .dark [data-sonner-toast] [data-close-button] {

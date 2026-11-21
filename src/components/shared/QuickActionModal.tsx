@@ -237,7 +237,13 @@ export function QuickActionModal() {
         completed: !isDone,
       });
 
-      toast.success(!isDone ? "Habit checked! Streak glowing 🔥" : "Check removed");
+      const targetHabit = habits.find((h) => h.id === habitId);
+      const title = targetHabit ? targetHabit.title : "Habit";
+      if (!isDone) {
+        toast.success(`Logged "${title}"! Streak glowing 🔥`);
+      } else {
+        toast.info(`Unchecked "${title}" for today`);
+      }
     } catch {
       toast.error("Failed to update habit");
     }

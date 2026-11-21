@@ -662,7 +662,9 @@ export function DynamicIslandDock({
                     onClick={() => {
                       soundFX.playPop();
                       startPomodoro(25, "Deep Focus", "focus");
-                      toast.success("25m Focus Block Started!");
+                      toast.success("25m Deep Work Focus session active! ⏱️", {
+                        description: "Live activity docked in Dynamic Island.",
+                      });
                     }}
                     className="bg-white dark:bg-[#252321] hover:bg-[#F1EFEA] dark:hover:bg-[#2A2724] text-[#161514] dark:text-[#FAF8F5] font-heading font-black text-xs py-2.5 px-3 rounded-xl border-2 border-[#161514]/20 dark:border-white/20 shadow-xs flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95"
                   >
@@ -675,7 +677,9 @@ export function DynamicIslandDock({
                     onClick={() => {
                       soundFX.playPop();
                       startGymRest(60, "Set Recovery");
-                      toast.success("60s Rest Timer Started!");
+                      toast.success("60s Rest Recovery countdown active! 🏋️", {
+                        description: "Live recovery timer docked in Dynamic Island.",
+                      });
                     }}
                     className="bg-white dark:bg-[#252321] hover:bg-[#F1EFEA] dark:hover:bg-[#2A2724] text-[#161514] dark:text-[#FAF8F5] font-heading font-black text-xs py-2.5 px-3 rounded-xl border-2 border-[#161514]/20 dark:border-white/20 shadow-xs flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95"
                   >

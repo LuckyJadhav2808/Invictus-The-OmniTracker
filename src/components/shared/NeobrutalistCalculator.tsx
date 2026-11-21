@@ -98,13 +98,14 @@ export function NeobrutalistCalculator({
   };
 
   const clearEntireHistory = () => {
+    const count = state.history.length;
     setState((prev) => ({ ...prev, history: [] }));
     try {
       localStorage.removeItem("invictus_calc_history");
     } catch {}
     triggerHaptic("medium");
     soundFX.play("pop");
-    toast.success("Calculation tape cleared 🗑️");
+    toast.info(`Calculation tape cleared (${count} calculation${count === 1 ? "" : "s"}) 🗑️`);
   };
 
   const toggleSound = () => {

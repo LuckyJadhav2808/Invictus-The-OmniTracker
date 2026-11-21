@@ -50,7 +50,7 @@ export function QuickThoughtsWidget() {
     try {
       await navigator.clipboard.writeText(note);
       setIsCopied(true);
-      toast.success("Thoughts copied to clipboard! 📋✨");
+      toast.success(`Copied thoughts (${note.length} chars) to clipboard! 📋✨`);
       setTimeout(() => setIsCopied(false), 2000);
     } catch {
       toast.error("Failed to copy note.");
@@ -58,11 +58,12 @@ export function QuickThoughtsWidget() {
   };
 
   const handleClear = () => {
+    const lines = note.split("\n").filter((l) => l.trim().length > 0).length;
     setNote("");
     try {
       localStorage.removeItem("invictus_quick_thoughts");
     } catch {}
-    toast.info("Scratchpad cleared.");
+    toast.info(`Scratchpad cleared (${lines || 1} thought${lines === 1 ? "" : "s"}) 🧹`);
   };
 
   const currentTagObj = TAGS.find((t) => t.id === activeTag) || TAGS[0];

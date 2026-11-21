@@ -168,12 +168,14 @@ export default function HabitDetailPage({
       if (targetState) {
         soundFX.playPop();
         soundFX.vibrate(20);
-        toast.success("Habit checked for today. Keep the flame alive.");
+        toast.success(`Logged "${habit.title}"! 🔥`, {
+          description: "Keep the flame alive. Streak protected!",
+        });
       } else {
-        toast.success("Habit unchecked for today");
+        toast.info(`Unchecked "${habit.title}" for today`);
       }
     } catch {
-      toast.error("Failed to update habit check-in");
+      toast.error(`Failed to update check-in for "${habit.title}"`);
     }
   };
 
@@ -183,20 +185,20 @@ export default function HabitDetailPage({
         ...data,
         id: habitId,
       });
-      toast.success("Habit updated! ✨");
+      toast.success(`Updated habit "${data.title || habit.title}"! ✨`);
       setIsEditOpen(false);
     } catch {
-      toast.error("Failed to update habit");
+      toast.error(`Failed to update "${habit.title}"`);
     }
   };
 
   const handleDeleteHabit = async () => {
     try {
       await deleteHabitMutation.mutateAsync(habitId);
-      toast.success("Habit deleted");
+      toast.info(`Habit "${habit.title}" removed`);
       router.push("/goals");
     } catch {
-      toast.error("Failed to delete habit");
+      toast.error(`Failed to delete "${habit.title}"`);
     }
   };
 

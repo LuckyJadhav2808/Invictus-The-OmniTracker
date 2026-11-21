@@ -290,15 +290,17 @@ export function GymRoutineTracker() {
         id: currentRoutine.id,
         exercises: updatedExercises,
       });
-      toast.success("Exercise details updated! 📝");
+      toast.success(`Updated "${editExName.trim() || "Exercise"}" details! 📝`);
       setEditingExercise(null);
     } catch {
-      toast.error("Failed to update exercise");
+      toast.error(`Failed to update "${editExName.trim() || "exercise"}"`);
     }
   };
 
   const handleDeleteExercise = async (exId: string) => {
     if (!currentRoutine) return;
+    const target = (currentRoutine.exercises || []).find((ex: any) => ex.id === exId);
+    const exName = target ? `"${target.name}"` : "Exercise";
     const updatedExercises = (currentRoutine.exercises || []).filter((ex: any) => ex.id !== exId);
 
     try {
@@ -306,10 +308,10 @@ export function GymRoutineTracker() {
         id: currentRoutine.id,
         exercises: updatedExercises,
       });
-      toast.success("Exercise removed 🗑️");
+      toast.info(`Removed ${exName} from ${selectedDay} routine 🗑️`);
       setDeleteExId(null);
     } catch {
-      toast.error("Failed to remove exercise");
+      toast.error(`Failed to remove ${exName}`);
     }
   };
 
@@ -370,20 +372,25 @@ export function GymRoutineTracker() {
       return ex;
     });
 
+    const exTarget = (currentRoutine.exercises || []).find((e: any) => e.id === exId);
+    const exName = exTarget ? `"${exTarget.name}"` : "exercise";
+
     try {
       await updateRoutineMutation.mutateAsync({
         id: currentRoutine.id,
         exercises: updatedExercises,
       });
-      toast.success("Set added!");
+      toast.success(`Set added to ${exName}! 💪`);
     } catch {
-      toast.error("Failed to add set");
+      toast.error(`Failed to add set to ${exName}`);
     }
   };
 
   // Remove last set from an exercise
   const handleRemoveSet = async (exId: string) => {
     if (!currentRoutine) return;
+    const exTarget = (currentRoutine.exercises || []).find((e: any) => e.id === exId);
+    const exName = exTarget ? `"${exTarget.name}"` : "exercise";
 
     const updatedExercises = (currentRoutine.exercises || []).map((ex: any) => {
       if (ex.id === exId && ex.sets && ex.sets.length > 1) {
@@ -397,9 +404,9 @@ export function GymRoutineTracker() {
         id: currentRoutine.id,
         exercises: updatedExercises,
       });
-      toast.success("Set removed");
+      toast.info(`Set removed from ${exName}`);
     } catch {
-      toast.error("Failed to remove set");
+      toast.error(`Failed to remove set from ${exName}`);
     }
   };
 

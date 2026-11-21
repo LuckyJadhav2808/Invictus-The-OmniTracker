@@ -96,13 +96,13 @@ export function SavingsGoals() {
         currentAmount: Number(goalCurrent) || 0,
         category: "Personal",
       });
-      toast.success("Savings target created");
+      toast.success(`Created goal: "${goalTitle.trim()}" (Target: ₹${Number(goalTarget).toLocaleString()})! 🎯`);
       setIsAddOpen(false);
       setGoalTitle("");
       setGoalTarget("");
       setGoalCurrent("");
     } catch {
-      toast.error("Failed to create savings goal");
+      toast.error(`Failed to create savings goal "${goalTitle.trim()}"`);
     }
   };
 
@@ -401,11 +401,13 @@ export function SavingsGoals() {
         }}
         onConfirm={async () => {
           if (deleteGoalId) {
+            const delTarget = (goals || []).find((g: any) => g.id === deleteGoalId);
+            const goalName = delTarget ? `"${delTarget.title}"` : "Savings target";
             try {
               await deleteGoalMutation.mutateAsync(deleteGoalId);
-              toast.success("Savings target deleted 🗑️");
+              toast.info(`Removed ${goalName} 🗑️`);
             } catch {
-              toast.error("Failed to delete savings goal");
+              toast.error(`Failed to delete ${goalName}`);
             }
             setDeleteGoalId(null);
           }

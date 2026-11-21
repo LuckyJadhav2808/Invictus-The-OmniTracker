@@ -701,7 +701,7 @@ export function WhoOwesWhoTabView({
                       onClick={() => {
                         soundFX.playPop();
                         deleteIOU(iou.id);
-                        toast.success("Record deleted");
+                        toast.info(`Removed ${iou.personName} record (${currencySymbol}${iou.amount.toLocaleString()})`);
                       }}
                       className="size-8 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] hover:bg-rose-50 dark:hover:bg-rose-950/40 text-[#6B6B6B] hover:text-rose-600 border border-[#E8E5DF] dark:border-[#383531] flex items-center justify-center transition-colors cursor-pointer"
                       title="Delete record"

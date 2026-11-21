@@ -412,19 +412,23 @@ export function RetroStickyScratchpad({
   // 8. Cleanup converted lines
   const handleClearConverted = () => {
     soundFX.playPop();
+    const previousLineCount = content.split("\n").filter((l) => l.trim().length > 0).length;
     const cleaned = clearConvertedLines(content);
+    const newLineCount = cleaned.split("\n").filter((l) => l.trim().length > 0).length;
+    const cleared = Math.max(1, previousLineCount - newLineCount);
     setContent(cleaned);
     if (typeof window !== "undefined") {
       try {
         localStorage.setItem(STORAGE_KEY, cleaned);
       } catch {}
     }
-    toast.info("Cleared completed scratchpad notes");
+    toast.info(`Cleared ${cleared} completed scratchpad items 🧹`);
   };
 
   // 9. Clear full note
   const handleClearAll = () => {
     soundFX.playPop();
+    const count = content.split("\n").filter((l) => l.trim().length > 0).length;
     setContent("");
     setIsSaved(true);
     if (typeof window !== "undefined") {
@@ -432,7 +436,7 @@ export function RetroStickyScratchpad({
         localStorage.removeItem(STORAGE_KEY);
       } catch {}
     }
-    toast.info("Scratchpad cleared");
+    toast.info(`Desk scratchpad cleared (${count} thought${count === 1 ? "" : "s"}) 🧹`);
   };
 
   const handleInsertExample = (example: string) => {

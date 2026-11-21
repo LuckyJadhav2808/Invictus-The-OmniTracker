@@ -161,8 +161,8 @@ export function UpdateCheckModal({ open, onOpenChange, autoCheck = false }: Upda
       const text = JSON.stringify(dumpObj, null, 2);
       if (typeof navigator !== "undefined" && navigator.clipboard) {
         await navigator.clipboard.writeText(text);
-        toast.success("Version telemetry copied! 📋", {
-          description: `v${dumpObj.version} (Build ${dumpObj.buildNumber})`,
+        toast.success(`Copied Invictus v${dumpObj.version} telemetry! 📋`, {
+          description: `Build ${dumpObj.buildNumber} • Channel: ${dumpObj.channel}`,
         });
       } else {
         toast.info(`Version: v${dumpObj.version}`);

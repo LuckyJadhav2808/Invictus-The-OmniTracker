@@ -653,15 +653,19 @@ function MoneyPageContent() {
     note?: string;
     paymentMethod: string;
   }) => {
+    const cat = categoryMap.get(payload.categoryId);
+    const categoryLabel = cat?.name || (payload.type === "income" ? "Income" : "Expense");
+
     if (payload.id) {
       await updateTxMutation.mutateAsync(payload as any);
-      toast.success("Transaction updated");
+      toast.success(
+        `Updated ${currencySymbol}${payload.amount.toLocaleString()} for ${categoryLabel}${payload.note ? ` • ${payload.note}` : ""}`
+      );
     } else {
       const res = await addTxMutation.mutateAsync(payload as any);
       const newId = (res as any)?.id || (res as any)?._id;
-      const cat = categoryMap.get(payload.categoryId);
       strobiToast.money(
-        `Logged ${currencySymbol}${payload.amount} for ${cat?.name || "Expense"}${payload.note ? ` • ${payload.note}` : ""}`,
+        `Logged ${currencySymbol}${payload.amount.toLocaleString()} for ${categoryLabel}${payload.note ? ` • ${payload.note}` : ""}`,
         {
           quip: "Wallet in check! Every tracked rupee counts 💰",
           action: {
@@ -681,6 +685,8 @@ function MoneyPageContent() {
   };
 
   const handleDuplicateTransaction = async (tx: Transaction) => {
+    const cat = categoryMap.get(tx.categoryId);
+    const label = tx.note || cat?.name || "Expense";
     try {
       const newTx = await addTxMutation.mutateAsync({
         amount: tx.amount,
@@ -691,7 +697,7 @@ function MoneyPageContent() {
         paymentMethod: tx.paymentMethod,
       } as any);
       const newId = (newTx as any)?.id || (newTx as any)?._id;
-      toast.success("Duplicated transaction", {
+      toast.success(`Duplicated ${currencySymbol}${tx.amount.toLocaleString()} (${label})`, {
         action: {
           label: "Undo",
           onClick: () => {
@@ -700,14 +706,17 @@ function MoneyPageContent() {
         },
       });
     } catch {
-      toast.error("Failed to duplicate transaction");
+      toast.error(`Failed to duplicate ${currencySymbol}${tx.amount.toLocaleString()} transaction`);
     }
   };
 
   const handleDeleteTransaction = async (id: string) => {
     const existing = transactions.find((t) => t.id === id);
+    const cat = existing ? categoryMap.get(existing.categoryId) : null;
+    const label = existing ? `${currencySymbol}${existing.amount.toLocaleString()} (${existing.note || cat?.name || "record"})` : "transaction";
+
     await deleteTxMutation.mutateAsync(id);
-    toast.info("Transaction deleted", {
+    toast.info(`Deleted ${label}`, {
       action: existing
         ? {
             label: "Restore",
@@ -821,8 +830,10 @@ function MoneyPageContent() {
   };
 
   const handleDeleteCategory = async (id: string) => {
+    const existing = categories.find((c) => c.id === id);
+    const catName = existing ? existing.name : "Category";
     await deleteCatMutation.mutateAsync(id);
-    toast.info("Category deleted.");
+    toast.info(`Envelope "${catName}" removed from ledger`);
     setDeleteCatId(null);
   };
 
@@ -857,9 +868,13 @@ function MoneyPageContent() {
         customDailyBudget: payload.customDailyBudget,
         enableRollover: payload.enableRollover,
       });
-      toast.success("Budget allowances saved");
+      toast.success(
+        `Budget allowances saved: ${currencySymbol}${payload.upiBudget.toLocaleString()} UPI • ${currencySymbol}${payload.cashBudget.toLocaleString()} Cash`
+      );
     } catch {
-      toast.success("Allowances saved locally");
+      toast.success(
+        `Allowances saved locally: ${currencySymbol}${payload.upiBudget.toLocaleString()} UPI • ${currencySymbol}${payload.cashBudget.toLocaleString()} Cash`
+      );
     }
   };
 

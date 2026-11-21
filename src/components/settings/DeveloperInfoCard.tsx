@@ -29,9 +29,7 @@ export const DeveloperInfoCard: React.FC<DeveloperInfoCardProps> = ({ className 
       if (typeof navigator !== "undefined" && navigator.clipboard) {
         await navigator.clipboard.writeText(developer.email);
         setCopied(true);
-        toast.success("Copied to clipboard!", {
-          description: developer.email,
-        });
+        toast.success(`Copied ${developer.email} to clipboard! 📋`);
         setTimeout(() => setCopied(false), 2000);
       }
     } catch {
@@ -55,8 +53,8 @@ export const DeveloperInfoCard: React.FC<DeveloperInfoCardProps> = ({ className 
       }
       if (typeof navigator !== "undefined" && navigator.clipboard) {
         await navigator.clipboard.writeText(JSON.stringify(dumpObj, null, 2));
-        toast.success("Version dump telemetry copied! 📋", {
-          description: `v${dumpObj.version} • Build ${dumpObj.buildNumber}`,
+        toast.success(`Copied Invictus v${dumpObj.version} telemetry! 📋`, {
+          description: `Build ${dumpObj.buildNumber} • Channel: ${dumpObj.channel || "stable"}`,
         });
       } else {
         toast.info(`Version: v${dumpObj.version}`);

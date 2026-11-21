@@ -85,9 +85,10 @@ export function InAppDiagnosticsModal({ open, onOpenChange }: InAppDiagnosticsMo
   const handleClearMutations = async () => {
     try {
       await clearAllOfflineMutations();
+      const prev = pendingCount;
       setPendingCount(0);
       diagnosticLogger.log("warn", "OFFLINE_STORE", "Offline mutation queue cleared manually");
-      toast.success("Offline mutation queue cleared");
+      toast.info(`Offline mutation queue cleared (${prev} operations removed) 🧹`);
     } catch {
       toast.error("Failed to clear offline mutations");
     }
@@ -96,6 +97,7 @@ export function InAppDiagnosticsModal({ open, onOpenChange }: InAppDiagnosticsMo
   const handleExportPackage = () => {
     try {
       const json = diagnosticLogger.exportDiagnosticPackage();
+      const sizeKB = (json.length / 1024).toFixed(1);
       const blob = new Blob([json], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -103,7 +105,7 @@ export function InAppDiagnosticsModal({ open, onOpenChange }: InAppDiagnosticsMo
       a.download = `invictus_diagnostics_${Date.now()}.json`;
       a.click();
       URL.revokeObjectURL(url);
-      toast.success("Diagnostic package exported! 📋");
+      toast.success(`Diagnostic package exported (${sizeKB} KB)! 📋`);
     } catch {
       toast.error("Failed to export diagnostic data");
     }

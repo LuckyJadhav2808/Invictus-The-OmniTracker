@@ -112,7 +112,7 @@ export function WaterTracker({
     if (next >= dailyTarget && localAmount < dailyTarget) {
       soundFX.playCompleteChime();
       soundFX.vibrate([60, 60, 100]);
-      toast.success("Daily hydration goal completed! Outstanding discipline. 💧");
+      toast.success(`Daily hydration goal completed (${dailyTarget.toLocaleString()} ml)! Outstanding discipline. 💧`);
     } else if (delta > 0) {
       toast.info(`+${delta} ml logged`, {
         description: `${Math.max(0, dailyTarget - next)} ml remaining to reach goal`,
@@ -138,7 +138,7 @@ export function WaterTracker({
     setManualAmountInput("0");
     try {
       await onSetWater(0, dailyTarget);
-      toast.info("Hydration reset for today.");
+      toast.info(`Hydration reset for today (0 / ${dailyTarget.toLocaleString()} ml).`);
     } catch {
       toast.error("Failed to reset water");
     }

@@ -87,7 +87,9 @@ export function MealTracker() {
         localStorage.setItem("invictus_nutrition_targets", JSON.stringify(newTargets));
       } catch {}
     }
-    toast.success("Daily macro targets saved! 🎯");
+    toast.success(
+      `Macro targets saved: ${newTargets.calories} kcal • ${newTargets.protein}g P • ${newTargets.carbs}g C • ${newTargets.fat}g F 🎯`
+    );
     setIsTargetsOpen(false);
     soundFX.playPop();
   };
@@ -225,21 +227,23 @@ export function MealTracker() {
         fat: Number(editFat) || 0,
         time: editTime.trim(),
       });
-      toast.success("Meal updated! 📝");
+      toast.success(`Updated meal "${editMealName.trim() || "Meal"}"! 📝`);
       setEditingMeal(null);
     } catch {
-      toast.error("Failed to update meal");
+      toast.error(`Failed to update "${editMealName.trim() || "meal"}"`);
     }
   };
 
   const handleDeleteMeal = async () => {
     if (!deleteMealId) return;
+    const target = meals.find((m: any) => m.id === deleteMealId);
+    const title = target ? `"${target.name}"` : "Meal";
     try {
       await deleteMealMutation.mutateAsync(deleteMealId);
-      toast.success("Meal entry deleted 🗑️");
+      toast.info(`Removed ${title} from meal log 🗑️`);
       setDeleteMealId(null);
     } catch {
-      toast.error("Failed to delete meal");
+      toast.error(`Failed to delete ${title}`);
     }
   };
 
@@ -252,12 +256,12 @@ export function MealTracker() {
       if (!meal.completed) {
         soundFX.playPop();
         soundFX.vibrate(20);
-        toast.success("Meal consumed! 🍎");
+        toast.success(`Consumed "${meal.name}" (+${meal.calories} kcal)! 🍎`);
       } else {
-        toast.info("Meal unchecked");
+        toast.info(`Unchecked "${meal.name}"`);
       }
     } catch {
-      toast.error("Failed to update meal status");
+      toast.error(`Failed to update status for "${meal.name}"`);
     }
   };
 

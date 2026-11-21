@@ -121,7 +121,9 @@ export function useCreateTask() {
       const userId = getActiveUserId(user);
       queryClient.setQueryData<TaskItem[]>(["tasks", userId], (old = []) => [task, ...old]);
       queryClient.setQueryData<TaskItem[]>(["tasks"], (old = []) => [task, ...old]);
-      strobiToast.tasks("Task Created", { description: `"${task.title}" added to #${task.projectTag || "Dev"}.` });
+      strobiToast.tasks(`Created "${task.title}"! 🎯`, {
+        description: `Added to #${task.projectTag || "General"}`,
+      });
     },
   });
 }
@@ -175,9 +177,14 @@ export function useUpdateTask() {
         old.map((t) => (t.id === updatedTask.id ? updatedTask : t))
       );
       if (updatedTask.status === "completed") {
-        strobiToast.tasks("Task Conquered! ⚡", { description: `"${updatedTask.title}" marked as done!`, quip: "Queue yields to your focus 🎯" });
+        strobiToast.tasks(`Conquered "${updatedTask.title}"! ⚡`, {
+          description: "Marked as completed • Queue yields to your focus 🎯",
+          quip: "Queue yields to your focus 🎯",
+        });
       } else {
-        toast.success("Task Updated", { description: `"${updatedTask.title}" updated successfully.` });
+        toast.success(`Updated "${updatedTask.title}"! ✨`, {
+          description: "Task parameters updated successfully.",
+        });
       }
     },
   });
@@ -216,8 +223,8 @@ export function useDeleteTask() {
       queryClient.setQueryData<TaskItem[]>(["tasks"], (old = []) =>
         old.filter((t) => t.id !== taskId)
       );
-      toast("Task Deleted", {
-        description: task ? `"${task.title}" removed from workflow.` : "Item removed from workflow.",
+      toast(task ? `Deleted "${task.title}"` : "Task Deleted", {
+        description: task ? `Removed from workflow.` : "Item removed from workflow.",
         action: task
           ? {
               label: "Undo",
@@ -238,8 +245,8 @@ export function useDeleteTask() {
                     console.warn("Undo sync warning:", e);
                   }
                 }
-                toast.success("Task Restored", {
-                  description: `"${task.title}" restored to active workflow.`,
+                toast.success(`Restored "${task.title}"! 📋`, {
+                  description: "Restored to active workflow queue.",
                 });
               },
             }

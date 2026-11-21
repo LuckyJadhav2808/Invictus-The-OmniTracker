@@ -128,12 +128,12 @@ export function SubscriptionsTracker() {
         nextRenewalDate: subDate,
         category: subCategory,
       });
-      toast.success("Subscription added");
+      toast.success(`Tracked "${subName.trim()}" (₹${Number(subAmount).toLocaleString()}/${subCycle})! 💳`);
       setIsAddOpen(false);
       setSubName("");
       setSubAmount("");
     } catch {
-      toast.error("Failed to add subscription");
+      toast.error(`Failed to add subscription "${subName.trim()}"`);
     }
   };
 
@@ -373,11 +373,13 @@ export function SubscriptionsTracker() {
         }}
         onConfirm={async () => {
           if (deleteSubId) {
+            const delTarget = (subscriptions || []).find((s: any) => s.id === deleteSubId);
+            const subTitle = delTarget ? `"${delTarget.name}"` : "Subscription";
             try {
               await deleteSubMutation.mutateAsync(deleteSubId);
-              toast.success("Subscription removed 🗑️");
+              toast.info(`Removed ${subTitle} 🗑️`);
             } catch {
-              toast.error("Failed to remove subscription");
+              toast.error(`Failed to remove ${subTitle}`);
             }
             setDeleteSubId(null);
           }

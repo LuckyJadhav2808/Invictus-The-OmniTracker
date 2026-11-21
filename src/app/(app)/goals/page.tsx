@@ -228,7 +228,7 @@ function GoalsPageContent() {
         age: formattedAge,
         weight: formattedWeight,
       });
-      toast.success("Health stats updated");
+      toast.success(`Health profile calibrated! Weight: ${formattedWeight}kg • Age: ${formattedAge}`);
       setIsProfileOpen(false);
     } catch {
       toast.error("Failed to update profile stats");
@@ -339,7 +339,7 @@ function GoalsPageContent() {
   const handleAddHabit = async (data: any) => {
     try {
       await addHabitMutation.mutateAsync(data);
-      toast.success("Habit created");
+      toast.success(`Habit "${data.title}" added to daily routines! 🔥`);
       setIsAddOpen(false);
     } catch (err: any) {
       toast.error(err?.message || "Failed to create habit");
@@ -347,6 +347,9 @@ function GoalsPageContent() {
   };
 
   const handleToggleLog = async (habitId: string, completed: boolean, dateStr: string = selectedDate) => {
+    const targetHabit = habits.find((h) => h.id === habitId);
+    const title = targetHabit ? targetHabit.title : "Habit";
+
     try {
       await toggleLogMutation.mutateAsync({
         habitId,
@@ -354,12 +357,15 @@ function GoalsPageContent() {
         completed,
       });
       if (completed) {
-        strobiToast.habits("Habit Checked! 🔥", { quip: "Discipline compounds daily. Streak glowing!" });
+        strobiToast.habits(`Logged "${title}"! 🔥`, {
+          quip: "Discipline compounds daily. Streak glowing!",
+          description: targetHabit ? `Frequency: ${targetHabit.frequency}` : undefined,
+        });
       } else {
-        toast.info("Check removed");
+        toast.info(`Unchecked "${title}" for today`);
       }
     } catch {
-      toast.error("Failed to update habit log");
+      toast.error(`Failed to update log for "${title}"`);
     }
   };
 
@@ -412,7 +418,7 @@ function GoalsPageContent() {
             })
           )
         );
-        toast.info("Reset routines for today");
+        toast.info(`Reset ${completedTodayHabits.length} routines for today`);
       } catch {
         toast.error("Failed to reset routines");
       }
@@ -1067,7 +1073,7 @@ function GoalsPageContent() {
                 title: editHabitTitle,
                 reminderTime: editHabitDesc,
               });
-              toast.success("Habit updated");
+              toast.success(`Updated habit "${editHabitTitle}"! ✨`);
               setEditingHabit(null);
             }
           }}
@@ -1147,11 +1153,13 @@ function GoalsPageContent() {
         }}
         onConfirm={async () => {
           if (deleteHabitId) {
+            const targetHabit = habits.find((h) => h.id === deleteHabitId);
+            const title = targetHabit ? targetHabit.title : "Habit";
             try {
               await deleteHabitMutation.mutateAsync(deleteHabitId);
-              toast.success("Habit deleted");
+              toast.info(`Removed habit "${title}" from routines`);
             } catch {
-              toast.error("Failed to delete habit");
+              toast.error(`Failed to delete "${title}"`);
             }
             setDeleteHabitId(null);
           }
