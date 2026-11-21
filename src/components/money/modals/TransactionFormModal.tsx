@@ -186,6 +186,7 @@ export function TransactionFormModal({
     }
 
     // Tier 1: Learned merchant dictionary
+    let categoryMatched = false;
     const hit = MerchantCategoryCache.get(val);
     if (hit) {
       const targetCat = filteredCategories.find(
@@ -198,31 +199,34 @@ export function TransactionFormModal({
           setCategoryId(targetCat.id);
           setMatchedCategoryName(targetCat.name);
         }
-        return;
+        categoryMatched = true;
       }
     }
 
-    // Tier 2: Keyword & semantic dictionary mapping
-    const match = detectCategoryFromNote(val, filteredCategories);
-    if (match) {
-      if (categoryId !== match.categoryId) {
-        soundFX.playPop();
-        soundFX.vibrate(15);
-        setCategoryId(match.categoryId);
-        setMatchedCategoryName(match.categoryName);
+    // Tier 2: Keyword & semantic dictionary mapping (if not already matched by cache)
+    if (!categoryMatched) {
+      const match = detectCategoryFromNote(val, filteredCategories);
+      if (match) {
+        if (categoryId !== match.categoryId) {
+          soundFX.playPop();
+          soundFX.vibrate(15);
+          setCategoryId(match.categoryId);
+          setMatchedCategoryName(match.categoryName);
+        }
+        categoryMatched = true;
+      } else {
+        setMatchedCategoryName(null);
       }
-    } else {
-      setMatchedCategoryName(null);
     }
 
     // Tier 3: NLP intent parsing (extract amount if empty, e.g. "Chai 20" or "Uber 150")
     const parsed = parseSmartIntent(val);
     if (parsed.domain === "MONEY_EXPENSE" && parsed.expense) {
-      if (parsed.expense.amount && (!amount || amount === "0")) {
+      if (parsed.expense.amount && (!amount || amount === "0" || amount === "0.00")) {
         setAmount(String(parsed.expense.amount));
         soundFX.playPop();
       }
-      if (!match && parsed.expense.category) {
+      if (!categoryMatched && parsed.expense.category) {
         const catNameLower = parsed.expense.category.toLowerCase();
         const fallbackMatch = filteredCategories.find((c) =>
           c.name.toLowerCase().includes(catNameLower)

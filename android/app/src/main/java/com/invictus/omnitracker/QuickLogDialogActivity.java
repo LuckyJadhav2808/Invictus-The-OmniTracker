@@ -1,7 +1,9 @@
 package com.invictus.omnitracker;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
@@ -27,6 +29,8 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Invictus Ambient Floating Micro-Dialog
@@ -56,6 +60,7 @@ public class QuickLogDialogActivity extends AppCompatActivity {
     private String optionalNote = "";
     private double safeToSpend = 1420.0;
     private boolean isManualCategorySelected = false;
+    private boolean isAutoExtractedAmount = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,7 +109,24 @@ public class QuickLogDialogActivity extends AppCompatActivity {
             finish();
         });
 
-        // Note Input Listeners with Real-Time Smart Category Detection
+        // Studio Modal Button: Launches the rich web modal with full NLP, math & transformer rules
+        View btnStudio = findViewById(R.id.btn_open_studio_modal);
+        if (btnStudio != null) {
+            btnStudio.setOnClickListener(v -> {
+                vibrateTactile(20);
+                try {
+                    Intent studioIntent = new Intent(this, MainActivity.class);
+                    studioIntent.setData(Uri.parse("https://invictus-the-omni-tracker.vercel.app/quick-log"));
+                    studioIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(studioIntent);
+                    finish();
+                } catch (Exception e) {
+                    Log.e(TAG, "Failed to launch studio modal from dialog", e);
+                }
+            });
+        }
+
+        // Note Input Listeners with Real-Time Smart Category Detection & NLP Entity Extraction
         if (etExpenseNote != null) {
             etExpenseNote.addTextChangedListener(new android.text.TextWatcher() {
                 @Override
@@ -116,9 +138,7 @@ public class QuickLogDialogActivity extends AppCompatActivity {
                         btnClearNote.setVisibility(s.length() > 0 ? View.VISIBLE : View.GONE);
                     }
                     optionalNote = s.toString().trim();
-                    if (!isManualCategorySelected && !optionalNote.isEmpty()) {
-                        detectCategoryFromNoteText(optionalNote.toLowerCase());
-                    }
+                    parseNlpIntent(optionalNote);
                 }
 
                 @Override
@@ -134,6 +154,11 @@ public class QuickLogDialogActivity extends AppCompatActivity {
                 }
                 optionalNote = "";
                 isManualCategorySelected = false;
+                if (isAutoExtractedAmount) {
+                    currentAmount = "0";
+                    isAutoExtractedAmount = false;
+                    updateAmountDisplay();
+                }
             });
         }
 
@@ -172,6 +197,7 @@ public class QuickLogDialogActivity extends AppCompatActivity {
 
         findViewById(R.id.btn_num_dot).setOnClickListener(v -> {
             vibrateTactile(15);
+            isAutoExtractedAmount = false;
             if (!currentAmount.contains(".")) {
                 currentAmount += ".";
                 updateAmountDisplay();
@@ -180,6 +206,7 @@ public class QuickLogDialogActivity extends AppCompatActivity {
 
         findViewById(R.id.btn_num_backspace).setOnClickListener(v -> {
             vibrateTactile(15);
+            isAutoExtractedAmount = false;
             if (currentAmount.length() > 1) {
                 currentAmount = currentAmount.substring(0, currentAmount.length() - 1);
             } else {
@@ -198,6 +225,7 @@ public class QuickLogDialogActivity extends AppCompatActivity {
         if (view != null) {
             view.setOnClickListener(v -> {
                 vibrateTactile(15);
+                isAutoExtractedAmount = false;
                 if ("0".equals(currentAmount)) {
                     currentAmount = digit;
                 } else {
@@ -255,6 +283,7 @@ public class QuickLogDialogActivity extends AppCompatActivity {
                         final String amountStr = String.valueOf((int) amount);
                         btn.setOnClickListener(v -> {
                             vibrateTactile(20);
+                            isAutoExtractedAmount = false;
                             currentAmount = amountStr;
                             optionalNote = name;
                             updateAmountDisplay();
@@ -290,6 +319,7 @@ public class QuickLogDialogActivity extends AppCompatActivity {
         if (btn != null) {
             btn.setOnClickListener(v -> {
                 vibrateTactile(20);
+                isAutoExtractedAmount = false;
                 currentAmount = amount;
                 optionalNote = note;
                 updateAmountDisplay();
@@ -317,24 +347,68 @@ public class QuickLogDialogActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Real-time NLP intent parser & regex entity extraction
+     * Parses amounts (e.g. "Chai 20", "Uber 150.50", "Coffee 45") and merchant categories
+     */
+    private void parseNlpIntent(String text) {
+        if (text == null || text.trim().isEmpty()) {
+            if (isAutoExtractedAmount) {
+                currentAmount = "0";
+                isAutoExtractedAmount = false;
+                updateAmountDisplay();
+            }
+            return;
+        }
+
+        String lower = text.toLowerCase(Locale.getDefault());
+
+        // 1. Amount Extraction via Regex Transformer
+        // Matches standalone numeric tokens like "20", "150.50", "45", "1200", optionally prefixed with ₹ or Rs
+        Pattern amountPattern = Pattern.compile("(?:^|\\s|₹|rs\\.?|inr\\s*)(\\d+(?:\\.\\d{1,2})?)(?:\\s|$)", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = amountPattern.matcher(lower);
+        if (matcher.find()) {
+            String numStr = matcher.group(1);
+            if (numStr != null && !numStr.isEmpty()) {
+                try {
+                    double val = Double.parseDouble(numStr);
+                    if (val > 0 && ("0".equals(currentAmount) || isAutoExtractedAmount)) {
+                        currentAmount = (val == (long) val) ? String.valueOf((long) val) : numStr;
+                        isAutoExtractedAmount = true;
+                        updateAmountDisplay();
+                    }
+                } catch (Exception ignored) {}
+            }
+        } else if (isAutoExtractedAmount && !text.matches(".*\\d.*")) {
+            currentAmount = "0";
+            isAutoExtractedAmount = false;
+            updateAmountDisplay();
+        }
+
+        // 2. Real-time Semantic Category Matching
+        if (!isManualCategorySelected) {
+            detectCategoryFromNoteText(lower);
+        }
+    }
+
     private void detectCategoryFromNoteText(String lowerNote) {
         // 1. Food keywords
-        if (lowerNote.matches(".*\\b(chai|tea|coffee|snack|snacks|meal|lunch|dinner|breakfast|swiggy|zomato|burger|pizza|food|canteen|cafe|maggi|samosa|restaurant|biryani|ice cream|dosa|idli|momos|cake|pastry|bake|bakery|eat|drinks|juice|roti|thali)\\b.*")) {
+        if (lowerNote.matches(".*\\b(chai|tea|coffee|snack|snacks|meal|lunch|dinner|breakfast|swiggy|zomato|burger|pizza|food|canteen|cafe|maggi|samosa|restaurant|biryani|ice cream|dosa|idli|momos|cake|pastry|bake|bakery|eat|drinks|juice|roti|thali|starbucks|kfc|mcdonalds|dominos|subway|haldiram|roll|shawarma)\\b.*")) {
             updateCategorySelectionInternal(btnCatFood, "Food");
             return;
         }
         // 2. Travel keywords
-        if (lowerNote.matches(".*\\b(metro|uber|ola|rapido|auto|cab|taxi|petrol|diesel|fuel|cng|bus|train|flight|ticket|toll|parking|commute|ride|travel)\\b.*")) {
+        if (lowerNote.matches(".*\\b(metro|uber|ola|rapido|auto|cab|taxi|petrol|diesel|fuel|cng|bus|train|flight|ticket|toll|parking|commute|ride|travel|indigo|irctc|redbus|makemytrip)\\b.*")) {
             updateCategorySelectionInternal(btnCatTravel, "Travel");
             return;
         }
         // 3. Grocery keywords
-        if (lowerNote.matches(".*\\b(zepto|blinkit|instamart|grocery|groceries|supermarket|vegetables|veggies|fruits|milk|bread|curd|paneer|eggs|ration|dmart|d-mart|kirana|market|bigbasket)\\b.*")) {
+        if (lowerNote.matches(".*\\b(zepto|blinkit|instamart|grocery|groceries|supermarket|vegetables|veggies|fruits|milk|bread|curd|paneer|eggs|ration|dmart|d-mart|kirana|market|bigbasket|nature's basket)\\b.*")) {
             updateCategorySelectionInternal(btnCatGrocery, "Grocery");
             return;
         }
         // 4. Bills keywords
-        if (lowerNote.matches(".*\\b(bill|bills|electricity|power|wifi|internet|broadband|recharge|rent|water|gas|cylinder|lpg|subscription|netflix|spotify|prime|hotstar|airtel|jio|vi|maintenance)\\b.*")) {
+        if (lowerNote.matches(".*\\b(bill|bills|electricity|power|wifi|internet|broadband|recharge|rent|water|gas|cylinder|lpg|subscription|netflix|spotify|prime|hotstar|airtel|jio|vi|maintenance|credit card|emi|insurance|fee|tuition)\\b.*")) {
             updateCategorySelectionInternal(btnCatBills, "Bills");
             return;
         }

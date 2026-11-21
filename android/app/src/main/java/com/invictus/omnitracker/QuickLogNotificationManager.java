@@ -86,6 +86,18 @@ public class QuickLogNotificationManager {
                     pendingFlags
             );
 
+            // 2b. Intent to Launch Reused Web Expense Modal directly
+            Intent studioIntent = new Intent(context, MainActivity.class);
+            studioIntent.setData(android.net.Uri.parse("https://invictus-the-omni-tracker.vercel.app/quick-log"));
+            studioIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+            PendingIntent studioPendingIntent = PendingIntent.getActivity(
+                    context,
+                    NOTIFICATION_ID + 1,
+                    studioIntent,
+                    pendingFlags
+            );
+
             // 3. Format Telemetry Text
             String formattedBudget = String.format(Locale.getDefault(), "%,.0f", remainingBudget);
             String title = "⚡ Invictus Fast-Log";
@@ -97,6 +109,7 @@ public class QuickLogNotificationManager {
                     .setContentTitle(title)
                     .setContentText(subtitle)
                     .setContentIntent(pendingIntent)
+                    .addAction(R.drawable.ic_stat_icon, "Studio Form ↗", studioPendingIntent)
                     .setOngoing(true)
                     .setShowWhen(false)
                     .setAutoCancel(false)
