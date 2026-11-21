@@ -1,7 +1,7 @@
 "use client";
 
 import { X, FileText } from "lucide-react";
-import { type Category } from "@/types";
+import { type Category, type Habit } from "@/types";
 import { type ThoughtPriority } from "@/lib/utils/scratchpad-nlp";
 import {
   Sheet,
@@ -15,6 +15,7 @@ export interface RetroStickyScratchpadDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   categories?: Category[];
+  habits?: Habit[];
   onConvertToTask?: (task: {
     title: string;
     priority?: ThoughtPriority;
@@ -26,6 +27,14 @@ export interface RetroStickyScratchpadDrawerProps {
     amount: number;
     note: string;
     categoryId?: string;
+    date?: string;
+  }) => void;
+  onConvertToHabit?: (habit: {
+    habitId?: string;
+    title: string;
+    action?: "complete" | "progress";
+    value?: number;
+    unit?: string;
     date?: string;
   }) => void;
   onBatchConvert?: (
@@ -41,6 +50,14 @@ export interface RetroStickyScratchpadDrawerProps {
       note: string;
       categoryId?: string;
       date?: string;
+    }>,
+    habits?: Array<{
+      habitId?: string;
+      title: string;
+      action?: "complete" | "progress";
+      value?: number;
+      unit?: string;
+      date?: string;
     }>
   ) => void;
 }
@@ -49,8 +66,10 @@ export function RetroStickyScratchpadDrawer({
   open,
   onOpenChange,
   categories = [],
+  habits = [],
   onConvertToTask,
   onConvertToExpense,
+  onConvertToHabit,
   onBatchConvert,
 }: RetroStickyScratchpadDrawerProps) {
   return (
@@ -75,7 +94,7 @@ export function RetroStickyScratchpadDrawer({
                 Desk Scratchpad
               </h2>
               <p className="text-[10px] font-mono text-[#6B6B6B] dark:text-[#A8A29E]">
-                Natural Language Quick-Capture (⌘J)
+                Tasks • Habits • Expenses (⌘J)
               </p>
             </div>
           </div>
@@ -93,8 +112,10 @@ export function RetroStickyScratchpadDrawer({
         {/* Scratchpad Body */}
         <RetroStickyScratchpad
           categories={categories}
+          habits={habits}
           onConvertToTask={onConvertToTask}
           onConvertToExpense={onConvertToExpense}
+          onConvertToHabit={onConvertToHabit}
           onBatchConvert={onBatchConvert}
           className="shadow-none border-2 border-[#161514] dark:border-[#2A2724]"
         />

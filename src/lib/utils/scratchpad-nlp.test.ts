@@ -122,4 +122,49 @@ describe("Scratchpad NLP AST Tokenizer Engine", () => {
     expect(cleared).toContain("Line 1: Buy milk");
     expect(cleared).toContain("Line 3: Call Mom");
   });
+
+  it("identifies habit telemetry, water logging, reading pages, and workouts instead of treating them as expenses", () => {
+    const resWater = parseThoughtLine("Drank 500ml water", mockCategories, baseDate);
+    expect(resWater.type).toBe("habit");
+    expect(resWater.habitName).toBe("Drink Water");
+    expect(resWater.habitValue).toBe(500);
+    expect(resWater.habitUnit).toBe("ml");
+    expect(resWater.amount).toBeUndefined(); // Crucial: not ₹500!
+
+    const resReading = parseThoughtLine("Read 25 pages today", mockCategories, baseDate);
+    expect(resReading.type).toBe("habit");
+    expect(resReading.habitName).toBe("Reading");
+    expect(resReading.habitValue).toBe(25);
+    expect(resReading.habitUnit).toBe("pages");
+
+    const resPushups = parseThoughtLine("50 pushups done", mockCategories, baseDate);
+    expect(resPushups.type).toBe("habit");
+    expect(resPushups.habitValue).toBe(50);
+    expect(resPushups.habitUnit).toBe("reps");
+
+    const resColdShower = parseThoughtLine("Cold shower finished", mockCategories, baseDate);
+    expect(resColdShower.type).toBe("habit");
+    expect(resColdShower.habitName).toBe("Cold Shower");
+  });
+
+  it("evaluates inline math expressions in expense notes", () => {
+    const resMath = parseThoughtLine("₹120+30 Coffee and cookie", mockCategories, baseDate);
+    expect(resMath.type).toBe("expense");
+    expect(resMath.amount).toBe(150);
+  });
+
+  it("aggregates tri-domain statistics across tasks, habits, and expenses", () => {
+    const multiNote = `
+- Swiggy dinner 450
+- Drank 750ml water
+- Finish physics report tomorrow p1
+- Read 20 pages
+- Metro 40
+    `;
+    const analysis = parseScratchpad(multiNote, mockCategories, baseDate);
+    expect(analysis.expenseCount).toBe(2); // Swiggy 450, Metro 40
+    expect(analysis.habitCount).toBe(2); // 750ml water, Read 20 pages
+    expect(analysis.taskCount).toBe(1); // Finish physics report
+    expect(analysis.totalExpenseAmount).toBe(490); // 450 + 40
+  });
 });

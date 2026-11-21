@@ -166,12 +166,22 @@ export default function TodayPage() {
       handleQuickLogWater(amt);
     };
 
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "j") {
+        e.preventDefault();
+        soundFX.playPop();
+        setIsScratchpadDrawerOpen((prev) => !prev);
+      }
+    };
+
+    window.addEventListener("keydown", handleGlobalKeyDown);
     window.addEventListener("invictus:today-open-reflection", handleOpenReflection);
     window.addEventListener("invictus:tasks-new-task", handleNewTask);
     window.addEventListener("invictus:money-new-expense", handleNewExpense);
     window.addEventListener("invictus:quick-log-water", handleQuickWater);
 
     return () => {
+      window.removeEventListener("keydown", handleGlobalKeyDown);
       window.removeEventListener("invictus:today-open-reflection", handleOpenReflection);
       window.removeEventListener("invictus:tasks-new-task", handleNewTask);
       window.removeEventListener("invictus:money-new-expense", handleNewExpense);
@@ -658,6 +668,7 @@ export default function TodayPage() {
         open={isScratchpadDrawerOpen}
         onOpenChange={setIsScratchpadDrawerOpen}
         categories={categories}
+        habits={habits}
         onConvertToTask={(task) => {
           createTaskMutation.mutate({
             title: task.title,
@@ -675,7 +686,40 @@ export default function TodayPage() {
             expense.note
           );
         }}
-        onBatchConvert={(batchTasks, batchExpenses) => {
+        onConvertToHabit={(habit) => {
+          const targetDate = habit.date || selectedDate;
+          if (/water|hydrate|hydration/i.test(habit.title) || habit.unit === "ml" || habit.unit === "l") {
+            const ml = habit.value ? (habit.unit === "l" ? habit.value * 1000 : habit.value) : 250;
+            handleQuickLogWater(ml);
+            return;
+          }
+          let matchedHabit = habits.find((item) => item.id === habit.habitId);
+          if (!matchedHabit && habit.title) {
+            const lower = habit.title.toLowerCase();
+            matchedHabit = habits.find(
+              (item) => item.title.toLowerCase().includes(lower) || lower.includes(item.title.toLowerCase())
+            );
+          }
+          if (matchedHabit) {
+            toggleHabitMutation.mutate({
+              habitId: matchedHabit.id,
+              date: targetDate,
+              completed: true,
+              countLogged: habit.value || 1,
+              note: habit.title,
+            });
+            soundFX.playCompleteChime();
+            toast.success(`⚡ Crushed Habit: "${matchedHabit.title}"!`, {
+              description: `Recorded for ${targetDate}`,
+            });
+          } else {
+            soundFX.playCompleteChime();
+            toast.success(`⚡ Completed: "${habit.title}"!`, {
+              description: `Activity recorded on ${targetDate}`,
+            });
+          }
+        }}
+        onBatchConvert={(batchTasks, batchExpenses, batchHabits) => {
           batchTasks.forEach((t) => {
             createTaskMutation.mutate({
               title: t.title,
@@ -688,6 +732,30 @@ export default function TodayPage() {
           });
           batchExpenses.forEach((e) => {
             handleAddExpense(e.amount, e.categoryId || "", e.note);
+          });
+          batchHabits?.forEach((h) => {
+            const targetDate = h.date || selectedDate;
+            if (/water|hydrate|hydration/i.test(h.title) || h.unit === "ml" || h.unit === "l") {
+              const ml = h.value ? (h.unit === "l" ? h.value * 1000 : h.value) : 250;
+              handleQuickLogWater(ml);
+              return;
+            }
+            let matchedHabit = habits.find((item) => item.id === h.habitId);
+            if (!matchedHabit && h.title) {
+              const lower = h.title.toLowerCase();
+              matchedHabit = habits.find(
+                (item) => item.title.toLowerCase().includes(lower) || lower.includes(item.title.toLowerCase())
+              );
+            }
+            if (matchedHabit) {
+              toggleHabitMutation.mutate({
+                habitId: matchedHabit.id,
+                date: targetDate,
+                completed: true,
+                countLogged: h.value || 1,
+                note: h.title,
+              });
+            }
           });
         }}
       />

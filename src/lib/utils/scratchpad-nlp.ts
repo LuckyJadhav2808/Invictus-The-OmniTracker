@@ -1,10 +1,11 @@
-import { type Category } from "@/types";
+import { type Category, type Habit } from "@/types";
 import { format, addDays, isToday, isTomorrow, differenceInCalendarDays } from "date-fns";
 import * as chrono from "chrono-node";
 import { detectCategoryFromNote } from "./merchant-categorizer";
+import { evaluateExpression } from "./calculator-engine";
 
 export type ThoughtPriority = "p1" | "p2" | "p3";
-export type ThoughtType = "expense" | "task" | "thought";
+export type ThoughtType = "expense" | "task" | "habit" | "thought";
 
 export interface ParsedThought {
   originalLine: string;
@@ -16,6 +17,13 @@ export interface ParsedThought {
   categoryId?: string;
   categoryName?: string;
   categoryIcon?: string;
+  // Habit-specific metadata
+  habitId?: string;
+  habitName?: string;
+  habitIcon?: string;
+  habitAction?: "complete" | "progress";
+  habitValue?: number;
+  habitUnit?: string;
   type: ThoughtType;
   isConverted: boolean;
 }
@@ -23,21 +31,57 @@ export interface ParsedThought {
 export interface ScratchpadAnalysis {
   lines: ParsedThought[];
   taskCount: number;
+  habitCount: number;
   expenseCount: number;
   totalExpenseAmount: number;
   convertedCount: number;
 }
 
+// Common wellness & habit keywords
+const HABIT_KEYWORDS = [
+  "water", "hydrate", "hydration",
+  "workout", "gym", "pushup", "pushups", "pullup", "pullups", "squat", "squats", "reps",
+  "running", "run", "walk", "walking", "steps",
+  "meditation", "meditate", "cold shower",
+  "reading", "read", "book", "pages",
+  "sleep", "stretching", "stretch", "floss", "journal", "deep work",
+];
+
+const HABIT_ACTION_VERBS = [
+  "did", "done", "finished", "completed", "drank", "logged", "crushed", "read", "took",
+];
+
+const EXPENSE_ACTION_VERBS = [
+  "coffee", "chai", "tea", "swiggy", "zomato", "uber", "ola", "rapido", "cab", "metro",
+  "lunch", "dinner", "breakfast", "meal", "grocery", "groceries", "supermarket",
+  "blinkit", "zepto", "instamart", "bill", "recharge", "rent", "wifi", "paid", "spent",
+  "cost", "bought", "buy", "fee", "ticket", "petrol", "fuel", "diesel",
+];
 
 /**
  * Parses a single line from the scratchpad using a deterministic regex AST.
- * Extracts amount, priority, relative/weekday date, mapped category, and clean note.
+ * Extracts amount, priority, relative/weekday date, mapped category, habit metadata, and clean note.
  */
 export function parseThoughtLine(
   line: string,
   categories: Category[] = [],
-  baseDate: Date = new Date()
+  habitsOrBaseDate?: Habit[] | Date,
+  maybeBaseDate?: Date
 ): ParsedThought {
+  let habits: Habit[] = [];
+  let baseDate = new Date();
+
+  if (habitsOrBaseDate instanceof Date) {
+    baseDate = habitsOrBaseDate;
+  } else if (Array.isArray(habitsOrBaseDate)) {
+    habits = habitsOrBaseDate;
+    if (maybeBaseDate instanceof Date) {
+      baseDate = maybeBaseDate;
+    }
+  } else if (maybeBaseDate instanceof Date) {
+    baseDate = maybeBaseDate;
+  }
+
   const trimmed = line.trim();
   if (!trimmed) {
     return {
@@ -64,6 +108,13 @@ export function parseThoughtLine(
   let extractedDueDate: string | undefined;
   let extractedDueDateLabel: string | undefined;
   let extractedAmount: number | undefined;
+
+  let extractedHabitId: string | undefined;
+  let extractedHabitName: string | undefined;
+  let extractedHabitIcon: string | undefined;
+  let extractedHabitValue: number | undefined;
+  let extractedHabitUnit: string | undefined;
+  let isHabitDetected = false;
 
   // 2. Extract Priority (!p1, p1, urgent, !urgent, p2, p3, low)
   const priorityP1Regex = /\b(?:!p1|p1|!urgent|urgent|critical|high)\b/i;
@@ -129,24 +180,121 @@ export function parseThoughtLine(
     }
   }
 
-  // 4. Extract Amount (e.g. "₹250", "Coffee 150", "120 books", "$15")
-  const currencyPrefixedRegex = /(?:₹|\$|€|£|rs\.?|inr)\s*(\d+(?:\.\d{1,2})?)/i;
-  const currencySuffixedRegex = /(\d+(?:\.\d{1,2})?)\s*(?:₹|\$|€|£|rs\.?|inr|bucks|rupees)/i;
+  const lowerWorking = workingText.toLowerCase();
+
+  // 4. Extract Habit Telemetry & Metrics (e.g. "500ml water", "20 pages", "50 pushups", "10000 steps", "30 mins workout")
+  const waterMatch = workingText.match(/\b(\d+(?:\.\d+)?)\s*(ml|l|litres?|liters?)\b/i);
+  const pagesMatch = workingText.match(/\b(\d+)\s*(?:pages?|p|chapters?)\b/i) || workingText.match(/\bread\s+(\d+)\b/i);
+  const pushupsMatch = workingText.match(/\b(\d+)\s*(?:pushups?|pullups?|squats?|reps?|sets?)\b/i);
+  const stepsMatch = workingText.match(/\b(\d+)\s*(?:steps?|km|miles?)\b/i);
+  const durationMatch = workingText.match(/\b(\d+)\s*(?:mins?|minutes?|hrs?|hours?)\b/i);
+
+  if (waterMatch) {
+    const rawVal = parseFloat(waterMatch[1]);
+    const unit = waterMatch[2].toLowerCase();
+    extractedHabitValue = unit.startsWith("l") ? rawVal * 1000 : rawVal;
+    extractedHabitUnit = "ml";
+    isHabitDetected = true;
+    extractedHabitName = "Drink Water";
+    extractedHabitIcon = "💧";
+  } else if (pagesMatch) {
+    extractedHabitValue = parseInt(pagesMatch[1], 10);
+    extractedHabitUnit = "pages";
+    isHabitDetected = true;
+    extractedHabitName = "Reading";
+    extractedHabitIcon = "📖";
+  } else if (pushupsMatch) {
+    extractedHabitValue = parseInt(pushupsMatch[1], 10);
+    extractedHabitUnit = "reps";
+    isHabitDetected = true;
+    extractedHabitName = "Workout";
+    extractedHabitIcon = "🏋️";
+  } else if (stepsMatch) {
+    extractedHabitValue = parseInt(stepsMatch[1], 10);
+    extractedHabitUnit = stepsMatch[0].toLowerCase().includes("step") ? "steps" : "km";
+    isHabitDetected = true;
+    extractedHabitName = "Steps / Walk";
+    extractedHabitIcon = "👟";
+  } else if (durationMatch && (lowerWorking.includes("workout") || lowerWorking.includes("gym") || lowerWorking.includes("meditat") || lowerWorking.includes("study") || lowerWorking.includes("read"))) {
+    extractedHabitValue = parseInt(durationMatch[1], 10);
+    extractedHabitUnit = durationMatch[0].toLowerCase().includes("hr") || durationMatch[0].toLowerCase().includes("hour") ? "hrs" : "mins";
+    isHabitDetected = true;
+  }
+
+  // Check matching against user's actual habit list
+  if (habits && habits.length > 0) {
+    for (const h of habits) {
+      if (!h.title) continue;
+      const hLower = h.title.toLowerCase();
+      if (lowerWorking.includes(hLower) || (hLower.length >= 4 && lowerWorking.includes(hLower.slice(0, -1)))) {
+        extractedHabitId = h.id;
+        extractedHabitName = h.title;
+        extractedHabitIcon = h.icon || "🎯";
+        isHabitDetected = true;
+        break;
+      }
+    }
+  }
+
+  // Check generic habit keywords if not yet matched
+  if (!isHabitDetected) {
+    const hasHabitWord = HABIT_KEYWORDS.some((kw) => new RegExp(`\\b${kw}\\b`, "i").test(lowerWorking));
+    const hasHabitDone = HABIT_ACTION_VERBS.some((verb) => new RegExp(`\\b${verb}\\b`, "i").test(lowerWorking));
+    if (hasHabitWord && (hasHabitDone || lowerWorking.includes("done") || lowerWorking.startsWith("did ") || !extractedPriority)) {
+      isHabitDetected = true;
+      if (lowerWorking.includes("water") || lowerWorking.includes("hydrat")) {
+        extractedHabitName = "Drink Water";
+        extractedHabitIcon = "💧";
+      } else if (lowerWorking.includes("gym") || lowerWorking.includes("workout")) {
+        extractedHabitName = "Workout";
+        extractedHabitIcon = "🏋️";
+      } else if (lowerWorking.includes("meditat")) {
+        extractedHabitName = "Meditation";
+        extractedHabitIcon = "🧘";
+      } else if (lowerWorking.includes("cold shower")) {
+        extractedHabitName = "Cold Shower";
+        extractedHabitIcon = "🚿";
+      } else if (lowerWorking.includes("read")) {
+        extractedHabitName = "Reading";
+        extractedHabitIcon = "📖";
+      }
+    }
+  }
+
+  // 5. Extract Amount for Expenses
+  // Only extract amount if this is NOT a habit metric (e.g. NOT "500ml water" or "20 pages")
+  const currencyPrefixedRegex = /(?:₹|\$|€|£|rs\.?|inr)\s*([\d\s+\-/*.,]+)/i;
+  const currencySuffixedRegex = /([\d\s+\-/*.,]+)\s*(?:₹|\$|€|£|rs\.?|inr|bucks|rupees)/i;
   const bareNumberRegex = /\b(\d+(?:\.\d{1,2})?)\b/;
+
+  let hasExplicitCurrency = false;
 
   if (currencyPrefixedRegex.test(workingText)) {
     const match = workingText.match(currencyPrefixedRegex);
     if (match && match[1]) {
-      extractedAmount = parseFloat(match[1]);
+      const expr = match[1].trim();
+      try {
+        extractedAmount = evaluateExpression(expr);
+      } catch {
+        extractedAmount = parseFloat(expr.replace(/,/g, ""));
+      }
+      hasExplicitCurrency = true;
       workingText = workingText.replace(currencyPrefixedRegex, "").trim();
     }
   } else if (currencySuffixedRegex.test(workingText)) {
     const match = workingText.match(currencySuffixedRegex);
     if (match && match[1]) {
-      extractedAmount = parseFloat(match[1]);
+      const expr = match[1].trim();
+      try {
+        extractedAmount = evaluateExpression(expr);
+      } catch {
+        extractedAmount = parseFloat(expr.replace(/,/g, ""));
+      }
+      hasExplicitCurrency = true;
       workingText = workingText.replace(currencySuffixedRegex, "").trim();
     }
-  } else if (bareNumberRegex.test(workingText)) {
+  } else if (!isHabitDetected && bareNumberRegex.test(workingText)) {
+    // If not a habit metric, check if number is an expense amount
     const match = workingText.match(bareNumberRegex);
     if (match && match[1]) {
       extractedAmount = parseFloat(match[1]);
@@ -168,7 +316,7 @@ export function parseThoughtLine(
     cleanTitle = trimmed;
   }
 
-  // 5. Category keyword semantic matching
+  // 6. Category keyword semantic matching for Expenses
   let categoryId: string | undefined;
   let categoryName: string | undefined;
   let categoryIcon: string | undefined;
@@ -182,10 +330,16 @@ export function parseThoughtLine(
     }
   }
 
-  // 6. Classification: Expense vs Task vs Thought
+  // 7. Classification: Expense vs Habit vs Task vs Thought
   let type: ThoughtType = "thought";
-  if (extractedAmount !== undefined && extractedAmount > 0) {
+
+  // Check if expense action words are explicitly present
+  const hasExpenseWord = EXPENSE_ACTION_VERBS.some((v) => new RegExp(`\\b${v}\\b`, "i").test(cleanTitle.toLowerCase()));
+
+  if (extractedAmount !== undefined && extractedAmount > 0 && (hasExplicitCurrency || hasExpenseWord || categoryName || !isHabitDetected)) {
     type = "expense";
+  } else if (isHabitDetected) {
+    type = "habit";
   } else if (extractedPriority || extractedDueDate || cleanTitle) {
     type = "task";
   }
@@ -200,6 +354,12 @@ export function parseThoughtLine(
     categoryId,
     categoryName,
     categoryIcon,
+    habitId: extractedHabitId,
+    habitName: extractedHabitName,
+    habitIcon: extractedHabitIcon,
+    habitAction: "complete",
+    habitValue: extractedHabitValue,
+    habitUnit: extractedHabitUnit,
     type,
     isConverted,
   };
@@ -211,12 +371,28 @@ export function parseThoughtLine(
 export function parseScratchpad(
   content: string,
   categories: Category[] = [],
-  baseDate: Date = new Date()
+  habitsOrBaseDate?: Habit[] | Date,
+  maybeBaseDate?: Date
 ): ScratchpadAnalysis {
+  let habits: Habit[] = [];
+  let baseDate = new Date();
+
+  if (habitsOrBaseDate instanceof Date) {
+    baseDate = habitsOrBaseDate;
+  } else if (Array.isArray(habitsOrBaseDate)) {
+    habits = habitsOrBaseDate;
+    if (maybeBaseDate instanceof Date) {
+      baseDate = maybeBaseDate;
+    }
+  } else if (maybeBaseDate instanceof Date) {
+    baseDate = maybeBaseDate;
+  }
+
   if (!content || !content.trim()) {
     return {
       lines: [],
       taskCount: 0,
+      habitCount: 0,
       expenseCount: 0,
       totalExpenseAmount: 0,
       convertedCount: 0,
@@ -227,13 +403,14 @@ export function parseScratchpad(
   const parsedLines: ParsedThought[] = [];
 
   let taskCount = 0;
+  let habitCount = 0;
   let expenseCount = 0;
   let totalExpenseAmount = 0;
   let convertedCount = 0;
 
   for (const rawLine of rawLines) {
     if (!rawLine.trim()) continue;
-    const parsed = parseThoughtLine(rawLine, categories, baseDate);
+    const parsed = parseThoughtLine(rawLine, categories, habits, baseDate);
     parsedLines.push(parsed);
 
     if (parsed.isConverted) {
@@ -244,6 +421,8 @@ export function parseScratchpad(
     if (parsed.type === "expense" && parsed.amount) {
       expenseCount++;
       totalExpenseAmount += parsed.amount;
+    } else if (parsed.type === "habit") {
+      habitCount++;
     } else if (parsed.cleanTitle) {
       taskCount++;
     }
@@ -252,6 +431,7 @@ export function parseScratchpad(
   return {
     lines: parsedLines,
     taskCount,
+    habitCount,
     expenseCount,
     totalExpenseAmount,
     convertedCount,
