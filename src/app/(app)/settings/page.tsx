@@ -391,7 +391,7 @@ export default function SettingsPage() {
         timezone,
         weekStartsOn,
         currency,
-        modulesEnabled,
+        modulesEnabled: { goals: true, tasks: true, money: true },
       };
 
       customUpdateUser(user.uid, settingsData);
@@ -722,10 +722,8 @@ export default function SettingsPage() {
         sticky={false}
       />
 
-      {/* ================= MAIN CONTENT: RESPONSIVE BENTO ================= */}
-      <div className="lg:grid lg:grid-cols-12 lg:gap-6 items-start">
-        {/* LEFT COLUMN: HERO SUMMARY + ACTIVE CONFIGURATION CANVAS */}
-        <div className="lg:col-span-8 space-y-3 sm:space-y-4">
+      {/* ================= MAIN CONTENT: UNIFIED STUDIO CANVAS ================= */}
+      <div className="space-y-4">
           {/* ================= SLOT 3: BORDERLESS HERO SUMMARY ================= */}
           <SettingsHeroSummary
             displayName={displayName}
@@ -756,7 +754,8 @@ export default function SettingsPage() {
           {/* ================= SLOT 5: ACTIVE TAB CONFIGURATION CANVAS ================= */}
           {/* TAB 1: GENERAL PREFERENCES */}
           {activeTab === "preferences" && (
-            <div className="bg-white dark:bg-[#161514] rounded-3xl p-4 sm:p-6 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-5">
+            <div className="space-y-4">
+              <div className="bg-white dark:bg-[#161514] rounded-3xl p-4 sm:p-6 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-5">
               <div className="flex items-center justify-between border-b border-[#E8E5DF] dark:border-[#2A2724] pb-3">
                 <div className="flex items-center gap-2">
                   <User className="size-4 text-amber-500 stroke-[2.5]" />
@@ -859,92 +858,57 @@ export default function SettingsPage() {
                   </div>
                 </div>
 
-                {/* Interface Theme & Appearance Accordion on Mobile (Always Open on Desktop) */}
-                <div id="theme-settings" className="border-t border-[#E8E5DF] dark:border-[#2A2724] pt-4">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      soundFX.playPop();
-                      setIsAppearanceOpen(!isAppearanceOpen);
-                    }}
-                    className="w-full flex items-center justify-between p-3 rounded-2xl bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] hover:bg-white dark:hover:bg-[#252220] transition-colors cursor-pointer lg:hidden"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <div className="size-8 rounded-xl bg-purple-100 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 flex items-center justify-center">
-                        <Palette className="size-4 stroke-[2.5]" />
-                      </div>
-                      <div className="text-left">
-                        <span className="text-xs font-heading font-black text-[#161514] dark:text-[#FAF8F5] uppercase tracking-wide block">
-                          Appearance & Sound
-                        </span>
-                        <span className="text-[10px] font-mono text-muted-foreground">
-                          Themes, Colors & Audio Feedback
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-mono font-bold uppercase text-muted-foreground">
-                        {isAppearanceOpen ? "Hide" : "Customize"}
+                {/* Interface Theme & Appearance */}
+                <div id="theme-settings" className="border-t border-[#E8E5DF] dark:border-[#2A2724] pt-4 space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <span className="text-xs font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] block font-heading">
+                        Interface Theme & Appearance
                       </span>
-                      {isAppearanceOpen ? (
-                        <ChevronUp className="size-4 text-muted-foreground" />
-                      ) : (
-                        <ChevronDown className="size-4 text-muted-foreground" />
-                      )}
                     </div>
-                  </button>
+                    <ThemeToggle variant="segmented" />
+                  </div>
 
-                  <div className={cn("space-y-4 pt-3 lg:pt-0", !isAppearanceOpen && "hidden lg:block")}>
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  {/* Color Palette & Action Punch Theme Selector */}
+                  <ThemeColorSelector className="pt-2 border-t border-[#E8E5DF]/60 dark:border-[#2A2724]/60" />
+
+                  {/* Completion Sound Selector */}
+                  <div className="space-y-2 border-t border-[#E8E5DF] dark:border-[#2A2724] pt-4">
+                    <div className="flex items-center justify-between">
                       <div>
-                        <span className="text-xs font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] block font-heading">
-                          Interface Theme & Appearance
+                        <span className="text-xs font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5 font-heading">
+                          <Volume2 className="h-3.5 w-3.5 stroke-[2.5]" /> Habit Audio Feedback
                         </span>
                       </div>
-                      <ThemeToggle variant="segmented" />
                     </div>
 
-                    {/* Color Palette & Action Punch Theme Selector */}
-                    <ThemeColorSelector className="pt-2 border-t border-[#E8E5DF]/60 dark:border-[#2A2724]/60" />
-
-                    {/* Completion Sound Selector */}
-                    <div className="space-y-2 border-t border-[#E8E5DF] dark:border-[#2A2724] pt-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <span className="text-xs font-black uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5] flex items-center gap-1.5 font-heading">
-                            <Volume2 className="h-3.5 w-3.5 stroke-[2.5]" /> Habit Audio Feedback
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
-                        {[
-                          { type: "tap" as const, label: "Crisp Pop", icon: "🎵" },
-                          { type: "chime" as const, label: "Chords", icon: "🎶" },
-                          { type: "haptic" as const, label: "Thud", icon: "🥊" },
-                          { type: "off" as const, label: "Mute", icon: "🔇" },
-                        ].map((snd) => (
-                          <button
-                            key={snd.type}
-                            type="button"
-                            onClick={() => {
-                              setCompletionSound(snd.type);
-                              localStorage.setItem("invictus_completion_sound", snd.type);
-                              playCompletionSound(snd.type);
-                              toast.success(`Sound feedback: ${snd.label}`);
-                            }}
-                            className={cn(
-                              "p-2.5 rounded-xl border text-center transition-all cursor-pointer shadow-xs flex flex-col items-center gap-1",
-                              completionSound === snd.type
-                                ? "bg-[#161514] text-white dark:bg-white dark:text-[#161514] border-[#161514] dark:border-white"
-                                : "border-[#E8E5DF] dark:border-[#2A2724] bg-[#FAF8F5] dark:bg-[#1C1A18] text-[#161514]/70 dark:text-[#FAF8F5]/60 hover:bg-white dark:hover:bg-[#252220]"
-                            )}
-                          >
-                            <span className="text-base">{snd.icon}</span>
-                            <span className="text-[10px] font-black uppercase tracking-tight">{snd.label}</span>
-                          </button>
-                        ))}
-                      </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+                      {[
+                        { type: "tap" as const, label: "Crisp Pop", icon: "🎵" },
+                        { type: "chime" as const, label: "Chords", icon: "🎶" },
+                        { type: "haptic" as const, label: "Thud", icon: "🥊" },
+                        { type: "off" as const, label: "Mute", icon: "🔇" },
+                      ].map((snd) => (
+                        <button
+                          key={snd.type}
+                          type="button"
+                          onClick={() => {
+                            setCompletionSound(snd.type);
+                            localStorage.setItem("invictus_completion_sound", snd.type);
+                            playCompletionSound(snd.type);
+                            toast.success(`Sound feedback: ${snd.label}`);
+                          }}
+                          className={cn(
+                            "p-2.5 rounded-xl border text-center transition-all cursor-pointer shadow-xs flex flex-col items-center gap-1",
+                            completionSound === snd.type
+                              ? "bg-[#161514] text-white dark:bg-white dark:text-[#161514] border-[#161514] dark:border-white"
+                              : "border-[#E8E5DF] dark:border-[#2A2724] bg-[#FAF8F5] dark:bg-[#1C1A18] text-[#161514]/70 dark:text-[#FAF8F5]/60 hover:bg-white dark:hover:bg-[#252220]"
+                          )}
+                        >
+                          <span className="text-base">{snd.icon}</span>
+                          <span className="text-[10px] font-black uppercase tracking-tight">{snd.label}</span>
+                        </button>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -986,7 +950,111 @@ export default function SettingsPage() {
                 {saving ? "Saving Preferences…" : "Save Preferences"}
               </Button>
             </div>
-          )}
+
+            {/* System Diagnostics & Engine Update Deck */}
+            <div className="bg-white dark:bg-[#161514] rounded-3xl p-4 sm:p-6 border-2 border-[#161514] dark:border-[#38332E] shadow-[3px_3px_0px_0px_#161514] dark:shadow-[3px_3px_0px_0px_#000000] space-y-4">
+              <div className="flex items-center justify-between border-b border-[#161514]/15 dark:border-[#38332E] pb-3">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="size-4 text-sky-500 stroke-[2.5]" />
+                  <h3 className="font-heading font-black text-xs uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5]">
+                    System Diagnostics & Updates
+                  </h3>
+                </div>
+                <span className="text-[10px] font-mono font-bold text-emerald-500 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
+                  100% Operational
+                </span>
+              </div>
+
+              {/* Action buttons (full width, zero clipping) */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    soundFX.playPop();
+                    setIsDiagnosticsOpen(true);
+                  }}
+                  className="w-full justify-between rounded-xl border-2 border-[#161514] dark:border-[#38332E] hover:bg-secondary text-xs font-heading font-black uppercase p-3 h-auto"
+                >
+                  <span className="flex items-center gap-2">
+                    <ShieldCheck className="size-4 text-sky-500 shrink-0" />
+                    Diagnostics
+                  </span>
+                  <ChevronRight className="size-4 text-muted-foreground shrink-0" />
+                </Button>
+
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    soundFX.playPop();
+                    setIsUpdateCheckOpen(true);
+                  }}
+                  className="w-full justify-between rounded-xl border-2 border-[#161514] dark:border-[#38332E] hover:bg-secondary text-xs font-heading font-black uppercase p-3 h-auto"
+                >
+                  <span className="flex items-center gap-2">
+                    <RefreshCw className="size-4 text-amber-500 shrink-0" />
+                    Check Updates
+                  </span>
+                  <ChevronRight className="size-4 text-muted-foreground shrink-0" />
+                </Button>
+
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    soundFX.playPop();
+                    setIsReportIssueOpen(true);
+                  }}
+                  className="w-full justify-between rounded-xl border-2 border-[#161514] dark:border-[#38332E] hover:bg-secondary text-xs font-heading font-black uppercase p-3 h-auto"
+                >
+                  <span className="flex items-center gap-2">
+                    <LifeBuoy className="size-4 text-rose-500 shrink-0" />
+                    Report Issue
+                  </span>
+                  <ChevronRight className="size-4 text-muted-foreground shrink-0" />
+                </Button>
+              </div>
+
+              {/* Install PWA & Native Android (clean, full width) */}
+              <div className="pt-2 border-t border-[#161514]/15 dark:border-[#38332E] flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="size-9 rounded-xl bg-[#CEF431] border-2 border-[#161514] flex items-center justify-center text-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] shrink-0">
+                    <Smartphone className="size-4 stroke-[2.5]" />
+                  </div>
+                  <div>
+                    <h4 className="font-heading font-black text-xs uppercase text-[#161514] dark:text-[#FAF8F5]">
+                      Install Invictus App
+                    </h4>
+                    <span className="text-[10px] font-mono text-muted-foreground">
+                      v{APP_VERSION_CONFIG.version} Production Build
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={handleInstallPWA}
+                    className="flex-1 sm:flex-none bg-[#CEF431] hover:bg-[#bce028] text-[#161514] font-black text-xs uppercase py-2 px-3.5 rounded-xl border-2 border-[#161514] shadow-[1.5px_1.5px_0px_0px_#161514] cursor-pointer transition-all flex items-center justify-center gap-1.5"
+                  >
+                    <Smartphone className="size-3.5" />
+                    <span>Install PWA</span>
+                  </button>
+
+                  <a
+                    href="/api/download/android"
+                    onClick={handleDownloadApk}
+                    className="flex-1 sm:flex-none bg-white dark:bg-[#252220] hover:bg-neutral-50 text-[#161514] dark:text-[#FAF8F5] font-black text-xs uppercase py-2 px-3.5 rounded-xl border-2 border-[#161514] dark:border-[#38332E] shadow-[1.5px_1.5px_0px_0px_#161514] cursor-pointer transition-all flex items-center justify-center gap-1.5"
+                  >
+                    <Download className="size-3.5" />
+                    <span>Download APK (v{APP_VERSION_CONFIG.version})</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Developer & Founder Info Card */}
+            <DeveloperInfoCard />
+          </div>
+        )}
 
           {/* TAB 2: SPACES & WORKSPACES */}
           {activeTab === "modules" && (
@@ -1003,55 +1071,39 @@ export default function SettingsPage() {
                 </span>
               </div>
 
-              {/* Active Workspace Switches */}
+              {/* Permanent Core Pillars (Honors: preference to save spaces (money , task , life) we should keep all 3) */}
               <div className="space-y-3">
                 {[
-                  { key: "goals" as const, label: "Goals & Habits Space", desc: "Streaks, gym tracking & nutrition", Icon: Target },
-                  { key: "tasks" as const, label: "Tasks & Projects Space", desc: "Kanban board, priorities & subtasks", Icon: Kanban },
-                  { key: "money" as const, label: "Money & Ledger Space", desc: "Daily spending, budgets & SMS telemetry", Icon: Wallet },
+                  { key: "goals" as const, label: "Goals & Habits Space (Life)", desc: "Habit streaks, workout anatomy & nutrition telemetry", Icon: Target },
+                  { key: "tasks" as const, label: "Tasks & Projects Space", desc: "Kanban board, P1 matrix & focused project streams", Icon: Kanban },
+                  { key: "money" as const, label: "Money & Ledger Space", desc: "Expense tracking, daily limits & SMS telemetry", Icon: Wallet },
                 ].map(({ key, label, desc, Icon }) => (
-                  <button
+                  <div
                     key={key}
-                    type="button"
-                    onClick={() => {
-                      soundFX.playPop();
-                      toggleModule(key);
-                    }}
-                    className={cn(
-                      "w-full text-left p-3.5 rounded-2xl border transition-all flex items-center justify-between gap-3 shadow-xs cursor-pointer",
-                      modulesEnabled[key]
-                        ? "bg-[#FAF8F5] dark:bg-[#1C1A18] border-[#161514] dark:border-white/30"
-                        : "bg-white dark:bg-[#161514] border-[#E8E5DF] dark:border-[#2A2724] opacity-60"
-                    )}
+                    className="w-full text-left p-3.5 rounded-2xl border-2 border-[#161514] dark:border-white/30 bg-[#FAF8F5] dark:bg-[#1C1A18] shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] flex items-center justify-between gap-3"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div
-                        className={cn(
-                          "size-10 rounded-xl border flex items-center justify-center shrink-0 shadow-xs",
-                          modulesEnabled[key]
-                            ? "bg-[#CEF431] border-[#161514] text-[#161514]"
-                            : "bg-[#E8E5DF] dark:bg-[#252220] border-transparent text-[#8C8882]"
-                        )}
-                      >
+                      <div className="size-10 rounded-xl border-2 border-[#161514] bg-[#CEF431] text-[#161514] flex items-center justify-center shrink-0 shadow-[1px_1px_0px_0px_#161514]">
                         <Icon className="size-5 stroke-[2.2]" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <h4 className="font-heading font-black text-xs text-[#161514] dark:text-[#FAF8F5] uppercase tracking-wide leading-tight break-words">
+                        <h4 className="font-heading font-black text-xs text-[#161514] dark:text-[#FAF8F5] uppercase tracking-wide leading-tight">
                           {label}
                         </h4>
+                        <p className="text-[10px] text-[#8C8882] dark:text-[#A8A29E] font-medium mt-0.5">
+                          {desc}
+                        </p>
                       </div>
                     </div>
-                    <div
-                      className={cn(
-                        "size-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors",
-                        modulesEnabled[key]
-                          ? "bg-[#161514] border-[#161514] text-white dark:bg-white dark:border-white dark:text-[#161514]"
-                          : "border-[#8C8882] bg-transparent"
-                      )}
-                    >
-                      {modulesEnabled[key] && <Check className="size-3 stroke-[3]" />}
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-[9px] font-mono font-black uppercase px-2 py-0.5 rounded-full bg-[#03D26F]/20 text-[#03D26F] border border-[#03D26F]/30">
+                        Active Pillar
+                      </span>
+                      <div className="size-5 rounded-full border-2 border-[#161514] bg-[#161514] text-white dark:bg-white dark:border-white dark:text-[#161514] flex items-center justify-center">
+                        <Check className="size-3 stroke-[3]" />
+                      </div>
                     </div>
-                  </button>
+                  </div>
                 ))}
               </div>
 
@@ -1682,112 +1734,6 @@ export default function SettingsPage() {
             </div>
           )}
         </div>
-
-        {/* RIGHT COLUMN: DESKTOP BENTO DOCK (Laptop / Widescreen Only) */}
-        <div className="hidden lg:flex lg:col-span-4 flex-col space-y-4">
-          {/* Bento Card 1: System Health & Diagnostics */}
-          <div className="bg-white dark:bg-[#161514] rounded-3xl p-5 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-4">
-            <div className="flex items-center justify-between border-b border-[#E8E5DF] dark:border-[#2A2724] pb-3">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="size-4 text-sky-500 stroke-[2.5]" />
-                <h3 className="font-heading font-black text-xs uppercase tracking-wider text-[#161514] dark:text-[#FAF8F5]">
-                  System Diagnostics
-                </h3>
-              </div>
-              <span className="text-[10px] font-mono font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                Healthy
-              </span>
-            </div>
-
-            <div className="space-y-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  soundFX.playPop();
-                  setIsDiagnosticsOpen(true);
-                }}
-                className="w-full justify-between rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] hover:bg-secondary text-xs font-heading font-black uppercase"
-              >
-                <span className="flex items-center gap-2">
-                  <ShieldCheck className="size-4 text-sky-500" />
-                  Run Diagnostics Report
-                </span>
-                <ChevronRight className="size-4 text-muted-foreground" />
-              </Button>
-
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  soundFX.playPop();
-                  setIsUpdateCheckOpen(true);
-                }}
-                className="w-full justify-between rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] hover:bg-secondary text-xs font-heading font-black uppercase"
-              >
-                <span className="flex items-center gap-2">
-                  <RefreshCw className="size-4 text-amber-500" />
-                  Check Engine Updates
-                </span>
-                <ChevronRight className="size-4 text-muted-foreground" />
-              </Button>
-
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  soundFX.playPop();
-                  setIsReportIssueOpen(true);
-                }}
-                className="w-full justify-between rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] hover:bg-secondary text-xs font-heading font-black uppercase"
-              >
-                <span className="flex items-center gap-2">
-                  <LifeBuoy className="size-4 text-rose-500" />
-                  Report Issue / Bug
-                </span>
-                <ChevronRight className="size-4 text-muted-foreground" />
-              </Button>
-            </div>
-          </div>
-
-          {/* Bento Card 2: 1-Tap PWA & Native Android */}
-          <div className="bg-white dark:bg-[#161514] rounded-3xl p-5 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-3">
-            <div className="flex items-center gap-2.5">
-              <div className="size-9 rounded-xl bg-[#CEF431] border border-[#161514] flex items-center justify-center text-[#161514] shadow-xs shrink-0">
-                <Smartphone className="size-4 stroke-[2.5]" />
-              </div>
-              <div>
-                <h4 className="font-heading font-black text-xs uppercase text-[#161514] dark:text-[#FAF8F5]">
-                  Install Invictus
-                </h4>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2 pt-1">
-              <button
-                type="button"
-                onClick={handleInstallPWA}
-                className="bg-[#CEF431] hover:bg-[#bce028] text-[#161514] font-black text-xs uppercase py-2 px-3 rounded-xl border border-[#161514] shadow-xs cursor-pointer transition-all flex items-center justify-center gap-1.5"
-              >
-                <Smartphone className="size-3.5" />
-                <span>Install PWA</span>
-              </button>
-
-              <a
-                href="/api/download/android"
-                onClick={handleDownloadApk}
-                className="bg-white dark:bg-[#252220] hover:bg-neutral-50 text-[#161514] dark:text-[#FAF8F5] font-black text-xs uppercase py-2 px-3 rounded-xl border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs cursor-pointer transition-all flex items-center justify-center gap-1.5"
-              >
-                <Download className="size-3.5" />
-                <span>APK (v{APP_VERSION_CONFIG.version})</span>
-              </a>
-            </div>
-          </div>
-
-          {/* Bento Card 3: Developer Info Card */}
-          <DeveloperInfoCard />
-        </div>
-      </div>
 
       {/* ================= MODALS & CONFIRMATION DIALOGS ================= */}
       {/* Clear Cache Confirmation Dialog */}

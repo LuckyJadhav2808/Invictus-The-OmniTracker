@@ -66,7 +66,7 @@ export function SegmentedSubNav({
         className
       )}
     >
-      <div className="w-full bg-secondary/80 border border-border rounded-xl p-1 flex items-center justify-between gap-1 overflow-x-auto no-scrollbar">
+      <div className="w-full bg-secondary/80 border border-border rounded-xl p-1 flex items-center gap-1 overflow-x-auto no-scrollbar scroll-smooth">
         {tabs.map((tab) => {
           const active = isTabActive(tab);
           const Icon = tab.icon;
@@ -79,14 +79,14 @@ export function SegmentedSubNav({
                 onClick={() => handleTabClick(tab.id)}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex-1 min-w-0 py-1.5 px-1 sm:px-2 rounded-lg text-[11px] sm:text-xs font-heading text-center flex items-center justify-center gap-1 sm:gap-1.5 transition-all cursor-pointer active:scale-95 min-h-[36px]",
+                  "flex-1 min-w-fit whitespace-nowrap py-1.5 px-2.5 sm:px-3 rounded-lg text-xs font-heading text-center flex items-center justify-center gap-1.5 transition-all cursor-pointer active:scale-95 min-h-[36px] shrink-0",
                   active
-                    ? "bg-[#CEF431] text-[#161514] border border-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_#161514]"
+                    ? "bg-[var(--theme-accent-brand,#CEF431)] text-[#161514] border border-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_#161514]"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted font-bold"
                 )}
               >
                 {Icon && <Icon className="size-3.5 stroke-[2.2] shrink-0" />}
-                <span className="truncate">{tab.shortLabel || tab.label}</span>
+                <span className="whitespace-nowrap">{tab.shortLabel || tab.label}</span>
                 {tab.badge}
               </button>
             );
@@ -99,14 +99,14 @@ export function SegmentedSubNav({
               onClick={() => handleTabClick(tab.id)}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "flex-1 min-w-0 py-1.5 px-1 sm:px-2 rounded-lg text-[11px] sm:text-xs font-heading text-center flex items-center justify-center gap-1 sm:gap-1.5 transition-all cursor-pointer active:scale-95 min-h-[36px]",
+                "flex-1 min-w-fit whitespace-nowrap py-1.5 px-2.5 sm:px-3 rounded-lg text-xs font-heading text-center flex items-center justify-center gap-1.5 transition-all cursor-pointer active:scale-95 min-h-[36px] shrink-0",
                 active
-                  ? "bg-[#CEF431] text-[#161514] border border-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_#161514]"
+                  ? "bg-[var(--theme-accent-brand,#CEF431)] text-[#161514] border border-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_#161514]"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted font-bold"
               )}
             >
               {Icon && <Icon className="size-3.5 stroke-[2.2] shrink-0" />}
-              <span className="truncate">{tab.shortLabel || tab.label}</span>
+              <span className="whitespace-nowrap">{tab.shortLabel || tab.label}</span>
               {tab.badge}
             </Link>
           );
