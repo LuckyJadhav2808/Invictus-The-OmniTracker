@@ -111,7 +111,7 @@ export function MobileAppBar({
   return (
     <header
       className={cn(
-        "sticky top-0 z-30 w-full safe-top-pad bg-[#FAF8F5]/90 dark:bg-[#161514]/90 backdrop-blur-md border-b border-[#161514]/10 dark:border-white/10 select-none transition-colors lg:hidden",
+        "sticky top-0 z-30 w-full safe-top-pad bg-[#FAF8F5]/90 dark:bg-[#161514]/90 backdrop-blur-md border-b border-[#161514]/10 dark:border-white/10 select-none transition-colors",
         className
       )}
     >
