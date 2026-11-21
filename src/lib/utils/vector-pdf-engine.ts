@@ -343,30 +343,12 @@ export function generateEnterpriseVectorPDF({
 
   if (typeof window !== "undefined") {
     try {
+      pdf.save(filename);
       const blob = pdf.output("blob");
       const blobUrl = window.URL.createObjectURL(blob);
-      const downloadLink = document.createElement("a");
-      downloadLink.style.display = "none";
-      downloadLink.href = blobUrl;
-      downloadLink.download = filename;
-      downloadLink.setAttribute("download", filename);
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-
-      // Clean up after download has started
-      setTimeout(() => {
-        try {
-          if (downloadLink.parentNode) {
-            document.body.removeChild(downloadLink);
-          }
-          window.URL.revokeObjectURL(blobUrl);
-        } catch {}
-      }, 5000);
-
       return { success: true, blob, blobUrl };
     } catch (browserErr) {
-      console.warn("DOM anchor download fallback to pdf.save:", browserErr);
-      pdf.save(filename);
+      console.warn("pdf.save fallback error:", browserErr);
       return { success: true };
     }
   } else {

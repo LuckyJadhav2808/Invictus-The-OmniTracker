@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Tag, Plus, Layers, Wallet, Trash2, Edit3, Sparkles } from "lucide-react";
-import { SubpageHeader } from "@/components/shared/SubpageHeader";
-import { MobileAppBar } from "@/components/mobile/MobileAppBar";
+import { Tag, Plus, Layers, Trash2 } from "lucide-react";
+import { SubpageLayout } from "@/components/shared/SubpageLayout";
+import { SubpageTwoTabs } from "@/components/shared/SubpageTwoTabs";
+import { NeobrutalistEmptyCard } from "@/components/shared/NeobrutalistEmptyCard";
 import { useCategories, useTransactions, useDeleteCategory, useAddCategory } from "@/lib/queries/money";
 import { BUDGET_CATEGORY_TEMPLATE_PACKS } from "@/lib/templates-data";
 import { soundFX } from "@/components/shared/SoundFX";
@@ -53,72 +54,39 @@ export default function CategoryEnvelopesPage() {
   };
 
   return (
-    <div className="w-full max-w-xl lg:max-w-5xl xl:max-w-6xl mx-auto space-y-3.5 select-none animate-in fade-in duration-200 pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
-      {/* Dynamic Strobi Top App Bar */}
-      <div className="-mx-2 -mt-2 sm:-mx-4 sm:-mt-4 lg:hidden">
-        <MobileAppBar title="Categories" showDynamicIsland={true} />
-      </div>
-
-      {/* 1. Title Bar with inline back button */}
-      <SubpageHeader
-        backHref="/money"
-        backLabel="Money"
-        title="Category Envelopes"
-        badge="Zero-Based Envelopes"
-        badgeColorClass="bg-amber-400/20 text-amber-700 dark:text-amber-300 border-amber-500/30"
-        subtitle="Manage spending limits, monthly envelopes & curated template packs"
-        icon={Tag}
-        rightAction={
-          <button
-            type="button"
-            onClick={() => {
-              soundFX.playPop();
-              soundFX.vibrate(15);
-              toast.info("Create a new category from the Preset tab or main cockpit!");
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 border-[#161514] bg-[#CEF431] text-[#161514] font-heading font-black text-xs shadow-[2px_2px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer"
-          >
-            <Plus className="size-3.5 stroke-[3]" />
-            <span>Add Envelope</span>
-          </button>
-        }
+    <SubpageLayout
+      appBarTitle="Categories"
+      backHref="/money"
+      backLabel="Money"
+      title="Category Envelopes"
+      badge="Zero-Based Envelopes"
+      badgeColorClass="bg-amber-400/20 text-amber-700 dark:text-amber-300 border-amber-500/30"
+      subtitle="Manage spending limits, monthly envelopes & curated template packs"
+      icon={Tag}
+      rightAction={
+        <button
+          type="button"
+          onClick={() => {
+            soundFX.playPop();
+            soundFX.vibrate(15);
+            toast.info("Select a preset envelope pack to install envelopes!");
+          }}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 border-[#161514] bg-[#CEF431] text-[#161514] font-heading font-black text-xs shadow-[2px_2px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer"
+        >
+          <Plus className="size-3.5 stroke-[3]" />
+          <span>Add Envelope</span>
+        </button>
+      }
+    >
+      {/* 2-Tab Navigation */}
+      <SubpageTwoTabs<"envelopes" | "packs">
+        tabs={[
+          { id: "envelopes", label: "Active Envelopes", icon: "🏷️", count: categories.length },
+          { id: "packs", label: "Envelope Packs", icon: "📦" },
+        ]}
+        activeTab={activeTab}
+        onChange={setActiveTab}
       />
-
-      {/* 2. Strict 2-Tab Navigation */}
-      <div className="grid grid-cols-2 p-1 bg-muted/60 dark:bg-card border-2 border-[#161514] dark:border-white/20 rounded-xl shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.15)] gap-1">
-        <button
-          type="button"
-          onClick={() => {
-            soundFX.playPop();
-            soundFX.vibrate(10);
-            setActiveTab("envelopes");
-          }}
-          className={cn(
-            "py-2 text-xs font-heading font-black rounded-lg transition-all text-center cursor-pointer",
-            activeTab === "envelopes"
-              ? "bg-[#161514] text-white dark:bg-white dark:text-[#161514] shadow-xs"
-              : "text-muted-foreground hover:text-foreground"
-          )}
-        >
-          🏷️ Active Envelopes ({categories.length})
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            soundFX.playPop();
-            soundFX.vibrate(10);
-            setActiveTab("packs");
-          }}
-          className={cn(
-            "py-2 text-xs font-heading font-black rounded-lg transition-all text-center cursor-pointer",
-            activeTab === "packs"
-              ? "bg-[#161514] text-white dark:bg-white dark:text-[#161514] shadow-xs"
-              : "text-muted-foreground hover:text-foreground"
-          )}
-        >
-          📦 Envelope Packs ({BUDGET_CATEGORY_TEMPLATE_PACKS.length})
-        </button>
-      </div>
 
       {/* TAB 1: Active Envelopes */}
       {activeTab === "envelopes" && (
@@ -134,13 +102,13 @@ export default function CategoryEnvelopesPage() {
             </div>
 
             {categories.length === 0 ? (
-              <div className="p-5 rounded-xl border border-dashed border-border text-center space-y-2">
-                <Tag className="size-6 text-muted-foreground mx-auto" />
-                <p className="text-xs font-heading font-bold text-foreground">No category envelopes created</p>
-                <p className="text-[11px] text-muted-foreground">
-                  Switch to the Preset Packs tab to install instant envelopes.
-                </p>
-              </div>
+              <NeobrutalistEmptyCard
+                icon={Tag}
+                title="No category envelopes created"
+                description="Switch to the Envelope Packs tab to install curated zero-based presets."
+                actionLabel="Browse Envelope Packs"
+                onAction={() => setActiveTab("packs")}
+              />
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {categories.map((cat) => {
@@ -256,6 +224,6 @@ export default function CategoryEnvelopesPage() {
           </div>
         </div>
       )}
-    </div>
+    </SubpageLayout>
   );
 }

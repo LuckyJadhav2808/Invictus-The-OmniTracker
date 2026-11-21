@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { Utensils, Apple, Plus, Target, Flame, Sparkles, CheckCircle2, ChevronRight, Edit3, Trash2 } from "lucide-react";
-import { SubpageHeader } from "@/components/shared/SubpageHeader";
-import { MobileAppBar } from "@/components/mobile/MobileAppBar";
+import { Utensils, Plus, Target, Trash2 } from "lucide-react";
+import { SubpageLayout } from "@/components/shared/SubpageLayout";
+import { SubpageTwoTabs } from "@/components/shared/SubpageTwoTabs";
+import { NeobrutalistEmptyCard } from "@/components/shared/NeobrutalistEmptyCard";
 import { useMealPlans, useDeleteMealPlan } from "@/lib/queries/gym";
 import { format, subDays, eachDayOfInterval } from "date-fns";
 import { soundFX } from "@/components/shared/SoundFX";
@@ -146,72 +147,39 @@ export default function NutritionPage() {
   const fatPct = Math.max(0, 100 - proteinPct - carbsPct);
 
   return (
-    <div className="w-full max-w-xl lg:max-w-5xl xl:max-w-6xl mx-auto space-y-3.5 select-none animate-in fade-in duration-200 pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
-      {/* Dynamic Strobi Top App Bar */}
-      <div className="-mx-2 -mt-2 sm:-mx-4 sm:-mt-4 lg:hidden">
-        <MobileAppBar title="Diet & Fuel" showDynamicIsland={true} />
-      </div>
-
-      {/* 1. Title Bar with inline back button & Flower Menu Trigger */}
-      <SubpageHeader
-        backHref="/goals"
-        backLabel="Habits"
-        title="Diet & Macro Pacing"
-        badge="Fuel Discipline"
-        badgeColorClass="bg-amber-400/20 text-amber-700 dark:text-amber-300 border-amber-500/30"
-        subtitle="Daily caloric targets, macro pacing & weekly fuel balance"
-        icon={Utensils}
-        rightAction={
-          <button
-            type="button"
-            onClick={() => {
-              soundFX.playPop();
-              soundFX.vibrate(15);
-              window.dispatchEvent(new CustomEvent("invictus:open-quick-meal"));
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 border-[#161514] bg-[#CEF431] text-[#161514] font-heading font-black text-xs shadow-[2px_2px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer"
-          >
-            <Plus className="size-3.5 stroke-[3]" />
-            <span>Log Meal</span>
-          </button>
-        }
+    <SubpageLayout
+      appBarTitle="Diet & Fuel"
+      backHref="/goals"
+      backLabel="Habits"
+      title="Diet & Macro Pacing"
+      badge="Fuel Discipline"
+      badgeColorClass="bg-amber-400/20 text-amber-700 dark:text-amber-300 border-amber-500/30"
+      subtitle="Daily caloric targets, macro pacing & weekly fuel balance"
+      icon={Utensils}
+      rightAction={
+        <button
+          type="button"
+          onClick={() => {
+            soundFX.playPop();
+            soundFX.vibrate(15);
+            window.dispatchEvent(new CustomEvent("invictus:open-quick-meal"));
+          }}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 border-[#161514] bg-[#CEF431] text-[#161514] font-heading font-black text-xs shadow-[2px_2px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer"
+        >
+          <Plus className="size-3.5 stroke-[3]" />
+          <span>Log Meal</span>
+        </button>
+      }
+    >
+      {/* 2-Tab Navigation */}
+      <SubpageTwoTabs<"pacing" | "distribution">
+        tabs={[
+          { id: "pacing", label: "Macro Pacing & Targets", icon: "🎯" },
+          { id: "distribution", label: "Weekly Distribution", icon: "📊" },
+        ]}
+        activeTab={activeTab}
+        onChange={setActiveTab}
       />
-
-      {/* 2. Strict 2-Tab Navigation */}
-      <div className="grid grid-cols-2 p-1 bg-muted/60 dark:bg-card border-2 border-[#161514] dark:border-white/20 rounded-xl shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.15)] gap-1">
-        <button
-          type="button"
-          onClick={() => {
-            soundFX.playPop();
-            soundFX.vibrate(10);
-            setActiveTab("pacing");
-          }}
-          className={cn(
-            "py-2 text-xs font-heading font-black rounded-lg transition-all text-center cursor-pointer",
-            activeTab === "pacing"
-              ? "bg-[#161514] text-white dark:bg-white dark:text-[#161514] shadow-xs"
-              : "text-muted-foreground hover:text-foreground"
-          )}
-        >
-          🎯 Macro Pacing & Targets
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            soundFX.playPop();
-            soundFX.vibrate(10);
-            setActiveTab("distribution");
-          }}
-          className={cn(
-            "py-2 text-xs font-heading font-black rounded-lg transition-all text-center cursor-pointer",
-            activeTab === "distribution"
-              ? "bg-[#161514] text-white dark:bg-white dark:text-[#161514] shadow-xs"
-              : "text-muted-foreground hover:text-foreground"
-          )}
-        >
-          📊 Weekly Distribution
-        </button>
-      </div>
 
       {/* TAB 1: Macro Pacing & Targets */}
       {activeTab === "pacing" && (
@@ -442,7 +410,7 @@ export default function NutritionPage() {
             )}
           </div>
 
-          {/* Today's Logged Meals Stream (Clean & Lightweight) */}
+          {/* Today's Logged Meals Stream */}
           <div className="bg-card rounded-2xl p-4 sm:p-5 border border-border shadow-xs space-y-3">
             <div className="flex items-center justify-between">
               <h4 className="font-heading font-black text-xs sm:text-sm uppercase tracking-wider text-foreground">
@@ -458,13 +426,13 @@ export default function NutritionPage() {
             </div>
 
             {todayMeals.length === 0 ? (
-              <div className="p-4 rounded-xl border border-dashed border-border text-center space-y-1">
-                <Utensils className="size-5 text-muted-foreground mx-auto" />
-                <p className="text-xs font-heading font-bold text-foreground">No meals logged today yet</p>
-                <p className="text-[11px] text-muted-foreground">
-                  Tap &ldquo;Log Meal&rdquo; above or use the flower menu to quickly add from 1,000+ items.
-                </p>
-              </div>
+              <NeobrutalistEmptyCard
+                icon={Utensils}
+                title="No meals logged today yet"
+                description="Tap 'Log Meal' above or use the flower menu to quickly add from 1,000+ items."
+                actionLabel="+ Log Meal"
+                onAction={() => window.dispatchEvent(new CustomEvent("invictus:open-quick-meal"))}
+              />
             ) : (
               <div className="divide-y divide-border">
                 {todayMeals.map((meal: any) => (
@@ -587,6 +555,6 @@ export default function NutritionPage() {
           </div>
         </div>
       )}
-    </div>
+    </SubpageLayout>
   );
 }

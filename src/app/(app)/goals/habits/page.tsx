@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { CheckSquare, Plus, Target, Sparkles, Flame, CheckCircle2, Circle, BookOpen, Layers } from "lucide-react";
-import { SubpageHeader } from "@/components/shared/SubpageHeader";
-import { MobileAppBar } from "@/components/mobile/MobileAppBar";
+import { CheckSquare, Plus, Flame, CheckCircle2, Circle, BookOpen, Layers } from "lucide-react";
+import { SubpageLayout } from "@/components/shared/SubpageLayout";
+import { SubpageTwoTabs } from "@/components/shared/SubpageTwoTabs";
+import { NeobrutalistEmptyCard } from "@/components/shared/NeobrutalistEmptyCard";
 import { useHabits, useToggleHabitLog, useStreaks } from "@/lib/queries/goals";
 import { ATOMIC_HABITS_VAULT } from "@/components/goals/HabitChoiceModal";
 import { HABIT_TEMPLATE_PACKS } from "@/lib/templates-data";
@@ -29,72 +30,39 @@ export default function HabitVaultPage() {
   };
 
   return (
-    <div className="w-full max-w-xl lg:max-w-5xl xl:max-w-6xl mx-auto space-y-3.5 select-none animate-in fade-in duration-200 pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
-      {/* Dynamic Strobi Top App Bar */}
-      <div className="-mx-2 -mt-2 sm:-mx-4 sm:-mt-4 lg:hidden">
-        <MobileAppBar title="Habit Vault" showDynamicIsland={true} />
-      </div>
-
-      {/* 1. Title Bar with inline back button */}
-      <SubpageHeader
-        backHref="/goals"
-        backLabel="Habits"
-        title="Habit Vault & Roster"
-        badge="Atomic Habits"
-        badgeColorClass="bg-lime-400/20 text-lime-700 dark:text-[#CEF431] border-lime-500/30"
-        subtitle="Manage daily routines, frequency schedules, cues & template packs"
-        icon={CheckSquare}
-        rightAction={
-          <button
-            type="button"
-            onClick={() => {
-              soundFX.playPop();
-              soundFX.vibrate(15);
-              window.dispatchEvent(new CustomEvent("invictus:open-new-habit"));
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 border-[#161514] bg-[#CEF431] text-[#161514] font-heading font-black text-xs shadow-[2px_2px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer"
-          >
-            <Plus className="size-3.5 stroke-[3]" />
-            <span>New Habit</span>
-          </button>
-        }
+    <SubpageLayout
+      appBarTitle="Habit Vault"
+      backHref="/goals"
+      backLabel="Habits"
+      title="Habit Vault & Roster"
+      badge="Atomic Habits"
+      badgeColorClass="bg-lime-400/20 text-lime-700 dark:text-[#CEF431] border-lime-500/30"
+      subtitle="Manage daily routines, frequency schedules, cues & template packs"
+      icon={CheckSquare}
+      rightAction={
+        <button
+          type="button"
+          onClick={() => {
+            soundFX.playPop();
+            soundFX.vibrate(15);
+            window.dispatchEvent(new CustomEvent("invictus:open-new-habit"));
+          }}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 border-[#161514] bg-[#CEF431] text-[#161514] font-heading font-black text-xs shadow-[2px_2px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer"
+        >
+          <Plus className="size-3.5 stroke-[3]" />
+          <span>New Habit</span>
+        </button>
+      }
+    >
+      {/* 2-Tab Navigation */}
+      <SubpageTwoTabs<"roster" | "presets">
+        tabs={[
+          { id: "roster", label: "Active Roster", icon: "📋", count: habits.length },
+          { id: "presets", label: "Curated Presets", icon: "⚡" },
+        ]}
+        activeTab={activeTab}
+        onChange={setActiveTab}
       />
-
-      {/* 2. Strict 2-Tab Navigation */}
-      <div className="grid grid-cols-2 p-1 bg-muted/60 dark:bg-card border-2 border-[#161514] dark:border-white/20 rounded-xl shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.15)] gap-1">
-        <button
-          type="button"
-          onClick={() => {
-            soundFX.playPop();
-            soundFX.vibrate(10);
-            setActiveTab("roster");
-          }}
-          className={cn(
-            "py-2 text-xs font-heading font-black rounded-lg transition-all text-center cursor-pointer",
-            activeTab === "roster"
-              ? "bg-[#161514] text-white dark:bg-white dark:text-[#161514] shadow-xs"
-              : "text-muted-foreground hover:text-foreground"
-          )}
-        >
-          📋 Active Roster ({habits.length})
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            soundFX.playPop();
-            soundFX.vibrate(10);
-            setActiveTab("presets");
-          }}
-          className={cn(
-            "py-2 text-xs font-heading font-black rounded-lg transition-all text-center cursor-pointer",
-            activeTab === "presets"
-              ? "bg-[#161514] text-white dark:bg-white dark:text-[#161514] shadow-xs"
-              : "text-muted-foreground hover:text-foreground"
-          )}
-        >
-          ⚡ Curated Presets ({ATOMIC_HABITS_VAULT.length}+)
-        </button>
-      </div>
 
       {/* TAB 1: Active Roster */}
       {activeTab === "roster" && (
@@ -110,13 +78,13 @@ export default function HabitVaultPage() {
             </div>
 
             {habits.length === 0 ? (
-              <div className="p-5 rounded-xl border border-dashed border-border text-center space-y-2">
-                <CheckSquare className="size-6 text-muted-foreground mx-auto" />
-                <p className="text-xs font-heading font-bold text-foreground">No habits created yet</p>
-                <p className="text-[11px] text-muted-foreground">
-                  Tap &ldquo;New Habit&rdquo; above or pick from curated presets in the second tab.
-                </p>
-              </div>
+              <NeobrutalistEmptyCard
+                icon={CheckSquare}
+                title="No habits created yet"
+                description="Tap 'New Habit' above or pick from curated split packs in the Presets tab."
+                actionLabel="+ Create Habit"
+                onAction={() => window.dispatchEvent(new CustomEvent("invictus:open-new-habit"))}
+              />
             ) : (
               <div className="divide-y divide-border">
                 {habits.map((habit) => {
@@ -247,6 +215,6 @@ export default function HabitVaultPage() {
           </div>
         </div>
       )}
-    </div>
+    </SubpageLayout>
   );
 }

@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { FolderKanban, Plus, CheckCircle2, ChevronRight } from "lucide-react";
-import { SubpageHeader } from "@/components/shared/SubpageHeader";
-import { MobileAppBar } from "@/components/mobile/MobileAppBar";
+import { FolderKanban, Plus } from "lucide-react";
+import { SubpageLayout } from "@/components/shared/SubpageLayout";
 import { useTasks, useUpdateTask, useDeleteTask, useToggleSubtask, useCreateTask } from "@/lib/queries/tasks";
 import { TasksPrimaryList } from "@/components/tasks/TasksPrimaryList";
 import { soundFX } from "@/components/shared/SoundFX";
@@ -49,39 +48,33 @@ export default function TasksProjectsPage() {
   }, [tasks, selectedTag]);
 
   return (
-    <div className="w-full max-w-xl lg:max-w-6xl mx-auto space-y-3.5 select-none animate-in fade-in duration-200 pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
-      {/* Dynamic Strobi Top App Bar */}
-      <div className="-mx-2 -mt-2 sm:-mx-4 sm:-mt-4 lg:hidden">
-        <MobileAppBar title="Projects" showDynamicIsland={true} />
-      </div>
-
-      {/* 1. Title Bar with inline back button */}
-      <SubpageHeader
-        backHref="/tasks"
-        backLabel="Tasks"
-        title="Project Deliverables Hub"
-        badge="Streams & Tags"
-        badgeColorClass="bg-sky-400/20 text-sky-700 dark:text-sky-300 border-sky-500/30"
-        subtitle="Manage deliverables grouped by project tag & stream progress"
-        icon={FolderKanban}
-        rightAction={
-          <button
-            type="button"
-            onClick={() => {
-              soundFX.playPop();
-              soundFX.vibrate(15);
-              setTaskToEdit(null);
-              setIsCreateModalOpen(true);
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 border-[#161514] bg-[#CEF431] text-[#161514] font-heading font-black text-xs shadow-[2px_2px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer"
-          >
-            <Plus className="size-3.5 stroke-[3]" />
-            <span>New Task</span>
-          </button>
-        }
-      />
-
-      {/* 2. Project Tags Filter Pills */}
+    <SubpageLayout
+      appBarTitle="Projects"
+      backHref="/tasks"
+      backLabel="Tasks"
+      title="Project Deliverables Hub"
+      badge="Streams & Tags"
+      badgeColorClass="bg-sky-400/20 text-sky-700 dark:text-sky-300 border-sky-500/30"
+      subtitle="Manage deliverables grouped by project tag & stream progress"
+      icon={FolderKanban}
+      maxWidthClass="max-w-xl lg:max-w-6xl"
+      rightAction={
+        <button
+          type="button"
+          onClick={() => {
+            soundFX.playPop();
+            soundFX.vibrate(15);
+            setTaskToEdit(null);
+            setIsCreateModalOpen(true);
+          }}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 border-[#161514] bg-[#CEF431] text-[#161514] font-heading font-black text-xs shadow-[2px_2px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer"
+        >
+          <Plus className="size-3.5 stroke-[3]" />
+          <span>New Task</span>
+        </button>
+      }
+    >
+      {/* Project Tags Filter Pills */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
         <button
           type="button"
@@ -115,7 +108,7 @@ export default function TasksProjectsPage() {
         ))}
       </div>
 
-      {/* 3. Project Progress Cards Deck */}
+      {/* Project Progress Cards Deck */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {projectTags.map((p) => (
           <div
@@ -147,7 +140,7 @@ export default function TasksProjectsPage() {
         ))}
       </div>
 
-      {/* 4. Filtered Tasks Stream */}
+      {/* Filtered Tasks Stream */}
       <div className="bg-card rounded-2xl p-4 sm:p-5 border border-border shadow-xs space-y-3">
         <h3 className="font-heading font-black text-xs sm:text-sm uppercase tracking-wider text-foreground">
           {selectedTag === "all" ? "All Project Deliverables" : `${selectedTag} Tasks`} ({filteredTasks.length})
@@ -182,6 +175,6 @@ export default function TasksProjectsPage() {
           setTaskToEdit(null);
         }}
       />
-    </div>
+    </SubpageLayout>
   );
 }

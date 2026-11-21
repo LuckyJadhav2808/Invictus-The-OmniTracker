@@ -3,29 +3,6 @@
 import { domToCanvas } from "modern-screenshot";
 import { jsPDF } from "jspdf";
 
-function triggerPdfDownload(pdf: jsPDF, filename: string) {
-  try {
-    const blob = pdf.output("blob");
-    const blobUrl = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = blobUrl;
-    link.download = filename;
-    link.style.display = "none";
-    document.body.appendChild(link);
-    link.click();
-    setTimeout(() => {
-      try {
-        if (link.parentNode) {
-          document.body.removeChild(link);
-        }
-        URL.revokeObjectURL(blobUrl);
-      } catch {}
-    }, 4000);
-  } catch {
-    pdf.save(filename);
-  }
-}
-
 export async function exportElementToPDF(elementId: string, filename: string = "Invictus_Statement.pdf") {
   if (typeof window === "undefined") return;
 
@@ -34,11 +11,17 @@ export async function exportElementToPDF(elementId: string, filename: string = "
     throw new Error(`Element with id "${elementId}" not found for PDF export.`);
   }
 
-  // 1. High-resolution canvas capture
-  const fullCanvas = await domToCanvas(element, {
+  // 1. High-resolution canvas capture with 3.5s timeout protection against CORS font hangs
+  const capturePromise = domToCanvas(element, {
     scale: 1.5,
     backgroundColor: "#FAF8F5",
   });
+
+  const timeoutPromise = new Promise<never>((_, reject) =>
+    setTimeout(() => reject(new Error("Canvas capture timed out")), 3500)
+  );
+
+  const fullCanvas = await Promise.race([capturePromise, timeoutPromise]);
 
   const pdf = new jsPDF("p", "mm", "a4");
   const pdfWidth = pdf.internal.pageSize.getWidth(); // 210mm
@@ -60,7 +43,7 @@ export async function exportElementToPDF(elementId: string, filename: string = "
     const xPos = (pdfWidth - imgWidth) / 2;
     const imgData = fullCanvas.toDataURL("image/jpeg", 0.82);
     pdf.addImage(imgData, "JPEG", xPos, margin, imgWidth, imgHeight);
-    triggerPdfDownload(pdf, filename);
+    pdf.save(filename);
     return;
   }
 
@@ -104,5 +87,5 @@ export async function exportElementToPDF(elementId: string, filename: string = "
   }
 
   // 4. Bulletproof PDF download
-  triggerPdfDownload(pdf, filename);
+  pdf.save(filename);
 }

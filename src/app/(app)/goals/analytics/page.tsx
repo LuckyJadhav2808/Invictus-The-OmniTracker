@@ -8,9 +8,8 @@ import { WeeklyOverviewWidget } from "@/components/goals/WeeklyOverviewWidget";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isSameDay, subWeeks } from "date-fns";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from "recharts";
 import { cn } from "@/lib/utils";
-import { MobileAppBar } from "@/components/mobile/MobileAppBar";
-import { SubpageHeader } from "@/components/shared/SubpageHeader";
-import { soundFX } from "@/components/shared/SoundFX";
+import { SubpageLayout } from "@/components/shared/SubpageLayout";
+import { SubpageTwoTabs } from "@/components/shared/SubpageTwoTabs";
 
 export default function GoalsAnalyticsPage() {
   const [activeTab, setActiveTab] = useState<"heatmap" | "velocity">("heatmap");
@@ -71,64 +70,31 @@ export default function GoalsAnalyticsPage() {
   }, [totalHabits, fourWeekLogs]);
 
   return (
-    <div className="w-full max-w-xl lg:max-w-5xl xl:max-w-6xl mx-auto space-y-3.5 select-none animate-in fade-in duration-200 pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
-      {/* Dynamic Strobi Top App Bar */}
-      <div className="-mx-2 -mt-2 sm:-mx-4 sm:-mt-4 lg:hidden">
-        <MobileAppBar title="Habit Analytics" showDynamicIsland={true} />
-      </div>
-
-      {/* 1. Title Bar with inline back button */}
-      <SubpageHeader
-        backHref="/goals"
-        backLabel="Habits"
-        title="Habit Analytics"
-        badge="Consistency Engine"
-        badgeColorClass="bg-purple-400/20 text-purple-700 dark:text-purple-300 border-purple-500/30"
-        subtitle="30-day streak heatmaps, velocity pacing & day-of-week adherence"
-        icon={BarChart2}
-        rightAction={
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] font-mono text-[11px] font-bold text-[#161514] dark:text-stone-200">
-            <Sparkles className="size-3 text-amber-500 fill-amber-400" />
-            <span>{activeStreaksList.length} FLAMES</span>
-          </div>
-        }
+    <SubpageLayout
+      appBarTitle="Habit Analytics"
+      backHref="/goals"
+      backLabel="Habits"
+      title="Habit Analytics"
+      badge="Consistency Engine"
+      badgeColorClass="bg-purple-400/20 text-purple-700 dark:text-purple-300 border-purple-500/30"
+      subtitle="30-day streak heatmaps, velocity pacing & day-of-week adherence"
+      icon={BarChart2}
+      rightAction={
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-[#FAF8F5] dark:bg-[#1C1A18] border border-[#E8E5DF] dark:border-[#2A2724] font-mono text-[11px] font-bold text-[#161514] dark:text-stone-200">
+          <Sparkles className="size-3 text-amber-500 fill-amber-400" />
+          <span>{activeStreaksList.length} FLAMES</span>
+        </div>
+      }
+    >
+      {/* 2-Tab Navigation */}
+      <SubpageTwoTabs<"heatmap" | "velocity">
+        tabs={[
+          { id: "heatmap", label: "Heatmap & Streaks", icon: "📅" },
+          { id: "velocity", label: "Weekly Velocity", icon: "⚡" },
+        ]}
+        activeTab={activeTab}
+        onChange={setActiveTab}
       />
-
-      {/* 2. Strict 2-Tab Navigation (Max 2 Tabs Architecture) */}
-      <div className="grid grid-cols-2 p-1 bg-muted/60 dark:bg-card border-2 border-[#161514] dark:border-white/20 rounded-xl shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.15)] gap-1">
-        <button
-          type="button"
-          onClick={() => {
-            soundFX.playPop();
-            soundFX.vibrate(10);
-            setActiveTab("heatmap");
-          }}
-          className={cn(
-            "py-2 text-xs font-heading font-black rounded-lg transition-all text-center cursor-pointer",
-            activeTab === "heatmap"
-              ? "bg-[#161514] text-white dark:bg-white dark:text-[#161514] shadow-xs"
-              : "text-muted-foreground hover:text-foreground"
-          )}
-        >
-          📅 Heatmap & Streaks
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            soundFX.playPop();
-            soundFX.vibrate(10);
-            setActiveTab("velocity");
-          }}
-          className={cn(
-            "py-2 text-xs font-heading font-black rounded-lg transition-all text-center cursor-pointer",
-            activeTab === "velocity"
-              ? "bg-[#161514] text-white dark:bg-white dark:text-[#161514] shadow-xs"
-              : "text-muted-foreground hover:text-foreground"
-          )}
-        >
-          ⚡ Weekly Velocity
-        </button>
-      </div>
 
       {/* TAB 1: Heatmap & Streaks */}
       {activeTab === "heatmap" && (
@@ -297,6 +263,6 @@ export default function GoalsAnalyticsPage() {
           <WeeklyVelocityAndHabitMatrix />
         </div>
       )}
-    </div>
+    </SubpageLayout>
   );
 }

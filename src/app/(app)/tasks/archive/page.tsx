@@ -1,14 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { CheckSquare, RotateCcw, Trash2, Sparkles, CheckCircle2 } from "lucide-react";
-import { SubpageHeader } from "@/components/shared/SubpageHeader";
-import { MobileAppBar } from "@/components/mobile/MobileAppBar";
+import { CheckSquare, RotateCcw, Trash2, CheckCircle2 } from "lucide-react";
+import { SubpageLayout } from "@/components/shared/SubpageLayout";
+import { NeobrutalistEmptyCard } from "@/components/shared/NeobrutalistEmptyCard";
 import { useTasks, useUpdateTask, useDeleteTask } from "@/lib/queries/tasks";
 import { soundFX } from "@/components/shared/SoundFX";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
 
 export default function TasksArchivePage() {
   const { data: tasks = [] } = useTasks();
@@ -36,30 +34,23 @@ export default function TasksArchivePage() {
   };
 
   return (
-    <div className="w-full max-w-xl lg:max-w-6xl mx-auto space-y-3.5 select-none animate-in fade-in duration-200 pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
-      {/* Dynamic Strobi Top App Bar */}
-      <div className="-mx-2 -mt-2 sm:-mx-4 sm:-mt-4 lg:hidden">
-        <MobileAppBar title="Archive" showDynamicIsland={true} />
-      </div>
-
-      {/* 1. Title Bar with inline back button */}
-      <SubpageHeader
-        backHref="/tasks"
-        backLabel="Tasks"
-        title="Completed History & Archive"
-        badge="Task Vault"
-        badgeColorClass="bg-emerald-400/20 text-emerald-700 dark:text-[#03D26F] border-emerald-500/30"
-        subtitle="Review finished accomplishments, restore archived tasks or purge records"
-        icon={CheckSquare}
-        rightAction={
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-card border border-border font-mono text-xs font-bold text-foreground">
-            <CheckCircle2 className="size-3.5 text-[#03D26F]" />
-            <span>{completedTasks.length} DONE</span>
-          </div>
-        }
-      />
-
-      {/* 2. Archive Stream */}
+    <SubpageLayout
+      appBarTitle="Archive"
+      backHref="/tasks"
+      backLabel="Tasks"
+      title="Completed History & Archive"
+      badge="Task Vault"
+      badgeColorClass="bg-emerald-400/20 text-emerald-700 dark:text-[#03D26F] border-emerald-500/30"
+      subtitle="Review finished accomplishments, restore archived tasks or purge records"
+      icon={CheckSquare}
+      rightAction={
+        <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-card border border-border font-mono text-xs font-bold text-foreground">
+          <CheckCircle2 className="size-3.5 text-[#03D26F]" />
+          <span>{completedTasks.length} DONE</span>
+        </div>
+      }
+    >
+      {/* Archive Stream */}
       <div className="bg-card rounded-2xl p-4 sm:p-5 border border-border shadow-xs space-y-3">
         <div className="flex items-center justify-between">
           <h3 className="font-heading font-black text-xs sm:text-sm uppercase tracking-wider text-foreground">
@@ -71,13 +62,13 @@ export default function TasksArchivePage() {
         </div>
 
         {completedTasks.length === 0 ? (
-          <div className="p-6 rounded-xl border border-dashed border-border text-center space-y-2">
-            <CheckSquare className="size-6 text-muted-foreground mx-auto" />
-            <p className="text-xs font-heading font-bold text-foreground">Archive is empty</p>
-            <p className="text-[11px] text-muted-foreground">
-              Completed tasks from your checklist will automatically land here.
-            </p>
-          </div>
+          <NeobrutalistEmptyCard
+            icon={CheckSquare}
+            title="Archive is empty"
+            description="Completed tasks from your checklist will automatically land here."
+            actionHref="/tasks"
+            actionLabel="Return to Tasks"
+          />
         ) : (
           <div className="divide-y divide-border">
             {completedTasks.map((t) => (
@@ -129,6 +120,6 @@ export default function TasksArchivePage() {
           </div>
         )}
       </div>
-    </div>
+    </SubpageLayout>
   );
 }

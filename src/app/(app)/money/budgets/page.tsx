@@ -2,8 +2,7 @@
 
 import { useMemo } from "react";
 import { Target, Plus } from "lucide-react";
-import { SubpageHeader } from "@/components/shared/SubpageHeader";
-import { MobileAppBar } from "@/components/mobile/MobileAppBar";
+import { SubpageLayout } from "@/components/shared/SubpageLayout";
 import { useCategories, useTransactions } from "@/lib/queries/money";
 import { BudgetTabView } from "@/components/money/views/BudgetTabView";
 import { computeMonthlyBudgetStats } from "@/lib/utils/budget-rollover";
@@ -23,38 +22,30 @@ export default function MoneyBudgetsPage() {
   }, [transactions, categories]);
 
   return (
-    <div className="w-full max-w-xl lg:max-w-5xl xl:max-w-6xl mx-auto space-y-3.5 select-none animate-in fade-in duration-200 pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
-      {/* Dynamic Strobi Top App Bar */}
-      <div className="-mx-2 -mt-2 sm:-mx-4 sm:-mt-4 lg:hidden">
-        <MobileAppBar title="Budgets" showDynamicIsland={true} />
-      </div>
-
-      {/* 1. Title Bar with inline back button */}
-      <SubpageHeader
-        backHref="/money"
-        backLabel="Money"
-        title="Budget Limits & Allowances"
-        badge="Zero-Based Limits"
-        badgeColorClass="bg-emerald-400/20 text-emerald-700 dark:text-[#03D26F] border-emerald-500/30"
-        subtitle="Monthly allowances, daily safe pace & rollover discipline"
-        icon={Target}
-        rightAction={
-          <button
-            type="button"
-            onClick={() => {
-              soundFX.playPop();
-              soundFX.vibrate(15);
-              window.dispatchEvent(new CustomEvent("invictus:money-new-expense"));
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 border-[#161514] bg-[#CEF431] text-[#161514] font-heading font-black text-xs shadow-[2px_2px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer"
-          >
-            <Plus className="size-3.5 stroke-[3]" />
-            <span>Log Expense</span>
-          </button>
-        }
-      />
-
-      {/* 2. Budget Tab View */}
+    <SubpageLayout
+      appBarTitle="Budgets"
+      backHref="/money"
+      backLabel="Money"
+      title="Budget Limits & Allowances"
+      badge="Zero-Based Limits"
+      badgeColorClass="bg-emerald-400/20 text-emerald-700 dark:text-[#03D26F] border-emerald-500/30"
+      subtitle="Monthly allowances, daily safe pace & rollover discipline"
+      icon={Target}
+      rightAction={
+        <button
+          type="button"
+          onClick={() => {
+            soundFX.playPop();
+            soundFX.vibrate(15);
+            window.dispatchEvent(new CustomEvent("invictus:money-new-expense"));
+          }}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 border-[#161514] bg-[#CEF431] text-[#161514] font-heading font-black text-xs shadow-[2px_2px_0px_0px_#161514] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer"
+        >
+          <Plus className="size-3.5 stroke-[3]" />
+          <span>Log Expense</span>
+        </button>
+      }
+    >
       <BudgetTabView
         categories={categories}
         transactions={transactions}
@@ -68,6 +59,6 @@ export default function MoneyBudgetsPage() {
         }}
         onEditCategory={() => {}}
       />
-    </div>
+    </SubpageLayout>
   );
 }
