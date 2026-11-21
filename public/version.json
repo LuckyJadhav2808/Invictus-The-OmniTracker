@@ -6,20 +6,20 @@
   "releaseDate": "November 21, 2026",
   "minSupportedVersion": "1.0.0",
   "git": {
-    "commitHash": "8940b970b309835672f00a8f5c8c2111a956fa13",
-    "shortHash": "8940b97",
+    "commitHash": "de51a10da37a120dbc7b02c29a36d17310948635",
+    "shortHash": "de51a10",
     "branch": "main",
     "commitAuthor": "Lucky Manoj Jadhav",
-    "commitDate": "2026-11-21 17:31:57 +0530",
-    "commitMessage": "feat(perf): integrate 5 high-performance packages (comlink, mutative, fast-deep-equal, quick-lru, xxhash-wasm) and bump to v1.8.4"
+    "commitDate": "2026-11-21 17:32:26 +0530",
+    "commitMessage": "chore(release): record fresh v1.8.4 commit telemetry in version dump"
   },
   "apk": {
     "exists": true,
-    "isVersionVerified": false,
-    "binaryVersion": "1.8.2",
+    "isVersionVerified": true,
+    "binaryVersion": "1.8.4",
     "fileName": "Invictus.apk",
-    "sha256": "04b9031ccb91cce39a37c9656bcea7b96a4727670a5715e617656c5553ff17c8",
-    "sizeBytes": 4420370,
+    "sha256": "aaccaaacafd8085b637e4dd54bba0a6589b72f707538c19ab80c37935378e8cf",
+    "sizeBytes": 4426638,
     "sizeFormatted": "4.22 MB",
     "directDownloadUrl": "https://invictus-the-omni-tracker.vercel.app/downloads/Invictus.apk",
     "githubReleaseAssetUrl": "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v1.8.4/Invictus.apk"
@@ -41,6 +41,6 @@
     "nodeVersion": "v24.12.0",
     "platform": "win32",
     "arch": "x64",
-    "generatedAt": "2026-11-21T12:02:18.254Z"
+    "generatedAt": "2026-11-21T12:09:21.952Z"
   }
 }
