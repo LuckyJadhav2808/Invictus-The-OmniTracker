@@ -6,12 +6,12 @@
   "releaseDate": "November 21, 2026",
   "minSupportedVersion": "1.0.0",
   "git": {
-    "commitHash": "3d9cfe10711f7c91750c63a76d2f6ec677cb7c9c",
-    "shortHash": "3d9cfe1",
+    "commitHash": "8940b970b309835672f00a8f5c8c2111a956fa13",
+    "shortHash": "8940b97",
     "branch": "main",
     "commitAuthor": "Lucky Manoj Jadhav",
-    "commitDate": "2026-11-21 17:04:08 +0530",
-    "commitMessage": "feat(ui): dynamic contextual toast messages and non-clipping sonner card styling"
+    "commitDate": "2026-11-21 17:31:57 +0530",
+    "commitMessage": "feat(perf): integrate 5 high-performance packages (comlink, mutative, fast-deep-equal, quick-lru, xxhash-wasm) and bump to v1.8.4"
   },
   "apk": {
     "exists": true,
@@ -41,6 +41,6 @@
     "nodeVersion": "v24.12.0",
     "platform": "win32",
     "arch": "x64",
-    "generatedAt": "2026-11-21T12:01:42.114Z"
+    "generatedAt": "2026-11-21T12:02:18.254Z"
   }
 }
