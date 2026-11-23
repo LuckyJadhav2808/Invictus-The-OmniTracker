@@ -48,6 +48,7 @@ next-env.d.ts
 scratch/
 .playwright-mcp/
 screenshots/audit/
+*.pdf
 
 # agent & ide configs
 .agent/

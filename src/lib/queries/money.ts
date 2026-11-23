@@ -3,6 +3,7 @@ import { useAuth } from "@/components/shared/AuthProvider";
 import { type Category, type Transaction, type Debt } from "@/types";
 import { getCustomSession } from "@/lib/custom-auth";
 import { executeOfflineMutation } from "@/lib/offline/offline-mutation";
+import { persistToIDB, getSyncFromCacheOrLocal } from "@/lib/offline/idb-storage";
 
 const isGuestMode = (user?: any) => {
   if (user?.uid && user.uid !== "guest-user") return false;
@@ -253,6 +254,15 @@ export function useDeleteCategory() {
 
 // --- TRANSACTIONS (MongoDB Atlas Connected) ---
 
+// Helpers for high-speed IndexedDB + Cache storage for money transactions
+const getLocalTransactions = (): Transaction[] => {
+  return getSyncFromCacheOrLocal<Transaction[]>("invictus_transactions", []);
+};
+
+const saveLocalTransactions = (txs: Transaction[]) => {
+  persistToIDB("invictus_transactions", txs).catch(() => {});
+};
+
 export interface UseTransactionsOptions {
   month?: string;
   limit?: number;
@@ -272,8 +282,7 @@ export function useTransactions(options?: UseTransactionsOptions) {
     queryKey,
     queryFn: async () => {
       if (isGuestMode(user)) {
-        const local = localStorage.getItem("invictus_transactions");
-        const list: Transaction[] = local ? JSON.parse(local) : [];
+        const list = getLocalTransactions();
         if (options?.month) {
           return list.filter((t) => t.date && t.date.startsWith(options.month!));
         }
@@ -307,8 +316,7 @@ export function useAddTransaction() {
     mutationFn: async (transaction: Omit<Transaction, "id" | "createdAt" | "updatedAt">) => {
       const userId = getActiveUserId(user);
       if (isGuestMode(user)) {
-        const local = localStorage.getItem("invictus_transactions");
-        const list = local ? JSON.parse(local) : [];
+        const list = getLocalTransactions();
         const newTransaction = {
           ...transaction,
           id: (transaction as any).id || Math.random().toString(36).substring(2, 9),
@@ -316,7 +324,7 @@ export function useAddTransaction() {
           updatedAt: new Date().toISOString(),
         } as unknown as Transaction;
         list.unshift(newTransaction);
-        localStorage.setItem("invictus_transactions", JSON.stringify(list));
+        saveLocalTransactions(list);
         return newTransaction;
       }
 
@@ -382,16 +390,16 @@ export function useBulkAddTransactions() {
     }>) => {
       const userId = getActiveUserId(user);
       if (isGuestMode(user)) {
-        const local = localStorage.getItem("invictus_transactions");
-        const list = local ? JSON.parse(local) : [];
+        const list = getLocalTransactions();
         const newTransactions = transactions.map((t, idx) => ({
           ...t,
+          type: (t.type || "expense") as "expense" | "income",
           id: t.id || `tx_${Date.now()}_${idx}_${Math.random().toString(36).substring(2, 6)}`,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
-        }));
+        })) as Transaction[];
         const updated = [...newTransactions, ...list];
-        localStorage.setItem("invictus_transactions", JSON.stringify(updated));
+        saveLocalTransactions(updated);
         return { success: true, count: newTransactions.length, transactions: newTransactions };
       }
 
@@ -427,10 +435,9 @@ export function useDeleteTransaction() {
     mutationFn: async (transactionId: string) => {
       const userId = getActiveUserId(user);
       if (isGuestMode(user)) {
-        const local = localStorage.getItem("invictus_transactions");
-        const list = local ? JSON.parse(local) : [];
+        const list = getLocalTransactions();
         const filtered = list.filter((t: any) => t.id !== transactionId);
-        localStorage.setItem("invictus_transactions", JSON.stringify(filtered));
+        saveLocalTransactions(filtered);
         return transactionId;
       }
 
@@ -476,12 +483,11 @@ export function useUpdateTransaction() {
     mutationFn: async (transaction: Partial<Transaction> & { id: string }) => {
       const userId = getActiveUserId(user);
       if (isGuestMode(user)) {
-        const local = localStorage.getItem("invictus_transactions");
-        const list = local ? JSON.parse(local) : [];
+        const list = getLocalTransactions();
         const idx = list.findIndex((t: any) => t.id === transaction.id);
         if (idx > -1) {
           list[idx] = { ...list[idx], ...transaction, updatedAt: new Date().toISOString() };
-          localStorage.setItem("invictus_transactions", JSON.stringify(list));
+          saveLocalTransactions(list);
         }
         return transaction;
       }

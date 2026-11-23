@@ -5,6 +5,7 @@ import { useAuth } from "@/components/shared/AuthProvider";
 import { useUIStore } from "@/store/ui-store";
 import {
   useHabits,
+  useAddHabit,
   useHabitLogs,
   useToggleHabitLog,
   useStreaks,
@@ -30,6 +31,7 @@ import {
   subDays,
   isToday as checkIsToday,
 } from "date-fns";
+import { useQueryState, parseAsString } from "nuqs";
 
 // 5-Slot Architecture Components
 import { MobileAppBar } from "@/components/mobile/MobileAppBar";
@@ -72,6 +74,10 @@ const ConfettiCelebration = dynamic(
   () => import("@/components/common/ConfettiCelebration").then((m) => m.ConfettiCelebration),
   { ssr: false }
 );
+const HabitChoiceModal = dynamic(
+  () => import("@/components/goals/HabitChoiceModal").then((m) => m.HabitChoiceModal),
+  { ssr: false }
+);
 
 const TODAY_DESKTOP_SUB_NAV_TABS: SubNavTab[] = [
   { id: "overview", label: "Overview", shortLabel: "Agenda", icon: SunMedium },
@@ -86,6 +92,7 @@ export default function TodayPage() {
 
   // Queries
   const { data: habits = [] } = useHabits();
+  const addHabitMutation = useAddHabit();
   const { data: logs = [] } = useHabitLogs(selectedDate);
   const { data: streaks = {} } = useStreaks();
   const { data: streakFreeze = { userId: "", tokensAvailable: 1, lastMonthlyCredit: "", frozenDates: [], autoShieldEvent: null } } = useStreakFreeze();
@@ -119,11 +126,34 @@ export default function TodayPage() {
   // User Cloud Budget Preferences
   const { data: cloudBudgetPrefs } = useBudgetPreferences();
   const updateBudgetMutation = useUpdateBudgetPreferences();
-  const [isDailyLimitModalOpen, setIsDailyLimitModalOpen] = useState(false);
-  const [isCloseoutDrawerOpen, setIsCloseoutDrawerOpen] = useState(false);
-  const [isScratchpadDrawerOpen, setIsScratchpadDrawerOpen] = useState(false);
-  const [isWaterSheetOpen, setIsWaterSheetOpen] = useState(false);
-  const [isNewTaskOpen, setIsNewTaskOpen] = useState(false);
+
+  // 🛡️ Android Hardware Back-Button & URL Modal State Sync (nuqs)
+  const [activeModal, setActiveModal] = useQueryState(
+    "modal",
+    parseAsString.withOptions({ history: "push", shallow: true })
+  );
+
+  const isDailyLimitModalOpen = activeModal === "daily-limit";
+  const isCloseoutDrawerOpen = activeModal === "closeout";
+  const isScratchpadDrawerOpen = activeModal === "scratchpad";
+  const isWaterSheetOpen = activeModal === "water";
+  const isNewTaskOpen = activeModal === "new-task";
+  const isNewHabitOpen = activeModal === "new-habit";
+  const isQuickExpenseOpen = activeModal === "new-expense";
+
+  const setModal = (name: string) => (open: boolean | ((prev: boolean) => boolean)) => {
+    const isOpen = typeof open === "function" ? open(activeModal === name) : open;
+    setActiveModal(isOpen ? name : null);
+  };
+
+  const setIsDailyLimitModalOpen = setModal("daily-limit");
+  const setIsCloseoutDrawerOpen = setModal("closeout");
+  const setIsScratchpadDrawerOpen = setModal("scratchpad");
+  const setIsWaterSheetOpen = setModal("water");
+  const setIsNewTaskOpen = setModal("new-task");
+  const setIsNewHabitOpen = setModal("new-habit");
+  const setIsQuickExpenseOpen = setModal("new-expense");
+
   const [showConfetti, setShowConfetti] = useState(false);
   const [desktopActiveTab, setDesktopActiveTab] = useState("overview");
   const previousConqueredRef = useRef(false);
@@ -165,6 +195,16 @@ export default function TodayPage() {
       const amt = e.detail?.amount || 250;
       handleQuickLogWater(amt);
     };
+    const handleOpenWaterModal = () => {
+      soundFX.playPop();
+      soundFX.vibrate(15);
+      setIsWaterSheetOpen(true);
+    };
+    const handleOpenNewHabit = () => {
+      soundFX.playPop();
+      soundFX.vibrate(15);
+      setIsNewHabitOpen(true);
+    };
 
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "j") {
@@ -179,6 +219,8 @@ export default function TodayPage() {
     window.addEventListener("invictus:tasks-new-task", handleNewTask);
     window.addEventListener("invictus:money-new-expense", handleNewExpense);
     window.addEventListener("invictus:quick-log-water", handleQuickWater);
+    window.addEventListener("invictus:open-water-modal", handleOpenWaterModal);
+    window.addEventListener("invictus:open-new-habit", handleOpenNewHabit);
 
     return () => {
       window.removeEventListener("keydown", handleGlobalKeyDown);
@@ -186,6 +228,8 @@ export default function TodayPage() {
       window.removeEventListener("invictus:tasks-new-task", handleNewTask);
       window.removeEventListener("invictus:money-new-expense", handleNewExpense);
       window.removeEventListener("invictus:quick-log-water", handleQuickWater);
+      window.removeEventListener("invictus:open-water-modal", handleOpenWaterModal);
+      window.removeEventListener("invictus:open-new-habit", handleOpenNewHabit);
     };
   }, [handleQuickLogWater]);
 
@@ -274,15 +318,21 @@ export default function TodayPage() {
   const completedHabitsCount = completedHabitLogs.length;
   const allHabitsConquered = totalHabitsCount > 0 && completedHabitsCount === totalHabitsCount;
 
-  // Task metrics for Today's Executive Telemetry
+  // Task metrics for Today's Executive Telemetry - synchronized with agenda
   const todayTasks = useMemo(() => {
     return tasks.filter((t) => {
-      if (t.status === "completed") {
-        return !t.dueDate || t.dueDate === selectedDate;
+      if (t.dueDate) {
+        if (t.dueDate === selectedDate) return true;
+        if (isCurrentDayToday && t.dueDate < selectedDate && t.status !== "completed") return true;
+        return false;
       }
-      return !t.dueDate || t.dueDate === selectedDate || t.priority === "p1";
+      if (isCurrentDayToday) {
+        if (t.status !== "completed") return true;
+        if (!t.completedAt || t.completedAt.startsWith(selectedDate)) return true;
+      }
+      return false;
     });
-  }, [tasks, selectedDate]);
+  }, [tasks, selectedDate, isCurrentDayToday]);
   const completedTasksCount = useMemo(() => {
     return todayTasks.filter((t) => t.status === "completed").length;
   }, [todayTasks]);
@@ -420,7 +470,6 @@ export default function TodayPage() {
   };
 
   // Quick Expense Modal state
-  const [isQuickExpenseOpen, setIsQuickExpenseOpen] = useState(false);
   const [isSavingExpense, setIsSavingExpense] = useState(false);
 
   const handleAddExpense = async (amount: number, categoryId: string, note: string) => {
@@ -476,6 +525,70 @@ export default function TodayPage() {
     } finally {
       setIsSavingMood(false);
     }
+  };
+
+  // Habit creation handlers for Today page HabitChoiceModal
+  const handleSaveHabit = async (
+    habitData: {
+      title: string;
+      icon?: string;
+      color?: string;
+      frequency?: any;
+      frequencyType?: string;
+      reminderTime?: string;
+      allowGraceSkip?: boolean;
+      goalTarget?: number;
+      goalUnit?: string;
+    },
+    successQuip: string
+  ) => {
+    try {
+      await addHabitMutation.mutateAsync({
+        title: habitData.title,
+        icon: habitData.icon || "Target",
+        color: habitData.color || "amber",
+        frequency: habitData.frequency || { type: habitData.frequencyType || "daily", targetPerDay: 1 },
+        reminderTime: habitData.reminderTime || "",
+        allowGraceSkip: habitData.allowGraceSkip ?? false,
+        isGoalStyle: !!habitData.goalTarget,
+        goalTarget: habitData.goalTarget,
+        goalUnit: habitData.goalUnit,
+      });
+      soundFX.playCompleteChime();
+      strobiToast.habits(`Crushed habit creation: "${habitData.title}"! 🔥`, {
+        quip: successQuip,
+      });
+      setIsNewHabitOpen(false);
+    } catch {
+      toast.error(`Failed to create habit "${habitData.title}"`);
+    }
+  };
+
+  const handleSelectHabitPreset = (preset: any) =>
+    handleSaveHabit(preset, "Small atomic habits forge unstoppable gladiators ⚔️");
+
+  const handleAddCustomHabit = (customHabit: any) =>
+    handleSaveHabit(
+      { ...customHabit, allowGraceSkip: customHabit.allowGraceSkip ?? true },
+      "Locked into your daily ritual. No excuses!"
+    );
+
+  const handleApplyHabitPack = (pack: any) => {
+    pack.items.forEach((item: any) => {
+      addHabitMutation.mutate({
+        title: item.title,
+        icon: "Target",
+        color: "amber",
+        frequency: { type: "daily", targetPerDay: 1 },
+        allowGraceSkip: true,
+        isGoalStyle: false,
+      });
+    });
+    soundFX.playCompleteChime();
+    strobiToast.habits(`Applied '${pack.name}' protocol! 🏆`, {
+      quip: "All protocol routines locked into your daily agenda 🛡️",
+    });
+    setIsNewHabitOpen(false);
   };
 
   // Tomorrow pending tasks preview for night closeout
@@ -830,6 +943,16 @@ export default function TodayPage() {
             toast.error(`Failed to create task "${data.title}"`);
           }
         }}
+      />
+
+      {/* 7. Quick Habit Creation Modal (Atomic Presets, Custom, Protocols) */}
+      <HabitChoiceModal
+        open={isNewHabitOpen}
+        onOpenChange={setIsNewHabitOpen}
+        onSelectPreset={handleSelectHabitPreset}
+        onAddCustomHabit={handleAddCustomHabit}
+        onApplyPresetPack={handleApplyHabitPack}
+        isPending={addHabitMutation.isPending}
       />
     </div>
   );

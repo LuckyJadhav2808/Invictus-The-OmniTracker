@@ -6,6 +6,7 @@ import { toast, strobiToast } from "@/lib/utils/toasts";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { getCustomSession } from "@/lib/custom-auth";
 import { generateKeyBetween } from "@/lib/utils/lexorank";
+import { persistToIDB, getSyncFromCacheOrLocal } from "@/lib/offline/idb-storage";
 
 const TASKS_STORAGE_KEY = "invictus_tasks_db";
 
@@ -24,31 +25,21 @@ const getActiveUserId = (user: any) => {
   return "user_1kapw9sad_1784744868999";
 };
 
-// Helper to get local tasks
+// Helper to get local tasks with fast cache & IndexedDB sync
 export function getLocalTasks(): TaskItem[] {
   if (typeof window === "undefined") return [];
-  const data = localStorage.getItem(TASKS_STORAGE_KEY);
-  if (!data) return [];
-  try {
-    const parsed: TaskItem[] = JSON.parse(data);
-    if (Array.isArray(parsed)) {
-      // Strip any legacy mock seed tasks
-      const sanitized = parsed.filter((t) => !t.id?.startsWith("task_seed_"));
-      if (sanitized.length !== parsed.length) {
-        saveLocalTasks(sanitized);
-      }
-      return sanitized;
-    }
-    return [];
-  } catch {
-    return [];
+  const items = getSyncFromCacheOrLocal<TaskItem[]>(TASKS_STORAGE_KEY, []);
+  if (Array.isArray(items) && items.length > 0) {
+    const sanitized = items.filter((t) => !t.id?.startsWith("task_seed_"));
+    return sanitized;
   }
+  return [];
 }
 
-// Helper to save local tasks
+// Helper to save local tasks with non-blocking IndexedDB persistence
 export function saveLocalTasks(tasks: TaskItem[]) {
   if (typeof window === "undefined") return;
-  localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(tasks));
+  persistToIDB(TASKS_STORAGE_KEY, tasks).catch(() => {});
 }
 
 // 1. Fetch All Tasks Hook (MongoDB Atlas Connected + Local Fallback)
@@ -121,6 +112,8 @@ export function useCreateTask() {
       const userId = getActiveUserId(user);
       queryClient.setQueryData<TaskItem[]>(["tasks", userId], (old = []) => [task, ...old]);
       queryClient.setQueryData<TaskItem[]>(["tasks"], (old = []) => [task, ...old]);
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["tasks", userId] });
       strobiToast.tasks(`Created "${task.title}"! 🎯`, {
         description: `Added to #${task.projectTag || "General"}`,
       });

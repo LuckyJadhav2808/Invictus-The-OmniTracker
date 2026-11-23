@@ -2,7 +2,8 @@
 
 import { AdaptiveDrawerDialog } from "@/components/shared/AdaptiveDrawerDialog";
 import { soundFX } from "@/components/shared/SoundFX";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Trash2 } from "lucide-react";
+import { TactileHoldButton } from "@/components/ui/tactile/TactileHoldButton";
 
 interface DeleteConfirmationModalProps {
   open: boolean;
@@ -46,28 +47,30 @@ export function DeleteConfirmationModal({
         </div>
 
         {/* Ergonomic Action Buttons */}
-        <div className="flex gap-2.5 pt-1">
+        <div className="flex flex-col sm:flex-row gap-2.5 pt-1">
           <button
             type="button"
             onClick={() => {
               soundFX.playPop();
               onOpenChange(false);
             }}
-            className="flex-1 min-h-[42px] bg-white dark:bg-[#161514] hover:bg-[#F1EFEA] dark:hover:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#2A2724] rounded-lg font-medium text-xs shadow-xs transition-colors cursor-pointer flex items-center justify-center"
+            className="flex-1 min-h-[42px] bg-white dark:bg-[#161514] hover:bg-[#F1EFEA] dark:hover:bg-[#252321] text-[#161514] dark:text-[#FAF8F5] border border-[#E8E5DF] dark:border-[#2A2724] rounded-xl font-heading font-black text-xs shadow-xs transition-colors cursor-pointer flex items-center justify-center order-2 sm:order-1"
           >
             Cancel
           </button>
-          <button
-            type="button"
-            onClick={() => {
-              soundFX.playPop();
+          <TactileHoldButton
+            variant="danger"
+            label={confirmLabel}
+            confirmingLabel="Hold to delete..."
+            confirmedLabel="Deleted!"
+            holdDurationMs={1000}
+            icon={Trash2}
+            className="flex-1 min-h-[42px] order-1 sm:order-2"
+            onConfirm={() => {
               onConfirm();
               onOpenChange(false);
             }}
-            className="flex-1 min-h-[42px] bg-rose-600 hover:bg-rose-700 dark:bg-rose-600 dark:hover:bg-rose-500 text-white rounded-lg font-medium text-xs shadow-xs transition-colors cursor-pointer flex items-center justify-center"
-          >
-            {confirmLabel}
-          </button>
+          />
         </div>
       </div>
     </AdaptiveDrawerDialog>

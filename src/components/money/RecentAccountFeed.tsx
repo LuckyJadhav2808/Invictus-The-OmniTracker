@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { type Transaction, type Category } from "@/types";
 import { type DailyBudgetStats, type MonthlyBudgetStats } from "@/lib/utils/budget-rollover";
 import { BelanjeTransactionRow } from "@/components/money/BelanjeTransactionRow";
@@ -96,6 +97,15 @@ export function RecentAccountFeed({
         };
     }
   }, [activeCardIndex, transactions]);
+
+  // Virtualizer for high-volume transactions feed
+  const virtualContainerRef = useRef<HTMLDivElement>(null);
+  const rowVirtualizer = useVirtualizer({
+    count: feedConfig.items.length,
+    getScrollElement: () => virtualContainerRef.current,
+    estimateSize: () => 62,
+    overscan: 4,
+  });
 
   const handleSeeAllClick = () => {
     soundFX.playPop();
@@ -275,6 +285,51 @@ export function RecentAccountFeed({
             <Plus className="size-3.5 stroke-[2.5]" />
             <span>+ Log Transaction</span>
           </button>
+        </div>
+      ) : feedConfig.items.length > 20 ? (
+        /* Virtualized High-Density Feed (When transactions exceed 20 rows) */
+        <div
+          ref={virtualContainerRef}
+          className="max-h-[460px] overflow-y-auto pr-1 select-none scrollbar-thin scrollbar-thumb-stone-300 dark:scrollbar-thumb-stone-700"
+        >
+          <div
+            style={{
+              height: `${rowVirtualizer.getTotalSize()}px`,
+              width: "100%",
+              position: "relative",
+            }}
+          >
+            {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+              const tx = feedConfig.items[virtualRow.index];
+              if (!tx) return null;
+              return (
+                <div
+                  key={tx.id}
+                  data-index={virtualRow.index}
+                  ref={rowVirtualizer.measureElement}
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    transform: `translateY(${virtualRow.start}px)`,
+                  }}
+                  className="pb-1.5"
+                >
+                  <BelanjeTransactionRow
+                    tx={tx}
+                    category={categoryMap.get(tx.categoryId)}
+                    currencySymbol={currencySymbol}
+                    onInspect={onInspectTransaction}
+                    onEdit={onEditTransaction}
+                    onDuplicate={onDuplicateTransaction}
+                    onDelete={onDeleteTransaction}
+                    compact={true}
+                  />
+                </div>
+              );
+            })}
+          </div>
         </div>
       ) : (
         /* Render Belanje Squircles */

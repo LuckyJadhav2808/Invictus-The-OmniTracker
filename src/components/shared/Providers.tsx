@@ -17,6 +17,7 @@ import {
   hydrateQueryCacheFromIndexedDB,
   attachQueryCachePersister,
 } from "@/lib/offline/query-cache-persister";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 // Suppress React 19 false-positive script warning during development
 if (typeof window !== "undefined" && process.env.NODE_ENV === "development") {
@@ -112,8 +113,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
       }}
     >
       <AuthProvider>
-        <OfflineStatusBanner />
-        {children}
+        <NuqsAdapter>
+          <OfflineStatusBanner />
+          {children}
+        </NuqsAdapter>
         <Toaster
           position="top-center"
           expand={true}

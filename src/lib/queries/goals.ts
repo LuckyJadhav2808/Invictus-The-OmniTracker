@@ -4,6 +4,16 @@ import { type Habit, type HabitLog, type Streak, type HealthProfile, type WaterL
 import { calculateStreak, evaluateAutonomousStreakFreeze, isHabitScheduledOnDate } from "@/lib/utils/streaks";
 import { format } from "date-fns";
 import { executeOfflineMutation } from "@/lib/offline/offline-mutation";
+import { persistToIDB, getSyncFromCacheOrLocal } from "@/lib/offline/idb-storage";
+
+// Helpers for non-blocking IndexedDB & memory cache habit persistence
+const getLocalHabits = (): Habit[] => {
+  return getSyncFromCacheOrLocal<Habit[]>("invictus_habits", []);
+};
+
+const saveLocalHabits = (habits: Habit[]) => {
+  persistToIDB("invictus_habits", habits).catch(() => {});
+};
 
 const isGuestMode = (user?: any) => {
   if (user?.uid && user.uid !== "guest-user") return false;
@@ -19,8 +29,7 @@ export function useHabits() {
     queryKey: ["habits", user?.uid],
     queryFn: async () => {
       if (isGuestMode(user)) {
-        const local = localStorage.getItem("invictus_habits");
-        const list = local ? JSON.parse(local) : [];
+        const list = getLocalHabits();
         return list.filter((h: any) => !h.archived);
       }
       if (!user) return [];
@@ -45,8 +54,7 @@ export function useAddHabit() {
   return useMutation({
     mutationFn: async (habit: Omit<Habit, "id" | "archived" | "createdAt" | "updatedAt">) => {
       if (isGuestMode(user)) {
-        const local = localStorage.getItem("invictus_habits");
-        const list = local ? JSON.parse(local) : [];
+        const list = getLocalHabits();
         const newHabit = {
           ...habit,
           id: Math.random().toString(36).substring(2, 9),
@@ -55,7 +63,7 @@ export function useAddHabit() {
           updatedAt: new Date().toISOString(),
         } as unknown as Habit;
         list.push(newHabit);
-        localStorage.setItem("invictus_habits", JSON.stringify(list));
+        saveLocalHabits(list);
         return newHabit;
       }
 
@@ -72,7 +80,7 @@ export function useAddHabit() {
         getOptimisticResult: () => newHabitObj,
       });
     },
-    onSuccess: () => {
+    onSuccess: (newHabit) => {
       queryClient.invalidateQueries({ queryKey: ["habits"] });
       queryClient.invalidateQueries({ queryKey: ["habitLogs"] });
       queryClient.invalidateQueries({ queryKey: ["streaks"] });
@@ -88,12 +96,11 @@ export function useUpdateHabit() {
   return useMutation({
     mutationFn: async (habit: Partial<Habit> & { id: string }) => {
       if (isGuestMode(user)) {
-        const local = localStorage.getItem("invictus_habits");
-        const list = local ? JSON.parse(local) : [];
+        const list = getLocalHabits();
         const idx = list.findIndex((h: any) => h.id === habit.id);
         if (idx > -1) {
           list[idx] = { ...list[idx], ...habit, updatedAt: new Date().toISOString() };
-          localStorage.setItem("invictus_habits", JSON.stringify(list));
+          saveLocalHabits(list);
         }
         return habit;
       }
@@ -122,10 +129,9 @@ export function useDeleteHabit() {
   return useMutation({
     mutationFn: async (habitId: string) => {
       if (isGuestMode(user)) {
-        const local = localStorage.getItem("invictus_habits");
-        const list = local ? JSON.parse(local) : [];
+        const list = getLocalHabits();
         const filtered = list.filter((h: any) => h.id !== habitId);
-        localStorage.setItem("invictus_habits", JSON.stringify(filtered));
+        saveLocalHabits(filtered);
         return;
       }
 

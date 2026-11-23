@@ -10,6 +10,8 @@ import {
   Sparkles,
   CheckCircle2,
   ListTodo,
+  Plus,
+  Target,
 } from "lucide-react";
 import { type Habit, type HabitLog, type Streak } from "@/types";
 import { soundFX } from "@/components/shared/SoundFX";
@@ -39,6 +41,7 @@ export interface TodayChronologicalAgendaProps {
     priority?: "p1" | "p2" | "p3" | "p4";
     dueDate?: string;
     dueTime?: string;
+    completedAt?: string;
   }>;
   selectedDate: string;
   isToday: boolean;
@@ -167,13 +170,21 @@ export const TodayChronologicalAgenda = React.memo(function TodayChronologicalAg
       else workload.push(item);
     });
 
-    // 2. Active Tasks (Scheduled for selectedDate, or active P1 due today)
+    // 2. Active Tasks:
+    // - Explicitly scheduled for selectedDate
+    // - On today's view: overdue uncompleted tasks (so they aren't lost)
+    // - On today's view: unscheduled tasks (inbox / general)
     const relevantTasks = tasks.filter((t) => {
       if (t.dueDate) {
-        return t.dueDate === selectedDate;
+        if (t.dueDate === selectedDate) return true;
+        if (isToday && t.dueDate < selectedDate && t.status !== "completed") return true;
+        return false;
       }
-      // If task has no explicit due date, only show in Today's agenda if it is today and marked P1
-      return isToday && t.priority === "p1" && t.status !== "completed";
+      if (isToday) {
+        if (t.status !== "completed") return true;
+        if (!t.completedAt || t.completedAt.startsWith(selectedDate)) return true;
+      }
+      return false;
     });
 
     relevantTasks.forEach((t) => {
@@ -206,7 +217,7 @@ export const TodayChronologicalAgenda = React.memo(function TodayChronologicalAg
       totalCompleted: completed,
       totalTodo: todo,
     };
-  }, [habits, completedHabitIdSet, streaks, tasks, selectedDate]);
+  }, [habits, completedHabitIdSet, streaks, tasks, selectedDate, isToday]);
 
   // Filter helper
   const filterList = (items: AgendaItem[]) => {
@@ -396,112 +407,95 @@ export const TodayChronologicalAgenda = React.memo(function TodayChronologicalAg
       </div>
 
       {/* 2. SINGLE UNIFIED AGENDA CANVAS (Flowing Morning, Workload, Night) */}
-      <div className="space-y-4">
-        {/* SECTION 1: MORNING */}
-        <div>
-          <button
-            type="button"
-            onClick={() => toggleSection("morning")}
-            className="w-full flex items-center justify-between text-left py-1 text-xs font-heading font-black text-foreground cursor-pointer select-none group"
-          >
-            <div className="flex items-center gap-1.5">
-              {collapsedSections.morning ? (
-                <ChevronRight className="size-3.5 text-muted-foreground group-hover:text-foreground transition-transform" />
-              ) : (
-                <ChevronDown className="size-3.5 text-muted-foreground group-hover:text-foreground transition-transform" />
-              )}
-              <span className="font-heading font-black text-xs sm:text-sm text-foreground tracking-tight">
-                Morning
-              </span>
-            </div>
-            <span className="text-xs font-sans font-medium text-muted-foreground tabular-nums">
-              {morningItems.filter((i) => i.isCompleted).length}/{morningItems.length}
-            </span>
-          </button>
-
-          {!collapsedSections.morning && (
-            <div className="mt-1 divide-y divide-[#161514]/5 dark:divide-white/5">
-              {filteredMorning.length > 0 ? (
-                filteredMorning.map((item) => renderChecklistRow(item))
-              ) : (
-                <div className="py-2.5 px-3 text-xs font-sans font-medium text-muted-foreground/60 italic">
-                  {filter === "completed" ? "No morning items completed." : "Morning clear!"}
-                </div>
-              )}
-            </div>
-          )}
+      {totalAll === 0 ? (
+        <div className="py-7 px-4 text-center rounded-xl border border-dashed border-border bg-[#161514]/2 dark:bg-white/2 space-y-3">
+          <div className="size-10 rounded-xl bg-[#CEF431]/20 dark:bg-[#CEF431]/10 border border-[#CEF431]/40 flex items-center justify-center mx-auto text-[#161514] dark:text-[#CEF431]">
+            <Sparkles className="size-5" />
+          </div>
+          <div>
+            <h4 className="font-heading font-black text-xs sm:text-sm text-foreground">
+              Agenda completely clear
+            </h4>
+            <p className="text-xs text-muted-foreground mt-0.5 max-w-xs mx-auto">
+              No habits or tasks scheduled for today. Add an atomic habit or quick task to build momentum.
+            </p>
+          </div>
+          <div className="flex items-center justify-center gap-2 pt-1">
+            <button
+              type="button"
+              onClick={() => {
+                soundFX.playPop();
+                window.dispatchEvent(new CustomEvent("invictus:tasks-new-task"));
+              }}
+              className="px-3 py-1.5 rounded-lg text-xs font-heading font-black bg-[#161514] text-[#FAF8F5] dark:bg-[#CEF431] dark:text-[#161514] shadow-xs active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer"
+            >
+              <Plus className="size-3.5" />
+              <span>New Task</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                soundFX.playPop();
+                window.dispatchEvent(new CustomEvent("invictus:open-new-habit"));
+              }}
+              className="px-3 py-1.5 rounded-lg text-xs font-heading font-black bg-white dark:bg-[#201E1C] text-foreground border border-border shadow-xs active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer"
+            >
+              <Target className="size-3.5" />
+              <span>New Habit</span>
+            </button>
+          </div>
         </div>
+      ) : (
+        <div className="space-y-4">
+          {[
+            { key: "morning" as const, label: "Morning", items: morningItems, filtered: filteredMorning, emptyText: "Morning clear!" },
+            { key: "workload" as const, label: "Workload", items: workloadItems, filtered: filteredWorkload, emptyText: "Workload clear!" },
+            { key: "night" as const, label: "Night", items: nightItems, filtered: filteredNight, emptyText: "Night routine clear!" },
+          ].map((sec, idx) => {
+            const isCollapsed = collapsedSections[sec.key];
+            const completedCount = sec.items.filter((i) => i.isCompleted).length;
 
-        {/* SECTION 2: WORKLOAD */}
-        <div className="pt-2 border-t border-[#161514]/10 dark:border-white/10">
-          <button
-            type="button"
-            onClick={() => toggleSection("workload")}
-            className="w-full flex items-center justify-between text-left py-1 text-xs font-heading font-black text-foreground cursor-pointer select-none group"
-          >
-            <div className="flex items-center gap-1.5">
-              {collapsedSections.workload ? (
-                <ChevronRight className="size-3.5 text-muted-foreground group-hover:text-foreground transition-transform" />
-              ) : (
-                <ChevronDown className="size-3.5 text-muted-foreground group-hover:text-foreground transition-transform" />
-              )}
-              <span className="font-heading font-black text-xs sm:text-sm text-foreground tracking-tight">
-                Workload
-              </span>
-            </div>
-            <span className="text-xs font-sans font-medium text-muted-foreground tabular-nums">
-              {workloadItems.filter((i) => i.isCompleted).length}/{workloadItems.length}
-            </span>
-          </button>
+            return (
+              <div
+                key={sec.key}
+                className={idx > 0 ? "pt-2 border-t border-[#161514]/10 dark:border-white/10" : undefined}
+              >
+                <button
+                  type="button"
+                  onClick={() => toggleSection(sec.key)}
+                  className="w-full flex items-center justify-between text-left py-1 text-xs font-heading font-black text-foreground cursor-pointer select-none group"
+                >
+                  <div className="flex items-center gap-1.5">
+                    {isCollapsed ? (
+                      <ChevronRight className="size-3.5 text-muted-foreground group-hover:text-foreground transition-transform" />
+                    ) : (
+                      <ChevronDown className="size-3.5 text-muted-foreground group-hover:text-foreground transition-transform" />
+                    )}
+                    <span className="font-heading font-black text-xs sm:text-sm text-foreground tracking-tight">
+                      {sec.label}
+                    </span>
+                  </div>
+                  <span className="text-xs font-sans font-medium text-muted-foreground tabular-nums">
+                    {completedCount}/{sec.items.length}
+                  </span>
+                </button>
 
-          {!collapsedSections.workload && (
-            <div className="mt-1 divide-y divide-[#161514]/5 dark:divide-white/5">
-              {filteredWorkload.length > 0 ? (
-                filteredWorkload.map((item) => renderChecklistRow(item))
-              ) : (
-                <div className="py-2.5 px-3 text-xs font-sans font-medium text-muted-foreground/60 italic">
-                  {filter === "completed" ? "No workload items completed." : "Workload clear!"}
-                </div>
-              )}
-            </div>
-          )}
+                {!isCollapsed && (
+                  <div className="mt-1 divide-y divide-[#161514]/5 dark:divide-white/5">
+                    {sec.filtered.length > 0 ? (
+                      sec.filtered.map((item) => renderChecklistRow(item))
+                    ) : (
+                      <div className="py-2.5 px-3 text-xs font-sans font-medium text-muted-foreground/60 italic">
+                        {filter === "completed" ? `No ${sec.label.toLowerCase()} items completed.` : sec.emptyText}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
-
-        {/* SECTION 3: NIGHT */}
-        <div className="pt-2 border-t border-[#161514]/10 dark:border-white/10">
-          <button
-            type="button"
-            onClick={() => toggleSection("night")}
-            className="w-full flex items-center justify-between text-left py-1 text-xs font-heading font-black text-foreground cursor-pointer select-none group"
-          >
-            <div className="flex items-center gap-1.5">
-              {collapsedSections.night ? (
-                <ChevronRight className="size-3.5 text-muted-foreground group-hover:text-foreground transition-transform" />
-              ) : (
-                <ChevronDown className="size-3.5 text-muted-foreground group-hover:text-foreground transition-transform" />
-              )}
-              <span className="font-heading font-black text-xs sm:text-sm text-foreground tracking-tight">
-                Night
-              </span>
-            </div>
-            <span className="text-xs font-sans font-medium text-muted-foreground tabular-nums">
-              {nightItems.filter((i) => i.isCompleted).length}/{nightItems.length}
-            </span>
-          </button>
-
-          {!collapsedSections.night && (
-            <div className="mt-1 divide-y divide-[#161514]/5 dark:divide-white/5">
-              {filteredNight.length > 0 ? (
-                filteredNight.map((item) => renderChecklistRow(item))
-              ) : (
-                <div className="py-2.5 px-3 text-xs font-sans font-medium text-muted-foreground/60 italic">
-                  {filter === "completed" ? "No night items completed." : "Night routine clear!"}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
+      )}
     </div>
   );
 });
