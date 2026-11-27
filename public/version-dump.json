@@ -6,21 +6,21 @@
   "releaseDate": "November 27, 2026",
   "minSupportedVersion": "1.0.0",
   "git": {
-    "commitHash": "f1ad80976a7046fa651fd7c025a2e5a288512a1a",
-    "shortHash": "f1ad809",
+    "commitHash": "f738ebb75141e58711b8833313859d1266720b46",
+    "shortHash": "f738ebb",
     "branch": "main",
     "commitAuthor": "Lucky Manoj Jadhav",
-    "commitDate": "2026-11-23 19:57:55 +0530",
-    "commitMessage": "feat(core): virtualize ledger, wire nuqs back-button, add idb storage, and tactile UI suite"
+    "commitDate": "2026-11-27 18:10:04 +0530",
+    "commitMessage": "feat(v1.8.5): desktop diagonal flower, kokonut UI, ML Kit OCR, dual-engine SMS & event bridge"
   },
   "apk": {
     "exists": true,
-    "isVersionVerified": false,
-    "binaryVersion": "1.8.4",
+    "isVersionVerified": true,
+    "binaryVersion": "1.8.5",
     "fileName": "Invictus.apk",
-    "sha256": "aaccaaacafd8085b637e4dd54bba0a6589b72f707538c19ab80c37935378e8cf",
-    "sizeBytes": 4426638,
-    "sizeFormatted": "4.22 MB",
+    "sha256": "88faee98b6ef105b2ead6e5306fcfc77abc5a5f4d02812466806373b99e7026b",
+    "sizeBytes": 50320447,
+    "sizeFormatted": "47.99 MB",
     "directDownloadUrl": "https://invictus-the-omni-tracker.vercel.app/downloads/Invictus.apk",
     "githubReleaseAssetUrl": "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v1.8.5/Invictus.apk"
   },
@@ -41,6 +41,6 @@
     "nodeVersion": "v24.12.0",
     "platform": "win32",
     "arch": "x64",
-    "generatedAt": "2026-11-27T12:40:04.242Z"
+    "generatedAt": "2026-11-27T12:44:11.816Z"
   }
 }
