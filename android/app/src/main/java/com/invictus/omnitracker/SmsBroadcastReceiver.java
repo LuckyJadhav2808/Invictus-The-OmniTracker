@@ -37,9 +37,9 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
     private static final String DEFAULT_USER_ID = "user_1kapw9sad_1784744868999";
     private static final String SYNC_ENDPOINT = "https://invictus-the-omni-tracker.vercel.app/api/money/sms-webhook";
 
-    // 1. TRAI Approved Bank Headers (Pre-compiled Regex)
+    // 1. TRAI Approved Bank Headers (Pre-compiled Regex, supports DLT -S/-T/-P/-G suffixes & FinTechs)
     private static final Pattern BANK_HEADER_PATTERN = Pattern.compile(
-            "^(?:[A-Za-z]{2}[-_]?)?(HDFC(?:BK)?|SBI(?:NB|PSG|UPI|INB)?|ICICI(?:B)?|AXIS(?:BK)?|KOTAK(?:B)?|INDUS(?:B)?|YES(?:BNK)?|PNB(?:SMS)?|PUNJAB|BOI(?:SMS)?|CAN(?:BNK|ARA)?|UBI(?:SMS)?|UNION(?:B)?|IDFC(?:FB)?|FED(?:BNK)?|PAYTM(?:B)?|CRED(?:BK)?|CENT(?:BK)?|BOB(?:SMS)?|MAH(?:BK)?|IOB|UCO(?:BNK)?|RBL(?:BNK)?|AUFIN(?:B)?|BANDH(?:N)?|IDBI(?:BK)?|SC(?:ISMS)?|AMEX(?:IN)?|AIRTEL|JIO(?:BNK)?)(?:[-_][A-Za-z0-9]+)?$",
+            "^(?:[A-Za-z0-9]{2,4}[-_]?)?(HDFC(?:BK)?|SBI(?:NB|PSG|UPI|INB|TXN)?|ICICI(?:B)?|AXIS(?:BK)?|KOTAK(?:B)?|INDUS(?:B)?|YES(?:BNK)?|PNB(?:SMS|TXN)?|PUNJAB|BOI(?:SMS)?|CAN(?:BNK|ARA)?|UBI(?:SMS)?|UNION(?:B)?|IDFC(?:FB)?|FED(?:BNK)?|PAYTM(?:B)?|CRED(?:BK)?|CENT(?:BK)?|BOB(?:SMS|TXN)?|MAH(?:BK|A)?|IOB|UCO(?:BNK)?|RBL(?:BNK)?|AUFIN(?:B)?|BANDH(?:N)?|IDBI(?:BK)?|SC(?:ISMS)?|AMEX(?:IN)?|AIRTEL|JIO(?:BNK)?|PHONEPE|PHONEP|GPAY|GOOGLP|BHIM|NPCI|UPI|ONECRD|ONECARD|JUPITR|FIBANK|SLICE|TATANEU|AMZPAY|INDBNK|INDIANB|BHARATPE|RAZORPAY|CASHFREE)(?:[-_][A-Za-z0-9]+)*$",
             Pattern.CASE_INSENSITIVE
     );
 
@@ -107,12 +107,16 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                 return;
             }
 
-            // Step 1: TRAI Bank Sender Verification
-            if (!BANK_HEADER_PATTERN.matcher(sender.trim()).matches()) {
-                return; // Not an approved bank -> Drop immediately
-            }
-
             final String bodyText = fullBody.toString().replace("\n", " ").trim();
+
+            // Step 1: TRAI Bank Sender Verification OR defensive financial-context check
+            boolean isKnownSender = BANK_HEADER_PATTERN.matcher(sender.trim()).matches();
+            boolean hasFinancialContext = (bodyText.toLowerCase().contains("debited") || bodyText.toLowerCase().contains("spent") || bodyText.toLowerCase().contains("paid") || bodyText.toLowerCase().contains("payment"))
+                    && (bodyText.toUpperCase().contains("UPI") || bodyText.toUpperCase().contains("A/C") || bodyText.toUpperCase().contains("ACCT") || bodyText.toUpperCase().contains("CARD") || bodyText.toUpperCase().contains("RS") || bodyText.toUpperCase().contains("INR") || bodyText.contains("₹"));
+
+            if (!isKnownSender && !hasFinancialContext) {
+                return; // Not a financial SMS -> Drop immediately
+            }
 
             // Step 2: Strict Zero-Tolerance OTP Dropper
             if (OTP_PATTERN.matcher(bodyText).find()) {

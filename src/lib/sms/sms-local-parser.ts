@@ -27,8 +27,9 @@ export interface ParsedSmsTransaction {
 }
 
 import { fastHashSync } from "@/lib/crypto/fast-hash";
-// 1. TRAI Approved Indian Bank Alphanumeric Headers & Sender Patterns (Supports +91, FinTech, & All Banks)
-export const BANK_HEADER_REGEX = /^(?:[A-Za-z0-9]{2,4}[-_]?)?(HDFC(?:BK)?|SBI(?:NB|PSG|UPI|INB|TXN)?|ICICI(?:B)?|AXIS(?:BK)?|KOTAK(?:B)?|INDUS(?:B)?|YES(?:BNK)?|PNB(?:SMS|TXN)?|PUNJAB|BOI(?:SMS)?|CAN(?:BNK|ARA)?|UBI(?:SMS)?|UNION(?:B)?|IDFC(?:FB)?|FED(?:BNK)?|PAYTM(?:B)?|CRED(?:BK)?|CENT(?:BK)?|BOB(?:SMS|TXN)?|MAH(?:BK|A)?|IOB|UCO(?:BNK)?|RBL(?:BNK)?|AUFIN(?:B)?|BANDH(?:N)?|IDBI(?:BK)?|SC(?:ISMS)?|AMEX(?:IN)?|AIRTEL|JIO(?:BNK)?|PHONEPE|PHONEP|GPAY|GOOGLP|BHIM|NPCI|UPI|ONECRD|ONECARD|JUPITR|FIBANK|SLICEN|SLICE|NIYO|TATANEU|AMZPAY|INDBNK|INDIANB|BOMAH|CBIN|DBS|HSBC|CITI|KVB|SIB|CSB|BHARATPE|PINELAB|RAZORPAY|CASHFREE)(?:[-_][A-Za-z0-9]+)?$/i;
+import { getTransactionInfo } from "transaction-sms-parser";
+// 1. TRAI Approved Indian Bank Alphanumeric Headers & Sender Patterns (Supports +91, DLT -S/-T/-P/-G, FinTech, & All Banks)
+export const BANK_HEADER_REGEX = /^(?:[A-Za-z0-9]{2,4}[-_]?)?(HDFC(?:BK)?|SBI(?:NB|PSG|UPI|INB|TXN)?|ICICI(?:B)?|AXIS(?:BK)?|KOTAK(?:B)?|INDUS(?:B)?|YES(?:BNK)?|PNB(?:SMS|TXN)?|PUNJAB|BOI(?:SMS)?|CAN(?:BNK|ARA)?|UBI(?:SMS)?|UNION(?:B)?|IDFC(?:FB)?|FED(?:BNK)?|PAYTM(?:B)?|CRED(?:BK)?|CENT(?:BK)?|BOB(?:SMS|TXN)?|MAH(?:BK|A)?|IOB|UCO(?:BNK)?|RBL(?:BNK)?|AUFIN(?:B)?|BANDH(?:N)?|IDBI(?:BK)?|SC(?:ISMS)?|AMEX(?:IN)?|AIRTEL|JIO(?:BNK)?|PHONEPE|PHONEP|GPAY|GOOGLP|BHIM|NPCI|UPI|ONECRD|ONECARD|JUPITR|FIBANK|SLICEN|SLICE|NIYO|TATANEU|AMZPAY|INDBNK|INDIANB|BOMAH|CBIN|DBS|HSBC|CITI|KVB|SIB|CSB|BHARATPE|PINELAB|RAZORPAY|CASHFREE)(?:[-_][A-Za-z0-9]+)*$/i;
 
 // 2. Strict Zero-Tolerance OTP / Secret Token Dropper
 export const OTP_REGEX = /\b(otp|one time password|verification code|secret code|cvv|atm pin|upi pin|password|passcode)\b/i;
@@ -45,8 +46,8 @@ export const BALANCE_STRIPPER_REGEX = /(?:\.|\s)*(?:Avl\s*Bal|Avail\s*Bal|Availa
 // 6. Spend & Debit Intent Verification (Broadened to include debit of, transferred from, txn of, payment of)
 export const DEBIT_INTENT_REGEX = /\b(debited|debit|spent|paid|sent|withdrawn|purchase|deducted|transfer to|transferred to|transferred from|transferred|payment to|payment of|txn of|transaction of|charged|auto[- ]?debit)\b/i;
 
-// 7. Amount Pattern (Supports INR, Rs, Re, ₹, with commas and decimals)
-export const AMOUNT_REGEX = /(?:(?:Rs\.?|Re\.?|INR|₹)\s*([\d,]+(?:\.\d{1,2})?))|(?:debited\s*(?:by|with|for)?|spent|paid|sent)\s*(?:Rs\.?|Re\.?|INR|₹)?\s*([\d,]+(?:\.\d{1,2})?)/i;
+// 7. Amount Pattern (Supports INR, Rs, Re, ₹, and action verbs with commas/decimals)
+export const AMOUNT_REGEX = /(?:(?:Rs\.?|Re\.?|INR|₹)\s*([\d,]+(?:\.\d{1,2})?))|(?:debited\s*(?:by|with|for)?|spent|paid|sent|payment\s+of|txn\s+of|transaction\s+of|transfer\s+of|deducted|amt[:\s]*)\s*(?:Rs\.?|Re\.?|INR|₹)?\s*([\d,]+(?:\.\d{1,2})?)/i;
 
 // 8. Masked Account Pattern (e.g. A/c X3866, Card ending 4321, Acct XX9012)
 export const ACCOUNT_MASKED_REGEX = /(?:A\/c|acct|acc|card|ending|vpa|xx|\*{2,})\s*([xX*]*(\d{4}))/i;
@@ -316,30 +317,48 @@ export function parseBankSms(
   // Rule 5: Strip Available Balance Clauses BEFORE Amount Extraction!
   const textWithoutBalance = bodyText.replace(BALANCE_STRIPPER_REGEX, "").trim();
 
-  // Rule 6: Amount Extraction
-  const amountMatch = textWithoutBalance.match(AMOUNT_REGEX);
-  if (!amountMatch) {
+  // Run transaction-sms-parser as secondary/enrichment engine
+  let tspInfo: ReturnType<typeof getTransactionInfo> | null = null;
+  try {
+    tspInfo = getTransactionInfo(bodyText);
+  } catch {
+    tspInfo = null;
+  }
+
+  // Respect strict outflow policy if transaction-sms-parser explicitly detected a pure credit without debit
+  if (tspInfo?.transaction?.type === "credit" && !hasDebitIntent) {
     return null;
   }
 
-  const rawAmountStr = amountMatch[1] || amountMatch[2];
-  if (!rawAmountStr) return null;
+  // Rule 6: Amount Extraction (Primary Engine A, fallback to Engine B transaction-sms-parser)
+  const amountMatch = textWithoutBalance.match(AMOUNT_REGEX);
+  const rawAmountStr = amountMatch ? amountMatch[1] || amountMatch[2] : null;
+  let cleanAmount = rawAmountStr ? parseFloat(rawAmountStr.replace(/,/g, "")) : NaN;
 
-  const cleanAmount = parseFloat(rawAmountStr.replace(/,/g, ""));
+  if ((isNaN(cleanAmount) || cleanAmount <= 0) && tspInfo?.transaction?.amount) {
+    const tspParsedAmt = parseFloat(String(tspInfo.transaction.amount).replace(/,/g, ""));
+    if (!isNaN(tspParsedAmt) && tspParsedAmt > 0) {
+      cleanAmount = tspParsedAmt;
+    }
+  }
+
   if (isNaN(cleanAmount) || cleanAmount <= 0) return null;
 
-  // Rule 7: Masked Account Number
+  // Rule 7: Masked Account Number (Primary + transaction-sms-parser fallback)
   let accountMasked = "";
   const accMatch = bodyText.match(ACCOUNT_MASKED_REGEX);
   if (accMatch && accMatch[2]) {
     accountMasked = accMatch[2];
+  } else if (tspInfo?.account?.number) {
+    const digits = tspInfo.account.number.replace(/\D/g, "");
+    if (digits.length >= 4) accountMasked = digits.slice(-4);
   }
 
   // Rule 8: Payment Method Classification
   let paymentMethod: "UPI" | "Card" | "Bank" | "ATM" | "Cash" = "UPI";
   if (ATM_TOKEN_REGEX.test(bodyText)) {
     paymentMethod = "ATM";
-  } else if (CARD_TOKEN_REGEX.test(bodyText)) {
+  } else if (CARD_TOKEN_REGEX.test(bodyText) || tspInfo?.account?.type === "CARD") {
     paymentMethod = "Card";
   } else if (UPI_TOKEN_REGEX.test(bodyText)) {
     paymentMethod = "UPI";
@@ -347,15 +366,25 @@ export function parseBankSms(
     paymentMethod = "Bank";
   }
 
-  // Rule 9: Reference ID Extraction (e.g. thru UPI:693771418779)
+  // Rule 9: Reference ID Extraction (Primary + transaction-sms-parser fallback)
   let referenceId: string | undefined;
   const refMatch = bodyText.match(UPI_REF_REGEX);
   if (refMatch && refMatch[1]) {
     referenceId = refMatch[1];
+  } else if (tspInfo?.transaction?.referenceNo) {
+    referenceId = tspInfo.transaction.referenceNo;
   }
 
-  // Rule 10: Merchant / Beneficiary Extraction
-  const cleanMerchant = extractCleanMerchant(textWithoutBalance);
+  // Rule 10: Merchant / Beneficiary Extraction (Primary + transaction-sms-parser enrichment)
+  let cleanMerchant = extractCleanMerchant(textWithoutBalance);
+  if (
+    cleanMerchant === "UPI Payment" &&
+    tspInfo?.transaction?.merchant &&
+    tspInfo.transaction.merchant.trim().length >= 2 &&
+    !BLACKLIST_MERCHANTS_REGEX.test(tspInfo.transaction.merchant.trim())
+  ) {
+    cleanMerchant = tspInfo.transaction.merchant.trim();
+  }
 
   // Rule 11: Date & Time
   const { date, time } = extractDateAndTime(bodyText, timestampMs);

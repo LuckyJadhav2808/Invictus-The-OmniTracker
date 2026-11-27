@@ -187,6 +187,26 @@ export function findSynonymCategory(
   return null;
 }
 
+/**
+ * Finds a known semantic CategoryBlueprint matching a merchant/note string.
+ * Returns null if the merchant is unknown (e.g. a person's name), preventing
+ * accidental creation of categories named after individual merchants.
+ */
+export function findBlueprintForMerchant(merchantOrNote: string): CategoryBlueprint | null {
+  if (!merchantOrNote) return null;
+  const normalized = merchantOrNote.toLowerCase().trim();
+  for (const bp of Object.values(CATEGORY_BLUEPRINTS)) {
+    if (
+      bp.key.toLowerCase() === normalized ||
+      bp.name.toLowerCase() === normalized ||
+      bp.synonyms.some((s) => normalized.includes(s) || s.includes(normalized))
+    ) {
+      return bp;
+    }
+  }
+  return null;
+}
+
 export interface EnsureCategoryResult {
   category: Category;
   wasCreated: boolean;

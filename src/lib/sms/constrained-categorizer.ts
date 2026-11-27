@@ -11,7 +11,7 @@
 
 import { MerchantCategoryCache } from "./merchant-cache";
 import { detectCategoryFromNote } from "@/lib/utils/merchant-categorizer";
-import { ensureCategoryExists } from "./category-provisioner";
+import { ensureCategoryExists, findBlueprintForMerchant } from "./category-provisioner";
 import { type Category } from "@/types";
 
 export interface CategorizedMerchantResult {
@@ -85,9 +85,10 @@ export async function categorizeMerchants(
       };
       MerchantCategoryCache.set(merchant, match.categoryId, match.categoryName, false);
     } else {
-      // Check if any category blueprint matches the merchant token directly
-      const resolved = await resolveOrProvisionCategory(merchant);
-      if (resolved.category && resolved.category.id !== "cat-general") {
+      // Only auto-provision if merchant matches a KNOWN semantic blueprint (never create categories named after raw merchants/persons)
+      const blueprint = findBlueprintForMerchant(merchant);
+      if (blueprint && blueprint.key !== "cat-general") {
+        const resolved = await resolveOrProvisionCategory(blueprint.key);
         results[merchant] = {
           merchant,
           categoryId: resolved.category.id,

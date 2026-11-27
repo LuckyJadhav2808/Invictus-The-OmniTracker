@@ -97,7 +97,8 @@ function GoalsPageContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Subtab redirect handlers
+  // Subtab & deep-link action handlers
+  const actionParam = searchParams.get("action");
   useEffect(() => {
     if (tabParam === "gym") {
       router.replace("/goals/gym");
@@ -107,6 +108,13 @@ function GoalsPageContent() {
       router.replace("/goals/analytics");
     }
   }, [tabParam, router]);
+
+  useEffect(() => {
+    if (actionParam === "new-habit") setIsChoiceOpen(true);
+    else if (actionParam === "quick-meal") setIsQuickMealOpen(true);
+    else if (actionParam === "quick-workout") setIsQuickWorkoutOpen(true);
+    else if (actionParam === "water") setIsQuickWaterOpen(true);
+  }, [actionParam]);
 
   // Modal / Sheet visibility states
   const [isChoiceOpen, setIsChoiceOpen] = useState(false);

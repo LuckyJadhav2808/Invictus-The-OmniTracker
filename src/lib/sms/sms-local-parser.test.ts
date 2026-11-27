@@ -122,6 +122,18 @@ describe("Invictus Zero-Knowledge Local SMS Parser Engine", () => {
       expect(parsed?.paymentMethod).toBe("ATM");
       expect(parsed?.accountMasked).toBe("1122");
     });
+
+    it("should handle TRAI DLT suffixes and payment-of wording via dual-engine parser", () => {
+      const dltSms =
+        "Dear Customer, payment of 499.00 via UPI Ref 512345678901 to NETFLIX on 27-11-26 from A/c XX4321. Avl Bal Rs 12,000.-HDFC";
+      const parsed = parseBankSms(dltSms, "JD-HDFCBK-S");
+
+      expect(parsed).not.toBeNull();
+      expect(parsed?.amount).toBe(499.0);
+      expect(parsed?.merchant).toBe("NETFLIX");
+      expect(parsed?.accountMasked).toBe("4321");
+      expect(parsed?.bankName).toBe("HDFC");
+    });
   });
 
   describe("6. Deduplication Consistency (SHA-256 Idempotency)", () => {

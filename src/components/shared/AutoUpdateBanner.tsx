@@ -101,7 +101,7 @@ export function AutoUpdateBanner() {
         aria-live="polite"
         className="fixed z-50 pointer-events-none transition-all duration-300
           bottom-[calc(env(safe-area-inset-bottom,0px)+76px)] inset-x-3 max-w-sm mx-auto
-          lg:bottom-6 lg:right-6 lg:left-auto lg:inset-x-auto lg:max-w-md
+          lg:bottom-24 lg:right-6 lg:left-auto lg:inset-x-auto lg:max-w-md
           animate-in fade-in slide-in-from-bottom-4"
       >
         <div className="pointer-events-auto bg-[#CEF431] border-2 border-[#161514] rounded-2xl p-2.5 sm:p-3 shadow-[3px_3px_0px_#161514] lg:shadow-[4px_4px_0px_#161514] text-[#161514] select-none flex items-center justify-between gap-2.5 sm:gap-3">

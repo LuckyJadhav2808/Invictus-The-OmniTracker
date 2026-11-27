@@ -6,13 +6,20 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useAddTransaction, useCategories } from "@/lib/queries/money";
-import { useHabits, useHabitLogs, useToggleHabitLog, useStreaks } from "@/lib/queries/goals";
+import { useHabits, useHabitLogs, useToggleHabitLog, useStreaks, useWaterLog, useLogWater, useSetWater } from "@/lib/queries/goals";
+import { getPendingSmsTransactions } from "@/lib/sms/sms-sync-service";
 import { useUIStore } from "@/store/ui-store";
 import { detectCategoryFromNote } from "@/lib/utils/merchant-categorizer";
 import { cn } from "@/lib/utils";
 import { X, Check, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import dynamic from "next/dynamic";
+
+const QuickWaterModal = dynamic(
+  () => import("@/components/goals/QuickWaterModal").then((m) => m.QuickWaterModal),
+  { ssr: false }
+);
 
 const QUICK_PRESETS = [50, 100, 200, 500, 1000, 2000];
 
@@ -41,6 +48,7 @@ export function QuickActionModal() {
   const { selectedDate } = useUIStore();
 
   const [isOpen, setIsOpen] = useState(false);
+  const [isGlobalWaterOpen, setIsGlobalWaterOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"expense" | "habits">("expense");
   const [sessionLoggedCount, setSessionLoggedCount] = useState(0);
 
@@ -58,6 +66,10 @@ export function QuickActionModal() {
   const { data: logs = [] } = useHabitLogs(selectedDate);
   const { data: streaks = {} } = useStreaks();
   const toggleHabitMutation = useToggleHabitLog();
+  const activeDateStr = selectedDate || format(new Date(), "yyyy-MM-dd");
+  const { data: waterLog } = useWaterLog(activeDateStr);
+  const logWaterMutation = useLogWater();
+  const setWaterMutation = useSetWater();
 
   // Watch URL params & direct URL on mount/navigation
   useEffect(() => {
@@ -139,13 +151,117 @@ export function QuickActionModal() {
       setIsOpen(true);
     };
 
+    // Universal fallback bridge: ensures flower menu & subpage buttons work on EVERY route
+    const handleGlobalNewExpense = () => {
+      if (pathname !== "/today" && pathname !== "/money") {
+        setActiveTab("expense");
+        setIsOpen(true);
+      }
+    };
+    const handleGlobalWaterModal = () => {
+      if (pathname !== "/today" && pathname !== "/goals") {
+        setIsGlobalWaterOpen(true);
+      }
+    };
+    const handleGlobalNewHabit = () => {
+      if (pathname !== "/today" && pathname !== "/goals") {
+        router.push("/goals?action=new-habit");
+      }
+    };
+    const handleGlobalQuickMeal = () => {
+      if (pathname !== "/goals") {
+        router.push("/goals?action=quick-meal");
+      }
+    };
+    const handleGlobalQuickWorkout = () => {
+      if (pathname !== "/goals") {
+        router.push("/goals?action=quick-workout");
+      }
+    };
+    const handleGlobalNewTask = () => {
+      if (pathname !== "/today" && pathname !== "/tasks") {
+        router.push("/tasks?action=new-task");
+      }
+    };
+    const handleGlobalNewProject = () => {
+      if (pathname !== "/tasks") {
+        router.push("/tasks?action=new-project");
+      }
+    };
+    const handleGlobalMoneyExport = () => {
+      if (pathname !== "/money") router.push("/money?action=export");
+    };
+    const handleGlobalMoneySplit = () => {
+      if (pathname !== "/money") router.push("/money?action=split");
+    };
+    const handleGlobalMoneyLedger = () => {
+      if (pathname !== "/money") router.push("/money?action=ledger");
+    };
+    const handleGlobalMoneyNewCat = () => {
+      if (pathname !== "/money") router.push("/money?action=envelopes");
+    };
+
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("invictus:open-quick-actions", handleCustomOpen);
+    window.addEventListener("invictus:money-new-expense", handleGlobalNewExpense);
+    window.addEventListener("invictus:open-water-modal", handleGlobalWaterModal);
+    window.addEventListener("invictus:open-new-habit", handleGlobalNewHabit);
+    window.addEventListener("invictus:open-quick-meal", handleGlobalQuickMeal);
+    window.addEventListener("invictus:open-quick-workout", handleGlobalQuickWorkout);
+    window.addEventListener("invictus:tasks-new-task", handleGlobalNewTask);
+    window.addEventListener("invictus:tasks-new-project", handleGlobalNewProject);
+    window.addEventListener("invictus:money-export", handleGlobalMoneyExport);
+    window.addEventListener("invictus:money-split", handleGlobalMoneySplit);
+    window.addEventListener("invictus:money-open-ledger", handleGlobalMoneyLedger);
+    window.addEventListener("invictus:money-new-category", handleGlobalMoneyNewCat);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("invictus:open-quick-actions", handleCustomOpen);
+      window.removeEventListener("invictus:money-new-expense", handleGlobalNewExpense);
+      window.removeEventListener("invictus:open-water-modal", handleGlobalWaterModal);
+      window.removeEventListener("invictus:open-new-habit", handleGlobalNewHabit);
+      window.removeEventListener("invictus:open-quick-meal", handleGlobalQuickMeal);
+      window.removeEventListener("invictus:open-quick-workout", handleGlobalQuickWorkout);
+      window.removeEventListener("invictus:tasks-new-task", handleGlobalNewTask);
+      window.removeEventListener("invictus:tasks-new-project", handleGlobalNewProject);
+      window.removeEventListener("invictus:money-export", handleGlobalMoneyExport);
+      window.removeEventListener("invictus:money-split", handleGlobalMoneySplit);
+      window.removeEventListener("invictus:money-open-ledger", handleGlobalMoneyLedger);
+      window.removeEventListener("invictus:money-new-category", handleGlobalMoneyNewCat);
     };
-  }, []);
+  }, [pathname, router]);
+
+  // Global Pending Native SMS Prompt: alerts user on ANY page (e.g. Today) if a bank SMS is waiting
+  useEffect(() => {
+    if (pathname.startsWith("/money")) return;
+    let cancelled = false;
+    const checkPendingSms = async () => {
+      try {
+        const pending = await getPendingSmsTransactions();
+        if (!cancelled && pending.length > 0) {
+          const latest = pending[0];
+          const shownKey = `invictus_sms_prompted_${latest.dedupSignature}`;
+          if (sessionStorage.getItem(shownKey) === "1") return;
+          sessionStorage.setItem(shownKey, "1");
+          toast.info(`⚡ New SMS Expense: ₹${latest.amount.toLocaleString()} (${latest.merchant})`, {
+            description: `${pending.length} pending transaction${pending.length > 1 ? "s" : ""} ready to log`,
+            action: {
+              label: "Review",
+              onClick: () => router.push(`/money?pending_sms=1&sig=${encodeURIComponent(latest.dedupSignature)}`),
+            },
+          });
+        }
+      } catch {}
+    };
+    const timer = setTimeout(checkPendingSms, 1200);
+    const onFocus = () => checkPendingSms();
+    window.addEventListener("focus", onFocus);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+      window.removeEventListener("focus", onFocus);
+    };
+  }, [pathname, router]);
 
   // Auto focus amount input on open
   useEffect(() => {
@@ -514,9 +630,30 @@ export function QuickActionModal() {
     </div>
   );
 
+  const globalWaterModal = (
+    <QuickWaterModal
+      open={isGlobalWaterOpen}
+      onOpenChange={setIsGlobalWaterOpen}
+      currentAmount={waterLog?.amount || 0}
+      targetAmount={2000}
+      onLogWater={(delta) => {
+        logWaterMutation.mutate({ date: activeDateStr, amount: delta });
+      }}
+      onSetTarget={(targetMl) => {
+        setWaterMutation.mutate({
+          date: activeDateStr,
+          amount: waterLog?.amount || 0,
+          waterGoal: targetMl,
+        });
+      }}
+    />
+  );
+
   if (isDesktop) {
     return (
-      <Dialog open={isOpen} onOpenChange={(open) => { if (!open) handleClose(); else setIsOpen(true); }}>
+      <>
+        {globalWaterModal}
+        <Dialog open={isOpen} onOpenChange={(open) => { if (!open) handleClose(); else setIsOpen(true); }}>
         <DialogContent
           showCloseButton={false}
           className="sm:max-w-[480px] bg-white dark:bg-[#1C1A18] rounded-2xl p-0 border border-[#E8E5DF] dark:border-[#383531] shadow-2xl overflow-hidden"
@@ -550,11 +687,14 @@ export function QuickActionModal() {
           <div className="p-5">{modalBody}</div>
         </DialogContent>
       </Dialog>
+      </>
     );
   }
 
   return (
-    <Sheet open={isOpen} onOpenChange={(open) => { if (!open) handleClose(); else setIsOpen(true); }}>
+    <>
+      {globalWaterModal}
+      <Sheet open={isOpen} onOpenChange={(open) => { if (!open) handleClose(); else setIsOpen(true); }}>
       <SheetContent
         side="bottom"
         showCloseButton={false}
@@ -591,5 +731,6 @@ export function QuickActionModal() {
         {modalBody}
       </SheetContent>
     </Sheet>
+    </>
   );
 }

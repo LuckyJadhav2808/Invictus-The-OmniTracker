@@ -225,10 +225,18 @@ function MoneyPageContent() {
     }
   };
 
-  // Handle deep-link action triggers (e.g., from quick-action menu or widgets)
+  // Handle deep-link action triggers (e.g., from quick-action menu, subpages, or widgets)
   useEffect(() => {
-    if (actionParam === "add_tx") {
+    if (actionParam === "add_tx" || actionParam === "new-expense" || actionParam === "add") {
       setIsAddTxOpen(true);
+    } else if (actionParam === "export") {
+      setIsExportModalOpen(true);
+    } else if (actionParam === "split") {
+      setIsWhoOwesWhoOpen(true);
+    } else if (actionParam === "ledger") {
+      setIsLedgerSheetOpen(true);
+    } else if (actionParam === "envelopes" || actionParam === "categories") {
+      setIsCategoryEnvelopesOpen(true);
     }
   }, [actionParam]);
 
@@ -965,6 +973,58 @@ function MoneyPageContent() {
       />
 
       <div className="px-3.5 space-y-3">
+        {/* ================= INSTANT MONEY ACTION BAR (Desktop & Mobile 1-Click Capture) ================= */}
+        <div className="flex items-center justify-between gap-2 flex-wrap pt-1">
+          <div className="flex items-center gap-2 min-w-0">
+            <h1 className="text-lg sm:text-xl font-heading font-black tracking-tight text-foreground">
+              Money &amp; Ledger
+            </h1>
+            <span className="hidden sm:inline-flex px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-secondary border border-border text-muted-foreground">
+              {monthlyStats.targetMonthLabel}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              type="button"
+              onClick={() => {
+                soundFX.playPop();
+                setEditingTx(null);
+                setTxModalMode("quick");
+                setIsAddTxOpen(true);
+              }}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#CEF431] hover:bg-[#d8fa4d] text-[#161514] text-xs font-heading font-black border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
+            >
+              <Plus className="size-3.5 stroke-[2.8]" />
+              <span>Log Expense</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                soundFX.playPop();
+                setIsWhoOwesWhoOpen(true);
+              }}
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white dark:bg-[#1C1A18] hover:bg-[#F1EFEA] dark:hover:bg-[#252321] text-foreground text-xs font-heading font-bold border border-border shadow-xs transition-all cursor-pointer"
+            >
+              <Users className="size-3.5 stroke-[2.2]" />
+              <span>Split / IOU</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                soundFX.playPop();
+                setIsLedgerSheetOpen(true);
+              }}
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white dark:bg-[#1C1A18] hover:bg-[#F1EFEA] dark:hover:bg-[#252321] text-foreground text-xs font-heading font-bold border border-border shadow-xs transition-all cursor-pointer"
+            >
+              <Receipt className="size-3.5 stroke-[2.2]" />
+              <span>Full Ledger</span>
+            </button>
+          </div>
+        </div>
+
         {/* ================= INSTANT 1-TAP PENDING SMS PAYMENT ALERT DOCK ================= */}
         <PendingSmsTransactionsBanner
           categories={categories}

@@ -1,46 +1,46 @@
 {
   "application": "Invictus Life OS & Omni-Tracker",
-  "version": "1.8.4",
-  "buildNumber": 35,
+  "version": "1.8.5",
+  "buildNumber": 36,
   "channel": "stable",
-  "releaseDate": "November 21, 2026",
+  "releaseDate": "November 27, 2026",
   "minSupportedVersion": "1.0.0",
   "git": {
-    "commitHash": "de51a10da37a120dbc7b02c29a36d17310948635",
-    "shortHash": "de51a10",
+    "commitHash": "f1ad80976a7046fa651fd7c025a2e5a288512a1a",
+    "shortHash": "f1ad809",
     "branch": "main",
     "commitAuthor": "Lucky Manoj Jadhav",
-    "commitDate": "2026-11-21 17:32:26 +0530",
-    "commitMessage": "chore(release): record fresh v1.8.4 commit telemetry in version dump"
+    "commitDate": "2026-11-23 19:57:55 +0530",
+    "commitMessage": "feat(core): virtualize ledger, wire nuqs back-button, add idb storage, and tactile UI suite"
   },
   "apk": {
     "exists": true,
-    "isVersionVerified": true,
+    "isVersionVerified": false,
     "binaryVersion": "1.8.4",
     "fileName": "Invictus.apk",
     "sha256": "aaccaaacafd8085b637e4dd54bba0a6589b72f707538c19ab80c37935378e8cf",
     "sizeBytes": 4426638,
     "sizeFormatted": "4.22 MB",
     "directDownloadUrl": "https://invictus-the-omni-tracker.vercel.app/downloads/Invictus.apk",
-    "githubReleaseAssetUrl": "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v1.8.4/Invictus.apk"
+    "githubReleaseAssetUrl": "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v1.8.5/Invictus.apk"
   },
   "changelog": [
-    "⚡ Ambient Quick-Expense Micro-Dialog Overhaul: Fixed dark mode keypad and habit chip contrast in native Android dialog with electric lime feedback, full theme adaptability, and OEM tint immunity",
-    "☁️ Cloud Webhook & Bi-Directional Offline Sync: Enabled direct structured expense ingestion in /api/money/sms-webhook with automatic MongoDB persistence and instant app-resume cache synchronization",
-    "🔔 Notification Logger & Android Quick Settings Tile: 1-tap persistent notification shade logger with live safe spend telemetry and native Quick Settings tile beside Wi-Fi & Bluetooth",
-    "💎 Space Header Stacking & Mini-Cockpit Polish: Solved profile dropdown z-index stacking over money card decks and streamlined mini-island sticky bars",
-    "🌅 Unified Daily Command Deck & Chronological Agenda: Streamlined Today cockpit with 7-day horizon scrubber, live Safe Spend pacing, and high-performance mobile runtime"
+    "🌸 Desktop Diagonal Flower Menu & Quick Actions: Added bottom-right 90° diagonal quick-action flower on desktop, top-level Money Log Expense CTA, and unified zero-scroll Transaction modal with sticky footer",
+    "💧 3D Physics Liquid Hydration & Flickable Spending Ring: Integrated Kokonut UI LiquidSlider with ||| L custom capacity menu and physics-driven SpendingRing with real MoM % deltas",
+    "📸 Native ML Kit & Spatial Receipt OCR: Wired @capacitor-mlkit/text-recognition for Android, Bradley-Roth adaptive thresholding, bounding-box row pairing, and chrono/fuse/compromise/currency parsing",
+    "💬 Dual-Engine Bank SMS & Category Fix: Wired transaction-sms-parser with TRAI DLT header support, global pending-SMS review toast, and eliminated junk merchant category creation",
+    "🔗 Universal Cross-Page Event Bridge: Fixed every Flower Menu petal and subpage action across Today, Habits, Tasks, Money, and all subroutes"
   ],
   "links": {
     "repoUrl": "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker",
     "latestReleaseUrl": "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/latest",
     "inAppDownloadUrl": "https://invictus-the-omni-tracker.vercel.app/downloads/Invictus.apk",
-    "githubAssetDownloadUrl": "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v1.8.4/Invictus.apk"
+    "githubAssetDownloadUrl": "https://github.com/LuckyJadhav2808/Invictus-The-OmniTracker/releases/download/v1.8.5/Invictus.apk"
   },
   "environment": {
     "nodeVersion": "v24.12.0",
     "platform": "win32",
     "arch": "x64",
-    "generatedAt": "2026-11-21T12:09:21.952Z"
+    "generatedAt": "2026-11-27T12:40:04.242Z"
   }
 }

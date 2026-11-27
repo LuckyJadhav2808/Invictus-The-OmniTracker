@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { soundFX } from "@/components/shared/SoundFX";
 import { toast } from "sonner";
 import { NumberTicker } from "@/components/ui/number-ticker";
+import LiquidSlider from "@/components/kokonutui/liquid-slider";
 
 export interface WaterTrackerProps {
   amount: number; // in ml
@@ -240,33 +241,84 @@ export function WaterTracker({
           </div>
         </div>
 
-        {/* Full-width Neobrutalist Reservoir Fluid Bar */}
-        <div className="space-y-1.5 pt-0.5">
-          <div className="h-4 w-full bg-secondary/80 rounded-full border-2 border-[#161514] dark:border-[#38332E] overflow-hidden p-[2px] relative">
-            <div
+        {/* Interactive 3D Physics Liquid Bottle Slider + ||| Custom Liters Button */}
+        <div className="space-y-2.5 pt-1">
+          <div className="flex items-start justify-center gap-2">
+            <LiquidSlider
+              value={Math.min(dailyTarget, Math.max(0, localAmount))}
+              min={0}
+              max={dailyTarget || 2000}
+              step={50}
+              unit="ml"
+              label="Drag Liquid or Tap Vessel"
+              onValueChange={(next) => {
+                const delta = next - localAmount;
+                if (delta !== 0) {
+                  setLocalAmount(next);
+                  setManualAmountInput(String(next));
+                  onLogWater(delta);
+                }
+              }}
+            />
+
+            <button
+              type="button"
+              onClick={() => {
+                soundFX.playPop();
+                setIsCustomTargetOpen((prev) => !prev);
+              }}
               className={cn(
-                "h-full rounded-full transition-all duration-500 ease-out relative",
-                isGoalMet
-                  ? "bg-[#03D26F]"
-                  : "bg-gradient-to-r from-sky-400 via-sky-500 to-cyan-400 dark:from-sky-500 dark:to-cyan-300"
+                "h-11 px-2.5 rounded-xl border-2 border-[#161514] dark:border-[#38332E] font-mono font-black text-xs flex items-center justify-center gap-1 transition-all shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer shrink-0",
+                isCustomTargetOpen
+                  ? "bg-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:text-[#161514]"
+                  : "bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] hover:bg-sky-50 dark:hover:bg-[#252321]"
               )}
-              style={{ width: `${Math.min(100, Math.max(0, percentage))}%` }}
+              title="Set bottle capacity (custom ml)"
             >
-              {/* Fluid specular top sheen */}
-              <div className="absolute top-0 inset-x-0 h-[1.5px] bg-white/40 rounded-full" />
-            </div>
+              <span className="tracking-tighter font-mono font-black text-sm">|||</span>
+              <span className="text-[10px] font-heading font-black">L</span>
+            </button>
           </div>
 
-          {/* Fluid Milestone Ticks */}
-          <div className="flex justify-between items-center text-[10px] font-mono text-muted-foreground/80 px-1 font-bold">
-            <span>0ml</span>
-            <span>{(dailyTarget * 0.25).toFixed(0)}ml</span>
-            <span>{(dailyTarget * 0.5).toFixed(0)}ml</span>
-            <span>{(dailyTarget * 0.75).toFixed(0)}ml</span>
-            <span className={isGoalMet ? "text-[#03D26F] font-black" : ""}>
-              {(dailyTarget / 1000).toFixed(1)}L
-            </span>
-          </div>
+          {isCustomTargetOpen && (
+            <form
+              onSubmit={handleSaveCustomTarget}
+              className="p-3 rounded-2xl bg-secondary/60 dark:bg-secondary/30 border-2 border-[#161514] dark:border-[#38332E] shadow-[2px_2px_0px_0px_#161514] space-y-2 animate-in fade-in zoom-in-95 duration-150"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-heading font-black uppercase tracking-wider text-foreground flex items-center gap-1.5">
+                  <Target className="size-3.5 text-sky-500" />
+                  <span>Daily Target Goal (ml)</span>
+                </span>
+                <span className="text-[10px] font-mono text-muted-foreground">
+                  {(dailyTarget / 1000).toFixed(1)}L
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="relative flex-1">
+                  <input
+                    type="number"
+                    min="500"
+                    step="100"
+                    max="10000"
+                    value={customTargetInput}
+                    onChange={(e) => setCustomTargetInput(e.target.value)}
+                    placeholder="Target in ml"
+                    className="w-full h-9 px-3 pr-9 bg-white dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#38332E] rounded-xl text-xs font-mono font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-[#CEF431]"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono text-muted-foreground font-bold">
+                    ml
+                  </span>
+                </div>
+                <button
+                  type="submit"
+                  className="h-9 px-4 bg-[#161514] dark:bg-[#CEF431] text-white dark:text-[#161514] border border-[#161514] rounded-xl text-xs font-heading font-black shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer"
+                >
+                  Set Goal
+                </button>
+              </div>
+            </form>
+          )}
         </div>
       </div>
 
@@ -378,82 +430,7 @@ export function WaterTracker({
         </button>
       </div>
 
-      {/* ================= 4. INLINE TARGET GOAL ADJUSTER (NO NESTED MODAL) ================= */}
-      <div className="p-3.5 rounded-2xl bg-secondary/50 border border-border space-y-2.5">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5">
-            <Target className="size-3.5 text-sky-500" />
-            <span className="text-[11px] font-heading font-black uppercase tracking-wider text-foreground">
-              Daily Target Goal
-            </span>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => {
-              soundFX.playPop();
-              setIsCustomTargetOpen(!isCustomTargetOpen);
-            }}
-            className="text-[11px] font-mono font-bold text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1 cursor-pointer"
-          >
-            <SlidersHorizontal className="size-3" />
-            <span>{isCustomTargetOpen ? "Presets" : "Custom"}</span>
-          </button>
-        </div>
-
-        {/* Preset Chips */}
-        {!isCustomTargetOpen ? (
-          <div className="grid grid-cols-4 gap-2">
-            {TARGET_PRESETS.map((t) => {
-              const active = dailyTarget === t;
-              return (
-                <button
-                  key={t}
-                  type="button"
-                  onClick={() => handleSelectTarget(t)}
-                  className={cn(
-                    "min-h-[38px] py-1.5 px-2 rounded-xl text-xs font-heading text-center flex items-center justify-center gap-1 transition-all cursor-pointer",
-                    active
-                      ? "bg-[#CEF431] text-[#161514] border-2 border-[#161514] font-black shadow-[1.5px_1.5px_0px_0px_#161514]"
-                      : "bg-white dark:bg-[#1C1A18] text-muted-foreground hover:text-foreground border border-border font-bold hover:bg-secondary"
-                  )}
-                >
-                  <span>{(t / 1000).toFixed(1)}L</span>
-                  {active && <Check className="size-3 stroke-[3]" />}
-                </button>
-              );
-            })}
-          </div>
-        ) : (
-          /* Inline Custom Target Goal Form */
-          <form onSubmit={handleSaveCustomTarget} className="flex items-center gap-2 pt-0.5">
-            <div className="relative flex-1">
-              <input
-                type="number"
-                min="500"
-                step="100"
-                max="10000"
-                value={customTargetInput}
-                onChange={(e) => setCustomTargetInput(e.target.value)}
-                placeholder="Target in ml"
-                className="w-full h-10 px-3 bg-white dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#38332E] rounded-xl text-xs font-mono font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-[#CEF431]"
-              />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono text-muted-foreground font-bold">
-                ml
-              </span>
-            </div>
-
-            <button
-              type="submit"
-              className="h-10 px-4 bg-[#161514] dark:bg-[#CEF431] text-white dark:text-[#161514] border border-[#161514] rounded-xl text-xs font-heading font-black shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer"
-            >
-              Set Goal
-            </button>
-          </form>
-        )}
-      </div>
-
-      {/* ================= 5. MANUAL VOLUME DIRECT OVERRIDE (COLLAPSIBLE) ================= */}
+      {/* ================= 4. MANUAL VOLUME DIRECT OVERRIDE (COLLAPSIBLE) ================= */}
       <div className="pt-0.5">
         {!isManualOverrideOpen ? (
           <button

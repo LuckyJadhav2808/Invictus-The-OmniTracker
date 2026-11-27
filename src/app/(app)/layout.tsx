@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/components/shared/AuthProvider";
 import { Sidebar } from "@/components/shared/Sidebar";
 import { BottomNav } from "@/components/shared/BottomNav";
+import { DesktopDiagonalFlowerMenu } from "@/components/shared/DesktopDiagonalFlowerMenu";
 import { GlobalAnnouncementBanner } from "@/components/shared/GlobalAnnouncementBanner";
 import { QuickActionModal } from "@/components/shared/QuickActionModal";
 import { OmniWidgetSync } from "@/components/shared/OmniWidgetSync";
@@ -169,6 +170,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* Mobile 5-Tab Persistent Navigation */}
       <BottomNav />
+
+      {/* Desktop Corner Diagonal Flower Quick Actions */}
+      <DesktopDiagonalFlowerMenu />
 
       {/* Bootloader Safe-Mode Circuit Breaker Recovery Dialog */}
       {safeModeActive && (

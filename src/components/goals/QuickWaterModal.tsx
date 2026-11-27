@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { AdaptiveDrawerDialog } from "@/components/shared/AdaptiveDrawerDialog";
 import { WATER_VESSELS, type VesselPreset } from "@/components/goals/WaterTracker";
-import { HorizontalWaterBottle } from "@/components/goals/HorizontalWaterBottle";
+import LiquidSlider from "@/components/kokonutui/liquid-slider";
 import { soundFX } from "@/components/shared/SoundFX";
 import { strobiToast } from "@/lib/utils/toasts";
 import { NumberTicker } from "@/components/ui/number-ticker";
@@ -27,10 +27,15 @@ export function QuickWaterModal({
   onSetTarget,
 }: QuickWaterModalProps) {
   const [localTarget, setLocalTarget] = useState(targetAmount || 1000);
+  const [isCustomCapacityOpen, setIsCustomCapacityOpen] = useState(false);
+  const [customLitersInput, setCustomLitersInput] = useState(
+    ((targetAmount || 1000) / 1000).toFixed(1)
+  );
 
   useEffect(() => {
     if (targetAmount) {
       setLocalTarget(targetAmount);
+      setCustomLitersInput((targetAmount / 1000).toFixed(1));
     }
   }, [targetAmount]);
 
@@ -92,13 +97,90 @@ export function QuickWaterModal({
           </span>
         </div>
 
-        {/* 1L Horizontal Water Bottle Progress Bar with ||| Custom L button */}
-        <HorizontalWaterBottle
-          currentAmount={currentAmount}
-          targetAmount={localTarget}
-          onSetTarget={handleUpdateTarget}
-          showCustomButton={true}
-        />
+        {/* Interactive 3D Physics Liquid Glass Slider + ||| Custom Liters Button */}
+        <div className="space-y-2">
+          <div className="flex items-start justify-center gap-2">
+            <LiquidSlider
+              value={Math.min(localTarget, Math.max(0, currentAmount))}
+              min={0}
+              max={localTarget || 1000}
+              step={50}
+              unit="ml"
+              label="Drag Glass to Log"
+              onValueChange={(next) => {
+                const delta = next - currentAmount;
+                if (delta !== 0) {
+                  onLogWater(delta);
+                }
+              }}
+            />
+
+            <button
+              type="button"
+              onClick={() => {
+                soundFX.playPop();
+                setIsCustomCapacityOpen((prev) => !prev);
+              }}
+              className={cn(
+                "h-11 px-2.5 rounded-xl border-2 border-[#161514] dark:border-[#38332E] font-mono font-black text-xs flex items-center justify-center gap-1 transition-all shadow-[2px_2px_0px_0px_#161514] dark:shadow-[2px_2px_0px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer shrink-0",
+                isCustomCapacityOpen
+                  ? "bg-[#161514] text-[#CEF431] dark:bg-[#CEF431] dark:text-[#161514]"
+                  : "bg-white dark:bg-[#1C1A18] text-[#161514] dark:text-[#FAF8F5] hover:bg-sky-50 dark:hover:bg-[#252321]"
+              )}
+              title="Set bottle capacity (custom Liters)"
+            >
+              <span className="tracking-tighter font-mono font-black text-sm">|||</span>
+              <span className="text-[10px] font-heading font-black">L</span>
+            </button>
+          </div>
+
+          {isCustomCapacityOpen && (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const parsedLiters = parseFloat(customLitersInput);
+                if (!isNaN(parsedLiters) && parsedLiters >= 0.5) {
+                  soundFX.playPop();
+                  handleUpdateTarget(Math.round(parsedLiters * 1000));
+                  setIsCustomCapacityOpen(false);
+                }
+              }}
+              className="p-3 bg-secondary/60 dark:bg-secondary/30 rounded-2xl border-2 border-[#161514] dark:border-[#38332E] shadow-[2px_2px_0px_0px_#161514] space-y-2 animate-in fade-in zoom-in-95 duration-150"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-heading font-black uppercase tracking-wider text-foreground">
+                  Bottle Capacity (Target L)
+                </span>
+                <span className="text-[10px] font-mono text-muted-foreground">
+                  Current: {(localTarget / 1000).toFixed(1)}L
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="relative flex-1">
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="0.5"
+                    max="10.0"
+                    value={customLitersInput}
+                    onChange={(e) => setCustomLitersInput(e.target.value)}
+                    placeholder="e.g. 2.5"
+                    className="w-full h-9 px-3 pr-8 bg-white dark:bg-[#1C1A18] border-2 border-[#161514] dark:border-[#38332E] rounded-xl text-xs font-mono font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-[#CEF431]"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono text-muted-foreground font-bold">
+                    L
+                  </span>
+                </div>
+                <button
+                  type="submit"
+                  className="h-9 px-3.5 bg-[#161514] dark:bg-[#CEF431] text-white dark:text-[#161514] border border-[#161514] rounded-xl text-xs font-heading font-black shadow-[1.5px_1.5px_0px_0px_#161514] active:translate-x-[0.5px] active:translate-y-[0.5px] active:shadow-none cursor-pointer"
+                >
+                  Set L
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
 
         {/* Remaining Telemetry */}
         <p className="text-center text-xs font-mono text-muted-foreground">

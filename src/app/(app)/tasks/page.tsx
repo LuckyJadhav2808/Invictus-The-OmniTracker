@@ -66,6 +66,15 @@ export default function TasksPage() {
 
   // Popstate history listener for native mobile back gestures + Flower Menu Listeners
   useEffect(() => {
+    const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+    const action = params?.get("action");
+    if (action === "new-task") {
+      setTaskToEdit(null);
+      setIsCreateModalOpen(true);
+    } else if (action === "new-project") {
+      setActivePortal("projects");
+    }
+
     const handlePopState = (e: PopStateEvent) => {
       if (activePortal !== "none") {
         setActivePortal("none");

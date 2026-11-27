@@ -24,6 +24,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import {
   parseRawOCRText,
+  reconstructVisualRowsFromBlocks,
   createEmptyTurboRows,
   TurboGridRow,
   ParsedExpenseItem,
@@ -253,8 +254,8 @@ export function BulkExpenseModal({
           const ctx = canvas.getContext("2d");
           if (!ctx) return resolve(dataUrl);
 
-          // Scale up 1.5x (up to 1200px max) for distinct font character boundaries
-          const scale = Math.min(2, Math.max(1.2, 1200 / Math.max(img.width, 1)));
+          // Scale up cleanly (up to 1600px max) for crisp font boundaries on thermal receipts & screenshots
+          const scale = Math.min(2.5, Math.max(1.5, 1600 / Math.max(img.width, 1)));
           canvas.width = Math.round(img.width * scale);
           canvas.height = Math.round(img.height * scale);
 
@@ -274,27 +275,60 @@ export function BulkExpenseModal({
           }
           const isDarkMode = (totalLuminance / (sampleCount || 1)) < 115;
 
-          // 2. Grayscale, invert dark mode, and boost contrast
-          const contrast = 1.35;
-          const factor = (259 * (contrast * 100 + 255)) / (255 * (259 - contrast * 100));
+          // 2. Grayscale + Dark Mode Inversion
+          const w = canvas.width;
+          const h = canvas.height;
+          const gray = new Uint8Array(w * h);
 
-          for (let i = 0; i < d.length; i += 4) {
+          for (let i = 0, p = 0; i < d.length; i += 4, p++) {
             let r = d[i];
             let g = d[i + 1];
             let b = d[i + 2];
-
             if (isDarkMode) {
               r = 255 - r;
               g = 255 - g;
               b = 255 - b;
             }
+            gray[p] = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+          }
 
-            const gray = 0.299 * r + 0.587 * g + 0.114 * b;
-            const adjusted = Math.min(255, Math.max(0, factor * (gray - 128) + 128));
+          // 3. Bradley-Roth Adaptive Local Thresholding (Integral Image)
+          // Handles uneven lighting, shadows, and creases on offline paper receipts
+          const integral = new Int32Array(w * h);
+          for (let y = 0; y < h; y++) {
+            let rowSum = 0;
+            const rowOffset = y * w;
+            for (let x = 0; x < w; x++) {
+              rowSum += gray[rowOffset + x];
+              integral[rowOffset + x] = (y > 0 ? integral[(y - 1) * w + x] : 0) + rowSum;
+            }
+          }
 
-            d[i] = adjusted;
-            d[i + 1] = adjusted;
-            d[i + 2] = adjusted;
+          const s = Math.max(16, Math.round(w / 18));
+          const halfS = Math.floor(s / 2);
+          const t = 0.12; // sensitivity (12% darker than local neighborhood = ink)
+
+          for (let y = 0; y < h; y++) {
+            const y1 = Math.max(0, y - halfS);
+            const y2 = Math.min(h - 1, y + halfS);
+            for (let x = 0; x < w; x++) {
+              const x1 = Math.max(0, x - halfS);
+              const x2 = Math.min(w - 1, x + halfS);
+              const count = (x2 - x1 + 1) * (y2 - y1 + 1);
+
+              const sum =
+                integral[y2 * w + x2] -
+                (y1 > 0 ? integral[(y1 - 1) * w + x2] : 0) -
+                (x1 > 0 ? integral[y2 * w + (x1 - 1)] : 0) +
+                (y1 > 0 && x1 > 0 ? integral[(y1 - 1) * w + (x1 - 1)] : 0);
+
+              const pixel = gray[y * w + x];
+              const bin = pixel * count < sum * (1 - t) ? 0 : 255;
+              const idx = (y * w + x) * 4;
+              d[idx] = bin;
+              d[idx + 1] = bin;
+              d[idx + 2] = bin;
+            }
           }
 
           ctx.putImageData(imgData, 0, 0);
@@ -324,30 +358,75 @@ export function BulkExpenseModal({
         setOcrStatusText("Optimizing image contrast & layout...");
 
         try {
-          // Preprocess: dark-mode inversion & contrast boost
+          // Preprocess: dark-mode inversion & Bradley-Roth adaptive thresholding
           const preprocessedUrl = await preprocessImageForOcr(dataUrl);
-          setOcrProgress(15);
-          setOcrStatusText("Initializing local OCR engine...");
+          setOcrProgress(20);
 
-          const { createWorker } = await import("tesseract.js");
+          let extractedText = "";
 
-          const worker = await createWorker("eng", 1, {
-            logger: (m) => {
-              if (m.status === "recognizing text") {
-                const pct = Math.round((m.progress || 0) * 100);
-                setOcrProgress(pct);
-                setOcrStatusText(`Scanning transactions (${pct}%)...`);
-              } else if (m.status === "loading language traineddata") {
-                setOcrStatusText("Loading language models...");
+          // Native Android/iOS Fast Path: Google ML Kit On-Device Text Recognition (~0KB JS, <150ms)
+          try {
+            const { Capacitor } = await import("@capacitor/core");
+            if (Capacitor.isNativePlatform()) {
+              setOcrStatusText("Running native ML Kit OCR...");
+              const { TextRecognition } = await import("@capacitor-mlkit/text-recognition");
+              const mlkitRes = await TextRecognition.processImage({ path: preprocessedUrl });
+              if (mlkitRes?.blocks?.length) {
+                const mappedBlocks = mlkitRes.blocks.map((b) => ({
+                  paragraphs: [
+                    {
+                      lines: (b.lines || []).map((l) => ({
+                        words: (l.elements || []).map((el) => ({
+                          text: el.text,
+                          bbox: {
+                            x0: el.boundingBox?.left ?? 0,
+                            y0: el.boundingBox?.top ?? 0,
+                            x1: el.boundingBox?.right ?? 0,
+                            y1: el.boundingBox?.bottom ?? 0,
+                          },
+                        })),
+                      })),
+                    },
+                  ],
+                }));
+                extractedText = reconstructVisualRowsFromBlocks(mappedBlocks) || mlkitRes.text || "";
+              } else if (mlkitRes?.text) {
+                extractedText = mlkitRes.text;
               }
-            },
-          });
+            }
+          } catch {
+            // Fall back transparently to local Tesseract.js engine on web or unsupported URI
+          }
 
-          setOcrStatusText("Extracting items...");
-          const result = await worker.recognize(preprocessedUrl);
-          await worker.terminate();
+          if (!extractedText) {
+            setOcrStatusText("Initializing local OCR engine...");
+            const { createWorker, PSM } = await import("tesseract.js");
 
-          const extractedText = result.data.text || "";
+            const worker = await createWorker("eng", 1, {
+              logger: (m) => {
+                if (m.status === "recognizing text") {
+                  const pct = Math.round((m.progress || 0) * 100);
+                  setOcrProgress(pct);
+                  setOcrStatusText(`Scanning transactions (${pct}%)...`);
+                } else if (m.status === "loading language traineddata") {
+                  setOcrStatusText("Loading language models...");
+                }
+              },
+            });
+
+            await worker.setParameters({
+              tessedit_pageseg_mode: PSM.AUTO,
+              preserve_interword_spaces: "1",
+            });
+
+            setOcrStatusText("Extracting items...");
+            const result = await worker.recognize(preprocessedUrl, {}, { blocks: true });
+            await worker.terminate();
+
+            const spatialText = reconstructVisualRowsFromBlocks(result.data.blocks);
+            extractedText = spatialText || result.data.text || "";
+          }
+
           setOcrProgress(100);
 
           const parsed = parseRawOCRText(extractedText, expenseCategories);

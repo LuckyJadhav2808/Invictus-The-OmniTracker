@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   User,
   LogOut,
+  Zap,
 } from "lucide-react";
 import { useUIStore } from "@/store/ui-store";
 import { cn } from "@/lib/utils";
@@ -82,6 +83,25 @@ function SidebarContent() {
         <div className="px-1.5 py-1">
           <InvictusLogo size="md" variant="full" href="/today" />
         </div>
+
+        {/* Desktop Sidebar Quick Capture CTA */}
+        <button
+          type="button"
+          onClick={() => {
+            if (typeof window !== "undefined") {
+              window.dispatchEvent(new CustomEvent("invictus:open-quick-actions"));
+            }
+          }}
+          className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-[#CEF431] hover:bg-[#d8fa4d] text-[#161514] border-2 border-[#161514] shadow-[2px_2px_0px_0px_#161514] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer select-none"
+        >
+          <span className="flex items-center gap-2 text-xs font-heading font-black">
+            <Zap className="size-3.5 fill-current stroke-[2.5]" />
+            <span>Quick Log</span>
+          </span>
+          <kbd className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-[#161514]/10 text-[#161514]">
+            ⌘K
+          </kbd>
+        </button>
 
         {/* Primary Navigation Spaces */}
         <div className="space-y-1.5">

@@ -2,11 +2,12 @@
 
 import { useMemo, useState } from "react";
 import { type Transaction, type Category } from "@/types";
-import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend, BarChart, Bar, XAxis, YAxis } from "recharts";
+import { ResponsiveContainer, Tooltip, Legend, BarChart, Bar, XAxis, YAxis } from "recharts";
 import { TrendingUp, Plus, BarChart2, Smartphone, Banknote, CreditCard, Store, PieChart as PieChartIcon } from "lucide-react";
 import { format, subMonths, parseISO } from "date-fns";
 import { cn } from "@/lib/utils";
 import { NeobrutalistSelect } from "@/components/shared/NeobrutalistSelect";
+import SpendingRing, { type SpendingCategory } from "@/components/kokonutui/spending-ring";
 
 interface AnalyticsTabViewProps {
   transactions: Transaction[];
@@ -123,6 +124,44 @@ export function AnalyticsTabView({
 
     return items.sort((a, b) => b.value - a.value);
   }, [scopedTransactions, categoryMap]);
+
+  // Interactive SpendingRing categories with month-over-month delta
+  const RING_STYLES = [
+    { stroke: "stroke-[#03D26F]", dot: "bg-[#03D26F]" },
+    { stroke: "stroke-sky-500 dark:stroke-sky-400", dot: "bg-sky-500 dark:bg-sky-400" },
+    { stroke: "stroke-amber-400 dark:stroke-amber-300", dot: "bg-amber-400 dark:bg-amber-300" },
+    { stroke: "stroke-purple-500 dark:stroke-purple-400", dot: "bg-purple-500 dark:bg-purple-400" },
+    { stroke: "stroke-rose-500 dark:stroke-rose-400", dot: "bg-rose-500 dark:bg-rose-400" },
+    { stroke: "stroke-zinc-500 dark:stroke-zinc-400", dot: "bg-zinc-500 dark:bg-zinc-400" },
+  ];
+
+  const spendingRingCategories: SpendingCategory[] = useMemo(() => {
+    const prevTotals = new Map<string, number>();
+    if (selectedMonth !== "all") {
+      try {
+        const prevMonthKey = format(subMonths(parseISO(`${selectedMonth}-01`), 1), "yyyy-MM");
+        transactions.forEach((tx) => {
+          if (tx.type === "expense" && tx.date?.startsWith(prevMonthKey)) {
+            const name = categoryMap.get(tx.categoryId)?.name || "Uncategorized";
+            prevTotals.set(name, (prevTotals.get(name) || 0) + Number(tx.amount || 0));
+          }
+        });
+      } catch {}
+    }
+
+    return expensePieData.map((item, idx) => {
+      const style = RING_STYLES[idx % RING_STYLES.length];
+      const prevAmt = prevTotals.get(item.name) || 0;
+      const change = prevAmt > 0 ? ((item.value - prevAmt) / prevAmt) * 100 : 0;
+      return {
+        name: item.name,
+        amount: item.value,
+        change,
+        stroke: style.stroke,
+        dot: style.dot,
+      };
+    });
+  }, [expensePieData, selectedMonth, transactions, categoryMap]);
 
   // 6-Month Rolling Income vs Expense Bar Chart Data
   const barChartData = useMemo(() => {
@@ -334,39 +373,18 @@ export function AnalyticsTabView({
         </div>
       </div>
 
-      {/* Expense Categories Share Donut */}
-      {expensePieData.length > 0 && (
-        <div className="bg-white dark:bg-[#161514] rounded-2xl p-5 sm:p-6 border border-[#E8E5DF] dark:border-[#2A2724] shadow-xs space-y-3 transition-colors">
-          <div className="flex items-center gap-2.5">
-            <span className="size-8 rounded-lg bg-[#F1EFEA] dark:bg-[#22201D] flex items-center justify-center text-[#161514] dark:text-[#FAF8F5] shrink-0 border border-[#E8E5DF] dark:border-[#2A2724]">
-              <PieChartIcon className="size-4 stroke-[1.5]" />
-            </span>
-            <h3 className="font-semibold text-[15px] text-[#161514] dark:text-[#FAF8F5] tracking-tight">
-              Expense Categories Share
-            </h3>
-          </div>
-          <div className="h-64 w-full flex items-center justify-center">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={expensePieData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={55}
-                  outerRadius={80}
-                  paddingAngle={4}
-                  dataKey="value"
-                >
-                  {expensePieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} stroke="transparent" />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(v) => [`${currencySymbol}${Number(v).toLocaleString()}`, "Spend"]} />
-                <Legend verticalAlign="bottom" height={36} />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+      {/* Interactive Physics Spending Ring (Kokonut UI) */}
+      {spendingRingCategories.length > 0 && (
+        <SpendingRing
+          title={
+            selectedMonth === "all"
+              ? "All-Time Category Spend"
+              : `${availableMonths.find((m) => m.key === selectedMonth)?.label || selectedMonth} Spend`
+          }
+          categories={spendingRingCategories}
+          currencySymbol={currencySymbol}
+          className="max-w-none"
+        />
       )}
 
       {/* 6-Month Income vs Expenses Comparison */}
